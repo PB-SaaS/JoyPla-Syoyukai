@@ -1,0 +1,59 @@
+{
+ "id": "deliver_rule10231439",
+ "envelope":  {
+  "id": "envelope_def10159119",
+  "name": "見積依頼完了",
+  "subject": "[JoyPla] %val:usr:requestUName%さんが見積依頼「%val:usr:requestTitle%」を作成しました",
+  "parts": 1,
+  "content_type": "text/plain; charset=iso-2022-jp",
+  "from_address": "#SMP_APP_MAIL_REPLACE#",
+  "from_name": "#SMP_APP_NAME_REPLACE#",
+  "application": "DirectEnv",
+  "message_list": [  {
+   "id": "message_def16061211",
+   "message_name": "de_10159119_[JoyPla] %val:usr:requestUName%さんが見積依頼「%val:usr:requestTitle%」を作成しました",
+   "content_type": "text/plain; charset=iso-2022-jp",
+   "swap_flg": false,
+   "application": "DirectEnv",
+   "contents": [   {
+    "content":     {
+     "id": "content_mst16068653",
+     "category":      {
+      "id": "category_mst25214",
+      "category_name": "DIRECT_ENV",
+      "public_flg": false,
+      "application": "DirectEnv"
+     },
+     "content_type": "text/plain; charset=iso-2022-jp",
+     "content_name": "de_10159119_[JoyPla] %val:usr:requestUName%さんが見積依頼「%val:usr:requestTitle%」を作成しました",
+     "application": "DirectEnv",
+     "body": "%val:usr:requestUName% 様\r\n\r\nJoyPla からお知らせです。\r\n\r\n新しい見積依頼が生成されました。\r\n\r\n【タイトル】%val:usr:requestTitle%\r\n\r\n※このメールへの返信は受け付けていません。"
+    },
+    "swap_flg": false
+   }]
+  }]
+ },
+ "list":  {
+  "id": "list_mst7913854",
+  "db": "NJ_QRequestDB",
+  "db_id": "db_mst104519",
+  "application": "List",
+  "del_err_auto_flg": false,
+  "n5_count": 3,
+  "n5_except_flg": false,
+  "reflect_stop_db_flg": false,
+  "list_name": "見積依頼",
+  "recipient_field": "mail",
+  "prefix": "様",
+  "domain_detect": "all"
+ },
+ "application": "thanks",
+ "ready_flg": true,
+ "url_secs_count": 31536000,
+ "url_secs_login": 2678400,
+ "night_stop_period": "1_2200_0700",
+ "attribute":  {
+  "form_id": "remote_mst140173",
+  "seq_order": 1
+ }
+}

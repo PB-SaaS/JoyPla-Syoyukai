@@ -1,0 +1,572 @@
+{
+ "id": "db_mst104565",
+ "name": "発注情報DB",
+ "title": "orderdataDB",
+ "comment": "",
+ "record_limit": "100",
+ "check_regist_auth_selected": [],
+ "type": "view_n",
+ "fieldList":  [
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_regist_date",
+   "title": "registrationTime",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "登録日時",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349740",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_date_ymdhhmmss",
+   "title": "orderTime",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "発注日時",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349741",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_date_ymdhhmmss",
+   "title": "receivingTime",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "入庫日時",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349742",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": true,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "orderNumber",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": true,
+   "index_flg": false,
+   "name": "発注履歴ID",
+   "not_null_flg": true,
+   "comment": "",
+   "id": "field_def2348980",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "hospitalId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "病院ID",
+   "not_null_flg": true,
+   "comment": "",
+   "id": "field_def2348869",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "divisionId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "部署ID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348896",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_integer",
+   "title": "itemsNumber",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "品目数",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349743",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_real",
+   "title": "totalAmount",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "合計金額",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349744",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "label":    {
+    "candidates": 7,
+    "idAry":     [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ],
+    "keywordAry":     [
+     "未発注",
+     "発注完了",
+     "受注完了",
+     "納期報告済",
+     "一部入庫完了",
+     "入庫完了",
+     "納品取消"
+    ]
+   },
+   "type": "mm_alternative",
+   "title": "orderStatus",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "ステータス",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349745",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "hachuRarrival",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "入荷状況",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349746",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "distributorId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "卸業者ID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348841",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "distributorName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "卸業者名",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349777",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "divisionName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "部署名",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349796",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "hospitalName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "病院名",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349802",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_zip_code",
+   "title": "postalCode",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "郵便番号",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349803",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_pref",
+   "title": "prefectures",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "都道府県",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349804",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "address",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "住所",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349805",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_phone",
+   "title": "phoneNumber",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "電話番号",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349806",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_phone",
+   "title": "faxNumber",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "FAX番号",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349807",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field64",
+   "title": "ordererUserName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "発注担当者氏名",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348994",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_area512",
+   "title": "ordercomment",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "特記事項",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349748",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_ezpassword",
+   "title": "orderAuthKey",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "発注履歴用変更削除キー",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349749",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "label":    {
+    "candidates": 2,
+    "idAry":     [
+     1,
+     2
+    ],
+    "keywordAry":     [
+     "大倉庫",
+     "発注部署"
+    ]
+   },
+   "type": "mm_alternative",
+   "title": "receivingTarget",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "入庫先カスタマイズ",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349813",
+   "set_default": null
+  }
+ ],
+ "real_db_id": "db_mst104534",
+ "view_fields":  [
+    {
+   "real_db_id": "db_mst104534",
+   "field": "distributorId"
+  },
+    {
+   "real_db_id": "db_mst104534",
+   "field": "hospitalId"
+  },
+    {
+   "real_db_id": "db_mst104534",
+   "field": "divisionId"
+  },
+    {
+   "real_db_id": "db_mst104534",
+   "field": "orderNumber"
+  },
+    {
+   "real_db_id": "db_mst104534",
+   "field": "ordererUserName"
+  },
+    {
+   "real_db_id": "db_mst104534",
+   "field": "registrationTime"
+  },
+    {
+   "real_db_id": "db_mst104534",
+   "field": "orderTime"
+  },
+    {
+   "real_db_id": "db_mst104534",
+   "field": "receivingTime"
+  },
+    {
+   "real_db_id": "db_mst104534",
+   "field": "itemsNumber"
+  },
+    {
+   "real_db_id": "db_mst104534",
+   "field": "totalAmount"
+  },
+    {
+   "real_db_id": "db_mst104534",
+   "field": "orderStatus"
+  },
+    {
+   "real_db_id": "db_mst104534",
+   "field": "hachuRarrival"
+  },
+    {
+   "real_db_id": "db_mst104534",
+   "field": "ordercomment"
+  },
+    {
+   "real_db_id": "db_mst104534",
+   "field": "orderAuthKey"
+  },
+    {
+   "real_db_id": "db_mst104539",
+   "field": "distributorName"
+  },
+    {
+   "real_db_id": "db_mst104541",
+   "field": "divisionName"
+  },
+    {
+   "real_db_id": "db_mst104542",
+   "field": "hospitalName"
+  },
+    {
+   "real_db_id": "db_mst104542",
+   "field": "postalCode"
+  },
+    {
+   "real_db_id": "db_mst104542",
+   "field": "prefectures"
+  },
+    {
+   "real_db_id": "db_mst104542",
+   "field": "address"
+  },
+    {
+   "real_db_id": "db_mst104542",
+   "field": "phoneNumber"
+  },
+    {
+   "real_db_id": "db_mst104542",
+   "field": "faxNumber"
+  },
+    {
+   "real_db_id": "db_mst104542",
+   "field": "receivingTarget"
+  }
+ ],
+ "view_constraints":  [
+    {
+   "db_left_id": "db_mst104534",
+   "db_right_id": "db_mst104539",
+   "constraint_id": "NJ_OrderHDB_NJ_distributorDB",
+   "join_type": "LEFT OUTER JOIN"
+  },
+    {
+   "db_left_id": "db_mst104534",
+   "db_right_id": "db_mst104541",
+   "constraint_id": "NJ_OrderHDB_NJ_divisionDB",
+   "join_type": "LEFT OUTER JOIN"
+  },
+    {
+   "db_left_id": "db_mst104534",
+   "db_right_id": "db_mst104542",
+   "constraint_id": "NJ_OrderHDB_NJ_HospitalDB",
+   "join_type": "LEFT OUTER JOIN"
+  }
+ ]
+}

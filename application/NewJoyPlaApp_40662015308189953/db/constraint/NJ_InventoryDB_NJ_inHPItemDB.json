@@ -1,0 +1,13 @@
+{
+ "right_field": "inHospitalItemId",
+ "right_db_id": "db_mst104537",
+ "strength": 50,
+ "right_db": "NJ_inHPItemDB",
+ "left_field": "inHospitalItemId",
+ "mstOnInsertCascade": 0,
+ "left_db_id": "db_mst104526",
+ "comment": "",
+ "id": "constraint_mst10526",
+ "left_db": "NJ_InventoryDB",
+ "mstOnDeleteCascade": false
+}

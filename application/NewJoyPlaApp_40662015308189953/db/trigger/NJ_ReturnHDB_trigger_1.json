@@ -1,0 +1,26 @@
+{
+ "trigger_id": "trigger_mst24518",
+ "db_id": "db_mst104520",
+ "seq_order": 1,
+ "event": "UPDATE",
+ "type": "ref",
+ "name": "IDºË∆¿",
+ "comment": "",
+ "ref_db_id": "db_mst104531",
+ "trigger_input_null": 10,
+ "many_record": 20,
+ "many_record_order_by_field": "id",
+ "many_record_sort": "ASC",
+ "zero_record": 10,
+ "condition_list": [],
+ "mapping_list":  [
+    {
+   "ref_field": "divisionId",
+   "trigger_field": "divisionId"
+  },
+    {
+   "ref_field": "orderHistoryId",
+   "trigger_field": "orderHistoryId"
+  }
+ ]
+}

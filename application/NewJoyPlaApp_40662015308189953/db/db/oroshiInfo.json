@@ -1,0 +1,427 @@
+{
+ "id": "db_mst104554",
+ "name": "卸業者情報",
+ "title": "oroshiInfo",
+ "comment": "",
+ "record_limit": "30",
+ "check_regist_auth_selected": [],
+ "type": "view_n",
+ "fieldList":  [
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_regist_date",
+   "title": "registrationTime",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "登録日時",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349784",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_date_ymdhhmmss",
+   "title": "updateTime",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "更新日時",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349785",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": "autoval_mm_ezpassword,f%09d,alnum,16,force",
+   "_interface_field_id": 0,
+   "type": "mm_ezpassword",
+   "title": "authKey",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "変更削除キー",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349786",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "distributorId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "卸業者ID",
+   "not_null_flg": true,
+   "comment": "",
+   "id": "field_def2348841",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "label":    {
+    "candidates": 2,
+    "idAry":     [
+     1,
+     2
+    ],
+    "keywordAry":     [
+     "卸管理者",
+     "卸担当者"
+    ]
+   },
+   "type": "mm_alternative",
+   "title": "userPermission",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "ユーザー権限",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349788",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": true,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "loginId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": true,
+   "index_flg": false,
+   "name": "ログインID",
+   "not_null_flg": true,
+   "comment": "",
+   "id": "field_def2349789",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_digest_sha256",
+   "title": "loginPassword",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "ログインパスワード",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349790",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field64",
+   "title": "name",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "氏名",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349791",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_address_katakana",
+   "title": "nameKana",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "氏名（カナ）",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349792",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": true,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_email_nc",
+   "title": "mailAddress",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "メールアドレス",
+   "not_null_flg": true,
+   "comment": "",
+   "id": "field_def2349793",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_area256",
+   "title": "remarks",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "備考",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349794",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "hospitalId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "病院ID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348869",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "distributorName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "卸業者名",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349777",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_zip_code",
+   "title": "postalCode",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "郵便番号",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349778",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_pref",
+   "title": "prefectures",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "都道府県",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349779",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "address",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "住所",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349780",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_phone",
+   "title": "phoneNumber",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "電話番号",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349781",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_phone",
+   "title": "faxNumber",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "FAX番号",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349782",
+   "set_default": null
+  }
+ ],
+ "real_db_id": "db_mst104540",
+ "view_fields":  [
+    {
+   "real_db_id": "db_mst104539",
+   "field": "distributorName"
+  },
+    {
+   "real_db_id": "db_mst104539",
+   "field": "postalCode"
+  },
+    {
+   "real_db_id": "db_mst104539",
+   "field": "prefectures"
+  },
+    {
+   "real_db_id": "db_mst104539",
+   "field": "address"
+  },
+    {
+   "real_db_id": "db_mst104539",
+   "field": "phoneNumber"
+  },
+    {
+   "real_db_id": "db_mst104539",
+   "field": "faxNumber"
+  },
+    {
+   "real_db_id": "db_mst104540",
+   "field": "distributorId"
+  },
+    {
+   "real_db_id": "db_mst104540",
+   "field": "hospitalId"
+  },
+    {
+   "real_db_id": "db_mst104540",
+   "field": "registrationTime"
+  },
+    {
+   "real_db_id": "db_mst104540",
+   "field": "updateTime"
+  },
+    {
+   "real_db_id": "db_mst104540",
+   "field": "authKey"
+  },
+    {
+   "real_db_id": "db_mst104540",
+   "field": "userPermission"
+  },
+    {
+   "real_db_id": "db_mst104540",
+   "field": "loginId"
+  },
+    {
+   "real_db_id": "db_mst104540",
+   "field": "loginPassword"
+  },
+    {
+   "real_db_id": "db_mst104540",
+   "field": "name"
+  },
+    {
+   "real_db_id": "db_mst104540",
+   "field": "nameKana"
+  },
+    {
+   "real_db_id": "db_mst104540",
+   "field": "mailAddress"
+  },
+    {
+   "real_db_id": "db_mst104540",
+   "field": "remarks"
+  }
+ ],
+ "view_constraints": [ {
+  "db_left_id": "db_mst104540",
+  "db_right_id": "db_mst104539",
+  "constraint_id": "NJ_OUserDB_NJ_distributorDB",
+  "join_type": "LEFT OUTER JOIN"
+ }]
+}

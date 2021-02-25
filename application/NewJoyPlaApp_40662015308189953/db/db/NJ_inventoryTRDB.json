@@ -1,0 +1,229 @@
+{
+ "id": "db_mst104548",
+ "name": "NJ_ºß¸Ë´ÉÍýTRDB",
+ "title": "NJ_inventoryTRDB",
+ "comment": "",
+ "record_limit": "0",
+ "check_regist_auth_selected": [],
+ "type": "transaction",
+ "fieldList":  [
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_regist_date",
+   "title": "registrationTime",
+   "radio_flg": false,
+   "app_role": "transaction.regist_date",
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "TRDB_ÅÐÏ¿Æü»þ",
+   "not_null_flg": true,
+   "not_deletable": true,
+   "comment": "",
+   "id": "field_def2349854",
+   "set_default": "now"
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "divisionId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": true,
+   "name": "Éô½ðID",
+   "not_null_flg": true,
+   "comment": "",
+   "id": "field_def2348896",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "inHospitalItemId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": true,
+   "name": "±¡Æâ¾¦ÉÊID",
+   "not_null_flg": true,
+   "comment": "",
+   "id": "field_def2348899",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_integer",
+   "title": "count",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "¸Ä¿ô(Æþ¿ô¸Ä)",
+   "not_null_flg": true,
+   "comment": "",
+   "id": "field_def2349855",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "hospitalId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "ÉÂ±¡ID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348869",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_integer",
+   "title": "orderWithinCount",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "È¯ÃíÃæ¸Ä¿ô(Æþ¿ô¸Ä)",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349856",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "label":    {
+    "candidates": 5,
+    "idAry":     [
+     1,
+     2,
+     3,
+     4,
+     5
+    ],
+    "keywordAry":     [
+     "ÊªÉÊÀÁµá",
+     "È¯Ãí",
+     "Æþ¸Ë",
+     "Ê§½Ð¸µ",
+     "Ê§½ÐÀè"
+    ]
+   },
+   "type": "mm_alternative",
+   "title": "pattern",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "¥Ñ¥¿¡¼¥ó",
+   "not_null_flg": false,
+   "comment": "1\tÊªÉÊÀÁµá¡¡-\r\n2\tÈ¯Ãí +\r\n3\tÆþ¸Ë -\r\n4\tÊ§½Ð¸µ -\r\n5\tÊ§½ÐÀè +",
+   "id": "field_def2349857",
+   "set_default": null
+  }
+ ],
+ "action_list":  [
+    {
+   "actionName": "²Ã»»",
+   "db": "NJ_inventoryTRDB",
+   "db_id": "db_mst104548",
+   "tgt_db_id": "db_mst104532",
+   "execCondition": 0,
+   "command": "upsert",
+   "commandCase": 3354675,
+   "trdb_search_field": "inHospitalItemId",
+   "tgt_search_field": "inHospitalItemId",
+   "trdb_search_field2": "divisionId",
+   "tgt_search_field2": "divisionId",
+   "field_mapping":    [
+        {
+     "left_field": "hospitalId",
+     "right_field": "hospitalId",
+     "allowNullUpdate": "false"
+    },
+        {
+     "operator": "+=",
+     "left_field": "orderWithinCount",
+     "right_field": "orderWithinCount",
+     "allowNullUpdate": "false"
+    },
+        {
+     "left_field": "inHospitalItemId",
+     "right_field": "inHospitalItemId",
+     "allowNullUpdate": "false"
+    },
+        {
+     "operator": "+=",
+     "left_field": "count",
+     "right_field": "stockQuantity",
+     "allowNullUpdate": "false"
+    },
+        {
+     "left_field": "registrationTime",
+     "right_field": "updateTime",
+     "allowNullUpdate": "false"
+    },
+        {
+     "left_field": "divisionId",
+     "right_field": "divisionId",
+     "allowNullUpdate": "false"
+    }
+   ]
+  },
+    {
+   "actionName": "±¡ÆâÁíºß¸Ë¿ô",
+   "db": "NJ_inventoryTRDB",
+   "db_id": "db_mst104548",
+   "tgt_db_id": "db_mst104537",
+   "execCondition": 0,
+   "command": "update",
+   "commandCase": 539176994,
+   "trdb_search_field": "inHospitalItemId",
+   "tgt_search_field": "inHospitalItemId",
+   "field_mapping":    [
+        {
+     "operator": "+=",
+     "left_field": "count",
+     "right_field": "HPstock",
+     "allowNullUpdate": "false"
+    },
+        {
+     "left_field": "registrationTime",
+     "right_field": "updateTime",
+     "allowNullUpdate": "false"
+    }
+   ]
+  }
+ ],
+ "image_db": {}
+}

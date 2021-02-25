@@ -1,0 +1,21 @@
+<!-- SMP_DYNAMIC_PAGE DISPLAY_ERRORS=OFF NAME=Top_Page -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>JoyPla 管理者ページTOP</title>
+	<?php include_once 'NewJoyPla/src/Head.php'; ?>
+	
+  </head>
+  <body>
+	  	<div uk-grid>
+    		<div class="uk-width-1-5">
+    			<?= include_once 'NewJoyPla/src/AdminMenu.php'; ?>
+    		</div>
+    		<div class="uk-width-4-5 uk-padding-large">
+   		  <div class="animsition" uk-height-viewport="expand: true">
+    			%sf:usr:search59%
+                  </div>
+    		</div>
+    	</div>
+  </body>
+</html>

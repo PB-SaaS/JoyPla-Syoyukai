@@ -1,0 +1,112 @@
+{
+ "id": "db_mst104523",
+ "name": "NJ_テナント管理DB",
+ "title": "NJ_TenantAdminDB",
+ "comment": "",
+ "record_limit": "20",
+ "check_regist_auth_selected": [],
+ "type": "normal",
+ "fieldList":  [
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_regist_date",
+   "title": "registrationTime",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "登録日時",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349673",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": true,
+   "autoval_trig": "autoval_mm_number32_id,f%09d,tenant_,10,,force",
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "tenantId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": true,
+   "index_flg": true,
+   "name": "テナントID",
+   "not_null_flg": true,
+   "comment": "",
+   "id": "field_def2348836",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "tenantName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "テナント名",
+   "not_null_flg": true,
+   "comment": "",
+   "id": "field_def2349674",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_area4096",
+   "title": "note",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "備考",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349675",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "label":    {
+    "candidates": 2,
+    "idAry":     [
+     1,
+     2
+    ],
+    "keywordAry":     [
+     "シングル",
+     "マルチ"
+    ]
+   },
+   "type": "mm_alternative",
+   "title": "tenantKind",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "テナント種別",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349676",
+   "set_default": null
+  }
+ ]
+}

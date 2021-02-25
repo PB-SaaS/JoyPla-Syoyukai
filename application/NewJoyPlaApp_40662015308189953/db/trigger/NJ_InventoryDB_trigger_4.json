@@ -1,0 +1,31 @@
+{
+ "trigger_id": "trigger_mst24523",
+ "db_id": "db_mst104526",
+ "seq_order": 2,
+ "event": "INSERT",
+ "type": "calc",
+ "name": "¶â³Û·×»»",
+ "comment": "",
+ "calc_formula_list": [ {
+  "result_field_id": "inventryAmount",
+  "error_type": 0,
+  "error": "",
+  "condition": "",
+  "formula": "$rfid:1$  /  $rfid:2$  *   $rfid:3$",
+  "_seq_order": 1,
+  "calc_formula_field_rel":   [
+      {
+    "_replace_field_id": 1,
+    "_field_id": "price"
+   },
+      {
+    "_replace_field_id": 2,
+    "_field_id": "quantity"
+   },
+      {
+    "_replace_field_id": 3,
+    "_field_id": "inventryNum"
+   }
+  ]
+ }]
+}

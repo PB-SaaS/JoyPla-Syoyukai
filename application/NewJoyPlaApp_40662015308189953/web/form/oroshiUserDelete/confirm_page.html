@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html id="SMP_STYLE">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=shift_jis">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<title></title>
+
+<style type="text/css">
+<!--
+
+#SMP_STYLE .body {
+	margin: 0;
+	padding: 0;
+	background: #F4F4F4;
+	font-size: 13px;
+	*font-size: small;
+	*font: x-small;
+	font-family: "メイリオ", "Meiryo", "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "ＭＳ Ｐゴシック", "MS PGothic", Sans-Serif;
+}
+
+#SMP_STYLE .body_tbl {
+	width: 900px;
+	margin: 0 auto;
+	padding-bottom: 30px;
+	border: 1px solid #999999;
+	background: #FFFFFF;
+}
+
+#SMP_STYLE h1 {
+	margin: 0;
+	padding: 10px 10px 10px 10px;
+	background: #333333;
+	color: #FFFFFF;
+	font-size: 153.9%;
+	font-weight:bold;
+	text-align:center;
+}
+
+#SMP_STYLE .header_img_smartphone {display: none;}
+#SMP_STYLE .header_img_tablet {display: none;}
+#SMP_STYLE .header_img_pc {display: block;}
+
+#SMP_STYLE .header_text {
+	margin: 0;
+	padding: 20px 70px 20px 70px;
+	background: #F1F1F1;
+	color: #111111;
+	font-size: 100%;
+	font-weight:normal;
+	text-align:left;
+}
+
+#SMP_STYLE .header_rmesg {
+	margin: 0;
+	padding: 30px 70px 10px 70px;
+	color: #111111;
+	font-size: 100%;
+	font-weight:normal;
+	text-align:left;
+}
+
+#SMP_STYLE .header_emesg {
+	width: 720px;
+	margin: 30px auto;
+	padding: 20px 20px 20px 20px;
+	border: 2px solid #FF0000;
+	color: #FF0000;
+	font-size: 100%;
+	font-weight:normal;
+	text-align:left;
+}
+
+#SMP_STYLE .smp_tmpl {
+	width: 760px;
+	padding: 20px 0 0 0;
+	margin: 0 70px;
+}
+
+#SMP_STYLE dl {
+	position: relative;
+	margin: 0;
+	padding: 13px 0 0 0;
+	width: 760px;
+	border-bottom: 1px solid #DDDDDD;
+}
+
+#SMP_STYLE dl:first-child {
+border-top: 1px solid #DDDDDD;
+}
+#SMP_STYLE dl.top {
+	border-top: 1px solid #DDDDDD;
+}
+#SMP_STYLE dt.title {
+	display: inline-block;
+	width: 220px;
+	margin: 0;
+	padding: 23px 15px 18px 0;
+	color: #333333;
+	background-color: #FFFFFF;
+	font-size: 108%;
+	font-weight:bold;
+	text-align:left;
+	line-height: 1.2;
+	vertical-align: top;
+}
+
+#SMP_STYLE dt.title .caution {
+	display: block;
+	width: 220px;
+	color: #5F5F5F;
+	font-size: 85%;
+	font-weight:normal;
+	padding: 10px 0 0 0;
+	line-height: 1.2;
+	text-align:left;
+}
+
+#SMP_STYLE dd.data {
+	display: inline-block;
+	width: 520px;
+	margin: 0;
+	padding: 18px 0;
+	color: #5F5F5F;
+	font-size: 100%;
+	font-weight: bold;
+	text-align: left;
+}
+
+#SMP_STYLE .input {
+	width: 420px;
+	margin-bottom: 8px;
+	padding: 5px;
+	color: #333333;
+	border: 1px solid #999999;
+	border-radius: 3px 3px 3px 3px;
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) inset;
+	font-size: 108%;
+	text-align: left;
+}
+
+#SMP_STYLE .zipcode li.code01 input {
+	width: 30px;
+}
+
+#SMP_STYLE .zipcode li.code02 input {
+	width: 40px;
+}
+
+#SMP_STYLE .phone li.num01 input {
+	width: 50px;
+}
+
+#SMP_STYLE .phone li.num02 input {
+	width: 40px;
+}
+
+#SMP_STYLE .phone li.num03 input {
+	width: 40px;
+}
+
+#SMP_STYLE .price input {
+	width: 200px;
+}
+
+#SMP_STYLE .num input {
+	width: 60px;
+}
+
+#SMP_STYLE .integer input {
+	width: 90px;
+}
+
+#SMP_STYLE .real input {
+	width: 170px;
+}
+
+#SMP_STYLE .pass input {
+	width: 150px;
+}
+
+#SMP_STYLE .epass input {
+	width: 160px;
+}
+
+#SMP_STYLE .time input {
+	width: 20px;
+}
+
+#SMP_STYLE .time .year {
+	width: 40px;
+}
+
+#SMP_STYLE ul,#smp_style li {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+#SMP_STYLE .zipcode ul li,
+#SMP_STYLE .phone ul li,
+#SMP_STYLE .time ul li {
+	width: auto;
+	float: left;
+	margin: 0 3px 0 0;
+	padding: 0;
+	height: 35px;
+	line-height: 35px;
+}
+
+#SMP_STYLE .multi1 label {
+	display: block;
+	float: left;
+	min-width: 135px;
+	margin: 0 0 7px 0;
+	padding: 0 10px;
+	text-align: left;
+}
+
+#SMP_STYLE .multi1 label input {
+	display: block;
+	float: left;
+	width: 1em;
+	height: 1em;
+	margin: 0.4em 0 0 0;
+	padding: 0;
+	box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+	border-radius: 0 0 0 0;
+	overflow: hidden;
+}
+
+#SMP_STYLE .multi1 label span {
+	display: block;
+	margin: 0 0 0 30px;
+	font-size: 100%;
+	font-weight: normal;
+}
+
+#SMP_STYLE .multi1 .radio input {
+	border-radius: 1em;
+}
+
+#SMP_STYLE .multi2 li {
+	display: inline;
+	float: left;
+	min-width: 135px;
+	margin: 0 0 0 0;
+	padding: 0 5px 2px 10px;
+	text-align: left;
+	clear: both;
+}
+
+#SMP_STYLE .multi2 label input {
+	display: block;
+	float: left;
+	width: 1em;
+	height: 1em;
+	box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+	margin: 0.2em 0 0 0;
+	padding: 0;
+	border-radius: 0 0 0 0;
+	overflow: hidden;
+}
+
+#SMP_STYLE .multi2 label span {
+	display: block;
+	margin: 0 0 0 30px;
+	font-size: 100%;
+	font-weight: normal;
+}
+
+#SMP_STYLE .multi2 .radio input {
+	border-radius: 1em;
+}
+
+#SMP_STYLE select {
+	margin-bottom: 8px;
+	font-size: 100%;
+	width: 180px;
+}
+
+#SMP_STYLE textarea {
+	width: 510px;
+	padding: 5px;
+	border: 1px solid #999999;
+	border-radius: 3px 3px 3px 3px;
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) inset;
+	font-size: 108%;
+	text-align: left;
+}
+
+#SMP_STYLE .image input {
+	width: 100%;
+}
+
+#SMP_STYLE .file input {
+	width: 100%;
+}
+
+#SMP_STYLE input.clear {
+	width: 55px;
+	text-align: center;
+}
+
+#SMP_STYLE input.submit {
+	width: 270px;
+	height: 42px;
+	margin: 40px 0 40px 0;
+	border: hidden;
+	border-radius: 3px 3px 3px 3px;
+	/* other browser */
+	background: #303030;
+	/* for old webkit */
+	background: -webkit-gradient(
+		linear, left top, left bottom,
+		color-stop(0.00, #606060),
+		color-stop(1.00, #303030)
+	);
+	/* for modern browser */
+	background: linear-gradient(
+		to bottom,
+		#606060 0%,
+		#303030 100%
+	);
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);
+	color: #FFFFFF;
+	font-size: 153.9%;
+	font-weight: normal;
+	text-align: center;
+	cursor: pointer;
+}
+
+#SMP_STYLE input.submit:hover {
+	filter: alpha(opacity=90);
+	-ms-filter: alpha(opacity=90);
+	opacity: 0.9;
+}
+
+#SMP_STYLE input.image {
+	margin: 40px 0 40px 0;
+	width: auto;
+	border: none;
+	padding: 0;
+	vertical-align: middle;
+}
+
+#SMP_STYLE input.searchZipcode {
+	width: 150px;
+	height: 32px;
+	margin: auto;
+	border: hidden;
+	border-radius: 3px 3px 3px 3px;
+	/* other browser */
+	background: #303030;
+	/* for old webkit */
+	background: -webkit-gradient(
+		linear, left top, left bottom,
+		color-stop(0.00, #606060),
+		color-stop(1.00, #303030)
+	);
+	/* for modern browser */
+	background: linear-gradient(
+		to bottom,
+		#606060 0%,
+		#303030 100%
+	);
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);
+	color: #FFFFFF;
+	font-size: 153.9%;
+	font-weight: normal;
+	text-align: center;
+	cursor: pointer;
+}
+
+#SMP_STYLE input.searchZipcode:hover {
+	filter: alpha(opacity=90);
+	-ms-filter: alpha(opacity=90);
+	opacity: 0.9;
+}
+
+#SMP_STYLE input.imageZipcode {
+	margin: auto;
+	width: auto;
+	border: none;
+	padding: 0;
+	vertical-align: middle;
+}
+
+#SMP_STYLE input[name=SMPFORM_BACK] {
+	width: 270px;
+	height: 42px;
+	margin: 40px 0 40px 0;
+	border: hidden;
+	border-radius: 3px 3px 3px 3px;
+	/* other browser */
+	background: #303030;
+	/* for old webkit */
+	background: -webkit-gradient(
+		linear, left top, left bottom,
+		color-stop(0.00, #606060),
+		color-stop(1.00, #303030)
+	);
+	/* for modern browser */
+	background: linear-gradient(
+		to bottom,
+		#606060 0%,
+		#303030 100%
+	);
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);
+	color: #FFFFFF;
+	font-size: 153.9%;
+	font-weight: normal;
+	text-align: center;
+	cursor: pointer;
+}
+
+#SMP_STYLE input.submit:hover {
+	filter: alpha(opacity=90);
+	-ms-filter: alpha(opacity=90);
+	opacity: 0.9;
+}
+
+#SMP_STYLE input.image {
+	margin: 40px 0 40px 0;
+	width: auto;
+	border: none;
+	padding: 0;
+	vertical-align: middle;
+}
+
+#SMP_STYLE .sample {
+	color: #555555;
+	font-size: 93%;
+	font-weight:normal;
+	text-align:left;
+	line-height: 1.2;
+}
+
+#SMP_STYLE .suffix {
+	color: #111111;
+	font-size: 100%;
+	font-weight:normal;
+	text-align:left;
+	height: 35px;
+	line-height: 35px;
+}
+
+#SMP_STYLE .need {
+	color: #CC0000;
+	font-size: 100%;
+	font-weight:bold;
+	text-align:left;
+}
+
+#SMP_STYLE .msg {
+	display: block;
+	color: #DD0000;
+	font-size: 100%;
+	font-weight:bold;
+	margin-bottom: 5px;
+	text-align:left;
+}
+
+#SMP_STYLE .sub_text {
+	width: 760px;
+	font-size: 123.1%;
+	font-weight:bold;
+	padding: 150px 0;
+	text-align:left;
+	color: #111111;
+}
+
+#SMP_STYLE .error {
+	background: #FFE4E4;
+}
+
+#SMP_STYLE .spiralSeal {
+	width: 80%;
+	overflow: hidden;
+	margin: 0;
+	background-color: #FFFFFF;
+	border: 1px solid #CCCCCC;
+}
+
+#SMP_STYLE .spiralSeal tr td.description {
+	display: table-cell;
+	text-align: left;
+	overflow: auto;
+}
+
+#SMP_STYLE .spiralSeal tr td.img {
+	display: table-cell;
+	margin-left: 0px;
+	margin-right: 0px;
+	overflow: auto;
+	text-align: center;
+}
+
+#SMP_STYLE .footer_text {
+	width: 760px;
+	font-size: 100%;
+	margin: 30px 0 0 0;
+	font-weight:normal;
+	text-align:left;
+}
+
+#SMP_STYLE .cf:before,#SMP_STYLE .cf:after {content:"";display:table;}
+#SMP_STYLE .cf:after {clear:both;}
+#SMP_STYLE .cf {*zoom:1;}
+
+
+@media screen and (min-width:726px) and (max-width:981px) {
+	#SMP_STYLE .body {
+		margin: 0;
+		padding: 0;
+		font-size: 13px;
+		*font-size: small;
+		*font: x-small;
+		font-family: "メイリオ", "Meiryo", "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "ＭＳ Ｐゴシック", "MS PGothic", Sans-Serif;
+		background: #FFFFFF;
+	}
+
+	#SMP_STYLE .body_tbl {
+		width: 100%;
+		margin: 0 auto;
+		padding: 0 0 30px 0;
+		border: none;
+		background: #FFFFFF;
+	}
+
+	#SMP_STYLE h1 {
+		margin: 0;
+		padding: 10px 10px 10px 10px;
+		background: #333333;
+		color: #FFFFFF;
+		font-size: 153.9%;
+		font-weight:bold;
+		text-align:center;
+	}
+
+	#SMP_STYLE .header_img_smartphone {display: none;}
+	#SMP_STYLE .header_img_tablet {display: block;}
+	#SMP_STYLE .header_img_pc {display: none;}
+
+	#SMP_STYLE .header_text {
+		margin: 0;
+		padding: 15px 70px 15px 70px;
+		background: #F1F1F1;
+		color: #111111;
+		font-size: 93%;
+		font-weight:normal;
+		text-align:left;
+	}
+
+	#SMP_STYLE .header_rmesg {
+		margin: 0;
+		padding: 30px 70px 10px 70px;
+		color: #111111;
+		font-size: 100%;
+		font-weight:normal;
+		text-align:left;
+	}
+
+	#SMP_STYLE .header_emesg {
+		width: 80%;
+		margin: 30px auto 10px;
+		padding: 15px 15px 15px 15px;
+		border: 2px solid #FF0000;
+		color: #FF0000;
+		font-size: 100%;
+		font-weight:normal;
+		text-align:left;
+	}
+
+	#SMP_STYLE .smp_tmpl {
+		width: 80%;
+		margin: 20px auto 0;
+		padding: 20px 0 0 0;
+	}
+
+	#SMP_STYLE dl {
+		display: table;
+		margin: 0;
+		position: relative;
+		width: 100%;
+	}
+
+	#SMP_STYLE dl:first-child {
+	border-top: 1px solid #DDDDDD;
+	}
+	#SMP_STYLE dl.top {
+		border-top: 1px solid #DDDDDD;
+	}
+	#SMP_STYLE dt.title {
+		display: inline-block;
+		width: 20%;
+		margin: 0;
+		padding: 23px 15px 28px 0;
+		color: #333333;
+		background-color: #FFFFFF;
+		font-size: 108%;
+		font-weight:bold;
+		text-align:left;
+		line-height: 1.2;
+		vertical-align: top;
+	}
+
+	#SMP_STYLE dt.title .caution {
+		display: block;
+		width: 100%;
+		color: #5F5F5F;
+		font-size: 85%;
+		font-weight:normal;
+		padding: 10px 0 0 0;
+		line-height: 1.2;
+		text-align:left;
+	}
+
+	#SMP_STYLE dd.data {
+		display: inline-block;
+		width: 70%;
+		margin: 0;
+		padding: 18px 0 18px 0;
+		color: #5F5F5F;
+		font-size: 100%;
+		font-weight: bold;
+		text-align: left;
+	}
+
+	#SMP_STYLE .input {
+		width: 70%;
+		margin-bottom: 8px;
+		padding: 5px;
+		color: #333333;
+		border: 1px solid #999999;
+		border-radius: 3px 3px 3px 3px;
+		box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) inset;
+		font-size: 108%;
+		text-align: left;
+	}
+
+	#SMP_STYLE .zipcode li.code01 input {
+		width: 30px;
+	}
+
+	#SMP_STYLE .zipcode li.code02 input {
+		width: 40px;
+	}
+
+	#SMP_STYLE .phone li.num01 input {
+		width: 50px;
+	}
+
+	#SMP_STYLE .phone li.num02 input {
+		width: 40px;
+	}
+
+	#SMP_STYLE .phone li.num03 input {
+		width: 40px;
+	}
+
+	#SMP_STYLE .price input {
+		width: 200px;
+	}
+
+	#SMP_STYLE .num input {
+		width: 60px;
+	}
+
+	#SMP_STYLE .integer input {
+		width: 90px;
+	}
+
+	#SMP_STYLE .real input {
+		width: 170px;
+	}
+
+	#SMP_STYLE .pass input {
+		width: 50%;
+	}
+
+	#SMP_STYLE .epass input {
+		width: 50%;
+	}
+
+	#SMP_STYLE .time input {
+		width: 20px;
+	}
+
+	#SMP_STYLE .time .year {
+		width: 40px;
+	}
+
+	#SMP_STYLE .time .new_line {
+		clear: both;
+	}
+
+	#SMP_STYLE ul,#smp_style li {
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	#SMP_STYLE .zipcode ul li,
+	#SMP_STYLE .phone ul li,
+	#SMP_STYLE .time ul li {
+		width: auto;
+		float: left;
+		margin: 0 3px 0 0;
+		padding: 0;
+		height: 35px;
+		line-height: 35px;
+	}
+
+	#SMP_STYLE .multi1 label {
+		display: block;
+		float: left;
+		min-width: 126px;
+		margin: 0 10px 7px 0;
+		padding: 10px 10px 0 10px;
+		border-radius: 4px 4px 4px 4px;
+		background: #F1F1F1;
+		text-align: left;
+	}
+
+	#SMP_STYLE .multi1 label input {
+		display: block;
+		float: left;
+		width: 20px;
+		margin: 0.2em 0 0 0;
+		padding: 0;
+		box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+		border-radius: 3px 3px 3px 3px;
+		text-align: left;
+		overflow: hidden;
+	}
+
+	#SMP_STYLE .multi1 label span {
+		display: block;
+		margin: 0 0 10px 30px;
+		font-size: 100%;
+	}
+
+	#SMP_STYLE .multi1 .radio input {
+		border-radius: 1em;
+	}
+
+	#SMP_STYLE .multi2 li {
+		display: inline;
+		float: left;
+		width: 100%;
+		margin: 0 0 7px 0;
+		padding: 10px 10px 10px 10px;
+		border-radius: 4px 4px 4px 4px;
+		background: #EEEEEE;
+		text-align: left;
+		clear: both;
+	}
+
+	#SMP_STYLE .multi2 label input {
+		display: block;
+		float: left;
+		width: 20px;
+		margin: 0.2em 0 0 0;
+		padding: 0;
+		text-align: left;
+		box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+		border-radius: 3px 3px 3px 3px;
+		overflow: hidden;
+	}
+
+	#SMP_STYLE .multi2 label span {
+		display: block;
+		margin: 0 0 0 30px;
+		font-size: 100%;
+	}
+
+	#SMP_STYLE .multi2 .radio input {
+		border-radius: 1em;
+	}
+
+	#SMP_STYLE select {
+		margin-bottom: 8px;
+		font-size: 100%;
+		width: 180px;
+	}
+
+	#SMP_STYLE textarea {
+		width: 100%;
+		padding: 5px;
+		border: 1px solid #999999;
+		border-radius: 3px 3px 3px 3px;
+		box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) inset;
+		font-size: 108%;
+		text-align: left;
+	}
+
+	#SMP_STYLE .image input {
+		width: 100%;
+	}
+
+	#SMP_STYLE .file input {
+		width: 100%;
+	}
+
+	#SMP_STYLE input.clear {
+		width: 55px;
+		text-align: center;
+	}
+
+	#SMP_STYLE input.submit {
+		width: 40%;
+		height: 42px;
+		margin: 40px 0 40px 0;
+		border: hidden;
+		border-radius: 3px 3px 3px 3px;
+		/* other browser */
+		background: #303030;
+		/* for old webkit */
+		background: -webkit-gradient(
+			linear, left top, left bottom,
+			color-stop(0.00, #606060),
+			color-stop(1.00, #303030)
+		);
+		/* for modern browser */
+		background: linear-gradient(
+			to bottom,
+			#606060 0%,
+			#303030 100%
+		);
+		box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);
+		color: #FFFFFF;
+		font-size: 153.9%;
+		font-weight: normal;
+		text-align: center;
+		cursor: pointer;
+	}
+
+	#SMP_STYLE input.submit:hover {
+		filter: alpha(opacity=90);
+		-ms-filter: alpha(opacity=90);
+		opacity: 0.9;
+	}
+
+	#SMP_STYLE input.image {
+		margin: 40px 0 40px 0;
+		width: auto;
+		border: none;
+		padding: 0;
+		vertical-align: middle;
+	}
+
+	#SMP_STYLE input[name=SMPFORM_BACK] {
+		width: 40%;
+		height: 42px;
+		margin: 40px 0 40px 0;
+		border: hidden;
+		border-radius: 3px 3px 3px 3px;
+		/* other browser */
+		background: #303030;
+		/* for old webkit */
+		background: -webkit-gradient(
+			linear, left top, left bottom,
+			color-stop(0.00, #606060),
+			color-stop(1.00, #303030)
+		);
+		/* for modern browser */
+		background: linear-gradient(
+			to bottom,
+			#606060 0%,
+			#303030 100%
+		);
+		box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);
+		color: #FFFFFF;
+		font-size: 153.9%;
+		font-weight: normal;
+		text-align: center;
+		cursor: pointer;
+	}
+
+	#SMP_STYLE input.submit:hover {
+		filter: alpha(opacity=90);
+		-ms-filter: alpha(opacity=90);
+		opacity: 0.9;
+	}
+
+	#SMP_STYLE input.image {
+		margin: 40px 0 40px 0;
+		width: auto;
+		border: none;
+		padding: 0;
+		vertical-align: middle;
+	}
+
+	#SMP_STYLE input.searchZipcode {
+		width: 40%;
+		height: 32px;
+		margin: auto;
+		margin-left: 30px;
+		border: hidden;
+		border-radius: 3px 3px 3px 3px;
+		/* other browser */
+		background: #303030;
+		/* for old webkit */
+		background: -webkit-gradient(
+			linear, left top, left bottom,
+			color-stop(0.00, #606060),
+			color-stop(1.00, #303030)
+		);
+		/* for modern browser */
+		background: linear-gradient(
+			to bottom,
+			#606060 0%,
+			#303030 100%
+		);
+		box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);
+		color: #FFFFFF;
+		font-size: 153.9%;
+		font-weight: normal;
+		text-align: center;
+		cursor: pointer;
+	}
+
+	#SMP_STYLE input.searchZipcode:hover {
+		filter: alpha(opacity=90);
+		-ms-filter: alpha(opacity=90);
+		opacity: 0.9;
+	}
+
+	#SMP_STYLE input.imageZipcode {
+		margin: auto;
+		width: auto;
+		border: none;
+		padding: 0;
+		vertical-align: middle;
+	}
+
+	#SMP_STYLE .sample {
+		color: #555555;
+		font-size: 93%;
+		font-weight:normal;
+		text-align:left;
+		line-height: 1.2;
+	}
+
+	#SMP_STYLE .suffix {
+		color: #111111;
+		font-size: 100%;
+		font-weight:normal;
+		text-align:left;
+		height: 35px;
+		line-height: 35px;
+	}
+
+	#SMP_STYLE .need {
+		color: #CC0000;
+		font-size: 100%;
+		font-weight:bold;
+		text-align:left;
+	}
+
+	#SMP_STYLE .msg {
+		display: block;
+		color: #DD0000;
+		font-size: 100%;
+		font-weight:bold;
+		margin-bottom: 5px;
+		text-align:left;
+	}
+
+	#SMP_STYLE .sub_text {
+		width: 80%;
+		font-size: 123.1%;
+		font-weight:bold;
+		padding: 150px 0;
+		text-align:left;
+		color: #111111;
+	}
+
+	#SMP_STYLE .error {
+		background: #FFE4E4;
+	}
+
+	#SMP_STYLE .spiralSeal {
+		width: 80%;
+		overflow: hidden;
+		margin: 0;
+		background-color: #FFFFFF;
+		border: 1px solid #CCCCCC;
+	}
+
+	#SMP_STYLE .spiralSeal tr td.description {
+		display: table-cell;
+		text-align: left;
+		overflow: auto;
+	}
+
+	#SMP_STYLE .spiralSeal tr td.img {
+		display: table-cell;
+		margin-left: 0px;
+		margin-right: 0px;
+		overflow: auto;
+		text-align: center;
+	}
+
+	#SMP_STYLE .footer_text {
+		width: 80%;
+		font-size: 93%;
+		margin: 30px 0 0 0;
+		font-weight:normal;
+		text-align:left;
+	}
+
+	#SMP_STYLE .cf:before,#SMP_STYLE .cf:after {content:"";display:table;}
+	#SMP_STYLE .cf:after {clear:both;}
+	#SMP_STYLE .cf {*zoom:1;}
+
+}
+@media screen and (max-width:725px) {
+	#SMP_STYLE .body {
+		margin: 0;
+		padding: 0;
+		font-size: 13px;
+		*font-size: small;
+		*font: x-small;
+		font-family: "メイリオ", "Meiryo", "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "ＭＳ Ｐゴシック", "MS PGothic", Sans-Serif;
+		background: #FFFFFF;
+	}
+
+	#SMP_STYLE .body_tbl {
+		width: 100%;
+		margin: 0 auto;
+		padding-bottom: 30px;
+		border: none;
+		background: #FFFFFF;
+	}
+
+	#SMP_STYLE h1 {
+		margin: 0;
+		padding: 10px 10px 10px 10px;
+		background: #333333;
+		color: #FFFFFF;
+		font-size: 153.9%;
+		font-weight:bold;
+		text-align:center;
+	}
+
+	#SMP_STYLE .header_img_smartphone {display: block;}
+	#SMP_STYLE .header_img_tablet {display: none;}
+	#SMP_STYLE .header_img_pc {display: none;}
+
+	#SMP_STYLE .header_text {
+		margin: 0;
+		padding: 15px 15px 15px 15px;
+		background: #F1F1F1;
+		color: #111111;
+		font-size: 85%;
+		font-weight:normal;
+		text-align:left;
+	}
+
+	#SMP_STYLE .header_rmesg {
+		margin: 0 0 0 0;
+		padding: 30px 15px 10px 15px;
+		color: #111111;
+		font-size: 100%;
+		font-weight:normal;
+		text-align:left;
+	}
+
+	#SMP_STYLE .header_emesg {
+		width: 240px;
+		margin: 10px auto 10px;
+		padding: 15px 15px 15px 15px;
+		border: 2px solid #FF0000;
+		color: #FF0000;
+		font-size: 100%;
+		font-weight:normal;
+		text-align:left;
+	}
+
+	#SMP_STYLE .smp_tmpl {
+		width: 300px;
+		margin: 0 auto;
+		padding-top: 20px 0 0 0;
+	}
+
+	#SMP_STYLE dl {
+		display: block;
+		margin: 0 0 10px 0;
+		padding: 20px 0 0 0;
+		position: relative;
+		width: 100%;
+		border-bottom: 1px solid #DDDDDD;
+	}
+
+	#SMP_STYLE dl:first-child {
+	border-top: 1px solid #DDDDDD;
+	}
+	#SMP_STYLE dl.top {
+		border-top: 1px solid #DDDDDD;
+	}
+	#SMP_STYLE dt.title {
+		display: block;
+		width: 270px;
+		margin: 0;
+		padding: 0 0 0 0;
+		color: #333333;
+		background-color: #FFFFFF;
+		font-size: 108%;
+		font-weight:bold;
+		text-align:left;
+		vertical-align: middle;
+	}
+
+	#SMP_STYLE dt.title .caution {
+		display: block;
+		width: 270px;
+		color: #5F5F5F;
+		font-size: 85%;
+		font-weight:normal;
+		padding: 10px 0 0 0;
+		line-height: 1.2;
+		text-align:left;
+	}
+
+	#SMP_STYLE dd.data {
+		position: relative;
+		display: block;
+		width: 270px;
+		margin: 0 0 10px 0;
+		padding: 18px 0 10px 0;
+		color: #5F5F5F;
+		font-size: 100%;
+		font-weight: bold;
+		text-align: left;
+	}
+
+	#SMP_STYLE .input {
+		width: 170px;
+		margin-bottom: 8px;
+		padding: 5px;
+		color: #333333;
+		border: 1px solid #999999;
+		border-radius: 3px 3px 3px 3px;
+		box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) inset;
+		font-size: 108%;
+		text-align: left;
+	}
+
+	#SMP_STYLE .zipcode li.code01 input {
+		width: 30px;
+	}
+
+	#SMP_STYLE .zipcode li.code02 input {
+		width: 40px;
+	}
+
+	#SMP_STYLE .phone li.num01 input {
+		width: 50px;
+	}
+
+	#SMP_STYLE .phone li.num02 input {
+		width: 40px;
+	}
+
+	#SMP_STYLE .phone li.num03 input {
+		width: 40px;
+	}
+
+	#SMP_STYLE .price input {
+		width: 150px;
+	}
+
+	#SMP_STYLE .num input {
+		width: 60px;
+	}
+
+	#SMP_STYLE .integer input {
+		width: 90px;
+	}
+
+	#SMP_STYLE .real input {
+		width: 170px;
+	}
+
+	#SMP_STYLE .pass input {
+		width: 150px;
+	}
+
+	#SMP_STYLE .epass input {
+		width: 160px;
+	}
+
+	#SMP_STYLE .time input {
+		width: 20px;
+	}
+
+	#SMP_STYLE .time .year {
+		width: 40px;
+	}
+
+	#SMP_STYLE .time .new_line {
+		clear: both;
+	}
+
+	#SMP_STYLE ul,#smp_style li {
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	#SMP_STYLE .zipcode ul li,
+	#SMP_STYLE .phone ul li,
+	#SMP_STYLE .time ul li {
+		width: auto;
+		float: left;
+		margin: 0 3px 0 0;
+		padding: 0;
+		height: 35px;
+		line-height: 35px;
+	}
+
+	#SMP_STYLE .multi1 label {
+		display: block;
+		min-width: 250px;
+		margin: 0 10px 10px 0;
+		padding: 10px;
+		border-radius: 4px 4px 4px 4px;
+		background: #F1F1F1;
+		text-align: left;
+	}
+
+	#SMP_STYLE .multi1 label input {
+		display: block;
+		float: left;
+		width: 20px;
+		margin: 0.2em 0 0 0;
+		padding: 0;
+		box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+		border-radius: 3px 3px 3px 3px;
+		text-align: left;
+		overflow: hidden;
+	}
+
+	#SMP_STYLE .multi1 label span {
+		display: block;
+		margin: 0 0 0 25px;
+		font-size: 100%;
+	}
+
+	#SMP_STYLE .multi1 .radio input {
+		border-radius: 1em;
+	}
+
+	#SMP_STYLE .multi2 li {
+		display: block;
+		min-width: 250px;
+		margin: 0 10px 10px 0;
+		padding: 10px;
+		border-radius: 4px 4px 4px 4px;
+		background: #F1F1F1;
+		text-align: left;
+		width: auto;
+	}
+
+	#SMP_STYLE .multi2 label input {
+		display: block;
+		float: left;
+		width: 20px;
+		margin: 0.2em 0 0 0;
+		padding: 0;
+		box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+		border-radius: 3px 3px 3px 3px;
+		text-align: left;
+		overflow: hidden;
+	}
+
+	#SMP_STYLE .multi2 label span {
+		display: block;
+		margin: 0 0 0 25px;
+		font-size: 100%;
+	}
+
+	#SMP_STYLE .multi2 .radio input {
+		border-radius: 1em;
+	}
+
+	#SMP_STYLE select {
+		margin-bottom: 8px;
+		font-size: 100%;
+		width: 180px;
+	}
+
+	#SMP_STYLE textarea {
+		width: 260px;
+		padding: 5px;
+		border: 1px solid #999999;
+		border-radius: 3px 3px 3px 3px;
+		box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) inset;
+		font-size: 108%;
+		text-align: left;
+	}
+
+	#SMP_STYLE .image input {
+		width: 100%;
+	}
+
+	#SMP_STYLE .file input {
+		width: 100%;
+	}
+
+	#SMP_STYLE input.clear {
+		width: 55px;
+		text-align: center;
+	}
+
+	#SMP_STYLE input.submit {
+		width: 150px;
+		height: 42px;
+		margin: 20px 0 40px 0;
+		border: hidden;
+		border-radius: 3px 3px 3px 3px;
+		/* other browser */
+		background: #303030;
+		/* for old webkit */
+		background: -webkit-gradient(
+			linear, left top, left bottom,
+			color-stop(0.00, #606060),
+			color-stop(1.00, #303030)
+		);
+		/* for modern browser */
+		background: linear-gradient(
+			to bottom,
+			#606060 0%,
+			#303030 100%
+		);
+		box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);
+		color: #FFFFFF;
+		font-size: 153.9%;
+		font-weight: normal;
+		text-align: center;
+		cursor: pointer;
+	}
+
+	#SMP_STYLE input.submit:hover {
+		filter: alpha(opacity=90);
+		-ms-filter: alpha(opacity=90);
+		opacity: 0.9;
+	}
+
+	#SMP_STYLE input.image {
+		margin: 40px 0 40px 0;
+		width: auto;
+		border: none;
+		padding: 0;
+		vertical-align: middle;
+	}
+
+	#SMP_STYLE input[name=SMPFORM_BACK] {
+		width: 150px;
+		height: 42px;
+		margin: 20px 0 40px 0;
+		border: hidden;
+		border-radius: 3px 3px 3px 3px;
+		/* other browser */
+		background: #303030;
+		/* for old webkit */
+		background: -webkit-gradient(
+			linear, left top, left bottom,
+			color-stop(0.00, #606060),
+			color-stop(1.00, #303030)
+		);
+		/* for modern browser */
+		background: linear-gradient(
+			to bottom,
+			#606060 0%,
+			#303030 100%
+		);
+		box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);
+		color: #FFFFFF;
+		font-size: 153.9%;
+		font-weight: normal;
+		text-align: center;
+		cursor: pointer;
+	}
+
+	#SMP_STYLE input.submit:hover {
+		filter: alpha(opacity=90);
+		-ms-filter: alpha(opacity=90);
+		opacity: 0.9;
+	}
+
+	#SMP_STYLE input.image {
+		margin: 40px 0 40px 0;
+		width: auto;
+		border: none;
+		padding: 0;
+		vertical-align: middle;
+	}
+
+	#SMP_STYLE .sample {
+		color: #555555;
+		font-size: 93%;
+		font-weight:normal;
+		text-align:left;
+		line-height: 1.2;
+	}
+
+	#SMP_STYLE .suffix {
+		color: #111111;
+		font-size: 100%;
+		font-weight:normal;
+		text-align:left;
+		height: 35px;
+		line-height: 35px;
+	}
+
+	#SMP_STYLE .need {
+		color: #CC0000;
+		font-size: 100%;
+		font-weight:bold;
+		text-align:left;
+	}
+
+	#SMP_STYLE .msg {
+		display: block;
+		color: #DD0000;
+		font-size: 100%;
+		font-weight:bold;
+		margin-bottom: 5px;
+		text-align:left;
+	}
+
+	#SMP_STYLE .sub_text {
+		width: 270px;
+		font-size: 123.1%;
+		font-weight:bold;
+		padding: 150px 0;
+		text-align:left;
+		color: #111111;
+	}
+
+	#SMP_STYLE .error {
+		background: #FFE4E4;
+	}
+
+	#SMP_STYLE .spiralSeal {
+		width: 270px;
+		overflow: hidden;
+		margin: 0;
+		background-color: #FFFFFF;
+		border: 1px solid #CCCCCC;
+	}
+
+	#SMP_STYLE .spiralSeal tr td.description {
+		display: block;
+		text-align: left;
+		overflow: auto;
+	}
+
+	#SMP_STYLE .spiralSeal tr td.img {
+		display: block;
+		margin-left: 60px;
+		margin-right: 60px;
+		overflow: auto;
+		text-align: center;
+	}
+
+	#SMP_STYLE .footer_text {
+		width: 270px;
+		font-size: 85%;
+		margin: 30px 0 0 0;
+		font-weight:normal;
+		text-align:left;
+	}
+
+	#SMP_STYLE .cf:before,#SMP_STYLE .cf:after {content:"";display:table;}
+	#SMP_STYLE .cf:after {clear:both;}
+	#SMP_STYLE .cf {*zoom:1;}
+
+}
+-->
+</style>
+
+</head>
+<body class="body">
+<center>
+<div class="body_tbl">
+<!-- SMP_TEMPLATE_HEADER start -->
+<!-- SMP_TEMPLATE_HEADER end -->
+<!-- SMP_TEMPLATE_FORM start -->
+	<form method="post" action="/regist/Reg2">
+	<input type="hidden" name="confirm" value="true">
+		<div class="smp_tmpl">
+					<dl class="cf">
+						<dt class="title">
+							ユーザー権限
+						</dt><dd class="data ">
+						 $userPermission$ <br>						</dd>
+					</dl>
+					<dl class="cf">
+						<dt class="title">
+							ログインID
+						</dt><dd class="data ">
+						 $loginId$ <br>						</dd>
+					</dl>
+					<dl class="cf">
+						<dt class="title">
+							氏名
+						</dt><dd class="data ">
+						 $name$ <br>						</dd>
+					</dl>
+					<dl class="cf">
+						<dt class="title">
+							氏名（カナ）
+						</dt><dd class="data ">
+						 $nameKana$ <br>						</dd>
+					</dl>
+					<dl class="cf">
+						<dt class="title">
+							メールアドレス
+						</dt><dd class="data ">
+						 $mailAddress$ <br>						</dd>
+					</dl>
+					<dl class="cf">
+						<dt class="title">
+							備考
+						</dt><dd class="data ">
+						 $remarks:br$ <br>						</dd>
+					</dl>
+			</div>
+		<input type="hidden" name="detect" value="判定">
+		<!-- HIDDEN_PARAM START -->
+		$form:hidden$
+		<!-- HIDDEN_PARAM END -->
+		<input class="submit" type="submit" name="SMPFORM_BACK" value="戻る">  <input class="submit" type="submit" name="submit" value="削除">  
+	</form>
+<!-- SMP_TEMPLATE_FORM end -->
+<!-- ここから -->
+<table class="spiralSeal">
+<tr>
+<td style="font-size:11px; padding:5px;" class="description">
+ご登録される情報は、暗号化された通信(SSL)で保護され、プライバシーマークやISO27001/JIS Q 27001, ISO27017, ISO20000-1, ISO9001などの認証を取得している<a href="http://www.pi-pe.co.jp/" target="_blank" title="株式会社パイプドビッツ">株式会社パイプドビッツ</a>による<a href="https://www.pi-pe.co.jp/security/customer_db.html" target="_blank" title="データベース管理のためのASPサービス「スパイラル」">情報管理システム「スパイラル」</a>で安全に管理されます。
+</td>
+<td style="padding:5px;" class="img">
+<script type="text/javascript" src="%SPIRAL_SEAL_SRC%&amp;type=send&amp;size=m&amp;lang=ja"></script>
+</td>
+</tr>
+</table>
+<!-- ここまで -->
+<!-- SMP_TEMPLATE_FOOTER start -->
+<!-- SMP_TEMPLATE_FOOTER end -->
+</div>
+</center>
+</body>
+</html>

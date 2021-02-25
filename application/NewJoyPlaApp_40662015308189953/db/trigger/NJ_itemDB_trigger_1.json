@@ -1,0 +1,41 @@
+{
+ "trigger_id": "trigger_mst24537",
+ "db_id": "db_mst104538",
+ "seq_order": 1,
+ "event": "UPDATE",
+ "type": "calc",
+ "name": "ブーリアン値セット",
+ "comment": "",
+ "calc_formula_list":  [
+    {
+   "result_field_id": "officialFlag",
+   "error_type": 0,
+   "error": "",
+   "condition": "$rfid:1$  IS NULL",
+   "formula": "0",
+   "_seq_order": 1,
+   "calc_formula_field_rel": [   {
+    "_replace_field_id": 1,
+    "_field_id": "officialFlag"
+   }]
+  },
+    {
+   "result_field_id": "janTenantId",
+   "error_type": 0,
+   "error": "",
+   "condition": "",
+   "formula": "$rfid:1$||$rfid:2$",
+   "_seq_order": 2,
+   "calc_formula_field_rel":    [
+        {
+     "_replace_field_id": 1,
+     "_field_id": "itemJANCode"
+    },
+        {
+     "_replace_field_id": 2,
+     "_field_id": "tenantId"
+    }
+   ]
+  }
+ ]
+}

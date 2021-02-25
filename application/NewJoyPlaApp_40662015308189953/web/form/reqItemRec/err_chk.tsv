@@ -1,0 +1,30 @@
+nn_err_msg	
+dup_err_msg	入力された値をご確認ください
+cnf_err_msg	確認入力と一致しません
+mem_err_msg	認証に失敗しました
+not_null_alter	-1	-1	入力必須項目に未入力があります
+depend_err_msg	t	f	機種依存文字が含まれています
+space2null	t
+0	id	
+requestFlg	mm_alternative	t	t			入力された値をご確認ください	
+itemName	mm_text_field	t	t			入力された値をご確認ください	0	f		f					f	1
+itemCode	mm_text_field	t	t			入力された値をご確認ください	0	f		f					f	1
+itemStandard	mm_text_field	t	t			入力された値をご確認ください	0	f		f					f	1
+janTenantId	mm_text_field64	t	t			入力された値をご確認ください	0	f		f					f	1
+itemJANCode	mm_text_field	t	t			入力された値をご確認ください	0	f		f					f	1
+makerName	mm_text_field	t	t			入力された値をご確認ください	0	f		f					f	1
+catalogNo	mm_text_field	t	t			入力された値をご確認ください	0	f		f					f	1
+serialNo	mm_text_field	t	t			入力された値をご確認ください	0	f		f					f	1
+officialFlag	mm_bool	t	t			入力された値をご確認ください	
+officialprice	mm_real	t	t			入力された値をご確認ください											
+officialpriceOld	mm_real	t	t			入力された値をご確認ください											
+f002207340	mm_regist_date		t	t		入力された値をご確認ください	
+quantity	mm_integer	t	t			入力された値をご確認ください											
+quantityUnit	mm_name	t	t			入力された値をご確認ください	0	f		f					f	1
+itemUnit	mm_name	t	t			入力された値をご確認ください	0	f		f					f	1
+minPrice	mm_real	t	t			入力された値をご確認ください											
+requestItemId	mm_number32	t	t			入力された値をご確認ください	0	f		f					f	
+authKey	mm_ezpassword	t	t			入力された値をご確認ください	0	f		f					f	1	確認入力と一致しません
+tenantId	mm_number32	t	t			入力された値をご確認ください	0	f		f					f	
+distributorId	mm_number32	t	t			入力された値をご確認ください	0	f		f					f	
+requestId	mm_number32	t	t			入力された値をご確認ください										

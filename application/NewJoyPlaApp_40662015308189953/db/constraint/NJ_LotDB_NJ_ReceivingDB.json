@@ -1,0 +1,13 @@
+{
+ "right_field": "receivingNumber",
+ "right_db_id": "db_mst104530",
+ "strength": 50,
+ "right_db": "NJ_ReceivingDB",
+ "left_field": "receivingNumber",
+ "mstOnInsertCascade": 0,
+ "left_db_id": "db_mst104522",
+ "comment": "",
+ "id": "constraint_mst10521",
+ "left_db": "NJ_LotDB",
+ "mstOnDeleteCascade": false
+}

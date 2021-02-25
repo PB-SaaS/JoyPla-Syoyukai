@@ -1,0 +1,238 @@
+<?php
+//<!-- SMP_DYNAMIC_PAGE DISPLAY_ERRORS=OFF NAME=form -->
+?>
+<!DOCTYPE html>
+<html>
+  <head>
+ <?php include_once "NewJoyPla/src/Head.php"; ?>
+    <title>JoyPla ≤∑∂»º‘æ Û≈–œø - ∆˛Œœ</title>
+    <style>
+     .uk-navbar-container{
+      border-bottom : solid 2px #98CB00;
+     }
+     .bk-application-color{
+      background : #98CB00;
+     }
+#mainPage{
+    display: none;
+}
+
+dl.cf{
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5e5e5 !important;
+}
+
+.hyphen{
+ position: relative; 
+}
+
+.hyphen::after{
+ content: '-';
+ position: absolute;
+ left : 0px;
+ width : 30px;
+ font-size:14px;
+ top:12px;
+ text-align: center;
+ bottom:0;
+}
+@media (min-width: 1200px){
+ .hyphen::after{
+  width : 40px;
+ }
+}
+    </style>
+  </head>
+  <body>
+ <?php include_once "NewJoyPla/src/Header.php"; ?>
+   <div class="uk-section uk-section-default uk-preserve-color uk-padding-remove">
+     <div class="uk-container uk-container-expand" uk-height-viewport="expand: true">
+<div class="uk-width-2-3@m uk-margin-auto uk-margin-remove-top uk-margin-bottom" id="mainPage">
+
+                <!-- SMP_TEMPLATE_HEADER start -->
+ <h1>≤∑∂»º‘æ Û≈–œø - ∆˛Œœ</h1>
+
+ <!--SMP:DISP:REG:START-->
+ <p class="header_rmesg">…¨Õ◊ªˆπ‡§Ú§¥∆˛Œœ§ŒæÂ°¢≥Œ«ß•‹•ø•Û§Ú≤°§∑§∆§Ø§¿§µ§§°£</p>
+ <!--SMP:DISP:REG:END-->
+
+ <!--SMP:DISP:ERR:START-->
+ <p class="header_emesg">§¥∆˛Œœ∆‚Õ∆§À…‘»˜§¨§¥§∂§§§ﬁ§π°£•®•È°º§¨»Ø¿∏§∑§øπ‡Ã‹§ÚΩ§¿µ§∑°¢¡˜øÆ§∑§ §™§∑§∆§Ø§¿§µ§§°£</p>
+ <!--SMP:DISP:ERR:END-->
+                <!-- SMP_TEMPLATE_HEADER end -->
+               <!-- SMP_TEMPLATE_FORM start -->
+ <form method="post" action="/regist/Reg2">
+  <div class="smp_tmpl">
+     <dl class="cf">
+      <dt class="title">
+       ≤∑∂»º‘Ãæ <span class="need">…¨ø‹</span>
+      </dt><dd class="data ">
+       
+       <input class="input $errorInputColor:distributorName$" type="text" name="distributorName" value="$distributorName$" maxlength="128" >
+       <br>
+       <span class="msg">$error:distributorName$</span>
+      </dd>
+     </dl>
+     <dl class="cf">
+      <dt class="title">
+       Õπ ÿ»÷πÊ
+       </dt><dd class="data zipcode">
+             <div class="" uk-grid>
+              <div class="uk-width-2-5"><input class="input $errorInputColor:postalCode$" type="text" name="postalCode:a" value="$postalCode:a$" maxlength="3" ></div>
+              <div class="uk-width-3-5 hyphen"><input class="input $errorInputColor:postalCode$" type="text" name="postalCode:t" value="$postalCode:t$" maxlength="4" ></div>
+             </div>
+       <span class="msg">$error:postalCode$</span>
+      </dd>
+     </dl>
+     <dl class="cf">
+      <dt class="title">
+       ≈‘∆ª…‹∏©
+      </dt><dd class="data ">
+       
+       <select class="$errorInputColor:prefectures$" name="prefectures">
+        <option value="">----- ¡™¬Ú§∑§∆§Ø§¿§µ§§ -----</option>
+        <option value="ÀÃ≥§∆ª" $prefectures:1$>ÀÃ≥§∆ª</option>
+        <option value="¿ƒøπ∏©" $prefectures:2$>¿ƒøπ∏©</option>
+        <option value="¥‰ºÍ∏©" $prefectures:3$>¥‰ºÍ∏©</option>
+        <option value="µ‹æÎ∏©" $prefectures:4$>µ‹æÎ∏©</option>
+        <option value="Ω©≈ƒ∏©" $prefectures:5$>Ω©≈ƒ∏©</option>
+        <option value="ª≥∑¡∏©" $prefectures:6$>ª≥∑¡∏©</option>
+        <option value=" °≈Á∏©" $prefectures:7$> °≈Á∏©</option>
+        <option value="∞ÒæÎ∏©" $prefectures:8$>∞ÒæÎ∏©</option>
+        <option value="∆ Ã⁄∏©" $prefectures:9$>∆ Ã⁄∏©</option>
+        <option value="∑≤«œ∏©" $prefectures:10$>∑≤«œ∏©</option>
+        <option value="∫Î∂Ã∏©" $prefectures:11$>∫Î∂Ã∏©</option>
+        <option value="¿ÈÕ’∏©" $prefectures:12$>¿ÈÕ’∏©</option>
+        <option value="≈Ïµ˛≈‘" $prefectures:13$>≈Ïµ˛≈‘</option>
+        <option value="ø¿∆‡¿Ó∏©" $prefectures:14$>ø¿∆‡¿Ó∏©</option>
+        <option value="ø∑≥„∏©" $prefectures:15$>ø∑≥„∏©</option>
+        <option value="…Ÿª≥∏©" $prefectures:16$>…Ÿª≥∏©</option>
+        <option value="¿–¿Ó∏©" $prefectures:17$>¿–¿Ó∏©</option>
+        <option value=" °∞Ê∏©" $prefectures:18$> °∞Ê∏©</option>
+        <option value="ª≥Õ¸∏©" $prefectures:19$>ª≥Õ¸∏©</option>
+        <option value="ƒπÃÓ∏©" $prefectures:20$>ƒπÃÓ∏©</option>
+        <option value="¥Ù…Ï∏©" $prefectures:21$>¥Ù…Ï∏©</option>
+        <option value="¿≈≤¨∏©" $prefectures:22$>¿≈≤¨∏©</option>
+        <option value="∞¶√Œ∏©" $prefectures:23$>∞¶√Œ∏©</option>
+        <option value="ª∞Ω≈∏©" $prefectures:24$>ª∞Ω≈∏©</option>
+        <option value="º¢≤Ï∏©" $prefectures:25$>º¢≤Ï∏©</option>
+        <option value="µ˛≈‘…‹" $prefectures:26$>µ˛≈‘…‹</option>
+        <option value="¬Á∫Â…‹" $prefectures:27$>¬Á∫Â…‹</option>
+        <option value=" º∏À∏©" $prefectures:28$> º∏À∏©</option>
+        <option value="∆‡Œ…∏©" $prefectures:29$>∆‡Œ…∏©</option>
+        <option value="œ¬≤Œª≥∏©" $prefectures:30$>œ¬≤Œª≥∏©</option>
+        <option value="ƒªºË∏©" $prefectures:31$>ƒªºË∏©</option>
+        <option value="≈Á∫¨∏©" $prefectures:32$>≈Á∫¨∏©</option>
+        <option value="≤¨ª≥∏©" $prefectures:33$>≤¨ª≥∏©</option>
+        <option value="π≠≈Á∏©" $prefectures:34$>π≠≈Á∏©</option>
+        <option value="ª≥∏˝∏©" $prefectures:35$>ª≥∏˝∏©</option>
+        <option value="∆¡≈Á∏©" $prefectures:36$>∆¡≈Á∏©</option>
+        <option value="π·¿Ó∏©" $prefectures:37$>π·¿Ó∏©</option>
+        <option value="∞¶…≤∏©" $prefectures:38$>∞¶…≤∏©</option>
+        <option value="π‚√Œ∏©" $prefectures:39$>π‚√Œ∏©</option>
+        <option value=" °≤¨∏©" $prefectures:40$> °≤¨∏©</option>
+        <option value="∫¥≤Ï∏©" $prefectures:41$>∫¥≤Ï∏©</option>
+        <option value="ƒπ∫Í∏©" $prefectures:42$>ƒπ∫Í∏©</option>
+        <option value="∑ßÀ‹∏©" $prefectures:43$>∑ßÀ‹∏©</option>
+        <option value="¬Á ¨∏©" $prefectures:44$>¬Á ¨∏©</option>
+        <option value="µ‹∫Í∏©" $prefectures:45$>µ‹∫Í∏©</option>
+        <option value="ºØª˘≈Á∏©" $prefectures:46$>ºØª˘≈Á∏©</option>
+        <option value="≤≠∆Ï∏©" $prefectures:47$>≤≠∆Ï∏©</option>
+        <option value="§Ω§Œ¬æ" $prefectures:0$>§Ω§Œ¬æ</option>
+       </select>
+       <br>
+       <span class="msg">$error:prefectures$</span>
+      </dd>
+     </dl>
+     <dl class="cf">
+      <dt class="title">
+       ΩªΩÍ <span class="need">…¨ø‹</span>
+      </dt><dd class="data ">
+       
+       <input class="input $errorInputColor:address$" type="text" name="address" value="$address$" maxlength="128" >
+       <br>
+       <span class="msg">$error:address$</span>
+      </dd>
+     </dl>
+     <dl class="cf">
+      <dt class="title">
+       ≈≈œ√»÷πÊ
+      </dt><dd class="data phone">
+       <div class="" uk-grid>
+        <div class="uk-width-1-5"><input class="input $errorInputColor:phoneNumber$ uk-width-middle" type="text" name="phoneNumber:a" value="$phoneNumber:a$" maxlength="6" ></div>
+        <div class="uk-width-2-5 hyphen"><input class="input $errorInputColor:phoneNumber$ uk-width-middle" type="text" name="phoneNumber:e" value="$phoneNumber:e$" maxlength="4" ></div>
+        <div class="uk-width-2-5 hyphen"><input class="input $errorInputColor:phoneNumber$ uk-width-middle" type="text" name="phoneNumber:n" value="$phoneNumber:n$" maxlength="5" ></div>
+       </div>
+       <span class="msg">$error:phoneNumber$</span>
+      </dd>
+     </dl>
+     <dl class="cf">
+      <dt class="title">
+       FAX»÷πÊ
+      </dt><dd class="data phone">
+       <div class="" uk-grid>
+        <div class="uk-width-1-5"><input class="input $errorInputColor:faxNumber$" type="text" name="faxNumber:a" value="$faxNumber:a$" maxlength="6" ></div>
+        <div class="uk-width-2-5 hyphen"><input class="input $errorInputColor:faxNumber$" type="text" name="faxNumber:e" value="$faxNumber:e$" maxlength="4" ></div>
+        <div class="uk-width-2-5 hyphen"><input class="input $errorInputColor:faxNumber$" type="text" name="faxNumber:n" value="$faxNumber:n$" maxlength="5" ></div>
+       </div>
+       <span class="msg">$error:faxNumber$</span>
+      </dd>
+     </dl>
+   </div>
+  <input type="hidden" name="detect" value="»ΩƒÍ">
+  <!-- HIDDEN_PARAM START -->
+  $form:hidden$  <!-- HIDDEN_PARAM END -->
+  <input class="submit" type="submit" name="submit" value="¡˜øÆ">  
+ </form>
+<!-- SMP_TEMPLATE_FORM end -->
+</div>
+     </div>
+ </div>
+<script>
+  $(function(){
+    $("form").addClass("uk-form-horizontal uk-margin-large uk-text-center uk-margin-remove");
+
+    $("table").addClass("uk-table");
+
+    $("div.smp_tmpl").addClass("uk-text-left");
+
+    $("input[type='text']").addClass("uk-input uk-width-expand");
+
+
+    $("input[type='password']").addClass("uk-input uk-width-expand");
+    $("select").addClass("uk-select");
+    $("input[type='checkbox']").addClass("uk-checkbox");
+    $("input[type='checkbox']").addClass("uk-margin-small-right");
+
+
+    $("input[type='submit']").addClass("uk-button uk-button-primary uk-margin-large-right uk-margin-large-left");
+    $("input[type='reset']").addClass("uk-button uk-button-default");
+    $("input[name='SMPFORM_BACK']").removeClass("uk-button-primary");
+    $("input[name='SMPFORM_BACK']").addClass("uk-button-default");
+    $("input").css('text-align','left');
+    $("textarea").addClass("uk-textarea");
+
+    $(".title").addClass("uk-form-label uk-margin-remove-top");
+    $(".data").addClass("uk-form-controls");
+
+    $(".header").addClass("uk-text-large");
+    $(".need").addClass("uk-label uk-label-danger");
+
+    $(".sample").addClass("uk-text-meta uk-text-small");
+    $(".suffix").addClass("uk-text-meta uk-text-small uk-width-1-5");
+    $(".caution").addClass("uk-text-meta uk-text-small");
+    $(".caution").before("<br>");
+
+    $("ul").addClass("uk-list");
+
+    $(".error").addClass("uk-form-danger");
+    $(".msg").addClass("uk-text-danger");
+    $(".header_emesg").addClass("uk-alert-danger uk-alert");
+
+
+    $("#mainPage").show();
+
+  });
+</script>
+  </body>
+</html>

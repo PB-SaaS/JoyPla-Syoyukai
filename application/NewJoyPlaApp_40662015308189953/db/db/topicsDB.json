@@ -1,0 +1,314 @@
+{
+ "id": "db_mst104551",
+ "name": "トピック情報DB",
+ "title": "topicsDB",
+ "comment": "",
+ "record_limit": "0",
+ "check_regist_auth_selected": [],
+ "type": "view_n",
+ "fieldList":  [
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "hospitalId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "病院ID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348869",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "distributorId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "卸業者ID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348841",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_regist_date",
+   "title": "registrationTime",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "登録日時",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349639",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": true,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "topicId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": true,
+   "index_flg": false,
+   "name": "トピックID",
+   "not_null_flg": true,
+   "comment": "",
+   "id": "field_def2349640",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "topicTitle",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "タイトル",
+   "not_null_flg": true,
+   "comment": "",
+   "id": "field_def2349641",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field64",
+   "title": "topicName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "投稿者氏名",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349642",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "distributorName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "卸業者名",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349777",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "hospitalName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "病院名",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349802",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_date_ymdhhmmss",
+   "title": "updateTime",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "最終更新日時",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349643",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_area8192",
+   "title": "topicContent",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "内容",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349644",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_ezpassword",
+   "title": "authKey",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "変更削除キー",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349645",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field64",
+   "title": "lastName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "最終更新者",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349646",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_integer",
+   "title": "commentCount",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "コメント数",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349647",
+   "set_default": null
+  }
+ ],
+ "real_db_id": "db_mst104518",
+ "view_fields":  [
+    {
+   "real_db_id": "db_mst104518",
+   "field": "distributorId"
+  },
+    {
+   "real_db_id": "db_mst104518",
+   "field": "hospitalId"
+  },
+    {
+   "real_db_id": "db_mst104518",
+   "field": "registrationTime"
+  },
+    {
+   "real_db_id": "db_mst104518",
+   "field": "topicId"
+  },
+    {
+   "real_db_id": "db_mst104518",
+   "field": "topicTitle"
+  },
+    {
+   "real_db_id": "db_mst104518",
+   "field": "topicName"
+  },
+    {
+   "real_db_id": "db_mst104518",
+   "field": "updateTime"
+  },
+    {
+   "real_db_id": "db_mst104518",
+   "field": "topicContent"
+  },
+    {
+   "real_db_id": "db_mst104518",
+   "field": "authKey"
+  },
+    {
+   "real_db_id": "db_mst104518",
+   "field": "lastName"
+  },
+    {
+   "real_db_id": "db_mst104518",
+   "field": "commentCount"
+  },
+    {
+   "real_db_id": "db_mst104539",
+   "field": "distributorName"
+  },
+    {
+   "real_db_id": "db_mst104542",
+   "field": "hospitalName"
+  }
+ ],
+ "view_constraints":  [
+    {
+   "db_left_id": "db_mst104518",
+   "db_right_id": "db_mst104539",
+   "constraint_id": "NJ_TopicDB_NJ_distributorDB",
+   "join_type": "LEFT OUTER JOIN"
+  },
+    {
+   "db_left_id": "db_mst104518",
+   "db_right_id": "db_mst104542",
+   "constraint_id": "NJ_TopicDB_NJ_HospitalDB",
+   "join_type": "LEFT OUTER JOIN"
+  }
+ ]
+}

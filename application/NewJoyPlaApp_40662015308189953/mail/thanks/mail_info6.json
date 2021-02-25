@@ -1,0 +1,61 @@
+{
+ "id": "deliver_rule10231438",
+ "envelope":  {
+  "id": "envelope_def10159118",
+  "name": "お問合せ",
+  "subject": "[JoyPla] お問合せが完了しました",
+  "parts": 1,
+  "content_type": "text/plain; charset=iso-2022-jp",
+  "from_address": "#SMP_APP_MAIL_REPLACE#",
+  "from_name": "#SMP_APP_NAME_REPLACE#",
+  "application": "DirectEnv",
+  "message_list": [  {
+   "id": "message_def16061210",
+   "message_name": "de_10159118_[JoyPla] お問合せが完了しました",
+   "content_type": "text/plain; charset=iso-2022-jp",
+   "swap_flg": false,
+   "application": "DirectEnv",
+   "contents": [   {
+    "content":     {
+     "id": "content_mst16068652",
+     "category":      {
+      "id": "category_mst25214",
+      "category_name": "DIRECT_ENV",
+      "public_flg": false,
+      "application": "DirectEnv"
+     },
+     "content_type": "text/plain; charset=iso-2022-jp",
+     "content_name": "de_10159118_[JoyPla] お問合せが完了しました",
+     "application": "DirectEnv",
+     "body": "%val:usr:facilityName%\r\n%val:usr:name% 様\r\n\r\nJoyPlaのお問合せを行いました。\r\n\r\n=== 下記お問合せ内容 ===\r\n種別\r\n%val:usr:type%\r\n\r\nタイトル\r\n%val:usr:title%\r\n\r\nお問い合わせ内容\r\n%val:usr:content%"
+    },
+    "swap_flg": false
+   }]
+  }]
+ },
+ "list":  {
+  "id": "list_mst7913853",
+  "db": "NJ_contactUsDB",
+  "db_id": "db_mst104516",
+  "application": "List",
+  "del_err_field": "ErrorCount",
+  "del_err_auto_flg": true,
+  "n5_count": 3,
+  "n5_except_flg": true,
+  "reflect_stop_db_flg": false,
+  "list_name": "お問合せ",
+  "recipient_field": "mailAddress",
+  "prefix": "様",
+  "domain_detect": "all",
+  "recipient_name_field": "name"
+ },
+ "application": "thanks",
+ "ready_flg": true,
+ "url_secs_count": 31536000,
+ "url_secs_login": 2678400,
+ "night_stop_period": "1_2200_0700",
+ "attribute":  {
+  "form_id": "remote_mst140171",
+  "seq_order": 1
+ }
+}

@@ -1,0 +1,23 @@
+nn_err_msg	入力必須です
+dup_err_msg	入力された値をご確認ください
+cnf_err_msg	確認入力と一致しません
+mem_err_msg	認証に失敗しました
+not_null_alter	-1	-1	入力必須項目に未入力があります
+depend_err_msg	f	f	機種依存文字が含まれています
+space2null	f
+0	id	t
+updateTime	mm_date_ymdhhmmss		t			入力された値をご確認ください											
+userPermission	mm_alternative	t	t			入力された値をご確認ください	
+loginId	mm_number32	t	t	t	t	入力された値をご確認ください	0	f		f					f	
+name	mm_text_field64	t	t			入力された値をご確認ください	0	f		f					f	1
+authKey	mm_ezpassword	t	t			入力された値をご確認ください											確認入力と一致しません
+nameKana	mm_address_katakana	t	t			入力された値をご確認ください	0	f		f					f	1
+mailAddress	mm_email_nc	t	t	t	t	入力された値をご確認ください											確認入力と一致しません
+remarks	mm_text_area256	t	t			入力された値をご確認ください	0	f		f					f	1
+hospitalId	mm_number32		t	t		入力された値をご確認ください										
+divisionId	mm_number32		t			入力された値をご確認ください										
+loginPassword	mm_digest_sha256		t			入力された値をご確認ください											確認入力と一致しません
+termsAgreement	mm_alternative		t			入力された値をご確認ください	
+tenantId	mm_number32		t			入力された値をご確認ください										
+agreementDate	mm_date_ymdhhmmss		t			入力された値をご確認ください											
+registrationTime	mm_regist_date		t			入力された値をご確認ください	

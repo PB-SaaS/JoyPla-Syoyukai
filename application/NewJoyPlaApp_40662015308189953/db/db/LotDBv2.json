@@ -1,0 +1,558 @@
+{
+ "id": "db_mst105056",
+ "name": "ロット情報DBv2",
+ "title": "LotDBv2",
+ "comment": "",
+ "record_limit": "1000",
+ "check_regist_auth_selected": [],
+ "type": "view_n",
+ "fieldList":  [
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_regist_date",
+   "title": "registrationTime",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "登録日時",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349667",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_date_ymdhhmmss",
+   "title": "updateTime",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "更新日時",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349668",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "receivingNumber",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "入庫情報ID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348900",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "payoutId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "払出情報ID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348907",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": true,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "lotId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": true,
+   "index_flg": false,
+   "name": "ロット情報ID",
+   "not_null_flg": true,
+   "comment": "",
+   "id": "field_def2349669",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "lotNumber",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "ロット番号",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349670",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_date_ymd",
+   "title": "lotDate",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "使用期限",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349671",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "divisionId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "部署ID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348896",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "inHospitalItemId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "院内商品ID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348899",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "hospitalId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "病院ID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348869",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "label":    {
+    "candidates": 2,
+    "idAry":     [
+     1,
+     2
+    ],
+    "keywordAry":     [
+     "入庫処理",
+     "払出処理"
+    ]
+   },
+   "type": "mm_alternative",
+   "title": "lotRegistration",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "ロット登録方法",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349672",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "receivingHId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "入庫履歴ID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348889",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "payoutHistoryId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "払出履歴ID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348912",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_integer",
+   "title": "quantity",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "入数",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348837",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "divisionName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "部署名",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349796",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "itemId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "商品ID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349017",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "itemName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "商品名",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348831",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "itemCode",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "商品コード",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348832",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "itemStandard",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "商品規格",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348833",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "itemJANCode",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "商品JANコード",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348834",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_area512",
+   "title": "notice",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "特記事項",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349768",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_integer",
+   "title": "HPstock",
+   "radio_flg": false,
+   "app_role": null,
+   "default_string": "0",
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "院内総在庫数",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349769",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "makerName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "メーカー名",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348835",
+   "set_default": null
+  }
+ ],
+ "real_db_id": "db_mst104522",
+ "view_fields":  [
+    {
+   "real_db_id": "db_mst104522",
+   "field": "quantity"
+  },
+    {
+   "real_db_id": "db_mst104522",
+   "field": "hospitalId"
+  },
+    {
+   "real_db_id": "db_mst104522",
+   "field": "receivingHId"
+  },
+    {
+   "real_db_id": "db_mst104522",
+   "field": "divisionId"
+  },
+    {
+   "real_db_id": "db_mst104522",
+   "field": "inHospitalItemId"
+  },
+    {
+   "real_db_id": "db_mst104522",
+   "field": "receivingNumber"
+  },
+    {
+   "real_db_id": "db_mst104522",
+   "field": "payoutId"
+  },
+    {
+   "real_db_id": "db_mst104522",
+   "field": "payoutHistoryId"
+  },
+    {
+   "real_db_id": "db_mst104522",
+   "field": "registrationTime"
+  },
+    {
+   "real_db_id": "db_mst104522",
+   "field": "updateTime"
+  },
+    {
+   "real_db_id": "db_mst104522",
+   "field": "lotId"
+  },
+    {
+   "real_db_id": "db_mst104522",
+   "field": "lotNumber"
+  },
+    {
+   "real_db_id": "db_mst104522",
+   "field": "lotDate"
+  },
+    {
+   "real_db_id": "db_mst104522",
+   "field": "lotRegistration"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "itemName"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "itemCode"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "itemStandard"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "itemJANCode"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "makerName"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "itemId"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "notice"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "HPstock"
+  },
+    {
+   "real_db_id": "db_mst104541",
+   "field": "divisionName"
+  }
+ ],
+ "view_constraints":  [
+    {
+   "db_left_id": "db_mst104522",
+   "db_right_id": "db_mst104541",
+   "constraint_id": "NJ_LotDB_NJ_divisionDB",
+   "join_type": "LEFT OUTER JOIN"
+  },
+    {
+   "db_left_id": "db_mst104522",
+   "db_right_id": "db_mst104531",
+   "constraint_id": "NJ_LotDB_NJ_ReceivingHDB",
+   "join_type": "LEFT OUTER JOIN"
+  },
+    {
+   "db_left_id": "db_mst104522",
+   "db_right_id": "db_mst104537",
+   "constraint_id": "NJ_LotDB_NJ_inHPItemDB",
+   "join_type": "LEFT OUTER JOIN"
+  },
+    {
+   "db_left_id": "db_mst104522",
+   "db_right_id": "db_mst104530",
+   "constraint_id": "NJ_LotDB_NJ_ReceivingDB",
+   "join_type": "LEFT OUTER JOIN"
+  }
+ ]
+}

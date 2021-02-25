@@ -1,0 +1,491 @@
+{
+ "no_style_name": "<!DOCTYPE html>\r\n<html>\r\n  <head>\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=Shift_JIS\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0\">\r\n    <!-- UIkit CSS -->\r\n\t<link rel=\"stylesheet\" href=\"https://i02.smp.ne.jp/u/joypla/new/css/uikit.min.css\" />\r\n\t<link rel=\"stylesheet\" href=\"https://i02.smp.ne.jp/u/joypla/new/css/normalize.css\" />\r\n \r\n\t<!-- UIkit JS -->\r\n\t<script src=\"https://i02.smp.ne.jp/u/joypla/new/js/uikit.min.js\"><\/script>\r\n\t<script src=\"https://i02.smp.ne.jp/u/joypla/new/js/uikit-icons.min.js\"><\/script>\r\n \r\n    <script src=\"https://i02.smp.ne.jp/u/joypla/new/js/jquery-3.5.1.js\"><\/script>\r\n    \r\n    <script src=\"https://i02.smp.ne.jp/u/joypla/new/js/createPage.js\"><\/script>\r\n\r\n    <title><\/title>\r\n    <style>\r\n     .uk-navbar-container{\r\n      border-bottom : solid 2px #98CB00;\r\n     }\r\n     .bk-application-color{\r\n      background : #98CB00;\r\n     }\r\n    <\/style>\r\n  <\/head>\r\n  <body>\r\n  <script>\r\ncreateErrorPage(\"%val:error:code%\",\"%val:error:msg%\");\r\n  <\/script>\r\n  <\/body>\r\n  \r\n\r\n<\/html>",
+ "style_name": "<!DOCTYPE html>\r\n<html>\r\n  <head>\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=Shift_JIS\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0\">\r\n    <!-- UIkit CSS -->\r\n\t<link rel=\"stylesheet\" href=\"https://i02.smp.ne.jp/u/joypla/new/css/uikit.min.css\" />\r\n\t<link rel=\"stylesheet\" href=\"https://i02.smp.ne.jp/u/joypla/new/css/normalize.css\" />\r\n \r\n\t<!-- UIkit JS -->\r\n\t<script src=\"https://i02.smp.ne.jp/u/joypla/new/js/uikit.min.js\"><\/script>\r\n\t<script src=\"https://i02.smp.ne.jp/u/joypla/new/js/uikit-icons.min.js\"><\/script>\r\n \r\n    <script src=\"https://i02.smp.ne.jp/u/joypla/new/js/jquery-3.5.1.js\"><\/script>\r\n    \r\n    <script src=\"https://i02.smp.ne.jp/u/joypla/new/js/createPage.js\"><\/script>\r\n\r\n    <title><\/title>\r\n    <style>\r\n     .uk-navbar-container{\r\n      border-bottom : solid 2px #98CB00;\r\n     }\r\n     .bk-application-color{\r\n      background : #98CB00;\r\n     }\r\n    <\/style>\r\n  <\/head>\r\n  <body>\r\n  <script>\r\ncreateErrorPage(\"%val:error:code%\",\"%val:error:msg%\");\r\n  <\/script>\r\n  <\/body>\r\n  \r\n\r\n<\/html>",
+ "design_tmpl": "hf000002581",
+ "template_name": "NewJoyPla-Error",
+ "template_mode": "multi_device",
+ "style_list":  [
+    {
+   "num": "1",
+   "name": "切り替え",
+   "body": "@media screen and (min-width:726px) and (max-width:981px) {\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "1",
+   "name": "切り替え",
+   "body": "@media screen and (max-width:725px) {\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "1",
+   "name": "ページ全体",
+   "body": "#SMP_STYLE .body {\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n\tbackground: #F4F4F4;\r\n\tfont-size: 13px;\r\n\t*font-size: small;\r\n\t*font: x-small;\r\n\tfont-family: \"メイリオ\", \"Meiryo\", \"ヒラギノ角ゴ Pro W3\", \"Hiragino Kaku Gothic Pro\", \"ＭＳ Ｐゴシック\", \"MS PGothic\", Sans-Serif;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "2",
+   "name": "ページ全体",
+   "body": "\t#SMP_STYLE .body {\r\n\t\tmargin: 0;\r\n\t\tpadding: 0;\r\n\t\tfont-size: 13px;\r\n\t\t*font-size: small;\r\n\t\t*font: x-small;\r\n\t\tfont-family: \"メイリオ\", \"Meiryo\", \"ヒラギノ角ゴ Pro W3\", \"Hiragino Kaku Gothic Pro\", \"ＭＳ Ｐゴシック\", \"MS PGothic\", Sans-Serif;\r\n\t\tbackground: #FFFFFF;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "2",
+   "name": "ページ全体",
+   "body": "\t#SMP_STYLE .body {\r\n\t\tmargin: 0;\r\n\t\tpadding: 0;\r\n\t\tfont-size: 13px;\r\n\t\t*font-size: small;\r\n\t\t*font: x-small;\r\n\t\tfont-family: \"メイリオ\", \"Meiryo\", \"ヒラギノ角ゴ Pro W3\", \"Hiragino Kaku Gothic Pro\", \"ＭＳ Ｐゴシック\", \"MS PGothic\", Sans-Serif;\r\n\t\tbackground: #FFFFFF;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "2",
+   "name": "外枠",
+   "body": "#SMP_STYLE .body_tbl {\r\n\twidth: 900px;\r\n\tmargin: 0 auto;\r\n\tpadding-bottom: 30px;\r\n\tborder: 1px solid #999999;\r\n\tbackground: #FFFFFF;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "3",
+   "name": "外枠",
+   "body": "\t#SMP_STYLE .body_tbl {\r\n\t\twidth: 100%;\r\n\t\tmargin: 0 auto;\r\n\t\tpadding: 0 0 30px 0;\r\n\t\tborder: none;\r\n\t\tbackground: #FFFFFF;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "3",
+   "name": "見出し",
+   "body": "#SMP_STYLE h1 {\r\n\tmargin: 0;\r\n\tpadding: 10px 10px 10px 10px;\r\n\tbackground: #333333;\r\n\tcolor: #FFFFFF;\r\n\tfont-size: 153.9%;\r\n\ttext-align: center;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "3",
+   "name": "外枠",
+   "body": "\t#SMP_STYLE .body_tbl {\r\n\t\twidth: 100%;\r\n\t\tmargin: 0 auto;\r\n\t\tpadding-bottom: 30px;\r\n\t\tborder: none;\r\n\t\tbackground: #FFFFFF;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "4",
+   "name": "見出し",
+   "body": "\t#SMP_STYLE h1 {\r\n\t\tmargin: 0;\r\n\t\tpadding: 10px 10px 10px 10px;\r\n\t\tbackground: #333333;\r\n\t\tcolor: #FFFFFF;\r\n\t\tfont-size: 153.9%;\r\n\t\ttext-align: center;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "4",
+   "name": "見出し画像",
+   "body": "#SMP_STYLE .header_img_smartphone {display: none;}\r\n#SMP_STYLE .header_img_tablet {display: none;}\r\n#SMP_STYLE .header_img_pc {display: block;}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "4",
+   "name": "見出し",
+   "body": "\t#SMP_STYLE h1 {\r\n\t\tmargin: 0;\r\n\t\tpadding: 10px 10px 10px 10px;\r\n\t\tbackground: #333333;\r\n\t\tcolor: #FFFFFF;\r\n\t\tfont-size: 153.9%;\r\n\t\ttext-align: center;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "5",
+   "name": "見出し画像",
+   "body": "\t#SMP_STYLE .header_img_smartphone {display: block;}\r\n\t#SMP_STYLE .header_img_tablet {display: none;}\r\n\t#SMP_STYLE .header_img_pc {display: none;}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "5",
+   "name": "見出しの補足説明",
+   "body": "#SMP_STYLE .header_text {\r\n\tmargin: 0;\r\n\tpadding: 20px 70px 20px 70px;\r\n\tbackground: #F1F1F1;\r\n\tcolor: #111111;\r\n\tfont-size: 100%;\r\n\tfont-weight: normal;\r\n\ttext-align: left;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "5",
+   "name": "見出し画像",
+   "body": "\t#SMP_STYLE .header_img_smartphone {display: none;}\r\n\t#SMP_STYLE .header_img_tablet {display: block;}\r\n\t#SMP_STYLE .header_img_pc {display: none;}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "6",
+   "name": "見出しの補足説明",
+   "body": "\t#SMP_STYLE .header_text {\r\n\t\tmargin: 0;\r\n\t\tpadding: 15px 70px 15px 70px;\r\n\t\tbackground: #F1F1F1;\r\n\t\tcolor: #111111;\r\n\t\tfont-size: 93%;\r\n\t\tfont-weight: normal;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "6",
+   "name": "見出しの補足説明",
+   "body": "\t#SMP_STYLE .header_text {\r\n\t\tmargin: 0;\r\n\t\tpadding: 15px 15px 15px 15px;\r\n\t\tbackground: #F1F1F1;\r\n\t\tcolor: #111111;\r\n\t\tfont-size: 85%;\r\n\t\tfont-weight: normal;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "6",
+   "name": "入力時の説明",
+   "body": "#SMP_STYLE .header_rmesg {\r\n\tmargin: 0;\r\n\tpadding: 30px 70px 10px 70px;\r\n\tcolor: #111111;\r\n\tfont-size: 100%:\r\n\tfont-weight: normal;\r\n\ttext-align: left;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "7",
+   "name": "入力時の説明",
+   "body": "\t#SMP_STYLE .header_rmesg {\r\n\t\tmargin: 0;\r\n\t\tpadding: 30px 70px 10px 70px;\r\n\t\tcolor: #111111;\r\n\t\tfont-size: 100%;\r\n\t\tfont-weight: normal;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "7",
+   "name": "入力時の説明",
+   "body": "\t#SMP_STYLE .header_rmesg {\r\n\t\tmargin: 0 0 0 0;\r\n\t\tpadding: 30px 15px 10px 15px;\r\n\t\tcolor: #111111;\r\n\t\tfont-size: 100%:\r\n\t\tfont-weight: normal;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "7",
+   "name": "入力エラー時の説明",
+   "body": "#SMP_STYLE .header_emesg {\r\n\twidth: 720px;\r\n\tmargin: 30px auto;\r\n\tpadding: 20px 20px 20px 20px;\r\n\tborder: 2px solid #FF0000;\r\n\tcolor: #FF0000;\r\n\tfont-size: 100%;\r\n\tfont-weight: normal;\r\n\ttext-align: left;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "8",
+   "name": "入力エラー時の説明",
+   "body": "\t#SMP_STYLE .header_emesg {\r\n\t\twidth: 80%;\r\n\t\tmargin: 30px auto 10px;\r\n\t\tpadding: 15px 15px 15px 15px;\r\n\t\tborder: 2px solid #FF0000;\r\n\t\tcolor: #FF0000;\r\n\t\tfont-size: 100%;\r\n\t\tfont-weight: normal;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "8",
+   "name": "入力項目",
+   "body": "#SMP_STYLE .smp_tmpl {\r\n\twidth: 760px;\r\n\tpadding: 20px 0 0 0;\r\n\tmargin: 0 70px;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "8",
+   "name": "入力エラー時の説明",
+   "body": "\t#SMP_STYLE .header_emesg {\r\n\t\twidth: 240px;\r\n\t\tmargin: 10px auto 10px;\r\n\t\tpadding: 15px 15px 15px 15px;\r\n\t\tborder: 2px solid #FF0000;\r\n\t\tcolor: #FF0000;\r\n\t\tfont-size: 100%;\r\n\t\tfont-weight: normal;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "9",
+   "name": "入力項目",
+   "body": "\t#SMP_STYLE .smp_tmpl {\r\n\t\twidth: 80%;\r\n\t\tmargin: 20px auto 0;\r\n\t\tpadding: 20px 0 0 0;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "9",
+   "name": "入力項目",
+   "body": "\t#SMP_STYLE .smp_tmpl {\r\n\t\twidth: 300px;\r\n\t\tmargin: 0 auto;\r\n\t\tpadding-top: 20px 0 0 0;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "9",
+   "name": "フォーム　行",
+   "body": "#SMP_STYLE dl {\r\n\tposition: relative;\r\n\tmargin: 0;\r\n\tpadding: 13px 0 0 0;\r\n\twidth: 760px;\r\n\tborder-bottom: 1px solid #DDDDDD;\r\n}\r\n#SMP_STYLE dl:first-child {\r\nborder-top: 1px solid #DDDDDD;\r\n}\r\n#SMP_STYLE dl.top {\r\n\tborder-top: 1px solid #DDDDDD;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "10",
+   "name": "項目名",
+   "body": "#SMP_STYLE dt.title {\r\n\tdisplay: inline-block;\r\n\twidth: 220px;\r\n\tmargin: 0;\r\n\tpadding: 23px 15px 18px 0;\r\n\tcolor: #333333;\r\n\tfont-size: 108%;\r\n\tfont-weight: bold;\r\n\ttext-align: left;\r\n\tline-height: 1.2;\r\n\tvertical-align: top;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "10",
+   "name": "フォーム　行",
+   "body": "\t#SMP_STYLE dl {\r\n\t\tdisplay: table;\r\n\t\tmargin: 0;\r\n\t\tposition: relative;\r\n\t\twidth: 100%;\r\n\t}\r\n\t#SMP_STYLE dl:first-child {\r\n\tborder-top: 1px solid #DDDDDD;\r\n\t}\r\n\t#SMP_STYLE dl.top {\r\n\t\tborder-top: 1px solid #DDDDDD;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "10",
+   "name": "フォーム　行",
+   "body": "\t#SMP_STYLE dl {\r\n\t\tdisplay: block;\r\n\t\tmargin: 0 0 10px 0;\r\n\t\tpadding: 20px 0 0 0;\r\n\t\tposition: relative;\r\n\t\twidth: 100%;\r\n\t\tborder-bottom: 1px solid #DDDDDD;\r\n\t}\r\n\t#SMP_STYLE dl:first-child {\r\n\tborder-top: 1px solid #DDDDDD;\r\n\t}\r\n\t#SMP_STYLE dl.top {\r\n\t\tborder-top: 1px solid #DDDDDD;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "11",
+   "name": "注意事項",
+   "body": "#SMP_STYLE dt.title .caution {\r\n\tdisplay: block;\r\n\twidth: 220px;\r\n\tcolor: #5F5F5F;\r\n\tfont-size: 85%;\r\n\tfont-weight: normal;\r\n\tpadding: 10px 0 0 0;\r\n\tline-height: 1.2;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "11",
+   "name": "項目名",
+   "body": "\t#SMP_STYLE dt.title {\r\n\t\tdisplay: block;\r\n\t\twidth: 270px;\r\n\t\tmargin: 0;\r\n\t\tpadding: 0 0 0 0;\r\n\t\tcolor: #333333;\r\n\t\tfont-size: 108%;\r\n\t\tfont-weight: bold;\r\n\t\ttext-align: left;\r\n\t\tvertical-align: middle;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "11",
+   "name": "項目名",
+   "body": "\t#SMP_STYLE dt.title {\r\n\t\tdisplay: inline-block;\r\n\t\twidth: 20%;\r\n\t\tmargin: 0;\r\n\t\tpadding: 23px 15px 28px 0;\r\n\t\tcolor: #333333;\r\n\t\tfont-weight: bold;\r\n\t\ttext-align: left;\r\n\t\ttext-align: left;\r\n\t\tline-height: 1.2;\r\n\t\tvertical-align: top;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "12",
+   "name": "注意事項",
+   "body": "\t#SMP_STYLE dt.title .caution {\r\n\t\tdisplay: block;\r\n\t\twidth: 270px;\r\n\t\tcolor: #5F5F5F;\r\n\t\tfont-size: 85%;\r\n\t\tfont-weight: normal;\r\n\t\tpadding: 10px 0 0 0;\r\n\t\tline-height: 1.2;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "12",
+   "name": "項目入力部",
+   "body": "#SMP_STYLE dd.data {\r\n\tdisplay: inline-block;\r\n\twidth: 520px;\r\n\tmargin: 0;\r\n\tpadding: 18px 0;\r\n\tcolor: #5F5F5F;\r\n\tfont-size: 100%;\r\n\tfont-weight: bold;\r\n\ttext-align: left;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "12",
+   "name": "注意事項",
+   "body": "\t#SMP_STYLE dt.title .caution {\r\n\t\tdisplay: block;\r\n\t\twidth: 100%;\r\n\t\tcolor: #5F5F5F;\r\n\t\tfont-size: 85%;\r\n\t\tfont-weight: normal;\r\n\t\tpadding: 10px 0 0 0;\r\n\t\tline-height: 1.2;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "13",
+   "name": "項目入力部",
+   "body": "\t#SMP_STYLE dd.data {\r\n\t\tposition: relative;\r\n\t\tdisplay: block;\r\n\t\twidth: 270px;\r\n\t\tmargin: 0 0 10px 0;\r\n\t\tpadding: 18px 0 10px 0;\r\n\t\tcolor: #5F5F5F;\r\n\t\tfont-size: 100%;\r\n\t\tfont-weight: bold;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "13",
+   "name": "項目入力部",
+   "body": "\t#SMP_STYLE dd.data {\r\n\t\tdisplay: inline-block;\r\n\t\twidth: 70%;\r\n\t\tmargin: 0;\r\n\t\tpadding: 18px 0 18px 0;\r\n\t\tcolor: #5F5F5F;\r\n\t\tfont-size: 100%;\r\n\t\tfont-weight: bold;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "13",
+   "name": "inputタグ",
+   "body": "#SMP_STYLE .input {\r\n\twidth: 420px;\r\n\tmargin-bottom: 8px;\r\n\tpadding: 5px;\r\n\tcolor: #333333;\r\n\tborder: 1px solid #999999;\r\n\tborder-radius: 3px 3px 3px 3px;\r\n\tbox-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) inset;\r\n\tfont-size: 108%;\r\n\ttext-align: left;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "14",
+   "name": "フィールドごとのデザイン",
+   "body": "#SMP_STYLE .zipcode li.code01 input {\r\n\twidth: 30px;\r\n}\r\n\r\n#SMP_STYLE .zipcode li.code02 input {\r\n\twidth: 40px;\r\n}\r\n\r\n#SMP_STYLE .phone li.num01 input {\r\n\twidth: 50px;\r\n}\r\n\r\n#SMP_STYLE .phone li.num02 input {\r\n\twidth: 40px;\r\n}\r\n\r\n#SMP_STYLE .phone li.num03 input {\r\n\twidth: 40px;\r\n}\r\n\r\n#SMP_STYLE .price input {\r\n\twidth: 200px;\r\n}\r\n\r\n#SMP_STYLE .num input {\r\n\twidth: 60px;\r\n}\r\n\r\n#SMP_STYLE .integer input {\r\n\twidth: 90px;\r\n}\r\n\r\n#SMP_STYLE .real input {\r\n\twidth: 170px;\r\n}\r\n\r\n#SMP_STYLE .pass input {\r\n\twidth: 150px;\r\n}\r\n\r\n#SMP_STYLE .epass input {\r\n\twidth: 160px;\r\n}\r\n\r\n#SMP_STYLE .time input {\r\n\twidth: 20px;\r\n}\r\n\r\n#SMP_STYLE .time .year {\r\n\twidth: 40px;\r\n}\r\n\r\n#SMP_STYLE ul,#SMP_STYLE li {\r\n\tlist-style-type: none;\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n}\r\n\r\n#SMP_STYLE .zipcode ul li,\r\n#SMP_STYLE .phone ul li,\r\n#SMP_STYLE .time ul li {\r\n\twidth: auto;\r\n\tfloat: left;\r\n\tmargin: 0 3px 0 0;\r\n\tpadding: 0;\r\n\theight: 35px;\r\n\tline-height: 35px;\r\n}\r\n\r\n#SMP_STYLE .multi1 label {\r\n\tdisplay: block;\r\n\tfloat: left;\r\n\tmin-width: 135px;\r\n\tmargin: 0 0 7px 0;\r\n\tpadding: 0 10px;\r\n\ttext-align: left;\r\n}\r\n\r\n#SMP_STYLE .multi1 label input {\r\n\tdisplay: block;\r\n\tfloat: left;\r\n\twidth: 1em;\r\n\theight: 1em;\r\n\tmargin: 0.4em 0 0 0;\r\n\tpadding: 0;\r\n\tbox-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;\r\n\tborder-radius: 0 0 0 0;\r\n\toverflow: hidden;\r\n}\r\n\r\n#SMP_STYLE .multi1 label span {\r\n\tdisplay: block;\r\n\tmargin: 0 0 0 30px;\r\n\tfont-size: 100%;\r\n\tfont-weight: normal;\r\n}\r\n\r\n#SMP_STYLE .multi2 li {\r\n\tdisplay: inline;\r\n\tfloat: left;\r\n\tmin-width: 135px;\r\n\tmargin: 0 0 0 0;\r\n\tpadding: 0 5px 2px 10px;\r\n\ttext-align: left;\r\n\tclear: both;\r\n}\r\n\r\n#SMP_STYLE .multi2 label input {\r\n\tdisplay: block;\r\n\tfloat: left;\r\n\twidth: 1em;\r\n\theight: 1em;\r\n\tbox-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;\r\n\tmargin: 0.2em 0 0 0;\r\n\tpadding: 0;\r\n\tborder-radius: 0 0 0 0;\r\n\toverflow: hidden;\r\n}\r\n\r\n#SMP_STYLE .multi2 label span {\r\n\tdisplay: block;\r\n\tmargin: 0 0 0 30px;\r\n\tfont-size: 100%;\r\n\tfont-weight: normal;\r\n}\r\n\r\n#SMP_STYLE select {\r\n\tmargin-bottom: 8px;\r\n\tfont-size: 100%;\r\n\twidth: 180px;\r\n}\r\n\r\n#SMP_STYLE textarea {\r\n\twidth: 510px;\r\n\tpadding: 5px;\r\n\tborder: 1px solid #999999;\r\n\tborder-radius: 3px 3px 3px 3px;\r\n\tbox-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) inset;\r\n\tfont-size: 108%;\r\n\ttext-align: left;\r\n}\r\n\r\n#SMP_STYLE .image input {\r\n\twidth: 100%;\r\n}\r\n#SMP_STYLE .file input {\r\n\twidth: 100%;\r\n}\r\n#SMP_STYLE input.clear {\r\n\twidth: 55px;\r\n\ttext-align: center;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "14",
+   "name": "inputタグ",
+   "body": "\t#SMP_STYLE .input {\r\n\t\twidth: 170px;\r\n\t\tmargin-bottom: 8px;\r\n\t\tpadding: 5px;\r\n\t\tcolor: #333333;\r\n\t\tborder: 1px solid #999999;\r\n\t\tborder-radius: 3px 3px 3px 3px;\r\n\t\tbox-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) inset;\r\n\t\tfont-size: 108%;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "14",
+   "name": "inputタグ",
+   "body": "\t#SMP_STYLE .input {\r\n\t\twidth: 70%;\r\n\t\tmargin-bottom: 8px;\r\n\t\tpadding: 5px;\r\n\t\tcolor: #333333;\r\n\t\tborder: 1px solid #999999;\r\n\t\tborder-radius: 3px 3px 3px 3px;\r\n\t\tbox-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) inset;\r\n\t\tfont-size: 108%;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "15",
+   "name": "フィールドごとのデザイン",
+   "body": "\t#SMP_STYLE .zipcode li.code01 input {\r\n\t\twidth: 30px;\r\n\t}\r\n\r\n\t#SMP_STYLE .zipcode li.code02 input {\r\n\t\twidth: 40px;\r\n\t}\r\n\r\n\t#SMP_STYLE .phone li.num01 input {\r\n\t\twidth: 50px;\r\n\t}\r\n\r\n\t#SMP_STYLE .phone li.num02 input {\r\n\t\twidth: 40px;\r\n\t}\r\n\r\n\t#SMP_STYLE .phone li.num03 input {\r\n\t\twidth: 40px;\r\n\t}\r\n\r\n\t#SMP_STYLE .price input {\r\n\t\twidth: 200px;\r\n\t}\r\n\r\n\t#SMP_STYLE .num input {\r\n\t\twidth: 60px;\r\n\t}\r\n\r\n\t#SMP_STYLE .integer input {\r\n\t\twidth: 90px;\r\n\t}\r\n\r\n\t#SMP_STYLE .real input {\r\n\t\twidth: 170px;\r\n\t}\r\n\r\n\t#SMP_STYLE .pass input {\r\n\t\twidth: 50%;\r\n\t}\r\n\r\n\t#SMP_STYLE .epass input {\r\n\t\twidth: 50%;\r\n\t}\r\n\r\n\t#SMP_STYLE .time input {\r\n\t\twidth: 20px;\r\n\t}\r\n\r\n\t#SMP_STYLE .time .year {\r\n\t\twidth: 40px;\r\n\t}\r\n\r\n\t#SMP_STYLE .time .new_line {\r\n\t\tclear: both;\r\n\t}\r\n\r\n\t#SMP_STYLE ul,#SMP_STYLE li {\r\n\t\tlist-style-type: none;\r\n\t\tmargin: 0;\r\n\t\tpadding: 0;\r\n\t}\r\n\r\n\t#SMP_STYLE .zipcode ul li,\r\n\t#SMP_STYLE .phone ul li,\r\n\t#SMP_STYLE .time ul li {\r\n\t\twidth: auto;\r\n\t\tfloat: left;\r\n\t\tmargin: 0 3px 0 0;\r\n\t\tpadding: 0;\r\n\t\theight: 35px;\r\n\t\tline-height: 35px;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi1 label {\r\n\t\tdisplay: block;\r\n\t\tfloat: left;\r\n\t\tmin-width: 126px;\r\n\t\tmargin: 0 10px 7px 0;\r\n\t\tpadding: 10px 10px 0 10px;\r\n\t\tborder-radius: 4px 4px 4px 4px;\r\n\t\tbackground: #F1F1F1;\r\n\t\ttext-align: left;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi1 label input {\r\n\t\tdisplay: block;\r\n\t\tfloat: left;\r\n\t\twidth: 20px;\r\n\t\tmargin: 0.2em 0 0 0;\r\n\t\tpadding: 0;\r\n\t\tbox-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;\r\n\t\tborder-radius: 3px 3px 3px 3px;\r\n\t\ttext-align: left;\r\n\t\toverflow: hidden;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi1 label span {\r\n\t\tdisplay: block;\r\n\t\tmargin: 0 0 10px 30px;\r\n\t\tfont-size: 100%;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi1 .radio input {\r\n\t\tborder-radius: 1em;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi2 li {\r\n\t\tdisplay: inline;\r\n\t\tfloat: left;\r\n\t\twidth: 100%;\r\n\t\tmargin: 0 0 7px 0;\r\n\t\tpadding: 10px 10px 10px 10px;\r\n\t\tborder-radius: 4px 4px 4px 4px;\r\n\t\tbackground: #EEEEEE;\r\n\t\ttext-align: left;\r\n\t\tclear: both;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi2 label input {\r\n\t\tdisplay: block;\r\n\t\tfloat: left;\r\n\t\twidth: 20px;\r\n\t\tmargin: 0.2em 0 0 0;\r\n\t\tpadding: 0;\r\n\t\ttext-align: left;\r\n\t\tbox-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;\r\n\t\tborder-radius: 3px 3px 3px 3px;\r\n\t\toverflow: hidden;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi2 label span {\r\n\t\tdisplay: block;\r\n\t\tmargin: 0 0 0 30px;\r\n\t\tfont-size: 100%;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi2 .radio input {\r\n\t\tborder-radius: 1em;\r\n\t}\r\n\r\n\t#SMP_STYLE select {\r\n\t\tmargin-bottom: 8px;\r\n\t\tfont-size: 100%;\r\n\t\twidth: 180px;\r\n\t}\r\n\r\n\t#SMP_STYLE textarea {\r\n\t\twidth: 100%;\r\n\t\tpadding: 5px;\r\n\t\tborder: 1px solid #999999;\r\n\t\tborder-radius: 3px 3px 3px 3px;\r\n\t\tbox-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) inset;\r\n\t\tfont-size: 108%;\r\n\t\ttext-align: left;\r\n\t}\r\n\r\n\t#SMP_STYLE .image input {\r\n\t\twidth: 100%;\r\n\t}\r\n\t#SMP_STYLE .file input {\r\n\t\twidth: 100%;\r\n\t}\r\n\t#SMP_STYLE input.clear {\r\n\t\twidth: 55px;\r\n\t\ttext-align: center;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "15",
+   "name": "送信ボタン",
+   "body": "#SMP_STYLE input.submit {\r\n\twidth: 270px;\r\n\theight: 42px;\r\n\tmargin: 40px 0 40px 0;\r\n\tborder: hidden;\r\n\tborder-radius: 3px 3px 3px 3px;\r\n\t/* other browser */\r\n\tbackground: #303030;\r\n\t/* for old webkit */\r\n\tbackground: -webkit-gradient(\r\n\t\tlinear, left top, left bottom,\r\n\t\tcolor-stop(0.00, #555555),\r\n\t\tcolor-stop(1.00, #303030)\r\n\t);\r\n\t/* for modern browser */\r\n\tbackground: linear-gradient(\r\n\t\tto bottom,\r\n\t\t#555555 0%,\r\n\t\t#303030 100%\r\n\t);\r\n\tbox-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);\r\n\tcolor: #FFFFFF;\r\n\tfont-size: 153.9%;\r\n\tfont-weight: bold;\r\n\ttext-align: center;\r\n\tcursor: pointer;\r\n}\r\n\r\n#SMP_STYLE input.submit:hover {\r\n\tfilter: alpha(opacity=90);\r\n\t-ms-filter: alpha(opacity=90);\r\n\topacity: 0.9;\r\n}\r\n\r\n#SMP_STYLE input.image {\r\n\tmargin: 40px 0 40px 0;\r\n\twidth: auto;\r\n\tborder: none;\r\n\tpadding: 0;\r\n\tvertical-align: middle;\r\n}\r\n\r\n",
+   "type": "default"
+  },
+    {
+   "num": "15",
+   "name": "フィールドごとのデザイン",
+   "body": "\t#SMP_STYLE .zipcode li.code01 input {\r\n\t\twidth: 30px;\r\n\t}\r\n\r\n\t#SMP_STYLE .zipcode li.code02 input {\r\n\t\twidth: 40px;\r\n\t}\r\n\r\n\t#SMP_STYLE .phone li.num01 input {\r\n\t\twidth: 50px;\r\n\t}\r\n\r\n\t#SMP_STYLE .phone li.num02 input {\r\n\t\twidth: 40px;\r\n\t}\r\n\r\n\t#SMP_STYLE .phone li.num03 input {\r\n\t\twidth: 40px;\r\n\t}\r\n\r\n\t#SMP_STYLE .price input {\r\n\t\twidth: 150px;\r\n\t}\r\n\r\n\t#SMP_STYLE .num input {\r\n\t\twidth: 60px;\r\n\t}\r\n\r\n\t#SMP_STYLE .integer input {\r\n\t\twidth: 90px;\r\n\t}\r\n\r\n\t#SMP_STYLE .real input {\r\n\t\twidth: 170px;\r\n\t}\r\n\r\n\t#SMP_STYLE .pass input {\r\n\t\twidth: 150px;\r\n\t}\r\n\r\n\t#SMP_STYLE .epass input {\r\n\t\twidth: 160px;\r\n\t}\r\n\r\n\t#SMP_STYLE .time input {\r\n\t\twidth: 20px;\r\n\t}\r\n\r\n\t#SMP_STYLE .time .year {\r\n\t\twidth: 40px;\r\n\t}\r\n\r\n\t#SMP_STYLE .time .new_line {\r\n\t\tclear: both;\r\n\t}\r\n\r\n\t#SMP_STYLE ul,#SMP_STYLE li {\r\n\t\tlist-style-type: none;\r\n\t\tmargin: 0;\r\n\t\tpadding: 0;\r\n\t}\r\n\r\n\t#SMP_STYLE .zipcode ul li,\r\n\t#SMP_STYLE .phone ul li,\r\n\t#SMP_STYLE .time ul li {\r\n\t\twidth: auto;\r\n\t\tfloat: left;\r\n\t\tmargin: 0 3px 0 0;\r\n\t\tpadding: 0;\r\n\t\theight: 35px;\r\n\t\tline-height: 35px;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi1 label {\r\n\t\tdisplay: block;\r\n\t\tmin-width: 250px;\r\n\t\tmargin: 0 10px 10px 0;\r\n\t\tpadding: 10px;\r\n\t\tborder-radius: 4px 4px 4px 4px;\r\n\t\tbackground: #F1F1F1;\r\n\t\ttext-align: left;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi1 label input {\r\n\t\tdisplay: block;\r\n\t\tfloat: left;\r\n\t\twidth: 20px;\r\n\t\tmargin: 0.2em 0 0 0;\r\n\t\tpadding: 0;\r\n\t\tbox-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;\r\n\t\tborder-radius: 3px 3px 3px 3px;\r\n\t\ttext-align: left;\r\n\t\toverflow: hidden;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi1 label span {\r\n\t\tdisplay: block;\r\n\t\tmargin: 0 0 0 25px;\r\n\t\tfont-size: 100%;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi1 .radio input {\r\n\t\tborder-radius: 1em;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi2 li {\r\n\t\tdisplay: block;\r\n\t\tmin-width: 250px;\r\n\t\tmargin: 0 10px 10px 0;\r\n\t\tpadding: 10px;\r\n\t\tborder-radius: 4px 4px 4px 4px;\r\n\t\tbackground: #F1F1F1;\r\n\t\ttext-align: left;\r\n\t\twidth: auto;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi2 label input {\r\n\t\tdisplay: block;\r\n\t\tfloat: left;\r\n\t\twidth: 20px;\r\n\t\tmargin: 0.2em 0 0 0;\r\n\t\tpadding: 0;\r\n\t\tbox-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;\r\n\t\tborder-radius: 3px 3px 3px 3px;\r\n\t\ttext-align: left;\r\n\t\toverflow: hidden;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi2 label span {\r\n\t\tdisplay: block;\r\n\t\tmargin: 0 0 0 25px;\r\n\t\tfont-size: 100%;\r\n\t}\r\n\r\n\t#SMP_STYLE .multi2 .radio input {\r\n\t\tborder-radius: 1em;\r\n\t}\r\n\r\n\t#SMP_STYLE select {\r\n\t\tmargin-bottom: 8px;\r\n\t\tfont-size: 100%;\r\n\t\twidth: 180px;\r\n\t}\r\n\r\n\t#SMP_STYLE textarea {\r\n\t\twidth: 260px;\r\n\t\tpadding: 5px;\r\n\t\tborder: 1px solid #999999;\r\n\t\tborder-radius: 3px 3px 3px 3px;\r\n\t\tbox-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) inset;\r\n\t\tfont-size: 108%;\r\n\t\ttext-align: left;\r\n\t}\r\n\r\n\t#SMP_STYLE .image input {\r\n\t\twidth: 100%;\r\n\t}\r\n\t#SMP_STYLE .file input {\r\n\t\twidth: 100%;\r\n\t}\r\n\t#SMP_STYLE input.clear {\r\n\t\twidth: 55px;\r\n\t\ttext-align: center;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "16",
+   "name": "送信ボタン",
+   "body": "\t#SMP_STYLE input.submit {\r\n\t\twidth: 40%;\r\n\t\theight: 42px;\r\n\t\tmargin: 40px 0 40px 0;\r\n\t\tborder: hidden;\r\n\t\tborder-radius: 3px 3px 3px 3px;\r\n\t\t/* other browser */\r\n\t\tbackground: #303030;\r\n\t\t/* for old webkit */\r\n\t\tbackground: -webkit-gradient(\r\n\t\t\tlinear, left top, left bottom,\r\n\t\t\tcolor-stop(0.00, #555555),\r\n\t\t\tcolor-stop(1.00, #303030)\r\n\t\t);\r\n\t\t/* for modern browser */\r\n\t\tbackground: linear-gradient(\r\n\t\t\tto bottom,\r\n\t\t\t#555555 0%,\r\n\t\t\t#303030 100%\r\n\t\t);\r\n\t\tbox-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);\r\n\t\tcolor: #FFFFFF;\r\n\t\tfont-size: 153.9%;\r\n\t\tfont-weight: bold;\r\n\t\ttext-align: center;\r\n\t\tcursor: pointer;\r\n\t}\r\n\r\n\t#SMP_STYLE input.submit:hover {\r\n\t\tfilter: alpha(opacity=90);\r\n\t\t-ms-filter: alpha(opacity=90);\r\n\t\topacity: 0.9;\r\n\t}\r\n\r\n\t#SMP_STYLE input.image {\r\n\t\tmargin: 40px 0 40px 0;\r\n\t\twidth: auto;\r\n\t\tborder: none;\r\n\t\tpadding: 0;\r\n\t\tvertical-align: middle;\r\n\t}\r\n\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "16",
+   "name": "送信ボタン",
+   "body": "\t#SMP_STYLE input.submit {\r\n\t\twidth: 150px;\r\n\t\theight: 42px;\r\n\t\tmargin: 20px 0 40px 0;\r\n\t\tborder: hidden;\r\n\t\tborder-radius: 3px 3px 3px 3px;\r\n\t\t/* other browser */\r\n\t\tbackground: #303030;\r\n\t\t/* for old webkit */\r\n\t\tbackground: -webkit-gradient(\r\n\t\t\tlinear, left top, left bottom,\r\n\t\t\tcolor-stop(0.00, #555555),\r\n\t\t\tcolor-stop(1.00, #303030)\r\n\t\t);\r\n\t\t/* for modern browser */\r\n\t\tbackground: linear-gradient(\r\n\t\t\tto bottom,\r\n\t\t\t#555555 0%,\r\n\t\t\t#303030 100%\r\n\t\t);\r\n\t\tbox-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);\r\n\t\tcolor: #FFFFFF;\r\n\t\tfont-size: 153.9%;\r\n\t\tfont-weight: bold;\r\n\t\ttext-align: center;\r\n\t\tcursor: pointer;\r\n\t}\r\n\r\n\t#SMP_STYLE input.submit:hover {\r\n\t\tfilter: alpha(opacity=90);\r\n\t\t-ms-filter: alpha(opacity=90);\r\n\t\topacity: 0.9;\r\n\t}\r\n\r\n\t#SMP_STYLE input.image {\r\n\t\tmargin: 40px 0 40px 0;\r\n\t\twidth: auto;\r\n\t\tborder: none;\r\n\t\tpadding: 0;\r\n\t\tvertical-align: middle;\r\n\t}\r\n\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "16",
+   "name": "例文",
+   "body": "#SMP_STYLE .sample {\r\n\tcolor: #555555;\r\n\tfont-size: 93%;\r\n\tfont-weight: normal;\r\n\ttext-align: left;\r\n\tline-height: 1.2;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "17",
+   "name": "例文",
+   "body": "\t#SMP_STYLE .sample {\r\n\t\tcolor: #555555;\r\n\t\tfont-size: 93%;\r\n\t\tfont-weight: normal;\r\n\t\ttext-align: left;\r\n\t\tline-height: 1.2;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "17",
+   "name": "接頭語・接尾語",
+   "body": "#SMP_STYLE .suffix {\r\n\tcolor: #111111;\r\n\tfont-size: 100%;\r\n\tfont-weight: normal;\r\n\ttext-align: left;\r\n\theight: 35px;\r\n\tline-height: 35px;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "17",
+   "name": "例文",
+   "body": "\t#SMP_STYLE .sample {\r\n\t\tcolor: #555555;\r\n\t\tfont-size: 93%;\r\n\t\tfont-weight: normal;\r\n\t\ttext-align: left;\r\n\t\tline-height: 1.2;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "18",
+   "name": "入力必須文字",
+   "body": "#SMP_STYLE .need {\r\n\tcolor: #CC0000;\r\n\tfont-size: 100%;\r\n\tfont-weight: bold;\r\n\ttext-align: left;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "18",
+   "name": "接頭語・接尾語",
+   "body": "\t#SMP_STYLE .suffix {\r\n\t\tcolor: #111111;\r\n\t\tfont-size: 100%;\r\n\t\tfont-weight: normal;\r\n\t\ttext-align: left;\r\n\t\theight: 35px;\r\n\t\tline-height: 35px;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "18",
+   "name": "接頭語・接尾語",
+   "body": "\t#SMP_STYLE .suffix {\r\n\t\tcolor: #111111;\r\n\t\tfont-size: 100%;\r\n\t\tfont-weight: normal;\r\n\t\ttext-align: left;\r\n\t\theight: 35px;\r\n\t\tline-height: 35px;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "19",
+   "name": "入力必須文字",
+   "body": "\t#SMP_STYLE .need {\r\n\t\tcolor: #CC0000;\r\n\t\tfont-size: 100%;\r\n\t\tfont-weight: bold;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "19",
+   "name": "入力必須文字",
+   "body": "\t#SMP_STYLE .need {\r\n\t\tcolor: #CC0000;\r\n\t\tfont-size: 100%;\r\n\t\tfont-weight: bold;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "19",
+   "name": "エラーメッセージ<br>(入力チェック時)",
+   "body": "#SMP_STYLE .msg {\r\n\tdisplay: block;\r\n\tcolor: #DD0000;\r\n\tfont-size: 100%;\r\n\tmargin-bottom: 5px;\r\n\tfont-weight: bold;\r\n\ttext-align: left;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "20",
+   "name": "エラーメッセージ<br>(入力チェック時)",
+   "body": "\t#SMP_STYLE .msg {\r\n\t\tdisplay: block;\r\n\t\tcolor: #DD0000;\r\n\t\tfont-size: 100%;\r\n\t\tmargin-bottom: 5px;\r\n\t\tfont-weight: bold;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "20",
+   "name": "エラーメッセージ<br>(入力チェック時)",
+   "body": "\t#SMP_STYLE .msg {\r\n\t\tdisplay: block;\r\n\t\tcolor: #DD0000;\r\n\t\tfont-size: 100%;\r\n\t\tmargin-bottom: 5px;\r\n\t\tfont-weight: bold;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "20",
+   "name": "エラーメッセージ<br>(サンキュー・締め切り・システムエラー)",
+   "body": "#SMP_STYLE .sub_text {\r\n\twidth: 760px;\r\n\tfont-size: 123.1%;\r\n\tfont-weight: bold;\r\n\tpadding: 150px 0;\r\n\tcolor: #111111;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "21",
+   "name": "入力エラー時のボックス背景色",
+   "body": "#SMP_STYLE .error {\r\n\tbackground: #FFE4E4;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "21",
+   "name": "エラーメッセージ<br>(サンキュー・締め切り・システムエラー)",
+   "body": "\t#SMP_STYLE .sub_text {\r\n\t\twidth: 270px;\r\n\t\tfont-size: 123.1%;\r\n\t\tfont-weight: bold;\r\n\t\tpadding: 150px 0;\r\n\t\tcolor: #111111;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "21",
+   "name": "エラーメッセージ<br>(サンキュー・締め切り・システムエラー)",
+   "body": "\t#SMP_STYLE .sub_text {\r\n\t\twidth: 80%;\r\n\t\tfont-size: 123.1%;\r\n\t\tfont-weight: bold;\r\n\t\tpadding: 150px 0;\r\n\t\tcolor: #111111;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "22",
+   "name": "スパイラルシール",
+   "body": "#SMP_STYLE .spiralSeal {\r\n\twidth: 80%;\r\n\toverflow: hidden;\r\n\tmargin: 0;\r\n\tbackground-color: #FFFFFF;\r\n\tborder: 1px solid #CCCCCC;\r\n}\r\n#SMP_STYLE .spiralSeal tr td.description {\r\n\tdisplay: table-cell;\r\n\ttext-align: left;\r\n\toverflow: auto;\r\n}\r\n\r\n#SMP_STYLE .spiralSeal tr td.img {\r\n\tdisplay: table-cell;\r\n\tmargin-left: 0px;\r\n\tmargin-right: 0px;\r\n\toverflow: auto;\r\n\ttext-align: center;\r\n}\r\n\r\n",
+   "type": "default"
+  },
+    {
+   "num": "22",
+   "name": "入力エラー時のボックス背景色",
+   "body": "\t#SMP_STYLE .error {\r\n\t\tbackground: #FFE4E4;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "22",
+   "name": "入力エラー時のボックス背景色",
+   "body": "\t#SMP_STYLE .error {\r\n\t\tbackground: #FFE4E4;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "23",
+   "name": "スパイラルシール",
+   "body": "\t#SMP_STYLE .spiralSeal {\r\n\t\twidth: 270px;\r\n\t\toverflow: hidden;\r\n\t\tmargin: 0;\r\n\t\tbackground-color: #FFFFFF;\r\n\t\tborder: 1px solid #CCCCCC;\r\n\t}\r\n\t#SMP_STYLE .spiralSeal tr td.description {\r\n\t\tdisplay: block;\r\n\t\ttext-align: left;\r\n\t\toverflow: auto;\r\n\t}\r\n\r\n\t#SMP_STYLE .spiralSeal tr td.img {\r\n\t\tdisplay: block;\r\n\t\tmargin-left: 60px;\r\n\t\tmargin-right: 60px;\r\n\t\toverflow: auto;\r\n\t\ttext-align: center;\r\n\t}\r\n\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "23",
+   "name": "スパイラルシール",
+   "body": "\t#SMP_STYLE .spiralSeal {\r\n\t\twidth: 80%;\r\n\t\toverflow: hidden;\r\n\t\tmargin: 0;\r\n\t\tbackground-color: #FFFFFF;\r\n\t\tborder: 1px solid #CCCCCC;\r\n\t}\r\n\t#SMP_STYLE .spiralSeal tr td.description {\r\n\t\tdisplay: table-cell;\r\n\t\ttext-align: left;\r\n\t\toverflow: auto;\r\n\t}\r\n\r\n\t#SMP_STYLE .spiralSeal tr td.img {\r\n\t\tdisplay: table-cell;\r\n\t\tmargin-left: 0px;\r\n\t\tmargin-right: 0px;\r\n\t\toverflow: auto;\r\n\t\ttext-align: center;\r\n\t}\r\n\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "23",
+   "name": "フッタ",
+   "body": "#SMP_STYLE .footer_text {\r\n\twidth: 760px;\r\n\tfont-size: 100%;\r\n\tmargin: 30px 0 0 0;\r\n\tfont-weight: normal;\r\n\ttext-align: left;\r\n}\r\n",
+   "type": "default"
+  },
+    {
+   "num": "24",
+   "name": "clearfix",
+   "body": "#SMP_STYLE .cf:before,#SMP_STYLE .cf:after {content:\"\";display:table;}\r\n#SMP_STYLE .cf:after {clear:both;}\r\n#SMP_STYLE .cf {*zoom:1;}\r\n\r\n",
+   "type": "default"
+  },
+    {
+   "num": "24",
+   "name": "フッタ",
+   "body": "\t#SMP_STYLE .footer_text {\r\n\t\twidth: 270px;\r\n\t\tfont-size: 85%;\r\n\t\tmargin: 30px 0 0 0;\r\n\t\tfont-weight: normal;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "24",
+   "name": "フッタ",
+   "body": "\t#SMP_STYLE .footer_text {\r\n\t\twidth: 80%;\r\n\t\tfont-size: 93%;\r\n\t\tmargin: 30px 0 0 0;\r\n\t\tfont-weight: normal;\r\n\t\ttext-align: left;\r\n\t}\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "25",
+   "name": "clearfix",
+   "body": "\t#SMP_STYLE .cf:before,#SMP_STYLE .cf:after {content:\"\";display:table;}\r\n\t#SMP_STYLE .cf:after {clear:both;}\r\n\t#SMP_STYLE .cf {*zoom:1;}\r\n\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "25",
+   "name": "住所検索ボタン",
+   "body": "#SMP_STYLE input.searchZipcode {\r\n\twidth: 150px;\r\n\theight: 32px;\r\n\tmargin: auto;\r\n\tborder: hidden;\r\n\tborder-radius: 3px 3px 3px 3px;\r\n\t/* other browser */\r\n\tbackground: #303030;\r\n\t/* for old webkit */\r\n\tbackground: -webkit-gradient(\r\n\t\tlinear, left top, left bottom,\r\n\t\tcolor-stop(0.00, #555555),\r\n\t\tcolor-stop(1.00, #303030)\r\n\t);\r\n\t/* for modern browser */\r\n\tbackground: linear-gradient(\r\n\t\tto bottom,\r\n\t\t#555555 0%,\r\n\t\t#303030 100%\r\n\t);\r\n\tbox-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);\r\n\tcolor: #FFFFFF;\r\n\tfont-size: 153.9%;\r\n\tfont-weight: bold;\r\n\ttext-align: center;\r\n\tcursor: pointer;\r\n}\r\n\r\n#SMP_STYLE input.searchZipcode:hover {\r\n\tfilter: alpha(opacity=90);\r\n\t-ms-filter: alpha(opacity=90);\r\n\topacity: 0.9;\r\n}\r\n\r\n#SMP_STYLE input.imageZipcode {\r\n\tmargin: auto;\r\n\twidth: auto;\r\n\tborder: none;\r\n\tpadding: 0;\r\n\tvertical-align: middle;\r\n}\r\n\r\n",
+   "type": "default"
+  },
+    {
+   "num": "25",
+   "name": "clearfix",
+   "body": "\t#SMP_STYLE .cf:before,#SMP_STYLE .cf:after {content:\"\";display:table;}\r\n\t#SMP_STYLE .cf:after {clear:both;}\r\n\t#SMP_STYLE .cf {*zoom:1;}\r\n\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "26",
+   "name": "切り替え閉じ",
+   "body": "\t#SMP_STYLE input.searchZipcode {\r\n\t\twidth: 150px;\r\n\t\theight: 32px;\r\n\t\tmargin: auto;\r\n\t\tborder: hidden;\r\n\t\tborder-radius: 3px 3px 3px 3px;\r\n\t\t/* other browser */\r\n\t\tbackground: #303030;\r\n\t\t/* for old webkit */\r\n\t\tbackground: -webkit-gradient(\r\n\t\t\tlinear, left top, left bottom,\r\n\t\t\tcolor-stop(0.00, #555555),\r\n\t\t\tcolor-stop(1.00, #303030)\r\n\t\t);\r\n\t\t/* for modern browser */\r\n\t\tbackground: linear-gradient(\r\n\t\t\tto bottom,\r\n\t\t\t#555555 0%,\r\n\t\t\t#303030 100%\r\n\t\t);\r\n\t\tbox-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);\r\n\t\tcolor: #FFFFFF;\r\n\t\tfont-size: 153.9%;\r\n\t\tfont-weight: bold;\r\n\t\ttext-align: center;\r\n\t\tcursor: pointer;\r\n\t}\r\n\r\n\t#SMP_STYLE input.searchZipcode:hover {\r\n\t\tfilter: alpha(opacity=90);\r\n\t\t-ms-filter: alpha(opacity=90);\r\n\t\topacity: 0.9;\r\n\t}\r\n\r\n\t#SMP_STYLE input.imageZipcode {\r\n\t\tmargin: auto;\r\n\t\twidth: auto;\r\n\t\tborder: none;\r\n\t\tpadding: 0;\r\n\t\tvertical-align: middle;\r\n\t}\r\n\r\n",
+   "type": "switch2"
+  },
+    {
+   "num": "26",
+   "name": "切り替え閉じ",
+   "body": "\t#SMP_STYLE input.searchZipcode {\r\n\t\twidth: 40%;\r\n\t\theight: 32px;\r\n\t\tmargin: auto;\r\n\t\tborder: hidden;\r\n\t\tborder-radius: 3px 3px 3px 3px;\r\n\t\t/* other browser */\r\n\t\tbackground: #303030;\r\n\t\t/* for old webkit */\r\n\t\tbackground: -webkit-gradient(\r\n\t\t\tlinear, left top, left bottom,\r\n\t\t\tcolor-stop(0.00, #555555),\r\n\t\t\tcolor-stop(1.00, #303030)\r\n\t\t);\r\n\t\t/* for modern browser */\r\n\t\tbackground: linear-gradient(\r\n\t\t\tto bottom,\r\n\t\t\t#555555 0%,\r\n\t\t\t#303030 100%\r\n\t\t);\r\n\t\tbox-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);\r\n\t\tcolor: #FFFFFF;\r\n\t\tfont-size: 153.9%;\r\n\t\tfont-weight: bold;\r\n\t\ttext-align: center;\r\n\t\tcursor: pointer;\r\n\t}\r\n\r\n\t#SMP_STYLE input.searchZipcode:hover {\r\n\t\tfilter: alpha(opacity=90);\r\n\t\t-ms-filter: alpha(opacity=90);\r\n\t\topacity: 0.9;\r\n\t}\r\n\r\n\t#SMP_STYLE input.imageZipcode {\r\n\t\tmargin: auto;\r\n\t\twidth: auto;\r\n\t\tborder: none;\r\n\t\tpadding: 0;\r\n\t\tvertical-align: middle;\r\n\t}\r\n\r\n",
+   "type": "switch1"
+  },
+    {
+   "num": "27",
+   "name": "住所検索ボタン",
+   "body": "}",
+   "type": "switch2"
+  },
+    {
+   "num": "27",
+   "name": "住所検索ボタン",
+   "body": "}",
+   "type": "switch1"
+  }
+ ],
+ "multidevice":  {
+  "smartphone_design": "smartphone",
+  "tablet_design": "tablet",
+  "pc_design": "pc",
+  "multidevice_switch": "mediaqueries",
+  "mediaqueries_threshold1": "725",
+  "mediaqueries_threshold2": "725"
+ }
+}

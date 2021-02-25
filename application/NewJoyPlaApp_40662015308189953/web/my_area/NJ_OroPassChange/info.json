@@ -1,0 +1,54 @@
+{
+ "id": "my_area_mst56428",
+ "db_id": "db_mst104540",
+ "db": "NJ_OUserDB",
+ "name": "NewJoyPla_卸業者用パスワード変更",
+ "title": "NJ_OroPassChange",
+ "auth_type": 4,
+ "login_lock":  {
+  "subject": "[ログイン]連続ログインエラー通知",
+  "body": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\r\n　　　　　　　　　　　　連続ログインエラー通知　　　　　　　　　　　　\r\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\r\n\r\nログインページに対するログインエラーが%LOGIN_ERR_COUNT%回連続で発生しました。\r\n不正ログインとしてみなされた為、%LOGIN_LOCK_TIME%ログインができません。\r\n本メールは、ログインロックされたことをお知らせするためにお送りして\r\nいます。\r\n\r\n■ログイン情報\r\n==================================================\r\n%MEMBER_VALUE%\r\n\r\n■ログインエラー情報\r\n==================================================\r\nログインエラー日時：%NOW%\r\n\r\n※本メールは通知専用メールで返信ができません。\r\n※本メールにお心当たりがない場合には、第三者による不正ログイン等の\r\n可能性がありますので管理者までご連絡ください。\r\n"
+ },
+ "comment": "",
+ "member_detect_field": "loginId",
+ "from_address": "#SMP_APP_REPLACE#",
+ "notice_mode": 0,
+ "click_login_flg": true,
+ "top_page_url": "%url/rel:mpgt:page_266216%",
+ "after_logout_url": "%url/area:login:NJ_OroPassChange%",
+ "url_eternal": false,
+ "loginlock_notice_flg": false,
+ "login_err_count": 5,
+ "login_lock_time": 30,
+ "session_expire": 60,
+ "auto_login_hours": 0,
+ "login_post_disabled_flg": true,
+ "login_view_list": [],
+ "allow_security_content_flg": true,
+ "allow_xss_flg": true,
+ "allow_click_jacking_flg": true,
+ "allow_http_flg": false,
+ "status": "public",
+ "closed_page_type": "inside_page",
+ "allow_ip_flg": false,
+ "my_page_list":  [
+    {
+   "id": "my_area_my_page_rel161859",
+   "my_page_type_id": 16,
+   "active_flg": true,
+   "title": "page_266215",
+   "url": "%url/area:login:NJ_OroPassChange%",
+   "page_detail": null
+  },
+    {
+   "id": "my_area_my_page_rel161858",
+   "my_page_type_id": 4,
+   "active_flg": true,
+   "title": "page_266216",
+   "page_detail": {"page_name": "page_266216"}
+  }
+ ],
+ "common_err": "common_err.html",
+ "login_err": "login_err.html",
+ "status_page": "status_page.html"
+}

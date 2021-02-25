@@ -1,0 +1,13 @@
+{
+ "right_field": "requestId",
+ "right_db_id": "db_mst104519",
+ "strength": 50,
+ "right_db": "NJ_QRequestDB",
+ "left_field": "requestId",
+ "mstOnInsertCascade": 0,
+ "left_db_id": "db_mst104515",
+ "comment": "",
+ "id": "constraint_mst10507",
+ "left_db": "NJ_reqItemDB",
+ "mstOnDeleteCascade": false
+}

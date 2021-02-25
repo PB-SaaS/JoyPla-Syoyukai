@@ -1,0 +1,53 @@
+{
+ "trigger_id": "trigger_mst24536",
+ "db_id": "db_mst104537",
+ "seq_order": 2,
+ "event": "INSERT",
+ "type": "calc",
+ "name": "ÃÍ¤ÎÄ´À°",
+ "comment": "",
+ "calc_formula_list":  [
+    {
+   "result_field_id": "HPstock",
+   "error_type": 0,
+   "error": "",
+   "condition": "$rfid:1$ < 0",
+   "formula": "0",
+   "_seq_order": 1,
+   "calc_formula_field_rel": [   {
+    "_replace_field_id": 1,
+    "_field_id": "HPstock"
+   }]
+  },
+    {
+   "result_field_id": "price",
+   "error_type": 0,
+   "error": "",
+   "condition": "",
+   "formula": "$rfid:1$  *  $rfid:2$",
+   "_seq_order": 2,
+   "calc_formula_field_rel":    [
+        {
+     "_replace_field_id": 1,
+     "_field_id": "minPrice"
+    },
+        {
+     "_replace_field_id": 2,
+     "_field_id": "quantity"
+    }
+   ]
+  },
+    {
+   "result_field_id": "notUsedFlag",
+   "error_type": 0,
+   "error": "",
+   "condition": "$rfid:1$ IS NULL",
+   "formula": "0",
+   "_seq_order": 3,
+   "calc_formula_field_rel": [   {
+    "_replace_field_id": 1,
+    "_field_id": "notUsedFlag"
+   }]
+  }
+ ]
+}

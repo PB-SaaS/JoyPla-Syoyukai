@@ -1,0 +1,23 @@
+{
+ "trigger_id": "trigger_mst24531",
+ "db_id": "db_mst104532",
+ "seq_order": 2,
+ "event": "INSERT",
+ "type": "ref",
+ "name": "院内商品情報取得",
+ "comment": "",
+ "ref_db_id": "db_mst104537",
+ "trigger_input_null": 10,
+ "many_record": 20,
+ "many_record_order_by_field": "id",
+ "many_record_sort": "ASC",
+ "zero_record": 10,
+ "condition_list": [ {
+  "ref_field": "inHospitalItemId",
+  "trigger_field": "inHospitalItemId"
+ }],
+ "mapping_list": [ {
+  "ref_field": "distributorId",
+  "trigger_field": "distributorId"
+ }]
+}

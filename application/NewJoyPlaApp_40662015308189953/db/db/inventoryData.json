@@ -1,0 +1,679 @@
+{
+ "id": "db_mst104559",
+ "name": "Ãª²·¾ðÊó",
+ "title": "inventoryData",
+ "comment": "",
+ "record_limit": "0",
+ "check_regist_auth_selected": [],
+ "type": "view_n",
+ "fieldList":  [
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_regist_date",
+   "title": "registrationTime",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "ÅÐÏ¿Æü»þ",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349689",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_date_ymdhhmmss",
+   "title": "updateTime",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "¹¹¿·Æü»þ",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349690",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "inventoryHId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "Ãª²·ÍúÎòID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348932",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "inHospitalItemId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "±¡Æâ¾¦ÉÊID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348899",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "hospitalId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "ÉÂ±¡ID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348869",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_real",
+   "title": "price",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "¹ØÇã²Á³Ê",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348901",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_integer",
+   "title": "calculatingStock",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "·×»»¾åºß¸Ë",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348933",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_integer",
+   "title": "inventryNum",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "Ãª²·¿ô",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348934",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_integer",
+   "title": "quantity",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "Æþ¿ô",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348837",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_name",
+   "title": "quantityUnit",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "Æþ¿ôÃ±°Ì",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348838",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_name",
+   "title": "itemUnit",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "¸Ä¿ôÃ±°Ì",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348839",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "divisionId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "Éô½ðID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348896",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_real",
+   "title": "inventryAmount",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "Ãª²·¶â³Û",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348935",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "distributorId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "²·¶È¼ÔID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348841",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "distributorName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "²·¶È¼ÔÌ¾",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349777",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "catalogNo",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "¥«¥¿¥í¥°No",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349764",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "serialNo",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "¥·¥ê¥¢¥ëNo",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349765",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_area512",
+   "title": "medicineCategory",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "ÊÝ¸±ÀÁµáÊ¬Îà¡Ê°å²Ê¡Ë",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349766",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_area512",
+   "title": "homeCategory",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "ÊÝ¸±ÀÁµáÊ¬Îà¡ÊºßÂð¡Ë",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349767",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "label":    {
+    "candidates": 2,
+    "idAry":     [
+     0,
+     1
+    ],
+    "keywordAry":     [
+     "»ÈÍÑÃæ",
+     "Ì¤»ÈÍÑ"
+    ]
+   },
+   "type": "mm_bool",
+   "title": "notUsedFlag",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "ÉÔ»ÈÍÑ¥Õ¥é¥°",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349016",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_number32",
+   "title": "itemId",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "¾¦ÉÊID",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349017",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "itemName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "¾¦ÉÊÌ¾",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348831",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "itemCode",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "¾¦ÉÊ¥³¡¼¥É",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348832",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "itemStandard",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "¾¦ÉÊµ¬³Ê",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348833",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "itemJANCode",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "¾¦ÉÊJAN¥³¡¼¥É",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348834",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_area512",
+   "title": "notice",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "ÆÃµ­»ö¹à",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349768",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_integer",
+   "title": "HPstock",
+   "radio_flg": false,
+   "app_role": null,
+   "default_string": "0",
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "±¡ÆâÁíºß¸Ë¿ô",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349769",
+   "set_default": null
+  },
+    {
+   "shared": true,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_text_field",
+   "title": "makerName",
+   "radio_flg": false,
+   "app_role": null,
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "¥á¡¼¥«¡¼Ì¾",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2348835",
+   "set_default": null
+  },
+    {
+   "shared": false,
+   "unique_flg": false,
+   "autoval_trig": null,
+   "_interface_field_id": 0,
+   "type": "mm_real",
+   "title": "oldPrice",
+   "radio_flg": false,
+   "app_role": null,
+   "default_string": "0",
+   "application": "import",
+   "primary_key_flg": false,
+   "index_flg": false,
+   "name": "µì²Á³Ê",
+   "not_null_flg": false,
+   "comment": "",
+   "id": "field_def2349771",
+   "set_default": null
+  }
+ ],
+ "real_db_id": "db_mst104526",
+ "view_fields":  [
+    {
+   "real_db_id": "db_mst104526",
+   "field": "quantity"
+  },
+    {
+   "real_db_id": "db_mst104526",
+   "field": "quantityUnit"
+  },
+    {
+   "real_db_id": "db_mst104526",
+   "field": "itemUnit"
+  },
+    {
+   "real_db_id": "db_mst104526",
+   "field": "distributorId"
+  },
+    {
+   "real_db_id": "db_mst104526",
+   "field": "hospitalId"
+  },
+    {
+   "real_db_id": "db_mst104526",
+   "field": "divisionId"
+  },
+    {
+   "real_db_id": "db_mst104526",
+   "field": "inHospitalItemId"
+  },
+    {
+   "real_db_id": "db_mst104526",
+   "field": "price"
+  },
+    {
+   "real_db_id": "db_mst104526",
+   "field": "inventoryHId"
+  },
+    {
+   "real_db_id": "db_mst104526",
+   "field": "calculatingStock"
+  },
+    {
+   "real_db_id": "db_mst104526",
+   "field": "inventryNum"
+  },
+    {
+   "real_db_id": "db_mst104526",
+   "field": "inventryAmount"
+  },
+    {
+   "real_db_id": "db_mst104526",
+   "field": "registrationTime"
+  },
+    {
+   "real_db_id": "db_mst104526",
+   "field": "updateTime"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "itemName"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "itemCode"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "itemStandard"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "itemJANCode"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "makerName"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "notUsedFlag"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "itemId"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "catalogNo"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "serialNo"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "medicineCategory"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "homeCategory"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "notice"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "HPstock"
+  },
+    {
+   "real_db_id": "db_mst104537",
+   "field": "oldPrice"
+  },
+    {
+   "real_db_id": "db_mst104539",
+   "field": "distributorName"
+  }
+ ],
+ "view_constraints":  [
+    {
+   "db_left_id": "db_mst104526",
+   "db_right_id": "db_mst104539",
+   "constraint_id": "NJ_InventoryDB_NJ_distributorDB",
+   "join_type": "LEFT OUTER JOIN"
+  },
+    {
+   "db_left_id": "db_mst104526",
+   "db_right_id": "db_mst104537",
+   "constraint_id": "NJ_InventoryDB_NJ_inHPItemDB",
+   "join_type": "LEFT OUTER JOIN"
+  }
+ ]
+}
