@@ -309,8 +309,8 @@ if($userInfo->getUserPermission() == '1') {
                 UIkit.modal.alert('物品請求が完了しました').then(function () {
 					UIkit.modal.confirm("物品請求内容で未発注伝票を作成しますか？").then(function () {
 						$('.goodsBillingButton').prop('disabled', true);
-						sendUnorderedSlip();
 						canAjax = true; // 再びAjaxできるようにする
+						sendUnorderedSlip();
 					}, function () {
 						dataReset();
 						canAjax = true; // 再びAjaxできるようにする

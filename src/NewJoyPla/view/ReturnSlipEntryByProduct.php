@@ -256,6 +256,7 @@ foreach($divisionData["division"] as $record ){
 						url:"%url/rel:@mpgt:regReturn%",
 						type:"POST",
 						data:{
+							divisionId: "<?php echo $receivingHistory[0]["divisionId"] ?>",
 							receivingHistoryId : "%val:usr:receivingHId%",
 							distributorId: "<?php echo $receivingHistory[0]["distributorId"] ?>",
 							returnData : JSON.stringify( itemsToJs ),

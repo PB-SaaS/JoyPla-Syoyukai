@@ -229,6 +229,7 @@ if($userInfo->getUserPermission() == "1"){
 						url:"%url/rel:@mpgt:regReturn%",
 						type:"POST",
 						data:{
+							divisionId: "%val:usr:divisionId%",
 							receivingHistoryId : "%val:usr:receivingHId%",
 							distributorId: "%val:usr:distributorId%",
 							returnData : JSON.stringify( itemsToJs ),

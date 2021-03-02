@@ -27,11 +27,11 @@
 	    var month = parseInt($(elm).val());
 	    var monthMax = parseInt($(elm).attr('max'));
 	    var monthMin = parseInt($(elm).attr('min'));
-	    if(month > monthMax){ $(elm).val(monthMax); }
-	    if(month < monthMin){ $(elm).val(monthMin); }
+	    if(month > monthMax){ $(elm).val(monthMax).change(); }
+	    if(month < monthMin){ $(elm).val(monthMin).change(); }
 	    if(isNaN(month)){ 
-			if(monthMin){ $(elm).val(monthMin); 
-			} else {$(elm).val(monthMin);}
+			if(monthMin){ $(elm).val(monthMin).change(); 
+			} else {$(elm).val(monthMin).change();}
 		}
 	}
 
