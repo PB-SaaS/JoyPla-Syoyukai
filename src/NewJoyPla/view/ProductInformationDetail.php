@@ -31,6 +31,12 @@ $tenantData = $getTenantData->select();
     });
     
 	</script>
+	<style>
+	.itemInfo.table.uk-table td, .itemInfo.table.uk-table th {
+		line-break: anywhere;	
+		min-width:120px;
+	}
+	</style>
 </head>
 <body>
     <?php include_once "NewJoyPla/src/HeaderForMypage.php"; ?>
@@ -45,47 +51,62 @@ $tenantData = $getTenantData->select();
 				<div class="no_print uk-margin" uk-margin>
 					<input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
 					<?php if($userInfo->getUserPermission() == "1"): ?>
-					<?php if($tenantData['data'][0]['tenantKind'] == '1'): ?>
-						<input class="print_hidden uk-button uk-button-primary" type="submit" value="商品情報変更" onclick="document.itemsChange.submit()">
-						<form action="/regist/is" method="post" name="itemsChange" target="_blank" class="uk-hidden">
+						<?php if($tenantData['data'][0]['tenantKind'] == '1'): ?>
+							<input class="print_hidden uk-button uk-button-primary" type="submit" value="商品情報変更" onclick="document.itemsChange.submit()">
+							<form action="/regist/is" method="post" name="itemsChange" target="_blank" class="uk-hidden">
+								%SMPAREA%
+								<input type="hidden" name="itemId" value="%val:usr:itemId%">
+								<input type="hidden" name="itemName" value="%val:usr:itemName%">
+								<input type="hidden" name="itemCode" value="%val:usr:itemCode%">
+								<input type="hidden" name="itemStandard" value="%val:usr:itemStandard%">
+								<input type="hidden" name="itemJANCode" value="%val:usr:itemJANCode%">
+								<input type="hidden" name="officialFlag" value="%val:usr:officialFlag%">
+								<input type="hidden" name="officialpriceOld" value="%val:usr:officialpriceOld%">
+								<input type="hidden" name="officialprice" value="%val:usr:officialprice%">
+								<input type="hidden" name="quantity" value="%val:usr:quantity%">
+								<input type="hidden" name="quantityUnit" value="%val:usr:quantityUnit%">
+								<input type="hidden" name="itemUnit" value="%val:usr:itemUnit%">
+								<input type="hidden" name="tenantId" value="%val:usr:tenantId%">
+								<input type="hidden" name="itemsAuthKey" value="%val:usr:itemsAuthKey%">
+								<input type="hidden" name="makerName" value="%val:usr:makerName%">
+								<input type="hidden" name="catalogNo" value="%val:usr:catalogNo%">
+								<input type="hidden" name="serialNo" value="%val:usr:serialNo%">
+								<input type="hidden" name="minPrice" value="%val:usr:minPrice%">
+								<input type="hidden" name="SMPFORM" value="%smpform:310a_itemsChange%">
+							</form>
+							<input class="print_hidden uk-button uk-button-primary" type="submit" value="金額情報登録" onclick="document.priceReg.submit()">
+							<form action="/regist/is" method="post" name="priceReg" target="_blank" class="uk-hidden">
+								%SMPAREA%
+								<input type="hidden" name="itemName" value="%val:usr:itemName%">
+								<input type="hidden" name="itemCode" value="%val:usr:itemCode%">
+								<input type="hidden" name="itemStandard" value="%val:usr:itemStandard%">
+								<input type="hidden" name="itemJANCode" value="%val:usr:itemJANCode%">
+								<input type="hidden" name="makerName" value="%val:usr:makerName%">
+								<input type="hidden" name="itemId" value="%val:usr:itemId%">
+								<input type="hidden" name="quantity" value="%val:usr:quantity%">
+								<input type="hidden" name="quantityUnit" value="%val:usr:quantityUnit%">
+								<input type="hidden" name="itemUnit" value="%val:usr:itemUnit%">
+								<input type="hidden" name="SMPFORM" value="%smpform:310_priceReg%">
+								<input type="hidden" name="hospitalId" value="%val:@usr:hospitalId%">
+							</form>
+						<?php endif ?>
+						<input class="print_hidden uk-button uk-button-primary" type="submit" value="院内商品として追加" onclick="document.inHPItemsReg.submit()">
+						<form action="/regist/is" method="post" name="inHPItemsReg" target="_blank" class="uk-hidden">
 							%SMPAREA%
 							<input type="hidden" name="itemId" value="%val:usr:itemId%">
 							<input type="hidden" name="itemName" value="%val:usr:itemName%">
 							<input type="hidden" name="itemCode" value="%val:usr:itemCode%">
 							<input type="hidden" name="itemStandard" value="%val:usr:itemStandard%">
 							<input type="hidden" name="itemJANCode" value="%val:usr:itemJANCode%">
-							<input type="hidden" name="officialFlag" value="%val:usr:officialFlag%">
-							<input type="hidden" name="officialpriceOld" value="%val:usr:officialpriceOld%">
-							<input type="hidden" name="officialprice" value="%val:usr:officialprice%">
 							<input type="hidden" name="quantity" value="%val:usr:quantity%">
 							<input type="hidden" name="quantityUnit" value="%val:usr:quantityUnit%">
 							<input type="hidden" name="itemUnit" value="%val:usr:itemUnit%">
-							<input type="hidden" name="tenantId" value="%val:usr:tenantId%">
-							<input type="hidden" name="minPrice" value="%val:usr:minPrice%">
-							<input type="hidden" name="itemsAuthKey" value="%val:usr:itemsAuthKey%">
 							<input type="hidden" name="makerName" value="%val:usr:makerName%">
+							<input type="hidden" name="hospitalId" value="%val:@usr:hospitalId%">
+							<input type="hidden" name="SMPFORM" value="%smpform:310_inHpItemsR%">
 							<input type="hidden" name="catalogNo" value="%val:usr:catalogNo%">
 							<input type="hidden" name="serialNo" value="%val:usr:serialNo%">
-							<input type="hidden" name="SMPFORM" value="%smpform:itemsChange%">
 						</form>
-					<?php endif ?>
-					<input class="print_hidden uk-button uk-button-primary" type="submit" value="院内商品として追加" onclick="document.inHPItemsReg.submit()">
-					<form action="/regist/is" method="post" name="inHPItemsReg" target="_blank" class="uk-hidden">
-						%SMPAREA%
-						<input type="hidden" name="itemId" value="%val:usr:itemId%">
-						<input type="hidden" name="itemName" value="%val:usr:itemName%">
-						<input type="hidden" name="itemCode" value="%val:usr:itemCode%">
-						<input type="hidden" name="itemStandard" value="%val:usr:itemStandard%">
-						<input type="hidden" name="itemJANCode" value="%val:usr:itemJANCode%">
-						<input type="hidden" name="quantity" value="%val:usr:quantity%">
-						<input type="hidden" name="quantityUnit" value="%val:usr:quantityUnit%">
-						<input type="hidden" name="itemUnit" value="%val:usr:itemUnit%">
-						<input type="hidden" name="makerName" value="%val:usr:makerName%">
-						<input type="hidden" name="hospitalId" value="%val:@usr:hospitalId%">
-						<input type="hidden" name="SMPFORM" value="%smpform:inHpItemsReg%">
-						<input type="hidden" name="catalogNo" value="%val:usr:catalogNo%">
-						<input type="hidden" name="serialNo" value="%val:usr:serialNo%">
-					</form>
 					<?php endif ?>
 				</div>
 				
@@ -96,7 +117,7 @@ $tenantData = $getTenantData->select();
 		    			<h2>商品情報詳細</h2>
 					</div>
 		    	</div>
-		    	<div class="uk-width-4-5@m uk-margin-auto uk-margin-remove-top print-width-1-1">
+		    	<div class="uk-width-4-5@m uk-margin-auto uk-margin-remove-top print-width-1-1 itemInfo">
 		    		<table class="uk-table uk-table-divider uk-table-responsive">
 					    <tr><td colspan="6">商品基本情報</td></tr>
 					        <tr>
@@ -125,16 +146,30 @@ $tenantData = $getTenantData->select();
 					            <th>償還価格フラグ</th>
 					            <td>%val:usr:officialFlag:v%</td>
 					            <th>償還価格</th>
-					            <td><script>price(fixed("%val:usr:officialprice%"))</script>円</td>
+					            <td>￥<script>price(fixed("%val:usr:officialprice%"))</script></td>
 					            <th>旧償還価格</th>
-					            <td><script>price(fixed("%val:usr:officialpriceOld%"))</script>円</td>
+					            <td>￥<script>price(fixed("%val:usr:officialpriceOld%"))</script></td>
 					        </tr>
 					        <tr>
-					            <th>最小入数単位の価格</th>
-					            <td colspan="5"><script>price(fixed("%val:usr:minPrice%"))</script>円 / 1 %val:usr:quantityUnit%</td>
+					            <th>入数</th>
+					            <td>%val:usr:quantity% %val:usr:quantityUnit%</td>
+					            <th>個数単位</th>
+					            <td>%val:usr:itemUnit%</td>
+					            <th>定価</th>
+					            <td>￥<script>price(fixed("%val:usr:minPrice%"))</script></td>
 					        </tr>
 					</table>
 		    	</div>
+
+		    	<div class="uk-width-1-1" uk-grid>
+		    		<div class="uk-width-5-6@m uk-width-2-3">
+		    			<h2>金額情報</h2>
+					</div>
+		    	</div>
+		    	<div class="uk-width-1-1 uk-margin-top">
+					%sf:usr:search4:table:mstfilter%
+		    	</div>
+
 		    	<div uk-grid>
 		    		<div class="uk-width-3-4@m">
 		    			<h2>使用中の院内商品情報</h2>
@@ -145,120 +180,136 @@ $tenantData = $getTenantData->select();
 							        <a class="uk-accordion-title" href="#">表示項目選択</a>
 							        <div class="uk-accordion-content" hidden>
 							    		<a class="uk-button uk-button-secondary uk-button-small uk-width-1-1" href="#" onclick="table_field_selector()">反映</a>
-							        	<ul class="uk-list uk-list-striped">
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_01" type="checkbox"> 使用状況</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_02" type="checkbox"> 登録日時</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_03" type="checkbox"> 更新日時</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_04" type="checkbox"> 商品ID</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_05" type="checkbox"> メーカー名</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_06" type="checkbox"> 商品名</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_07" type="checkbox"> 製品コード</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_08" type="checkbox"> 規格</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_09" type="checkbox"> カタログNO</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_10" type="checkbox"> シリアルNO</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_11" type="checkbox"> 入数</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_12" type="checkbox"> 最小単位の価格</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_13" type="checkbox"> 価格</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_14" type="checkbox"> 旧価格</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_15" type="checkbox"> JANコード</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_16" type="checkbox"> 院内倉庫在庫数</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_17" type="checkbox"> 償還価格フラグ</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_18" type="checkbox"> 償還価格</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_19" type="checkbox"> 旧償還価格</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_20" type="checkbox"> 卸業者</label>
-									            </div>
-											</li>
-										    <li>
-										    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-									            	<label><input class="uk-checkbox chk_21" type="checkbox"> 特記事項</label>
-									            </div>
-											</li>
-										</ul>
+						        	<ul class="uk-list uk-list-striped">
+									
+									<li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_01" type="checkbox"> id</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_02" type="checkbox"> 使用状況</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_03" type="checkbox"> 院内商品ID</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_04" type="checkbox"> 登録日時</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_05" type="checkbox"> 更新日時</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_06" type="checkbox"> 商品ID</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_07" type="checkbox"> メーカー</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_08" type="checkbox"> 商品名</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_09" type="checkbox"> 製品コード</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_10" type="checkbox"> 規格</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_11" type="checkbox"> JANコード</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_12" type="checkbox"> カタログNO</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_13" type="checkbox"> シリアルNO</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_14" type="checkbox"> 保険請求分類（医科）</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_15" type="checkbox"> 保険請求分類（在宅）</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_16" type="checkbox"> 入数</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_17" type="checkbox"> 入数単位</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_18" type="checkbox"> 個数単位</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_19" type="checkbox"> 購買価格</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_20" type="checkbox"> 院内在庫数</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_21" type="checkbox"> 償還フラグ</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_22" type="checkbox"> 償還価格</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_23" type="checkbox"> 旧償還価格</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_24" type="checkbox"> 卸業者</label>
+								            </div>
+										</li>
+									</ul>
 							        </div>
 							    </li>
 							</ul>
 						</div>
 					</div>
 		    	<div class="uk-width-1-1 uk-margin-top">
-		    	  %sf:usr:search63:mstfilter:table%
+		    	  %sf:usr:search5:mstfilter:table%
                </div>
 			</div>
 		</div>
@@ -269,7 +320,7 @@ $tenantData = $getTenantData->select();
 		let storage = JSON.parse(localStorage.getItem("joypla_inHpItemsList"));
 		let dispObj = {};
 		if(!storage){
-			for(let i = 1 ; i <= 22 ; i++){
+			for(let i = 1 ; i <= 24 ; i++){
 				dispObj[i] = true;
 			}
 		} else {

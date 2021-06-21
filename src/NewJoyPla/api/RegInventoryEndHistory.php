@@ -32,6 +32,7 @@ class RegInventoryEndHistory{
 			var_dump($inventoryHDB);
 			return false;
 		}
+
 		$this->totalAmount = $this->sumInventoryAmount($inventoryDB['data']);
 		$this->itemsNumber = $this->sumItemsNumber($inventoryDB['data']);
 		

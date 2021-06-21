@@ -43,11 +43,12 @@ $divisionData = $getDivision->select();
 				</ul>
 				<div class="no_print uk-margin" uk-margin>
 					<input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
+				  <input class="print_hidden uk-button uk-button-primary" type="button" value="出力" onclick="$('#exportButton').click()">
 				</div>
 		    	<h2 class="page_title uk-margin">在庫管理表</h2>
 		    	<hr>
 		    	<div class="" id="tablearea">
-		    		%sf:usr:search12:mstfilter%
+		    		%sf:usr:search18:mstfilter%
 		    	</div>
 		    </div>
 		</div>

@@ -404,7 +404,7 @@ $tenantData = $getTenantData->select($hospitalData['data'][0]['tenantId']);
 		    	<div class="uk-margin">
 		    		<form action="#" onsubmit="search(); return false;" method="post">
 				    	<div class="uk-padding-top uk-background-muted uk-padding-small uk-width-1-2@m" >
-		    				<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." autofocus="true" name="searchValue"> 
+		    				<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." autofocus="true" name="searchValue" autocomplete="off"> 
 			    			<button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
 			    		</div>
 		    		</form> 
@@ -457,7 +457,7 @@ $tenantData = $getTenantData->select($hospitalData['data'][0]['tenantId']);
 	                            <div class="menu-foot">
 	                                <span>More Info</span>
 	                            </div>
-	                            <a href="%url/rel:mpgt:page_266228%" class="slide3"></a>
+	                            <a href="%url/rel:mpgt:page_169059%" class="slide3"></a>
 	                        </div>
 				        </div>
 				    </div>
@@ -614,7 +614,7 @@ $tenantData = $getTenantData->select($hospitalData['data'][0]['tenantId']);
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:page_267642%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:page_169057%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>

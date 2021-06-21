@@ -36,6 +36,7 @@ class LabelSearchBarcode{
         if(preg_match('/^1/', $systemCheckId) && strlen($systemCheckId) == 14){
             //旧JoyPlaのラベル
             $labelId = substr($systemCheckId, 1 , 5);
+            $labelId = str_pad($labelId, 8, 0, STR_PAD_LEFT);
             $customQuantity = substr($systemCheckId, 10 , 4);
             
             $result = $this->getInHPItemDBForOldLabel($labelId);

@@ -23,7 +23,7 @@ if($userInfo->getUserPermission() == '1') {
 <!DOCTYPE html>
 <html>
   <head>
-    <title>JoyPla 物品請求/個別発注</title>
+    <title>JoyPla 消費登録/個別発注</title>
 	<?php include_once 'NewJoyPla/src/Head.php'; ?>
     <style>
 		.id{
@@ -63,7 +63,6 @@ if($userInfo->getUserPermission() == '1') {
 		}
 		.shouhin-data .officialFlag{
 			font-size: 8px;
-			
 		}
 		.itemCount{
 			position: relative;
@@ -87,6 +86,22 @@ if($userInfo->getUserPermission() == '1') {
 			border-bottom: #e5e5e5 1px solid;
 			border-top: #e5e5e5 1px solid;
 		}
+
+		.uk-button.goodsBillingButton{
+			background: #EB8400;
+		}
+		
+		table.uk-table {
+			counter-reset: rowCount;
+		}
+
+		table.uk-table > tbody > tr {
+			counter-increment: rowCount;
+		}
+
+		table.uk-table > tbody > tr > td:first-child::before {
+			content: counter(rowCount);
+		}
     </style>
     <script>
 		let canAjax = true;
@@ -101,6 +116,11 @@ if($userInfo->getUserPermission() == '1') {
 		let listObject = {};
 		let dataKey = ['id','maker','shouhinName','code','kikaku','irisu','count','kakaku','jan','oroshi'];
 		
+		function delTr(object , elm){
+			elm.parentElement.parentElement.remove()
+			delete listObject[object.recordId];
+		}
+
 		function addTr(object){
 			if(listObject[object.recordId]){
 				return false;
@@ -113,10 +133,10 @@ if($userInfo->getUserPermission() == '1') {
 			let tdElm = '';
 			for(let i = 0 ; i < dataKey.length; i++){
 				tdElm = document.createElement("td");
-				html = '';
+				html = document.createTextNode('');
 				
 				if(dataKey[i] === 'id'){
-					html = document.createTextNode(listObject[object.recordId].row);
+					//html = document.createTextNode(listObject[object.recordId].row);
 				} else if(dataKey[i] === 'count'){
 					//html = '<input type="number" class="uk-input" style="width:72px" step="10">';
 				    html = document.createElement("div");
@@ -144,10 +164,13 @@ if($userInfo->getUserPermission() == '1') {
 					text = '';
 					if(dataKey[i] === 'kakaku'){
 						text += '￥';
-					}
-					text += listObject[object.recordId][dataKey[i]];
-					if(dataKey[i] === 'teisu' || dataKey[i] === 'irisu') {
+						text += price_text(listObject[object.recordId][dataKey[i]]);
+						text += '/'+ listObject[object.recordId].itemUnit;
+					} else if(dataKey[i] === 'teisu' || dataKey[i] === 'irisu') {
+						text += listObject[object.recordId][dataKey[i]];
 						text += listObject[object.recordId].unit;
+					} else {
+						text += listObject[object.recordId][dataKey[i]];
 					}
 					html = document.createTextNode(text);
 				}
@@ -155,9 +178,19 @@ if($userInfo->getUserPermission() == '1') {
 				tdElm.appendChild(html);
 				trElm.appendChild(tdElm);
 			}
+			tdElm = document.createElement("td");
+
+			input = document.createElement("input");
+			input.type = 'button';
+			input.value = '削除';
+			input.className = 'uk-button uk-button-danger uk-button-small';
+			input.onclick = function(){
+				delTr(object,this);
+			}
 			
+			tdElm.appendChild(input);
+			trElm.appendChild(tdElm);
 			$(".shouhin-table table tbody").append(trElm);
-			
 		}
 		
 		function onchangeCountNum(id,value){
@@ -225,109 +258,117 @@ if($userInfo->getUserPermission() == '1') {
 			
 		}
 		
-		function sendUnorderedSlip(){
-			if(!canAjax) { 
-				console.log('通信中');
-				return;
-			}
-			if(! unorderedSlipValidationCheck()){
-				loading_remove();
-				return false;
-			}
+		function sendUnorderedSlip(goodsFlg){
 			
-			loading();
-			
-			canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
-			$.ajax({
-				async: false,
-                url:'%url/rel:mpgt:regUnordered%',
-                type:'POST',
-                data:{
-                	ordered : JSON.stringify( objectValueToURIencode(listObject) ),
-                	divisionId : $('select[name="busyo"]').val()
-                },
-                dataType: 'json'
-            })
-            // Ajaxリクエストが成功した時発動
-            .done( (data) => {
-                if(! data.result){
-            		UIkit.modal.alert("未発注伝票の作成に失敗しました");
-					canAjax = true; // 再びAjaxできるようにする
-            		return false;
-                }
-                
-                UIkit.modal.alert("未発注伝票を作成しました").then(function(){
-					$('.goodsBillingButton').prop('disabled', false);
-					dataReset();
-					canAjax = true; // 再びAjaxできるようにする
-				});
-                
-            })
-            // Ajaxリクエストが失敗した時発動
-            .fail( (data) => {
-                UIkit.modal.alert("未発注伝票の作成に失敗しました").then(function(){
-					canAjax = true; // 再びAjaxできるようにする
-				});
-            })
-            // Ajaxリクエストが成功・失敗どちらでも発動
-            .always( (data) => {
-				loading_remove();
+			UIkit.modal.confirm("未発注伝票を作成しますか？").then(function () {
+				if(!canAjax) { 
+					console.log('通信中');
+					return;
+				}
+				if(! unorderedSlipValidationCheck()){
+					loading_remove();
+					return false;
+				}
 				
-            });
-		}
-		
-		function sendGoodsBilling(){
-			if(!canAjax) { 
-				console.log('通信中');
-				return;
-			}
-			canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
-            loading();
-			if(! goodsBillingValidationCheck()){
-				loading_remove();
-				canAjax = true; // 再びAjaxできるようにする
-				return false;
-			}
-			$.ajax({
-				async: false,
-                url:'%url/rel:mpgt:regGoodsBilling%',
-                type:'POST',
-                data:{
-                	billing : JSON.stringify( objectValueToURIencode(listObject) ),
-                	divisionId : $('select[name="busyo"]').val()
-                },
-                dataType: 'json'
-            })
-            // Ajaxリクエストが成功した時発動
-            .done( (data) => {
-                if(! data.result){
-            		UIkit.modal.alert("物品請求に失敗しました").then(function(){
+				loading();
+				
+				canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
+				$.ajax({
+					async: false,
+					url:'%url/rel:mpgt:regUnordered%',
+					type:'POST',
+					data:{
+						ordered : JSON.stringify( objectValueToURIencode(listObject) ),
+						divisionId : $('select[name="busyo"]').val()
+					},
+					dataType: 'json'
+				})
+				// Ajaxリクエストが成功した時発動
+				.done( (data) => {
+					if(! data.result){
+						UIkit.modal.alert("未発注伝票の作成に失敗しました");
 						canAjax = true; // 再びAjaxできるようにする
-					});
-            		return false;
-                }
-                UIkit.modal.alert('物品請求が完了しました').then(function () {
-					UIkit.modal.confirm("物品請求内容で未発注伝票を作成しますか？").then(function () {
-						$('.goodsBillingButton').prop('disabled', true);
-						canAjax = true; // 再びAjaxできるようにする
-						sendUnorderedSlip();
-					}, function () {
+						return false;
+					}
+					
+					UIkit.modal.alert("未発注伝票を作成しました").then(function(){
+						$('.goodsBillingButton').prop('disabled', false);
 						dataReset();
 						canAjax = true; // 再びAjaxできるようにする
 					});
+					
+				})
+				// Ajaxリクエストが失敗した時発動
+				.fail( (data) => {
+					UIkit.modal.alert("未発注伝票の作成に失敗しました").then(function(){
+						canAjax = true; // 再びAjaxできるようにする
+					});
+				})
+				// Ajaxリクエストが成功・失敗どちらでも発動
+				.always( (data) => {
+					loading_remove();
+					
 				});
-            })
-            // Ajaxリクエストが失敗した時発動
-            .fail( (data) => {
-				console.log(data);
-            	UIkit.modal.alert("物品請求に失敗しました").then(function(){
+			
+			}, function () {
+				if(goodsFlg == true){
+					dataReset();
+				}
+				canAjax = true; // 再びAjaxできるようにする
+			});
+		}
+		
+		function sendGoodsBilling(){
+			UIkit.modal.confirm("消費登録を行いますか？").then(function () {
+							
+				if(!canAjax) { 
+					console.log('通信中');
+					return;
+				}
+				canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
+				loading();
+				if(! goodsBillingValidationCheck()){
+					loading_remove();
 					canAjax = true; // 再びAjaxできるようにする
+					return false;
+				}
+				$.ajax({
+					async: false,
+					url:'%url/rel:mpgt:regGoodsBilling%',
+					type:'POST',
+					data:{
+						billing : JSON.stringify( objectValueToURIencode(listObject) ),
+						divisionId : $('select[name="busyo"]').val()
+					},
+					dataType: 'json'
+				})
+				// Ajaxリクエストが成功した時発動
+				.done( (data) => {
+					if(! data.result){
+						UIkit.modal.alert("消費登録に失敗しました").then(function(){
+							canAjax = true; // 再びAjaxできるようにする
+						});
+						return false;
+					}
+					UIkit.modal.alert('消費登録が完了しました').then(function () {
+						canAjax = true; // 再びAjaxできるようにする
+						sendUnorderedSlip(true);
+					});
+				})
+				// Ajaxリクエストが失敗した時発動
+				.fail( (data) => {
+					console.log(data);
+					UIkit.modal.alert("消費登録に失敗しました").then(function(){
+						canAjax = true; // 再びAjaxできるようにする
+					});
+				})
+				// Ajaxリクエストが成功・失敗どちらでも発動
+				.always( (data) => {
+					loading_remove();
 				});
-            })
-            // Ajaxリクエストが成功・失敗どちらでも発動
-            .always( (data) => {
-				loading_remove();
-            });
+			
+			}, function () {
+			});
 		}
 		
 		
@@ -361,6 +402,7 @@ if($userInfo->getUserPermission() == '1') {
                 value = parseInt(listObject[data.recordId].countNum) + parseInt(data.count);
                 onchangeCountNum(data.recordId,value);
 				canAjax = true; // 再びAjaxできるようにする
+            	$('input[name="barcode"]').val('');
             })
             // Ajaxリクエストが失敗した時発動
             .fail( (data) => {
@@ -370,7 +412,6 @@ if($userInfo->getUserPermission() == '1') {
             })
             // Ajaxリクエストが成功・失敗どちらでも発動
             .always( (data) => {
-            	$('input[name="barcode"]').val('');
 				loading_remove();
             });
 		}
@@ -391,9 +432,9 @@ if($userInfo->getUserPermission() == '1') {
 		    <div class="uk-container uk-container-expand uk-margin-top">
 		    	<ul class="uk-breadcrumb">
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
-				    <li><span>物品請求・個別発注 内容入力</span></li>
+				    <li><span>消費登録・個別発注 内容入力</span></li>
 				</ul>
-		    	<h2 class="page_title">物品請求・個別発注 内容入力</h2>
+		    	<h2 class="page_title">消費登録・個別発注 内容入力</h2>
 		    	<hr>
 		    	<div class="uk-width-1-3@m">
 		    		<div class="uk-margin">
@@ -428,8 +469,8 @@ if($userInfo->getUserPermission() == '1') {
 		    			<div uk-margin>
 		    				<button class="uk-button uk-button-default" onclick="sanshouClick()">商品マスタを開く</button>
 		    				<button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
-		    				<button class="uk-button uk-button-primary goodsBillingButton" onclick="sendGoodsBilling()">物品請求</button>
-		    				<button class="uk-button uk-button-primary unorderedSlipButton" onclick="sendUnorderedSlip()">未発注伝票作成</button>
+		    				<button class="uk-button uk-button-primary goodsBillingButton" onclick="sendGoodsBilling()">消費登録</button>
+		    				<button class="uk-button uk-button-primary unorderedSlipButton" onclick="sendUnorderedSlip(false)">未発注伝票作成</button>
 		    			</div>
 		    		</div>
 		    		<?php /*
@@ -440,7 +481,7 @@ if($userInfo->getUserPermission() == '1') {
 		    	</div>
 			    <div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky" class="uk-padding-top uk-background-muted uk-padding-small">
 		    		<form action='#' method="post" onsubmit="barcodeSearch(); return false">
-	    				<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." autofocus="true" name="barcode"> 
+	    				<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." name="barcode" autocomplete="off"> 
 		    			<button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
 					</form>	
 				</div>
@@ -459,6 +500,7 @@ if($userInfo->getUserPermission() == '1') {
 		    					<th>価格</th>
 		    					<th>JANコード</th>
 		    					<th>卸業者</th>
+		    					<th></th>
 		    				</tr>
 		    			</thead>
 		    			<tbody>
@@ -475,20 +517,23 @@ if($userInfo->getUserPermission() == '1') {
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
-		    				</tr>
-		    				<tr>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    				</tr>
 		    				<tr>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    				</tr>
+		    				<tr>
+		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>

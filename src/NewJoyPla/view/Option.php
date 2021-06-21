@@ -8,8 +8,6 @@ include_once 'NewJoyPla/lib/UserInfo.php';
 include_once 'NewJoyPla/api/GetHospitalData.php';
 include_once 'NewJoyPla/api/GetTenantData.php';
 
-
-
 $spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
 $spiralApiRequest = new SpiralApiRequest();
 $spiralDataBase = new App\Lib\SpiralDataBase($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);

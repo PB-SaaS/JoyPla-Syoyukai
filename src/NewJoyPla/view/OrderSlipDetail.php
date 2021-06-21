@@ -230,11 +230,11 @@ if($userInfo->getUserPermission() == "1"){
 					    						echo "<td>".$record["itemName"]."</td>";
 					    						echo "<td>".$record["itemCode"]."</td>";
 					    						echo "<td>".$record["itemStandard"]."</td>";
-					    						echo "<td>￥".$record["price"]."<span class='uk-text-small'></span> / <span class='uk-text-small'>1".$record["itemUnit"]."</span></td>";
+					    						echo "<td>￥<script>price('".$record["price"]."')</script><span class='uk-text-small'></span> / <span class='uk-text-small'>".$record["itemUnit"]."</span></td>";
 					    						echo "<td>".$record["quantity"]."<span class='uk-text-small'>".$record["quantityUnit"]."</span></td>";
 					    						echo "<td>".$record["orderQuantity"]."<span class='uk-text-small'>".$record["itemUnit"]."</span></td>";
 					    					
-					    						echo "<td>".$record["receivingNowCount"]."<span class='uk-text-remove'>".$record["itemUnit"]."</span></td>";
+					    						echo "<td>".$record["receivingNowCount"]."<span class='uk-text-remove uk-text-small'>".$record["itemUnit"]."</span></td>";
 					    						if($record["receivingFlag"]){
 					    							echo "<td>入庫完了</td>";
 					    						} else {
@@ -355,6 +355,11 @@ if($userInfo->getUserPermission() == "1"){
 					}
 				});
 
+				if(!chkLotObj()){
+					UIkit.modal.alert("ロット情報を入力してください");
+					return false;
+				}
+
 				if(Object.keys(receivingData).length == 0){
 					UIkit.modal.alert("納品対象がありません。<br>入庫数を入力して下さい");
 					return false;
@@ -409,7 +414,7 @@ if($userInfo->getUserPermission() == "1"){
 			});
 		}
 		
-		function addLotInput(num,inHospitalItemId,lotval,lotDate){
+		function addLotInput(num,inHospitalItemId,lotval,lotDate,lotQuantity){
 			if(parseInt(upToData[inHospitalItemId]["orderQuantity"]) <= parseInt(upToData[inHospitalItemId].lotNum)){
 				UIkit.modal.alert("発注数より多くはできません。ご確認ください");
 				return ;
@@ -430,8 +435,10 @@ if($userInfo->getUserPermission() == "1"){
 			tdElm = document.createElement("td");
 			tdElm.className = "uk-text-small uk-text-break";
 			tdElm.style = "white-space: break-spaces";
-			html = document.createTextNode("ロット番号:※ 分からない場合は無記入");
+			html = document.createTextNode("ロット番号");
 			tdElm.appendChild(html);
+			brelm = document.createElement("br");
+			tdElm.appendChild(brelm);
 			tdElm.colSpan = "4";
 			tdElm.className = "uk-text-small";
 			input = document.createElement("input");
@@ -451,8 +458,10 @@ if($userInfo->getUserPermission() == "1"){
 			tdElm = document.createElement("td");
 			tdElm.className = "uk-text-small uk-text-break";
 			tdElm.style = "white-space: break-spaces";
-			html = document.createTextNode("使用期限: ※ 分からない場合は無記入");
+			html = document.createTextNode("使用期限");
 			tdElm.appendChild(html);
+			brelm = document.createElement("br");
+			tdElm.appendChild(brelm);
 			tdElm.colSpan = "4";
 			input = document.createElement("input");
 			input.className = "uk-input lotDate_" +inHospitalItemId;
@@ -467,7 +476,29 @@ if($userInfo->getUserPermission() == "1"){
 			
 			tdElm.appendChild(input); 
 			trElm.appendChild(tdElm); 
+			/*
+			tdElm = document.createElement("td");
+			tdElm.className = "uk-text-small uk-text-break";
+			tdElm.style = "white-space: break-spaces";
+			html = document.createTextNode("入数");
+			tdElm.appendChild(html);
+			brelm = document.createElement("br");
+			tdElm.appendChild(brelm);
+			tdElm.colSpan = "1";
+			input = document.createElement("input");
+			input.className = "uk-input uk-width-small lotQuantity_" +inHospitalItemId;
+			input.type = "number";
+			input.value = lotQuantity;
+			if(lotQuantity){
+    			input.style.backgroundColor = "rgb(255, 204, 153)";
+			}
+			input.onchange  = function () {  
+			    	$(this).css("background-color","rgb(255, 204, 153)");
+			    };
 			
+			tdElm.appendChild(input); 
+			trElm.appendChild(tdElm); 
+			*/
 			tdElm = document.createElement("td");
 			tdElm.className = "uk-text-center";
 			input = document.createElement("input");
@@ -594,6 +625,7 @@ if($userInfo->getUserPermission() == "1"){
 				
 				if(objkey == "" ){
 					searchJan = addCheckDigit(obj["01"]);
+					console.log(searchJan);
 					Object.keys(upToData).forEach(function (key) {
 					  if(searchJan == upToData[key]["itemJANCode"]){
 						  chkflg = true;
@@ -610,7 +642,7 @@ if($userInfo->getUserPermission() == "1"){
 					});
 					return false;
 				}
-				addLotInput(upToData[objkey]["num"],objkey,obj["10"],changeDate(obj["17"]));
+				addLotInput(upToData[objkey]["num"],objkey,obj["10"],changeDate(obj["17"]),obj["30"]);
 				$(".select_items").hide();
 				$(".select_items select").val("");
 				$("#GS1-128").val("");
@@ -635,7 +667,7 @@ if($userInfo->getUserPermission() == "1"){
 		
 				
 		function makeLotObj(){
-			lotObj = {};
+			let lotObj = {};
 			Object.keys(upToData).forEach(function (inHPItemKey) {
 				lotObj[inHPItemKey] = {};
 				$(".lot_"+inHPItemKey).each(function(index,elm){
@@ -649,6 +681,19 @@ if($userInfo->getUserPermission() == "1"){
 				
 			});
 			return lotObj;
+		}
+
+		function chkLotObj(){
+			let lotObj = makeLotObj();
+			let flg = true;
+			Object.keys(lotObj).forEach(function (inHPItemKey) {
+				Object.keys(lotObj[inHPItemKey]).forEach(function (index) {
+					if(lotObj[inHPItemKey][index]["lotDate"] == '' || lotObj[inHPItemKey][index]["lotNumber"] == '' ){
+						flg = false;
+					}
+				});
+			});
+			return flg;
 		}
     </script>
   </body>

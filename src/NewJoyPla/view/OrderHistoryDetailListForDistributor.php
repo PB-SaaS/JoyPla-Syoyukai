@@ -15,13 +15,12 @@
 				</ul>
 		    	<div class="no_print uk-margin">
 				  <input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
-				  <?php //<input class="print_hidden uk-button uk-button-primary" type="button" value="出力" onclick="$('#exportButton').click()">
-				  ?>
+				  <input class="print_hidden uk-button uk-button-primary" type="button" value="出力" onclick="$('#exportButton').click()">
 				</div>
 		    	<h2 class="page_title uk-margin-remove">発注履歴詳細一覧</h2>
 		    	<hr>
 		    	<div class="" id="tablearea">
-					%sf:usr:search85%
+					%sf:usr:oroshiJisseki%
 		    	</div>
 			</div>
 		</div>

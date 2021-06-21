@@ -70,7 +70,7 @@ $divisionData = $getDivision->select();
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
 	<?php include_once 'NewJoyPla/src/Head.php'; ?>
-    <title>JoyPla 月次レポート【物品請求】</title>
+    <title>JoyPla 月次レポート【消費】</title>
   </head>
   <body>
    
@@ -80,13 +80,13 @@ $divisionData = $getDivision->select();
 		    <div class="uk-container uk-container-expand">
 	    		<ul class="uk-breadcrumb">
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
-				    <li><span>月次レポート【物品請求】</span></li>
+				    <li><span>月次レポート【消費】</span></li>
 				</ul>
 		    	<div class="no_print uk-margin">
 					<input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
 					<input class="print_hidden uk-button uk-button-primary" type="button" value="出力" onclick="listDl();return false;">
 				</div>
-		    	<h2 class="page_title uk-margin-remove">月次レポート【物品請求】</h2>
+		    	<h2 class="page_title uk-margin-remove">月次レポート【消費】</h2>
 		    	<hr>
 				<div class="uk-width-1-1 uk-margin-auto">
 					<form class="uk-form-stacked" name="myform" action="%url/rel:mpgt:goodsBillingMR%" method="post" onsubmit="return submitCheck()">
@@ -230,12 +230,14 @@ $divisionData = $getDivision->select();
 								<thead>
 									<tr>
 										<th>No</th>
+										<th>院内商品ID</th>
 										<th>メーカー</th>
 										<th>商品名</th>
 										<th>製品コード</th>
 										<th>規格</th>
-										<th>最小単位の価格</th>
-										<th>請求数</th>
+										<th>購買価格</th>
+										<th>入数</th>
+										<th>消費数</th>
 										<th>合計金額</th>
 									</tr>
 								</thead>
@@ -245,13 +247,32 @@ $divisionData = $getDivision->select();
 										foreach($result['data'] as $record){
 											echo "<tr>";
 											echo "<td>".$record['id'] ."</td>";
+											echo "<td>".$record['inHospitalItemId']."</td>".PHP_EOL;
 											echo "<td>".$record['makerName'] ."</td>";
 											echo "<td>".$record['itemName'] ."</td>";
 											echo "<td>".$record['itemCode'] ."</td>";
 											echo "<td>".$record['itemStandard'] ."</td>";
-											echo "<td>￥<script>price(fixed('".$record['minPrice'] ."'))</script></td>";
-											echo "<td>".$record['billingQuantity'] ." ".$record['quantityUnit'] ."</td>";
-											echo "<td>￥<script>price(fixed('".$record['totalAmount'] ."'))</script></td>";
+											//echo "<td>￥<script>price(fixed('".$record['minPrice'] ."'))</script></td>";
+											echo "<td>";
+											foreach($record['price'] as $price){
+												echo "￥<script>price(fixed('".$price."'))</script><br>".PHP_EOL;
+											}
+											echo "</td>".PHP_EOL;
+											echo "<td>";
+											foreach($record['quantity'] as $key => $quantity){
+												echo $quantity . $record['quantityUnit'][$key]."<br>".PHP_EOL;
+											}
+											echo "</td>".PHP_EOL;
+											echo "<td>";
+											foreach($record['billingQuantity'] as $key => $payoutQuantity){
+												echo $payoutQuantity . $record['quantityUnit'][$key]."<br>".PHP_EOL;
+											}
+											echo "</td>".PHP_EOL;
+											echo "<td>";
+											foreach($record['totalAmount'] as $totalAmount){
+												echo "￥<script>price(fixed('".$totalAmount."'))</script><br>".PHP_EOL;
+											}
+											echo "</td>".PHP_EOL;
 											echo "</tr>";
 										}
 									} ?>
@@ -281,13 +302,34 @@ $divisionData = $getDivision->select();
 	}
      
 	function exportCSV(records) {
-		let data = records.map((record)=>record.join('\t')).join('\r\n');
+		let remakeArray = new Array();
+
+		k = 0;
+		remakeArray[k] = records[0];
+		for( let i = 1; i < records.length; i++ ) {
+			for( let j = 0; j < records[i][6].length; j++ ){
+				k = k + 1;
+				remakeArray[k] = new Array();
+				remakeArray[k][0] = records[i][0];
+				remakeArray[k][1] = records[i][1];
+				remakeArray[k][2] = records[i][2];
+				remakeArray[k][3] = records[i][3];
+				remakeArray[k][4] = records[i][4];
+				remakeArray[k][5] = records[i][5];
+				remakeArray[k][6] = records[i][6][j];
+				remakeArray[k][7] = records[i][7][j];
+				remakeArray[k][8] = records[i][8][j];
+				remakeArray[k][9] = records[i][9][j];
+				remakeArray[k][10] = records[i][10][j];
+			}
+		}
+		let data = remakeArray.map((record)=>record.join('\t')).join('\r\n');
 		
 		let bom  = new Uint8Array([0xEF, 0xBB, 0xBF]);
 		let blob = new Blob([bom, data], {type: 'text/tab-separated-values'});
 		let url = (window.URL || window.webkitURL).createObjectURL(blob);
 		let link = document.createElement('a');
-		link.download = 'goodsBillingMonthlyReport_<?php echo date('Ymd') ?>.tsv';
+		link.download = 'ConsumeMonthlyReport_<?php echo date('Ymd') ?>.tsv';
 		link.href = url;
 		document.body.appendChild(link);
 		link.click();
@@ -304,7 +346,7 @@ $divisionData = $getDivision->select();
 			});
 		}
 		
-		result.unshift(['id','inHospitalItemId','makerName','itemName','itemCode','itemStandard','minPrice','billingQuantity','totalAmount','quantityUnit']);
+		result.unshift(['id','inHospitalItemId','makerName','itemName','itemCode','itemStandard','price','quantity','quantityUnit','billingQuantity','totalAmount']);
 	
 		exportCSV(result);
 	}

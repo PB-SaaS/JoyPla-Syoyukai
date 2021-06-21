@@ -17,7 +17,7 @@
 		    	<hr>
                         
 		    	<div class="uk-margin" id="tablearea">
-					%sf:usr:orderHdivSelect:table%
+					%sf:usr:search7:table%
 		    	</div>
 			</div>
 		</div>

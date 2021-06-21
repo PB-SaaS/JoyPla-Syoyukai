@@ -102,7 +102,7 @@ class PayoutMonthlyReport{
     private function makePayoutMonthlyReport(){
         $result = array();
         foreach($this->inHPItemData['data'] as $inHPitem){
-            $payoutQuantity = $this->getPayoutQuantity($inHPitem[1]);
+            $getInformationByPrice = $this->getInformationByPrice($inHPitem[1]);
             $result['data'][] = array(
                 'id' => $inHPitem[0],
                 'inHospitalItemId' => $inHPitem[1],
@@ -110,10 +110,14 @@ class PayoutMonthlyReport{
                 'itemName' => $inHPitem[3],
                 'itemCode' => $inHPitem[4],
                 'itemStandard' => $inHPitem[5],
-                'minPrice' => $inHPitem[6],
-                'payoutQuantity' => $payoutQuantity,
-                'totalAmount' => $inHPitem[6] * $payoutQuantity,
-                'quantityUnit'=> $inHPitem[7]
+                //'minPrice' => $inHPitem[6],
+                'price' => $getInformationByPrice["price"],
+                'quantity' => $getInformationByPrice["quantity"],
+                'payoutQuantity' => $getInformationByPrice["payoutQuantity"],
+                'totalAmount' => $getInformationByPrice["totalAmount"],
+                'adjAmount' => $getInformationByPrice["adjAmount"],
+                'priceAfterAdj' => $getInformationByPrice["priceAfterAdj"],
+                'quantityUnit'=> $getInformationByPrice["quantityUnit"],
             );
         }
         $result['count'] = $this->inHPItemData['count'];
@@ -121,20 +125,36 @@ class PayoutMonthlyReport{
         return $result;
     }
 
-    private function getPayoutQuantity(string $inHospitalItemId){
-        $payoutQuantity = 0;
+    private function getInformationByPrice(string $inHospitalItemId){
+        $payoutDataByPrice = array("price" => array(), "quantity" => array(), "payoutQuantity" => array(), "totalAmount" => array(), "adjAmount" => array(), "quantityUnit" =>array());
         foreach($this->PayoutData['data'] as $payoutItem){
             if($inHospitalItemId == $payoutItem[0]){
-                $payoutQuantity = $payoutQuantity + $payoutItem[1];
+                $key = array_search($payoutItem[4], $payoutDataByPrice["price"]);
+                if($key === false){
+                    $payoutDataByPrice["price"][] = $payoutItem[4];
+                    $key = array_search($payoutItem[4], $payoutDataByPrice["price"]);
+                    $payoutDataByPrice["quantity"][$key] = 0;
+                    $payoutDataByPrice["payoutQuantity"][$key] = 0;
+                }
+
+                $payoutDataByPrice["quantity"][$key] = $payoutItem[5];
+                $payoutDataByPrice["quantityUnit"][$key] = $payoutItem[8];
+                $payoutDataByPrice["payoutQuantity"][$key] = $payoutDataByPrice["payoutQuantity"][$key] + $payoutItem[1];
+                $payoutDataByPrice["adjAmount"][$key] = $payoutDataByPrice["adjAmount"][$key] + $payoutItem[6];
             }
         }
-        return $payoutQuantity;
+        
+        foreach($payoutDataByPrice["price"] as $key => $byPriceData){
+            $payoutDataByPrice["totalAmount"][$key] = ( $byPriceData / $payoutDataByPrice["quantity"][$key] ) * $payoutDataByPrice["payoutQuantity"][$key] ;
+            $payoutDataByPrice["priceAfterAdj"][$key] = $payoutDataByPrice["totalAmount"][$key] + $payoutDataByPrice["adjAmount"][$key];
+        }
+        return $payoutDataByPrice;
     }
 
     private function getPayoutDB(){
         $this->spiralDataBase->setDataBase($this->PayoutDB);
         $this->spiralDataBase->addSearchCondition('hospitalId',$this->userInfo->getHospitalId());
-        $this->spiralDataBase->addSelectFields('inHospitalItemId','payoutQuantity','registrationTime','payoutAmount');
+        $this->spiralDataBase->addSelectFields('inHospitalItemId','payoutQuantity','registrationTime','payoutAmount','price','quantity','adjAmount','priceAfterAdj','quantityUnit');
         return $this->spiralDataBase->doSelectLoop();
     }
 
@@ -144,15 +164,16 @@ class PayoutMonthlyReport{
         foreach($this->PayoutData['data'] as $record){
             $this->spiralDataBase->addSearchCondition('inHospitalItemId',$record[0],'=','or');
         }
-        $this->spiralDataBase->addSelectFields('id','inHospitalItemId','makerName','itemName','itemCode','itemStandard','minPrice','quantityUnit');
+        $this->spiralDataBase->addSortField('id', 'asc' );
+        $this->spiralDataBase->addSelectFields('id','inHospitalItemId','makerName','itemName','itemCode','itemStandard','price','quantityUnit');
         return $this->spiralDataBase->doSelect();
     }
 
     private function getTotalAmount(){
-        $payoutQuantity = 0;
+        $TotalAmount = 0;
         foreach($this->PayoutData['data'] as $payoutItem){
-            $payoutQuantity += (float)$payoutItem[3];
+            $TotalAmount += $payoutItem[7];
         }
-        return $payoutQuantity;
+        return $TotalAmount;
     }
 }

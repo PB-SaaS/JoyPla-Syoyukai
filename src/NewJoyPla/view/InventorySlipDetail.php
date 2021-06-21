@@ -21,7 +21,7 @@ $cardInfo = new App\Api\GetCardInfo($spiralDataBase);
 $session = $SPIRAL->getSession();
 $cardUrl = $session->get("cardUrl");
 
-$card = $cardInfo->select("inventoryByDiv",$SPIRAL->getCardId(),"inventoryHId","inventoryEndId","invHAuthKey","divisionId");
+$card = $cardInfo->select("inventoryByDiv",$SPIRAL->getCardId(),"inventoryHId","inventoryEndId","invHAuthKey","divisionId","itemsNumber","totalAmount");
 
 $InventoryHistoryId = $card["data"][0][0];
 $inventoryEndHistoryId = $card["data"][0][1];
@@ -29,9 +29,13 @@ $inventoryEndHistoryId = $card["data"][0][1];
 $crypt   = $SPIRAL->getSpiralCryptOpenSsl();
 $authKeyCrypt = $crypt->encrypt($card["data"][0][2], "JoyPla");
 
+
+$itemsNumber = $card["data"][0][4];
+$totalAmount = $card["data"][0][5];
+
 $regInventoryHistory = new App\Api\RegInventoryHistory($spiralDataBase,$userInfo);
 
-$result = $regInventoryHistory->updateHistory($InventoryHistoryId);
+$result = $regInventoryHistory->updateHistory($InventoryHistoryId,$itemsNumber,$totalAmount);
 
 if(!$result){
 	echo json_encode(array("result"=>$result));
@@ -143,6 +147,10 @@ if(!$result){
 		    				<tr>
 		    					<td class="uk-text-bold">棚卸登録日時</td>
 		    					<td class="uk-text-right">%val:usr:registrationTime%</td>
+		    				</tr>
+		    				<tr>
+		    					<td class="uk-text-bold">棚卸更新日時</td>
+		    					<td class="uk-text-right">%val:usr:updateTime%</td>
 		    				</tr>
 		    				<tr>
 		    					<td class="uk-text-bold">部署名</td>

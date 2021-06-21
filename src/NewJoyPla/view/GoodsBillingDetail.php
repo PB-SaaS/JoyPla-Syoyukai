@@ -47,7 +47,7 @@ if($userInfo->getUserPermission() == "1"){
 <!DOCTYPE html>
 <html>
   <head>
-    <title>JoyPla 物品請求書</title>
+    <title>JoyPla 消費物品</title>
 	<?php include_once 'NewJoyPla/src/Head.php'; ?>
 
   </head>
@@ -58,21 +58,21 @@ if($userInfo->getUserPermission() == "1"){
 		    <div class="uk-container uk-container-expand">
 		    	<ul class="uk-breadcrumb no_print">
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
-				    <li><a href="<?php echo $link ?>&table_cache=true"><span>物品請求一覧</span></a></li>
-				    <li><span>物品請求書</span></li>
+				    <li><a href="<?php echo $link ?>&table_cache=true"><span>消費一覧</span></a></li>
+				    <li><span>消費物品</span></li>
 				</ul>
 				<div class="no_print uk-margin">
 					<input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
-					<input class="print_hidden uk-button uk-button-danger" type="submit" value="物品請求取消" onclick="billingDelete();return false;">
+					<input class="print_hidden uk-button uk-button-danger" type="submit" value="消費取消" onclick="billingDelete();return false;">
 				</div>
 		    	<div class="uk-text-center uk-text-large">
-		    		<p class="uk-text-bold" style="font-size: 32px">物　品　請　求　書</p>
+		    		<p class="uk-text-bold" style="font-size: 32px">消　費　物　品</p>
 		    	</div>
 		    	<div uk-grid>
 			    	<div class="uk-width-1-2">
 		    			<table class="uk-table uk-width-1-1 uk-width-2-3@m uk-table-divider uk-text-nowrap">
 		    				<tr>
-		    					<td class="uk-text-bold">物品請求日時</td>
+		    					<td class="uk-text-bold">消費日時</td>
 		    					<td class="uk-text-right">%val:usr:registrationTime%</td>
 		    				</tr>
 		    				<tr>
@@ -104,8 +104,8 @@ if($userInfo->getUserPermission() == "1"){
 										<th>規格</th>
 										<th>入数</th>
 										<th>価格</th>
-										<th>請求数</th>
-										<th>請求金額</th>
+										<th>消費数</th>
+										<th>金額</th>
 				    				</tr>
 				    			</thead>
 				    			<tbody>
@@ -145,7 +145,7 @@ if($userInfo->getUserPermission() == "1"){
 				console.log('通信中');
 				return;
 			}
-			UIkit.modal.confirm('物品請求情報を取消します。<br>よろしいですか<br>注意:在庫数を戻します。').then(function () {
+			UIkit.modal.confirm('消費情報を取消します。<br>よろしいですか<br>注意:在庫数を戻します。').then(function () {
 				
 				loading();
 				canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
@@ -164,19 +164,19 @@ if($userInfo->getUserPermission() == "1"){
 	            // Ajaxリクエストが成功した時発動
 	            .done( (data) => {
 	                if(! data.result){
-	            		UIkit.modal.alert("物品請求取消に失敗しました").then(function(){
+	            		UIkit.modal.alert("消費取消に失敗しました").then(function(){
 							canAjax = true; // 再びAjaxできるようにする
 						});
 	            		return false;
 	                }
-	                UIkit.modal.alert("物品請求取消が完了しました").then(function () {
+	                UIkit.modal.alert("消費取消が完了しました").then(function () {
 						canAjax = true; // 再びAjaxできるようにする
 						location.href ="<?php echo $link ?>&table_cache=true";
 					});
 	            })
 	            // Ajaxリクエストが失敗した時発動
 	            .fail( (data) => {
-	        		UIkit.modal.alert("物品請求取消に失敗しました").then(function(){
+	        		UIkit.modal.alert("消費取消に失敗しました").then(function(){
 						canAjax = true; // 再びAjaxできるようにする
 					});
 	        		return false;

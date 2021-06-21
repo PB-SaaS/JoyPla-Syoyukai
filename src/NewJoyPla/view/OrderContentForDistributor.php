@@ -5,6 +5,8 @@ include_once "NewJoyPla/lib/Define.php";
 include_once "NewJoyPla/lib/SpiralDataBase.php";
 include_once "NewJoyPla/lib/UserInfo.php";
 include_once "NewJoyPla/api/GetCardInfo.php";
+include_once 'NewJoyPla/api/GetHospitalData.php';
+include_once 'NewJoyPla/api/GetTenantData.php';
 include_once "NewJoyPla/api/UpdateRequestStatus.php";
 
 $userInfo = new App\Lib\UserInfo($SPIRAL);
@@ -21,6 +23,10 @@ if($card["data"][0][1] == "1"){
 	$updateRequestStatus->open($card["data"][0][0]);
 }
 
+$getHospitalData = new App\Api\GetHospitalData($spiralDataBase,$userInfo);
+$hospitalData = $getHospitalData->select();
+$getTenantData = new App\Api\GetTenantData($spiralDataBase,$userInfo);
+$tenantData = $getTenantData->select($hospitalData['data'][0]['tenantId']);
 
 ?>
 <!DOCTYPE html>
@@ -65,17 +71,25 @@ if($card["data"][0][1] == "1"){
 						
 					</article>
 				</div>
-				<div>
+				<?php if($tenantData['data'][0]['tenantKind'] == '1') : ?>
+				<hr>
+				<div class="uk-margin">
 					<p>見積商品一覧</p>
-					<div>%sf:usr:search93:mstfilter:table%</div>
+					<div>%sf:usr:search20:mstfilter:table%</div>
 				</div>
 				<form name="reqItemsReg" action="/regist/is" target="_blank" method="POST">
 					%SMPAREA%
-					<input type="hidden" name="SMPFORM" value="%smpform:reqItemsReg%">
+					<input type="hidden" name="SMPFORM" value="%smpform:310a_reqItemsReg%">
 					<input type="hidden" name="requestId" value="%val:usr:requestId%">
 					<input type="hidden" name="tenantId" value="%val:usr:tenantId%">
 					<input type="hidden" name="distributorId" value="%val:usr:distributorId%">
 				</form>
+				<?php endif; ?>
+				<hr>
+				<div class="uk-margin">
+					<p>金額見積依頼の商品一覧</p>
+					<div>%sf:usr:search16:mstfilter:table%</div>
+				</div>
 			</div>
 		</div>
 	</div>

@@ -102,7 +102,7 @@ class GoodsBillingMonthlyReport{
     private function makeGoodsBillingMonthlyReport(){
         $result = array();
         foreach($this->inHPItemData['data'] as $inHPitem){
-            $billingQuantity = $this->getBillingQuantity($inHPitem[1]);
+            $getInformationByPrice = $this->getInformationByPrice($inHPitem[1]);
             $result['data'][] = array(
                 'id' => $inHPitem[0],
                 'inHospitalItemId' => $inHPitem[1],
@@ -110,10 +110,12 @@ class GoodsBillingMonthlyReport{
                 'itemName' => $inHPitem[3],
                 'itemCode' => $inHPitem[4],
                 'itemStandard' => $inHPitem[5],
-                'minPrice' => $inHPitem[6],
-                'billingQuantity' => $billingQuantity,
-                'totalAmount' => $inHPitem[6] * $billingQuantity,
-                'quantityUnit'=> $inHPitem[7]
+                //'minPrice' => $inHPitem[6],
+                'price'=> $getInformationByPrice['price'],
+                'quantity'=> $getInformationByPrice['quantity'],
+                'quantityUnit'=> $getInformationByPrice['quantityUnit'],
+                'billingQuantity' => $getInformationByPrice['billingQuantity'],
+                'totalAmount' => $getInformationByPrice['totalAmount'],
             );
         }
         $result['count'] = $this->inHPItemData['count'];
@@ -121,20 +123,34 @@ class GoodsBillingMonthlyReport{
         return $result;
     }
 
-    private function getBillingQuantity(string $inHospitalItemId){
-        $billingQuantity = 0;
+    private function getInformationByPrice(string $inHospitalItemId){
+        $goodsDataByPrice = array("price" => array(), "quantity" => array(), "billingQuantity" => array(), "quantityUnit" => array());
         foreach($this->billingData['data'] as $billingItem){
             if($inHospitalItemId == $billingItem[0]){
-                $billingQuantity = $billingQuantity + $billingItem[1];
+                $key = array_search($billingItem[4], $goodsDataByPrice["price"]);
+                if($key === false){
+                    $goodsDataByPrice["price"][] = $billingItem[4];
+                    $key = array_search($billingItem[4], $goodsDataByPrice["price"]);
+                    $goodsDataByPrice["quantity"][$key] = 0;
+                    $goodsDataByPrice["billingQuantity"][$key] = 0;
+                }
+
+                $goodsDataByPrice["quantity"][$key] = $billingItem[5];
+                $goodsDataByPrice["quantityUnit"][$key] = $billingItem[6];
+                $goodsDataByPrice["billingQuantity"][$key] = $goodsDataByPrice["billingQuantity"][$key] + $billingItem[1];
             }
         }
-        return $billingQuantity;
+        
+        foreach($goodsDataByPrice["price"] as $key => $byPriceData){
+            $goodsDataByPrice["totalAmount"][$key] = ( $byPriceData / $goodsDataByPrice["quantity"][$key] ) * $goodsDataByPrice["billingQuantity"][$key] ;
+        }
+        return $goodsDataByPrice;
     }
 
     private function getBillingDB(){
         $this->spiralDataBase->setDataBase($this->billingDB);
         $this->spiralDataBase->addSearchCondition('hospitalId',$this->userInfo->getHospitalId());
-        $this->spiralDataBase->addSelectFields('inHospitalItemId','billingQuantity','registrationTime','billingAmount');
+        $this->spiralDataBase->addSelectFields('inHospitalItemId','billingQuantity','registrationTime','billingAmount','price','quantity','quantityUnit');
         return $this->spiralDataBase->doSelectLoop();
     }
 
@@ -144,7 +160,8 @@ class GoodsBillingMonthlyReport{
         foreach($this->billingData['data'] as $record){
             $this->spiralDataBase->addSearchCondition('inHospitalItemId',$record[0],'=','or');
         }
-        $this->spiralDataBase->addSelectFields('id','inHospitalItemId','makerName','itemName','itemCode','itemStandard','minPrice','quantityUnit');
+        $this->spiralDataBase->addSortField('id', 'asc' );
+        $this->spiralDataBase->addSelectFields('id','inHospitalItemId','makerName','itemName','itemCode','itemStandard','minPrice','quantityUnit','price','quantity');
         return $this->spiralDataBase->doSelect();
     }
 

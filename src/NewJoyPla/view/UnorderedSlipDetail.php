@@ -163,7 +163,7 @@ if($userInfo->getUserPermission() == "1"){
 				    						echo "<td>".$record["itemName"]."</td>";
 				    						echo "<td>".$record["itemCode"]."</td>";
 				    						echo "<td>".$record["itemStandard"]."</td>";
-				    						echo "<td>￥".$record["price"]."<span class='uk-text-small'> / 1".$record["itemUnit"]."</span></td>";
+				    						echo "<td>￥<script>price('".$record["price"]."')</script><span class='uk-text-small'> / 1".$record["itemUnit"]."</span></td>";
 				    						echo "<td>".$record["quantity"]."<span class='uk-text-small'>".$record["quantityUnit"]."</span></td>";
 				    						echo "<td><input type='number' step='1' class='uk-input' style='color:#444444;width:100px;' onchange='active(this,".$num.")' min='1' value='".$record["orderQuantity"]."'><span class='uk-text-small uk-text-middle'>".$record["itemUnit"]."</span></td>";
 				    						echo "<td>￥<script>price('".$record["orderPrice"]."')</script></td>";

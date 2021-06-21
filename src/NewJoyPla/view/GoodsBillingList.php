@@ -17,7 +17,7 @@ if($userInfo->getUserPermission() != "1" && $myPageID != ''){
 <!DOCTYPE html>
 <html>
   <head>
-    <title>JoyPla 物品請求一覧</title>
+    <title>JoyPla 消費一覧</title>
 	<?php include_once 'NewJoyPla/src/Head.php'; ?>
   </head>
   <body>
@@ -27,9 +27,9 @@ if($userInfo->getUserPermission() != "1" && $myPageID != ''){
 		    <div class="uk-container uk-container-expand">
 		    	<ul class="uk-breadcrumb">
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
-				    <li><span>物品請求一覧</span></li>
+				    <li><span>消費一覧</span></li>
 				</ul>
-		    	<h2 class="page_title">物品請求一覧</h2>
+		    	<h2 class="page_title">消費一覧</h2>
 		    	<hr>
 		    	<div class="" id="tablearea">
 		    		%sf:usr:goodsBillingList:mstfilter%

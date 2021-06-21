@@ -45,7 +45,7 @@ class RegInventory{
 
 		$itemList = array();
 		foreach($array as $inHPid => $data){
-			if( (int)$data['countNum']  > 0 ){
+			if( (int)$data['countNum']  >= 0 ){ //0でも入庫できるようにする
 			$itemList[] = array(
 				'now',
 				$InventoryEId,
@@ -56,7 +56,7 @@ class RegInventory{
 				str_replace(',', '', $data['kakaku']),
 				'',
 				(int)$data['countNum'],
-				(string)(str_replace(',', '', $data['kakaku']) / $data['irisu'] * (int)$data['countNum']),
+				str_replace(',', '', $data['kakaku']) / $data['irisu'] * (int)$data['countNum'],
 				$data['irisu'],
 				$data['unit'],
 				$data['itemUnit'],

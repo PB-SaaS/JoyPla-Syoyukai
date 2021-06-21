@@ -24,17 +24,22 @@ class RegInventoryHistory{
         $this->divisionId = $divisionId;
 	}
 
-    public function updateHistory(string $InventoryHId){
+    public function updateHistory(string $InventoryHId,string $itemsNumber = "0",string $totalAmount = "0"){
 
 		$inventoryDB = $this->getInventoryDB($InventoryHId);
 
 		$this->totalAmount = $this->sumInventryAmount($inventoryDB['data']);
+
+		if($itemsNumber != count($inventoryDB['data']) || $totalAmount != $this->totalAmount ){
 		
-		$result = $this->updateInventoryHistoryDB($InventoryHId, $inventoryDB['data']);
-		if($result['code'] != "0"){
-			var_dump($result);
-			return false;
+			$result = $this->updateInventoryHistoryDB($InventoryHId, $inventoryDB['data']);
+
+			if($result['code'] != "0"){
+				var_dump($result);
+				return false;
+			}
 		}
+
 		return true;
 	}
 
@@ -59,7 +64,7 @@ class RegInventoryHistory{
         $this->spiralDataBase->setDataBase($this->historyDatabase);
 		$this->spiralDataBase->addSearchCondition('inventoryHId',$inventoryHId);
         $this->spiralDataBase->addSelectNameCondition('');
-        return $this->spiralDataBase->doUpdate(array(array('name'=> 'itemsNumber','value'=>count($array)),array('name'=> 'totalAmount','value'=>$this->totalAmount)));
+        return $this->spiralDataBase->doUpdate(array(array('name'=> 'updateTime','value'=>"now"),array('name'=> 'itemsNumber','value'=>count($array)),array('name'=> 'totalAmount','value'=>$this->totalAmount)));
     }
 
     private function requestUrldecode(array $array){

@@ -1,4 +1,3 @@
-
 <?php
 include_once 'NewJoyPla/lib/ApiSpiral.php';
 include_once "NewJoyPla/lib/Define.php";
@@ -213,7 +212,7 @@ $getUnorderedData = $getUnordered->select();
             
             UIkit.modal.alert("未発注伝票を作成しました").then(function(){
 				UIkit.modal.alert("未発注伝票一覧へ移動します").then(function(){
-					location.href="%url/rel:mpgt:unorderedList%";
+					location.href="%url/rel:mpgt:page_266849%";
 				});
 			});
         })

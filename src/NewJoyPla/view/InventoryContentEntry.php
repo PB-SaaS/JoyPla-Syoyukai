@@ -91,6 +91,18 @@ $divisionData = $getDivision->select();
 			border-bottom: #e5e5e5 1px solid;
 			border-top: #e5e5e5 1px solid;
 		}
+		
+		table.uk-table {
+			counter-reset: rowCount;
+		}
+
+		table.uk-table > tbody > tr {
+			counter-increment: rowCount;
+		}
+
+		table.uk-table > tbody > tr > td:first-child::before {
+			content: counter(rowCount);
+		}
     </style>
     <script>
 		let canAjax = true;
@@ -104,6 +116,11 @@ $divisionData = $getDivision->select();
 		let listObject = {};
 		let dataKey = ['id','maker','shouhinName','code','kikaku','irisu','count','kakaku','jan','oroshi'];
 		
+		function delTr(object , elm){
+			elm.parentElement.parentElement.remove()
+			delete listObject[object.recordId];
+		}
+
 		function addTr(object){
 			if(listObject[object.recordId]){
 				return false;
@@ -116,9 +133,9 @@ $divisionData = $getDivision->select();
 			let tdElm = '';
 			for(let i = 0 ; i < dataKey.length; i++){
 				tdElm = document.createElement("td");
-				html = '';
+				html = document.createTextNode('');
 				if(dataKey[i] === 'id'){
-					html = document.createTextNode(listObject[object.recordId].row);
+					//html = document.createTextNode(listObject[object.recordId].row);
 				} else if(dataKey[i] === 'count'){
 					//html = '<input type="number" class="uk-input" style="width:72px" step="10">';
 				    html = document.createElement("div");
@@ -143,13 +160,16 @@ $divisionData = $getDivision->select();
 					html.appendChild(input);
 					html.appendChild(span);
 				} else {
-					text = "";
-					if(dataKey[i] === 'kakaku') {
-						text += "￥";
-					}
-					text += listObject[object.recordId][dataKey[i]];
-					if(dataKey[i] === 'teisu' || dataKey[i] === 'irisu') {
+					text = '';
+					if(dataKey[i] === 'kakaku'){
+						text += '￥';
+						text += price_text(listObject[object.recordId][dataKey[i]]);
+						text += '/'+ listObject[object.recordId].itemUnit;
+					} else if(dataKey[i] === 'teisu' || dataKey[i] === 'irisu') {
+						text += listObject[object.recordId][dataKey[i]];
 						text += listObject[object.recordId].unit;
+					} else {
+						text += listObject[object.recordId][dataKey[i]];
 					}
 					html = document.createTextNode(text);
 				}
@@ -157,6 +177,18 @@ $divisionData = $getDivision->select();
 				tdElm.appendChild(html);
 				trElm.appendChild(tdElm);
 			}
+			tdElm = document.createElement("td");
+
+			input = document.createElement("input");
+			input.type = 'button';
+			input.value = '削除';
+			input.className = 'uk-button uk-button-danger uk-button-small';
+			input.onclick = function(){
+				delTr(object,this)
+			}
+			
+			tdElm.appendChild(input);
+			trElm.appendChild(tdElm);
 			
 			$(".shouhin-table table tbody").append(trElm);
 		}
@@ -201,6 +233,7 @@ $divisionData = $getDivision->select();
                 value = parseInt(listObject[data.recordId].countNum) + parseInt(data.count);
                 onchangeCountNum(data.recordId,value);
 				canAjax = true; // 再びAjaxできるようにする
+            	$('input[name="barcode"]').val('');
             })
             // Ajaxリクエストが失敗した時発動
             .fail( (data) => {
@@ -210,7 +243,6 @@ $divisionData = $getDivision->select();
             })
             // Ajaxリクエストが成功・失敗どちらでも発動
             .always( (data) => {
-            	$('input[name="barcode"]').val('');
 				loading_remove();
 				
             });
@@ -227,7 +259,7 @@ $divisionData = $getDivision->select();
 				UIkit.modal.alert('商品を選択してください');
 				return false ;
 			}
-			
+			/*
 			let checkflg = false;
 			Object.keys(listObject).forEach(function (key) {
 			  if(listObject[key].countNum !== 0){
@@ -240,7 +272,7 @@ $divisionData = $getDivision->select();
 				UIkit.modal.alert('数量を入力してください');
 				return false ;
 			}
-			
+			*/
 			return true;
 			
 		}
@@ -355,7 +387,7 @@ $divisionData = $getDivision->select();
 		    	
 			    <div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky" class="uk-padding-top uk-background-muted uk-padding-small">
 		    		<form action='#' method="post" onsubmit="barcodeSearch(); return false">
-	    				<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." autofocus="true" name="barcode"> 
+	    				<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." autofocus="true" name="barcode" autocomplete="off"> 
 		    			<button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
 					</form>	
 				</div>
@@ -374,6 +406,7 @@ $divisionData = $getDivision->select();
 		    					<th>価格</th>
 		    					<th>JANコード</th>
 		    					<th>卸業者</th>
+		    					<th></th>
 		    				</tr>
 		    			</thead>
 		    			<tbody>
@@ -390,20 +423,23 @@ $divisionData = $getDivision->select();
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
-		    				</tr>
-		    				<tr>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    				</tr>
 		    				<tr>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    				</tr>
+		    				<tr>
+		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>

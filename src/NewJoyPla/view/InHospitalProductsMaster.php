@@ -14,6 +14,10 @@
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
 				    <li><span>院内商品マスタ</span></li>
 				</ul>
+		    	<div class="no_print uk-margin">
+				  <input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
+				  <input class="print_hidden uk-button uk-button-primary" type="button" value="出力" onclick="$('#exportButton').click()">
+				</div>
 		    	<div class="uk-width-1-1 uk-margin-remove-left" uk-grid>
 		    		<div class="uk-width-3-4@m uk-padding-remove">
 		    			<h2>院内商品マスタ</h2>
@@ -25,109 +29,125 @@
 						        <div class="uk-accordion-content" hidden>
 						    		<a class="uk-button uk-button-secondary uk-button-small uk-width-1-1" href="#" onclick="table_field_selector()">反映</a>
 						        	<ul class="uk-list uk-list-striped">
-									    <li>
+									
+									<li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_01" type="checkbox"> 使用状況</label>
+								            	<label><input class="uk-checkbox chk_01" type="checkbox"> id</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_02" type="checkbox"> 登録日時</label>
+								            	<label><input class="uk-checkbox chk_02" type="checkbox"> 使用状況</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_03" type="checkbox"> 更新日時</label>
+								            	<label><input class="uk-checkbox chk_03" type="checkbox"> 院内商品ID</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_04" type="checkbox"> 商品ID</label>
+								            	<label><input class="uk-checkbox chk_04" type="checkbox"> 登録日時</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_05" type="checkbox"> メーカー名</label>
+								            	<label><input class="uk-checkbox chk_05" type="checkbox"> 更新日時</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_06" type="checkbox"> 商品名</label>
+								            	<label><input class="uk-checkbox chk_06" type="checkbox"> 商品ID</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_07" type="checkbox"> 製品コード</label>
+								            	<label><input class="uk-checkbox chk_07" type="checkbox"> メーカー</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_08" type="checkbox"> 規格</label>
+								            	<label><input class="uk-checkbox chk_08" type="checkbox"> 商品名</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_09" type="checkbox"> カタログNO</label>
+								            	<label><input class="uk-checkbox chk_09" type="checkbox"> 製品コード</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_10" type="checkbox"> シリアルNO</label>
+								            	<label><input class="uk-checkbox chk_10" type="checkbox"> 規格</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_11" type="checkbox"> 入数</label>
+								            	<label><input class="uk-checkbox chk_11" type="checkbox"> JANコード</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_12" type="checkbox"> 最小単位の価格</label>
+								            	<label><input class="uk-checkbox chk_12" type="checkbox"> カタログNO</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_13" type="checkbox"> 価格</label>
+								            	<label><input class="uk-checkbox chk_13" type="checkbox"> シリアルNO</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_14" type="checkbox"> 旧価格</label>
+								            	<label><input class="uk-checkbox chk_14" type="checkbox"> 保険請求分類（医科）</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_15" type="checkbox"> JANコード</label>
+								            	<label><input class="uk-checkbox chk_15" type="checkbox"> 保険請求分類（在宅）</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_16" type="checkbox"> 院内倉庫在庫数</label>
+								            	<label><input class="uk-checkbox chk_16" type="checkbox"> 入数</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_17" type="checkbox"> 償還価格フラグ</label>
+								            	<label><input class="uk-checkbox chk_17" type="checkbox"> 入数単位</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_18" type="checkbox"> 償還価格</label>
+								            	<label><input class="uk-checkbox chk_18" type="checkbox"> 個数単位</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_19" type="checkbox"> 旧償還価格</label>
+								            	<label><input class="uk-checkbox chk_19" type="checkbox"> 購買価格</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_20" type="checkbox"> 卸業者</label>
+								            	<label><input class="uk-checkbox chk_20" type="checkbox"> 院内在庫数</label>
 								            </div>
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-								            	<label><input class="uk-checkbox chk_21" type="checkbox"> 特記事項</label>
+								            	<label><input class="uk-checkbox chk_21" type="checkbox"> 償還フラグ</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_22" type="checkbox"> 償還価格</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_23" type="checkbox"> 旧償還価格</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_24" type="checkbox"> 卸業者</label>
 								            </div>
 										</li>
 									</ul>
@@ -138,7 +158,7 @@
 		    		
 		    	</div>
 		    	<div class="uk-margin-top">
-				%sf:usr:search63%
+				%sf:usr:search5%
 				</div>
 			</div>
 		</div>
@@ -148,7 +168,7 @@
 		let storage = JSON.parse(localStorage.getItem("joypla_inHpItemsList"));
 		let dispObj = {};
 		if(!storage){
-			for(let i = 1 ; i <= 22 ; i++){
+			for(let i = 1 ; i <= 24 ; i++){
 				dispObj[i] = true;
 			}
 		} else {

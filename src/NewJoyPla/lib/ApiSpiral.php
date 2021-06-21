@@ -54,7 +54,7 @@ namespace App\Lib ;
 
 		$responseArray = array();
 		foreach($response->entrySet() as $key => $val){
-			$responseArray[$key] = $this->obj2arr($val);
+			$responseArray[$key] = $this->obj2arr($val,$apiHeader);
 		}
 		
 		return $responseArray;
@@ -67,19 +67,24 @@ namespace App\Lib ;
 	 *
 	 * @access private
 	 * @param Object or Array or String $obj 
+	 * @param Array  apiHeader
 	 * @return Array $arrayData SpiralApiReturnData(htmlspecialchars)
 	 * @throws なし
 	 * @todo 未対応（改善）事項等
 	 */
-	private function obj2arr($obj){
-		
-		if ( ! is_object($obj) && ! is_array($obj)  ) return htmlspecialchars($obj, ENT_QUOTES, "UTF-8");//PHPサーバーはUTF-8
+	private function obj2arr($obj,$apiHeader){
+		if ( ! is_object($obj) && ! is_array($obj) ){
+			if($apiHeader[0] == "database" && $apiHeader[1] == "select" ){
+				return htmlspecialchars($obj, ENT_QUOTES, "UTF-8");//PHPサーバーはUTF-8
+			} else {
+				return $obj;
+			}
+		}
 	
 		$arr = (array) $obj;
 	
-		foreach ( $arr as &$a )
-		{
-			$a = $this->obj2arr($a);
+		foreach ( $arr as &$a ){
+			$a = $this->obj2arr($a,$apiHeader);
 		}
 		return $arr;
 	}

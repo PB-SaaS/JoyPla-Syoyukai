@@ -13,14 +13,16 @@
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
 				    <li><span>商品マスタ</span></li>
 				</ul>
+		    	<div class="no_print uk-margin">
+				  <input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
+				  <input class="print_hidden uk-button uk-button-primary" type="button" value="出力" onclick="$('#exportButton').click()">
+				</div>
 		    	<div class="uk-width-1-1" uk-grid>
 		    		<div class="uk-width-3-4@l uk-width-2-3">
 		    			<h2>商品マスタ</h2>
 					</div>
-		    		
-		    		
 		    	</div>
-				%sf:usr:search74%
+				%sf:usr:search21%
 			</div>
 		</div>
 	</div>

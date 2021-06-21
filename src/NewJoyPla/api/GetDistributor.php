@@ -80,4 +80,17 @@ class GetDistributor{
     $this->spiralDataBase->addSearchCondition('distributorId',$distributorId);
     return $this->spiralDataBase->doSelect();
   }
+
+  public function getRequestDistributor(){
+    $result = $this->getRequestDistributorDB();
+    return $result;
+  }
+
+  private function getRequestDistributorDB(){
+    $this->spiralDataBase->setDataBase($this->distributorDB);
+    $this->spiralDataBase->addSelectFields('distributorName','distributorId');
+    $this->spiralDataBase->addSearchCondition('vendorFlag','1');
+    $this->spiralDataBase->addSearchCondition('hospitalId',$this->userInfo->getHospitalId());
+    return $this->spiralDataBase->doSelect();
+  }
 }

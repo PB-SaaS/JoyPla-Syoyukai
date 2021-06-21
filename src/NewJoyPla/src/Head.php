@@ -14,7 +14,7 @@
 	<link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/animsition.min.css">
 	<script type="text/javascript" src="https://i02.smp.ne.jp/u/joypla/new/js/animsition.min.js"></script>
 	
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <script src="https://i02.smp.ne.jp/u/joypla/new/js/JsBarcode.all.min.js"></script>
     
     <script>
 	$(function(){
@@ -180,7 +180,7 @@
 			}
 			let _num = num.replace( /^(-?\d+)(\d{3})/, "$1,$2" );
 			if(_num !== num) {
-				return price(_num);
+				return price_text(_num);
 		    }
 		    return _num;
 		}

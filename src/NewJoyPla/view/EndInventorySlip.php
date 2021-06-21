@@ -38,6 +38,10 @@ $cardUrl = $session->get("cardUrl");
 		    					<td class="uk-text-right">%val:usr:registrationTime%</td>
 		    				</tr>
 		    				<tr>
+		    					<td class="uk-text-bold">棚卸更新日時</td>
+		    					<td class="uk-text-right">%val:usr:updateTime%</td>
+		    				</tr>
+		    				<tr>
 		    					<td class="uk-text-bold">部署名</td>
 		    					<td class="uk-text-right">%val:usr:divisionName%</td>
 		    				</tr>

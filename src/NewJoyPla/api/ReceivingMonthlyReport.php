@@ -6,7 +6,8 @@ class ReceivingMonthlyReport{
     private $spiralDataBase;
     private $userInfo;
     
-    private $ReceivingDB = 'NJ_ReceivingDB';
+    private $distributorDB = 'NJ_distributorDB';
+    private $ReceivingDB = '310_receItems';
     private $inHPItemDB = 'itemInHospitalDB';
 
     private $ReceivingData = array();
@@ -20,15 +21,19 @@ class ReceivingMonthlyReport{
     public function dataSelect(string $startMonth = null,string $endMonth = null,string $distributorId = null,string $divisionId = null,string $itemName = null,string $itemCode = null,string $itemStandard = null,int $page = null,int $maxCount = null){
         $this->setReceivingDBSearch($startMonth,$endMonth,$divisionId);
         $this->ReceivingData = $this->getReceivingDB();
+
         if($this->ReceivingData['code'] != '0'){
-            //var_dump($this->ReceivingData);
+            //var_dump($this->ReceivingData); 
             return $this->ReceivingData;
         }
+
         if($this->ReceivingData['count'] == '0'){
             return array('data'=>array(),'count'=>'0','totalAmount' => '0');
         }
+        
         $this->setInHPItemDBSearch($itemName,$itemCode,$itemStandard,$page,$maxCount,$distributorId);
         $this->inHPItemData = $this->getInHPItemDB();
+        
         if($this->inHPItemData['code'] != '0'){
             //var_dump($this->inHPItemData);
             return $this->inHPItemData;
@@ -110,21 +115,25 @@ class ReceivingMonthlyReport{
     private function makeReceivingMonthlyReport(){
         $result = array();
         foreach($this->inHPItemData['data'] as $inHPitem){
-            $receivingCount = $this->getReceivingQuantity($inHPitem[1]);
-            $returnCount = $this->getReturnCount($inHPitem[1]);
-            $result['data'][] = array(
+            //$receivingCount = $this->getReceivingQuantity($inHPitem[1]);
+            //$returnCount = $this->getReturnCount($inHPitem[1]);
+            $getInformationByPrice = $this->getInformationByPrice($inHPitem[1]);
+            $result['data'][] = array(		
                 'id' => $inHPitem[0],
                 'inHospitalItemId' => $inHPitem[1],
                 'makerName' => $inHPitem[2],
                 'itemName' => $inHPitem[3],
                 'itemCode' => $inHPitem[4],
                 'itemStandard' => $inHPitem[5],
-                'price' => $inHPitem[6],
-                'receivingCount' => $receivingCount,
-                'totalAmount' => $inHPitem[6] * $receivingCount,
-                'itemUnit'=> $inHPitem[7],
-                'distributorName'=> $inHPitem[8],
-                'totalReturnCount'=> $returnCount,
+                'distributorName'=>  $getInformationByPrice['distributorName'],
+                'quantity' => $getInformationByPrice['quantity'],
+                'price' => $getInformationByPrice['price'],
+                'receivingCount' => $getInformationByPrice['receivingCount'],
+                'totalAmount' => $getInformationByPrice['totalAmount'],
+                'itemUnit'=> $getInformationByPrice['itemUnit'],
+                'totalReturnCount'=> $getInformationByPrice['returnCount'],
+                'adjAmount' => $getInformationByPrice["adjAmount"],
+                'priceAfterAdj' => $getInformationByPrice["priceAfterAdj"],
             );
         }
         $result['count'] = $this->inHPItemData['count'];
@@ -132,6 +141,7 @@ class ReceivingMonthlyReport{
         return $result;
     }
 
+/*
     private function getReceivingQuantity(string $inHospitalItemId){
         $ReceivingQuantity = 0;
         foreach($this->ReceivingData['data'] as $ReceivingItem){
@@ -141,6 +151,8 @@ class ReceivingMonthlyReport{
         }
         return $ReceivingQuantity;
     }
+*/
+/*
 
     private function getReturnCount(string $inHospitalItemId){
         $ReturnCount = 0;
@@ -151,11 +163,44 @@ class ReceivingMonthlyReport{
         }
         return $ReturnCount;
     }
+*/
+    
+    private function getInformationByPrice(string $inHospitalItemId){
+        $disAndPriceArray = array();
+        $receivingDataByPrice = array("price" => array(), "quantity" => array(), "receivingCount" => array(), "returnCount" => array(), "totalAmount" => array(), "adjAmount" => array(), "itemUnit" => array(), "distributorName" => array());
+        foreach($this->ReceivingData['data'] as $receiving){
+            if($inHospitalItemId == $receiving[0]){
+                $key = array_search($receiving[10] ."_". $receiving[5], $disAndPriceArray);
+                if($key === false){
+                    $disAndPriceArray[] = $receiving[10] ."_". $receiving[5];
+                    $key = array_search($receiving[10] ."_". $receiving[5], $disAndPriceArray);
+
+                    $receivingDataByPrice["price"][$key] = $receiving[5];
+                    $receivingDataByPrice["quantity"][$key] = 0;
+                    $receivingDataByPrice["receivingCount"][$key] = 0;
+                    $receivingDataByPrice["adjAmount"][$key] = 0;
+                    $receivingDataByPrice["returnCount"][$key] = 0;
+                }
+                $receivingDataByPrice["distributorName"][$key] = $receiving[11];
+                $receivingDataByPrice["quantity"][$key] = $receiving[6];
+                $receivingDataByPrice["itemUnit"][$key] = $receiving[9];
+                $receivingDataByPrice["receivingCount"][$key] = $receivingDataByPrice["receivingCount"][$key] + $receiving[1];
+                $receivingDataByPrice["adjAmount"][$key] = $receivingDataByPrice["adjAmount"][$key] + $receiving[7];
+                $receivingDataByPrice["returnCount"][$key] = $receivingDataByPrice["returnCount"][$key] + $receiving[4];
+            }
+        }
+        
+        foreach($receivingDataByPrice["price"] as $key => $byPriceData){
+            $receivingDataByPrice["totalAmount"][$key] = $byPriceData * $receivingDataByPrice["receivingCount"][$key] ;
+            $receivingDataByPrice["priceAfterAdj"][$key] = $receivingDataByPrice["totalAmount"][$key] + $receivingDataByPrice["adjAmount"][$key];
+        }
+        return $receivingDataByPrice;
+    }
 
     private function getTotalAmount(){
         $ReceivingQuantity = 0;
         foreach($this->ReceivingData['data'] as $ReceivingItem){
-            $ReceivingQuantity += (float)$ReceivingItem[3];
+            $ReceivingQuantity += $ReceivingItem[8];
         }
         return $ReceivingQuantity;
     }
@@ -163,8 +208,8 @@ class ReceivingMonthlyReport{
     private function getReceivingDB(){
         $this->spiralDataBase->setDataBase($this->ReceivingDB);
         $this->spiralDataBase->addSearchCondition('hospitalId',$this->userInfo->getHospitalId());
-        $this->spiralDataBase->addSelectFields('inHospitalItemId','receivingCount','registrationTime','receivingPrice','totalReturnCount');
-        return $this->spiralDataBase->doSelectLoop();
+        $this->spiralDataBase->addSelectFields('inHospitalItemId','receivingCount','registrationTime','receivingPrice','totalReturnCount','price','quantity','adjAmount','priceAfterAdj','itemUnit','distributorId','distributorName');
+        return $this->spiralDataBase->doSelectLoop(); 
     }
 
     private function getInHPItemDB(){
@@ -173,6 +218,7 @@ class ReceivingMonthlyReport{
         foreach($this->ReceivingData['data'] as $record){
             $this->spiralDataBase->addSearchCondition('inHospitalItemId',$record[0],'=','or');
         }
+        $this->spiralDataBase->addSortField('id', 'asc' );
         $this->spiralDataBase->addSelectFields('id','inHospitalItemId','makerName','itemName','itemCode','itemStandard','price','itemUnit','distributorName');
         return $this->spiralDataBase->doSelect();
     }

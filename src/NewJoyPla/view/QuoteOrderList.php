@@ -24,7 +24,7 @@
 					</div>
 				</div>
 		    	<div class="uk-margin-auto uk-width-4-5@m">
-				%sf:usr:search94%
+				%sf:usr:search10%
 				</div>
 			</div>
 		</div>

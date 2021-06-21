@@ -402,7 +402,7 @@ $hospitalData = $getHospitalData->select();
 		    	<div class="uk-margin">
 		    		<form action="#" onsubmit="search(); return false;" method="post">
 				    	<div class="uk-padding-top uk-background-muted uk-padding-small uk-width-1-2@m" >
-		    				<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." autofocus="true" name="searchValue"> 
+		    				<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." autofocus="true" name="searchValue" autocomplete="off"> 
 			    			<button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
 			    		</div>
 		    		</form> 
@@ -666,8 +666,8 @@ $hospitalData = $getHospitalData->select();
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
-				                                <span class="title">物品請求 / 個別発注</span><br>
-				                                <span class="text">Billing / Orders</span>
+				                                <span class="title">消費登録 / 個別発注</span><br>
+				                                <span class="text">consume / Orders</span>
 			                                </p>
 			                            </div>
 			                            <div class="menu-foot">
@@ -682,8 +682,8 @@ $hospitalData = $getHospitalData->select();
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
-				                                <span class="title">物品請求一覧</span><br>
-				                                <span class="text">Billing List</span>
+				                                <span class="title">消費一覧</span><br>
+				                                <span class="text">consume List</span>
 			                                </p>
 			                            </div>
 			                            <div class="menu-foot">
@@ -1002,7 +1002,7 @@ $hospitalData = $getHospitalData->select();
 			                                <span>More Info</span>
 			                            </div>
 										<?php if($userInfo->getUserPermission() == '1') : ?>
-			                            <a href="%url/rel:mpgt:page_263588%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:page_169195%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                            <?php else : ?>
 			                            <a href="%url/rel:mpgt:page_267320%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 										<?php endif ?>
@@ -1070,7 +1070,7 @@ $hospitalData = $getHospitalData->select();
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
-				                                <span class="title">月次レポート【物品請求】</span><br>
+				                                <span class="title">月次レポート【消費】</span><br>
 				                                <span class="text">Monthly Paper Goods Billing</span>
 			                                </p>
 			                            </div>
@@ -1142,11 +1142,50 @@ $hospitalData = $getHospitalData->select();
 			                                <span>More Info</span>
 			                            </div>
 										<?php if($userInfo->getUserPermission() == '1') : ?>
-											<a href="%url/rel:mpgt:page_264885%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+											<a href="%url/rel:mpgt:page_169065%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 										<?php else : ?>
-											<a href="%url/rel:mpgt:page_162388%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+											<a href="%url/rel:mpgt:page_169061%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 										<?php endif ?>
-			                            
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-3-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">入荷履歴詳細一覧</span><br>
+				                                <span class="text">Receiving History Detail List</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+										<?php if($userInfo->getUserPermission() == '1') : ?>
+											<a href="%url/rel:mpgt:page_168793%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+										<?php else : ?>
+											<a href="%url/rel:mpgt:page_168846%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+										<?php endif; ?>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-3-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">払出履歴詳細一覧</span><br>
+				                                <span class="text">Payout History Detail List</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+										<?php if($userInfo->getUserPermission() == '1') : ?>
+											<a href="%url/rel:mpgt:page_168790%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+										<?php else : ?>
+											<a href="%url/rel:mpgt:page_168844%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+										<?php endif; ?>
 			                        </div>
 						        </div>
 						    </div>
@@ -1186,7 +1225,6 @@ $hospitalData = $getHospitalData->select();
 				    		<p class="uk-width-1-1 content-7-1 category-title">見積</p>
 			    		</div>
 				    	<div class="uk-child-width-1-2@m uk-text-center" uk-grid>
-							<?php if($tenantData['data'][0]['tenantKind'] == '1') : ?>
 						    <div>
 						        <div class="nj_card content-7-1">
 			                        <div class="menu-content">
@@ -1203,7 +1241,7 @@ $hospitalData = $getHospitalData->select();
 										<form action="/regist/is" method="post" name="quoteRequest" target="_blank">
 											%SMPAREA%
 											<input type="hidden" name="tenantId" value="%val:usr:tenantId%">
-											<input type="hidden" name="SMPFORM" value="%smpform:quoteRequest%">
+											<input type="hidden" name="SMPFORM" value="%smpform:310_quoteReques%">
 											<input type="hidden" name="hospitalId" value="%val:usr:hospitalId%">
 											<input type="hidden" name="requestUName" value="%val:usr:name%">
 											<input type="hidden" name="mail" value="%val:usr:mailAddress%">
@@ -1211,8 +1249,6 @@ $hospitalData = $getHospitalData->select();
 			                        </div>
 						        </div>
 						    </div>
-						    <?php endif; ?>
-							<?php if($tenantData['data'][0]['tenantKind'] == '1') : ?>
 						    <div>
 						        <div class="nj_card content-7-1">
 			                        <div class="menu-content">
@@ -1225,11 +1261,10 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:page_266497%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:page_169094%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
-						    <?php endif; ?>
 						</div>
 					</div>
 		    		<div>
@@ -1249,7 +1284,23 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:page_264415%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:page_170282%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-7-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">金額一覧</span><br>
+				                                <span class="text">Price List</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:page_169004%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1265,7 +1316,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:page_264251%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:page_169054%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1287,13 +1338,13 @@ $hospitalData = $getHospitalData->select();
 									<form action="/regist/is" method="post" name="itemsReg" target="_blank">
 										%SMPAREA%
 										<input type="hidden" name="tenantId" value="%val:usr:tenantId%">
-										<input type="hidden" name="hospitalId" value="%val:usr:tenantId%">
-										<input type="hidden" name="SMPFORM" value="%smpform:itemReg%">
+										<input type="hidden" name="hospitalId" value="%val:usr:hospitalId%">
+										<input type="hidden" name="SMPFORM" value="%smpform:310a_itemReg%">
 									</form>
 						        </div>
 						    </div>
 						    <?php endif; ?>
-							<?php if($userInfo->getUserPermission() == '1' && $tenantData['data'][0]['tenantKind'] == '1') : ?>
+							<?php if($userInfo->getUserPermission() == '1' && $tenantData['data'][0]['tenantKind'] == '1' && false) : ?>
 						    <div>
 						        <div class="nj_card content-7-1">
 			                        <div class="menu-content">
@@ -1311,7 +1362,7 @@ $hospitalData = $getHospitalData->select();
 						        </div>
 						    </div>
 						    <?php endif; ?>
-							<?php if($userInfo->getUserPermission() == '1') : ?>
+							<?php if($userInfo->getUserPermission() == '1' && false) : ?>
 						    <div>
 						        <div class="nj_card content-7-1">
 			                        <div class="menu-content">

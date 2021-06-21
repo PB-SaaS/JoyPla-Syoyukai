@@ -154,7 +154,7 @@ class GetInventoryHistoryId{
 				str_replace(',', '', $data['kakaku']),
 				'',
 				(int)$data['countNum'],
-				(string)(number_format(str_replace(',', '', $data['kakaku']) / $data['irisu'], 2) * (int)$data['countNum']),
+				str_replace(',', '', $data['kakaku']) / $data['irisu'] * (int)$data['countNum'],
 				$data['irisu'],
 				$data['unit'],
 				$data['itemUnit'],

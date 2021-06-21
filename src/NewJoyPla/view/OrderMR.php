@@ -268,6 +268,7 @@ $result = $orderMonthlyReport->dataSelect($startMonth,$endMonth,$distributorId,$
 								<thead>
 									<tr>
 										<th>No</th>
+										<th>院内商品ID</th>
 										<th>卸業者</th>
 										<th>メーカー</th>
 										<th>商品名</th>
@@ -282,17 +283,34 @@ $result = $orderMonthlyReport->dataSelect($startMonth,$endMonth,$distributorId,$
 									<?php 
 									if($result['count'] > 0){
 										foreach($result['data'] as $record){
-											echo "<tr>";
-											echo "<td>".$record['id']."</td>";
-											echo "<td>".$record['distributorName']."</td>";
-											echo "<td>".$record['makerName']."</td>";
-											echo "<td>".$record['itemName']."</td>";
-											echo "<td>".$record['itemCode']."</td>";
-											echo "<td>".$record['itemStandard']."</td>";
-											echo "<td>￥<script>price(fixed('".$record['price']."'))</script></td>";
-											echo "<td>".$record['orderQuantity']." ".$record['itemUnit']."</td>";
-											echo "<td>￥<script>price(fixed('".$record['totalAmount']."'))</script></td>";
-											echo "</tr>";
+											echo "<tr>".PHP_EOL;
+											echo "<td>".$record['id']."</td>".PHP_EOL;
+											echo "<td>".$record['inHospitalItemId']."</td>".PHP_EOL;
+											echo "<td>";
+											foreach($record['distributorName'] as $distributorName){
+												echo $distributorName."<br>".PHP_EOL;
+											}
+											echo "</td>".PHP_EOL;
+											echo "<td>".$record['makerName']."</td>".PHP_EOL;
+											echo "<td>".$record['itemName']."</td>".PHP_EOL;
+											echo "<td>".$record['itemCode']."</td>".PHP_EOL;
+											echo "<td>".$record['itemStandard']."</td>".PHP_EOL;
+											echo "<td>";
+											foreach($record['price'] as $price){
+												echo "￥<script>price(fixed('". $price ."'))</script><br>".PHP_EOL;
+											}
+											echo "</td>".PHP_EOL;
+											echo "<td>";
+											foreach($record['orderQuantity'] as $key => $orderQuantity){
+												echo $orderQuantity." ".$record['itemUnit'][$key]."<br>".PHP_EOL;
+											}
+											echo "</td>".PHP_EOL;
+											echo "<td>";
+											foreach($record['totalAmount'] as $totalAmount){
+												echo "￥<script>price(fixed('". $totalAmount ."'))</script><br>".PHP_EOL;
+											}
+											echo "</td>".PHP_EOL;
+											echo "</tr>".PHP_EOL;
 										}
 									} 
 									?>
@@ -322,7 +340,28 @@ $result = $orderMonthlyReport->dataSelect($startMonth,$endMonth,$distributorId,$
      }
      
 	function exportCSV(records) {
-		let data = records.map((record)=>record.join('\t')).join('\r\n');
+		let remakeArray = new Array();
+
+		k = 0;
+		remakeArray[k] = records[0];
+		for( let i = 1; i < records.length; i++ ) {
+			for( let j = 0; j < records[i][6].length; j++ ){
+				k = k + 1;
+				remakeArray[k] = new Array();
+				remakeArray[k][0] = records[i][0];
+				remakeArray[k][1] = records[i][1];
+				remakeArray[k][2] = records[i][2];
+				remakeArray[k][3] = records[i][3];
+				remakeArray[k][4] = records[i][4];
+				remakeArray[k][5] = records[i][5];
+				remakeArray[k][6] = records[i][6][j];
+				remakeArray[k][7] = records[i][7][j];
+				remakeArray[k][8] = records[i][8][j];
+				remakeArray[k][9] = records[i][9][j];
+				remakeArray[k][10] = records[i][10][j];
+			}
+		}
+		let data = remakeArray.map((record)=>record.join('\t')).join('\r\n');
 		
 		let bom  = new Uint8Array([0xEF, 0xBB, 0xBF]);
 		let blob = new Blob([bom, data], {type: 'text/tab-separated-values'});

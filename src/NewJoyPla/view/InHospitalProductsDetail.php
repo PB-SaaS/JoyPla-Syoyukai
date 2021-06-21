@@ -16,6 +16,12 @@
     });
     
 	</script>
+	<style>
+	table.uk-table td, table.uk-table th {
+		line-break: anywhere;	
+		min-width:120px;
+	}
+	</style>
 </head>
 <body>
     <?php include_once "NewJoyPla/src/HeaderForMypage.php"; ?>
@@ -32,8 +38,10 @@
 	                    <input class="print_hidden uk-button uk-button-primary" type="submit" value="院内商品情報変更" onclick="document.itemsChange.submit()">
 						<form action="/regist/is" method="post" name="itemsChange" target="_blank" class="uk-hidden">
 							%SMPAREA%
-							<input type="hidden" name="SMPFORM" value="%smpform:inHpItemsChange%">
+							<input type="hidden" name="SMPFORM" value="%smpform:310_inHpItemC%">
+							<input type="hidden" name="hospitalId" value="%val:usr:hospitalId%">
 							<input type="hidden" name="makerName" value="%val:usr:makerName%">
+							<input type="hidden" name="itemId" value="%val:usr:itemId%">
 							<input type="hidden" name="itemName" value="%val:usr:itemName%">
 							<input type="hidden" name="itemCode" value="%val:usr:itemCode%">
 							<input type="hidden" name="itemStandard" value="%val:usr:itemStandard%">
@@ -46,23 +54,18 @@
 							<input type="hidden" name="distributorId" value="%val:usr:distributorId%">
 							<input type="hidden" name="catalogNo" value="%val:usr:catalogNo%">
 							<input type="hidden" name="serialNo" value="%val:usr:serialNo%">
-							<input type="hidden" name="constant" value="%val:usr:constant%">
 							<input type="hidden" name="quantity" value="%val:usr:quantity%">
 							<input type="hidden" name="quantityUnit" value="%val:usr:quantityUnit%">
 							<input type="hidden" name="itemUnit" value="%val:usr:itemUnit%">
 					
-							<input type="hidden" name="minPrice" value="%val:usr:minPrice%">
-					
 							<input type="hidden" name="price" value="%val:usr:price%">
 					
-							<input type="hidden" name="oldPrice" value="%val:usr:oldPrice%">
+							<input type="hidden" name="priceId" value="%val:usr:priceId%">
 					
 							<input type="hidden" name="medicineCategory" value="%val:usr:medicineCategory%">
 							<input type="hidden" name="homeCategory" value="%val:usr:homeCategory%">
 							<input type="hidden" name="HPstock" value="%val:usr:HPstock%">
 							<input type="hidden" name="notice" value="%val:usr:notice%">
-	
-							<input type="hidden" name="SMPFORM" value="%smpform:inHpItemsChange%">
 						</form>
 					<?php endif ?>
 							<a class="print_hidden uk-button uk-button-primary" href="#modal-label" uk-toggle>ラベル発行</a>
@@ -74,24 +77,42 @@
 		    	</div>
 		    	<div class="uk-width-4-5@m uk-margin-auto uk-margin-remove-top">
 		    		<table class="uk-table uk-table-divider uk-table-responsive">
-					    <tr><td colspan="6">商品基本情報</td></tr>
+					    	<tr><td colspan="6">院内商品情報</td></tr>
 					        <tr>
+					            <th>不使用フラグ</th>
+					            <td><span class="uk-label" id="notUsedFlag">%val:usr:notUsedFlag:v%</span></td>
 					            <th>商品ID</th>
 					            <td>%val:usr:itemId%</td>
-					            <th>JANコード</th>
-					            <td colspan="3">%val:usr:itemJANCode%</td>
+					            <th>院内商品ID</th>
+					            <td>%val:usr:inHospitalItemId%</td>
 					        </tr>
 					        <tr>
+					            <th>JANコード</th>
+					            <td>%val:usr:itemJANCode%</td>
 					            <th>メーカー名</th>
-					            <td>%val:usr:makerName%</td>
+					            <td colspan="3">%val:usr:makerName%</td>
+					        </tr>
+					        <tr>
 					            <th>商品名</th>
-					            <td colspan="3">%val:usr:itemName%</td>
+					            <td colspan="5">%val:usr:itemName%</td>
 					        </tr>
 					        <tr>
 					            <th>製品コード</th>
 					            <td>%val:usr:itemCode%</td>
 					            <th>規格</th>
 					            <td colspan="3">%val:usr:itemStandard%</td>
+					        </tr>
+					        <tr>
+					            <th>カタログNo</th>
+					            <td>%val:usr:catalogNo%</td>
+					            <th>シリアルNo</th>
+					            <td colspan="3">%val:usr:serialNo%</td>
+					        </tr>
+					        <tr>
+					            <th>保険請求分類（医科）</th>
+					            <td>%val:usr:medicineCategory%</td>
+					            <th>保険請求分類（在宅）</th>
+					            <td colspan="3">%val:usr:homeCategory%</td>
 					        </tr>
 					        <tr>
 					            <th>償還価格フラグ</th>
@@ -102,42 +123,29 @@
 					            <td><script>price(fixed("%val:usr:officialpriceOld%"))</script>円</td>
 					        </tr>
 					        <tr>
-					            <th>最小入数単位の価格</th>
-					            <td colspan="5"><script>price(fixed("%val:usr:minPrice%"))</script>円 / 1 %val:usr:quantityUnit%</td>
-					        </tr>
-					    	<tr><td colspan="6">院内商品情報</td></tr>
-					        <tr>
-					            <th>不使用フラグ</th>
-					            <td><span class="uk-label" id="notUsedFlag">%val:usr:notUsedFlag:v%</span></td>
 					            <th>卸業者</th>
-					            <td colspan="3">%val:usr:distributorName%</td>
-					        </tr>
-					        <tr>
-					            <th>カタログNo</th>
-					            <td>%val:usr:catalogNo%</td>
-					            <th>シリアルNo</th>
-					            <td colspan="3">%val:usr:serialNo%</td>
-					        </tr>
-					        <tr>
-					            <th>個数単位</th>
-					            <td colspan="5">%val:usr:itemUnit%</td>
+					            <td colspan="5">%val:usr:distributorName%</td>
 					        </tr>
 					        <tr>
 					            <th>入数</th>
 					            <td>%val:usr:quantity% %val:usr:quantityUnit% / 1 %val:usr:itemUnit%</td>
+					            <th>個数単位</th>
+					            <td>%val:usr:itemUnit%</td>
 					            <th>価格</th>
-					            <td colspan="3"><script>price(fixed("%val:usr:price%"))</script>円 / 1 %val:usr:itemUnit%</td>
+					            <td>￥<script>price(fixed("%val:usr:price%"))</script> /  %val:usr:itemUnit%</td>
 					            <!--
 					            <th>旧価格</th>
 					            <td><script>price(fixed("%val:usr:oldPrice%"))</script>円</td>
 					            -->
 					        </tr>
+					            <!--
 					        <tr>
 					            <th>保険請求分類（医科）</th>
 					            <td>%val:usr:medicineCategory%</td>
 					            <th>保険請求分類（在宅）</th>
 					            <td colspan="3">%val:usr:homeCategory%</td>
 					        </tr>
+					            -->
 					        <tr>
 					            <th class="uk-text-top">特記事項</th>
 					            <td colspan="5">%val:usr:notice:br%</td>

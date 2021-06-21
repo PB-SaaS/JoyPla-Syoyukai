@@ -43,6 +43,7 @@ foreach($receivingData as $record){
 		"itemJANCode" => $record["itemJANCode"],
 		"orderQuantity" => $record["orderQuantity"],
 		"labelId" => $record["labelId"],
+		"officialFlag" => $record["officialFlag"],
 		"totalReturnCount"=>$record["totalReturnCount"]
 		);
 }

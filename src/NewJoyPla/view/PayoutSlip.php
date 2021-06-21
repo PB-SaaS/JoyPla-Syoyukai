@@ -120,7 +120,7 @@ if($userInfo->getUserPermission() == "1"){
 				    						echo "<td>".$record["itemCode"]."</td>";
 				    						echo "<td>".$record["itemStandard"]."</td>";
 				    						echo "<td>".$record["quantity"].$record["quantityUnit"]."</td>";
-											echo "<td><script>price(\"".$record["price"]."\")</script>円 / ".$record["itemUnit"]."</td>";
+											echo "<td><script>price(\"".($record["price"] / $record["quantity"] )."\")</script>円 / ".$record["quantityUnit"]."</td>";
 
 											echo "<td>".$record["payoutCount"].$record["quantityUnit"]."</td>";
 											

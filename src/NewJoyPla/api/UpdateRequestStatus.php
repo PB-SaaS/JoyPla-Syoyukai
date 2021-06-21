@@ -9,7 +9,8 @@ class UpdateRequestStatus{
     private $status = "";
     
     private $historyDatabase = 'NJ_QRequestDB';
-    private $childDatabase = 'NJ_reqItemDB';
+    private $childDatabase = 'NJ_PriceDB';
+    private $childDatabase2 = 'NJ_reqItemDB';
 
     public function __construct(\App\Lib\SpiralDatabase $spiralDatabase){
         $this->spiralDatabase = $spiralDatabase;
@@ -37,13 +38,19 @@ class UpdateRequestStatus{
 
     public function hospitalCheck(string $requestId){
         $this->status = "";
+        $getReqPriceDB = $this->getReqPriceDB($requestId);
+        if($getReqPriceDB['code'] != "0"){
+            var_dump($getReqItemDB);
+            return array();
+        }
         $getReqItemDB = $this->getReqItemDB($requestId);
         
         if($getReqItemDB['code'] != "0"){
             var_dump($getReqItemDB);
             return array();
         }
-        $this->status = $this->checkStaus($getReqItemDB['data']);
+        $margeData = array_merge($getReqItemDB['data'], $getReqPriceDB['data']);
+        $this->status = $this->checkStaus($margeData);
         $updateQRequestDB = $this->updateQRequestDB($requestId);
         if($updateQRequestDB['code'] != "0"){
             var_dump($updateQRequestDB);
@@ -66,6 +73,8 @@ class UpdateRequestStatus{
         $recordCount = count($reqItemData);
         $rec = 0;
         $not = 0;
+        $mitumori = 0;
+        $gyosya = 0;
         foreach($reqItemData as $record){
            if($record['1'] == '1'){
             $rec++;
@@ -74,6 +83,23 @@ class UpdateRequestStatus{
            if($record['1'] == '2'){
             $not++;
            }
+           
+           if($record['1'] == '3'){
+            $mitumori++;
+           }
+           
+           if($record['1'] == '4'){
+            $gyosya++;
+           }
+        }
+        if($recordCount == 0){
+            return 0;
+        }
+        if($rec == 0 && $not == 0 && $gyosya > 0 ){
+            return 3;
+        }
+        if($rec == 0 && $not == 0 && $mitumori > 0 ){
+            return 0;
         }
         if($recordCount == $rec){
             return 7;
@@ -87,6 +113,18 @@ class UpdateRequestStatus{
         if($not > 0){
             return 4;
         }
+        return 0;
+    }
+
+    private function getReqPriceDB(string $requestId){
+        /** requestFlg
+         * 1	採用
+         * 2	不採用
+         */
+        $this->spiralDatabase->setDataBase($this->childDatabase);
+        $this->spiralDatabase->addSelectFields('id','requestFlg');
+        $this->spiralDatabase->addSearchCondition('requestId',$requestId);
+        return $this->spiralDatabase->doSelectLoop();
     }
 
     private function getReqItemDB(string $requestId){
@@ -94,7 +132,7 @@ class UpdateRequestStatus{
          * 1	採用
          * 2	不採用
          */
-        $this->spiralDatabase->setDataBase($this->childDatabase);
+        $this->spiralDatabase->setDataBase($this->childDatabase2);
         $this->spiralDatabase->addSelectFields('id','requestFlg');
         $this->spiralDatabase->addSearchCondition('requestId',$requestId);
         return $this->spiralDatabase->doSelectLoop();
@@ -107,6 +145,9 @@ class UpdateRequestStatus{
                 "value" => $this->status,
             )
         );
+        if($this->status == 0){
+            return array('code' => '0' , 'message' => 'not update');
+        } 
         $this->spiralDatabase->setDataBase($this->historyDatabase);
 		$this->spiralDatabase->addSearchCondition('requestId',$requestId);
         $this->spiralDatabase->addSelectNameCondition('');

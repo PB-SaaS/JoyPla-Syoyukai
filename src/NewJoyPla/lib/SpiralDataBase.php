@@ -11,7 +11,7 @@ class SpiralDataBase {
     protected $sort = array();
 	protected $groupBy = array();
 	protected $page = 1;
-	protected $linesPerPage = 10;
+	protected $linesPerPage = 1000;
 	protected $apiSpiral ;
 
 	public function __construct(\Spiral $SPIRAL,\PbSpiralApiCommunicator $PbSpiralApiCommunicator ,\SpiralApiRequest $SpiralApiRequest){
@@ -80,7 +80,7 @@ class SpiralDataBase {
 	public function doInsert(array $insertData){
 		$apiHeader = array("database","insert");
 		$parameters['db_title'] = $this->database;
-		$parameters['data'] = $this->obj2arr($insertData);
+		$parameters['data'] = $insertData;
 		$this->clearData();
 
 		return $this->apiSpiral->requestAPI($apiHeader, $parameters);
@@ -91,7 +91,7 @@ class SpiralDataBase {
 		$apiHeader = array("database","bulk_insert");
 		$parameters['db_title'] = $this->database;
 		$parameters['columns'] = $columns;
-		$parameters['data'] = $this->obj2arr($insertData);
+		$parameters['data'] = $insertData;
 		$this->clearData();
 
 		return $this->apiSpiral->requestAPI($apiHeader, $parameters);
@@ -102,7 +102,7 @@ class SpiralDataBase {
 		$parameters['db_title'] = $this->database;
 		$parameters['select_name'] = $this->selectName;
 		$parameters['search_condition'] = $this->searchCondition;
-		$parameters['data'] = $this->obj2arr($updateData);
+		$parameters['data'] = $updateData;
 		$this->clearData();
 
 		return $this->apiSpiral->requestAPI($apiHeader, $parameters);
@@ -123,7 +123,7 @@ class SpiralDataBase {
 		$parameters['db_title'] = $this->database;
 		$parameters['key'] = $keyTitle;
 		$parameters['columns'] = $columns;
-		$parameters['data'] = $this->obj2arr($updateData);
+		$parameters['data'] = $updateData;
 		$this->clearData();
 
 		return $this->apiSpiral->requestAPI($apiHeader, $parameters);
@@ -133,7 +133,7 @@ class SpiralDataBase {
 		$apiHeader = array("database","upsert");
 		$parameters['db_title'] = $this->database;
 		$parameters['key'] = $keyTitle;
-		$parameters['data'] = $this->obj2arr($upsertData);
+		$parameters['data'] = $upsertData;
 		$this->clearData();
 
 		return $this->apiSpiral->requestAPI($apiHeader, $parameters);
@@ -144,7 +144,7 @@ class SpiralDataBase {
 		$parameters['db_title'] = $this->database;
 		$parameters['key'] = $keyTitle;
 		$parameters['columns'] = $columns;
-		$parameters['data'] = $this->obj2arr($bulkData);
+		$parameters['data'] = $bulkData;
 		$this->clearData();
 		return $this->apiSpiral->requestAPI($apiHeader, $parameters);
 	}
@@ -176,7 +176,7 @@ class SpiralDataBase {
 		$this->sort = array();
 		$this->groupBy = array();
 		$this->page = 1;
-		$this->linesPerPage = 10;
+		$this->linesPerPage = 1000;
 	}
 
 	
@@ -189,17 +189,5 @@ class SpiralDataBase {
 			}
 		}
 		return $result;
-	}
-
-	private function obj2arr($obj){
-		if ( ! is_object($obj) && ! is_array($obj)  ) return htmlspecialchars($obj, ENT_QUOTES, "UTF-8");
-	
-		$arr = (array) $obj;
-	
-		foreach ( $arr as &$a )
-		{
-			$a = $this->obj2arr($a);
-		}
-		return $arr;
 	}
 }

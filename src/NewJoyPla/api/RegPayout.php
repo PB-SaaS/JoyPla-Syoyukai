@@ -147,7 +147,7 @@ class RegPayout{
 				$data['itemUnit'],
 				str_replace(',', '', $data['kakaku']),
 				(int)$data['countNum'],
-				(string)(number_format(str_replace(',', '', $data['kakaku']) / $data['irisu'], 2) * (int)$data['countNum']),
+				str_replace(',', '', $data['kakaku']) / $data['irisu'] * (int)$data['countNum'],
 				$data['payoutCount'],
 				$data['countLabelNum'],
 				);

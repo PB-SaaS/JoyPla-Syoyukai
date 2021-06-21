@@ -6,7 +6,7 @@ class OrderMonthlyReport{
     private $spiralDataBase;
     private $userInfo;
     
-    private $OrderDB = 'NJ_OrderDB';
+    private $OrderDB = 'hacchuShouhin';
     private $inHPItemDB = 'itemInHospitalDB';
  
     private $OrderData = array();
@@ -109,7 +109,7 @@ class OrderMonthlyReport{
     private function makeOrderMonthlyReport(){
         $result = array();
         foreach($this->inHPItemData['data'] as $inHPitem){
-            $orderQuantity = $this->getOrderQuantity($inHPitem[1]);
+            $getInformationByPrice = $this->getInformationByPrice($inHPitem[1]);
             $result['data'][] = array(
                 'id' => $inHPitem[0],
                 'inHospitalItemId' => $inHPitem[1],
@@ -117,11 +117,11 @@ class OrderMonthlyReport{
                 'itemName' => $inHPitem[3],
                 'itemCode' => $inHPitem[4],
                 'itemStandard' => $inHPitem[5],
-                'price' => $inHPitem[6],
-                'orderQuantity' => $orderQuantity,
-                'totalAmount' => $inHPitem[6] * $orderQuantity,
-                'itemUnit'=> $inHPitem[7],
-                'distributorName'=> $inHPitem[8]
+                'price' => $getInformationByPrice['price'],
+                'orderQuantity' => $getInformationByPrice['orderQuantity'],
+                'totalAmount' => $getInformationByPrice['totalAmount'],
+                'itemUnit'=> $getInformationByPrice['itemUnit'],
+                'distributorName'=> $getInformationByPrice['distributorName'],
             );
         }
         $result['count'] = $this->inHPItemData['count'];
@@ -129,6 +129,33 @@ class OrderMonthlyReport{
         return $result;
     }
 
+    private function getInformationByPrice(string $inHospitalItemId){
+        $disAndPriceArray = array();
+        $orderDataByPrice = array("price" => array(), "quantity" => array(), "receivingCount" => array(), "returnCount" => array(), "totalAmount" => array(), "adjAmount" => array(), "itemUnit" => array(), "distributorName" => array());
+        foreach($this->OrderData['data'] as $order){
+            if($inHospitalItemId == $order[0]){
+                $key = array_search($order[8] ."_". $order[7], $disAndPriceArray);
+                if($key === false){
+                    $disAndPriceArray[] = $order[8] ."_". $order[7];
+                    $key = array_search($order[8] ."_". $order[7], $disAndPriceArray);
+
+                    $orderDataByPrice["price"][$key] = $order[7];
+                    $orderDataByPrice["quantity"][$key] = 0;
+                    $orderDataByPrice["orderQuantity"][$key] = 0;
+                }
+                $orderDataByPrice["distributorName"][$key] = $order[9];
+                $orderDataByPrice["quantity"][$key] = $order[4];
+                $orderDataByPrice["itemUnit"][$key] = $order[6];
+                $orderDataByPrice["orderQuantity"][$key] = $orderDataByPrice["orderQuantity"][$key] + $order[1];
+            }
+        }
+        
+        foreach($orderDataByPrice["price"] as $key => $byPriceData){
+            $orderDataByPrice["totalAmount"][$key] = $byPriceData * $orderDataByPrice["orderQuantity"][$key] ;
+        }
+        return $orderDataByPrice;
+    }
+    
     private function getOrderQuantity(string $inHospitalItemId){
         $orderQuantity = 0;
         foreach($this->OrderData['data'] as $orderItem){
@@ -150,7 +177,8 @@ class OrderMonthlyReport{
     private function getOrderDB(){
         $this->spiralDataBase->setDataBase($this->OrderDB);
         $this->spiralDataBase->addSearchCondition('hospitalId',$this->userInfo->getHospitalId());
-        $this->spiralDataBase->addSelectFields('inHospitalItemId','orderQuantity','registrationTime','orderPrice');
+        $this->spiralDataBase->addSearchCondition('orderStatus','1','!=');
+        $this->spiralDataBase->addSelectFields('inHospitalItemId','orderQuantity','registrationTime','orderPrice','quantity','quantityUnit','itemUnit','price','distributorId','distributorName');
         return $this->spiralDataBase->doSelectLoop();
     }
 
@@ -160,6 +188,7 @@ class OrderMonthlyReport{
         foreach($this->OrderData['data'] as $record){
             $this->spiralDataBase->addSearchCondition('inHospitalItemId',$record[0],'=','or');
         }
+        $this->spiralDataBase->addSortField('id', 'asc' );
         $this->spiralDataBase->addSelectFields('id','inHospitalItemId','makerName','itemName','itemCode','itemStandard','price','itemUnit','distributorName');
         return $this->spiralDataBase->doSelect();
     }

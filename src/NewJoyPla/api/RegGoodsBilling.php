@@ -118,7 +118,7 @@ class RegGoodsBilling{
 				$this->billingId,
 				str_replace(',', '', $data['kakaku']),
 				(int)$data['countNum'],
-				(string)(number_format(str_replace(',', '', $data['kakaku']) / $data['irisu'], 2) * (int)$data['countNum']),
+				str_replace(',', '', $data['kakaku']) / $data['irisu'] * (int)$data['countNum'],
                 $this->userInfo->getHospitalId(),
                 $this->divisionId,
 				$data['irisu'],

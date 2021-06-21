@@ -5,7 +5,7 @@ namespace App\Lib;
 define('CHARSET', 'UTF-8');
 define('REPLACE_FLAGS', ENT_QUOTES);
 
-function html($string) {
+function html($string = '') {
     return htmlspecialchars($string, REPLACE_FLAGS, CHARSET);
 }
 
