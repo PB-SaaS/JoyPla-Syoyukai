@@ -20,7 +20,7 @@ $billingData = array();
 if(isset($_POST['billing'])){
 	$billingData = $_POST['billing'];
 }
-$divisionId = '';
+$divisionId = ''; 
 if(isset($_POST['divisionId'])){
 	$divisionId = $_POST['divisionId'];
 }

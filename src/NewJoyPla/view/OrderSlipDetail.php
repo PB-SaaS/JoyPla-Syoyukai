@@ -54,11 +54,21 @@ foreach($orderItems as $key => $record){
 }
 
 $num = 1;
+$minusOrder = false;
 foreach($orderItems as $key => $record){
 	$orderItems[$key]["remainingCount"] = $record["orderQuantity"] - $record["receivingNowCount"];
-	if($record["orderQuantity"] <= $record["receivingNowCount"]){
+
+	if($record["orderQuantity"] < 0 )
+	{
+		$minusOrder = true;
+	}
+	
+	if($record["orderQuantity"] > 0 && $record["orderQuantity"] <= $record["receivingNowCount"]){
+		$orderItems[$key]["receivingFlag"] = true;
+	} else if($record["orderQuantity"] < 0 && $record["orderQuantity"] >= $record["receivingNowCount"]){
 		$orderItems[$key]["receivingFlag"] = true;
 	}
+	
 	$ItemsToJs[$record["inHospitalItemId"]] = array(
 		"num" => $num,
 		"orderCNumber"=> $record["orderCNumber"],
@@ -79,6 +89,7 @@ foreach($orderItems as $key => $record){
 		"receivingFlag"=>$orderItems[$key]["receivingFlag"],
 		"lotNum" => $orderItems[$key]["receivingNowCount"],
 		"price" => $orderItems[$key]["price"],
+		"itemUnit" => $orderItems[$key]["itemUnit"],
 		"labelId" => $orderItems[$key]["labelId"],
 		);
 	$num++;
@@ -238,7 +249,24 @@ if($userInfo->getUserPermission() == "1"){
 					    						if($record["receivingFlag"]){
 					    							echo "<td>入庫完了</td>";
 					    						} else {
-					    							echo "<td><input type='number' class='uk-input receiving_".$record["inHospitalItemId"]."' style='width:82px' min='0' max='".$record["remainingCount"]."' value='0' onchange='active(this,\"".$record["inHospitalItemId"]."\")'><span class='uk-text-small uk-text-middle'>".$record["itemUnit"]."</span></td>";
+													if( $record["orderQuantity"] > 0 )
+													{
+														$attr['min'] = 0;
+														$attr['max'] = $record["remainingCount"];
+													}
+													else if( $record["orderQuantity"] < 0 )
+													{
+														$attr['min'] = $record["remainingCount"];
+														$attr['max'] = 0;
+													} 
+													else 
+													{
+														$attr['min'] = 0;
+														$attr['max'] = 0;
+													}
+					    							echo "<td><input type='number' class='uk-input receiving_".$record["inHospitalItemId"]."'";
+													foreach($attr as $key => $val) echo " $key='$val' ";
+													echo "style='width:82px' value='0' onchange='active(this,\"".$record["inHospitalItemId"]."\")'><span class='uk-text-small uk-text-middle'>".$record["itemUnit"]."</span></td>";
 					    						}
 					    						echo "<td>".$record["dueDate"]."</td>";
 					    						echo "<td>￥<script>price('".$record["orderPrice"]."')</script></td>";
@@ -295,15 +323,16 @@ if($userInfo->getUserPermission() == "1"){
 			        <input type="text" class="uk-input" placeholder="GS1-128" id="GS1-128" autofocus="true">
 			        <div class="uk-margin-top select_items" style="display:none">
 				        <p>商品特定</p>
-				        <select name="not_items_info" class="uk-select">
-				        	<option value=""> --- 選択してください --- </option>
+				        <select name="not_items_info" id="not_items_info" class="uk-select">
 							<?php
+							/*
 							$stringDom = '';
 				        	foreach($ItemsToJs as $key => $val){
 				        		$stringDom .= "<option value='".$key."'>".$val["itemName"]."</option>";
 							}
 							echo $stringDom;
-				        	?>
+				        	*/
+							?>
 				        </select>
 			        </div>
 					<p class="uk-text-right">
@@ -330,12 +359,51 @@ if($userInfo->getUserPermission() == "1"){
 		 	//$("td#barcode_" + i +" div").barcode(num, "ean13",{barWidth: 2 ,barHeight: 40 , output: "css"});
 		 }
 		 */
+		notItemsInfo("");
 		 let order_num = $("#hacchu_num").text();
 		 //$("#hacchu_num").remove();
 		 $("#order_barcode").html("<svg id='barcode_hacchu'></svg>");
 		 generateBarcode("barcode_hacchu",order_num);
 		 //$("td#order_barcode div").barcode({code:order_num, crc:false }, "int25",{barWidth: 3 ,barHeight: 40 , output: "css"});
 		});
+
+		function notItemsInfo(jancode)
+		{
+			let select = document.querySelector("#not_items_info");
+			while(select.firstChild){
+				select.removeChild(select.firstChild)
+			}
+			let option = "";
+			option = document.createElement("option");
+			option.value = "";
+			option.text  = " ----- 選択してください -----";
+			select.appendChild(option); 
+			for ( var key in upToData ) {
+				if(parseInt(upToData[key]["orderQuantity"]) > 0)
+				{
+					if( parseInt(upToData[key]["orderQuantity"]) <= parseInt(upToData[key]["receivingCount"]))
+					{ 
+						continue; 
+					}
+				} 
+				else if(parseInt(upToData[key]["orderQuantity"]) < 0)
+				{
+					if( parseInt(upToData[key]["orderQuantity"]) >= parseInt(upToData[key]["receivingCount"]))
+					{ 
+						continue; 
+					}
+				}
+
+				if( jancode !== "" && jancode !== upToData[key]["itemJANCode"]){
+					continue;
+				}
+				option = document.createElement("option");
+				option.value = key;
+				option.text  = upToData[key]["itemName"];
+				select.appendChild(option); 
+			
+			};
+		}
 		
 		function deliveryCheck(){
 			if(!canAjax) { 
@@ -345,6 +413,7 @@ if($userInfo->getUserPermission() == "1"){
 			//$_POST["orderHistoryId"],$_POST["divisionId"],$_POST["receiving"]
 			
 			let flg = true;
+			let labelCreateFlg = false;
 			
 			UIkit.modal.confirm("入力された値で納品照合を行います。<br>よろしいですか").then(function () {
 				let receivingData = {};
@@ -352,6 +421,10 @@ if($userInfo->getUserPermission() == "1"){
 					//if(upToData[key].changeReceiving != "0"){
 					if(upToData[key].receivingCount != "0"){
 						receivingData[key] = upToData[key];
+						if(upToData[key]["receivingCount"] > 0)
+						{
+							labelCreateFlg = true;
+						}
 					}
 				});
 
@@ -391,11 +464,18 @@ if($userInfo->getUserPermission() == "1"){
 						return false;
 					}
 					UIkit.modal.alert("納品照合が完了しました").then(function () {
-						UIkit.modal.confirm("ラベル発行を行いますか").then(function () {
-							createLabel();
-						}, function () {
+						if(labelCreateFlg)
+						{
+							UIkit.modal.confirm("ラベル発行を行いますか").then(function () {
+								createLabel();
+							}, function () {
+								location.reload();
+							});
+						} 
+						else 
+						{
 							location.reload();
-						});
+						}
 					});
 				})
 				// Ajaxリクエストが失敗した時発動
@@ -415,16 +495,42 @@ if($userInfo->getUserPermission() == "1"){
 		}
 		
 		function addLotInput(num,inHospitalItemId,lotval,lotDate,lotQuantity){
-			if(parseInt(upToData[inHospitalItemId]["orderQuantity"]) <= parseInt(upToData[inHospitalItemId].lotNum)){
-				UIkit.modal.alert("発注数より多くはできません。ご確認ください");
-				return ;
+			num_property = ["max" , "min"];
+			if(parseInt(upToData[inHospitalItemId]["orderQuantity"]) > 0 )
+			{
+				num_property = ["max" , "min"];
+				n_num = 1;
+				if(parseInt(upToData[inHospitalItemId]["orderQuantity"]) <= parseInt(upToData[inHospitalItemId].lotNum)){
+					console.log("testB");
+					UIkit.modal.alert("発注数より多くはできません。ご確認ください");
+					return ;
+				}
+				
+				if($("input.receiving_"+inHospitalItemId)[0][num_property[0]] < (parseInt($("input.receiving_"+inHospitalItemId).val()) + n_num)){
+					UIkit.modal.alert("発注数より多くはできません。ご確認ください");
+					return ;
+				}
+
+			} else
+			if(parseInt(upToData[inHospitalItemId]["orderQuantity"]) < 0 )
+			{
+				num_property = ["min" , "max"];
+				n_num = -1;
+				
+				if(parseInt(upToData[inHospitalItemId]["orderQuantity"]) >= parseInt(upToData[inHospitalItemId].lotNum)){
+					console.log("test");
+					UIkit.modal.alert("発注数より多くはできません。ご確認ください");
+					return ;
+				}
+
+				if($("input.receiving_"+inHospitalItemId)[0][num_property[0]] > (parseInt($("input.receiving_"+inHospitalItemId).val()) + n_num)){
+					UIkit.modal.alert("発注数より多くはできません。ご確認ください");
+					return ;
+				}
 			}
-			if($("input.receiving_"+inHospitalItemId)[0].max < (parseInt($("input.receiving_"+inHospitalItemId).val()) + 1)){
-				UIkit.modal.alert("発注数より多くはできません。ご確認ください");
-				return ;
-			}
+
 			
-			upToData[inHospitalItemId].lotNum = parseInt(upToData[inHospitalItemId].lotNum) + 1;
+			upToData[inHospitalItemId].lotNum = parseInt(upToData[inHospitalItemId].lotNum) + n_num;
 			
 			let trElm = document.createElement("tr"); 
 			let tdElm = document.createElement("td");
@@ -509,10 +615,10 @@ if($userInfo->getUserPermission() == "1"){
 			input.onclick  = function () {  
 			    	$(this).parent().parent().remove();
 					val = $("input.receiving_"+inHospitalItemId).val();
-					min = $("input.receiving_"+inHospitalItemId)[0].min;
-					$("input.receiving_"+inHospitalItemId)[0].min = parseInt(min) - 1;
-					$("input.receiving_"+inHospitalItemId).val(parseInt(val) - 1);
-					upToData[inHospitalItemId].lotNum = parseInt(upToData[inHospitalItemId].lotNum) - 1;
+					min = $("input.receiving_"+inHospitalItemId)[0][num_property[1]];
+					$("input.receiving_"+inHospitalItemId)[0][num_property[1]] = parseInt(min) - n_num;
+					$("input.receiving_"+inHospitalItemId).val(parseInt(val) - n_num);
+					upToData[inHospitalItemId].lotNum = parseInt(upToData[inHospitalItemId].lotNum) - n_num;
 					active($("input.receiving_"+inHospitalItemId),inHospitalItemId);
 			    };
 			
@@ -520,10 +626,10 @@ if($userInfo->getUserPermission() == "1"){
 			trElm.appendChild(tdElm); 
 			
 			$("#tr_"+num).after(trElm);
-			min = $("input.receiving_"+inHospitalItemId)[0].min;
-			$("input.receiving_"+inHospitalItemId)[0].min = parseInt(min) + 1;
+			min = $("input.receiving_"+inHospitalItemId)[0][num_property[1]];
+			$("input.receiving_"+inHospitalItemId)[0][num_property[1]] = parseInt(min) + n_num;
 			val = $("input.receiving_"+inHospitalItemId).val();
-			$("input.receiving_"+inHospitalItemId).val(parseInt(val) + 1);
+			$("input.receiving_"+inHospitalItemId).val(parseInt(val) + n_num);
 			$("input.receiving_"+inHospitalItemId).css("background-color","rgb(255, 204, 153)");
 			active($("input.receiving_"+inHospitalItemId)[0],inHospitalItemId);
 			
@@ -606,8 +712,6 @@ if($userInfo->getUserPermission() == "1"){
     	function gs1_128(gs1128){
     		gs1128_object = {};
 			if(gs1128.indexOf("]C1") !== 0){
-				//UIkit.modal.alert("GS1-128ではありません");
-				//return ;
 				return gs1_128("]C1"+gs1128);
 			} else {
 				gs1128 = gs1128.slice( 3 );
@@ -615,23 +719,52 @@ if($userInfo->getUserPermission() == "1"){
 				let chkflg = false;
 				let objkey = $(".select_items select").val();
 				
-				if( objkey == "" && ! obj.hasOwnProperty("01")){
+				if( objkey == "" && ! obj.hasOwnProperty("01") )
+				{
 					UIkit.modal.alert("商品情報が含まれておりませんでした<br>選択肢からお選びいただき再度、反映をクリックしてください。").then(function(){
 						$(".select_items").show();
+						notItemsInfo("");
 						UIkit.modal($('#modal-gs1128')).show();
 					});
 					return;
 				}
+
+				objectJan = [];
 				
 				if(objkey == "" ){
 					searchJan = addCheckDigit(obj["01"]);
-					console.log(searchJan);
-					Object.keys(upToData).forEach(function (key) {
-					  if(searchJan == upToData[key]["itemJANCode"]){
-						  chkflg = true;
-						  objkey = key;
+					for ( var key in upToData ) {
+						if(parseInt(upToData[key]["orderQuantity"]) > 0)
+						{
+							if( parseInt(upToData[key]["orderQuantity"]) <= parseInt(upToData[key]["receivingCount"]))
+							{ 
+								continue; 
+							}
+						} 
+						else if(parseInt(upToData[key]["orderQuantity"]) < 0)
+						{
+							if( parseInt(upToData[key]["orderQuantity"]) >= parseInt(upToData[key]["receivingCount"]))
+							{ 
+								continue; 
+							}
 						}
-					});
+
+						if(searchJan == upToData[key]["itemJANCode"]){
+							chkflg = true;
+							objkey = key;
+							objectJan.push(upToData[key]["itemJANCode"]);
+						}
+					};
+					
+					if(objectJan.length > 1)
+					{
+						UIkit.modal.alert("商品情報が複数見つかりました<br>選択肢からお選びいただき再度、反映をクリックしてください。").then(function(){
+							$(".select_items").show();
+							UIkit.modal($('#modal-gs1128')).show();
+							notItemsInfo("");
+						});
+						return ;
+					}
 				} else {
 					chkflg = true;
 				}
@@ -642,6 +775,7 @@ if($userInfo->getUserPermission() == "1"){
 					});
 					return false;
 				}
+
 				addLotInput(upToData[objkey]["num"],objkey,obj["10"],changeDate(obj["17"]),obj["30"]);
 				$(".select_items").hide();
 				$(".select_items select").val("");

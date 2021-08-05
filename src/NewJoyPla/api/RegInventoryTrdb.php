@@ -45,20 +45,21 @@ class RegInventoryTrdb{
      */
     private function makeOrderedData(array $array,string $divisionId,string $pattern){
       $itemList = array();
+      $count = (int)$data['countNum'];
       if($pattern == '1'){
-        $p = '';
+        $count = $count;
       }else if($pattern == '2'){
-        $p = '-';
+        $count = -$count;
       }
       foreach($array as $inHPItemid => $data){
-        if((int)$data['countNum'] > 0){
+        if((int)$data['countNum'] != 0){
             $itemList[] = array(
                       'now',
                       $divisionId,
                       $inHPItemid,
                       '0',
                       $this->userInfo->getHospitalId(),
-                      $p . $data['countNum'],
+                      $count,
           );
         }
       }
@@ -72,18 +73,19 @@ class RegInventoryTrdb{
      */
     private function makeRegData(array $array,string $divisionId,string $pattern){
       $itemList = array();
+      $count = (int)$data['countNum'];
       if($pattern == '1'){
-        $p = '';
+        $count = $count;
       }else if($pattern == '2'){
-        $p = '-';
+        $count = -$count;
       }
       foreach($array as $inHPItemid => $data){
-        if((int)$data['countNum'] > 0){
+        if((int)$data['countNum'] != 0){
             $itemList[] = array(
                       'now',
                       $divisionId,
                       $inHPItemid,
-                      $p . $data['countNum'],
+                      $count,
                       $this->userInfo->getHospitalId(),
                       0,
           );

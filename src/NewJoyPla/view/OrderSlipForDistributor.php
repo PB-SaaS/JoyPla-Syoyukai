@@ -228,8 +228,8 @@ if(!($card["data"][0][1] == 3 || $card["data"][0][1] == 4)){
 					    						echo "<td>￥<script>price('".$record['orderPrice']."')</script></td>";
 					    						echo "<td><input type='date' class='uk-input' style='width: 165px' value='".\App\Lib\changeDateFormat('Y年m月d日' , $record['dueDate'] , 'Y-m-d')."' min='".date("Y-m-d")."' onchange='dueDateChange(\"".$record['inHospitalItemId']."\",this)'></td>";
 					    						if($record['receivingFlag']){
-					    						echo "<td>入庫済み</td>";
-					    						} else if( $record['receivingNowCount'] > 0) {
+					    							echo "<td>入庫済み</td>";
+					    						} else if( $record['receivingNowCount'] != 0) {
 					    							echo "<td>一部入庫(".$record['receivingNowCount']."/".$record['orderQuantity'].")</td>";
 					    						} else {
 					    							echo "<td>未入庫</td>";

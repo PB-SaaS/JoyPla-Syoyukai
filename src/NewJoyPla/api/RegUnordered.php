@@ -49,14 +49,12 @@ class RegUnordered{
 	        $response = $this->regOrderHistory($historyData);
 	        
 	        if($response['code'] != 0){
-				var_dump($response);
 	    		return false;
 	        }
 	
 	        $response = $this->regOrder($childData);
 	        
 	        if($response['code'] != 0){
-				var_dump($response);
 	    		return false;
 	        }
         }
@@ -155,7 +153,7 @@ class RegUnordered{
 
 		$itemList = array();
 		foreach($array as $inHPItemid => $data){
-			if(floor((int)$data['countNum'] / (int)$data['irisu']) > 0){
+			if(floor((int)$data['countNum'] / (int)$data['irisu']) !== 0){
 			$itemList[] = array(
 				'now',
 				'',

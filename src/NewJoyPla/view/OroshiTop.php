@@ -576,7 +576,6 @@ $tenantData = $getTenantData->select($hospitalData['data'][0]['tenantId']);
 			    		<div>	
 				    		<p class="uk-width-1-1 content-7-1 category-title">見積</p>
 			    		</div>
-							<?php if($tenantData['data'][0]['tenantKind'] == '1') : ?>
 				    	<div class="uk-child-width-1-2@m uk-text-center" uk-grid>
 						    <div>
 						        <div class="nj_card content-7-1">
@@ -595,7 +594,6 @@ $tenantData = $getTenantData->select($hospitalData['data'][0]['tenantId']);
 						        </div>
 						    </div>
 						</div>
-							<?php endif; ?>
 					</div>
 		    		<div>
 			    		<div>	

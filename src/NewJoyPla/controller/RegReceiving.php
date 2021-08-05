@@ -40,6 +40,7 @@ if($hospitalData['data'][0]['receivingTarget'] == '2'){ //発注部署へ納品�
 }
 
 $result = $regReceiving->register($_POST['orderHistoryId'],$_POST['distributorId'],$divisionId,$_POST['receiving']);
+
 if(! $result){
 	echo json_encode(array('result'=>$result));
 	exit;
@@ -57,6 +58,7 @@ foreach($_POST['receiving'] as $itemId => $data){
 
 $result = $regInventoryTrdb->orderWithinCount($remakeData,$divisionId,'2');
 
+var_dump($result);
 if(! $result){
 	echo json_encode(array('result'=>$result));
 	exit;

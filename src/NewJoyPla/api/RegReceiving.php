@@ -128,7 +128,7 @@ class RegReceiving{
 
 		$itemList = array();
 		foreach($array as $inHPItemid => $data){
-			if($data['receivingCount'] > 0){
+			if($data['receivingCount'] !== 0){
 			$itemList[] = array(
 				'now',
 				$data['orderCNumber'],

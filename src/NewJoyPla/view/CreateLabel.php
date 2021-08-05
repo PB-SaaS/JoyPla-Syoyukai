@@ -236,19 +236,37 @@ EOM;
 						if($item['totalReturnCount'] == null){
 							$item['totalReturnCount'] = 0;
 						}
-						if((int)$inHpItemMaster[$inHPId]['quantity'] >= 10000 ){
+						
+						$quantityOrg = $item['quantity'];
+						$quantityVal = 0;
+						
+						if($quantityOrg === ''){
+							$quantityVal = (int)$inHpItemMaster[$inHPId]['quantity'];
+						} else {
+							$quantityVal = (int)$quantityOrg;
+						}
+						
+						if($quantityVal >= 10000 ){
 							$quantity = '9999';
-						} else if((int)$inHpItemMaster[$inHPId]['quantity'] < 1 ){
+						} else if($quantityVal < 1 ){
 							$quantity = str_pad(1 , 4, "0", STR_PAD_LEFT);
 						} else {
-							$quantity = str_pad((int)$inHpItemMaster[$inHPId]['quantity'] , 4, "0", STR_PAD_LEFT);
+							$quantity = str_pad($quantityVal , 4, "0", STR_PAD_LEFT);
 						}
+						
+						
 						$max = 0;
 						if($pattern == 'payout'){
 							$max = (int)$item['printCount'];
 						} else {
 							$max = (int)$item['receivingCount'] - (int)$item['totalReturnCount'];
 						}
+
+						if($item['quantityUnit'] == '')
+						{
+							$item['quantityUnit'] = ($item['unit'] != '')? $item['unit'] : "" ;
+						}
+						
 						for($rnum = 1 ; $rnum <= $max; $rnum++){
 							$barcodeId = "01".$item["labelId"].$quantity;
 							
@@ -270,7 +288,7 @@ EOM;
 							$design = str_replace('%JoyPla:itemStandard%',		$inHpItemMaster[$inHPId]['itemStandard'],	$design);//商品規格
 							$design = str_replace('%JoyPla:itemJANCode%',		$inHpItemMaster[$inHPId]['itemJANCode'], 	$design);//JANコードb
 							$design = str_replace('%JoyPla:itemUnit%',			$item['itemUnit'], 		$design);//個数単位
-							$design = str_replace('%JoyPla:quantity%',			$item['quantity'], 		$design);//入り数
+							$design = str_replace('%JoyPla:quantity%',			(int)$quantity, 		$design);//入り数
 							$design = str_replace('%JoyPla:catalogNo%',			$inHpItemMaster[$inHPId]['catalogNo'], 		$design);//カタログ名
 							$design = str_replace('%JoyPla:labelId%',			$inHpItemMaster[$inHPId]['labelId'], 		$design);//ラベルID
 							$design = str_replace('%JoyPla:printCount%',		$item['printCount'],						$design);//印刷数

@@ -2,6 +2,7 @@
 <?php
 include_once 'NewJoyPla/lib/ApiSpiral.php';
 include_once "NewJoyPla/lib/Define.php";
+include_once "NewJoyPla/lib/Func.php";
 include_once 'NewJoyPla/lib/SpiralDataBase.php';
 include_once 'NewJoyPla/lib/UserInfo.php';
 include_once 'NewJoyPla/api/GetDivision.php';

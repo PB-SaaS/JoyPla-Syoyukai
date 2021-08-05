@@ -30,8 +30,7 @@
 	    if(month > monthMax){ $(elm).val(monthMax).change(); }
 	    if(month < monthMin){ $(elm).val(monthMin).change(); }
 	    if(isNaN(month)){ 
-			if(monthMin){ $(elm).val(monthMin).change(); 
-			} else {$(elm).val(monthMin).change();}
+			$(elm).val(0).change();
 		}
 	}
 

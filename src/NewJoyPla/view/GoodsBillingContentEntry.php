@@ -146,7 +146,7 @@ if($userInfo->getUserPermission() == '1') {
 				    input.className = 'uk-input';
 				    input.id = 'hp_' + object.recordId;
 				    input.style = 'width:96px';
-				    input.min = 0;
+				    //input.min = 0;
 				    input.value = listObject[object.recordId].countNum;
 				    
 				    input.onchange  = function () {
@@ -214,7 +214,7 @@ if($userInfo->getUserPermission() == '1') {
 			
 			let checkflg = false;
 			Object.keys(listObject).forEach(function (key) {
-			  if(listObject[key].countNum !== 0){
+			  if(listObject[key].countNum > 0){
 			  	checkflg = true;
 			  }
 			});
@@ -243,7 +243,7 @@ if($userInfo->getUserPermission() == '1') {
 			
 			let checkflg = false;
 			Object.keys(listObject).forEach(function (key) {
-			  if(Math.floor(listObject[key].countNum / listObject[key].irisu) > 0){
+			  if( Math.floor(listObject[key].countNum / listObject[key].irisu) !== 0 ){
 			  	checkflg = true;
 			  }
 			});
