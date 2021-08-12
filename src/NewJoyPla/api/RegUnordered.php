@@ -153,7 +153,7 @@ class RegUnordered{
 
 		$itemList = array();
 		foreach($array as $inHPItemid => $data){
-			if(floor((int)$data['countNum'] / (int)$data['irisu']) !== 0){
+			if(floor((int)$data['countNum'] / (int)$data['irisu']) != 0){
 			$itemList[] = array(
 				'now',
 				'',

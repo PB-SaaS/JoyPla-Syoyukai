@@ -803,15 +803,20 @@ if($userInfo->getUserPermission() == "1"){
 		function makeLotObj(){
 			let lotObj = {};
 			Object.keys(upToData).forEach(function (inHPItemKey) {
-				lotObj[inHPItemKey] = {};
-				$(".lot_"+inHPItemKey).each(function(index,elm){
-					lotObj[inHPItemKey][index] = {};
-					lotObj[inHPItemKey][index]["lotNumber"]= elm.value;
-					lotObj[inHPItemKey][index]["inHospitalItemId"] = inHPItemKey;
-				});
-				$(".lotDate_"+inHPItemKey).each(function(index,elm){
-					lotObj[inHPItemKey][index]["lotDate"] = elm.value;
-				});
+					lotObj[inHPItemKey] = {};
+					regType = "insert";
+					$(".lot_"+inHPItemKey).each(function(index,elm){
+						lotObj[inHPItemKey][index] = {};
+						if(parseInt(upToData[inHPItemKey]["orderQuantity"]) < 0) {
+							regType = "delete";
+						}
+						lotObj[inHPItemKey][index]["registType"] = regType;
+						lotObj[inHPItemKey][index]["lotNumber"]= elm.value;
+						lotObj[inHPItemKey][index]["inHospitalItemId"] = inHPItemKey;
+					});
+					$(".lotDate_"+inHPItemKey).each(function(index,elm){
+						lotObj[inHPItemKey][index]["lotDate"] = elm.value;
+					});
 				
 			});
 			return lotObj;

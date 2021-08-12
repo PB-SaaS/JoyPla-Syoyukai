@@ -13,6 +13,7 @@ class RegLot{
 	private $receivingItemIds = array();
     
     private $database = 'NJ_LotDB';
+    private $DeleteLotDB = '320_NJ_lotDel';
     private $ReceivingDB = 'NJ_ReceivingDB';
 
     public function __construct(\App\Lib\SpiralDataBase $spiralDataBase, \App\Lib\UserInfo $userInfo){
@@ -47,8 +48,28 @@ class RegLot{
 			}
 			$this->receivingItemIds = $this->remakeReceivingItems($ReceivingItems['data']);
 		}
+
 		$makeLotUpsertData = $this->makeLotUpsertData($lotData);
-		return $this->regLotUpSert($makeLotUpsertData);
+		$regResult = $this->regLotUpSert($makeLotUpsertData);
+		if($regResult['code'] != '0')
+		{
+			return $regResult;
+		}
+		
+		$makeDeleteData = $this->makeDeleteData($lotData);
+		$delResult =  $this->regTrDeleteLotData($makeDeleteData);
+		if($delResult['code'] != '0')
+		{
+			return $delResult;
+		}
+		return $delResult;
+	}
+
+	private function regTrDeleteLotData(array $deleteData)
+	{
+        $this->spiralDataBase->setDataBase($this->DeleteLotDB);
+		$column = array('regDate','lotId','lotNumber','lotDate','divisionId','inHospitalItemId','hospitalId');
+        return $this->spiralDataBase->doBulkInsert($column ,$deleteData);
 	}
 
 	private function remakeLotData(array $lotData){
@@ -66,6 +87,10 @@ class RegLot{
 	private function makeLotUpsertData(array $lotData){
 		$result = array();
 		foreach($lotData as $lot){
+			if($lot['registType'] != "insert")
+			{
+				continue;
+			}
 			$lotId = '';
 			if($lot['lotId'] == ""){
 				//$lotId = $this->makeLotId();
@@ -84,6 +109,31 @@ class RegLot{
 				$lot['payoutId'],
 				$this->receivingHId,
 				$this->payoutHistoryId,
+				$lot['lotNumber'],
+				$lot['lotDate'],
+				$this->divisionId,
+				$lot['inHospitalItemId'],
+				$this->userInfo->getHospitalId(),
+			);
+		}
+		return $result;
+	}
+
+	private function makeDeleteData(array $lotData){
+		$result = array();
+		foreach($lotData as $lot){
+			if($lot['registType'] != "delete")
+			{
+				continue;
+			}
+			$lotId = '';
+			$receivingItemId = '';
+			if(array_key_exists($lot['inHospitalItemId'], $this->receivingItemIds)){
+				$receivingItemId = $this->receivingItemIds[$lot['inHospitalItemId']];
+			}
+			$result[] = array(
+				'now',
+				$lotId,
 				$lot['lotNumber'],
 				$lot['lotDate'],
 				$this->divisionId,

@@ -18,7 +18,7 @@ class RegInventoryTrdb{
     }
 
     public function orderCount(array $array, string $divisionId, string $pattern){
-    	$array = $this->requestUrldecode($array);
+    	  $array = $this->requestUrldecode($array);
 
         $regData = $this->makeRegData($array,$divisionId,$pattern);//入庫
         $result = $this->regInventoryTrdb($regData);
@@ -45,19 +45,24 @@ class RegInventoryTrdb{
      */
     private function makeOrderedData(array $array,string $divisionId,string $pattern){
       $itemList = array();
-      $count = (int)$data['countNum'];
-      if($pattern == '1'){
-        $count = $count;
-      }else if($pattern == '2'){
-        $count = -$count;
-      }
+      $count = 0;
       foreach($array as $inHPItemid => $data){
-        if((int)$data['countNum'] != 0){
+        $count = (int)$data['countNum'];
+        if($count <= 0)
+        {
+          continue; //マイナス発注は発注中個数の計算をしない。
+        }
+        if($pattern == '1'){
+          $count = $count;
+        }else if($pattern == '2'){
+          $count = -$count;
+        }
+        if($count != 0){
             $itemList[] = array(
                       'now',
                       $divisionId,
                       $inHPItemid,
-                      '0',
+                      0,
                       $this->userInfo->getHospitalId(),
                       $count,
           );
@@ -73,14 +78,15 @@ class RegInventoryTrdb{
      */
     private function makeRegData(array $array,string $divisionId,string $pattern){
       $itemList = array();
-      $count = (int)$data['countNum'];
-      if($pattern == '1'){
-        $count = $count;
-      }else if($pattern == '2'){
-        $count = -$count;
-      }
+      $count = 0;
       foreach($array as $inHPItemid => $data){
-        if((int)$data['countNum'] != 0){
+        $count = (int)$data['countNum'];
+        if($pattern == '1'){
+          $count = $count;
+        }else if($pattern == '2'){
+          $count = -$count;
+        }
+        if($count != 0){
             $itemList[] = array(
                       'now',
                       $divisionId,

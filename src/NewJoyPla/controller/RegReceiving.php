@@ -58,7 +58,6 @@ foreach($_POST['receiving'] as $itemId => $data){
 
 $result = $regInventoryTrdb->orderWithinCount($remakeData,$divisionId,'2');
 
-var_dump($result);
 if(! $result){
 	echo json_encode(array('result'=>$result));
 	exit;
