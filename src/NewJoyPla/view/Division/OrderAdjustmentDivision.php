@@ -167,7 +167,7 @@ $getUnorderedData = $getUnordered->select();
  
 			Object.keys(listObject[divkey]).forEach(function(key) {
 	 
-			    if(listObject[divkey][key].countNum > 0){
+			    if(listObject[divkey][key].countNum != 0){
 			    	flag = true;
 			    }
 			})
