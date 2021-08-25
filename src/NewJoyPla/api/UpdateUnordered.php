@@ -7,6 +7,8 @@ class UpdateUnordered{
     private $spiralDatabase;
     private $price;
     
+    private $itemsNumber = 0;
+    
     private $historyDatabase = 'NJ_OrderHDB';
     private $childDatabase = 'NJ_OrderDB';
 
@@ -29,6 +31,7 @@ class UpdateUnordered{
         }
 
         $this->price = $this->orderPriceCalculation($result['data']);
+        $this->itemsNumber = \count($result['data']);
 
         $result = $this->updateOrderHistoryDB($orderNum);
         
@@ -60,7 +63,7 @@ class UpdateUnordered{
         
         $this->spiralDatabase->setDataBase($this->historyDatabase);
 		$this->spiralDatabase->addSearchCondition('orderNumber',$orderNum);
-        return $this->spiralDatabase->doUpdate(array(array('name'=> 'totalAmount','value'=>$this->price)));
+        return $this->spiralDatabase->doUpdate(array(array('name'=> 'totalAmount','value'=>$this->price),array('name'=> 'itemsNumber','value'=>$this->itemsNumber)));
     }
 
     private function deleteOrderHistoryDB(string $orderNum){

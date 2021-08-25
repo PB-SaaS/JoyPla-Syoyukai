@@ -28,7 +28,7 @@ class UpdateOrder{
         
         $this->pattern = $this->checkPattern($array);
         
-        $makeOrderHistoryData = $this->makeOrderHistoryData($makeOrderData);
+        $makeOrderHistoryData = $this->makeOrderHistoryData($array);
         $result = $this->updateOrderHistoryDB($orderNum,$orderAuthKey,$makeOrderHistoryData);
 
         if($result['code'] != 0){
@@ -44,6 +44,7 @@ class UpdateOrder{
         $makeOrderData = $this->makeOrderDataWithDelAcceptance($array);
         
         $result = $this->updateOrderDB($makeOrderData); 
+        
         if($result['code'] != 0){
             var_dump($result);
             return false;
@@ -52,6 +53,7 @@ class UpdateOrder{
         $this->pattern = '7';//納品取消
         
         $makeOrderHistoryData = $this->makeOrderHistoryData($makeOrderData);
+
         $result = $this->updateOrderHistoryDB($orderNum,$orderAuthKey,$makeOrderHistoryData);
         
 
@@ -135,6 +137,10 @@ class UpdateOrder{
             array(
                 "name" => "receivingTime",
                 "value" => $receivingTime,
+            ),
+            array(
+                "name" => "itemsNumber",
+                "value" => count($array),
             )
         );
 

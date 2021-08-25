@@ -17,14 +17,15 @@ $regPayout= new App\Api\RegPayout($spiralDataBase,$userInfo);
 
 $payoutData = $_POST['payout'];
 foreach($payoutData as $payoutKey => $payoutRecord){
+	$payoutData[$payoutKey]['countNum'] = (int)$payoutRecord['countNum'];
+	$payoutData[$payoutKey]['countLabelNum'] = (int)$payoutRecord['countLabelNum'];
 	$payoutData[$payoutKey]['countNum'] = (int)$payoutRecord['countNum'] * (int)$payoutRecord['countLabelNum'] ;
-	$payoutData[$payoutKey]['payoutCount'] = $payoutRecord['countNum'];
+	$payoutData[$payoutKey]['payoutCount'] = (int)$payoutRecord['countNum'];
 }
 //払出登録
 $result = $regPayout->register($payoutData,$_POST['sourceDivisionId'],$_POST['sourceDivisionName'],$_POST['targetDivisionId'],$_POST['targetDivisionName']);
 
 if($result != true){
-	var_dump("test");
 	echo json_encode(array('result'=>$result));
 	exit;
 }

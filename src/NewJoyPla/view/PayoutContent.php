@@ -150,7 +150,7 @@ $divisionData = $getDivision->select();
 				    html = document.createElement("div");
 				    input = document.createElement("input");
 				    input.type = 'number';
-					input.step="1";
+					input.step="1"; 
 				    input.className = 'uk-input';
 				    input.style = 'width:96px';
 				    input.id = 'hp_' + object.recordId;
@@ -159,7 +159,7 @@ $divisionData = $getDivision->select();
 				    
 				    input.onchange  = function () {  
 						changeForInputNumber(this);
-				    	onchangeCountNum(object.recordId,this.value);
+				    	onchangeCountNum(object.recordId,parseInt(this.value));
 						onchangeSumCountNum(object.recordId);
 				    };
 				    //input.step = listObject[object.recordId].irisu;
@@ -470,9 +470,6 @@ $divisionData = $getDivision->select();
 			document.createLabelForm.submit();
 			return true;
 		}
-
-		
-		
 		
     </script>
   </head>

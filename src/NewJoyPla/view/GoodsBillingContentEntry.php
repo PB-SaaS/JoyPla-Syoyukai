@@ -243,7 +243,8 @@ if($userInfo->getUserPermission() == '1') {
 			
 			let checkflg = false;
 			Object.keys(listObject).forEach(function (key) {
-			  if( Math.floor(listObject[key].countNum / listObject[key].irisu) !== 0 ){
+				console.log(Math.abs(listObject[key].countNum));
+			  if( Math.floor(Math.abs(listObject[key].countNum) / listObject[key].irisu) !== 0 ){
 			  	checkflg = true;
 			  }
 			});

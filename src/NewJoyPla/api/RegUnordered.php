@@ -153,25 +153,31 @@ class RegUnordered{
 
 		$itemList = array();
 		foreach($array as $inHPItemid => $data){
-			if(floor((int)$data['countNum'] / (int)$data['irisu']) != 0){
-			$itemList[] = array(
-				'now',
-				'',
-				'',
-				'',
-                '',
-                $this->userInfo->getHospitalId(),
-				$inHPItemid,
-				$this->orderId,
-				str_replace(',', '', $data['kakaku']),
-				floor((int)$data['countNum'] / (int)$data['irisu']),
-				str_replace(',', '', $data['kakaku']) * floor((int)$data['countNum'] / (int)$data['irisu']),
-				'0',
-				$data['irisu'],
-				$data['unit'],
-				$data['itemUnit'],
-				$this->divisionId,
-				$this->distributorId
+			$sign = "";
+			if((int)$data['countNum'] < 0)
+			{
+				$sign = "-";
+			}
+			if(floor(abs((int)$data['countNum']) / (int)$data['irisu']) != 0)
+			{
+				$itemList[] = array(
+					'now',
+					'',
+					'',
+					'',
+					'',
+					$this->userInfo->getHospitalId(),
+					$inHPItemid,
+					$this->orderId,
+					str_replace(',', '', $data['kakaku']),
+					$sign . floor(abs((int)$data['countNum']) / (int)$data['irisu']),
+					$sign . str_replace(',', '', $data['kakaku']) * floor(abs((int)$data['countNum']) / (int)$data['irisu']),
+					'0',
+					$data['irisu'],
+					$data['unit'],
+					$data['itemUnit'],
+					$this->divisionId,
+					$this->distributorId
 				);
 			}
 		}
