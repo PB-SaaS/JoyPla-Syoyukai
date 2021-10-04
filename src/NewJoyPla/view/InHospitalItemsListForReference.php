@@ -10,7 +10,7 @@
 	function hanei(elm){
 		let shouhinTr = $(elm.parentNode.parentNode);
 		shouhinObject = JSON.parse($('.json',shouhinTr).text().replace(/\r?\n/g, '').trim());
-		window.opener.addTr(shouhinObject);
+		window.opener.addTr(shouhinObject, 1, 0);
 	}
 	</script>    <?php include_once "NewJoyPla/src/HeaderForMypage.php"; ?>
     <div class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
@@ -23,7 +23,7 @@
 		    	<h2 class="page_title">院内商品情報一覧</h2>
 		    	<hr>
 		    	<div class="" id="tablearea">
-		    		%sf:usr:innnaizyouhou%
+		    		%sf:usr:innnaizyouhouv3%
 		    	</div>
 		    </div>
 		</div>

@@ -31,15 +31,31 @@ if($result['code'] != '0'){
 	exit;
 }
 
-$inventoryData = $spiralDataBase->arrayToNameArray($result["data"],array('id','divisionId','inventryNum','inHospitalItemId'));
+$inventoryData = $spiralDataBase->arrayToNameArray($result["data"],array('id','divisionId','inventryNum','inHospitalItemId','lotNumber','lotDate','lotUniqueKey'));
 
 //棚卸情報加工
 $items = array();
+$lotList = array();
 foreach($inventoryData as $record){
 	if(!array_key_exists($record['divisionId'], $items)){
 		$items[$record['divisionId']] = array();
 	}
 	$items[$record['divisionId']][$record['inHospitalItemId']] = array('countNum'=>$record['inventryNum']);
+
+	if ($record['lotNumber'] && $record['lotDate'] && ((int)$record['inventryNum'] !== 0)) {
+		$lotList[] = array(
+			'now',
+			$record['divisionId'],
+			$record['inHospitalItemId'],
+			'0',
+			$userInfo->getHospitalId(),
+			$record['lotUniqueKey'],
+			$record['lotNumber'],
+			$record['lotDate'],
+			$record['inventryNum']
+		);
+	}
+
 }
 
 //棚卸結果でデータ更新
@@ -48,6 +64,13 @@ foreach($items as $divisionId => $item){
 	$result = $resetStock->resetStock($divisionId);
 	if(!$result){
 		var_dump($result);
+		echo json_encode(array('result'=>false));
+		exit;
+	}
+	
+	$resetLot = $resetStock->resetLotStock($divisionId);
+	if(!$resetLot){
+		var_dump($resetLot);
 		echo json_encode(array('result'=>false));
 		exit;
 	}
@@ -110,6 +133,19 @@ foreach($requestforBluk as $items_1000){
 	}
 }
 
+/**
+ * 棚卸数でロット在庫数更新 
+ */
+$lotBulkData = array_chunk($lotList, 999,true);
+
+foreach($lotBulkData as $items_1000){
+	$result = $regInventoryTrdb->updateLotStock($items_1000);
+	if(!$result){
+		var_dump($result);
+		echo json_encode(array('result'=>false));
+		exit; 
+	}
+}
 
 //ステータス更新
 $regInventoryFinish = new App\Api\RegInventoryFinish($spiralDataBase,$userInfo);

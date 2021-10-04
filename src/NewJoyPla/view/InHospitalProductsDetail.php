@@ -38,7 +38,7 @@
 	                    <input class="print_hidden uk-button uk-button-primary" type="submit" value="院内商品情報変更" onclick="document.itemsChange.submit()">
 						<form action="/regist/is" method="post" name="itemsChange" target="_blank" class="uk-hidden">
 							%SMPAREA%
-							<input type="hidden" name="SMPFORM" value="%smpform:310_inHpItemC%">
+							<input type="hidden" name="SMPFORM" value="%smpform:330_inHpItemsC%">
 							<input type="hidden" name="hospitalId" value="%val:usr:hospitalId%">
 							<input type="hidden" name="makerName" value="%val:usr:makerName%">
 							<input type="hidden" name="itemId" value="%val:usr:itemId%">
@@ -66,6 +66,13 @@
 							<input type="hidden" name="homeCategory" value="%val:usr:homeCategory%">
 							<input type="hidden" name="HPstock" value="%val:usr:HPstock%">
 							<input type="hidden" name="notice" value="%val:usr:notice%">
+					
+							<input type="hidden" name="unitPrice" value="%val:usr:unitPrice%">
+							<input type="hidden" name="measuringInst" value="%val:usr:measuringInst%">
+					
+
+							<input type="hidden" name="oldPrice" value="%val:usr:price%">
+							<input type="hidden" name="oldUnitPrice" value="%val:usr:unitPrice%">
 						</form>
 					<?php endif ?>
 							<a class="print_hidden uk-button uk-button-primary" href="#modal-label" uk-toggle>ラベル発行</a>
@@ -115,6 +122,10 @@
 					            <td colspan="3">%val:usr:homeCategory%</td>
 					        </tr>
 					        <tr>
+					            <th>測定機器名</th>
+					            <td colspan="5">%val:usr:measuringInst%</td>
+					        </tr>
+					        <tr>
 					            <th>償還価格フラグ</th>
 					            <td>%val:usr:officialFlag:v%</td>
 					            <th>償還価格</th>
@@ -137,6 +148,10 @@
 					            <th>旧価格</th>
 					            <td><script>price(fixed("%val:usr:oldPrice%"))</script>円</td>
 					            -->
+					        </tr>
+					        <tr>
+					            <th>単価</th>
+					            <td colspan="5">￥<script>price(fixed("%val:usr:unitPrice%"))</script></td>
 					        </tr>
 					            <!--
 					        <tr>

@@ -8,6 +8,8 @@ include_once "NewJoyPla/lib/UserInfo.php";
 include_once "NewJoyPla/api/GetCardInfo.php";
 include_once "NewJoyPla/api/RegInventoryHistory.php";
 include_once "NewJoyPla/api/RegInventoryEndHistory.php";
+include_once "NewJoyPla/api/GetItemInventory.php";
+include_once "NewJoyPla/api/GetStock.php";
 
 $userInfo = new App\Lib\UserInfo($SPIRAL);
 
@@ -52,6 +54,41 @@ if(!$result){
 }
 
 
+$getItemInventory = new App\Api\GetItemInventory($spiralDataBase,$userInfo);
+$inventoryData = $getItemInventory->getItemInventory($InventoryHistoryId);
+if($inventoryData['code'] != '0'){
+	echo json_encode(array('result'=>$result));
+	exit;
+}
+
+$inventoryData = $spiralDataBase->arrayToNameArray($inventoryData["data"],array('registrationTime','inHospitalItemId','distributorName','makerName','itemName','itemCode','itemStandard','quantityUnit','price','inventryNum','inventryAmount','unitPrice'));
+
+$inventoryItemData = [];
+foreach ($inventoryData as $data) {
+	if (array_key_exists($data['inHospitalItemId'], $inventoryItemData)) {
+		$inventoryItemData[$data['inHospitalItemId']]['inventryNum'] += (int)$data['inventryNum'];
+		$inventoryItemData[$data['inHospitalItemId']]['inventryAmount'] += (int)$data['inventryAmount'];
+	} else {
+		$inventoryItemData[$data['inHospitalItemId']] = $data;
+	}
+}
+
+$getStock = new App\Api\GetStock($spiralDataBase,$userInfo);
+$stockData = $getStock->getStockData($inventoryItemData,$card["data"][0][3]);
+if($stockData['code'] != '0'){
+	echo json_encode(array('result'=>$result));
+	exit;
+}
+
+foreach ($inventoryItemData as $key => $val) {
+	foreach ($stockData['data'] as $stock) {
+		if ($key == $stock[0]) {
+			$inventoryItemData[$key]['stockQuantity'] = $stock[1];
+		}
+	}
+}
+
+ksort($inventoryItemData);
 ?>
 <!DOCTYPE html>
 <html>
@@ -167,11 +204,60 @@ if(!$result){
 		    			</table>
 			    	</div>
 			    </div>
+
+		    	<div class="uk-margin" style="margin-bottom: 50px;">
+		    		<h3>棚卸総数</h3>
+			  		<div class="uk-margin">
+			  			<div class="uk-overflow-auto">
+			  				<table class="uk-table uk-table-hover uk-table-middle uk-table-divider uk-text-nowrap">
+			  					<thead>
+			  						<tr>
+			  							<th>NO</th>
+			  							<th>卸業者</th>
+			  							<th>メーカー名</th>
+			  							<th>商品名</th>
+			  							<th>商品コード</th>
+			  							<th>規格</th>
+			  							<th>購買価格</th>
+			  							<th>単価</th>
+			  							<th>計算上在庫</th>
+			  							<th>棚卸数量</th>
+			  							<th>棚卸金額</th>
+			  							<th>数量差分</th>
+			  						</tr>
+			  					</thead>
+			  					<tbody>
+				    				<?php
+				    					$num = 1;
+											foreach ($inventoryItemData as $record) {
+				    						echo "<tr>";
+				    						echo "<td>".$num."</td>";
+				    						echo "<td>".$record["distributorName"]."</td>";
+				    						echo "<td>".$record["makerName"]."</td>";
+				    						echo "<td>".$record["itemName"]."</td>";
+				    						echo "<td>".$record["itemCode"]."</td>";
+				    						echo "<td>".$record["itemStandard"]."</td>";
+				    						echo "<td>￥<script>price(\"".$record["price"]."\")</script></td>";
+				    						echo "<td>￥<script>price(\"".$record["unitPrice"]."\")</script></td>";
+				    						echo "<td>".$record["stockQuantity"]."<span class='uk-text-small'>".$record["quantityUnit"]."</span></td>";
+				    						echo "<td>".$record["inventryNum"]."<span class='uk-text-small'>".$record["quantityUnit"]."</span></td>";
+				    						echo "<td>￥<script>price(\"".$record["inventryAmount"]."\")</script></td>";
+				    						echo "<td>".((int)$record["stockQuantity"] - (int)$record["inventryNum"])."<span class='uk-text-small'>".$record["quantityUnit"]."</span></td>";
+				    						echo "</tr>";
+				    						$num++;
+											}
+				    				?>
+			  					</tbody>
+			  				</table>
+			  			</div>
+			  		</div>
+		    	</div>
+
 			    <div class="uk-margin" id="tablearea">
 			    <?php if($userInfo->getUserPermission() == "1" || $userInfo->getDivisionId() == $card["data"][0][3]): ?>
-			    　　%sf:usr:search15:mstfilter:table%
+			      %sf:usr:search24:mstfilter:table%
         		<?php else: ?>
-                    %sf:usr:search17:mstfilter:table%
+              %sf:usr:search25:mstfilter:table%
 	        	<?php endif ?>
 		        </div>
 		    	

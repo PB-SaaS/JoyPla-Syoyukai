@@ -8,9 +8,10 @@ include_once 'NewJoyPla/api/GetHospitalData.php';
 include_once 'NewJoyPla/api/GetDistributor.php';
 
 $spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
-$spiralApiRequest = new SpiralApiRequest();
+$spiralApiRequest = new \SpiralApiRequest();
 $spiralDataBase = new App\Lib\SpiralDataBase($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
 $userInfo = new App\Lib\UserInfo($SPIRAL);
+
 if($userInfo->getDistributorId() == ''){
 	$getUserData = new App\Api\GetHospitalData($spiralDataBase,$userInfo);
 	$byouinResult = $getUserData->select();

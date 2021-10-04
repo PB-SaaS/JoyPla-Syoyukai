@@ -9,6 +9,7 @@ include_once 'NewJoyPla/api/GetInventoryHistoryId.php';
 include_once 'NewJoyPla/api/RegInventory.php';
 include_once 'NewJoyPla/api/RegInventoryHistory.php';
 include_once 'NewJoyPla/api/RegInventoryEndHistory.php';
+include_once 'NewJoyPla/api/GetHospitalData.php';
 
 $userInfo = new App\Lib\UserInfo($SPIRAL);
 
@@ -24,8 +25,25 @@ $getInventoryHistory = new App\Api\GetInventoryHistoryId($spiralDataBase,$userIn
 $InventoryHistoryId = $getInventoryHistory->getInventoryHistoryId($_POST['divisionId'],$inventoryEndHistoryId);
 
 //棚卸情報の登録
+$inventoryData = $_POST['inventory'];
+foreach ($inventoryData as $array) {
+	foreach ($array as $data) {
+		if ($data['lotNumber']) {
+			if ((!ctype_alnum($data['lotNumber'])) || (strlen($data['lotNumber']) > 20)) {
+				echo json_encode(array('result'=>'invalid lotNumber'));
+				exit;
+			}
+		}
+	}
+}
+
+$getHospitalData = new App\Api\GetHospitalData($spiralDataBase,$userInfo);
+$hospitalData = $getHospitalData->select();
+$useUnitPrice = $hospitalData['data'][0]['invUnitPrice'];
+
+
 $regInventory = new App\Api\RegInventory($spiralDataBase,$userInfo);
-$result = $regInventory->register( $_POST['inventory'],  $_POST['divisionId'],  $inventoryEndHistoryId ,  $InventoryHistoryId);
+$result = $regInventory->register($inventoryData, $_POST['divisionId'], $inventoryEndHistoryId, $InventoryHistoryId, $useUnitPrice);
 if(!$result){
 	echo json_encode(array('result'=>$result));
 	exit;

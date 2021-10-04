@@ -103,7 +103,7 @@ $tenantData = $getTenantData->select();
 							<input type="hidden" name="itemUnit" value="%val:usr:itemUnit%">
 							<input type="hidden" name="makerName" value="%val:usr:makerName%">
 							<input type="hidden" name="hospitalId" value="%val:@usr:hospitalId%">
-							<input type="hidden" name="SMPFORM" value="%smpform:310_inHpItemsR%">
+							<input type="hidden" name="SMPFORM" value="%smpform:330_inHpItemsR%">
 							<input type="hidden" name="catalogNo" value="%val:usr:catalogNo%">
 							<input type="hidden" name="serialNo" value="%val:usr:serialNo%">
 						</form>

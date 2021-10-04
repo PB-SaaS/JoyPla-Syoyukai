@@ -43,6 +43,7 @@ if($SPIRAL->getContextByFieldTitle("distributorId") != ''){
 							<input type="hidden" name="hospitalId" value="%val:usr:hospitalId%" >
 							<input type="hidden" name="distributorId" value="%val:usr:distributorId%" >
 							<input type="hidden" name="topicName" value="%val:usr:name%" >
+							<input type="hidden" name="tenantId" value="%val:usr:tenantId%" >
 							<input type="hidden" name="distributorName" value="<?php echo $getMyDistributorData['data'][0][0] ?>" >
 						</form>
 		    			<?php else: ?>

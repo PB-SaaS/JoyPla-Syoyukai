@@ -51,7 +51,9 @@ foreach($receivingData as $record){
 		"orderQuantity" => $record["orderQuantity"],
 		"labelId" => $record["labelId"],
 		"officialFlag" => $record["officialFlag"],
-		"totalReturnCount"=>$record["totalReturnCount"]
+		"totalReturnCount"=>$record["totalReturnCount"],
+		"lotNumber" => $record["lotNumber"],
+		"lotDate" => $record["lotDate"]
 		);
 }
 
@@ -163,6 +165,8 @@ foreach($divisionData["division"] as $record ){
 										<th style="min-width:150px">商品名</th>
 										<th>製品コード</th>
 										<th>規格</th>
+										<th>ロット番号</th>
+										<th>使用期限</th>
 										<th>入数</th>
 										<th>発注数</th>
 										<th>入庫数</th>
@@ -179,6 +183,8 @@ foreach($divisionData["division"] as $record ){
 				    						echo "<td>".$record["itemName"]."</td>";
 				    						echo "<td>".$record["itemCode"]."</td>";
 				    						echo "<td>".$record["itemStandard"]."</td>";
+				    						echo "<td>".$record["lotNumber"]."</td>";
+				    						echo "<td>".$record["lotDate"]."</td>";
 				    						echo "<td>".$record["quantity"].$record["quantityUnit"]."</td>";
 				    						echo "<td>".$record["orderQuantity"].$record["itemUnit"]."</td>";
 				    						echo "<td>".$record["receivingCount"].$record["itemUnit"]."</td>";
@@ -204,10 +210,7 @@ foreach($divisionData["division"] as $record ){
 		    		</form>
 		    	</div>
 		    	
-<div class="uk-margin-large" id="lot_tablearea">
-	<h4>ロット情報一覧</h4>
-		    		%sf:usr:search76:mstfilter:table%
-		    	</div>
+		    	
 		    </div>
 		</div>
 	</div>

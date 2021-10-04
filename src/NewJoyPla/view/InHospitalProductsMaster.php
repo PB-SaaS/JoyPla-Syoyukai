@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
   <head>
@@ -127,6 +126,11 @@
 										</li>
 									    <li>
 									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_25" type="checkbox"> 単価</label>
+								            </div>
+										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
 								            	<label><input class="uk-checkbox chk_20" type="checkbox"> 院内在庫数</label>
 								            </div>
 										</li>
@@ -150,6 +154,11 @@
 								            	<label><input class="uk-checkbox chk_24" type="checkbox"> 卸業者</label>
 								            </div>
 										</li>
+									    <li>
+									    	<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+								            	<label><input class="uk-checkbox chk_26" type="checkbox"> 測定機器名</label>
+								            </div>
+										</li>
 									</ul>
 						        </div>
 						    </li>
@@ -158,7 +167,7 @@
 		    		
 		    	</div>
 		    	<div class="uk-margin-top">
-				%sf:usr:search5%
+				%sf:usr:search23%
 				</div>
 			</div>
 		</div>
@@ -168,7 +177,7 @@
 		let storage = JSON.parse(localStorage.getItem("joypla_inHpItemsList"));
 		let dispObj = {};
 		if(!storage){
-			for(let i = 1 ; i <= 24 ; i++){
+			for(let i = 1 ; i <= 26 ; i++){
 				dispObj[i] = true;
 			}
 		} else {

@@ -17,7 +17,7 @@ class GoodsBillingMonthlyReport{
         $this->userInfo = $userInfo;
     }
 
-    public function dataSelect(string $startMonth = null,string $endMonth = null,string $divisionId = null,string $itemName = null,string $itemCode = null,string $itemStandard = null,int $page = null,int $maxCount = null){
+    public function dataSelect(string $startMonth = null,string $endMonth = null,string $divisionId = null,string $itemName = null,string $itemCode = null,string $itemStandard = null,int $page = null,int $maxCount = null,bool $useUnitPrice){
         $this->setBillingDBSearch($startMonth,$endMonth,$divisionId);
         $this->billingData = $this->getBillingDB();
         if($this->billingData['code'] != '0'){
@@ -33,7 +33,7 @@ class GoodsBillingMonthlyReport{
             //var_dump($this->inHPItemData);
             return $this->inHPItemData;
         }
-        return $this->makeGoodsBillingMonthlyReport();
+        return $this->makeGoodsBillingMonthlyReport($useUnitPrice);
     }
 
     private function setStartMonth(string $startMonth){
@@ -99,10 +99,10 @@ class GoodsBillingMonthlyReport{
         }
     }
 
-    private function makeGoodsBillingMonthlyReport(){
+    private function makeGoodsBillingMonthlyReport(bool $useUnitPrice){
         $result = array();
         foreach($this->inHPItemData['data'] as $inHPitem){
-            $getInformationByPrice = $this->getInformationByPrice($inHPitem[1]);
+            $getInformationByPrice = $this->getInformationByPrice($inHPitem[1],$useUnitPrice);
             $result['data'][] = array(
                 'id' => $inHPitem[0],
                 'inHospitalItemId' => $inHPitem[1],
@@ -111,9 +111,10 @@ class GoodsBillingMonthlyReport{
                 'itemCode' => $inHPitem[4],
                 'itemStandard' => $inHPitem[5],
                 //'minPrice' => $inHPitem[6],
-                'price'=> $getInformationByPrice['price'],
-                'quantity'=> $getInformationByPrice['quantity'],
-                'quantityUnit'=> $getInformationByPrice['quantityUnit'],
+                'price' => $getInformationByPrice['price'],
+                'unitPrice' => $getInformationByPrice['unitPrice'],
+                'quantity' => $getInformationByPrice['quantity'],
+                'quantityUnit' => $getInformationByPrice['quantityUnit'],
                 'billingQuantity' => $getInformationByPrice['billingQuantity'],
                 'totalAmount' => $getInformationByPrice['totalAmount'],
             );
@@ -123,8 +124,8 @@ class GoodsBillingMonthlyReport{
         return $result;
     }
 
-    private function getInformationByPrice(string $inHospitalItemId){
-        $goodsDataByPrice = array("price" => array(), "quantity" => array(), "billingQuantity" => array(), "quantityUnit" => array());
+    private function getInformationByPrice(string $inHospitalItemId,bool $useUnitPrice){
+        $goodsDataByPrice = array("price" => array(), "quantity" => array(), "billingQuantity" => array(), "quantityUnit" => array(), "unitPrice" => array());
         foreach($this->billingData['data'] as $billingItem){
             if($inHospitalItemId == $billingItem[0]){
                 $key = array_search($billingItem[4], $goodsDataByPrice["price"]);
@@ -133,16 +134,25 @@ class GoodsBillingMonthlyReport{
                     $key = array_search($billingItem[4], $goodsDataByPrice["price"]);
                     $goodsDataByPrice["quantity"][$key] = 0;
                     $goodsDataByPrice["billingQuantity"][$key] = 0;
+                    $goodsDataByPrice["unitPrice"][$key] = 0;
                 }
 
                 $goodsDataByPrice["quantity"][$key] = $billingItem[5];
                 $goodsDataByPrice["quantityUnit"][$key] = $billingItem[6];
+                $goodsDataByPrice["unitPrice"][$key] = $billingItem[7];
                 $goodsDataByPrice["billingQuantity"][$key] = $goodsDataByPrice["billingQuantity"][$key] + $billingItem[1];
             }
         }
         
-        foreach($goodsDataByPrice["price"] as $key => $byPriceData){
-            $goodsDataByPrice["totalAmount"][$key] = ( $byPriceData / $goodsDataByPrice["quantity"][$key] ) * $goodsDataByPrice["billingQuantity"][$key] ;
+        if (!$useUnitPrice) {
+          foreach($goodsDataByPrice["price"] as $key => $byPriceData){
+              $goodsDataByPrice["totalAmount"][$key] = ( $byPriceData / $goodsDataByPrice["quantity"][$key] ) * $goodsDataByPrice["billingQuantity"][$key] ;
+          }
+        }
+        if ($useUnitPrice) {
+          foreach($goodsDataByPrice["price"] as $key => $byPriceData){
+              $goodsDataByPrice["totalAmount"][$key] = $goodsDataByPrice["unitPrice"][$key] * $goodsDataByPrice["billingQuantity"][$key] ;
+          }
         }
         return $goodsDataByPrice;
     }
@@ -150,7 +160,7 @@ class GoodsBillingMonthlyReport{
     private function getBillingDB(){
         $this->spiralDataBase->setDataBase($this->billingDB);
         $this->spiralDataBase->addSearchCondition('hospitalId',$this->userInfo->getHospitalId());
-        $this->spiralDataBase->addSelectFields('inHospitalItemId','billingQuantity','registrationTime','billingAmount','price','quantity','quantityUnit');
+        $this->spiralDataBase->addSelectFields('inHospitalItemId','billingQuantity','registrationTime','billingAmount','price','quantity','quantityUnit','unitPrice');
         return $this->spiralDataBase->doSelectLoop();
     }
 

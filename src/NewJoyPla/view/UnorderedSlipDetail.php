@@ -166,7 +166,7 @@ if($userInfo->getUserPermission() == "1"){
 				    						echo "<td>".$record["itemStandard"]."</td>";
 				    						echo "<td>￥<script>price('".$record["price"]."')</script><span class='uk-text-small'> / 1".$record["itemUnit"]."</span></td>";
 				    						echo "<td>".$record["quantity"]."<span class='uk-text-small'>".$record["quantityUnit"]."</span></td>";
-											if( $record["orderQuantity"] > 0 )
+				    						if( $record["orderQuantity"] > 0 )
 											{
 												$attr['min'] = 1;
 											}
@@ -177,8 +177,8 @@ if($userInfo->getUserPermission() == "1"){
 				    						echo "<td><input type='number' step='1' class='uk-input' style='color:#444444;width:100px;' onchange='active(this,".$num.")' ";
 											foreach($attr as $key => $val) echo " $key='$val' ";
 											echo "value='".$record["orderQuantity"]."'><span class='uk-text-small uk-text-middle'>".$record["itemUnit"]."</span></td>";
-				    						
-											echo "<td>￥<script>price('".$record["orderPrice"]."')</script></td>";
+
+				    						echo "<td>￥<script>price('".$record["orderPrice"]."')</script></td>";
 				    						echo "<td style='display:none'>".$record["orderCNumber"]."</td>";
 				    						echo "</tr>";
 				    						$num++;

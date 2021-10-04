@@ -1,4 +1,3 @@
-
 <?php
 include_once 'NewJoyPla/lib/ApiSpiral.php';
 include_once "NewJoyPla/lib/Define.php";
@@ -32,9 +31,10 @@ $receiptItem = $getItemReceipt->getItemReceipt($card["data"][0][0]);
 $receivingData = $receiptItem["data"];
 
 foreach($receivingData as $record){
-	$ItemsToJs[$record["inHospitalItemId"]] = array(
-		"receivingCount"=> $record["receivingCount"],
-		"quantity"=> $record["quantity"],
+	$ItemsToJs[$record["receivingNumber"]] = array(
+		"inHospitalItemId" => $record["inHospitalItemId"],
+		"receivingCount" => $record["receivingCount"],
+		"quantity" => $record["quantity"],
 		"orderCNumber" => $record["orderCNumber"],
 		"makerName" => $record["makerName"],
 		"itemName" => $record["itemName"],
@@ -48,6 +48,8 @@ foreach($receivingData as $record){
 		"totalReturnCount" => $record["totalReturnCount"],
 		"price" => $record["price"],
 		"returnCount" => 0,
+		"lotNumber" => $record["lotNumber"],
+		"lotDate" => $record["lotDate"]
 		);
 }
 
@@ -136,6 +138,8 @@ if($userInfo->getUserPermission() == "1"){
 										<th style="min-width:150px">商品名</th>
 										<th>製品コード</th>
 										<th>規格</th>
+										<th>ロット番号</th>
+										<th>使用期限</th>
 										<th>入数</th>
 										<th>発注数</th>
 										<th>入庫数</th>
@@ -163,11 +167,13 @@ if($userInfo->getUserPermission() == "1"){
 				    						echo "<td>".$record["itemName"]."</td>";
 				    						echo "<td>".$record["itemCode"]."</td>";
 				    						echo "<td>".$record["itemStandard"]."</td>";
+				    						echo "<td>".$record["lotNumber"]."</td>";
+				    						echo "<td>".$record["lotDate"]."</td>";
 				    						echo "<td>".$record["quantity"].$record["quantityUnit"]."</td>";
 				    						echo "<td>".$record["orderQuantity"].$record["itemUnit"]."</td>";
 				    						echo "<td>".$record["receivingCount"].$record["itemUnit"]."</td>";
 				    						echo "<td>".$record["totalReturnCount"].$record["itemUnit"]."</td>";
-				    						echo "<td><input type='number' step='1' class='uk-input' style='width:100px' id='hp_".$record["inHospitalItemId"]."' min='0' max='".$max."' value='0' onchange='returnCount(this,\"".$record["inHospitalItemId"]."\")'><span class='uk-text-small uk-text-middle'>".$record["itemUnit"]."</span></td>";
+				    						echo "<td><input type='number' step='1' class='uk-input' style='width:100px' min='0' max='".$max."' value='0' onchange='returnCount(this,\"".$record["receivingNumber"]."\")'><span class='uk-text-small uk-text-middle'>".$record["itemUnit"]."</span></td>";
 				    						echo "</tr>";
 				    						$num++;
 				    					}
@@ -268,9 +274,9 @@ if($userInfo->getUserPermission() == "1"){
 			});
 		}
 		
-		function returnCount(elm,inHpItemId){
-			itemsToJs[inHpItemId].returnCount = elm.value;
-			$('#hp_'+inHpItemId).css({"color":"rgb(68, 68, 68)", "background-color":"rgb(255, 204, 153)", "width":"100px"});
+		function returnCount(elm,receivingNumber){
+			itemsToJs[receivingNumber].returnCount = elm.value;
+			$(elm).css({"color":"rgb(68, 68, 68)", "background-color":"rgb(255, 204, 153)", "width":"100px"});
 		}
 		
 	</script>

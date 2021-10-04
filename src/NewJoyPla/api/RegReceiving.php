@@ -4,34 +4,34 @@ namespace App\Api;
 
 class RegReceiving{
 
-    private $spiralDataBase;
-    private $divisionId;
-    private $orderId;
+	private $spiralDataBase;
+	private $divisionId;
+	private $orderId;
 	private $userInfo;
 	public $ReceivingHistoryId;
 	private $orderHistoryId;
 	
 	private $itemsNumber;
 	
-    private $historyDatabase = 'NJ_ReceivingHDB';
+	private $historyDatabase = 'NJ_ReceivingHDB';
 	private $childDatabase = 'NJ_ReceivingDB';
 	
 	
-    private $orderDatabase = 'NJ_OrderDB';
+	private $orderDatabase = 'NJ_OrderDB';
 
     public function __construct(\App\Lib\SpiralDataBase $spiralDataBase, \App\Lib\UserInfo $userInfo){
         $this->spiralDataBase = $spiralDataBase;
         $this->userInfo = $userInfo;
 	}
 	
-    public function register(string $orderHistoryId,string $distributorId,string $divisionId,array $array){
+    public function register(string $orderHistoryId,string $distributorId,string $divisionId,array $array,array $regData){
 		$array = $this->requestUrldecode($array);
 
 		$this->distributorId = $distributorId;
 		$this->orderHistoryId = $orderHistoryId;
 		$this->ReceivingHistoryId = $this->makeReceivingHId();
 		
-		$makeReceiving = $this->makeReceiving($array,$divisionId);
+		$makeReceiving = $this->makeReceiving($regData,$divisionId);
 
 		if(count($makeReceiving) == "0"){
 			return true;
@@ -110,7 +110,7 @@ class RegReceiving{
         /**
          * ここに処理を書く
          */
-        $columns = array('registrationTime','orderCNumber','receivingCount','receivingHId','inHospitalItemId','price','receivingPrice','hospitalId','divisionId');
+        $columns = array('registrationTime','orderCNumber','receivingCount','receivingHId','inHospitalItemId','price','receivingPrice','hospitalId','divisionId','lotNumber','lotDate');
 
         $this->spiralDataBase->setDataBase($this->childDatabase);
 
@@ -127,19 +127,23 @@ class RegReceiving{
         //$columns = array('registrationTime','updateTime','receivingTime','dueDate','orderCNumber','hospitalId','inHospitalItemId','orderNumber','price','orderQuantity','orderPrice','receivingFlag');
 
 		$itemList = array();
-		foreach($array as $inHPItemid => $data){
-			if($data['receivingCount'] != 0){
-			$itemList[] = array(
-				'now',
-				$data['orderCNumber'],
-				$data['receivingCount'],
-				$this->ReceivingHistoryId,
-				$inHPItemid,
-				$data['price'],
-				$data['receivingCount'] * $data['price'],
-				$this->userInfo->getHospitalId(),
-				$divisionId
-				);
+		foreach ($array as $rows) {
+			foreach ($rows as $data) {
+				if($data['receivingCount'] != 0){
+					$itemList[] = array(
+						'now',
+						$data['orderCNumber'],
+						$data['receivingCount'],
+						$this->ReceivingHistoryId,
+						$data['inHPItemid'],
+						$data['price'],
+						$data['receivingCount'] * $data['price'],
+						$this->userInfo->getHospitalId(),
+						$divisionId,
+						$data['lotNumber'],
+						$data['lotDate']
+					);
+				}
 			}
 		}
 

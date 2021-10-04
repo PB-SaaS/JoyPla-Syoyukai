@@ -17,7 +17,7 @@ class PayoutMonthlyReport{
         $this->userInfo = $userInfo;
     }
 
-    public function dataSelect(string $startMonth = null,string $endMonth = null,string $divisionId = null,string $itemName = null,string $itemCode = null,string $itemStandard = null,int $page = null,int $maxCount = null){
+    public function dataSelect(string $startMonth = null,string $endMonth = null,string $divisionId = null,string $itemName = null,string $itemCode = null,string $itemStandard = null,int $page = null,int $maxCount = null,bool $useUnitPrice){
         $this->setPayoutDBSearch($startMonth,$endMonth,$divisionId);
         $this->PayoutData = $this->getPayoutDB();
         if($this->PayoutData['code'] != '0'){
@@ -33,7 +33,7 @@ class PayoutMonthlyReport{
             //var_dump($this->inHPItemData);
             return $this->inHPItemData;
         }
-        return $this->makePayoutMonthlyReport();
+        return $this->makePayoutMonthlyReport($useUnitPrice);
     }
 
     private function setStartMonth(string $startMonth){
@@ -99,10 +99,10 @@ class PayoutMonthlyReport{
         }
     }
 
-    private function makePayoutMonthlyReport(){
+    private function makePayoutMonthlyReport(bool $useUnitPrice){
         $result = array();
         foreach($this->inHPItemData['data'] as $inHPitem){
-            $getInformationByPrice = $this->getInformationByPrice($inHPitem[1]);
+            $getInformationByPrice = $this->getInformationByPrice($inHPitem[1],$useUnitPrice);
             $result['data'][] = array(
                 'id' => $inHPitem[0],
                 'inHospitalItemId' => $inHPitem[1],
@@ -112,6 +112,7 @@ class PayoutMonthlyReport{
                 'itemStandard' => $inHPitem[5],
                 //'minPrice' => $inHPitem[6],
                 'price' => $getInformationByPrice["price"],
+                'unitPrice' => $getInformationByPrice["unitPrice"],
                 'quantity' => $getInformationByPrice["quantity"],
                 'payoutQuantity' => $getInformationByPrice["payoutQuantity"],
                 'totalAmount' => $getInformationByPrice["totalAmount"],
@@ -125,8 +126,8 @@ class PayoutMonthlyReport{
         return $result;
     }
 
-    private function getInformationByPrice(string $inHospitalItemId){
-        $payoutDataByPrice = array("price" => array(), "quantity" => array(), "payoutQuantity" => array(), "totalAmount" => array(), "adjAmount" => array(), "quantityUnit" =>array());
+    private function getInformationByPrice(string $inHospitalItemId,bool $useUnitPrice){
+        $payoutDataByPrice = array("price" => array(), "quantity" => array(), "payoutQuantity" => array(), "totalAmount" => array(), "adjAmount" => array(), "quantityUnit" => array(), "unitPrice" => array());
         foreach($this->PayoutData['data'] as $payoutItem){
             if($inHospitalItemId == $payoutItem[0]){
                 $key = array_search($payoutItem[4], $payoutDataByPrice["price"]);
@@ -135,18 +136,28 @@ class PayoutMonthlyReport{
                     $key = array_search($payoutItem[4], $payoutDataByPrice["price"]);
                     $payoutDataByPrice["quantity"][$key] = 0;
                     $payoutDataByPrice["payoutQuantity"][$key] = 0;
+                    $payoutDataByPrice["unitPrice"][$key] = 0;
                 }
 
                 $payoutDataByPrice["quantity"][$key] = $payoutItem[5];
                 $payoutDataByPrice["quantityUnit"][$key] = $payoutItem[8];
                 $payoutDataByPrice["payoutQuantity"][$key] = $payoutDataByPrice["payoutQuantity"][$key] + $payoutItem[1];
+                $payoutDataByPrice["unitPrice"][$key] = $payoutItem[9];
                 $payoutDataByPrice["adjAmount"][$key] = $payoutDataByPrice["adjAmount"][$key] + $payoutItem[6];
             }
         }
         
-        foreach($payoutDataByPrice["price"] as $key => $byPriceData){
-            $payoutDataByPrice["totalAmount"][$key] = ( $byPriceData / $payoutDataByPrice["quantity"][$key] ) * $payoutDataByPrice["payoutQuantity"][$key] ;
-            $payoutDataByPrice["priceAfterAdj"][$key] = $payoutDataByPrice["totalAmount"][$key] + $payoutDataByPrice["adjAmount"][$key];
+        if (!$useUnitPrice) {
+          foreach($payoutDataByPrice["price"] as $key => $byPriceData){
+              $payoutDataByPrice["totalAmount"][$key] = ( $byPriceData / $payoutDataByPrice["quantity"][$key] ) * $payoutDataByPrice["payoutQuantity"][$key] ;
+              $payoutDataByPrice["priceAfterAdj"][$key] = $payoutDataByPrice["totalAmount"][$key] + $payoutDataByPrice["adjAmount"][$key];
+          }
+        }
+        if ($useUnitPrice) {
+          foreach($payoutDataByPrice["price"] as $key => $byPriceData){
+              $payoutDataByPrice["totalAmount"][$key] = $payoutDataByPrice["unitPrice"][$key] * $payoutDataByPrice["payoutQuantity"][$key] ;
+              $payoutDataByPrice["priceAfterAdj"][$key] = $payoutDataByPrice["totalAmount"][$key] + $payoutDataByPrice["adjAmount"][$key];
+          }
         }
         return $payoutDataByPrice;
     }
@@ -154,7 +165,7 @@ class PayoutMonthlyReport{
     private function getPayoutDB(){
         $this->spiralDataBase->setDataBase($this->PayoutDB);
         $this->spiralDataBase->addSearchCondition('hospitalId',$this->userInfo->getHospitalId());
-        $this->spiralDataBase->addSelectFields('inHospitalItemId','payoutQuantity','registrationTime','payoutAmount','price','quantity','adjAmount','priceAfterAdj','quantityUnit');
+        $this->spiralDataBase->addSelectFields('inHospitalItemId','payoutQuantity','registrationTime','payoutAmount','price','quantity','adjAmount','priceAfterAdj','quantityUnit','unitPrice');
         return $this->spiralDataBase->doSelectLoop();
     }
 

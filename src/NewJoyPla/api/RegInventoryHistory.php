@@ -11,6 +11,7 @@ class RegInventoryHistory{
 	
 	
 	private $totalAmount;
+	private $itemsNumber;
     
     private $historyDatabase = 'NJ_InventoryHDB';
     private $childDatabase = 'NJ_InventoryDB';
@@ -29,10 +30,11 @@ class RegInventoryHistory{
 		$inventoryDB = $this->getInventoryDB($InventoryHId);
 
 		$this->totalAmount = $this->sumInventryAmount($inventoryDB['data']);
+		$this->itemsNumber = $this->sumItemsNumber($inventoryDB['data']);
 
-		if($itemsNumber != count($inventoryDB['data']) || $totalAmount != $this->totalAmount ){
+		if($itemsNumber != $this->itemsNumber || $totalAmount != $this->totalAmount ){
 		
-			$result = $this->updateInventoryHistoryDB($InventoryHId, $inventoryDB['data']);
+			$result = $this->updateInventoryHistoryDB($InventoryHId);
 
 			if($result['code'] != "0"){
 				var_dump($result);
@@ -52,6 +54,20 @@ class RegInventoryHistory{
 		return $sum;
 	}
 
+	private function sumItemsNumber(array $array){
+		$sum = 0;
+		$items = array();
+		foreach($array as $record){
+			if(in_array($record[0], $items)){
+				continue;
+			}
+			$items[] = $record[0];
+			$sum ++;
+		}
+
+		return $sum;
+	}
+
 	private function getInventoryDB(string $inventoryHId){
         $this->spiralDataBase->setDataBase($this->childDatabase);
         $this->spiralDataBase->addSearchCondition('inventoryHId',$inventoryHId);
@@ -60,11 +76,11 @@ class RegInventoryHistory{
         return $this->spiralDataBase->doSelectLoop();
 	}
 	
-	private function updateInventoryHistoryDB(string $inventoryHId, array $array){
+	private function updateInventoryHistoryDB(string $inventoryHId){
         $this->spiralDataBase->setDataBase($this->historyDatabase);
 		$this->spiralDataBase->addSearchCondition('inventoryHId',$inventoryHId);
         $this->spiralDataBase->addSelectNameCondition('');
-        return $this->spiralDataBase->doUpdate(array(array('name'=> 'updateTime','value'=>"now"),array('name'=> 'itemsNumber','value'=>count($array)),array('name'=> 'totalAmount','value'=>$this->totalAmount)));
+        return $this->spiralDataBase->doUpdate(array(array('name'=> 'updateTime','value'=>"now"),array('name'=> 'itemsNumber','value'=>$this->itemsNumber),array('name'=> 'totalAmount','value'=>$this->totalAmount)));
     }
 
     private function requestUrldecode(array $array){

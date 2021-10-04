@@ -15,6 +15,7 @@
 	<script type="text/javascript" src="https://i02.smp.ne.jp/u/joypla/new/js/animsition.min.js"></script>
 	
     <script src="https://i02.smp.ne.jp/u/joypla/new/js/JsBarcode.all.min.js"></script>
+    <script src="https://i02.smp.ne.jp/u/joypla/new/js/BarcodeParser.js"></script>
     
     <script>
 	$(function(){
@@ -30,7 +31,8 @@
 	    if(month > monthMax){ $(elm).val(monthMax).change(); }
 	    if(month < monthMin){ $(elm).val(monthMin).change(); }
 	    if(isNaN(month)){ 
-			$(elm).val(0).change();
+			if(monthMin){ $(elm).val(monthMin).change(); 
+			} else {$(elm).val(monthMin).change();}
 		}
 	}
 
@@ -116,7 +118,7 @@
         // 結果
         return String(barcodeStr.slice(0,12)) + String(10 - parseInt((evenNum * 3 + oddNum).toString().slice(-1)));
     }
-	
+	/*
 	function check_gs1128(code){
 		let allcheck = false;
 		if(code.indexOf("01") === 0){
@@ -162,7 +164,33 @@
 			return check_gs1128(code);
 		}
 		return gs1128_object;
-	}  
+	}
+	*/
+	
+	
+	function check_gs1128(code){
+		try {
+			let answer = parseBarcode(code);
+			
+			answer.parsedCodeItems.forEach((element) => {
+				if(element.ai == "17")
+				{
+				var y = element.data.getFullYear();
+				var m = ("00" + (element.data.getMonth()+1)).slice(-2);
+				var d = ("00" + element.data.getDate()).slice(-2);
+				element.data = y + m + d;
+				}
+				gs1128_object[element.ai] = element.data;
+			})
+			console.log(gs1128_object);
+		} catch (error) {
+			console.error(error);
+			// expected output: ReferenceError: nonExistentFunction is not defined
+			// Note - error messages will vary depending on browser
+		}
+		return gs1128_object;
+	}
+	
 	    function price(num){
 			if(num === "") {
 				num = "0";
@@ -443,5 +471,9 @@
 
 .uk-table tr.tr-gray{
   background: #e5e5e5;
+}
+
+.title_spacing {
+	letter-spacing : 1em;
 }
 </style>

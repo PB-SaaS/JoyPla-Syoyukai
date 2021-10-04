@@ -9,9 +9,9 @@ class GetItemReceipt{
 
     private $receivingHId;
 
-    private $database = 'receivingdata';
+    private $database = 'receivingdatav2';
 
-    private $column = array('id','makerName','itemName','itemCode','itemStandard','quantity','quantityUnit','itemUnit','itemJANCode','orderQuantity','receivingCount','orderCNumber','inHospitalItemId','totalReturnCount','receivingNumber','price','labelId','officialFlag');
+    private $column = array('id','makerName','itemName','itemCode','itemStandard','quantity','quantityUnit','itemUnit','itemJANCode','orderQuantity','receivingCount','orderCNumber','inHospitalItemId','totalReturnCount','receivingNumber','price','labelId','officialFlag','lotNumber','lotDate');
     
     public function __construct(\App\Lib\SpiralDataBase $spiralDataBase,\App\Lib\UserInfo $userInfo){
         $this->spiralDataBase = $spiralDataBase;

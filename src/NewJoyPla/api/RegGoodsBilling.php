@@ -22,12 +22,12 @@ class RegGoodsBilling{
         $this->divisionId = $divisionId;
     }
     
-    public function register(array $array, string $divisionId){
+    public function register(array $array, string $divisionId, bool $useUnitPrice){
 		$array = $this->requestUrldecode($array);
         $this->setDivisionId($divisionId);
     	$this->billingId = $this->makeGoodsBillingId();
   
-    	$childData = $this->makeGoodsBilling($array);
+    	$childData = $this->makeGoodsBilling($array,$useUnitPrice);
     	
     	if(count($childData) === 0){
     		return false;
@@ -101,7 +101,7 @@ class RegGoodsBilling{
         //throw new Exception("エラーハンドリング");
     }
     
-    private function makeGoodsBilling(array $array){
+    private function makeGoodsBilling(array $array,bool $useUnitPrice){
 
         /**
          * ここに処理を書く
@@ -109,22 +109,29 @@ class RegGoodsBilling{
         //$columns = array('registrationTime','updateTime','inHospitalItemId','billingNumber','price','billingQuantity','billingAmount','hospitalId','divisionId');
 
 		$itemList = array();
-		foreach($array as $inHPid => $data){
-			if( (int)$data['countNum']  > 0 ){
-			$itemList[] = array(
-				'now',
-				'',
-				$inHPid,
-				$this->billingId,
-				str_replace(',', '', $data['kakaku']),
-				(int)$data['countNum'],
-				str_replace(',', '', $data['kakaku']) / $data['irisu'] * (int)$data['countNum'],
-                $this->userInfo->getHospitalId(),
-                $this->divisionId,
-				$data['irisu'],
-				$data['unit'],
-				$data['itemUnit'],
-				);
+		foreach($array as $rows){
+			foreach($rows as $data){
+				if( (int)$data['countNum']  > 0 ){
+					if ($useUnitPrice) { $unitPrice = str_replace(',', '', $data['unitPrice']); }
+					if (!$useUnitPrice) { $unitPrice = str_replace(',', '', $data['kakaku']) / $data['irisu']; }
+					$itemList[] = array(
+					'now',
+					'',
+					$data['recordId'],
+					$this->billingId,
+					str_replace(',', '', $data['kakaku']),
+					(int)$data['countNum'],
+					(int)$unitPrice * (int)$data['countNum'],
+					$this->userInfo->getHospitalId(),
+					$this->divisionId,
+					$data['irisu'],
+					$data['unit'],
+					$data['itemUnit'],
+					$data['lotNumber'],
+					$data['lotDate'],
+					$unitPrice
+					);
+				}
 			}
 		}
 
@@ -136,7 +143,7 @@ class RegGoodsBilling{
         /**
          * ここに処理を書く
          */
-        $columns = array('registrationTime','updateTime','inHospitalItemId','billingNumber','price','billingQuantity','billingAmount','hospitalId','divisionId','quantity','quantityUnit','itemUnit');
+        $columns = array('registrationTime','updateTime','inHospitalItemId','billingNumber','price','billingQuantity','billingAmount','hospitalId','divisionId','quantity','quantityUnit','itemUnit','lotNumber','lotDate','unitPrice');
 
         $this->spiralDataBase->setDataBase($this->childDatabase);
 

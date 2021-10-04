@@ -31,7 +31,7 @@ if($userInfo->getUserPermission() != "1" && $myPageID != ''){
 		    	<h2 class="page_title">ロット管理</h2>
 		    	<hr>
 		    	<div class="" id="tablearea">
-					%sf:usr:search76:mstfilter%
+					%sf:usr:search22:mstfilter%
 		    	</div>
 			</div>
 		</div>

@@ -118,7 +118,7 @@ class RegReturn{
         /**
          * ここに処理を書く
          */
-        $columns = array('registrationTime','receivingNumber','price','returnCount','returnPrice','hospitalId','returnHistoryID','orderCNumber','receivingHId','inHospitalItemId');
+        $columns = array('registrationTime','receivingNumber','price','returnCount','returnPrice','hospitalId','returnHistoryID','orderCNumber','receivingHId','inHospitalItemId','lotNumber','lotDate');
 
         $this->spiralDataBase->setDataBase($this->childDatabase);
 
@@ -143,7 +143,7 @@ class RegReturn{
         //$columns = array('registrationTime','receivingNumber','price','returnCount','returnPrice','hospitalId','returnHistoryID');
 
 		$itemList = array();
-		foreach($array as $inHPItemid => $data){
+		foreach($array as $data){
 			if($data['returnCount'] > 0){
 			$itemList[] = array(
 				'now',
@@ -155,7 +155,9 @@ class RegReturn{
 				$this->returnHistoryId,
 				$data['orderCNumber'],
 				$this->receivingHistoryId,
-				$inHPItemid
+				$data['inHospitalItemId'],
+				$data['lotNumber'],
+				$data['lotDate']
 				);
 			}
 		}
@@ -205,8 +207,8 @@ class RegReturn{
         $itemList = array();
 		foreach($array as $inHPItemid => $data){
 			$itemList[] = array(
-                $data['receivingNumber'],
-				(int)$data['totalReturnCount'] + (int)$data['returnCount'],
+				$data['receivingNumber'],
+				(int)$data['totalReturnCount'] + (int)$data['returnCount']
 				);
 			
 		}

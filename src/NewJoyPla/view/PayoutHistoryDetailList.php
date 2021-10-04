@@ -20,7 +20,7 @@
 		    	<h2 class="page_title uk-margin-remove">払出履歴詳細一覧</h2>
 		    	<hr>
 		    	<div class="" id="tablearea">
-					%sf:usr:payoutHDetailL:mstfilter%
+					%sf:usr:payoutHDetailLv2:mstfilter%
 		    	</div>
 			</div>
 		</div>

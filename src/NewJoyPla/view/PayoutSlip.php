@@ -24,11 +24,14 @@ if($userInfo->getUserPermission() != "1" && $card["data"][0][2] != $userInfo->ge
 $getItemPayout = new App\Api\GetItemPayout($spiralDataBase,$userInfo);
 $payoutData = $getItemPayout->getItemPayout($card["data"][0][0]);
 
-$payoutData = $spiralDataBase->arrayToNameArray($payoutData["data"],array("registrationTime","payoutHistoryId","price","itemId","itemName","itemCode","itemStandard","itemJANCode","quantityUnit","payoutQuantity","payoutAmount","itemUnit","quantity","makerName","inHospitalItemId","payoutCount","payoutLabelCount","distributorId","catalogNo","labelId"));
+$payoutData = $spiralDataBase->arrayToNameArray($payoutData["data"],array("registrationTime","payoutHistoryId","price","itemId","itemName","itemCode","itemStandard","itemJANCode","quantityUnit","payoutQuantity","payoutAmount","itemUnit","quantity","makerName","inHospitalItemId","payoutCount","payoutLabelCount","distributorId","catalogNo","labelId","lotNumber","lotDate","unitPrice"));
 
 foreach($payoutData as $record){
-	$ItemsToJs[$record["inHospitalItemId"]] = array(
-		"payoutQuantity"=> $record["payoutQuantity"]
+	$ItemsToJs[] = array(
+		'inHospitalItemId' => $record['inHospitalItemId'],
+		'payoutQuantity' => $record['payoutQuantity'],
+		'lotNumber' => $record['lotNumber'],
+		'lotDate' => $record['lotDate']
 		);
 }
 
@@ -100,8 +103,11 @@ if($userInfo->getUserPermission() == "1"){
 										<th style="min-width:150px">商品名</th>
 										<th>製品コード</th>
 										<th>規格</th>
+										<th>ロット番号</th>
+										<th>使用期限</th>
 										<th>入数</th>
 										<th>価格</th>
+										<th>単価</th>
 										<th class="uk-table-shrink">数量</th>
 										<th class="uk-table-shrink"></th>
 										<th class="uk-table-shrink">個数（ラベル枚数）</th>
@@ -119,9 +125,11 @@ if($userInfo->getUserPermission() == "1"){
 				    						echo "<td>".$record["itemName"]."</td>";
 				    						echo "<td>".$record["itemCode"]."</td>";
 				    						echo "<td>".$record["itemStandard"]."</td>";
+				    						echo "<td>".$record["lotNumber"]."</td>";
+				    						echo "<td>".$record["lotDate"]."</td>";
 				    						echo "<td>".$record["quantity"].$record["quantityUnit"]."</td>";
-											echo "<td><script>price(\"".($record["price"] / $record["quantity"] )."\")</script>円 / ".$record["quantityUnit"]."</td>";
-
+				    						echo "<td><script>price(\"".($record["price"] / $record["quantity"] )."\")</script>円 / ".$record["quantityUnit"]."</td>";
+				    						echo "<td>￥<script>price(\"".$record["unitPrice"]."\")</script></td>";
 											echo "<td>".$record["payoutCount"].$record["quantityUnit"]."</td>";
 											
 											echo "<td>×</td>";

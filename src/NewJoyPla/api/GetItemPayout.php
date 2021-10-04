@@ -9,7 +9,7 @@ class GetItemPayout{
 
     private $payoutNumber;
 
-    private $database = 'payoutData';
+    private $database = 'payoutDatav2';
     
     public function __construct(\App\Lib\SpiralDataBase $spiralDataBase, \App\Lib\UserInfo $userInfo){
         $this->spiralDataBase = $spiralDataBase;
@@ -23,7 +23,7 @@ class GetItemPayout{
 
     private function getPayoutDb(){
         $this->spiralDataBase->setDataBase($this->database);
-        $this->spiralDataBase->addSelectFields('registrationTime','payoutHistoryId','price','itemId','itemName','itemCode','itemStandard','itemJANCode','quantityUnit','payoutQuantity','payoutAmount','itemUnit','quantity','makerName','inHospitalItemId','payoutCount','payoutLabelCount','distributorId','catalogNo','labelId');
+        $this->spiralDataBase->addSelectFields('registrationTime','payoutHistoryId','price','itemId','itemName','itemCode','itemStandard','itemJANCode','quantityUnit','payoutQuantity','payoutAmount','itemUnit','quantity','makerName','inHospitalItemId','payoutCount','payoutLabelCount','distributorId','catalogNo','labelId','lotNumber','lotDate','unitPrice');
         $this->spiralDataBase->addSearchCondition('payoutHistoryId',$this->payoutNumber);
         $this->spiralDataBase->addSearchCondition('hospitalId',$this->userInfo->getHospitalId());
         return $this->spiralDataBase->doSelectLoop();

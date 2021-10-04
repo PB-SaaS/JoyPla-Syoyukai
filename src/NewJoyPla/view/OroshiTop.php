@@ -219,6 +219,16 @@ $tenantData = $getTenantData->select($hospitalData['data'][0]['tenantId']);
 			color: #edc99b;
 		}
 		
+		.content-5-1{
+    		background: #f3a43c;
+    	}
+    	
+		.content-5-1 .menu-foot{
+			background: #da9336;
+			color: #edc99b;
+		}
+		
+		
 		
 		.content-6{
     		background: #849d3e;
@@ -462,7 +472,7 @@ $tenantData = $getTenantData->select($hospitalData['data'][0]['tenantId']);
 				        </div>
 				    </div>
 				    <div>
-				        <div class="nj_card content-5">
+				        <div class="nj_card content-4">
 	                        <div class="menu-content">
 	                            <div class="menu-body">
 	                                <i class="icon"></i>
@@ -474,7 +484,24 @@ $tenantData = $getTenantData->select($hospitalData['data'][0]['tenantId']);
 	                            <div class="menu-foot">
 	                                <span>More Info</span>
 	                            </div>
-	                            <a href="%url/rel:mpgt:page_266278%" class="slide5"></a>
+	                            <a href="%url/rel:mpgt:page_266278%" class="slide4"></a>
+	                        </div>
+				        </div>
+				    </div>
+				    <div>
+				        <div class="nj_card content-5">
+	                        <div class="menu-content">
+	                            <div class="menu-body">
+	                                <i class="icon"></i>
+	                                <p>
+		                                <span class="title">貸出</span><br>
+		                                <span class="text">Borrowing</span>
+	                                </p>
+	                            </div>
+	                            <div class="menu-foot">
+	                                <span>More Info</span>
+	                            </div>
+	                            <a href="javascript:paging('page5')" class="slide5"></a>
 	                        </div>
 				        </div>
 				    </div>
@@ -511,8 +538,6 @@ $tenantData = $getTenantData->select($hospitalData['data'][0]['tenantId']);
 	                            <a href="javascript:paging('page8')" class="slide8"></a>
 	                        </div>
 				        </div>
-				    </div>
-				    <div>
 				    </div>
 				    <div>
 				    </div>
@@ -621,7 +646,98 @@ $tenantData = $getTenantData->select($hospitalData['data'][0]['tenantId']);
 		    	</div>
 		    </div>
 		</div>
-		
+
+
+		<div class="uk-section uk-section-default uk-preserve-color uk-padding-small uk-padding-remove-horizontal" id="page5">
+		    <div class="uk-container uk-container-large">
+		    	<div class="uk-child-width-1-1">
+                    <div class="uk-text-left uk-child-width-1-2 uk-margin-remove" uk-grid>
+	                    <div class="uk-text-left uk-inline">
+	                    	<a href="javascript:paging()" class="uk-position-center-left top-to-icon" uk-icon="icon: chevron-left"></a>
+	                    </div>
+	                    <div class="uk-padding-remove-right">
+	                        <p class="uk-text-right">
+	                            <span class="title">貸出</span><br>
+	                            <span class="sub-title">Borrowing</span>
+	                        </p>
+	                    </div>
+                    </div>
+                </div>
+		    	<div class="uk-child-width-1-1@m uk-text-left@m uk-margin-small-top"  style="color: #ffffff" uk-grid>
+		    		<div>
+			    		<div>	
+				    		<p class="uk-width-1-1 content-5-1 category-title">貸出</p>
+			    		</div>
+				    	<div class="uk-child-width-1-4@m uk-text-center" uk-grid>
+						    <div>
+						        <div class="nj_card content-5-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">貸出登録</span><br>
+				                                <span class="text">Borrowing Registration</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:BorrowingForD%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-5-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">貸出品リスト</span><br>
+				                                <span class="text">Borrowing List</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:BorrowingForD%&Action=borrowingList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-5-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">未承認使用済み伝票</span><br>
+				                                <span class="text">Unapproved Used Slip</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:BorrowingForD%&Action=unapprovedUsedSlip" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-5-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">使用済み伝票</span><br>
+				                                <span class="text">Used Slip</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:BorrowingForD%&Action=approvedUsedSlip" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						</div>
+					</div>
+		    	</div>
+		    </div>
+		</div>		
 	
 		<div class="uk-section uk-section-default uk-preserve-color uk-padding-small uk-padding-remove-horizontal" id="page8">
 		    <div class="uk-container uk-container-large">

@@ -23,10 +23,10 @@ class RegInventory{
         $this->divisionId = $divisionId;
 	}
 
-    public function register(array $array, string $divisionId, string $InventoryEId , string $InventoryHId){
+    public function register(array $array, string $divisionId, string $InventoryEId , string $InventoryHId, bool $useUnitPrice){
 		$array = $this->requestUrldecode($array);
 		$this->setDivisionId($divisionId);
-		$makeInventory = $this->makeInventory($array,$InventoryEId,$InventoryHId);
+		$makeInventory = $this->makeInventory($array,$InventoryEId,$InventoryHId,$useUnitPrice);
 
 		$result = $this->regInventory($makeInventory);
 		if($result['code'] != "0"){
@@ -36,7 +36,7 @@ class RegInventory{
 		return true;
 	}
 	
-    private function makeInventory(array $array, string $InventoryEId , string $InventoryHId){
+    private function makeInventory(array $array, string $InventoryEId , string $InventoryHId, bool $useUnitPrice){
 
         /**
          * ここに処理を書く
@@ -44,23 +44,31 @@ class RegInventory{
         //$columns = array('registrationTime','updateTime','inventoryHId','inHospitalItemId','hospitalId','price','calculatingStock','inventryNum','inventryAmount');
 
 		$itemList = array();
-		foreach($array as $inHPid => $data){
-			if( (int)$data['countNum']  >= 0 ){ //0でも入庫できるようにする
-			$itemList[] = array(
-				'now',
-				$InventoryEId,
-				$InventoryHId,
-				$inHPid,
-				$this->userInfo->getHospitalId(),
-				$this->divisionId,
-				str_replace(',', '', $data['kakaku']),
-				'',
-				(int)$data['countNum'],
-				str_replace(',', '', $data['kakaku']) / $data['irisu'] * (int)$data['countNum'],
-				$data['irisu'],
-				$data['unit'],
-				$data['itemUnit'],
-				);
+		foreach($array as $rows){
+			foreach($rows as $data){
+				if( (int)$data['countNum']  >= 0 ){ //0でも入庫できるようにする
+					$unitPrice = $useUnitPrice ? (str_replace(',', '', $data['unitPrice'])) : (str_replace(',', '', $data['kakaku']) / $data['irisu']);
+					$itemList[] = array(
+						'now',
+						$InventoryEId,
+						$InventoryHId,
+						$data['recordId'],
+						$this->userInfo->getHospitalId(),
+						$this->divisionId,
+						str_replace(',', '', $data['kakaku']),
+						'',
+						(int)$data['countNum'],
+						(int)$unitPrice * (int)$data['countNum'],
+						$data['irisu'],
+						$data['unit'],
+						$data['itemUnit'],
+						$unitPrice,
+						(int)$useUnitPrice,
+						$data['lotNumber'],
+						$data['lotDate'],
+						$this->userInfo->getHospitalId().$this->divisionId.$data['recordId'].$data['lotNumber'].$data['lotDate']
+					);
+				}
 			}
 		}
 
@@ -72,7 +80,7 @@ class RegInventory{
         /**
          * ここに処理を書く
          */
-        $columns = array('registrationTime','inventoryEndId','inventoryHId','inHospitalItemId','hospitalId','divisionId','price','calculatingStock','inventryNum','inventryAmount','quantity','quantityUnit','itemUnit');
+        $columns = array('registrationTime','inventoryEndId','inventoryHId','inHospitalItemId','hospitalId','divisionId','price','calculatingStock','inventryNum','inventryAmount','quantity','quantityUnit','itemUnit','unitPrice','invUnitPrice','lotNumber','lotDate','lotUniqueKey');
 
         $this->spiralDataBase->setDataBase($this->database);
 

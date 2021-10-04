@@ -1,4 +1,3 @@
-
 <?php
 //入庫データ登録
 include_once 'NewJoyPla/lib/ApiSpiral.php';
@@ -8,7 +7,6 @@ include_once 'NewJoyPla/lib/UserInfo.php';
 include_once 'NewJoyPla/api/RegReceiving.php';
 include_once 'NewJoyPla/api/RegInventoryTrdb.php';
 include_once 'NewJoyPla/api/GetDivision.php';
-include_once 'NewJoyPla/api/RegLot.php';
 include_once 'NewJoyPla/api/GetHospitalData.php';
 
 $userInfo = new App\Lib\UserInfo($SPIRAL);
@@ -29,6 +27,18 @@ if($divisionData['code'] != '0'){
 	exit;
 }
 
+$regData = $_POST['regData'];
+foreach ($regData as $array) {
+	foreach ($array as $lotItem) {
+		if ($lotItem['lotNumber']) {
+			if ((!ctype_alnum($lotItem['lotNumber'])) || (strlen($lotItem['lotNumber']) > 20)) {
+				echo json_encode(array('result'=>'invalid lotNumber'));
+				exit;
+			}
+		}
+	}
+}
+
 $divisionId = '';
 
 if($hospitalData['data'][0]['receivingTarget'] == '1'){ //大倉庫へ納品の場合
@@ -39,8 +49,7 @@ if($hospitalData['data'][0]['receivingTarget'] == '2'){ //発注部署へ納品�
 	$divisionId = $crypt->decrypt($_POST['divisionId'], 'JoyPla');
 }
 
-$result = $regReceiving->register($_POST['orderHistoryId'],$_POST['distributorId'],$divisionId,$_POST['receiving']);
-
+$result = $regReceiving->register($_POST['orderHistoryId'],$_POST['distributorId'],$divisionId,$_POST['receiving'],$regData);
 if(! $result){
 	echo json_encode(array('result'=>$result));
 	exit;
@@ -70,17 +79,32 @@ if(! $result){
 	exit;
 }
 
-$regLot = new App\Api\RegLot($spiralDataBase,$userInfo);
+//ロット管理情報
+$lotData = [];
 
-
-$result = $regLot->regLot($_POST['lotData'],$divisionId,$regReceiving->ReceivingHistoryId,null);
-if($result['code'] != "0"){
-	var_dump($result);
-	echo json_encode(array('result'=>false));
-	exit;
+foreach ($regData as $rows) {
+	foreach ($rows as $key => $val) {
+		if ($val['lotNumber'] && $val['lotDate']) {
+			$lotData[$val['inHPItemid'].$key] = [];
+			$lotData[$val['inHPItemid'].$key] = [
+				'inHPItemid' => $val['inHPItemid'],
+				'lotNumber' => $val['lotNumber'],
+				'lotDate' => $val['lotDate'],
+				'stockQuantity' => (int)$val['quantity'] * (int)$val['receivingCount']
+			];
+		}
+	}
 }
+
+if($lotData) { 
+	$result = $regInventoryTrdb->lotData($lotData,$divisionId,'1'); //在庫数加算
+
+	if(! $result) {
+		echo json_encode(array('result'=>$result));
+		exit;
+	}
+}
+
 
 //結果を返却
 echo json_encode(array('result'=>$result));
-
-

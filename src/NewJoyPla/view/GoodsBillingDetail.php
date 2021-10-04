@@ -26,11 +26,15 @@ if($userInfo->getUserPermission() != "1" && $card["data"][0][2] != $userInfo->ge
 $getItemBilling = new App\Api\GetItemBilling($spiralDataBase,$userInfo);
 $billingData = $getItemBilling->getItemBilling($card['data'][0][0]);
 
-$billingData = $spiralDataBase->arrayToNameArray($billingData['data'],array('registrationTime','updateTime','inHospitalItemId','billingNumber','price','billingQuantity','billingAmount','hospitalId','divisionId','itemId','itemName','itemCode','itemStandard','itemJANCode','quantityUnit','makerName','itemUnit','quantity'));
+$billingData = $spiralDataBase->arrayToNameArray($billingData['data'],array('registrationTime','updateTime','inHospitalItemId','billingNumber','price','billingQuantity','billingAmount','hospitalId','divisionId','itemId','itemName','itemCode','itemStandard','itemJANCode','quantityUnit','makerName','itemUnit','quantity','lotNumber','lotDate','unitPrice'));
 
 foreach($billingData as $record){
-	$ItemsToJs[$record['inHospitalItemId']] = array(
-		'billingQuantity'=> $record['billingQuantity']
+	$ItemsToJs[] = array(
+		'inHospitalItemId'=> $record['inHospitalItemId'],
+		'billingQuantity'=> $record['billingQuantity'],
+		'quantity'=> $record['quantity'],
+		'lotNumber'=> $record['lotNumber'],
+		'lotDate'=> $record['lotDate']
 		);
 }
 
@@ -102,8 +106,11 @@ if($userInfo->getUserPermission() == "1"){
 										<th style="min-width:150px">商品名</th>
 										<th>製品コード</th>
 										<th>規格</th>
+										<th>ロット番号</th>
+										<th>使用期限</th>
 										<th>入数</th>
 										<th>価格</th>
+										<th>単価</th>
 										<th>消費数</th>
 										<th>金額</th>
 				    				</tr>
@@ -119,8 +126,11 @@ if($userInfo->getUserPermission() == "1"){
 				    						echo '<td>'.$record['itemName'].'</td>';
 				    						echo '<td>'.$record['itemCode'].'</td>';
 				    						echo '<td>'.$record['itemStandard'].'</td>';
+				    						echo '<td>'.$record['lotNumber'].'</td>';
+				    						echo '<td>'.$record['lotDate'].'</td>';
 				    						echo '<td>'.$record['quantity'].$record['quantityUnit'].'</td>';
 				    						echo '<td>￥<script>price(fixed("'.$record['price'].'"))</script> / '.$record['itemUnit'].'</td>';
+				    						echo '<td>￥<script>price(fixed("'.$record['unitPrice'].'"))</script></td>';
 				    						echo '<td>'.$record['billingQuantity'].$record['quantityUnit'].'</td>';
 				    						echo '<td>￥<script>price(fixed("'.$record['billingAmount'].'"))</script></td>';
 				    						echo '</tr>';

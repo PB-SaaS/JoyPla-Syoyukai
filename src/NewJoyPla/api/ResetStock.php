@@ -5,12 +5,13 @@ namespace App\Api;
 class ResetStock{
 
     private $spiralDataBase;
-	private $userInfo;
+    private $userInfo;
 
     private $divisionId;
     
     private $database = 'NJ_stockDB';
     private $mstDatabase = 'NJ_inHPItemDB';
+    private $lotDatabase = '330_NJ_LotDB';
 
     public function __construct(\App\Lib\SpiralDataBase $spiralDataBase, \App\Lib\UserInfo $userInfo){
         $this->spiralDataBase = $spiralDataBase;
@@ -41,6 +42,16 @@ class ResetStock{
 		return true;
 	}
 	
+    public function resetLotStock(string $divisionId){
+        $this->setDivisionId($divisionId);
+        $result = $this->resetLotStockDB();
+        if ($result['code'] != "0") {
+            var_dump($result);
+            return false;
+        }
+        return true;
+    }
+  
 	public function getStock(array $divisionIdArray){
 		return $result = $this->getStockDB($divisionIdArray);
     }
@@ -78,5 +89,14 @@ class ResetStock{
 		$this->spiralDataBase->addSearchCondition('hospitalId',$this->userInfo->getHospitalId());
 		return $this->spiralDataBase->doBulkUpdate('inHospitalItemId',$columns,$blukUpdateData);
 	}
+
+    private function resetLotStockDB(){
+        $this->spiralDataBase->setDataBase($this->lotDatabase);
+        $this->spiralDataBase->addSearchCondition('hospitalId',$this->userInfo->getHospitalId());
+        $this->spiralDataBase->addSearchCondition('divisionId',$this->divisionId);
+        $this->spiralDataBase->addSelectNameCondition('');
+        return $this->spiralDataBase->doUpdate(array(array('name'=> 'updateTime','value'=>'now'),array('name'=> 'stockQuantity','value'=>'0')));
+    }
+  
 
 }

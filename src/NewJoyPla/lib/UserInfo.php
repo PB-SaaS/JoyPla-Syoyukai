@@ -45,4 +45,32 @@ class UserInfo{
     public function getUserPermission(){
         return $this->spiral->getContextByFieldTitle("userPermission");
     }
+
+    public function isHospitalUser(){
+        if($this->getDistributorId() == null)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public function isDistributorUser(){
+        return !$this->isHospitalUser();
+    }
+    
+    public function isAdmin(){
+        if($this->getUserPermission() == '1')
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public function isUser(){
+        if($this->getUserPermission() == '2')
+        {
+            return true;
+        }
+        return false;
+    }
 }

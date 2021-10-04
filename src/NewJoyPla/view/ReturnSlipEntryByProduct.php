@@ -38,7 +38,8 @@ $receivingData = $receiptItem["data"];
 
 $ItemsToJs = array();
 foreach($receivingData as $record){
-	$ItemsToJs[$record["inHospitalItemId"]] = array(
+	$ItemsToJs[$record["receivingNumber"]] = array(
+		"inHospitalItemId" => $record["inHospitalItemId"],
 		"receivingCount"=> $record["receivingCount"],
 		"quantity"=> $record["quantity"],
 		"orderCNumber" => $record["orderCNumber"],
@@ -54,6 +55,8 @@ foreach($receivingData as $record){
 		"totalReturnCount" => $record["totalReturnCount"],
 		"price" => $record["price"],
 		"returnCount" => 0,
+		"lotNumber" => $record["lotNumber"],
+		"lotDate" => $record["lotDate"]
 		);
 }
 
@@ -152,6 +155,8 @@ foreach($divisionData["division"] as $record ){
 										<th style="min-width:150px">商品名</th>
 										<th>製品コード</th>
 										<th>規格</th>
+										<th>ロット番号</th>
+										<th>使用期限</th>
 										<th>入数</th>
 										<th>発注数</th>
 										<th>入庫数</th>
@@ -181,11 +186,13 @@ foreach($divisionData["division"] as $record ){
 				    						echo "<td>".$record["itemName"]."</td>";
 				    						echo "<td>".$record["itemCode"]."</td>";
 				    						echo "<td>".$record["itemStandard"]."</td>";
+				    						echo "<td>".$record["lotNumber"]."</td>";
+				    						echo "<td>".$record["lotDate"]."</td>";
 				    						echo "<td>".$record["quantity"].$record["quantityUnit"]."</td>";
 				    						echo "<td>".$record["orderQuantity"].$record["itemUnit"]."</td>";
 				    						echo "<td>".$record["receivingCount"].$record["itemUnit"]."</td>";
 				    						echo "<td>".$record["totalReturnCount"].$record["itemUnit"]."</td>";
-				    						echo "<td><input type='number' step='1' class='uk-input' style='width:100px' id='hp_".$record["inHospitalItemId"]."' min='0' max='".$max."' value='0' onchange='returnCount(this,\"".$record["inHospitalItemId"]."\")'><span class='uk-text-small uk-text-middle'>".$record["itemUnit"]."</span></td>";
+				    						echo "<td><input type='number' step='1' class='uk-input' style='width:100px' min='0' max='".$max."' value='0' onchange='returnCount(this,\"".$record["receivingNumber"]."\")'><span class='uk-text-small uk-text-middle'>".$record["itemUnit"]."</span></td>";
 				    						echo "</tr>";
 				    						$num++;
 				    					}
@@ -203,6 +210,7 @@ foreach($divisionData["division"] as $record ){
 	</div>
 	<script>
 		let canAjax = true;
+/*
 		$(function(){
 		 let nouhin_num = $("#nouhin_num").text();
 		 //$("#hacchu_num").remove();
@@ -210,6 +218,7 @@ foreach($divisionData["division"] as $record ){
 		 generateBarcode("barcode_nouhin",nouhin_num);
 		 //$("td#order_barcode div").barcode({code:order_num, crc:false }, "int25",{barWidth: 3 ,barHeight: 40 , output: "css"});
 		});
+*/
     	
 		let itemsToJs = objectValueToURIencode( <?php echo json_encode($ItemsToJs); ?> );
 		function returnReg(){
@@ -295,15 +304,11 @@ foreach($divisionData["division"] as $record ){
 			});
 		}
 		
-		function createLabel(){
-			$("#itemsData").val(JSON.stringify( itemsToJs ));
-			return true;
+		function returnCount(elm,receivingNumber){
+			itemsToJs[receivingNumber].returnCount = elm.value;
+			$(elm).css({"color":"rgb(68, 68, 68)", "background-color":"rgb(255, 204, 153)", "width":"100px"});
 		}
 		
-		function returnCount(elm,inHpItemId){
-			itemsToJs[inHpItemId].returnCount = elm.value;
-			$('#hp_'+inHpItemId).css({"color":"rgb(68, 68, 68)", "background-color":"rgb(255, 204, 153)", "width":"100px"});
-		}
 	</script>
   </body>
 </html>

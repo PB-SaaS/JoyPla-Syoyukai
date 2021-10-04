@@ -7,6 +7,7 @@ include_once 'NewJoyPla/lib/UserInfo.php';
 include_once 'NewJoyPla/api/PayoutMonthlyReport.php';
 include_once 'NewJoyPla/api/GetDivision.php';
 include_once 'NewJoyPla/lib/Func.php';
+include_once 'NewJoyPla/api/GetHospitalData.php';
 
 $spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
 $spiralApiRequest = new SpiralApiRequest();
@@ -58,7 +59,11 @@ if(isset($_POST['itemStandard'])){
 	$itemStandard = App\Lib\html($_POST['itemStandard']);
 }
 
-$result = $payoutMonthlyReport->dataSelect($startMonth,$endMonth,$divisionId,$itemName,$itemCode,$itemStandard,$page,$limit);
+$getHospitalData = new App\Api\GetHospitalData($spiralDataBase,$userInfo);
+$hospitalData = $getHospitalData->select();
+$useUnitPrice = $hospitalData['data'][0]['payoutUnitPrice'];
+
+$result = $payoutMonthlyReport->dataSelect($startMonth,$endMonth,$divisionId,$itemName,$itemCode,$itemStandard,$page,$limit,$useUnitPrice);
 
 $getDivision = new App\Api\GetDivision($spiralDataBase,$userInfo);
 
@@ -239,6 +244,7 @@ $divisionData = $getDivision->select();
 										<th>製品コード</th>
 										<th>規格</th>
 										<th>購買価格</th>
+										<th>単価</th>
 										<th>入数</th>
 										<th>払出数</th>
 										<th>合計金額</th>
@@ -261,6 +267,11 @@ $divisionData = $getDivision->select();
 											echo "<td>";
 											foreach($record['price'] as $price){
 												echo "￥<script>price(fixed('".$price."'))</script><br>".PHP_EOL;
+											}
+											echo "</td>".PHP_EOL;
+											echo "<td>";
+											foreach($record['unitPrice'] as $unitPrice){
+												echo "￥<script>price(fixed('".$unitPrice."'))</script><br>".PHP_EOL;
 											}
 											echo "</td>".PHP_EOL;
 											echo "<td>";
@@ -340,6 +351,7 @@ $divisionData = $getDivision->select();
 				remakeArray[k][10] = records[i][10][j];
 				remakeArray[k][11] = records[i][11][j];
 				remakeArray[k][12] = records[i][12][j];
+				remakeArray[k][13] = records[i][13][j];
 			}
 		}
 		let data = remakeArray.map((record)=> record.join('\t')).join('\r\n');
@@ -365,7 +377,7 @@ $divisionData = $getDivision->select();
 			});
 		}
 		
-		result.unshift(['id','inHospitalItemId','makerName','itemName','itemCode','itemStandard','price','quantity','payoutQuantity','totalAmount','adjAmount','priceAfterAdj','quantityUnit']);
+		result.unshift(['id','inHospitalItemId','makerName','itemName','itemCode','itemStandard','price','unitPrice','quantity','payoutQuantity','totalAmount','adjAmount','priceAfterAdj','quantityUnit']);
 	
 		exportCSV(result);
 	}

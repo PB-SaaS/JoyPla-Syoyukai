@@ -220,6 +220,14 @@ $hospitalData = $getHospitalData->select();
 			color: #edc99b;
 		}
 		
+		.content-5-1{
+    		background: #f3a43c;
+    	}
+    	
+		.content-5-1 .menu-foot{
+			background: #da9336;
+			color: #edc99b;
+		}
 		
 		.content-6{
     		background: #849d3e;
@@ -318,89 +326,110 @@ $hospitalData = $getHospitalData->select();
 			border: solid 1px #999999;
 			height: 400px;
 		}
+		a{
+			pointer-events: none;
+		}
+		a.enabled{
+			pointer-events: auto;
+		}
     </style>
     <script>
-	let canAjax = true;
-    $(document).ready(function() {
-		 pageShow('<?php echo $_POST["page"] ?>');
-    });
-    	function paging(id){
-    		let url = location.href ;
-    		let param = '';
-    		if(id){
-    			param = '&page='+id ;
-    		}
-    		window.location.href = "/area/servlet/area.MyPageBundle?MyPageID=<?php echo $_POST["MyPageID"] ?>"+param;
-    	}
-    	
-    	function pageShow(page){
-    		if(page == null || page == ''){
-    			page = 'page_top';
-    		}
-			$("[id^='page']").hide();
-		    $('#'+page).show();
-    	}
-    	
-    	
-		function search(){
-			if(!canAjax) { 
-				console.log('通信中');
-				return;
+		class HospitalTop
+		{
+			constructor(phpData)
+			{
+				this.phpData = phpData;
+				this.canAjax = true;
 			}
-			let searchValue =  $('input[name="searchValue"]').val();
-			if(searchValue == ''){
-				UIkit.modal.alert('検索したいバーコードを読み取りまたは、入力してください');
-				return false;
+			paging(id){
+				let url = location.href ;
+				let param = '';
+				if(id){
+					param = '&page='+id ;
+				}
+				window.location.href = "/area/servlet/area.MyPageBundle?MyPageID="+ this.phpData.MyPageID +""+param;
 			}
+
+			pageShow(page){
+				if(page == null || page == ''){
+					page = 'page_top';
+				}
+				$('[id^="page"]').not('#'+page).remove();
+				$('#'+page).show();
+				$('#'+page+' a').addClass('enabled');
+			}	
 			
-            loading();
-            
-			canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
-			$.ajax({
-				async: false,
-                url:'%url/rel:mpgt:barcodeSearchAPI%',
-                type:'POST',
-                data:{
-                	searchValue :searchValue
-                },
-                dataType: 'json'
-            })
-            // Ajaxリクエストが成功した時発動
-            .done( (data) => {
-                if(data.code != 0){
-            		UIkit.modal.alert("伝票が見つかりませんでした").then(function(){
-						canAjax = true; // 再びAjaxできるようにする
+			search(){
+				let tmp = this;
+				if(!tmp.canAjax) { 
+					console.log('通信中');
+					return;
+				}
+				let searchValue =  $('input[name="searchValue"]').val();
+				if(searchValue == ''){
+					UIkit.modal.alert('検索したいバーコードを読み取りまたは、入力してください');
+					return false;
+				}
+				
+				loading();
+				tmp.canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
+				$.ajax({
+					async: false,
+					url:'%url/rel:mpgt:barcodeSearchAPI%',
+					type:'POST',
+					data:{
+						searchValue :searchValue
+					},
+					dataType: 'json'
+				})
+				// Ajaxリクエストが成功した時発動
+				.done( (data) => {
+					if(data.code != 0){
+						UIkit.modal.alert("伝票が見つかりませんでした").then(function(){
+							tmp.canAjax = true; // 再びAjaxできるようにする
+						});
+						return false;
+					}
+					UIkit.modal.alert("伝票が見つかりました").then(function(){
+						tmp.canAjax = true; // 再びAjaxできるようにする
+						location.href=data.urls[0];
 					});
-            		return false;
-                }
-                UIkit.modal.alert("伝票が見つかりました").then(function(){
-					canAjax = true; // 再びAjaxできるようにする
-					location.href=data.urls[0];
+				})
+				// Ajaxリクエストが失敗した時発動
+				.fail( (data) => {
+					UIkit.modal.alert("伝票が見つかりませんでした").then(function(){
+						tmp.canAjax = true; // 再びAjaxできるようにする
+					});
+				})
+				// Ajaxリクエストが成功・失敗どちらでも発動
+				.always( (data) => {
+					loading_remove();
 				});
-            })
-            // Ajaxリクエストが失敗した時発動
-            .fail( (data) => {
-            	UIkit.modal.alert("伝票が見つかりませんでした").then(function(){
-					canAjax = true; // 再びAjaxできるようにする
-				});
-            })
-            // Ajaxリクエストが成功・失敗どちらでも発動
-            .always( (data) => {
-				loading_remove();
-            });
+			}
+
 		}
+
+		let phpData = {
+			'MyPageID': '<?php echo $_POST["MyPageID"] ?>'
+		};
+		let hospitalTop = new HospitalTop(phpData);
+
+		$(document).ready(function() {
+			hospitalTop.pageShow('<?php echo $_POST["page"] ?>');
+		});
+    	
     </script>
   </head>
   <body>
     <?php include_once 'NewJoyPla/src/HeaderForMypage.php'; ?>
     <div class="animsition" uk-height-viewport="expand: true">
-	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding uk-padding-remove-horizontal" id="page_top">
+	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-small uk-padding-remove-horizontal" id="page_top">
 		    <div class="uk-container uk-container-large	">
 	    		<?php
 	    		if($hospitalData['data'][0]['function1'] == '1'):
 	    		?>
 		    	<div class="uk-margin">
-		    		<form action="#" onsubmit="search(); return false;" method="post">
+		    		<form action="#" onsubmit="hospitalTop.search(); return false;" method="post">
 				    	<div class="uk-padding-top uk-background-muted uk-padding-small uk-width-1-2@m" >
 		    				<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." autofocus="true" name="searchValue" autocomplete="off"> 
 			    			<button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
@@ -427,7 +456,7 @@ $hospitalData = $getHospitalData->select();
 	                            <div class="menu-foot">
 	                                <span>More Info</span>
 	                            </div>
-	                            <a href="javascript:paging('page1')" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+	                            <a href="javascript:hospitalTop.paging('page1')" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 	                        </div>
 				        </div>
 				    </div>
@@ -450,7 +479,7 @@ $hospitalData = $getHospitalData->select();
 	                            <div class="menu-foot">
 	                                <span>More Info</span>
 	                            </div>
-	                            <a href="javascript:paging('page2')" class="slide2 animsition-link"  data-animsition-out-class="fade-out"></a>
+	                            <a href="javascript:hospitalTop.paging('page2')" class="slide2 animsition-link"  data-animsition-out-class="fade-out"></a>
 	                        </div>
 				        </div>
 				    </div>
@@ -473,7 +502,7 @@ $hospitalData = $getHospitalData->select();
 	                            <div class="menu-foot">
 	                                <span>More Info</span>
 	                            </div>
-	                            <a href="javascript:paging('page3')" class="slide3 animsition-link"  data-animsition-out-class="fade-out"></a>
+	                            <a href="javascript:hospitalTop.paging('page3')" class="slide3 animsition-link"  data-animsition-out-class="fade-out"></a>
 	                        </div>
 				        </div>
 				    </div>
@@ -517,9 +546,9 @@ $hospitalData = $getHospitalData->select();
 	                                </p>
 	                            </div>
 	                            <div class="menu-foot">
-	                                <span>Coming Soon</span>
+	                                <span>More Info</span>
 	                            </div>
-	                            <a href="#" class="slide5"></a>
+	                            <a href="javascript:hospitalTop.paging('page5')" class="slide5"></a>
 	                        </div>
 				        </div>
 				    </div>
@@ -542,7 +571,7 @@ $hospitalData = $getHospitalData->select();
 	                            <div class="menu-foot">
 	                                <span>More Info</span>
 	                            </div>
-	                            <a  href="javascript:paging('page6')" class="slide6 animsition-link"  data-animsition-out-class="fade-out"></a>
+	                            <a href="javascript:hospitalTop.paging('page6')" class="slide6 animsition-link"  data-animsition-out-class="fade-out"></a>
 	                        </div>
 				        </div>
 				    </div>
@@ -565,7 +594,7 @@ $hospitalData = $getHospitalData->select();
 	                            <div class="menu-foot">
 	                                <span>More Info</span>
 	                            </div>
-	                            <a href="javascript:paging('page7')" class="slide7 animsition-link"  data-animsition-out-class="fade-out"></a>
+	                            <a href="javascript:hospitalTop.paging('page7')" class="slide7 animsition-link"  data-animsition-out-class="fade-out"></a>
 	                        </div>
 				        </div>
 				    </div>
@@ -588,7 +617,7 @@ $hospitalData = $getHospitalData->select();
 	                            <div class="menu-foot">
 	                                <span>More Info</span>
 	                            </div>
-	                            <a href="javascript:paging('page8')" class="slide8 animsition-link"  data-animsition-out-class="fade-out"></a>
+	                            <a href="javascript:hospitalTop.paging('page8')" class="slide8 animsition-link"  data-animsition-out-class="fade-out"></a>
 	                        </div>
 				        </div>
 				    </div>
@@ -645,7 +674,7 @@ $hospitalData = $getHospitalData->select();
 		    	<div class="uk-child-width-1-1">
                     <div class="uk-text-left uk-child-width-1-2 uk-margin-remove" uk-grid>
 	                    <div class="uk-text-left uk-inline">
-	                    	<a href="javascript:paging()" class="uk-position-center-left top-to-icon" uk-icon="icon: chevron-left"></a>
+	                    	<a href="javascript:hospitalTop.paging()" class="uk-position-center-left top-to-icon" uk-icon="icon: chevron-left"></a>
 	                    </div>
 	                    <div class="uk-padding-remove-right">
 	                        <p class="uk-text-right">
@@ -870,7 +899,7 @@ $hospitalData = $getHospitalData->select();
 		    	<div class="uk-child-width-1-1">
                     <div class="uk-text-left uk-child-width-1-2 uk-margin-remove" uk-grid>
 	                    <div class="uk-text-left uk-inline">
-	                    	<a href="javascript:paging()" class="uk-position-center-left top-to-icon" uk-icon="icon: chevron-left"></a>
+	                    	<a href="javascript:hospitalTop.paging()" class="uk-position-center-left top-to-icon" uk-icon="icon: chevron-left"></a>
 	                    </div>
 	                    <div class="uk-padding-remove-right">
 	                        <p class="uk-text-right">
@@ -929,7 +958,7 @@ $hospitalData = $getHospitalData->select();
 		    	<div class="uk-child-width-1-1">
                     <div class="uk-text-left uk-child-width-1-2 uk-margin-remove" uk-grid>
 	                    <div class="uk-text-left uk-inline">
-	                    	<a href="javascript:paging()" class="uk-position-center-left top-to-icon" uk-icon="icon: chevron-left"></a>
+	                    	<a href="javascript:hospitalTop.paging()" class="uk-position-center-left top-to-icon" uk-icon="icon: chevron-left"></a>
 	                    </div>
 	                    <div class="uk-padding-remove-right">
 	                        <p class="uk-text-right">
@@ -1022,7 +1051,7 @@ $hospitalData = $getHospitalData->select();
 			                                <span>More Info</span>
 			                            </div>
 										<?php if($userInfo->getUserPermission() == '1') : ?>
-			                            <a href="%url/rel:mpgt:page_264625%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:page_296575%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 										<?php else : ?>
 			                            <a href="%url/rel:mpgt:page_266925%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 										<?php endif ?>
@@ -1049,7 +1078,7 @@ $hospitalData = $getHospitalData->select();
 		    	<div class="uk-child-width-1-1">
                     <div class="uk-text-left uk-child-width-1-2 uk-margin-remove" uk-grid>
 	                    <div class="uk-text-left uk-inline">
-	                    	<a href="javascript:paging()" class="uk-position-center-left top-to-icon" uk-icon="icon: chevron-left"></a>
+	                    	<a href="javascript:hospitalTop.paging()" class="uk-position-center-left top-to-icon" uk-icon="icon: chevron-left"></a>
 	                    </div>
 	                    <div class="uk-padding-remove-right">
 	                        <p class="uk-text-right">
@@ -1182,10 +1211,109 @@ $hospitalData = $getHospitalData->select();
 			                                <span>More Info</span>
 			                            </div>
 										<?php if($userInfo->getUserPermission() == '1') : ?>
-											<a href="%url/rel:mpgt:page_168790%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+											<a href="%url/rel:mpgt:page_301356%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 										<?php else : ?>
 											<a href="%url/rel:mpgt:page_168844%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 										<?php endif; ?>
+			                        </div>
+						        </div>
+						    </div>
+						</div>
+					</div>
+		    	</div>
+		    </div>
+		</div>
+		
+		<?php
+		endif;
+		?>
+
+		<?php
+		if($hospitalData['data'][0]['function5'] == '1'):
+		?>			
+		
+		<div class="uk-section uk-section-default uk-preserve-color uk-padding-small uk-padding-remove-horizontal" id="page5">
+		    <div class="uk-container uk-container-large">
+		    	<div class="uk-child-width-1-1">
+                    <div class="uk-text-left uk-child-width-1-2 uk-margin-remove" uk-grid>
+	                    <div class="uk-text-left uk-inline">
+	                    	<a href="javascript:hospitalTop.paging()" class="uk-position-center-left top-to-icon" uk-icon="icon: chevron-left"></a>
+	                    </div>
+	                    <div class="uk-padding-remove-right">
+	                        <p class="uk-text-right">
+	                            <span class="title">貸出</span><br>
+	                            <span class="sub-title">Borrowing</span>
+	                        </p>
+	                    </div>
+                    </div>
+                </div>
+		    	<div class="uk-child-width-1-1@m uk-text-left@m uk-margin-small-top"  style="color: #ffffff" uk-grid>
+		    		<div>
+			    		<div>	
+				    		<p class="uk-width-1-1 content-5-1 category-title">貸出</p>
+			    		</div>
+				    	<div class="uk-child-width-1-4@m uk-text-center" uk-grid>
+						    <div>
+						        <div class="nj_card content-5-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">貸出登録</span><br>
+				                                <span class="text">Borrowing Registration</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:Borrowing%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-5-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">貸出品リスト</span><br>
+				                                <span class="text">Borrowing List</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:Borrowing%&Action=borrowingList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-5-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">未承認使用済み伝票</span><br>
+				                                <span class="text">Unapproved Used Slip</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:Borrowing%&Action=unapprovedUsedSlip" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-5-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">使用済み伝票</span><br>
+				                                <span class="text">Used Slip</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:Borrowing%&Action=approvedUsedSlip" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1208,7 +1336,7 @@ $hospitalData = $getHospitalData->select();
 		    	<div class="uk-child-width-1-1">
                     <div class="uk-text-left uk-child-width-1-2 uk-margin-remove" uk-grid>
 	                    <div class="uk-text-left uk-inline">
-	                    	<a href="javascript:paging()" class="uk-position-center-left top-to-icon" uk-icon="icon: chevron-left"></a>
+	                    	<a href="javascript:hospitalTop.paging()" class="uk-position-center-left top-to-icon" uk-icon="icon: chevron-left"></a>
 	                    </div>
 	                    <div class="uk-padding-remove-right">
 	                        <p class="uk-text-right">
@@ -1400,7 +1528,7 @@ $hospitalData = $getHospitalData->select();
 		    	<div class="uk-child-width-1-1">
                     <div class="uk-text-left uk-child-width-1-2 uk-margin-remove" uk-grid>
 	                    <div class="uk-text-left uk-inline">
-	                    	<a href="javascript:paging()" class="uk-position-center-left top-to-icon" uk-icon="icon: chevron-left"></a>
+	                    	<a href="javascript:hospitalTop.paging()" class="uk-position-center-left top-to-icon" uk-icon="icon: chevron-left"></a>
 	                    </div>
 	                    <div class="uk-padding-remove-right">
 	                        <p class="uk-text-right">

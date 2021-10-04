@@ -9,7 +9,7 @@ class GetItemBilling{
 
     private $billingNumber;
 
-    private $database = 'billingDetail';
+    private $database = 'billingDetailv2';
     
     public function __construct(\App\Lib\SpiralDataBase $spiralDataBase, \App\Lib\UserInfo $userInfo){
         $this->spiralDataBase = $spiralDataBase;
@@ -23,7 +23,7 @@ class GetItemBilling{
 
     private function getBillingDb(){ 
         $this->spiralDataBase->setDataBase($this->database);
-        $this->spiralDataBase->addSelectFields('registrationTime','updateTime','inHospitalItemId','billingNumber','price','billingQuantity','billingAmount','hospitalId','divisionId','itemId','itemName','itemCode','itemStandard','itemJANCode','quantityUnit','makerName','itemUnit','quantity');
+        $this->spiralDataBase->addSelectFields('registrationTime','updateTime','inHospitalItemId','billingNumber','price','billingQuantity','billingAmount','hospitalId','divisionId','itemId','itemName','itemCode','itemStandard','itemJANCode','quantityUnit','makerName','itemUnit','quantity','lotNumber','lotDate','unitPrice');
         $this->spiralDataBase->addSearchCondition('billingNumber',$this->billingNumber);
         $this->spiralDataBase->addSearchCondition('hospitalId',$this->userInfo->getHospitalId());
         return $this->spiralDataBase->doSelectLoop();

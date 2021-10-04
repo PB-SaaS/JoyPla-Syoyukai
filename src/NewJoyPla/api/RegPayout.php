@@ -31,7 +31,7 @@ class RegPayout{
         $this->targetDivisionName = $targetDivisionName;
 	}
 	
-    public function register(array $array, string $sourceDivisionId, string $sourceDivisionName, string $targetDivisionId, string $targetDivisionName){
+    public function register(array $array, string $sourceDivisionId, string $sourceDivisionName, string $targetDivisionId, string $targetDivisionName, bool $useUnitPrice){
 		$array = $this->requestUrldecode($array);
 		$sourceDivisionName = urldecode($sourceDivisionName);
 		$targetDivisionName = urldecode($targetDivisionName);
@@ -41,7 +41,7 @@ class RegPayout{
 		
     	$this->payoutId = $this->makePayoutId();
   
-    	$childData = $this->makePayout($array);
+    	$childData = $this->makePayout($array,$useUnitPrice);
     	
     	if(count($childData) === 0){
     		var_dump($childData);
@@ -123,7 +123,7 @@ class RegPayout{
         //throw new Exception("エラーハンドリング");
     }
     
-    private function makePayout(array $array){
+    private function makePayout(array $array, bool $useUnitPrice){
 
         /**
          * ここに処理を書く
@@ -131,26 +131,33 @@ class RegPayout{
         //$columns = array('registrationTime','updateTime','inHospitalItemId','billingNumber','price','billingQuantity','billingAmount','hospitalId','divisionId');
 
 		$itemList = array();
-		foreach($array as $inHPid => $data){
-			if( (int)$data['countNum']  > 0 ){
-			$itemList[] = array(
-				'now',
-				'',
-				$this->payoutId,
-				'',
-				$inHPid,
-				$this->userInfo->getHospitalId(),
-				$this->sourceDivisionId,
-				$this->targetDivisionId,
-				$data['irisu'],
-				$data['unit'],
-				$data['itemUnit'],
-				str_replace(',', '', $data['kakaku']),
-				(int)$data['countNum'],
-				str_replace(',', '', $data['kakaku']) / $data['irisu'] * (int)$data['countNum'],
-				$data['payoutCount'],
-				$data['countLabelNum'],
-				);
+		foreach($array as $rows){
+			foreach($rows as $data){
+				if( (int)$data['countNum']  > 0 ){
+					if ($useUnitPrice) { $unitPrice = str_replace(',', '', $data['unitPrice']); }
+					if (!$useUnitPrice) { $unitPrice = str_replace(',', '', $data['kakaku']) / $data['irisu']; }
+					$itemList[] = array(
+						'now',
+						'',
+						$this->payoutId,
+						'',
+						$data['recordId'],
+						$this->userInfo->getHospitalId(),
+						$this->sourceDivisionId,
+						$this->targetDivisionId,
+						$data['irisu'],
+						$data['unit'],
+						$data['itemUnit'],
+						str_replace(',', '', $data['kakaku']),
+						(int)$data['countNum'],
+						(int)$unitPrice * (int)$data['countNum'],
+						$data['payoutCount'],
+						$data['countLabelNum'],
+						$data['lotNumber'],
+						$data['lotDate'],
+						$unitPrice
+					);
+				}
 			}
 		}
 
@@ -162,7 +169,7 @@ class RegPayout{
         /**
          * ここに処理を書く
          */
-        $columns = array('registrationTime','updateTime','payoutHistoryId','payoutId','inHospitalItemId','hospitalId','sourceDivisionId','targetDivisionId','quantity','quantityUnit','itemUnit','price','payoutQuantity','payoutAmount','payoutCount','payoutLabelCount');
+        $columns = array('registrationTime','updateTime','payoutHistoryId','payoutId','inHospitalItemId','hospitalId','sourceDivisionId','targetDivisionId','quantity','quantityUnit','itemUnit','price','payoutQuantity','payoutAmount','payoutCount','payoutLabelCount','lotNumber','lotDate','unitPrice');
 
         $this->spiralDataBase->setDataBase($this->childDatabase);
 

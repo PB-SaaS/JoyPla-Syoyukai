@@ -6,6 +6,7 @@ include_once 'NewJoyPla/lib/UserInfo.php';
 include_once 'NewJoyPla/api/GoodsBillingMonthlyReport.php';
 include_once 'NewJoyPla/api/GetDivision.php';
 include_once 'NewJoyPla/lib/Func.php';
+include_once 'NewJoyPla/api/GetHospitalData.php';
 
 $spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
 $spiralApiRequest = new SpiralApiRequest();
@@ -57,8 +58,11 @@ if(isset($_POST['itemStandard'])){
 	$itemStandard = App\Lib\html($_POST['itemStandard']);
 }
 
+$getHospitalData = new App\Api\GetHospitalData($spiralDataBase,$userInfo);
+$hospitalData = $getHospitalData->select();
+$useUnitPrice = $hospitalData['data'][0]['billingUnitPrice'];
 
-$result = $goodsBillingMonthlyReport->dataSelect($startMonth,$endMonth,$divisionId,$itemName,$itemCode,$itemStandard,$page,$limit);
+$result = $goodsBillingMonthlyReport->dataSelect($startMonth,$endMonth,$divisionId,$itemName,$itemCode,$itemStandard,$page,$limit,$useUnitPrice);
 
 $getDivision = new App\Api\GetDivision($spiralDataBase,$userInfo);
 
@@ -236,6 +240,7 @@ $divisionData = $getDivision->select();
 										<th>製品コード</th>
 										<th>規格</th>
 										<th>購買価格</th>
+										<th>単価</th>
 										<th>入数</th>
 										<th>消費数</th>
 										<th>合計金額</th>
@@ -256,6 +261,11 @@ $divisionData = $getDivision->select();
 											echo "<td>";
 											foreach($record['price'] as $price){
 												echo "￥<script>price(fixed('".$price."'))</script><br>".PHP_EOL;
+											}
+											echo "</td>".PHP_EOL;
+											echo "<td>";
+											foreach($record['unitPrice'] as $unitPrice){
+												echo "￥<script>price(fixed('".$unitPrice."'))</script><br>".PHP_EOL;
 											}
 											echo "</td>".PHP_EOL;
 											echo "<td>";
@@ -321,6 +331,7 @@ $divisionData = $getDivision->select();
 				remakeArray[k][8] = records[i][8][j];
 				remakeArray[k][9] = records[i][9][j];
 				remakeArray[k][10] = records[i][10][j];
+				remakeArray[k][11] = records[i][11][j];
 			}
 		}
 		let data = remakeArray.map((record)=>record.join('\t')).join('\r\n');
@@ -346,7 +357,7 @@ $divisionData = $getDivision->select();
 			});
 		}
 		
-		result.unshift(['id','inHospitalItemId','makerName','itemName','itemCode','itemStandard','price','quantity','quantityUnit','billingQuantity','totalAmount']);
+		result.unshift(['id','inHospitalItemId','makerName','itemName','itemCode','itemStandard','price','unitPrice','quantity','quantityUnit','billingQuantity','totalAmount']);
 	
 		exportCSV(result);
 	}

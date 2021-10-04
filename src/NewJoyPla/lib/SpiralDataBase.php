@@ -7,7 +7,7 @@ class SpiralDataBase {
     protected $database;
     protected $selectColumns = array();
     protected $searchCondition = array();
-    protected $selectName;
+    protected $selectName = '';
     protected $sort = array();
 	protected $groupBy = array();
 	protected $page = 1;
@@ -91,10 +91,18 @@ class SpiralDataBase {
 		$apiHeader = array("database","bulk_insert");
 		$parameters['db_title'] = $this->database;
 		$parameters['columns'] = $columns;
-		$parameters['data'] = $insertData;
+		foreach(array_chunk($insertData , 1000) as $ary)
+		{
+			$parameters['data'] = $ary;
+			$result = $this->apiSpiral->requestAPI($apiHeader, $parameters);
+			if($result['code'] != "0")
+			{
+				return $result;
+			}
+		}
 		$this->clearData();
 
-		return $this->apiSpiral->requestAPI($apiHeader, $parameters);
+		return $result;
 	}
 	
 	public function doUpdate(array $updateData){
@@ -123,10 +131,18 @@ class SpiralDataBase {
 		$parameters['db_title'] = $this->database;
 		$parameters['key'] = $keyTitle;
 		$parameters['columns'] = $columns;
-		$parameters['data'] = $updateData;
+		foreach(array_chunk($updateData , 1000) as $ary)
+		{
+			$parameters['data'] = $ary;
+			$result = $this->apiSpiral->requestAPI($apiHeader, $parameters);
+			if($result['code'] != "0")
+			{
+				return $result;
+			}
+		}
 		$this->clearData();
 
-		return $this->apiSpiral->requestAPI($apiHeader, $parameters);
+		return $result;
 	}
 
 	public function doUpsert(string $keyTitle ,array $upsertData){
@@ -144,9 +160,18 @@ class SpiralDataBase {
 		$parameters['db_title'] = $this->database;
 		$parameters['key'] = $keyTitle;
 		$parameters['columns'] = $columns;
-		$parameters['data'] = $bulkData;
+		foreach(array_chunk($bulkData , 1000) as $ary)
+		{
+			$parameters['data'] = $ary;
+			$result = $this->apiSpiral->requestAPI($apiHeader, $parameters);
+			if($result['code'] != "0")
+			{
+				return $result;
+			}
+		}
 		$this->clearData();
-		return $this->apiSpiral->requestAPI($apiHeader, $parameters);
+
+		return $result;
 	}
 
 	public function doSelectLoop(){

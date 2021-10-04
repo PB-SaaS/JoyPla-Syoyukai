@@ -1,4 +1,3 @@
-
 <?php
 include_once 'NewJoyPla/lib/ApiSpiral.php';
 include_once "NewJoyPla/lib/Define.php";
@@ -111,34 +110,69 @@ $divisionData = $getDivision->select();
     </style>
     <script>
 		let canAjax = true;
+		let gs1128_object = {};
+		let listObject = {};
+		let dataKey = ['id','maker','shouhinName','code','kikaku','irisu','count','symbol','labelCount','sumCount','jan'];
+		let index = 1;
+		
     	// 参照ボタンクリック
 		function sanshouClick(){
 			// 参照マスタを別ウィンドウで開く
-			window.open('%url/rel:mpgt:page_262313%', '_blank','scrollbars=yes,width=1220,height=600');
+			window.open('%url/rel:mpgt:page_175973%', '_blank','scrollbars=yes,width=1220,height=600');
 		
 		}
 		
-		let listObject = {};
-		let dataKey = ['id','maker','shouhinName','code','kikaku','irisu','count','symbol','labelCount','sumCount','jan'];
-		
-		function delTr(object , elm){
+		function delTr(index , elm){
 			elm.parentElement.parentElement.remove()
-			delete listObject[object.recordId];
+			delete listObject[index];
 		}
-
-		function addTr(object){
-			if(listObject[object.recordId]){
-				return false;
-			} else {
-				listObject[object.recordId] = object;
-				listObject[object.recordId].row = Object.keys(listObject).length;
+		
+		function chkNotLotRow(itemKey) {
+			let index = null;
+			$(document).find('.item_' + itemKey).each(function() {
+				let lotNum = $(this).parents('tr').find('.lot_' + itemKey).val();
+				let lotDate = $(this).parents('tr').find('.lotDate_' + itemKey).val();
+				if (!lotNum && !lotDate) {
+					let target = $(this).parents('tr');
+					index = $(document).find('.shouhin-table table tbody tr').index(target);
+					return false;
+				}
+			});
+			return index;
+		}
+		
+		function addTr(object, type, count){
+			if ( type === 1 ) { //商品マスタ
+				let chk = chkNotLotRow(object.recordId);
+				if ( chk !== null ) { return; }
 			}
-			listObject[object.recordId].countNum = 0;
-			listObject[object.recordId].countLabelNum = 1;
-			let trElm = document.createElement("tr"); 
+			if ( type === 2 ) { //バーコード検索
+				let chk = chkNotLotRow(object.recordId);
+				if ( chk !== null ) {
+					let target = $('.shouhin-table table tbody tr').eq(chk);
+					let targetCount = parseInt(target.find('.item_' + object.recordId).val());
+					if(targetCount !== count) {
+						UIkit.modal.alert('すでに記載されている商品と数量が異なります。<br>追加されている数量:'+targetCount + '<br>今回追加の数量:'+count+'<br>ご確認ください。');
+						return;
+					}
+					let setLabelCount = parseInt(target.find('.labelCount_' + object.recordId).val()) + 1;
+					target.find('.labelCount_' + object.recordId).val(setLabelCount).css({'color':'rgb(68, 68, 68)', 'background':'rgb(255, 204, 153)'});
+					target.find('.sum').text(targetCount * setLabelCount);
+					$(window).scrollTop($(target.find('.labelCount_' + object.recordId)).offset().top - 100);
+					return;
+				}
+			}
+			
+			listObject[index] = object;
+			listObject[index].no = index;
+			listObject[index].countNum = count;
+			listObject[index].countLabelNum = 1;
+
+			let trElm = document.createElement('tr'); 
+			trElm.id = 'tr_' + index;
 			let tdElm = '';
 			for(let i = 0 ; i < dataKey.length; i++){
-				tdElm = document.createElement("td");
+				tdElm = document.createElement('td');
 				html = document.createTextNode('');
 				text = '';
 				input = '';
@@ -147,50 +181,51 @@ $divisionData = $getDivision->select();
 					//html = document.createTextNode(listObject[object.recordId].row);
 				} else if(dataKey[i] === 'count'){
 					//html = '<input type="number" class="uk-input" style="width:72px" step="10">';
-				    html = document.createElement("div");
-				    input = document.createElement("input");
+				    html = document.createElement('div');
+				    input = document.createElement('input');
 				    input.type = 'number';
-					input.step="1"; 
-				    input.className = 'uk-input';
+				    input.step = '1';
+				    input.className = 'uk-input item_' + object.recordId;
+				    input.name = 'count';
 				    input.style = 'width:96px';
-				    input.id = 'hp_' + object.recordId;
 				    input.min = 0;
-				    input.value = listObject[object.recordId].countNum;
-				    
+				    input.value = count;
+/*
+				    if ( count > 0 ) { 
+				      input.style.backgroundColor = "rgb(255, 204, 153)";
+				      input.style.color = "rgb(68, 68, 68)";
+				    }
+*/
 				    input.onchange  = function () {  
-						changeForInputNumber(this);
-				    	onchangeCountNum(object.recordId,parseInt(this.value));
-						onchangeSumCountNum(object.recordId);
+						  changeForInputNumber(this);
 				    };
 				    //input.step = listObject[object.recordId].irisu;
 				    //<span class="uk-text-bottom">個</span>
-				    span = document.createElement("span");
-				    span.innerText = listObject[object.recordId].unit;
+				    span = document.createElement('span');
+				    span.innerText = listObject[index].unit;
 				    span.className = 'uk-text-bottom';
 					html.appendChild(input);
 					html.appendChild(span);
 
 					
 				} else if(dataKey[i] === 'labelCount'){
-					html = document.createElement("div");
+					html = document.createElement('div');
 					//html = '<input type="number" class="uk-input" style="width:72px" step="10">';\
-				    input = document.createElement("input");
+				    input = document.createElement('input');
 				    input.type = 'number';
-					input.step="1";
-				    input.className = 'uk-input';
+				    input.step = '1';
+				    input.className = 'uk-input labelCount_' + object.recordId;
+				    input.name = 'labelCount';
 				    input.style = 'width:96px';
-				    input.id = 'labelCount_' + object.recordId;
 				    input.min = 1;
 				    input.value = 1;
 				    
 				    input.onchange  = function () {
-						changeForInputNumber(this);
-				    	onchangeCountLabelNum(object.recordId,parseInt(this.value));
-						onchangeSumCountNum(object.recordId);
+						  changeForInputNumber(this);
 				    };
 				    //input.step = listObject[object.recordId].irisu;
 				    //<span class="uk-text-bottom">個</span>
-				    span = document.createElement("span");
+				    span = document.createElement('span');
 				    span.innerText = '枚';
 				    span.className = 'uk-text-bottom';
 					html.appendChild(input);
@@ -198,27 +233,27 @@ $divisionData = $getDivision->select();
 				} else if(dataKey[i] === 'symbol'){
 					html = document.createTextNode('×');
 				} else if(dataKey[i] === 'sumCount'){
-					html = document.createElement("div");
-				    span = document.createElement("span");
-				    span.id = 'sumCount_' + object.recordId;
-				    span.innerText = parseInt(listObject[object.recordId].countNum) * parseInt(listObject[object.recordId].countLabelNum);
+					html = document.createElement('div');
+				    span = document.createElement('span');
+				    span.className = 'sum';
+				    span.innerText = parseInt(listObject[index].countNum) * parseInt(listObject[index].countLabelNum);
 					html.appendChild(span);
 				    
-					span = document.createElement("span");
-				    span.innerText = listObject[object.recordId].unit;
+					span = document.createElement('span');
+				    span.innerText = listObject[index].unit;
 				    span.className = 'uk-text-bottom';
 					html.appendChild(span);
 				} else {
 					text = '';
 					if(dataKey[i] === 'kakaku'){
 						text += '￥';
-						text += price_text(listObject[object.recordId][dataKey[i]]);
-						text += '/'+ listObject[object.recordId].itemUnit;
+						text += price_text(listObject[index][dataKey[i]]);
+						text += '/'+ listObject[index].itemUnit;
 					} else if(dataKey[i] === 'teisu' || dataKey[i] === 'irisu') {
-						text += listObject[object.recordId][dataKey[i]];
-						text += listObject[object.recordId].unit;
-					} else if(listObject[object.recordId][dataKey[i]]){
-						text += listObject[object.recordId][dataKey[i]];
+						text += listObject[index][dataKey[i]];
+						text += listObject[index].unit;
+					} else if(listObject[index][dataKey[i]]){
+						text += listObject[index][dataKey[i]];
 					}
 					html = document.createTextNode(text);
 				}
@@ -226,20 +261,80 @@ $divisionData = $getDivision->select();
 				tdElm.appendChild(html);
 				trElm.appendChild(tdElm);
 			}
-			tdElm = document.createElement("td");
 
-			input = document.createElement("input");
+			tdElm = document.createElement('td');
+			input = document.createElement('input');
+			input.className = 'uk-input lot_' + object.recordId;
+			input.name = 'lot';
+			input.type = 'text';
+			input.maxLength = 20;
+			input.style.width = '184px';
+			if ( type === 4 && object.lot ) {
+				input.value = object.lot;
+				input.style.backgroundColor = 'rgb(255, 204, 153)';
+				input.style.color = 'rgb(68, 68, 68)';
+			}
+			input.onchange  = function () {  
+			    	$(this).css({'background-color':'rgb(255, 204, 153)'});
+			    };
+			tdElm.appendChild(input); 
+			trElm.appendChild(tdElm); 
+			
+			tdElm = document.createElement('td');
+			input = document.createElement('input');
+			input.className = 'uk-input lotDate_' + object.recordId;
+			input.name = 'lotDate';
+			input.type = 'date';
+			input.style.width = '184px';
+			if ( type === 4 && object.lotDate ) {
+				input.value = object.lotDate;
+				input.style.backgroundColor = 'rgb(255, 204, 153)';
+				input.style.color = 'rgb(68, 68, 68)';
+			}
+			input.onchange  = function () {  
+			    	$(this).css({'background-color':'rgb(255, 204, 153)'});
+			    };
+			tdElm.appendChild(input); 
+			trElm.appendChild(tdElm);
+			
+			if ( type === 4 ) {
+				delete object['lot'];
+				delete object['lotDate'];
+			}
+			
+			tdElm = document.createElement('td');
+			input = document.createElement('input');
 			input.type = 'button';
 			input.value = '削除';
 			input.className = 'uk-button uk-button-danger uk-button-small';
 			input.onclick = function(){
-				delTr(object,this)
+				delTr(object.no, this)
 			}
 			
 			tdElm.appendChild(input);
 			trElm.appendChild(tdElm);
 			
-			$(".shouhin-table table tbody").append(trElm);
+			tdElm = document.createElement('td');
+			input = document.createElement('input');
+			input.type = 'button';
+			input.value = '追加';
+			input.className = 'uk-button uk-button-default uk-button-small';
+			input.onclick = function(){
+				let copy = { ...object };
+				addTr(copy, 3, 0);
+			}
+			tdElm.appendChild(input);
+			trElm.appendChild(tdElm);
+			
+			if ( type === 3 ) { //追加ボタン
+				var from = event.target;
+				$('.shouhin-table table tbody').find(from).parents('tr').after(trElm);
+			} else {
+				$('.shouhin-table table tbody').append(trElm);
+			}
+			// 数量は変更しない
+			// if ( count > 0 ) { $(window).scrollTop($(trElm).find(".item_" + object.recordId).offset().top - 100); }
+			index++;
 			return true;
 		}
 		/*
@@ -254,25 +349,19 @@ $divisionData = $getDivision->select();
 			$('input[name="deadlineMinimum_'+id+'"]').attr('max',value);
 			listObject[id].deadlineMax = value;
 		}
-		*/
-		function onchangeCountNum(id,value){
-			listObject[id].countNum = value;
-			$('#hp_'+id).css({"color":"rgb(68, 68, 68)", "background-color":"rgb(255, 204, 153)", "width":"96px"});
-			$('#hp_'+id).val(value);
-			$(window).scrollTop($('#hp_'+id+':first').offset().top - 100);
-		}
+*/
 		
-		function onchangeCountLabelNum(id,value){
-			listObject[id].countLabelNum = value;
-			$('#labelCount_'+id).css({"color":"rgb(68, 68, 68)", "background-color":"rgb(255, 204, 153)", "width":"96px"});
-			$('#labelCount_'+id).val(value);
-			$(window).scrollTop($('#labelCount_'+id+':first').offset().top - 100);
-		}
-
-		function onchangeSumCountNum(id){
-			value = parseInt(listObject[id].countLabelNum) * parseInt(listObject[id].countNum);
-			$('#sumCount_'+id).text(value);
-		}		
+		
+		$(document).on("change", "input[name='count'], input[name='labelCount']", function() {
+			let count = parseInt($(this).parents("tr").find("input[name='count']").val());
+			let label = parseInt($(this).parents("tr").find("input[name='labelCount']").val());
+			$(this).parents("tr").find(".sum").text(count * label);
+			$(this).css({"color":"rgb(68, 68, 68)", "background-color":"rgb(255, 204, 153)"});
+			$(window).scrollTop($(this).offset().top - 100);
+		});
+		
+		
+		
 		
 		function barcodeSearch(){
 			if(!canAjax) { 
@@ -300,23 +389,7 @@ $divisionData = $getDivision->select();
             		return false;
                 }
                 data = data.data;
-                let addFlag = addTr(data);
-                //value = parseInt(listObject[data.recordId].countNum) + parseInt(data.count);
-				value = parseInt(data.count);
-				if(addFlag == false){
-					if(parseInt(listObject[data.recordId].countNum) !== value){
-						UIkit.modal.alert("すでに記載されている商品と数量が異なります。<br>追加されている数量:"+listObject[data.recordId].countNum + "<br>今回追加の数量:"+value+"<br>ご確認ください。").then(function(){
-							canAjax = true; // 再びAjaxできるようにする
-						});
-						return false;
-					}
-					value = parseInt(listObject[data.recordId].countLabelNum) + 1;
-					onchangeCountLabelNum(data.recordId,value);
-				} else {
-					onchangeCountNum(data.recordId,value);
-				}
-
-				onchangeSumCountNum(data.recordId);
+                addTr(data, 2, parseInt(data.count));
 				canAjax = true; // 再びAjaxできるようにする
                 $('input[name="barcode"]').val('');
             })
@@ -370,7 +443,6 @@ $divisionData = $getDivision->select();
 				UIkit.modal.alert('数量を入力してください');
 				return false ;
 			}
-
 			
 			checkflg = false;
 			Object.keys(listObject).forEach(function (key) {
@@ -384,6 +456,36 @@ $divisionData = $getDivision->select();
 				return false ;
 			}
 			
+			let chkLot = true;
+			Object.keys(listObject).forEach(function (key) {
+				if(listObject[key]['countNum'] > 0) {
+					if((!listObject[key]['lotNumber'] && listObject[key]['lotDate']) || (listObject[key]['lotNumber'] && !listObject[key]['lotDate'])) {
+			    	chkLot = false;
+					}
+				}
+			});
+			
+			if(!chkLot){
+				UIkit.modal.alert('ロット情報を入力してください');
+				return false ;
+			}
+			
+			chkLot = true;
+			let regex = /^[0-9a-zA-Z]+$/;
+			Object.keys(listObject).forEach(function (key) {
+				if(listObject[key]['lotNumber']) {
+					if((!regex.test(listObject[key]['lotNumber'])) ||
+					   (encodeURI(listObject[key]['lotNumber']).replace(/%../g, '*').length > 20)) {
+			    	chkLot = false;
+					}
+				}
+			});
+			
+			if(!chkLot){
+				UIkit.modal.alert('ロット番号の入力を確認してください');
+				return false ;
+			}
+			
 			return true;
 			
 		}
@@ -394,18 +496,20 @@ $divisionData = $getDivision->select();
 				return;
 			}
             loading();
+			setRegData();
 			if(! payoutCheck()){
 				loading_remove();
 				return false;
 			}
 			
 			canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
+			let payout = mergeLot();
 			$.ajax({
 				async: false,
                 url:'%url/rel:mpgt:regPayout%',
                 type:'POST',
                 data:{
-                	payout : JSON.stringify( objectValueToURIencode(listObject) ),
+                	payout : JSON.stringify( objectValueToURIencode(payout) ),
                 	sourceDivisionId : $('select[name="sourceDivision"]').val(),
                 	sourceDivisionName : encodeURI($('select[name="sourceDivision"] option:selected').text()),
                 	targetDivisionId : $('select[name="targetDivision"]').val(),
@@ -470,6 +574,9 @@ $divisionData = $getDivision->select();
 			document.createLabelForm.submit();
 			return true;
 		}
+
+		
+		
 		
     </script>
   </head>
@@ -558,6 +665,10 @@ $divisionData = $getDivision->select();
 					</form>	
 				</div>
 		    	
+					<div class="uk-margin uk-text-right">
+						<button type="button" class="uk-button uk-button-primary"  uk-toggle="target: #modal-gs1128">GS1-128で照合</button>
+					</div>
+		    	
 		    	<div class="shouhin-table uk-width-expand uk-overflow-auto">
 		    		<table class="uk-table uk-table-striped uk-text-nowrap">
 		    			<thead>
@@ -573,6 +684,9 @@ $divisionData = $getDivision->select();
 		    					<th class="uk-table-shrink">個数（ラベル枚数）</th>
 		    					<th class="uk-table-shrink">合計払出数</th>
 		    					<th>JANコード</th>
+		    					<th>ロット番号</th>
+		    					<th>使用期限</th>
+		    					<th></th>
 		    					<th></th>
 		    				</tr>
 		    			</thead>
@@ -592,22 +706,31 @@ $divisionData = $getDivision->select();
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
-		    				</tr>
-		    				<tr>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    				</tr>
 		    				<tr>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    				</tr>
+		    				<tr>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
@@ -635,5 +758,164 @@ $divisionData = $getDivision->select();
 		<input type="hidden" value="payout" name="pattern">
 	</form>
 	
+	
+	<!-- This is a button toggling the modal with the default close button -->
+		<!-- This is the modal with the default close button -->
+		<div id="modal-gs1128" uk-modal>
+		    <div class="uk-modal-dialog uk-modal-body">
+		    	<form onsubmit="gs1_128($('#GS1-128').val());return false;" action="#">
+			        <button class="uk-modal-close" type="button" uk-close></button>
+			        <h2 class="uk-modal-title">GS1-128 読取</h2>
+			        <input type="text" class="uk-input" placeholder="GS1-128" id="GS1-128" autofocus="true">
+					    <p class="uk-text-right">
+			            <button class="uk-button uk-button-primary" type="button" onclick="gs1_128($('#GS1-128').val());">反映</button>
+			        </p>
+		        </form>
+		    </div>
+		</div>
+		
+	
+<script>
+    	function gs1_128(gs1128){
+    		gs1128_object = {};
+				
+			if(Object.keys(listObject).length === 0){
+				UIkit.modal.alert('先に商品を選択してください。');
+				return false ;
+			}
+				
+			if(gs1128.indexOf("]C1") !== 0){
+				//UIkit.modal.alert("GS1-128ではありません");
+				//return ;
+				return gs1_128("]C1"+gs1128);
+			} else {
+				gs1128 = gs1128.slice( 3 );
+				let obj = check_gs1128(gs1128);
+				let objkey = null;
+				let setObj = {};
+				
+				if(!obj.hasOwnProperty("01")){
+					UIkit.modal.alert("商品情報が含まれておりませんでした。").then(function(){
+						UIkit.modal($('#modal-gs1128')).show();
+					});
+					return;
+				}
+				
+				searchJan = addCheckDigit(obj["01"]);
+				console.log(searchJan);
+				Object.keys(listObject).forEach(function (key) {
+					if(searchJan == listObject[key]["jan"]){
+						objkey = listObject[key]["recordId"];
+						setObj = { ...listObject[key] };
+					}
+				});
+				
+				if(!objkey){
+					UIkit.modal.alert("対象の発注商品が見つかりませんでした。").then(function(){
+						UIkit.modal($('#modal-gs1128')).show();
+					});
+					return;
+				}
+
+				let existflg = false;
+				let objLot = (obj["10"] === void 0) ? "" : obj["10"]; //lotNumber
+				let objLotDate = (obj["17"] === void 0) ? "" : changeDate(obj["17"]); //lotDate
+
+				$(document).find(".lot_" + objkey).each(function() {
+					let addRowLot = $(this).val();
+					let addRowLotDate = $(this).parents("tr").find(".lotDate_" + objkey).val();
+					let addRowNum = parseInt($(this).parents("tr").find(".item_" + objkey).val());
+
+					if (addRowNum === 0 && !addRowLot && !addRowLotDate) {
+						$(this).val(objLot).css({"color":"rgb(68, 68, 68)", "background" : "rgb(255, 204, 153)"});
+						$(this).parents("tr").find(".lotDate_" + objkey).val(objLotDate).css({"color":"rgb(68, 68, 68)", "background" : "rgb(255, 204, 153)"});
+//						$(this).parents("tr").find(".item_" + objkey).val(parseInt(setObj.irisu)).css({"color":"rgb(68, 68, 68)", "background" : "rgb(255, 204, 153)"});
+						$(window).scrollTop($(this).offset().top - 100);
+						existflg = true;
+						return false;
+					}
+					if ((addRowLot == objLot) && (addRowLotDate == objLotDate)) {
+//						let num = addRowNum + parseInt(setObj.irisu);
+//						$(this).parents("tr").find(".item_" + objkey).val(num).css({"color":"rgb(68, 68, 68)", "background" : "rgb(255, 204, 153)"});
+//						let itemIndex = $.trim(($(this).parents("tr").attr("id")).replace("tr_", ""));
+//						$(window).scrollTop($(this).offset().top - 100);
+						existflg = true;
+						return false;
+					}
+				});
+
+				if (!existflg) {
+					setObj.lot = objLot;
+					setObj.lotDate = objLotDate;
+					addTr(setObj, 4, 0);
+				}
+
+				$(".select_items").hide();
+				$(".select_items select").val("");
+				$("#GS1-128").val("");
+				document.getElementById("GS1-128").focus();
+			}
+		}
+
+		function changeDate(text){
+			if(text == null){
+				return "";
+			}
+			if(text.length == "6"){
+				text = 20 + text;
+			}
+			date = text.slice(6, 8);
+			if(parseInt(text.slice(6, 8)) == 0){
+				date = '01';
+			}
+			return text.slice(0, 4) + "-" + text.slice(4, 6) + "-" + date;
+		}
+
+		function setRegData() {
+			$(document).find('.shouhin-table table tbody tr').each(function() {
+				let row = $.trim(($(this).attr('id')).replace('tr_', ''));
+				let count = $(this).find('input[name="count"]').val();
+				let labelCount = $(this).find('input[name="labelCount"]').val();
+				let lot = $(this).find('input[name="lot"]').val();
+				let date = $(this).find('input[name="lotDate"]').val();
+				listObject[row].countNum = parseInt(count);
+				listObject[row].countLabelNum = parseInt(labelCount);
+				listObject[row].lotNumber = lot;
+				listObject[row].lotDate = date;
+			});
+		}
+
+		function mergeLot() {
+			let regObj = {};
+			Object.keys(listObject).forEach(function (key) {
+				let itemId = listObject[key]['recordId'];
+				if (regObj[itemId] === void 0) { regObj[itemId] = {}; }
+				if (listObject[key].lotNumber && listObject[key].lotDate) {
+					let lotKey = listObject[key].lotNumber + listObject[key].lotDate;
+					let temp = Object.entries(regObj[itemId]);
+					let chkLotDup = temp.findIndex(([id, data]) => data.lotNumber == listObject[key].lotNumber && data.lotDate == listObject[key].lotDate);
+					if (chkLotDup === -1) {
+						regObj[itemId][lotKey] = { ...listObject[key] };
+					} else {
+						regObj[itemId][lotKey]['countNum'] = regObj[itemId][lotKey]['countNum'] + listObject[key].countNum;
+						regObj[itemId][lotKey]['countLabelNum'] = regObj[itemId][lotKey]['countLabelNum'] + listObject[key].countLabelNum;
+					}
+				}
+				
+				if (!listObject[key].lotNumber && !listObject[key].lotDate) {
+					if (regObj[itemId][0] === void 0) {
+						regObj[itemId][0] = {};
+						regObj[itemId][0] = { ...listObject[key] };
+					} else {
+						regObj[itemId][0]['countNum'] = regObj[itemId][0]['countNum'] + listObject[key].countNum;
+						regObj[itemId][0]['countLabelNum'] = regObj[itemId][0]['countLabelNum'] + listObject[key].countLabelNum;
+					}
+				}
+			});
+			return regObj;
+		}
+
+</script>
+
   </body>
 </html>

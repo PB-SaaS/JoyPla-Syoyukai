@@ -114,6 +114,8 @@ if($userInfo->getUserPermission() == "1"){
 										<th style="min-width:150px">商品名</th>
 										<th>製品コード</th>
 										<th>規格</th>
+										<th>ロット番号</th>
+										<th>使用期限</th>
 										<th>入数</th>
 										<th>入庫数</th>
 										<th>返品数</th>
@@ -130,6 +132,8 @@ if($userInfo->getUserPermission() == "1"){
 				    						echo "<td>".$record["itemName"]."</td>";
 				    						echo "<td>".$record["itemCode"]."</td>";
 				    						echo "<td>".$record["itemStandard"]."</td>";
+				    						echo "<td>".$record["lotNumber"]."</td>";
+				    						echo "<td>".$record["lotDate"]."</td>";
 				    						echo "<td>".$record["quantity"].$record["quantityUnit"]."</td>";
 				    						echo "<td>".$record["receivingCount"].$record["itemUnit"]."</td>";
 				    						echo "<td>".$record["returnCount"].$record["itemUnit"]."</td>";

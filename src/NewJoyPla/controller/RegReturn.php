@@ -37,9 +37,13 @@ $regInventoryTrdb = new App\Api\RegInventoryTrdb($spiralDataBase,$userInfo);
 
 $remakeData = array();
 
-foreach($_POST['returnData'] as $itemId => $data){
-	$remakeData[$itemId] = array();
-	$remakeData[$itemId]['countNum'] = $data['quantity'] * $data['returnCount'];
+foreach($_POST['returnData'] as $data){
+	if (array_key_exists($data['inHospitalItemId'], $remakeData)) {
+		$remakeData[$data['inHospitalItemId']]['countNum'] += $data['quantity'] * $data['returnCount'];
+	} else {
+		$remakeData[$data['inHospitalItemId']] = array();
+		$remakeData[$data['inHospitalItemId']]['countNum'] = $data['quantity'] * $data['returnCount'];
+	}
 }
 
 //オプション情報取得
@@ -61,5 +65,34 @@ if(! $result){
 	echo json_encode(array('result'=>$result));
 	exit;
 }
+
+//ロット管理情報更新
+$lotData = [];
+
+foreach ($_POST['returnData'] as $rows) {
+	if ($rows['lotNumber'] && $rows['lotDate']) {
+		$date = urldecode($rows['lotDate']);
+		$timestamp = date_create_from_format('Y年m月d日', $date)->getTimestamp();
+		$lotDate = date('Y-m-d', $timestamp);
+		$lot = $rows['inHospitalItemId'].$rows['lotNumber'].$lotDate;
+		$lotData[$lot] = [];
+		$lotData[$lot] = [
+			'inHPItemid' => $rows['inHospitalItemId'],
+			'lotNumber' => $rows['lotNumber'],
+			'lotDate' => $lotDate,
+			'stockQuantity' => (int)$rows['quantity'] * (int)$rows['returnCount']
+		];
+	}
+}
+
+if($lotData) {
+	$result = $regInventoryTrdb->lotData($lotData,$divisionId,'2'); // 在庫数減算
+
+	if(! $result) {
+		echo json_encode(array('result'=>$result));
+		exit;
+	}
+}
+
 //結果を返却
 echo json_encode(array('result'=>$result));

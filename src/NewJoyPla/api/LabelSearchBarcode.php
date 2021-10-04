@@ -7,9 +7,9 @@ class LabelSearchBarcode{
     private $spiralDataBase;
     private $userInfo;
     
-    private $InHPItemDB = 'itemInHospitalDB';
+    private $InHPItemDB = 'itemInHospitalv2';
 
-    private $fields = array("makerName","itemName","itemCode","itemStandard","quantity","price","itemJANCode","distributorName","inHospitalItemId","quantityUnit","itemUnit","distributorId","labelId");
+    private $fields = array("makerName","itemName","itemCode","itemStandard","quantity","price","itemJANCode","distributorName","inHospitalItemId","quantityUnit","itemUnit","distributorId","labelId","unitPrice");
 
     public function __construct(\App\Lib\SpiralDataBase $spiralDataBase, \App\Lib\UserInfo $userInfo){
         $this->spiralDataBase = $spiralDataBase;
@@ -106,7 +106,8 @@ class LabelSearchBarcode{
             "itemUnit" => $resultData[10],
             "distributorId" => $resultData[11],
             "count" => (int)$customQuantity,//ラベルの入数
-            "labelId" => $resultData[12]
+            "labelId" => $resultData[12],
+            "unitPrice" => $resultData[13]
             );
 
         return $items;

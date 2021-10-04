@@ -31,7 +31,7 @@ class GetInventory{
         $this->spiralDataBase->setDataBase($this->database);
         $this->spiralDataBase->addSearchCondition('hospitalId',$this->userInfo->getHospitalId());
         $this->spiralDataBase->addSearchCondition('inventoryEndId',$InventoryEId);
-        $this->spiralDataBase->addSelectFields('id','divisionId','inventryNum','inHospitalItemId');
+        $this->spiralDataBase->addSelectFields('id','divisionId','inventryNum','inHospitalItemId','lotNumber','lotDate','lotUniqueKey');
         return $this->spiralDataBase->doSelectLoop();
     }
 
