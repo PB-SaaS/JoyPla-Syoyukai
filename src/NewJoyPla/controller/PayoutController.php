@@ -72,7 +72,7 @@ class PayoutController extends Controller
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 払出登録',
-                'script' => '<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>',
+                'script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),

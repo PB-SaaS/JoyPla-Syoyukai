@@ -85,6 +85,7 @@
 		}
     </style>
     <script>
+/*
 		let canAjax = true;
 		let gs1128_object = {};
 		let listObject = {};
@@ -117,7 +118,7 @@
 			return index;
 		}
 		
-		function addTr(object, type, count){
+		function addTr0(object, type, count){
 			if ( type === 1 ) { //商品マスタ
 				let chk = chkNotLotRow(object.recordId);
 				if ( chk !== null ) { return; }
@@ -166,12 +167,10 @@
 				    input.style = 'width:96px';
 				    input.min = 0;
 				    input.value = count;
-/*
-				    if ( count > 0 ) { 
-				      input.style.backgroundColor = "rgb(255, 204, 153)";
-				      input.style.color = "rgb(68, 68, 68)";
-				    }
-*/
+				    //if ( count > 0 ) { 
+				    //  input.style.backgroundColor = "rgb(255, 204, 153)";
+				    //  input.style.color = "rgb(68, 68, 68)";
+				    //}
 				    input.onchange  = function () {  
 						  changeForInputNumber(this);
 				    };
@@ -313,19 +312,16 @@
 			index++;
 			return true;
 		}
-		/*
-		function onchangeDeadlineMinimum(id,value){
-			$('input[name="deadlineMax_'+id+'"]').attr('min',value);
-			listObject[id].deadlineMinimum = value;
-		}
-		*/
+		
+		//function onchangeDeadlineMinimum(id,value){
+		//	$('input[name="deadlineMax_'+id+'"]').attr('min',value);
+		//	listObject[id].deadlineMinimum = value;
+		//}
 
-		/*
-		function onchangeDeadlineMax(id,value){
-			$('input[name="deadlineMinimum_'+id+'"]').attr('max',value);
-			listObject[id].deadlineMax = value;
-		}
-*/
+		//function onchangeDeadlineMax(id,value){
+		//	$('input[name="deadlineMinimum_'+id+'"]').attr('max',value);
+		//	listObject[id].deadlineMax = value;
+		//}
 		
 		
 		$(document).on("change", "input[name='count'], input[name='labelCount']", function() {
@@ -551,11 +547,10 @@
 			return true;
 		}
 
-		
-		
+		*/
 		
     </script>
-    <div class="animsition" uk-height-viewport="expand: true">
+    <div id="app" class="animsition" uk-height-viewport="expand: true">
 	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
 		    <div class="uk-container uk-container-expand">
 		    	<ul class="uk-breadcrumb">
@@ -618,7 +613,7 @@
 		    	</div>
 		    	<div class="uk-margin-bottom" uk-grid>
 		    		<div class="uk-width-1-2@m" uk-margin>
-			    		<button class="uk-button uk-button-default" onclick="sanshouClick()">商品マスタを開く</button>
+			    		<button class="uk-button uk-button-default" v-on:click="sanshouClick">商品マスタを開く</button>
 			    		<button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
 			    		<button class="uk-button uk-button-primary uk-margin-small-top" onclick="sendPayout()">払出実行</button>
 		    		</div>
@@ -637,7 +632,7 @@
 				</div>
 		    	
 					<div class="uk-margin uk-text-right">
-						<button type="button" class="uk-button uk-button-primary"  uk-toggle="target: #modal-gs1128">GS1-128で照合</button>
+						<button type="button" class="uk-button uk-button-primary"  uk-toggle="target: #gs1-128">GS1-128で照合</button>
 					</div>
 		    	
 		    	<div class="shouhin-table uk-width-expand uk-overflow-auto">
@@ -662,6 +657,29 @@
 		    				</tr>
 		    			</thead>
 		    			<tbody>
+							<tr v-for="(list, key) in lists" :id="'tr_' + key">
+								<td>{{list.text}}</td>
+								<td>{{list.maker}}</td>
+								<td>{{list.shouhinName}}</td>
+								<td>{{list.code}}</td>
+								<td>{{list.kikaku}}</td>
+								<td>{{list.irisu}}{{list.unit}}</td>
+								<td>
+									<input type="number" step="1" class="uk-input" min="0" style="width: 96px;" v-model="list.count" v-on:change="changeInputStyle">
+									<span class="uk-text-bottom">{{list.unit}}</span>
+								</td>
+								<td>×</td>
+								<td>
+									<input type="number" step="1" class="uk-input" min="1" style="width: 96px;" v-model="list.labelCount" v-on:change="changeInputStyle">
+									<span class="uk-text-bottom">枚</span>
+								</td>
+								<td>{{list.count * list.labelCount}}{{list.unit}}</td>
+								<td>{{list.jan}}</td>
+								<td><input type="text" class="uk-input lot" v-model="list.lotNumber" v-on:change="changeInputStyle"></td>
+								<td><input type="date" class="uk-input lotDate" v-model="list.lotDate" v-on:change="changeInputStyle"></td>
+								<td><input type="button" class="uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)"></td>
+								<td><input type="button" class="uk-button uk-button-default uk-button-small" value="追加" v-on:click="copyList(key)"></td>
+							</tr>
 		    			</tbody>
 		    			<tfoot>
 		    				<tr>
@@ -731,22 +749,269 @@
 	
 	
 	<!-- This is a button toggling the modal with the default close button -->
-		<!-- This is the modal with the default close button -->
-		<div id="modal-gs1128" uk-modal>
-		    <div class="uk-modal-dialog uk-modal-body">
-		    	<form onsubmit="gs1_128($('#GS1-128').val());return false;" action="#">
-			        <button class="uk-modal-close" type="button" uk-close></button>
-			        <h2 class="uk-modal-title">GS1-128 読取</h2>
-			        <input type="text" class="uk-input" placeholder="GS1-128" id="GS1-128" autofocus="true">
-					    <p class="uk-text-right">
-			            <button class="uk-button uk-button-primary" type="button" onclick="gs1_128($('#GS1-128').val());">反映</button>
-			        </p>
-		        </form>
-		    </div>
-		</div>
-		
+	<!-- This is the modal with the default close button -->
+	<div id="gs1-128" uk-modal>
+	    <div class="uk-modal-dialog uk-modal-body">
+	    	<form onsubmit="gs1_128.check_gs1_128($('#GS1-128').val());return false;" action="#">
+		        <button class="uk-modal-close" type="button" uk-close></button>
+		        <h2 class="uk-modal-title">GS1-128 読取</h2>
+		        <input type="text" class="uk-input" placeholder="GS1-128" id="GS1-128" autofocus="true">
+				    <p class="uk-text-right">
+		            <button class="uk-button uk-button-primary" type="button" onclick="gs1_128.check_gs1_128($('#GS1-128').val());">反映</button>
+		        </p>
+	        </form>
+	    </div>
+	</div>
 	
 <script>
+var app = new Vue({
+	el: '#app',
+	data: {
+		lists: []
+	},
+	methods: {
+		addList: function(object) {
+			object.count = ((object.count == null)? 0 : object.count); 
+			object.labelCount = ((object.labelCount == null)? 1 : object.labelCount);
+			this.lists.push(object);
+		},
+		copyList: function(key) {
+			let original = JSON.parse(JSON.stringify(this.lists));
+			this.lists.splice(0, original.length);
+			let num = 0;
+			for(num ; num <= key ; num++)
+			{
+				this.addList(JSON.parse(JSON.stringify(original[num])));
+			}
+			
+			let copy = JSON.parse(JSON.stringify(original[key]));
+			copy.count = null;
+			copy.labelCount = null;
+			copy.lotNumber = null;
+			copy.lotDate = null;
+			
+			this.addList(copy); //コピー
+			
+			for(num ; num < original.length ; num++)
+			{
+				this.addList(JSON.parse(JSON.stringify(original[num])));
+			}
+			
+		},
+		deleteList: function(key) {
+			this.lists.splice(key, 1);
+		},
+		sanshouClick: function() {
+			window.open('%url/rel:mpgt:page_175973%', '_blank','scrollbars=yes,width=1220,height=600');
+		},
+		changeInputStyle: function(elm){
+			elm.currentTarget.style.backgroundColor = "rgb(255, 204, 153)";
+			elm.currentTarget.style.color = "rgb(68, 68, 68)";
+		},
+		search: function(searchJan,lotNumber,lotDate){
+			//商品が存在するかつロットが同一
+			let existflg = false;
+			this.lists.forEach(function(elem, index) {
+				changeObject = null;
+				if(!existflg){
+					if(searchJan == this.lists[index].jan && this.lists[index].lotNumber == objLotNumber && this.lists[index].lotDate == objLotDate ){
+						changeObject = this.lists[index];
+						changeObject.labelCount++;
+						
+						this.$set(this.lists, index, changeObject);
+						existflg = true;							
+						$("#tr_"+index+" input[type='text']").css({'backgroundColor' : 'rgb(255, 204, 153)','color' : 'rgb(68, 68, 68)'});
+						$("#tr_"+index+" input[type='number']").css({'backgroundColor' : 'rgb(255, 204, 153)','color' : 'rgb(68, 68, 68)'});
+						$("#tr_"+index+" input[type='date']").css({'backgroundColor' : 'rgb(255, 204, 153)','color' : 'rgb(68, 68, 68)'});
+						$(window).scrollTop($("#tr_"+index).offset().top - 100);
+
+					}
+				}
+			});
+			
+			//商品が存在するかつロットの記入がされていない
+			if(!existflg){
+				this.lists.forEach(function(elem, index) {
+					changeObject = null;
+					if(!existflg){
+						if(searchJan == this.lists[index].jan && this.lists[index].lotNumber == null && this.lists[index].lotDate == null ){
+							changeObject = this.lists[index];
+							changeObject.lotNumber = objLotNumber;
+							changeObject.lotDate = objLotDate;
+							
+							this.$set(this.lists, index, changeObject);
+							existflg = true;							
+							$("#tr_"+index+" input[type='text']").css({'backgroundColor' : 'rgb(255, 204, 153)','color' : 'rgb(68, 68, 68)'});
+							$("#tr_"+index+" input[type='number']").css({'backgroundColor' : 'rgb(255, 204, 153)','color' : 'rgb(68, 68, 68)'});
+							$("#tr_"+index+" input[type='date']").css({'backgroundColor' : 'rgb(255, 204, 153)','color' : 'rgb(68, 68, 68)'});
+							$(window).scrollTop($("#tr_"+index).offset().top - 100);
+
+						}
+					}
+				});
+			}
+			
+			//商品をaddする
+			if(!existflg){
+				this.lists.forEach(function(elem, index) {
+					changeObject = null;
+					if(!existflg){
+						if(searchJan == this.lists[index].jan){
+							changeObject = this.lists[index];
+							changeObject.lotNumber = objLotNumber;
+							changeObject.lotDate = objLotDate;
+							
+							this.addList(changeObject);
+							existflg = true;
+							$("#tr_"+index+" input").css({'backgroundColor' : 'rgb(255, 204, 153)','color' : 'rgb(68, 68, 68)'});
+							$("#tr_"+index+" input[type='number']").css({'backgroundColor' : 'rgb(255, 204, 153)','color' : 'rgb(68, 68, 68)'});
+							$("#tr_"+index+" input[type='date']").css({'backgroundColor' : 'rgb(255, 204, 153)','color' : 'rgb(68, 68, 68)'});
+							$(window).scrollTop($("#tr_"+index).offset().top - 100);
+						}
+					}
+				});
+			}
+			
+			return existflg;
+		},
+		labelSearch: function(object) {
+			let existflg = false;
+			this.lists.forEach(function(elem, index) {
+				changeObject = null;
+				if(!existflg){
+					if(object.jan == this.lists[index].jan && this.lists[index].count == object.count){
+						if(object.lotNumber == this.lists[index].lotNumber && object.objLotDate == this.lists[index].objLotDate){
+							changeObject = this.lists[index];
+							changeObject.labelCount++;
+							
+							this.$set(this.lists, index, changeObject);
+							existflg = true;							
+							$("#tr_"+index+" input[type='text']").css({'backgroundColor' : 'rgb(255, 204, 153)','color' : 'rgb(68, 68, 68)'});
+							$("#tr_"+index+" input[type='number']").css({'backgroundColor' : 'rgb(255, 204, 153)','color' : 'rgb(68, 68, 68)'});
+							$("#tr_"+index+" input[type='date']").css({'backgroundColor' : 'rgb(255, 204, 153)','color' : 'rgb(68, 68, 68)'});
+							$(window).scrollTop($("#tr_"+index).offset().top - 100);
+						}
+					}
+				}
+			});
+			if(!existflg){
+				this.lists.forEach(function(elem, index) {
+					changeObject = null;
+					if(!existflg){
+						if(object.jan == this.lists[index].jan){
+							this.addList(object);
+							existflg = true;
+							$(window).scrollTop($("#tr_"+index).offset().top - 100);
+						}
+					}
+				});
+			}
+			return existflg;
+		},
+		barcodeSearch: function() {
+			$.ajax({
+				async: false,
+                url:'%url/rel:mpgt:labelBarcodeSAPI%',
+                type:'POST',
+                data:{
+                	barcode : $('input[name="barcode"]').val(),
+                },
+                dataType: 'json'
+            })
+            // Ajaxリクエストが成功した時発動
+            .done( (data) => {
+            	let value = 0;
+                if(data.code != 0 || data.data.length == 0){
+            		UIkit.modal.alert("商品が見つかりませんでした");
+            		return false;
+                }
+                data = data.data;
+                this.labelSearch(data);
+                $('input[name="barcode"]').val('');
+            })
+            // Ajaxリクエストが失敗した時発動
+            .fail( (data) => {
+                UIkit.modal.alert("商品が見つかりませんでした");
+            })
+            // Ajaxリクエストが成功・失敗どちらでも発動
+            .always( (data) => {
+				loading_remove();
+            });
+		}
+	}
+});
+
+var gs1_128 = new Vue({
+	el: '#gs1-128',
+	data: {
+		gs1_128: {}
+	},
+	methods: {
+		changeDate: function (text){
+			if(text == null){
+				return "";
+			}
+			if(text.length == "6"){
+				text = 20 + text;
+			}
+			date = text.slice(6, 8);
+			if(parseInt(text.slice(6, 8)) == 0){
+				date = '01';
+			}
+			return text.slice(0, 4) + "-" + text.slice(4, 6) + "-" + date;
+		},
+		check_gs1_128: function (gs1128)
+		{
+			if(app.lists.length === 0)
+			{
+				UIkit.modal.alert('先に商品を選択してください。');
+				return false ;
+			}
+			if(gs1128.indexOf("]C1") !== 0){
+				//UIkit.modal.alert("GS1-128ではありません");
+				//return ;
+				return this.check_gs1_128("]C1"+gs1128);
+			}
+			
+			gs1128 = gs1128.slice( 3 );
+			let obj = check_gs1128(gs1128);
+				
+			if(!obj.hasOwnProperty("01")){
+				UIkit.modal.alert("商品情報が含まれておりませんでした。").then(function(){
+					UIkit.modal($('#gs1-128')).show();
+				});
+				return;
+			}
+			
+			let searchJan = removeCheckDigit(obj["01"]);
+			let objkey = null;
+			let setObj = {};
+			
+			let objLotNumber = (obj["10"] === void 0) ? "" : obj["10"]; //lotNumber
+			let objLotDate = (obj["17"] === void 0) ? "" : this.changeDate(obj["17"]); //lotDate
+			let existflg = false;
+			let changeObject = null;
+			
+			
+			existflg = app.search(searchJan,objLotNumber,objLotDate);
+			
+			if(!existflg){
+				UIkit.modal.alert("対象の発注商品が見つかりませんでした。").then(function(){
+					UIkit.modal($('#gs1-128')).show();
+				});
+				return;
+			} 
+			
+			$("#GS1-128").val("");
+			document.getElementById("GS1-128").focus();
+		}
+	}
+});
+
+function addTr(object, type, count){
+	app.addList(object);
+}
+/*
     	function gs1_128(gs1128){
     		gs1128_object = {};
 				
@@ -861,16 +1126,14 @@
 			Object.keys(listObject).forEach(function (key) {
 				let itemId = listObject[key]['recordId'];
 				if (regObj[itemId] === void 0) { regObj[itemId] = {}; }
-				if (listObject[key].lotNumber && listObject[key].lotDate) {
-					let lotKey = listObject[key].lotNumber + listObject[key].lotDate;
-					let temp = Object.entries(regObj[itemId]);
-					let chkLotDup = temp.findIndex(([id, data]) => data.lotNumber == listObject[key].lotNumber && data.lotDate == listObject[key].lotDate);
-					if (chkLotDup === -1) {
-						regObj[itemId][lotKey] = { ...listObject[key] };
-					} else {
-						regObj[itemId][lotKey]['countNum'] = regObj[itemId][lotKey]['countNum'] + listObject[key].countNum;
-						regObj[itemId][lotKey]['countLabelNum'] = regObj[itemId][lotKey]['countLabelNum'] + listObject[key].countLabelNum;
-					}
+				let lotKey = listObject[key].lotNumber + listObject[key].lotDate;
+				let temp = Object.entries(regObj[itemId]);
+				let chkLotDup = temp.findIndex(([id, data]) => data.lotNumber == listObject[key].lotNumber && data.lotDate == listObject[key].lotDate);
+				if (chkLotDup === -1) {
+					regObj[itemId][lotKey] = { ...listObject[key] };
+				} else {
+					regObj[itemId][lotKey]['countNum'] = regObj[itemId][lotKey]['countNum'] + listObject[key].countNum;
+					regObj[itemId][lotKey]['countLabelNum'] = regObj[itemId][lotKey]['countLabelNum'] + listObject[key].countLabelNum;
 				}
 				
 				if (!listObject[key].lotNumber && !listObject[key].lotDate) {
@@ -885,5 +1148,5 @@
 			});
 			return regObj;
 		}
-
+*/
 </script>

@@ -118,6 +118,15 @@
         // 結果
         return String(barcodeStr.slice(0,12)) + String(10 - parseInt((evenNum * 3 + oddNum).toString().slice(-1)));
     }
+    
+    
+	function removeCheckDigit(barcodeStr) { // 引数は文字列
+        if(barcodeStr.length == 14)
+        {
+        	return barcodeStr = barcodeStr.slice(0,13);	
+        }
+        return barcodeStr;
+    }
 	/*
 	function check_gs1128(code){
 		let allcheck = false;
