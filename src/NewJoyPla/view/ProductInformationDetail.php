@@ -155,7 +155,7 @@
                         <li>
                             <a class="uk-accordion-title" href="#">表示項目選択</a>
                             <div class="uk-accordion-content" hidden>
-                                <a class="uk-button uk-button-secondary uk-button-small uk-width-1-1" href="#" onclick="table_field_selector()">反映</a>
+                                <a class="uk-button uk-button-secondary uk-button-small uk-width-1-1" href="#" onclick="item_detail.table_field_selector()">反映</a>
                                 <ul class="uk-list uk-list-striped">
 
                                     <li>
@@ -308,50 +308,47 @@
     </div>
 </div>
 <script>
-    $(function() {
-        if ("%val:usr:notUsedFlag:id%" == "0") {
-            label = "uk-label-success";
+class Item
+{
+    constructor()
+    {
+        let storage = JSON.parse(localStorage.getItem("joypla_inHpItemsList"));
+        let dispObj = {};
+        if (!storage) {
+            for (let i = 1 ; i <= 27 ; i++) {
+                dispObj[i] = true;
+            }
         } else {
-            label = "uk-label-danger";
+            dispObj = storage;
         }
-
-        $("#notUsedFlag").addClass(label);
-    });
-
-  $(function(){
-    let storage = JSON.parse(localStorage.getItem("joypla_inHpItemsList"));
-    let dispObj = {};
-    if(!storage){
-      for(let i = 1 ; i <= 27 ; i++){
-        dispObj[i] = true;
-      }
-    } else {
-      dispObj = storage;
+        this.dispSet(dispObj);
     }
-    dispSet(dispObj);
-  });
-  function table_field_selector(){
-    let count = $("input[class^='uk-checkbox chk_']").length;;
-    let disp = {};
-    for(let i = 1 ; i <= count ; i++){
-      disp[i] = false;
-      if($("input.chk_"+( "00" + i ).slice( -2 )).is(":checked")){
-        disp[i] = true;
-      }
-    }
-    localStorage.setItem("joypla_inHpItemsList", JSON.stringify(disp));
-    location.reload();
-  }
-  
-  function dispSet(settingObj){
-    Object.keys(settingObj).forEach(function (key) {
-      $(".chk_"+( "00" + key ).slice( -2 )).prop("checked", settingObj[key]);
-      if(settingObj[key]){
-        $(".f_"+( "00" + key ).slice( -2 )).show();
-      } else {
-        $(".f_"+( "00" + key ).slice( -2 )).hide();
-      }
-    });
-  }
 
+    table_field_selector() {
+        let count = $("input[class^='uk-checkbox chk_']").length;
+        let disp = {};
+        for (let i = 1; i <= count; i++) {
+            disp[i] = false;
+            if ($("input.chk_" + ("00" + i).slice(-2)).is(":checked")) {
+                disp[i] = true;
+            }
+        }
+        localStorage.setItem("joypla_inHpItemsList", JSON.stringify(disp));
+        location.reload();
+    }
+
+    dispSet(settingObj) {
+        Object.keys(settingObj).forEach(function(key) {
+            $(".chk_" + ("00" + key).slice(-2)).prop("checked", settingObj[key]);
+            if (settingObj[key]) {
+                $(".f_" + ("00" + key).slice(-2)).show();
+            } else {
+                $(".f_" + ("00" + key).slice(-2)).hide();
+            }
+         });
+    }
+
+}
+
+let item_detail = new Item();
 </script>
