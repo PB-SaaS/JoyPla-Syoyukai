@@ -6,9 +6,7 @@
 
 
 JoyPla
- - application ・・・テスト環境のアプリを正とする
  - mock ・・・PHPUnitに使用するモック
  - src ・・・カスタムモジュールに設置するプログラム
  - sslServer ・・・SSL画像サーバーに設置するファイル群
- - table ・・・一覧表ソースコード群
  - test ・・・PHPUnit

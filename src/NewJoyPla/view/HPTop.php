@@ -1163,6 +1163,26 @@ $hospitalData = $getHospitalData->select();
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
+				                                <span class="title">消費履歴詳細一覧</span><br>
+				                                <span class="text">Consume History Detail List</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+										<?php if($userInfo->getUserPermission() == '1') : ?>
+											<a href="%url/rel:mpgt:page_177035%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+										<?php else : ?>
+											<a href="%url/rel:mpgt:page_177068%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+										<?php endif ?>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-3-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
 				                                <span class="title">発注履歴詳細一覧</span><br>
 				                                <span class="text">Order History Detail List</span>
 			                                </p>
@@ -1412,7 +1432,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:page_170282%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:Product%&Action=Item" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1444,7 +1464,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:page_169054%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:Product%&Action=InHospitalItem" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1467,7 +1487,7 @@ $hospitalData = $getHospitalData->select();
 										%SMPAREA%
 										<input type="hidden" name="tenantId" value="%val:usr:tenantId%">
 										<input type="hidden" name="hospitalId" value="%val:usr:hospitalId%">
-										<input type="hidden" name="SMPFORM" value="%smpform:310a_itemReg%">
+										<input type="hidden" name="SMPFORM" value="%smpform:330_itemReg%">
 									</form>
 						        </div>
 						    </div>

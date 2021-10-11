@@ -1,104 +1,114 @@
 <?php
+/*
+使用例
+echo Form::open(['method' => 'post','action' => 'test']);
+echo Form::token();
+echo Form::label('テスト','id',true,['class' => 'uk-form-label']);
+echo Form::text('text','テキスト',['class' => 'uk-input']);
+echo Form::textarea('textarea','テキストエリア',['class' => 'uk-textarea']);
+echo Form::hidden('hidden','非表示');
+echo Form::password('password',['class' => 'uk-input']);
+echo Form::email('email','test@test.com',['class' => 'uk-input']);
+echo Form::checkbox('checkbox',[1=>'A',2=>'B'],'1',['class' => 'uk-checkbox']);
+echo Form::radio('radio',['1'=>'Leopard','2'=>'Brass'],'1',['class' => 'uk-radio']);
+echo Form::select('select',['cat'=>'猫','dog'=>'犬'],'dog',['class' => 'uk-select']);
+echo Form::select('select',[
+    'Cats'=>['leopard'=>'Leopard'], 
+    'Dogs'=>['spaniel'=>'Spaniel'] 
+],'spaniel',['class' => 'uk-select']);
+
+echo Form::number('number', 25,['class' => 'uk-input']);
+echo Form::date('date', '',['class' => 'uk-input']);
+echo Form::week('week', '',['class' => 'uk-input']);
+echo Form::time('time', '',['class' => 'uk-input']);
+echo Form::datetime('datetime', '',['class' => 'uk-input']);
+echo Form::submit('送信ボタン',['class' => 'uk-button']);
+echo Form::button('登録', ['type' => 'submit', 'onfocus' => 'this.blur();','class' => 'uk-button']);
+echo Form::button('リセット', ['type' => 'reset','class' => 'uk-button']);
+echo Form::close();
+*/
 
 class Form {
 
-    public $fieldSetArray;
-    public $formOption;
-
-    public function __construct(array $fieldSetArray )
+    public function __construct()
     {
-        $this->fieldSetArray = $fieldSetArray;
     }
 
-    public function create(): string
+    public static function generator(array $field_set_array)
     {
-        global $SPIRAL;
-        $html = '';
-        
-        foreach($this->fieldSetArray as $fieldSet)
+        $content = '';
+        foreach($field_set_array as $field_set)
         {
-            $content = '';
-            switch($fieldSet->method){
-                case 'text':
-                    $content .= \Form::text($fieldSet->name, $fieldSet->currentValue ,$fieldSet->attr);
-                    break;
-                case 'number':
-                    $content .= \Form::number($fieldSet->name, $fieldSet->currentValue,$fieldSet->attr);
-                    break;
-                case 'tel':
-                    $content .= \Form::tel($fieldSet->name, $fieldSet->currentValue,$fieldSet->attr);
-                    break;
-                case 'search':
-                    $content .= \Form::search($fieldSet->name, $fieldSet->currentValue,$fieldSet->attr);
-                    break;
-                case 'date':
-                    $content .= \Form::date($fieldSet->name, $fieldSet->currentValue,$fieldSet->attr);
-                    break;
-                case 'month':
-                    $content .= \Form::month($fieldSet->name, $fieldSet->currentValue,$fieldSet->attr);
-                    break;
-                case 'week':
-                    $content .= \Form::week($fieldSet->name, $fieldSet->currentValue,$fieldSet->attr);
-                    break;
-                case 'time':
-                    $content .= \Form::time($fieldSet->name, $fieldSet->currentValue,$fieldSet->attr);
-                    break;
-                case 'datetime':
-                    $content .= \Form::datetime($fieldSet->name, $fieldSet->currentValue,$fieldSet->attr);
-                    break;
-                case 'hidden':
-                    $content .= \Form::tel($fieldSet->name, $fieldSet->currentValue,$fieldSet->attr);
-                    break;
-                case 'textarea':
-                    $content .= \Form::textarea($fieldSet->name, $fieldSet->currentValue,$fieldSet->attr);
-                    break;
-                case 'password':
-                    $content .= \Form::password($fieldSet->name,$fieldSet->attr);
-                    break;
-                case 'email':
-                    $content .= \Form::email($fieldSet->name, $fieldSet->currentValue,$fieldSet->attr);
-                    break;
-                case 'checkbox':
-                    $content .= \Form::checkbox($fieldSet->name, $fieldSet->option, $fieldSet->currentValue,$fieldSet->attr);
-                    break;
-                case 'radio':
-                    $content .= \Form::radio($fieldSet->name, $fieldSet->option, $fieldSet->currentValue,$fieldSet->attr);
-                    break;
-                case 'select':
-                    $content .= \Form::select($fieldSet->name, $fieldSet->option, $fieldSet->currentValue,$fieldSet->attr);
-                    break;
-                case 'submit':
-                    $content .= \Form::submit($fieldSet->label,$fieldSet->attr);
-                    break;
-                case 'button':
-                    $content .= \Form::button($fieldSet->label,$fieldSet->attr);
-                    break;
-                default:
-                    $content .= \Form::text($fieldSet->name, $fieldSet->currentValue , $fieldSet->attr);
-                    break;
-            }
-
-            if($fieldSet->method == 'button' || $fieldSet->method == 'submit' )
-            {
-                $html .= '<div class="uk-text-center" uk-margin>';
-                $html .= $content;
-                $html .= '</div>';
-            } 
-            else
-            {
-                $html .= '<div class="uk-margin">';
-                $html .= \Form::label($fieldSet->label,$fieldSet->name, $fieldSet->notNullFlg ,['class' => 'uk-form-label']);
-                $html .= '<div class="uk-form-controls">'; 
-                $html .= $content;
-                $html .= '</div>';
-                $html .= '</div>';
-            }
+            $content = self::create($field_set);
         }
-        
-        return $html;
+        return $content;
     }
 
-    public function open(array $attr = null): string
+    public static function create($field_set)
+    {
+        switch($field_set->method)
+        {
+            case 'text':
+                return self::text($field_set->name, $field_set->current_value ,$field_set->attr);
+                break;
+            case 'number':
+                return self::number($field_set->name, $field_set->current_value,$field_set->attr);
+                break;
+            case 'tel':
+                return self::tel($field_set->name, $field_set->current_value,$field_set->attr);
+                break;
+            case 'search':
+                return self::search($field_set->name, $field_set->current_value,$field_set->attr);
+                break;
+            case 'date':
+                return self::date($field_set->name, $field_set->current_value,$field_set->attr);
+                break;
+            case 'month':
+                return self::month($field_set->name, $field_set->current_value,$field_set->attr);
+                break;
+            case 'week':
+                return self::week($field_set->name, $field_set->current_value,$field_set->attr);
+                break;
+            case 'time':
+                return self::time($field_set->name, $field_set->current_value,$field_set->attr);
+                break;
+            case 'datetime':
+                return self::datetime($field_set->name, $field_set->current_value,$field_set->attr);
+                break;
+            case 'hidden':
+                return self::tel($field_set->name, $field_set->current_value,$field_set->attr);
+                break;
+            case 'textarea':
+                return self::textarea($field_set->name, $field_set->current_value,$field_set->attr);
+                break;
+            case 'password':
+                return self::password($field_set->name,$field_set->attr);
+                break;
+            case 'email':
+                return self::email($field_set->name, $field_set->current_value,$field_set->attr);
+                break;
+            case 'checkbox':
+                return self::checkbox($field_set->name, $field_set->option, $field_set->current_value,$field_set->attr);
+                break;
+            case 'radio':
+                return self::radio($field_set->name, $field_set->option, $field_set->current_value,$field_set->attr);
+                break;
+            case 'select':
+                return self::select($field_set->name, $field_set->option, $field_set->current_value,$field_set->attr);
+                break;
+            case 'submit':
+                return self::submit($field_set->label,$field_set->attr);
+                break;
+            case 'button':
+                return self::button($field_set->label,$field_set->attr);
+                break;
+            default:
+                return self::text($field_set->name, $field_set->current_value , $field_set->attr);
+                break;
+        }
+    }
+
+    public static function open(array $attr = null): string
     {
         $html = "<form ";
 
@@ -113,17 +123,17 @@ class Form {
         return $html ;
     }
 
-    public function close(): string
+    public static function close(): string
     {
         return "</form>";
     }
 
-    public function token(): string
+    public static function token(): string
     {
         return "<input type='hidden' value='' name='token' />";
     }
 
-    public function label(string $text , string $id , bool $not_null = false, array $attr = null): string 
+    public static function label(string $text , string $id , bool $not_null = false, array $attr = null): string 
     {
         $html = "<label for='$id' ";
 
@@ -144,7 +154,7 @@ class Form {
         return $html . $text . "</label>";
     }
 
-    public function text(string $name , string $default = null , array $attr = null):string
+    public static function text(string $name , string $default = null , array $attr = null):string
     {
 
         $html = "<input type='text' value='$default' name='$name'";
@@ -161,7 +171,7 @@ class Form {
         return $html;
     }
 
-    public function number(string $name , string $default = null , array $attr = null):string
+    public static function number(string $name , string $default = null , array $attr = null):string
     {
 
         $html = "<input type='number' value='$default' name='$name'";
@@ -178,7 +188,7 @@ class Form {
         return $html;
     }
 
-    public function tel(string $name , string $default = null , array $attr = null):string
+    public static function tel(string $name , string $default = null , array $attr = null):string
     {
         $html = "<input type='tel' value='$default' name='$name'";
         
@@ -194,7 +204,7 @@ class Form {
         return $html;
     }
 
-    public function search(string $name , string $default = null , array $attr = null):string
+    public static function search(string $name , string $default = null , array $attr = null):string
     {
 
         $html = "<input type='search' value='$default' name='$name'";
@@ -211,7 +221,7 @@ class Form {
         return $html;
     }
 
-    public function date(string $name , string $default = null , array $attr = null):string
+    public static function date(string $name , string $default = null , array $attr = null):string
     {
         $html = "<input type='number' value='$default' name='$name'";
         
@@ -227,7 +237,40 @@ class Form {
         return $html;
     }
     
-    public function month(string $name , string $default = null , array $attr = null):string
+    public static function month(string $name , string $default = null , array $attr = null):string
+    {
+
+        $html = "<input type='month' value='$default' name='$name'";
+        
+        if(! is_null($attr))
+        {
+            foreach($attr as $ot => $ov){
+                $html .= "$ot='$ov' ";
+            }
+        }
+
+        $html .= "/>";
+
+        return $html;
+    }
+     
+    public static function week(string $name , string $default = null , array $attr = null):string
+    {
+        $html = "<input type='month' value='$default' name='$name'";
+        
+        if(! is_null($attr))
+        {
+            foreach($attr as $ot => $ov){
+                $html .= "$ot='$ov' ";
+            }
+        }
+
+        $html .= "/>";
+
+        return $html;
+    }
+
+    public static function time(string $name , string $default = null , array $attr = null):string
     {
 
         $html = "<input type='month' value='$default' name='$name'";
@@ -244,40 +287,7 @@ class Form {
         return $html;
     }
     
-    public function week(string $name , string $default = null , array $attr = null):string
-    {
-        $html = "<input type='month' value='$default' name='$name'";
-        
-        if(! is_null($attr))
-        {
-            foreach($attr as $ot => $ov){
-                $html .= "$ot='$ov' ";
-            }
-        }
-
-        $html .= "/>";
-
-        return $html;
-    }
-
-    public function time(string $name , string $default = null , array $attr = null):string
-    {
-
-        $html = "<input type='month' value='$default' name='$name'";
-        
-        if(! is_null($attr))
-        {
-            foreach($attr as $ot => $ov){
-                $html .= "$ot='$ov' ";
-            }
-        }
-
-        $html .= "/>";
-
-        return $html;
-    }
-    
-    public function datetime(string $name , string $default = null , array $attr = null):string
+    public static function datetime(string $name , string $default = null , array $attr = null):string
     {
 
         $html = "<input type='datetime-local' value='$default' name='$name'";
@@ -294,7 +304,7 @@ class Form {
         return $html;
     }
     
-    public function hidden(string $name , string $default = null , array $attr = null):string
+    public static function hidden(string $name , string $default = null , array $attr = null):string
     {
         $html = "<input type='hidden' value='$default' name='$name'";
         
@@ -310,7 +320,7 @@ class Form {
         return $html;
     }
     
-    public function textarea(string $name , string $default = null , array $attr = null):string
+    public static function textarea(string $name , string $default = null , array $attr = null):string
     {
         $html = "<textarea name='$name'";
         
@@ -326,7 +336,7 @@ class Form {
         return $html;
     }
 
-    public function password(string $name , array $attr = null): string
+    public static function password(string $name , array $attr = null): string
     {
 
         $html = "<input type='password' name='$name'";
@@ -343,7 +353,7 @@ class Form {
         return $html;
     }
 
-    public function email(string $name , string $default = null , array $attr = null): string
+    public static function email(string $name , string $default = null , array $attr = null): string
     {
         $html = "<input type='email' value='$default' name='$name'";
         
@@ -359,7 +369,7 @@ class Form {
         return $html;
     }
 
-    public function checkbox(string $name , array $option , string $currentValue = '' , array $attr = null): string
+    public static function checkbox(string $name , array $option , string $current_value = '' , array $attr = null): string
     {
         $html = '';
 
@@ -367,22 +377,22 @@ class Form {
         {
             foreach($option as $key => $val)
             {
-                $html .= "<label><input type='checkbox' value='$key' name='$name' ". ($this->currentValue == $key ) ? 'checked' : '' ." ";
+                $html .= "<label><input type='checkbox' value='".$key."' name='".$name."' ".( ($current_value == $key ) ? ' checked' : '' )." ";
                 
                 if(! is_null($attr))
                 {
                     foreach($attr as $ot => $ov){
-                        $html .= "$ot='$ov' ";
+                        $html .= " $ot='$ov' ";
                     }
                 }
-                $html .= "/>$val</label>";
+                $html .= "/> $val</label>";
             }
         }
 
         return $html;
     }
 
-    public function radio(string $name , array $option , string $currentValue = '', array $attr = null): string
+    public static function radio(string $name , array $option , string $current_value = '', array $attr = null): string
     {
         $html = '';
         
@@ -390,22 +400,22 @@ class Form {
         {
             foreach($option as $key => $val)
             {
-                $html .= "<label><input type='radio' value='$key' name='$name' ".($this->currentValue == $key ) ? 'checked' : ''." ";
+                $html .= "<label><input type='radio' value='".$key."' name='".$name."' ".( ($current_value == $key ) ? ' checked' : '' )." ";
                 
                 if(! is_null($attr))
                 {
                     foreach($attr as $ot => $ov){
-                        $html .= "$ot='$ov' ";
+                        $html .= " $ot='$ov' ";
                     }
                 }
-                $html .= "/>$val</label>";
+                $html .= "/> $val</label>";
             }
         }
 
         return $html;
     }
 
-    public function select(string $name , array $option , string $currentValue = null , array $attr = null): string
+    public static function select(string $name , array $option , string $current_value = null , array $attr = null): string
     {
         
         $html = "<select name='$name' ";
@@ -428,7 +438,7 @@ class Form {
                     foreach($val as $opv => $opl )
                     {
                         $selected = "" ;
-                        if($opv == $currentValue)
+                        if($opv == $current_value)
                         {
                             $selected = "selected";
                         }
@@ -439,7 +449,7 @@ class Form {
                 else
                 {
                     $selected = "" ;
-                    if($key == $currentValue)
+                    if($key == $current_value)
                     {
                         $selected = "selected";
                     }
@@ -453,7 +463,7 @@ class Form {
         return $html;
     }
 
-    public function submit(string $value, array $attr = null ): string
+    public static function submit(string $value, array $attr = null ): string
     {
         $html = "<input type='submit' value='$value' ";
         
@@ -469,7 +479,7 @@ class Form {
         return $html;
     }
 
-    public function button(string $label, array $attr = null ): string
+    public static function button(string $label, array $attr = null ): string
     {
         $html = "<button ";
         
@@ -486,33 +496,3 @@ class Form {
     }
 
 }
-
-/*
-echo Form::open(['method' => 'post','action' => 'test']);
-echo Form::token();
-echo Form::label('test','テスト',['class' => 'uk-label']);
-echo Form::text('text','テキスト',['class' => 'uk-input']);
-echo Form::textarea('textarea','テキストエリア',['class' => 'uk-input']);
-echo Form::hidden('hidden','非表示');
-echo Form::password('password',['class' => 'uk-password']);
-echo Form::email('email','test@test.com',['class' => 'uk-password']);
-echo Form::checkbox('checkbox','チェックボックスA','value1',true,['class' => 'uk-checkbox']);
-echo Form::checkbox('checkbox','チェックボックスB','value2',false,['class' => 'uk-checkbox']);
-echo Form::radio('radio',['1'=>'Leopard'],1,['class' => 'uk-radio']);
-echo Form::radio('radio',['1'=>'Leopard'],2,['class' => 'uk-radio']);
-echo Form::select('select',['cat'=>'猫','dog'=>'犬'],'dog',['class' => 'uk-select']);
-echo Form::select('select',[
-    'Cats'=>['leopard'=>'Leopard'], 
-    'Dogs'=>['spaniel'=>'Spaniel'] 
-],'spaniel',['class' => 'uk-select']);
-
-echo Form::number('number', 25);
-echo Form::date('date', '');
-echo Form::week('week', '');
-echo Form::time('time', '');
-echo Form::datetime('datetime', '');
-echo Form::submit('送信ボタン');
-echo Form::button('登録', ['type' => 'submit', 'onfocus' => 'this.blur();']);
-echo Form::button('リセット', ['type' => 'reset']);
-echo Form::close();
-*/

@@ -27,7 +27,7 @@ class UsedSlipController extends Controller
     {
         global $SPIRAL;
 
-        $title = 'JoyPla 未承認使用伝票一覧';
+        $title = '';
 
         try {
             
@@ -85,6 +85,7 @@ class UsedSlipController extends Controller
             {
                 $link = $api_url."&Action=approvedUsedSlip";
                 $link_name = "承認済み使用伝票一覧";
+                $title = 'JoyPla 承認使用伝票一覧';
 
                 if( $user_info->isHospitalUser())
                 {
@@ -96,6 +97,7 @@ class UsedSlipController extends Controller
             {
                 $link = $api_url."&Action=unapprovedUsedSlip";
                 $link_name = "未承認使用伝票一覧";
+                $title = 'JoyPla 未承認使用伝票一覧';
             }
 
             $content = $this->view('NewJoyPla/view/UsedSlip', [

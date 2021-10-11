@@ -202,7 +202,7 @@
 		    document.write(_num);
 		}
 		function price_text(num){
-			if(num === "") {
+			if(num == "") {
 				num = "0";
 			}
 			let _num = num.replace( /^(-?\d+)(\d{3})/, "$1,$2" );

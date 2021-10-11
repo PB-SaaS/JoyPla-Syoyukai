@@ -530,7 +530,14 @@ $useUnitPrice = $hospitalData['data'][0]['billingUnitPrice'];
             		return false;
                 }
                 data = data.data;
-                addTr(data, 2, parseInt(data.count));
+				if(data.lotNumber || data.lotDate)
+				{
+					addLotData(data,data.inHospitalItemId,data.lotNumber,data.lotDate);
+				}
+				else
+				{
+					addTr(data, 2, parseInt(data.count));
+				}
 				canAjax = true; // 再びAjaxできるようにする
             	$('input[name="barcode"]').val('');
             })
@@ -759,42 +766,47 @@ $useUnitPrice = $hospitalData['data'][0]['billingUnitPrice'];
 					return;
 				}
 
-				let existflg = false;
 				let objLot = (obj["10"] === void 0) ? "" : obj["10"]; //lotNumber
 				let objLotDate = (obj["17"] === void 0) ? "" : changeDate(obj["17"]); //lotDate
 
-				$(document).find('.lot_' + objkey).each(function() {
-					let addRowLot = $(this).val();
-					let addRowLotDate = $(this).parents('tr').find('.lotDate_' + objkey).val();
-					let addRowNum = parseInt($(this).parents('tr').find('.item_' + objkey).val());
-
-					if (addRowNum === 0 && !addRowLot && !addRowLotDate) {
-						$(this).val(objLot).css({'color':'rgb(68, 68, 68)', 'background':'rgb(255, 204, 153)'});
-						$(this).parents('tr').find('.lotDate_' + objkey).val(objLotDate).css({'color':'rgb(68, 68, 68)', 'background':'rgb(255, 204, 153)'});
-						$(this).parents('tr').find('.item_' + objkey).val(parseInt(setObj.irisu)).css({'color':'rgb(68, 68, 68)', 'background':'rgb(255, 204, 153)'});
-						$(window).scrollTop($(this).offset().top - 100);
-						existflg = true;
-						return false;
-					}
-					if ((addRowLot == objLot) && (addRowLotDate == objLotDate)) {
-						let num = addRowNum + parseInt(setObj.irisu);
-						$(this).parents('tr').find('.item_' + objkey).val(num).css({'color':'rgb(68, 68, 68)', 'background':'rgb(255, 204, 153)'});
-						$(window).scrollTop($(this).offset().top - 100);
-						existflg = true;
-						return false;
-					}
-				});
-
-				if (!existflg) {
-					setObj.lot = objLot;
-					setObj.lotDate = objLotDate;
-					addTr(setObj, 4, parseInt(setObj.irisu));
-				}
+				addLotData(setObj,objkey,objLot,objLotDate)
 
 				$('.select_items').hide();
 				$('.select_items select').val('');
 				$('#GS1-128').val('');
 				document.getElementById('GS1-128').focus();
+			}
+		}
+
+		function addLotData(setObj,objkey,objLot,objLotDate)
+		{
+			let existflg = false;
+			$(document).find('.lot_' + objkey).each(function() {
+				let addRowLot = $(this).val();
+				let addRowLotDate = $(this).parents('tr').find('.lotDate_' + objkey).val();
+				let addRowNum = parseInt($(this).parents('tr').find('.item_' + objkey).val());
+
+				if (addRowNum === 0 && !addRowLot && !addRowLotDate) {
+					$(this).val(objLot).css({'color':'rgb(68, 68, 68)', 'background':'rgb(255, 204, 153)'});
+					$(this).parents('tr').find('.lotDate_' + objkey).val(objLotDate).css({'color':'rgb(68, 68, 68)', 'background':'rgb(255, 204, 153)'});
+					$(this).parents('tr').find('.item_' + objkey).val(parseInt(setObj.irisu)).css({'color':'rgb(68, 68, 68)', 'background':'rgb(255, 204, 153)'});
+					$(window).scrollTop($(this).offset().top - 100);
+					existflg = true;
+					return false;
+				}
+				if ((addRowLot == objLot) && (addRowLotDate == objLotDate)) {
+					let num = addRowNum + parseInt(setObj.irisu);
+					$(this).parents('tr').find('.item_' + objkey).val(num).css({'color':'rgb(68, 68, 68)', 'background':'rgb(255, 204, 153)'});
+					$(window).scrollTop($(this).offset().top - 100);
+					existflg = true;
+					return false;
+				}
+			});
+
+			if (!existflg) {
+				setObj.lot = objLot;
+				setObj.lotDate = objLotDate;
+				addTr(setObj, 4, parseInt(setObj.irisu));
 			}
 		}
 

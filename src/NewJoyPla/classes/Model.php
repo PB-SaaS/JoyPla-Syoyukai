@@ -2,8 +2,11 @@
 
 use App\Lib\UserInfo;
 use App\Lib\SpiralDataBase;
+use App\Lib\SpiralSendMail;
+use App\Lib\SpiralDBFilter;
 
 use ApiErrorCode\FactoryApiErrorCode;
+
 
 class Model
 {
@@ -19,7 +22,11 @@ class Model
         $spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
         $spiralApiRequest = new SpiralApiRequest();
         $this->spiralDataBase = new SpiralDataBase($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
-        
+        if(isset($this::$mail_field_title) && $this::$mail_field_title != null)
+        {
+            $this->spiralSendMail = new SpiralSendMail($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
+            $this->spiralDBFilter = new SpiralDBFilter($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
+        }
         foreach($this::$guarded as $column)
         {
             $this->{$column} = null;
@@ -109,10 +116,11 @@ class Model
     {
         $instance = self::getInstance();
         $instance->spiralDataBase->setDataBase($instance::$spiral_db_name);
-        $instance->spiralDataBase->addSelectFieldsToArray($instance::$fillable);
+        $column = array_merge($instance::$fillable,$instance::$guarded);
+        $instance->spiralDataBase->addSelectFieldsToArray($column);
         $result = $instance->spiralDataBase->doSelectLoop();
         if($result['count'] > 0){
-            $result['data'] = $instance->spiralDataBase->arrayToNameArray($result['data'],$instance::$fillable);
+            $result['data'] = $instance->spiralDataBase->arrayToNameArray($result['data'],$column);
             $result['data'] = $instance->getDataToInstance($result['data']);
         }
         
@@ -298,6 +306,92 @@ class Model
 
         return $save_array;
     }
+
+    /****
+     * Exprerss 2 Mail
+     */
+    public static function body(String $view)
+    {
+        $instance = self::getInstance();
+        $instance->spiralSendMail->addBodyText($view);
+        return $instance;
+    }
+
+    public static function subject(String $subject)
+    {
+        $instance = self::getInstance();
+        $instance->spiralSendMail->addSubject($subject);
+        return $instance;
+    }
+
+    public static function from(String $mail , String $name = null)
+    {
+        $instance = self::getInstance();
+        $instance->spiralSendMail->addFromAddress($mail);
+        $instance->spiralSendMail->addFromName($name);
+        return $instance;
+    }
+
+    public static function replyTo(String $mail)
+    {
+        $instance = self::getInstance();
+        $instance->spiralSendMail->addReplyTo($mail);
+        return $instance;
+    }
+
+    public static function selectRule(string $rule_name)
+    {
+        $instance = self::getInstance();
+        $instance->spiralSendMail->addSelectName($rule_name);
+        return $instance;
+    }
+
+    public static function send()
+    {
+        $instance = self::getInstance();
+        $instance->spiralSendMail->setDataBase($instance::$spiral_db_name);
+        $instance->spiralSendMail->addMailFieldTitle($instance::$mail_field_title);
+        $instance->spiralSendMail->addReserveDate('now');
+        $result = $instance->spiralSendMail->regist();
+        
+        if($result['code'] != 0)
+        {
+            throw new Exception(FactoryApiErrorCode::factory((int)$result['code'])->getMessage(),FactoryApiErrorCode::factory((int)$result['code'])->getCode());
+        }
+        return new Collection($result);
+    }
+
+    /**
+     * Filter
+     */
+    public static function selectName(String $name)
+    {
+        $instance = self::getInstance();
+        $instance->spiralDBFilter->addSelectName($name);
+        return $instance;
+    }
+
+    public static function rule(array $rule)
+    {
+        $instance = self::getInstance();
+        $instance->spiralDBFilter->addFields($rule);
+        return $instance;
+    }
+
+    public static function filterCreate()
+    {
+        $instance = self::getInstance();
+        $instance->spiralDBFilter->setDataBase($instance::$spiral_db_name);
+        $result = $instance->spiralDBFilter->create();
+        
+        if($result['code'] != 0)
+        {
+            throw new Exception(FactoryApiErrorCode::factory((int)$result['code'])->getMessage(),FactoryApiErrorCode::factory((int)$result['code'])->getCode());
+        }
+        return new Collection($result);
+    }
+
+
 
     public function logging(string $message, string $file_name = 'pdo.log')
     {

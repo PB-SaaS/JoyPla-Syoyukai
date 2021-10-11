@@ -103,10 +103,9 @@ foreach($divisionData["division"] as $record ){
 				<div class="no_print uk-margin" uk-margin>
 					<input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
 					<input class="print_hidden uk-button uk-button-danger" type="submit" value="返品伝票作成" onclick="location.href='%url/card:page_265590%'">
-					<form action="%url/rel:@mpgt:createLabel%" target="_blank" method="post" class="print_hidden uk-inline">
-						<input class="print_hidden uk-button uk-button-primary" type="submit" value="ラベル発行" onclick="createLabel()">
-						<input type="hidden" value="" name="itemsData" id="itemsData">
-						<input type="hidden" value="<?php echo $receivingHistory[0]["distributorName"] ?>" name="distributorName">
+					<form action="%url/rel:@mpgt:ReceivingLabel%" target="_blank" method="post" class="print_hidden uk-inline">
+						<input class="print_hidden uk-button uk-button-primary" type="submit" value="ラベル発行">
+						<input type="hidden" value="%val:usr:receivingHId%" name="receivingId">
 					</form>
 				</div>
 		    	<div class="uk-text-center uk-text-large">
@@ -222,14 +221,6 @@ foreach($divisionData["division"] as $record ){
 		 generateBarcode("barcode_nouhin",nouhin_num);
 		 //$("td#order_barcode div").barcode({code:order_num, crc:false }, "int25",{barWidth: 3 ,barHeight: 40 , output: "css"});
 		});
-		
-    	
-		let itemsToJs = objectValueToURIencode( <?php echo json_encode($ItemsToJs); ?> );
-		
-		function createLabel(){
-			$("#itemsData").val(JSON.stringify( itemsToJs ));
-			return true;
-		}
 		
 	</script>
   </body>

@@ -16,7 +16,11 @@ require_once "NewJoyPla/classes/Csrf.php";
 require_once "NewJoyPla/lib/ApiSpiral.php";
 require_once 'NewJoyPla/lib/UserInfo.php';
 require_once "NewJoyPla/lib/SpiralDataBase.php";
-include_once "NewJoyPla/lib/Func.php";
+require_once "NewJoyPla/lib/SpiralSendMail.php";
+require_once "NewJoyPla/lib/SpiralTable.php";
+require_once "NewJoyPla/lib/SpiralDBFilter.php";
+require_once "NewJoyPla/lib/Define.php";
+require_once "NewJoyPla/lib/Func.php";
 
 
 require_once "NewJoyPla/model/Base.php";

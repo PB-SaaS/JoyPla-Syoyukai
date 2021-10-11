@@ -10,7 +10,7 @@
                 <input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
                 <?php if($used_slip_history->usedSlipStatus == '1'): ?>
                     <input class="print_hidden uk-button uk-button-default uk-button-danger" type="button" value="取消" onclick="used_slip.cancel()">
-                    <?php if($user_info->isHospitalUser() && $used_info->isAdmin()): ?>
+                    <?php if($user_info->isHospitalUser() && $user_info->isAdmin()): ?>
                         <input class="print_hidden uk-button uk-button-default uk-button-primary" type="button" value="承認" onclick="used_slip.usedSlipApproval()">
                     <?php endif; ?>
                 <?php endif; ?>
@@ -154,8 +154,6 @@
             this.dataKey = ['id','maker','shouhinName','code','kikaku','irisu','kakaku','unitPrice','jan','oroshi','count'];
             this.index = 1;
         }
-
-        <?php if($used_slip_history->usedSlipStatus == '1'): ?>
         cancel(){
             let tmp = this;
             UIkit.modal.confirm('取消を行います。よろしいでしょうか').then(function () {
@@ -197,7 +195,6 @@
             });
         }
 
-        <?php if($user_info->isHospitalUser() && $used_info->isAdmin()): ?>
         usedSlipApproval(){
             let tmp = this;
             UIkit.modal.confirm('承認を行います。よろしいでしょうか<br>※発注書・検収書・消費伝票が自動で生成されます').then(function () {
@@ -238,9 +235,7 @@
             }, function () {
             });
         }
-        <?php endif ?>
-        <?php endif ?>
-        <?php if($used_slip_history->usedSlipStatus == '2'): ?>
+        
         search(slipnum){
             loading();
             $.ajax({
@@ -272,7 +267,6 @@
                 loading_remove();
             });
         }
-        <?php endif ?>
     }
 
     let used_slip = new UsedSlip();

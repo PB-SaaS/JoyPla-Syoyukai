@@ -257,6 +257,52 @@ class Receiving extends Model
     public static $select = [];
 }
 
+class ReceivingView extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = 'updateTime';
+
+    public static $spiral_db_name = '310_receItems';
+    public static $guarded = ['id'];
+    public static $primary_key = 'receivingNumber';
+    public static $fillable = [
+        'registrationTime',
+        'orderCNumber',
+        'receivingCount',
+        'receivingHId',
+        'inHospitalItemId',
+        'receivingNumber',
+        'price',
+        'receivingPrice',
+        'hospitalId',
+        'totalReturnCount',
+        'divisionId',
+        'distributorId',
+        'adjAmount',
+        'priceAfterAdj',
+        'lotNumber',
+        'lotDate',
+        'divisionName',
+        'distributorName',
+        'orderHistoryId',
+        'makerName',
+        'itemName',
+        'itemCode',
+        'itemStandard',
+        'itemJANCode',
+        'quantity',
+        'quantityUnit',
+        'itemUnit',
+        'unitPrice',
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+
+}
+
 
 class ReceivingHistory extends Model
 {
@@ -286,6 +332,178 @@ class ReceivingHistory extends Model
         'recevingStatus' => [
             1 =>'通常入庫',
             2 =>'貸出品',
+        ]
+    ];
+}
+//Return は使用できない文字列なので、ReturnItemにします
+class ReturnItem extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = '';
+
+    public static $spiral_db_name = 'NJ_ReturnDB';
+    public static $guarded = ['id'];
+    public static $primary_key = 'receivingNumber';
+    public static $fillable = [
+        "registrationTime",
+        "orderCNumber",
+        "receivingHId",
+        "inHospitalItemId",
+        "receivingNumber",
+        "price",
+        "returnID",
+        "returnCount",
+        "returnPrice",
+        "hospitalId",
+        "returnHistoryID",
+        "lotNumber",
+        "lotDate"
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
+
+class ReturnHistory extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = '';
+
+    public static $spiral_db_name = 'NJ_ReturnHDB';
+    public static $guarded = ['id'];
+    public static $primary_key = 'returnHistoryID';
+    public static $fillable = [
+        "registrationTime",
+        "receivingHId",
+        "distributorId",
+        "orderHistoryId",
+        "returnHistoryID",
+        "hospitalId",
+        "itemsNumber",
+        "authKey",
+        "returnTotalPrice",
+        "divisionId"
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
+
+class Payout extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = '';
+
+    public static $spiral_db_name = 'NJ_PayoutDB';
+    public static $guarded = ['id'];
+    public static $primary_key = 'payoutId';
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "payoutHistoryId",
+        "payoutId",
+        "inHospitalItemId",
+        "hospitalId",
+        "sourceDivisionId",
+        "targetDivisionId",
+        "quantity",
+        "quantityUnit",
+        "itemUnit",
+        "price",
+        "payoutQuantity",
+        "payoutAmount",
+        "payoutCount",
+        "payoutLabelCount",
+        "adjAmount",
+        "priceAfterAdj",
+        "lotNumber",
+        "lotDate",
+        "unitPrice"
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
+class PayoutHistory extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = '';
+
+    public static $spiral_db_name = 'NJ_PayoutHDB';
+    public static $guarded = ['id'];
+    public static $primary_key = 'payoutHistoryId';
+    public static $fillable = [
+        "registrationTime",
+        "payoutHistoryId",
+        "hospitalId",
+        "payoutAuthKey",
+        "sourceDivisionId",
+        "sourceDivision",
+        "targetDivisionId",
+        "targetDivision",
+        "itemsNumber",
+        "totalAmount",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
+class Item extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = '';
+
+    public static $spiral_db_name = 'NJ_itemDB';
+    public static $guarded = ['id'];
+    public static $primary_key = 'itemId';
+    public static $fillable = [
+        'itemId',
+        'itemName',
+        'itemCode',
+        'itemStandard',
+        'itemJANCode',
+        'makerName',
+        'officialFlag',
+        'tenantId',
+        'quantity',
+        'quantityUnit',
+        'itemUnit',
+        'minPrice',
+        'itemsAuthKey',
+        'janTenantId',
+        'requestId',
+        'requestFlg',
+        'requestItemId',
+        'hospitalId',
+        'registrationTime',
+        'officialpriceOld',
+        'officialprice',
+        'catalogNo',
+        'serialNo',
+        'lotManagement'
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [
+        'requestFlg' => [
+            1 => '採用',
+            2 => '不採用',
+            3 => '見積中',
+            4 => '業者記入済'
         ]
     ];
 }
@@ -330,7 +548,8 @@ class InHospitalItem extends Model
         'priceId',
         'unitPrice',
         'measuringInst',
-        'distributorName'
+        'distributorName',
+        'lotManagement'
     ];
 
     //デフォルト値
@@ -387,6 +606,74 @@ class Hospital extends Model
     public static $select = [];
 }
 
+
+class HospitalUser extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = 'updateTime';
+
+    public static $spiral_db_name = 'NJ_HUserDB';
+    public static $guarded = ['id'];
+    public static $primary_key = 'loginId';
+    public static $mail_field_title = 'mailAddress';
+    public static $fillable = [
+        'registrationTime',
+        'updateTime',
+        'authKey',
+        'hospitalId',
+        'divisionId',
+        'userPermission',
+        'loginId',
+        'loginPassword',
+        'name',
+        'nameKana',
+        'mailAddress',
+        'remarks',
+        'termsAgreement',
+        'tenantId',
+        'agreementDate',
+        'hospitalAuthKey'
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
+
+class DistributorUser extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = 'updateTime';
+
+    public static $spiral_db_name = 'NJ_OUserDB';
+    public static $guarded = ['id'];
+    public static $primary_key = 'loginId';
+    public static $mail_field_title = 'mailAddress';
+    public static $fillable = [
+        'registrationTime',
+        'updateTime',
+        'authKey',
+        'distributorId',
+        'userPermission',
+        'loginId',
+        'loginPassword',
+        'name',
+        'nameKana',
+        'mailAddress',
+        'remarks',
+        'hospitalId',
+        'termsAgreement',
+        'agreementDate',
+        'distAuthKey'
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
+
 class Distributor extends Model
 {
     const CREATED_AT = 'registrationTime';
@@ -414,6 +701,30 @@ class Distributor extends Model
     public static $attributes = [];
 
     public static $select = [];
+}
+
+class Tenant extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = '';
+
+    public static $spiral_db_name = 'NJ_TenantAdminDB';
+    public static $guarded = ['id'];
+    public static $primary_key = 'tenantId';
+    public static $fillable = [
+        'registrationTime',
+        'tenantId',
+        'tenantName',
+        'note',
+        'tenantKind'
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [
+        'tenantKind' => [1,2]
+    ];
 }
 
 class AssociationTR extends Model

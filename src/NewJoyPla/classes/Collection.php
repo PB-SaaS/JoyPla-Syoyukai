@@ -148,22 +148,21 @@ class Collection
 
     public function first()
     {
-        
-        $first = array_key_first($this->array);
+        $first = array_key_first($this->all());
         return $this->get($first);
     }
 
     public function last()
     {
-        $last = array_key_last($this->array);
+        $last = array_key_last($this->all());
         return $this->get($last);
     }
 
     public function get($index)
     {
-        if(array_key_exists($index , $this->array))
+        if(array_key_exists($index , $this->all()))
         {
-            return $this->array[$index];
+            return $this->all()[$index];
         }
         return null;
     }

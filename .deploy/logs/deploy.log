@@ -1,361 +1,453 @@
-[2021-10-02 14:38:17][INFO] make directory logs
-[2021-10-02 14:38:17][INFO] make directory tmp
-[2021-10-02 14:40:46][INFO] directory logs
-[2021-10-02 14:40:46][INFO] directory tmp
-[2021-10-02 14:40:47][INFO] cp directory ../src/NewJoyPla
-[2021-10-02 14:42:47][INFO] directory logs
-[2021-10-02 14:42:47][INFO] directory tmp
-[2021-10-02 14:42:47][ERROR] cp directory ../src
-[2021-10-02 14:42:59][INFO] directory logs
-[2021-10-02 14:42:59][INFO] directory tmp
-[2021-10-02 14:43:00][INFO] cp directory NewJoyPla
-[2021-10-02 14:43:53][INFO] directory logs
-[2021-10-02 14:43:53][INFO] directory tmp
-[2021-10-02 14:43:55][INFO] cp directory NewJoyPla
-[2021-10-02 14:43:56][INFO] zip directory NewJoyPla
-[2021-10-02 14:43:56][INFO] rm directory NewJoyPla
-[2021-10-02 14:46:08][INFO] directory logs
-[2021-10-02 14:46:08][INFO] directory tmp
-[2021-10-02 14:46:10][INFO] cp directory NewJoyPla
-[2021-10-02 14:46:11][INFO] zip directory NewJoyPla
-[2021-10-02 14:46:11][INFO] rm directory NewJoyPla
-[2021-10-02 14:46:23][INFO] directory logs
-[2021-10-02 14:46:23][INFO] directory tmp
-[2021-10-02 14:46:24][INFO] cp directory NewJoyPla
-[2021-10-02 14:46:26][INFO] zip directory NewJoyPla
-[2021-10-02 14:46:26][INFO] rm directory NewJoyPla
-[2021-10-02 14:46:26][ERROR] rm NewJoyPla
-[2021-10-02 14:49:59][INFO] directory logs
-[2021-10-02 14:49:59][INFO] directory tmp
-[2021-10-02 14:50:01][INFO] cp directory NewJoyPla
-[2021-10-02 14:50:02][INFO] zip directory NewJoyPla
-[2021-10-02 14:50:02][INFO] rm directory NewJoyPla
-[2021-10-02 14:50:02][ERROR] upload NewJoyPla
-[2021-10-02 15:05:31][INFO] directory logs
-[2021-10-02 15:05:31][INFO] directory tmp
-[2021-10-02 15:05:34][INFO] cp directory NewJoyPla
-[2021-10-02 15:05:37][INFO] zip directory NewJoyPla
-[2021-10-02 15:05:37][INFO] rm directory NewJoyPla
-[2021-10-02 15:05:37][ERROR] mv zip file NewJoyPla
-[2021-10-02 15:06:49][INFO] directory logs
-[2021-10-02 15:06:49][INFO] directory tmp
-[2021-10-02 15:06:53][INFO] cp directory NewJoyPla
-[2021-10-02 15:06:56][INFO] zip directory NewJoyPla
-[2021-10-02 15:06:56][INFO] rm directory NewJoyPla
-[2021-10-02 15:06:56][ERROR] mv zip file upload_file.zip
-[2021-10-02 15:11:51][INFO] directory logs
-[2021-10-02 15:11:51][INFO] directory tmp
-[2021-10-02 15:11:55][INFO] cp directory NewJoyPla
-[2021-10-02 15:11:58][INFO] zip directory NewJoyPla
-[2021-10-02 15:11:58][INFO] rm directory NewJoyPla
-[2021-10-02 15:11:58][ERROR] upload NewJoyPla
-[2021-10-02 15:13:05][INFO] directory logs
-[2021-10-02 15:13:05][INFO] directory tmp
-[2021-10-02 15:13:09][INFO] cp directory NewJoyPla
-[2021-10-02 15:13:11][INFO] zip directory NewJoyPla
-[2021-10-02 15:13:12][INFO] rm directory NewJoyPla
-[2021-10-02 15:13:12][INFO] upload NewJoyPla
-[2021-10-02 15:15:45][INFO] directory logs
-[2021-10-02 15:15:45][INFO] directory tmp
-[2021-10-02 15:15:49][INFO] cp directory NewJoyPla
-[2021-10-02 15:15:52][INFO] zip directory NewJoyPla
-[2021-10-02 15:15:52][INFO] rm directory NewJoyPla
-[2021-10-02 15:15:52][INFO] upload NewJoyPla
-[2021-10-02 15:16:43][INFO] directory logs
-[2021-10-02 15:16:43][INFO] directory tmp
-[2021-10-02 15:16:47][INFO] cp directory NewJoyPla
-[2021-10-02 15:16:49][INFO] zip directory NewJoyPla
-[2021-10-02 15:16:50][INFO] rm directory NewJoyPla
-[2021-10-02 15:16:50][INFO] upload NewJoyPla
-[2021-10-02 15:17:36][INFO] directory logs
-[2021-10-02 15:17:36][INFO] directory tmp
-[2021-10-02 15:17:40][INFO] cp directory NewJoyPla
-[2021-10-02 15:17:43][INFO] zip directory NewJoyPla
-[2021-10-02 15:17:43][INFO] rm directory NewJoyPla
-[2021-10-02 15:17:43][INFO] upload NewJoyPla
-[2021-10-02 15:17:45][INFO] directory logs
-[2021-10-02 15:17:45][INFO] directory tmp
-[2021-10-02 15:17:45][INFO] rm zip file
-[2021-10-02 15:17:48][INFO] cp directory NewJoyPla
-[2021-10-02 15:17:51][INFO] zip directory NewJoyPla
-[2021-10-02 15:17:51][INFO] rm directory NewJoyPla
-[2021-10-02 15:17:51][INFO] upload NewJoyPla
-[2021-10-02 15:18:10][INFO] directory logs
-[2021-10-02 15:18:10][INFO] directory tmp
-[2021-10-02 15:18:10][INFO] rm zip file
-[2021-10-02 15:18:14][INFO] cp directory NewJoyPla
-[2021-10-02 15:18:17][INFO] zip directory NewJoyPla
-[2021-10-02 15:18:17][INFO] rm directory NewJoyPla
-[2021-10-02 15:18:18][ERROR] upload NewJoyPla
-[2021-10-02 15:18:45][INFO] directory logs
-[2021-10-02 15:18:45][INFO] directory tmp
-[2021-10-02 15:18:45][INFO] rm zip file
-[2021-10-02 15:18:48][INFO] cp directory NewJoyPla
-[2021-10-02 15:18:51][INFO] zip directory NewJoyPla
-[2021-10-02 15:18:52][INFO] rm directory NewJoyPla
-[2021-10-02 15:18:52][ERROR] upload NewJoyPla
-[2021-10-02 15:19:19][INFO] directory logs
-[2021-10-02 15:19:19][INFO] directory tmp
-[2021-10-02 15:19:19][INFO] rm zip file
-[2021-10-02 15:19:23][INFO] cp directory NewJoyPla
-[2021-10-02 15:19:26][INFO] zip directory NewJoyPla
-[2021-10-02 15:19:26][INFO] rm directory NewJoyPla
-[2021-10-02 15:19:26][ERROR] upload NewJoyPla
-[2021-10-02 15:23:13][INFO] directory logs
-[2021-10-02 15:23:13][INFO] directory tmp
-[2021-10-02 15:23:13][INFO] rm zip file
-[2021-10-02 15:23:16][INFO] cp directory NewJoyPla
-[2021-10-02 15:23:19][INFO] zip directory NewJoyPla
-[2021-10-02 15:23:20][INFO] rm directory NewJoyPla
-[2021-10-02 15:23:20][ERROR] upload NewJoyPla
-[2021-10-02 15:37:10][INFO] directory logs
-[2021-10-02 15:37:10][INFO] directory tmp
-[2021-10-02 15:37:10][INFO] rm zip file
-[2021-10-02 15:37:11][INFO] cp directory NewJoyPla
-[2021-10-02 15:37:13][INFO] zip directory NewJoyPla
-[2021-10-02 15:37:13][INFO] rm directory NewJoyPla
-[2021-10-02 15:37:14][ERROR] upload NewJoyPla
-[2021-10-02 15:37:58][INFO] directory logs
-[2021-10-02 15:37:58][INFO] directory tmp
-[2021-10-02 15:37:58][INFO] rm zip file
-[2021-10-02 15:38:00][INFO] cp directory NewJoyPla
-[2021-10-02 15:38:02][INFO] zip directory NewJoyPla
-[2021-10-02 15:38:02][INFO] rm directory NewJoyPla
-[2021-10-02 15:38:02][INFO] upload NewJoyPla
-[2021-10-02 15:38:30][INFO] directory logs
-[2021-10-02 15:38:30][INFO] directory tmp
-[2021-10-02 15:38:30][INFO] rm zip file
-[2021-10-02 15:38:32][INFO] cp directory NewJoyPla
-[2021-10-02 15:38:33][INFO] zip directory NewJoyPla
-[2021-10-02 15:38:33][ERROR] rm directory NewJoyPla
-[2021-10-02 15:38:58][INFO] directory logs
-[2021-10-02 15:38:58][INFO] directory tmp
-[2021-10-02 15:38:58][INFO] rm zip file
-[2021-10-02 15:38:59][INFO] cp directory NewJoyPla
-[2021-10-02 15:39:01][INFO] zip directory NewJoyPla
-[2021-10-02 15:39:01][INFO] rm directory NewJoyPla
-[2021-10-02 15:39:02][ERROR] upload NewJoyPla
-[2021-10-02 15:39:24][INFO] directory logs
-[2021-10-02 15:39:24][INFO] directory tmp
-[2021-10-02 15:39:24][INFO] rm zip file
-[2021-10-02 15:39:25][INFO] cp directory NewJoyPla
-[2021-10-02 15:39:27][INFO] zip directory NewJoyPla
-[2021-10-02 15:39:27][INFO] rm directory NewJoyPla
-[2021-10-02 15:39:28][ERROR] upload NewJoyPla
-[2021-10-02 15:39:51][INFO] directory logs
-[2021-10-02 15:39:51][INFO] directory tmp
-[2021-10-02 15:39:51][INFO] rm zip file
-[2021-10-02 15:39:53][INFO] cp directory NewJoyPla
-[2021-10-02 15:39:54][INFO] zip directory NewJoyPla
-[2021-10-02 15:39:54][INFO] rm directory NewJoyPla
-[2021-10-02 15:39:55][ERROR] upload NewJoyPla
-[2021-10-02 15:40:24][INFO] directory logs
-[2021-10-02 15:40:24][INFO] directory tmp
-[2021-10-02 15:40:24][INFO] rm zip file
-[2021-10-02 15:40:26][INFO] cp directory NewJoyPla
-[2021-10-02 15:40:27][INFO] zip directory NewJoyPla
-[2021-10-02 15:40:27][INFO] rm directory NewJoyPla
-[2021-10-02 15:40:28][ERROR] upload NewJoyPla
-[2021-10-02 15:40:38][INFO] directory logs
-[2021-10-02 15:40:38][INFO] directory tmp
-[2021-10-02 15:40:38][INFO] rm zip file
-[2021-10-02 15:40:40][INFO] cp directory NewJoyPla
-[2021-10-02 15:40:41][INFO] zip directory NewJoyPla
-[2021-10-02 15:40:41][ERROR] rm directory NewJoyPla
-[2021-10-02 15:41:51][INFO] directory logs
-[2021-10-02 15:41:51][INFO] directory tmp
-[2021-10-02 15:41:51][INFO] rm directory NewJoyPla
-[2021-10-02 15:41:51][INFO] rm zip file
-[2021-10-02 15:41:53][INFO] cp directory NewJoyPla
-[2021-10-02 15:41:55][INFO] zip directory NewJoyPla
-[2021-10-02 15:41:55][INFO] rm directory NewJoyPla
-[2021-10-02 15:42:09][INFO] upload NewJoyPla
-[2021-10-02 15:43:39][INFO] directory logs
-[2021-10-02 15:43:39][INFO] directory tmp
-[2021-10-02 15:43:39][INFO] rm zip file
-[2021-10-02 15:43:40][INFO] cp directory NewJoyPla
-[2021-10-02 15:43:42][INFO] zip directory NewJoyPla
-[2021-10-02 15:43:42][INFO] rm directory NewJoyPla
-[2021-10-02 15:44:00][INFO] upload NewJoyPla
-[2021-10-02 23:27:11][INFO] directory logs
-[2021-10-02 23:27:11][INFO] directory tmp
-[2021-10-02 23:27:11][INFO] rm zip file
-[2021-10-02 23:27:15][INFO] cp directory NewJoyPla
-[2021-10-02 23:27:18][INFO] zip directory NewJoyPla
-[2021-10-02 23:27:19][INFO] rm directory NewJoyPla
-[2021-10-02 23:27:38][INFO] upload NewJoyPla
-[2021-10-02 23:27:51][INFO] directory logs
-[2021-10-02 23:27:51][INFO] directory tmp
-[2021-10-02 23:27:51][INFO] rm zip file
-[2021-10-02 23:27:53][INFO] cp directory NewJoyPla
-[2021-10-02 23:27:56][INFO] zip directory NewJoyPla
-[2021-10-02 23:27:56][INFO] rm directory NewJoyPla
-[2021-10-02 23:28:08][INFO] upload NewJoyPla
-[2021-10-02 23:28:10][INFO] directory logs
-[2021-10-02 23:28:10][INFO] directory tmp
-[2021-10-02 23:28:10][INFO] rm zip file
-[2021-10-02 23:28:13][INFO] cp directory NewJoyPla
-[2021-10-02 23:28:15][INFO] zip directory NewJoyPla
-[2021-10-02 23:28:16][INFO] rm directory NewJoyPla
-[2021-10-02 23:28:28][INFO] upload NewJoyPla
-[2021-10-02 23:33:49][INFO] directory logs
-[2021-10-02 23:33:49][INFO] directory tmp
-[2021-10-02 23:33:49][INFO] rm zip file
-[2021-10-02 23:33:53][INFO] cp directory NewJoyPla
-[2021-10-02 23:33:56][INFO] zip directory NewJoyPla
-[2021-10-02 23:33:56][ERROR] rm directory NewJoyPla
-[2021-10-02 23:33:59][INFO] directory logs
-[2021-10-02 23:33:59][INFO] directory tmp
-[2021-10-02 23:33:59][INFO] rm directory NewJoyPla
-[2021-10-02 23:33:59][INFO] rm zip file
-[2021-10-02 23:34:03][INFO] cp directory NewJoyPla
-[2021-10-02 23:34:05][INFO] zip directory NewJoyPla
-[2021-10-02 23:34:06][INFO] rm directory NewJoyPla
-[2021-10-02 23:34:20][INFO] upload NewJoyPla
-[2021-10-02 23:35:59][INFO] directory logs
-[2021-10-02 23:35:59][INFO] directory tmp
-[2021-10-02 23:35:59][INFO] rm zip file
-[2021-10-02 23:36:02][INFO] cp directory NewJoyPla
-[2021-10-02 23:36:06][INFO] zip directory NewJoyPla
-[2021-10-02 23:36:06][INFO] rm directory NewJoyPla
-[2021-10-02 23:36:18][INFO] upload NewJoyPla
-[2021-10-02 23:45:20][INFO] directory logs
-[2021-10-02 23:45:20][INFO] directory tmp
-[2021-10-02 23:45:20][INFO] rm zip file
-[2021-10-02 23:45:23][INFO] cp directory NewJoyPla
-[2021-10-02 23:45:25][INFO] zip directory NewJoyPla
-[2021-10-02 23:45:25][INFO] rm directory NewJoyPla
-[2021-10-02 23:45:37][INFO] upload NewJoyPla
-[2021-10-02 23:49:34][INFO] directory logs
-[2021-10-02 23:49:34][INFO] directory tmp
-[2021-10-02 23:49:34][INFO] rm zip file
-[2021-10-02 23:49:36][INFO] cp directory NewJoyPla
-[2021-10-02 23:49:38][INFO] zip directory NewJoyPla
-[2021-10-02 23:49:38][INFO] rm directory NewJoyPla
-[2021-10-02 23:49:50][INFO] upload NewJoyPla
-[2021-10-02 23:57:05][INFO] directory logs
-[2021-10-02 23:57:05][INFO] directory tmp
-[2021-10-02 23:57:05][INFO] rm zip file
-[2021-10-02 23:57:07][INFO] cp directory NewJoyPla
-[2021-10-02 23:57:09][INFO] zip directory NewJoyPla
-[2021-10-02 23:57:09][ERROR] rm directory NewJoyPla
-[2021-10-02 23:57:18][INFO] directory logs
-[2021-10-02 23:57:18][INFO] directory tmp
-[2021-10-02 23:57:18][INFO] rm directory NewJoyPla
-[2021-10-02 23:57:18][INFO] rm zip file
-[2021-10-02 23:57:20][INFO] cp directory NewJoyPla
-[2021-10-02 23:57:22][INFO] zip directory NewJoyPla
-[2021-10-02 23:57:22][INFO] rm directory NewJoyPla
-[2021-10-02 23:57:34][INFO] upload NewJoyPla
-[2021-10-02 23:59:31][INFO] directory logs
-[2021-10-02 23:59:31][INFO] directory tmp
-[2021-10-02 23:59:31][INFO] rm zip file
-[2021-10-02 23:59:33][INFO] cp directory NewJoyPla
-[2021-10-02 23:59:35][INFO] zip directory NewJoyPla
-[2021-10-02 23:59:35][INFO] rm directory NewJoyPla
-[2021-10-02 23:59:48][INFO] upload NewJoyPla
-[2021-10-03 00:01:50][INFO] directory logs
-[2021-10-03 00:01:50][INFO] directory tmp
-[2021-10-03 00:01:50][INFO] rm zip file
-[2021-10-03 00:01:53][INFO] cp directory NewJoyPla
-[2021-10-03 00:01:54][INFO] zip directory NewJoyPla
-[2021-10-03 00:01:54][INFO] rm directory NewJoyPla
-[2021-10-03 00:02:07][INFO] upload NewJoyPla
-[2021-10-03 00:06:19][INFO] directory logs
-[2021-10-03 00:06:19][INFO] directory tmp
-[2021-10-03 00:06:19][INFO] rm zip file
-[2021-10-03 00:06:22][INFO] cp directory NewJoyPla
-[2021-10-03 00:06:24][INFO] zip directory NewJoyPla
-[2021-10-03 00:06:24][INFO] rm directory NewJoyPla
-[2021-10-03 00:06:36][INFO] upload NewJoyPla
-[2021-10-03 00:08:06][INFO] directory logs
-[2021-10-03 00:08:06][INFO] directory tmp
-[2021-10-03 00:08:06][INFO] rm zip file
-[2021-10-03 00:08:08][INFO] cp directory NewJoyPla
-[2021-10-03 00:08:10][INFO] zip directory NewJoyPla
-[2021-10-03 00:08:10][INFO] rm directory NewJoyPla
-[2021-10-03 00:08:23][INFO] upload NewJoyPla
-[2021-10-03 00:09:19][INFO] directory logs
-[2021-10-03 00:09:19][INFO] directory tmp
-[2021-10-03 00:09:19][INFO] rm zip file
-[2021-10-03 00:09:21][INFO] cp directory NewJoyPla
-[2021-10-03 00:09:22][INFO] zip directory NewJoyPla
-[2021-10-03 00:09:23][INFO] rm directory NewJoyPla
-[2021-10-03 00:09:36][INFO] upload NewJoyPla
-[2021-10-03 00:11:08][INFO] directory logs
-[2021-10-03 00:11:08][INFO] directory tmp
-[2021-10-03 00:11:08][INFO] rm zip file
-[2021-10-03 00:11:12][INFO] cp directory NewJoyPla
-[2021-10-03 00:11:15][INFO] zip directory NewJoyPla
-[2021-10-03 00:11:15][INFO] rm directory NewJoyPla
-[2021-10-03 00:11:30][INFO] upload NewJoyPla
-[2021-10-03 00:13:10][INFO] directory logs
-[2021-10-03 00:13:10][INFO] directory tmp
-[2021-10-03 00:13:10][INFO] rm zip file
-[2021-10-03 00:13:13][INFO] cp directory NewJoyPla
-[2021-10-03 00:13:15][INFO] zip directory NewJoyPla
-[2021-10-03 00:13:15][INFO] rm directory NewJoyPla
-[2021-10-03 00:13:28][INFO] upload NewJoyPla
-[2021-10-03 00:14:38][INFO] directory logs
-[2021-10-03 00:14:38][INFO] directory tmp
-[2021-10-03 00:14:38][INFO] rm zip file
-[2021-10-03 00:14:41][INFO] cp directory NewJoyPla
-[2021-10-03 00:14:43][INFO] zip directory NewJoyPla
-[2021-10-03 00:14:43][INFO] rm directory NewJoyPla
-[2021-10-03 00:14:57][INFO] upload NewJoyPla
-[2021-10-03 00:16:03][INFO] directory logs
-[2021-10-03 00:16:03][INFO] directory tmp
-[2021-10-03 00:16:03][INFO] rm zip file
-[2021-10-03 00:16:06][INFO] cp directory NewJoyPla
-[2021-10-03 00:16:08][INFO] zip directory NewJoyPla
-[2021-10-03 00:16:08][INFO] rm directory NewJoyPla
-[2021-10-03 00:16:20][INFO] upload NewJoyPla
-[2021-10-03 00:16:57][INFO] directory logs
-[2021-10-03 00:16:57][INFO] directory tmp
-[2021-10-03 00:16:57][INFO] rm zip file
-[2021-10-03 00:17:00][INFO] cp directory NewJoyPla
-[2021-10-03 00:17:02][INFO] zip directory NewJoyPla
-[2021-10-03 00:17:02][INFO] rm directory NewJoyPla
-[2021-10-03 00:17:16][INFO] upload NewJoyPla
-[2021-10-03 00:21:51][INFO] directory logs
-[2021-10-03 00:21:51][INFO] directory tmp
-[2021-10-03 00:21:51][INFO] rm zip file
-[2021-10-03 00:21:53][INFO] cp directory NewJoyPla
-[2021-10-03 00:21:54][INFO] zip directory NewJoyPla
-[2021-10-03 00:21:55][INFO] rm directory NewJoyPla
-[2021-10-03 00:22:09][INFO] upload NewJoyPla
-[2021-10-03 00:25:08][INFO] directory logs
-[2021-10-03 00:25:08][INFO] directory tmp
-[2021-10-03 00:25:08][INFO] rm zip file
-[2021-10-03 00:25:10][INFO] cp directory NewJoyPla
-[2021-10-03 00:25:11][INFO] zip directory NewJoyPla
-[2021-10-03 00:25:11][INFO] rm directory NewJoyPla
-[2021-10-03 00:25:24][INFO] upload NewJoyPla
-[2021-10-03 00:26:07][INFO] directory logs
-[2021-10-03 00:26:07][INFO] directory tmp
-[2021-10-03 00:26:07][INFO] rm zip file
-[2021-10-03 00:26:09][INFO] cp directory NewJoyPla
-[2021-10-03 00:26:11][INFO] zip directory NewJoyPla
-[2021-10-03 00:26:11][INFO] rm directory NewJoyPla
-[2021-10-03 00:26:25][INFO] upload NewJoyPla
-[2021-10-03 01:00:16][INFO] directory logs
-[2021-10-03 01:00:16][INFO] directory tmp
-[2021-10-03 01:00:16][INFO] rm zip file
-[2021-10-03 01:00:20][INFO] cp directory NewJoyPla
-[2021-10-03 01:00:24][INFO] zip directory NewJoyPla
-[2021-10-03 01:00:24][ERROR] rm directory NewJoyPla
-[2021-10-03 01:00:27][INFO] directory logs
-[2021-10-03 01:00:27][INFO] directory tmp
-[2021-10-03 01:00:27][INFO] rm directory NewJoyPla
-[2021-10-03 01:00:27][INFO] rm zip file
-[2021-10-03 01:00:31][INFO] cp directory NewJoyPla
-[2021-10-03 01:00:34][INFO] zip directory NewJoyPla
-[2021-10-03 01:00:35][ERROR] rm directory NewJoyPla
-[2021-10-03 01:00:37][INFO] directory logs
-[2021-10-03 01:00:37][INFO] directory tmp
-[2021-10-03 01:00:37][INFO] rm directory NewJoyPla
-[2021-10-03 01:00:37][INFO] rm zip file
-[2021-10-03 01:00:41][INFO] cp directory NewJoyPla
-[2021-10-03 01:00:44][INFO] zip directory NewJoyPla
-[2021-10-03 01:00:45][INFO] rm directory NewJoyPla
-[2021-10-03 01:00:58][INFO] upload NewJoyPla
+[2021-10-09 00:52:42][INFO] make directory logs
+[2021-10-09 00:52:42][INFO] make directory tmp
+[2021-10-09 00:52:45][INFO] cp directory NewJoyPla
+[2021-10-09 00:52:46][INFO] zip directory NewJoyPla
+[2021-10-09 00:52:47][INFO] rm directory NewJoyPla
+[2021-10-09 00:52:58][INFO] upload NewJoyPla
+[2021-10-09 00:55:37][INFO] directory logs
+[2021-10-09 00:55:37][INFO] directory tmp
+[2021-10-09 00:55:37][INFO] rm zip file
+[2021-10-09 00:55:39][INFO] cp directory NewJoyPla
+[2021-10-09 00:55:41][INFO] zip directory NewJoyPla
+[2021-10-09 00:55:41][INFO] rm directory NewJoyPla
+[2021-10-09 00:55:52][INFO] upload NewJoyPla
+[2021-10-09 00:56:51][INFO] directory logs
+[2021-10-09 00:56:51][INFO] directory tmp
+[2021-10-09 00:56:51][INFO] rm zip file
+[2021-10-09 00:56:53][INFO] cp directory NewJoyPla
+[2021-10-09 00:56:54][INFO] zip directory NewJoyPla
+[2021-10-09 00:56:55][INFO] rm directory NewJoyPla
+[2021-10-09 00:57:07][INFO] upload NewJoyPla
+[2021-10-09 00:58:05][INFO] directory logs
+[2021-10-09 00:58:05][INFO] directory tmp
+[2021-10-09 00:58:05][INFO] rm zip file
+[2021-10-09 00:58:07][INFO] cp directory NewJoyPla
+[2021-10-09 00:58:09][INFO] zip directory NewJoyPla
+[2021-10-09 00:58:09][INFO] rm directory NewJoyPla
+[2021-10-09 00:58:20][INFO] upload NewJoyPla
+[2021-10-09 01:00:41][INFO] directory logs
+[2021-10-09 01:00:41][INFO] directory tmp
+[2021-10-09 01:00:41][INFO] rm zip file
+[2021-10-09 01:00:43][INFO] cp directory NewJoyPla
+[2021-10-09 01:00:45][INFO] zip directory NewJoyPla
+[2021-10-09 01:00:45][INFO] rm directory NewJoyPla
+[2021-10-09 01:00:56][INFO] upload NewJoyPla
+[2021-10-09 01:01:34][INFO] directory logs
+[2021-10-09 01:01:34][INFO] directory tmp
+[2021-10-09 01:01:34][INFO] rm zip file
+[2021-10-09 01:01:36][INFO] cp directory NewJoyPla
+[2021-10-09 01:01:38][INFO] zip directory NewJoyPla
+[2021-10-09 01:01:38][INFO] rm directory NewJoyPla
+[2021-10-09 01:01:49][INFO] upload NewJoyPla
+[2021-10-09 01:04:36][INFO] directory logs
+[2021-10-09 01:04:36][INFO] directory tmp
+[2021-10-09 01:04:36][INFO] rm zip file
+[2021-10-09 01:04:38][INFO] cp directory NewJoyPla
+[2021-10-09 01:04:40][INFO] zip directory NewJoyPla
+[2021-10-09 01:04:40][INFO] rm directory NewJoyPla
+[2021-10-09 01:04:51][INFO] upload NewJoyPla
+[2021-10-09 01:05:22][INFO] directory logs
+[2021-10-09 01:05:22][INFO] directory tmp
+[2021-10-09 01:05:22][INFO] rm zip file
+[2021-10-09 01:05:25][INFO] cp directory NewJoyPla
+[2021-10-09 01:05:26][INFO] zip directory NewJoyPla
+[2021-10-09 01:05:26][INFO] rm directory NewJoyPla
+[2021-10-09 01:05:39][INFO] upload NewJoyPla
+[2021-10-09 01:06:10][INFO] directory logs
+[2021-10-09 01:06:10][INFO] directory tmp
+[2021-10-09 01:06:10][INFO] rm zip file
+[2021-10-09 01:06:12][INFO] cp directory NewJoyPla
+[2021-10-09 01:06:13][INFO] zip directory NewJoyPla
+[2021-10-09 01:06:13][INFO] rm directory NewJoyPla
+[2021-10-09 01:06:24][INFO] upload NewJoyPla
+[2021-10-09 01:06:51][INFO] directory logs
+[2021-10-09 01:06:51][INFO] directory tmp
+[2021-10-09 01:06:51][INFO] rm zip file
+[2021-10-09 01:06:53][INFO] cp directory NewJoyPla
+[2021-10-09 01:06:54][INFO] zip directory NewJoyPla
+[2021-10-09 01:06:54][INFO] rm directory NewJoyPla
+[2021-10-09 01:07:08][INFO] upload NewJoyPla
+[2021-10-09 01:08:05][INFO] directory logs
+[2021-10-09 01:08:05][INFO] directory tmp
+[2021-10-09 01:08:05][INFO] rm zip file
+[2021-10-09 01:08:07][INFO] cp directory NewJoyPla
+[2021-10-09 01:08:09][INFO] zip directory NewJoyPla
+[2021-10-09 01:08:09][INFO] rm directory NewJoyPla
+[2021-10-09 01:08:36][INFO] upload NewJoyPla
+[2021-10-09 01:09:43][INFO] directory logs
+[2021-10-09 01:09:43][INFO] directory tmp
+[2021-10-09 01:09:43][INFO] rm zip file
+[2021-10-09 01:09:46][INFO] cp directory NewJoyPla
+[2021-10-09 01:09:47][INFO] zip directory NewJoyPla
+[2021-10-09 01:09:47][INFO] rm directory NewJoyPla
+[2021-10-09 01:09:59][INFO] upload NewJoyPla
+[2021-10-09 01:10:25][INFO] directory logs
+[2021-10-09 01:10:25][INFO] directory tmp
+[2021-10-09 01:10:25][INFO] rm zip file
+[2021-10-09 01:10:28][INFO] cp directory NewJoyPla
+[2021-10-09 01:10:29][INFO] zip directory NewJoyPla
+[2021-10-09 01:10:29][INFO] rm directory NewJoyPla
+[2021-10-09 01:11:18][INFO] upload NewJoyPla
+[2021-10-09 01:11:53][INFO] directory logs
+[2021-10-09 01:11:53][INFO] directory tmp
+[2021-10-09 01:11:53][INFO] rm zip file
+[2021-10-09 01:11:55][INFO] cp directory NewJoyPla
+[2021-10-09 01:11:56][INFO] zip directory NewJoyPla
+[2021-10-09 01:11:56][INFO] rm directory NewJoyPla
+[2021-10-09 01:12:15][INFO] upload NewJoyPla
+[2021-10-09 01:12:25][INFO] directory logs
+[2021-10-09 01:12:25][INFO] directory tmp
+[2021-10-09 01:12:25][INFO] rm zip file
+[2021-10-09 01:12:27][INFO] cp directory NewJoyPla
+[2021-10-09 01:12:29][INFO] zip directory NewJoyPla
+[2021-10-09 01:12:29][INFO] rm directory NewJoyPla
+[2021-10-09 01:12:45][INFO] upload NewJoyPla
+[2021-10-10 00:53:26][INFO] directory logs
+[2021-10-10 00:53:26][INFO] directory tmp
+[2021-10-10 00:53:26][INFO] rm zip file
+[2021-10-10 00:53:28][INFO] cp directory NewJoyPla
+[2021-10-10 00:53:30][INFO] zip directory NewJoyPla
+[2021-10-10 00:53:30][INFO] rm directory NewJoyPla
+[2021-10-10 00:53:45][INFO] upload NewJoyPla
+[2021-10-10 00:54:22][INFO] directory logs
+[2021-10-10 00:54:22][INFO] directory tmp
+[2021-10-10 00:54:22][INFO] rm zip file
+[2021-10-10 00:54:24][INFO] cp directory NewJoyPla
+[2021-10-10 00:54:26][INFO] zip directory NewJoyPla
+[2021-10-10 00:54:26][INFO] rm directory NewJoyPla
+[2021-10-10 00:54:40][INFO] upload NewJoyPla
+[2021-10-10 00:55:38][INFO] directory logs
+[2021-10-10 00:55:38][INFO] directory tmp
+[2021-10-10 00:55:38][INFO] rm zip file
+[2021-10-10 00:55:41][INFO] cp directory NewJoyPla
+[2021-10-10 00:55:43][INFO] zip directory NewJoyPla
+[2021-10-10 00:55:43][INFO] rm directory NewJoyPla
+[2021-10-10 00:55:57][INFO] upload NewJoyPla
+[2021-10-10 00:57:56][INFO] directory logs
+[2021-10-10 00:57:56][INFO] directory tmp
+[2021-10-10 00:57:56][INFO] rm zip file
+[2021-10-10 00:57:58][INFO] cp directory NewJoyPla
+[2021-10-10 00:58:00][INFO] zip directory NewJoyPla
+[2021-10-10 00:58:00][INFO] rm directory NewJoyPla
+[2021-10-10 00:58:14][INFO] upload NewJoyPla
+[2021-10-10 00:59:02][INFO] directory logs
+[2021-10-10 00:59:02][INFO] directory tmp
+[2021-10-10 00:59:02][INFO] rm zip file
+[2021-10-10 00:59:04][INFO] cp directory NewJoyPla
+[2021-10-10 00:59:06][INFO] zip directory NewJoyPla
+[2021-10-10 00:59:06][INFO] rm directory NewJoyPla
+[2021-10-10 00:59:23][INFO] upload NewJoyPla
+[2021-10-10 01:00:10][INFO] directory logs
+[2021-10-10 01:00:10][INFO] directory tmp
+[2021-10-10 01:00:10][INFO] rm zip file
+[2021-10-10 01:00:12][INFO] cp directory NewJoyPla
+[2021-10-10 01:00:14][INFO] zip directory NewJoyPla
+[2021-10-10 01:00:14][INFO] rm directory NewJoyPla
+[2021-10-10 01:00:28][INFO] upload NewJoyPla
+[2021-10-10 01:01:03][INFO] directory logs
+[2021-10-10 01:01:03][INFO] directory tmp
+[2021-10-10 01:01:03][INFO] rm zip file
+[2021-10-10 01:01:05][INFO] cp directory NewJoyPla
+[2021-10-10 01:01:07][INFO] zip directory NewJoyPla
+[2021-10-10 01:01:07][INFO] rm directory NewJoyPla
+[2021-10-10 01:01:21][INFO] upload NewJoyPla
+[2021-10-10 01:05:49][INFO] directory logs
+[2021-10-10 01:05:49][INFO] directory tmp
+[2021-10-10 01:05:49][INFO] rm zip file
+[2021-10-10 01:05:51][INFO] cp directory NewJoyPla
+[2021-10-10 01:05:53][INFO] zip directory NewJoyPla
+[2021-10-10 01:05:53][INFO] rm directory NewJoyPla
+[2021-10-10 01:06:07][INFO] upload NewJoyPla
+[2021-10-10 01:07:53][INFO] directory logs
+[2021-10-10 01:07:53][INFO] directory tmp
+[2021-10-10 01:07:53][INFO] rm zip file
+[2021-10-10 01:07:55][INFO] cp directory NewJoyPla
+[2021-10-10 01:07:56][INFO] zip directory NewJoyPla
+[2021-10-10 01:07:57][INFO] rm directory NewJoyPla
+[2021-10-10 01:08:12][INFO] upload NewJoyPla
+[2021-10-10 01:08:22][INFO] directory logs
+[2021-10-10 01:08:22][INFO] directory tmp
+[2021-10-10 01:08:22][INFO] rm zip file
+[2021-10-10 01:08:24][INFO] cp directory NewJoyPla
+[2021-10-10 01:08:25][INFO] zip directory NewJoyPla
+[2021-10-10 01:08:25][INFO] rm directory NewJoyPla
+[2021-10-10 01:08:39][INFO] upload NewJoyPla
+[2021-10-10 01:09:53][INFO] directory logs
+[2021-10-10 01:09:53][INFO] directory tmp
+[2021-10-10 01:09:53][INFO] rm zip file
+[2021-10-10 01:09:56][INFO] cp directory NewJoyPla
+[2021-10-10 01:09:57][INFO] zip directory NewJoyPla
+[2021-10-10 01:09:58][ERROR] rm directory NewJoyPla
+[2021-10-10 01:10:14][INFO] directory logs
+[2021-10-10 01:10:14][INFO] directory tmp
+[2021-10-10 01:10:14][INFO] rm directory NewJoyPla
+[2021-10-10 01:10:14][INFO] rm zip file
+[2021-10-10 01:10:16][INFO] cp directory NewJoyPla
+[2021-10-10 01:10:17][INFO] zip directory NewJoyPla
+[2021-10-10 01:10:18][INFO] rm directory NewJoyPla
+[2021-10-10 01:10:32][INFO] upload NewJoyPla
+[2021-10-10 01:11:59][INFO] directory logs
+[2021-10-10 01:11:59][INFO] directory tmp
+[2021-10-10 01:11:59][INFO] rm zip file
+[2021-10-10 01:12:01][INFO] cp directory NewJoyPla
+[2021-10-10 01:12:03][INFO] zip directory NewJoyPla
+[2021-10-10 01:12:03][INFO] rm directory NewJoyPla
+[2021-10-10 01:12:18][INFO] upload NewJoyPla
+[2021-10-10 01:19:37][INFO] directory logs
+[2021-10-10 01:19:37][INFO] directory tmp
+[2021-10-10 01:19:37][INFO] rm zip file
+[2021-10-10 01:19:39][INFO] cp directory NewJoyPla
+[2021-10-10 01:19:40][INFO] zip directory NewJoyPla
+[2021-10-10 01:19:41][INFO] rm directory NewJoyPla
+[2021-10-10 01:19:57][INFO] upload NewJoyPla
+[2021-10-10 01:21:23][INFO] directory logs
+[2021-10-10 01:21:23][INFO] directory tmp
+[2021-10-10 01:21:23][INFO] rm zip file
+[2021-10-10 01:21:25][INFO] cp directory NewJoyPla
+[2021-10-10 01:21:27][INFO] zip directory NewJoyPla
+[2021-10-10 01:21:27][INFO] rm directory NewJoyPla
+[2021-10-10 01:21:41][INFO] upload NewJoyPla
+[2021-10-10 01:21:54][INFO] directory logs
+[2021-10-10 01:21:54][INFO] directory tmp
+[2021-10-10 01:21:54][INFO] rm zip file
+[2021-10-10 01:21:56][INFO] cp directory NewJoyPla
+[2021-10-10 01:21:58][INFO] zip directory NewJoyPla
+[2021-10-10 01:21:58][INFO] rm directory NewJoyPla
+[2021-10-10 01:22:11][INFO] upload NewJoyPla
+[2021-10-10 01:22:27][INFO] directory logs
+[2021-10-10 01:22:27][INFO] directory tmp
+[2021-10-10 01:22:27][INFO] rm zip file
+[2021-10-10 01:22:30][INFO] cp directory NewJoyPla
+[2021-10-10 01:22:31][INFO] zip directory NewJoyPla
+[2021-10-10 01:22:31][INFO] rm directory NewJoyPla
+[2021-10-10 01:22:47][INFO] upload NewJoyPla
+[2021-10-10 01:23:17][INFO] directory logs
+[2021-10-10 01:23:17][INFO] directory tmp
+[2021-10-10 01:23:17][INFO] rm zip file
+[2021-10-10 01:23:19][INFO] cp directory NewJoyPla
+[2021-10-10 01:23:20][INFO] zip directory NewJoyPla
+[2021-10-10 01:23:21][INFO] rm directory NewJoyPla
+[2021-10-10 01:23:22][INFO] directory logs
+[2021-10-10 01:23:22][INFO] directory tmp
+[2021-10-10 01:23:22][INFO] rm zip file
+[2021-10-10 01:23:24][INFO] cp directory NewJoyPla
+[2021-10-10 01:23:26][INFO] zip directory NewJoyPla
+[2021-10-10 01:23:26][INFO] rm directory NewJoyPla
+[2021-10-10 01:23:39][INFO] upload NewJoyPla
+[2021-10-10 01:24:05][INFO] directory logs
+[2021-10-10 01:24:05][INFO] directory tmp
+[2021-10-10 01:24:05][INFO] rm zip file
+[2021-10-10 01:24:07][INFO] cp directory NewJoyPla
+[2021-10-10 01:24:09][INFO] zip directory NewJoyPla
+[2021-10-10 01:24:09][INFO] rm directory NewJoyPla
+[2021-10-10 01:24:23][INFO] upload NewJoyPla
+[2021-10-10 01:25:21][INFO] directory logs
+[2021-10-10 01:25:21][INFO] directory tmp
+[2021-10-10 01:25:21][INFO] rm zip file
+[2021-10-10 01:25:23][INFO] cp directory NewJoyPla
+[2021-10-10 01:25:25][INFO] zip directory NewJoyPla
+[2021-10-10 01:25:25][INFO] rm directory NewJoyPla
+[2021-10-10 01:25:37][INFO] upload NewJoyPla
+[2021-10-10 01:28:00][INFO] directory logs
+[2021-10-10 01:28:00][INFO] directory tmp
+[2021-10-10 01:28:00][INFO] rm zip file
+[2021-10-10 01:28:02][INFO] cp directory NewJoyPla
+[2021-10-10 01:28:04][INFO] zip directory NewJoyPla
+[2021-10-10 01:28:04][INFO] rm directory NewJoyPla
+[2021-10-10 01:28:19][INFO] upload NewJoyPla
+[2021-10-10 01:32:04][INFO] directory logs
+[2021-10-10 01:32:04][INFO] directory tmp
+[2021-10-10 01:32:04][INFO] rm zip file
+[2021-10-10 01:32:06][INFO] cp directory NewJoyPla
+[2021-10-10 01:32:07][INFO] zip directory NewJoyPla
+[2021-10-10 01:32:08][INFO] rm directory NewJoyPla
+[2021-10-10 01:32:21][INFO] upload NewJoyPla
+[2021-10-10 01:36:59][INFO] directory logs
+[2021-10-10 01:36:59][INFO] directory tmp
+[2021-10-10 01:36:59][INFO] rm zip file
+[2021-10-10 01:37:01][INFO] cp directory NewJoyPla
+[2021-10-10 01:37:03][INFO] zip directory NewJoyPla
+[2021-10-10 01:37:03][INFO] rm directory NewJoyPla
+[2021-10-10 01:37:40][INFO] upload NewJoyPla
+[2021-10-10 01:40:59][INFO] directory logs
+[2021-10-10 01:40:59][INFO] directory tmp
+[2021-10-10 01:40:59][INFO] rm zip file
+[2021-10-10 01:41:01][INFO] cp directory NewJoyPla
+[2021-10-10 01:41:03][INFO] zip directory NewJoyPla
+[2021-10-10 01:41:03][INFO] rm directory NewJoyPla
+[2021-10-10 01:41:15][INFO] upload NewJoyPla
+[2021-10-10 01:43:58][INFO] directory logs
+[2021-10-10 01:43:58][INFO] directory tmp
+[2021-10-10 01:43:58][INFO] rm zip file
+[2021-10-10 01:44:00][INFO] cp directory NewJoyPla
+[2021-10-10 01:44:02][INFO] zip directory NewJoyPla
+[2021-10-10 01:44:02][INFO] rm directory NewJoyPla
+[2021-10-10 01:44:15][INFO] upload NewJoyPla
+[2021-10-10 01:46:33][INFO] directory logs
+[2021-10-10 01:46:33][INFO] directory tmp
+[2021-10-10 01:46:33][INFO] rm zip file
+[2021-10-10 01:46:35][INFO] cp directory NewJoyPla
+[2021-10-10 01:46:37][INFO] zip directory NewJoyPla
+[2021-10-10 01:46:37][INFO] rm directory NewJoyPla
+[2021-10-10 01:46:50][INFO] upload NewJoyPla
+[2021-10-10 01:51:29][INFO] directory logs
+[2021-10-10 01:51:29][INFO] directory tmp
+[2021-10-10 01:51:29][INFO] rm zip file
+[2021-10-10 01:51:31][INFO] cp directory NewJoyPla
+[2021-10-10 01:51:32][INFO] zip directory NewJoyPla
+[2021-10-10 01:51:32][INFO] rm directory NewJoyPla
+[2021-10-10 01:51:47][INFO] upload NewJoyPla
+[2021-10-10 01:51:59][INFO] directory logs
+[2021-10-10 01:51:59][INFO] directory tmp
+[2021-10-10 01:51:59][INFO] rm zip file
+[2021-10-10 01:52:01][INFO] cp directory NewJoyPla
+[2021-10-10 01:52:03][INFO] zip directory NewJoyPla
+[2021-10-10 01:52:03][INFO] rm directory NewJoyPla
+[2021-10-10 01:52:19][INFO] upload NewJoyPla
+[2021-10-10 01:54:53][INFO] directory logs
+[2021-10-10 01:54:53][INFO] directory tmp
+[2021-10-10 01:54:53][INFO] rm zip file
+[2021-10-10 01:54:55][INFO] cp directory NewJoyPla
+[2021-10-10 01:54:57][INFO] zip directory NewJoyPla
+[2021-10-10 01:54:57][INFO] rm directory NewJoyPla
+[2021-10-10 01:55:13][INFO] upload NewJoyPla
+[2021-10-10 01:57:40][INFO] directory logs
+[2021-10-10 01:57:40][INFO] directory tmp
+[2021-10-10 01:57:40][INFO] rm zip file
+[2021-10-10 01:57:42][INFO] cp directory NewJoyPla
+[2021-10-10 01:57:44][INFO] zip directory NewJoyPla
+[2021-10-10 01:57:44][INFO] rm directory NewJoyPla
+[2021-10-10 01:57:58][INFO] upload NewJoyPla
+[2021-10-10 02:00:10][INFO] directory logs
+[2021-10-10 02:00:10][INFO] directory tmp
+[2021-10-10 02:00:10][INFO] rm zip file
+[2021-10-10 02:00:12][INFO] cp directory NewJoyPla
+[2021-10-10 02:00:14][INFO] zip directory NewJoyPla
+[2021-10-10 02:00:14][INFO] rm directory NewJoyPla
+[2021-10-10 02:00:28][INFO] upload NewJoyPla
+[2021-10-10 02:01:28][INFO] directory logs
+[2021-10-10 02:01:28][INFO] directory tmp
+[2021-10-10 02:01:28][INFO] rm zip file
+[2021-10-10 02:01:30][INFO] cp directory NewJoyPla
+[2021-10-10 02:01:31][INFO] zip directory NewJoyPla
+[2021-10-10 02:01:31][INFO] rm directory NewJoyPla
+[2021-10-10 02:01:45][INFO] upload NewJoyPla
+[2021-10-10 02:02:12][INFO] directory logs
+[2021-10-10 02:02:12][INFO] directory tmp
+[2021-10-10 02:02:12][INFO] rm zip file
+[2021-10-10 02:02:14][INFO] cp directory NewJoyPla
+[2021-10-10 02:02:16][INFO] zip directory NewJoyPla
+[2021-10-10 02:02:16][INFO] rm directory NewJoyPla
+[2021-10-10 02:02:38][INFO] upload NewJoyPla
+[2021-10-10 02:02:50][INFO] directory logs
+[2021-10-10 02:02:50][INFO] directory tmp
+[2021-10-10 02:02:50][INFO] rm zip file
+[2021-10-10 02:02:53][INFO] cp directory NewJoyPla
+[2021-10-10 02:02:55][INFO] zip directory NewJoyPla
+[2021-10-10 02:02:55][INFO] rm directory NewJoyPla
+[2021-10-10 02:03:11][INFO] upload NewJoyPla
+[2021-10-10 02:04:08][INFO] directory logs
+[2021-10-10 02:04:08][INFO] directory tmp
+[2021-10-10 02:04:08][INFO] rm zip file
+[2021-10-10 02:04:10][INFO] cp directory NewJoyPla
+[2021-10-10 02:04:11][INFO] zip directory NewJoyPla
+[2021-10-10 02:04:12][INFO] rm directory NewJoyPla
+[2021-10-10 02:04:31][INFO] upload NewJoyPla
+[2021-10-10 02:04:55][INFO] directory logs
+[2021-10-10 02:04:55][INFO] directory tmp
+[2021-10-10 02:04:55][INFO] rm zip file
+[2021-10-10 02:04:57][INFO] cp directory NewJoyPla
+[2021-10-10 02:04:58][INFO] zip directory NewJoyPla
+[2021-10-10 02:04:59][INFO] rm directory NewJoyPla
+[2021-10-10 02:05:14][INFO] upload NewJoyPla
+[2021-10-10 17:14:31][INFO] directory logs
+[2021-10-10 17:14:31][INFO] directory tmp
+[2021-10-10 17:14:31][INFO] rm zip file
+[2021-10-10 17:14:34][INFO] cp directory NewJoyPla
+[2021-10-10 17:14:35][INFO] zip directory NewJoyPla
+[2021-10-10 17:14:35][INFO] rm directory NewJoyPla
+[2021-10-10 17:14:50][INFO] upload NewJoyPla
+[2021-10-10 17:15:15][INFO] directory logs
+[2021-10-10 17:15:15][INFO] directory tmp
+[2021-10-10 17:15:15][INFO] rm zip file
+[2021-10-10 17:15:18][INFO] cp directory NewJoyPla
+[2021-10-10 17:15:19][INFO] zip directory NewJoyPla
+[2021-10-10 17:15:20][INFO] rm directory NewJoyPla
+[2021-10-10 17:15:39][INFO] upload NewJoyPla
+[2021-10-10 17:16:23][INFO] directory logs
+[2021-10-10 17:16:23][INFO] directory tmp
+[2021-10-10 17:16:23][INFO] rm zip file
+[2021-10-10 17:16:25][INFO] cp directory NewJoyPla
+[2021-10-10 17:16:27][INFO] zip directory NewJoyPla
+[2021-10-10 17:16:27][INFO] rm directory NewJoyPla
+[2021-10-10 17:16:48][INFO] upload NewJoyPla
+[2021-10-10 17:17:31][INFO] directory logs
+[2021-10-10 17:17:31][INFO] directory tmp
+[2021-10-10 17:17:31][INFO] rm zip file
+[2021-10-10 17:17:33][INFO] cp directory NewJoyPla
+[2021-10-10 17:17:34][INFO] zip directory NewJoyPla
+[2021-10-10 17:17:35][ERROR] rm directory NewJoyPla
+[2021-10-10 17:17:45][INFO] directory logs
+[2021-10-10 17:17:45][INFO] directory tmp
+[2021-10-10 17:17:45][INFO] rm directory NewJoyPla
+[2021-10-10 17:17:45][INFO] rm zip file
+[2021-10-10 17:17:47][INFO] cp directory NewJoyPla
+[2021-10-10 17:17:48][INFO] zip directory NewJoyPla
+[2021-10-10 17:17:48][INFO] rm directory NewJoyPla
+[2021-10-10 17:18:15][INFO] upload NewJoyPla
+[2021-10-10 17:19:21][INFO] directory logs
+[2021-10-10 17:19:21][INFO] directory tmp
+[2021-10-10 17:19:21][INFO] rm zip file
+[2021-10-10 17:19:23][INFO] cp directory NewJoyPla
+[2021-10-10 17:19:25][INFO] zip directory NewJoyPla
+[2021-10-10 17:19:25][INFO] rm directory NewJoyPla
+[2021-10-10 17:19:39][INFO] upload NewJoyPla
+[2021-10-10 17:19:42][INFO] directory logs
+[2021-10-10 17:19:42][INFO] directory tmp
+[2021-10-10 17:19:42][INFO] rm zip file
+[2021-10-10 17:19:44][INFO] cp directory NewJoyPla
+[2021-10-10 17:19:46][INFO] zip directory NewJoyPla
+[2021-10-10 17:19:46][INFO] rm directory NewJoyPla
+[2021-10-10 17:20:01][INFO] upload NewJoyPla
+[2021-10-10 17:20:52][INFO] directory logs
+[2021-10-10 17:20:52][INFO] directory tmp
+[2021-10-10 17:20:52][INFO] rm zip file
+[2021-10-10 17:20:54][INFO] cp directory NewJoyPla
+[2021-10-10 17:20:56][INFO] zip directory NewJoyPla
+[2021-10-10 17:20:56][INFO] rm directory NewJoyPla
+[2021-10-10 17:21:09][INFO] upload NewJoyPla
+[2021-10-10 17:22:08][INFO] directory logs
+[2021-10-10 17:22:08][INFO] directory tmp
+[2021-10-10 17:22:08][INFO] rm zip file
+[2021-10-10 17:22:10][INFO] cp directory NewJoyPla
+[2021-10-10 17:22:11][INFO] zip directory NewJoyPla
+[2021-10-10 17:22:11][INFO] rm directory NewJoyPla
+[2021-10-10 17:22:27][INFO] upload NewJoyPla
+[2021-10-10 17:22:43][INFO] directory logs
+[2021-10-10 17:22:43][INFO] directory tmp
+[2021-10-10 17:22:43][INFO] rm zip file
+[2021-10-10 17:22:45][INFO] cp directory NewJoyPla
+[2021-10-10 17:22:47][INFO] zip directory NewJoyPla
+[2021-10-10 17:22:47][INFO] rm directory NewJoyPla
+[2021-10-10 17:23:02][INFO] upload NewJoyPla
+[2021-10-10 17:23:36][INFO] directory logs
+[2021-10-10 17:23:36][INFO] directory tmp
+[2021-10-10 17:23:36][INFO] rm zip file
+[2021-10-10 17:23:38][INFO] cp directory NewJoyPla
+[2021-10-10 17:23:40][INFO] zip directory NewJoyPla
+[2021-10-10 17:23:40][INFO] rm directory NewJoyPla
+[2021-10-10 17:24:00][INFO] upload NewJoyPla
+[2021-10-10 17:26:51][INFO] directory logs
+[2021-10-10 17:26:51][INFO] directory tmp
+[2021-10-10 17:26:51][INFO] rm zip file
+[2021-10-10 17:26:53][INFO] cp directory NewJoyPla
+[2021-10-10 17:26:55][INFO] zip directory NewJoyPla
+[2021-10-10 17:26:55][INFO] rm directory NewJoyPla
+[2021-10-10 17:27:10][INFO] upload NewJoyPla
+[2021-10-10 17:27:31][INFO] directory logs
+[2021-10-10 17:27:31][INFO] directory tmp
+[2021-10-10 17:27:31][INFO] rm zip file
+[2021-10-10 17:27:33][INFO] cp directory NewJoyPla
+[2021-10-10 17:27:35][INFO] zip directory NewJoyPla
+[2021-10-10 17:27:35][INFO] rm directory NewJoyPla
+[2021-10-10 17:27:55][INFO] upload NewJoyPla

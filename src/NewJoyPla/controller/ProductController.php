@@ -16,6 +16,7 @@ use App\Model\OrderHistory;
 use App\Model\Order;
 use App\Model\ReceivingHistory;
 use App\Model\Receiving;
+use App\Model\Item;
 use App\Model\InHospitalItem;
 use App\Model\Hospital;
 use App\Model\HospitalUser;
@@ -27,7 +28,7 @@ use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
 use Exception;
 
-class BorrowingRegistrationController extends Controller
+class ProductController extends Controller
 {
     private $in_hospital_items = null ;
     public function __construct()
@@ -35,7 +36,7 @@ class BorrowingRegistrationController extends Controller
     }
     
     /**
-     * 貸出品登録
+     * 商品
      */
     public function index(): View
     {
@@ -54,17 +55,13 @@ class BorrowingRegistrationController extends Controller
             $divisionData = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
         }
 
-        $api_url = "%url/rel:mpgt:Borrowing%";
-        if( $user_info->isDistributorUser())
-        {
-            $api_url = "%url/rel:mpgt:BorrowingForD%";
-        }
+        $api_url = "%url/rel:mpgt:Product%";
 
         $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
         $header = $this->view('NewJoyPla/src/HeaderForMypage', [
             'SPIRAL' => $SPIRAL
         ], false);
-        $content = $this->view('NewJoyPla/view/BorrowingRegistration', [
+        $content = $this->view('NewJoyPla/view/ProductMaster', [
             'api_url' => $api_url,
             'user_info' => $user_info,
             'divisionData'=> $divisionData,
@@ -73,7 +70,7 @@ class BorrowingRegistrationController extends Controller
         
         // テンプレートにパラメータを渡し、HTMLを生成し返却
         return $this->view('NewJoyPla/view/template/Template', [
-            'title'     => 'JoyPla 貸出登録',
+            'title'     => 'JoyPla 商品マスタ',
             'content'   => $content->render(),
             'head' => $head->render(),
             'header' => $header->render(),
@@ -82,49 +79,9 @@ class BorrowingRegistrationController extends Controller
     }
 
     /**
-     * 貸出品リスト
+     * 商品一覧
      */
-    public function borrowingList(): View
-    {
-        global $SPIRAL;
-        // GETで呼ばれた
-        //$mytable = new mytable();
-        // テンプレートにパラメータを渡し、HTMLを生成し返却
-        $param = array();
-
-        $user_info = new UserInfo($SPIRAL);
-
-        $api_url = "%url/rel:mpgt:Borrowing%";
-        if( $user_info->isDistributorUser())
-        {
-            $api_url = "%url/rel:mpgt:BorrowingForD%";
-        }
-
-        $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
-        $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-            'SPIRAL' => $SPIRAL
-        ], false);
-
-        $content = $this->view('NewJoyPla/view/BorrowingList', [
-            'api_url' => $api_url,
-            'user_info' => $user_info,
-            'csrf_token' => Csrf::generate(16)
-        ] , false);
-        
-        // テンプレートにパラメータを渡し、HTMLを生成し返却
-        return $this->view('NewJoyPla/view/template/Template', [
-            'title'     => 'JoyPla 貸出登録',
-            'content'   => $content->render(),
-            'head' => $head->render(),
-            'header' => $header->render(),
-            'baseUrl' => '',
-        ],false);
-    }
-
-    /**
-     * 使用済みリスト（未承認）
-     */
-    public function unapprovedUsedSlip(): View
+    public function Item(): View
     {
         global $SPIRAL;
         // GETで呼ばれた
@@ -138,24 +95,25 @@ class BorrowingRegistrationController extends Controller
         $header = $this->view('NewJoyPla/src/HeaderForMypage', [
             'SPIRAL' => $SPIRAL
         ], false);
-        $content = $this->view('NewJoyPla/view/UnapprovedUsedSlip', [
-            'user_info' => $user_info,
+        $content = $this->view('NewJoyPla/view/ProductMaster', [
+            'userInfo' => $user_info,
             'csrf_token' => Csrf::generate(16)
             ] , false);
         
         // テンプレートにパラメータを渡し、HTMLを生成し返却
         return $this->view('NewJoyPla/view/template/Template', [
-            'title'     => 'JoyPla 未承認使用伝票一覧',
+            'title'     => 'JoyPla 商品マスタ',
             'content'   => $content->render(),
             'head' => $head->render(),
             'header' => $header->render(),
             'baseUrl' => '',
         ],false);
     }
+
     /**
-     * 使用済みリスト（承認）
+     * 院内商品一覧
      */
-    public function approvedUsedSlip(): View
+    public function InHospitalItem(): View
     {
         global $SPIRAL;
         // GETで呼ばれた
@@ -170,20 +128,21 @@ class BorrowingRegistrationController extends Controller
             'SPIRAL' => $SPIRAL
         ], false);
 
-        $content = $this->view('NewJoyPla/view/ApprovedUsedSlip', [
-            'user_info' => $user_info,
+        $content = $this->view('NewJoyPla/view/InHospitalProductsMaster', [
+            'userInfo' => $user_info,
             'csrf_token' => Csrf::generate(16)
         ] , false);
         
         // テンプレートにパラメータを渡し、HTMLを生成し返却
         return $this->view('NewJoyPla/view/template/Template', [
-            'title'     => 'JoyPla 承認済み使用伝票一覧',
+            'title'     => 'JoyPla 院内商品マスタ',
             'content'   => $content->render(),
             'head' => $head->render(),
             'header' => $header->render(),
             'baseUrl' => '',
         ],false);
     }
+
     /**
      * 貸出品登録
      */
@@ -218,7 +177,7 @@ class BorrowingRegistrationController extends Controller
      * 貸出品登録から使用済み報告
      * 管理者のみ
      */
-    public function borrowingRegistrationToUsedReportApi()
+    public function ProductToUsedReportApi()
     {
         global $SPIRAL;
         try{
@@ -420,34 +379,6 @@ class BorrowingRegistrationController extends Controller
             }
             
             $result = $this->association($used_slip_create_data['ids'],$all_create_data['ids']);
-
-            
-            /** メールを作成 */
-            foreach($used_slip_create_data['history_data'] as $history)
-            {  
-                $mail_body = $this->view('NewJoyPla/view/Mail/UsingRegistration', [
-                    'name' => '%val:usr:name%',
-                    'hospital_name' => $used_slip_history,
-                    'hospital_user_name' => $user_info->getName(),
-                    'used_date' => $used_slip_history->usedTime,
-                    'used_slip_number' => $used_slip_history->usedSlipId,
-                    'used_item_num' => $used_slip_history->itemsNumber,
-                    'total_price' => "￥".number_format((int)$used_slip_history->totalAmount),
-                    'login_url' => '',
-                ] , false)->render();
-                
-                $select_name = $this->makeId($used_slip_history->distributorId);
-                
-                $test = DistributorUser::selectName($select_name)->rule(
-                    ['name'=>'distributorId','label'=>'name_'.$used_slip_history->distributorId,'value1'=>$used_slip_history->distributorId,'condition'=>'matches']
-                    )->filterCreate();
-
-                $test = DistributorUser::selectRule($select_name)
-                    ->body($mail_body)
-                    ->subject("[JoyPla] 貸出品の使用登録がありました")
-                    ->from(FROM_ADDRESS,FROM_NAME)
-                    ->send();
-            }
 
             $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
             $content = $content->toJson();
@@ -951,45 +882,41 @@ class BorrowingRegistrationController extends Controller
 /***
  * 実行
  */
-$BorrowingRegistrationController = new BorrowingRegistrationController();
+$ProductController = new ProductController();
 
 $action = $SPIRAL->getParam('Action');
 
 {
-    if($action === 'borrowingRegistApi')
+    if($action === 'Item')
     {
-        echo $BorrowingRegistrationController->borrowingRegistApi()->render();
+        echo $ProductController->Item()->render();
     } 
-    else if($action === 'borrowingRegistrationToUsedReportApi')
+    else if($action === 'InHospitalItem')
     {
-        echo $BorrowingRegistrationController->borrowingRegistrationToUsedReportApi()->render();
+        echo $ProductController->InHospitalItem()->render();
     } 
     else if($action === 'usedTemporaryReportApi')
     {
-        echo $BorrowingRegistrationController->usedTemporaryReportApi()->render();
+        echo $ProductController->usedTemporaryReportApi()->render();
     } 
-    else if($action === 'borrowingList')
-    {
-        echo $BorrowingRegistrationController->borrowingList()->render();
-    }
     else if($action === 'unapprovedUsedSlip')
     {
-        echo $BorrowingRegistrationController->unapprovedUsedSlip()->render();
+        echo $ProductController->unapprovedUsedSlip()->render();
     }
     else if($action === 'approvedUsedSlip')
     {
-        echo $BorrowingRegistrationController->approvedUsedSlip()->render();
+        echo $ProductController->approvedUsedSlip()->render();
     }
     else if($action === 'usedSlipApprovalApi')
     {
-        echo $BorrowingRegistrationController->usedSlipApprovalApi()->render();
+        echo $ProductController->usedSlipApprovalApi()->render();
     }
     else if($action === 'cancelApi')
     {
-        echo $BorrowingRegistrationController->cancelApi()->render();
+        echo $ProductController->cancelApi()->render();
     }
     else 
     {
-        echo $BorrowingRegistrationController->index()->render();
+        echo $ProductController->index()->render();
     }
 }
