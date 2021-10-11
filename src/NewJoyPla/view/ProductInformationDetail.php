@@ -1,10 +1,16 @@
+<style>
+    .itemInfo.table.uk-table td, .itemInfo.table.uk-table th {
+        line-break: anywhere;
+        min-width:120px;
+    }
+</style>
 <div class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
     <div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
                 <li><a href="%url/rel:mpgt:Product%&Action=ProductMaster">商品マスタ</a></li>
-                <li><span><span>商品情報詳細</span></li>
+                <li><span>商品情報詳細</span></li>
             </ul>
             <div class="no_print uk-margin" uk-margin>
                 <input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">

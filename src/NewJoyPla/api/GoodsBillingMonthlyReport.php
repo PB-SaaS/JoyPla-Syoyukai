@@ -29,7 +29,8 @@ class GoodsBillingMonthlyReport{
         }
         $this->setInHPItemDBSearch($itemName,$itemCode,$itemStandard,$page,$maxCount);
         $this->inHPItemData = $this->getInHPItemDB();
-        if($this->inHPItemData['code'] != '0'){
+        if($this->inHPItemData['code'] != '0')
+        {
             //var_dump($this->inHPItemData);
             return $this->inHPItemData;
         }

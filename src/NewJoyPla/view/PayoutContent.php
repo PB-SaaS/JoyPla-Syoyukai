@@ -1,27 +1,3 @@
-<?php
-include_once 'NewJoyPla/lib/ApiSpiral.php';
-include_once "NewJoyPla/lib/Define.php";
-include_once 'NewJoyPla/lib/SpiralDataBase.php';
-include_once 'NewJoyPla/lib/UserInfo.php';
-include_once 'NewJoyPla/api/GetDivision.php';
-
-
-$userInfo = new App\Lib\UserInfo($SPIRAL);
-
-$spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
-$spiralApiRequest = new SpiralApiRequest();
-$spiralDataBase = new App\Lib\SpiralDataBase($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
-
-$getDivision = new App\Api\GetDivision($spiralDataBase,$userInfo);
-
-$divisionData = $getDivision->select();
-
-?>
-<!DOCTYPE html>
-<html> 
-  <head>
-    <title>JoyPla 払出内容入力</title>
-	<?php include_once 'NewJoyPla/src/Head.php'; ?>
     <style>
 		
 		a.top-to-icon {
@@ -579,9 +555,6 @@ $divisionData = $getDivision->select();
 		
 		
     </script>
-  </head>
-  <body>
-    <?php include_once 'NewJoyPla/src/HeaderForMypage.php'; ?>
     <div class="animsition" uk-height-viewport="expand: true">
 	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
 		    <div class="uk-container uk-container-expand">
@@ -597,29 +570,23 @@ $divisionData = $getDivision->select();
 		    			<div class="uk-form-controls">
 				            <select class="uk-width-3-4 uk-select uk-inline" name="sourceDivision">
 				                <option value="">----- 部署選択 -----</option>
-								<?php
-								$stringDom = '';
-				                if($userInfo->getUserPermission() == '1') {
-					                $stringDom .= '<option value="'.$divisionData['store'][0][1].'">'.$divisionData['store'][0][3].'(大倉庫)</option>';
-					                $stringDom .= '<option value="" disabled>--------------------</option>';
-					                foreach($divisionData['division'] as $divisiton){
-					                	if($divisiton[5] == '1'){
-					                		continue;
-					                	}
-										$stringDom .= '<option value="'.$divisiton[1].'">'.$divisiton[3].'</option>';
-					                }
-				                } else if($userInfo->getDivisionId() == $divisionData['store'][0][1]) {
-					                $stringDom .= '<option value="'.$divisionData['store'][0][1].'">'.$divisionData['store'][0][3].'(大倉庫)</option>';
-				                } else {
-					                foreach($divisionData['division'] as $divisiton){
-					                	if($divisiton[5] == '1'){
-					                		continue;
-					                	}
-										$stringDom .= '<option value="'.$divisiton[1].'">'.$divisiton[3].'</option>';
-					                }
-								}
-								echo $stringDom;
-				                ?>
+		                        <?php
+		                        foreach($source_division->data as $data)
+		                        {
+		                            if($data->divisionType === '1')
+		                            {
+		                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
+		                                echo '<option value="" disabled>--------------------</option>';
+		                            }
+		                        }
+		                        foreach($source_division->data as $data)
+		                        {
+		                            if($data->divisionType === '2')
+		                            {
+		                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
+		                            }
+		                        }
+		                        ?>
 				            </select>
 			            </div>
 			        </div>
@@ -628,19 +595,23 @@ $divisionData = $getDivision->select();
 		    			<div class="uk-form-controls">
 				            <select class="uk-select uk-width-3-4" name="targetDivision">
 				                <option value="">----- 部署選択 -----</option>
-				                
-								<?php
-								$stringDom = '';
-				                $stringDom .= '<option value="'.$divisionData['store'][0][1].'">'.$divisionData['store'][0][3].'(大倉庫)</option>';
-				                $stringDom .= '<option value="" disabled>---------------------</option>';
-				                foreach($divisionData['division'] as $divisiton){
-									if($divisiton[5] == '1'){
-										continue;
-									}
-									$stringDom .= '<option value="'.$divisiton[1].'">'.$divisiton[3].'</option>';
-								}
-								echo $stringDom;
-				                ?>
+		                        <?php
+		                        foreach($target_division->data as $data)
+		                        {
+		                            if($data->divisionType === '1')
+		                            {
+		                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
+		                                echo '<option value="" disabled>--------------------</option>';
+		                            }
+		                        }
+		                        foreach($target_division->data as $data)
+		                        {
+		                            if($data->divisionType === '2')
+		                            {
+		                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
+		                            }
+		                        }
+		                        ?>
 				            </select>
 			            </div>
 			        </div>
@@ -916,6 +887,3 @@ $divisionData = $getDivision->select();
 		}
 
 </script>
-
-  </body>
-</html>

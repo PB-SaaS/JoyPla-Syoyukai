@@ -10,3 +10,11 @@ JoyPla
  - src ・・・カスタムモジュールに設置するプログラム
  - sslServer ・・・SSL画像サーバーに設置するファイル群
  - test ・・・PHPUnit
+
+Deploy 方法
+
+cd .deploy
+
+joypla2_dev に反映
+
+sh deploy.sh
