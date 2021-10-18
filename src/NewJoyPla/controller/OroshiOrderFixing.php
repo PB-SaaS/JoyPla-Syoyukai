@@ -1,4 +1,4 @@
-<?php
+$in_hospital_item<?php
 //受注完了処理
 include_once 'NewJoyPla/lib/ApiSpiral.php';
 include_once "NewJoyPla/lib/Define.php";

@@ -84,9 +84,12 @@ foreach($orderItems as $key => $record){
 	$num++;
 }
 
+if($card["data"][0][1] != 8)
+{
+	$updateOrder = new App\Api\UpdateOrder($spiralDataBase);
+	$result = $updateOrder->update($card["data"][0][0],$card["data"][0][2],$orderItems);
+}
 
-$updateOrder = new App\Api\UpdateOrder($spiralDataBase);
-$result = $updateOrder->update($card["data"][0][0],$card["data"][0][2],$orderItems);
 
 
 $crypt   = $SPIRAL->getSpiralCryptOpenSsl();
@@ -289,8 +292,9 @@ if($userInfo->getUserPermission() == "1"){
 		    </div>
 		</div>
 	</div>
-	<form action="%url/rel:@mpgt:createLabel%" target="_blank" method="post" class="print_hidden uk-inline" id="createLabelForm">
-		<input type="hidden" value="" name="itemsData" id="itemsData">
+	<form action="%url/rel:mpgt:ReceivingLabel%" target="_blank" method="post" class="print_hidden uk-inline" id="createLabelForm">
+		<!-- <input type="hidden" value="" name="itemsData" id="itemsData"> -->
+		<input type="hidden" id="receivingId" name="receivingId">
 		<input type="hidden" value="%val:usr:distributorName%" name="distributorName">
 	</form>
 	
@@ -399,7 +403,7 @@ if($userInfo->getUserPermission() == "1"){
 					};
 				}
 				deliveryCheck(){
-					if(!this.canAjax ) { 
+					if(!this.canAjax ) {
 						console.log('通信中');
 						return;
 					}
@@ -469,7 +473,7 @@ if($userInfo->getUserPermission() == "1"){
 								if(labelCreateFlg)
 								{
 									UIkit.modal.confirm("ラベル発行を行いますか").then(function () {
-										tmp.createLabel();
+										tmp.createLabel(data.historyId);
 									}, function () {
 										location.reload();
 									});
@@ -738,8 +742,10 @@ if($userInfo->getUserPermission() == "1"){
 						}
 					}
 				}
-				createLabel(){
-					$("#itemsData").val(JSON.stringify( this.phpData['phpItemsData'] ));
+				createLabel(historyId){
+					//$("#itemsData").val(JSON.stringify( this.phpData['phpItemsData'] ));
+					$("#receivingId").val(historyId);
+					
 					$("#createLabelForm").submit();
 					location.reload();
 				}

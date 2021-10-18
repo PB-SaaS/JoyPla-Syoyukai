@@ -9,15 +9,15 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
-                <li><a href="%url/rel:mpgt:Product%&Action=ProductMaster">商品マスタ</a></li>
+                <li><a href="%url/rel:mpgt:Product%&Action=Item">商品マスタ</a></li>
                 <li><span>商品情報詳細</span></li>
             </ul>
             <div class="no_print uk-margin" uk-margin>
                 <input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
 
-            <?php if ($user_info->getUserPermission() == "1"): ?>
+            <?php if ($userInfo->getUserPermission() == "1"): ?>
 
-                <?php if ($tenantKind == '1'): ?>
+                <?php if ($tenantKind == "1"): ?>
                 <input class="print_hidden uk-button uk-button-primary" type="submit" value="商品情報変更" onclick="document.itemsChange.submit()">
                 <form action="/regist/is" method="post" name="itemsChange" target="_blank" class="uk-hidden">
                     %SMPAREA%
@@ -61,6 +61,7 @@
                 <input class="print_hidden uk-button uk-button-primary" type="submit" value="院内商品として追加" onclick="document.inHPItemsReg.submit()">
                 <form action="/regist/is" method="post" name="inHPItemsReg" target="_blank" class="uk-hidden">
                     %SMPAREA%
+                    <input type="hidden" name="SMPFORM" value="%smpform:330_inHpItemsR%">
                     <input type="hidden" name="itemId" value="%val:usr:itemId%">
                     <input type="hidden" name="itemName" value="%val:usr:itemName%">
                     <input type="hidden" name="itemCode" value="%val:usr:itemCode%">
@@ -71,9 +72,9 @@
                     <input type="hidden" name="itemUnit" value="%val:usr:itemUnit%">
                     <input type="hidden" name="makerName" value="%val:usr:makerName%">
                     <input type="hidden" name="hospitalId" value="%val:@usr:hospitalId%">
-                    <input type="hidden" name="SMPFORM" value="%smpform:330_inHpItemsR%">
                     <input type="hidden" name="catalogNo" value="%val:usr:catalogNo%">
                     <input type="hidden" name="serialNo" value="%val:usr:serialNo%">
+                    <input type="hidden" name="lotManagement" value="%val:usr:lotManagement:id%">
                 </form>
 
             <?php endif ?>

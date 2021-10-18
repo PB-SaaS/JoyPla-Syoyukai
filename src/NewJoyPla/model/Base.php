@@ -108,7 +108,8 @@ class Billing extends Model
         'itemUnit',
         'lotNumber',
         'lotDate',
-        'unitPrice'
+        'unitPrice',
+        'lotManagement'
     ];
 
     //デフォルト値
@@ -226,7 +227,7 @@ class OrderHistory extends Model
 class Receiving extends Model
 {
     const CREATED_AT = 'registrationTime';
-    const UPDATED_AT = 'updateTime';
+    const UPDATED_AT = '';
 
     public static $spiral_db_name = 'NJ_ReceivingDB';
     public static $guarded = ['id'];
@@ -260,7 +261,7 @@ class Receiving extends Model
 class ReceivingView extends Model
 {
     const CREATED_AT = 'registrationTime';
-    const UPDATED_AT = 'updateTime';
+    const UPDATED_AT = '';
 
     public static $spiral_db_name = '310_receItems';
     public static $guarded = ['id'];
@@ -393,6 +394,63 @@ class ReturnHistory extends Model
     public static $select = [];
 }
 
+class PayoutView extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = 'updateTime';
+
+    public static $spiral_db_name = '310_payoutItems';
+    public static $guarded = ['id'];
+    public static $primary_key = 'payoutId';
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "payoutHistoryId",
+        "payoutId",
+        "inHospitalItemId",
+        "hospitalId",
+        "sourceDivisionId",
+        "targetDivisionId",
+        "sourceDivision",
+        "targetDivision",
+        "quantity",
+        "quantityUnit",
+        "itemUnit",
+        "price",
+        "payoutQuantity",
+        "payoutAmount",
+        "payoutCount",
+        "payoutLabelCount",
+        "adjAmount",
+        "priceAfterAdj",
+        "lotNumber",
+        "lotDate",
+        'distributorId',
+        'catalogNo',
+        'serialNo',
+        'medicineCategory',
+        'homeCategory',
+        'notUsedFlag',
+        'itemId',
+        'itemName',
+        'itemCode',
+        'itemStandard',
+        'itemJANCode',
+        'notice',
+        'HPstock',
+        'makerName',
+        'labelId',
+        'officialFlag',
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
+
 class Payout extends Model
 {
     const CREATED_AT = 'registrationTime';
@@ -422,7 +480,8 @@ class Payout extends Model
         "priceAfterAdj",
         "lotNumber",
         "lotDate",
-        "unitPrice"
+        "unitPrice",
+        "cardId",
     ];
 
     //デフォルト値
@@ -508,6 +567,35 @@ class Item extends Model
     ];
 }
 
+class InventoryAdjustmentTransaction extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = '';
+
+    public static $spiral_db_name = 'NJ_inventoryTRDB';
+    public static $guarded = ['id'];
+    public static $primary_key = 'id';
+    public static $fillable = [
+        "registrationTime",
+        "divisionId",
+        "inHospitalItemId",
+        "count",
+        "hospitalId",
+        "orderWithinCount",
+        "pattern",
+        "lotUniqueKey",
+        "lotNumber",
+        "lotDate",
+        "stockQuantity",
+        "rackName",
+        "constantByDiv",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
 
 class InHospitalItem extends Model
 {
@@ -549,7 +637,6 @@ class InHospitalItem extends Model
         'unitPrice',
         'measuringInst',
         'distributorName',
-        'lotManagement'
     ];
 
     //デフォルト値
@@ -557,6 +644,62 @@ class InHospitalItem extends Model
 
     public static $select = [];
 }
+
+
+class InHospitalItemView extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = 'updateTime';
+
+    public static $spiral_db_name = 'itemInHospitalv2';
+    public static $guarded = ['id'];
+    public static $primary_key = 'inHospitalItemId';
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "inHospitalItemId",
+        "authKey",
+        "hospitalId",
+        "distributorId",
+        "catalogNo",
+        "serialNo",
+        "quantity",
+        "quantityUnit",
+        "itemUnit",
+        "medicineCategory",
+        "homeCategory",
+        "notUsedFlag",
+        "itemId",
+        "itemName",
+        "itemCode",
+        "itemStandard",
+        "itemJANCode",
+        "notice",
+        "distributorName",
+        "hospitalName",
+        "officialFlag",
+        "makerName",
+        "price",
+        "oldPrice",
+        "HPstock",
+        "minPrice",
+        "labelId",
+        "officialpriceOld",
+        "officialprice",
+        "priceId",
+        "unitPrice",
+        "measuringInst",
+        "lotManagement",
+
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
+
+
 
 class Hospital extends Model
 {
@@ -749,3 +892,211 @@ class AssociationTR extends Model
     public static $select = [];
 }
 
+class Stock extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = 'updateTime';
+
+    public static $spiral_db_name = 'NJ_stockDB';
+    public static $guarded = ['id'];
+    public static $primary_key = 'id';
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "hospitalId",
+        "divisionId",
+        "inHospitalItemId",
+        "stockQuantity",
+        "authKey",
+        "orderWithinCount",
+        "rackName",
+        "distributorId",
+        "invFinishTime",
+        "planInventoryCnt",
+        "constantByDiv",
+        "requiredOrderNum",
+        "barcode",
+        "labelId"
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
+
+
+class Card extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = 'updateTime';
+
+    public static $spiral_db_name = 'NJ_CardDB';
+    public static $guarded = ['id'];
+    public static $primary_key = 'cardId';
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "cardId",
+        "hospitalId",
+        "divisionId",
+        "inHospitalItemId",
+        "quantity",
+        "payoutId"
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
+
+class CardInfoView extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = 'updateTime';
+
+    public static $spiral_db_name = 'CardInfo';
+    public static $guarded = ['id'];
+    public static $primary_key = 'cardId';
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "cardId",
+        "hospitalId",
+        "divisionId",
+        "inHospitalItemId",
+        "quantity",
+        "payoutId",
+        'distributorId',
+        'catalogNo',
+        'serialNo',
+        'quantityUnit',
+        'itemUnit',
+        'medicineCategory',
+        'homeCategory',
+        'notUsedFlag',
+        'itemId',
+        'itemName',
+        'itemCode',
+        'itemStandard',
+        'itemJANCode',
+        'notice',
+        'HPstock',
+        'makerName',
+        'price',
+        'oldPrice',
+        'labelId',
+        'minPrice',
+        'officialFlag',
+        'priceId',
+        'unitPrice',
+        'measuringInst',
+        'distributorName',
+        'hospitalName',
+        'divisionName',
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
+
+
+class OrderDataView extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = '';
+
+    public static $spiral_db_name = 'orderdataDB';
+    public static $guarded = ['id'];
+    public static $primary_key = 'orderNumber';
+    public static $fillable = [
+        'registrationTime',
+        'orderTime',
+        'receivingTime',
+        'orderNumber',
+        'hospitalId',
+        'divisionId',
+        'itemsNumber',
+        'totalAmount',
+        'orderStatus',
+        'hachuRarrival',
+        'distributorId',
+        'distributorName',
+        'divisionName',
+        'hospitalName',
+        'postalCode',
+        'prefectures',
+        'address',
+        'phoneNumber',
+        'faxNumber',
+        'ordererUserName',
+        'ordercomment',
+        'orderAuthKey',
+        'receivingTarget'
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+
+}
+
+
+class OrderedItemView extends Model
+{
+    const CREATED_AT = 'registrationTime';
+    const UPDATED_AT = 'updateTime';
+
+    public static $spiral_db_name = 'hacchuShouhin';
+    public static $guarded = ['id'];
+    public static $primary_key = 'orderCNumber';
+    public static $fillable = [
+        'registrationTime',
+        'updateTime',
+        'receivingTime',
+        'dueDate',
+        'orderCNumber',
+        'hospitalId',
+        'inHospitalItemId',
+        'orderNumber',
+        'price',
+        'orderQuantity',
+        'orderPrice',
+        'receivingFlag',
+        'receivingNum',
+        'quantity',
+        'quantityUnit',
+        'itemUnit',
+        'divisionId',
+        'distributorId',
+        'distributorName',
+        'divisionName',
+        'deleteFlag',
+        'catalogNo',
+        'serialNo',
+        'medicineCategory',
+        'homeCategory',
+        'notUsedFlag',
+        'itemId',
+        'itemName',
+        'itemCode',
+        'itemStandard',
+        'itemJANCode',
+        'notice',
+        'HPstock',
+        'makerName',
+        'labelId',
+        'minPrice',
+        'orderStatus'
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+
+}

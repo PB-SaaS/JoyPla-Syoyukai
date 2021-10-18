@@ -107,4 +107,4 @@ if($lotData) {
 
 
 //結果を返却
-echo json_encode(array('result'=>$result));
+echo json_encode(array('result'=>$result , 'historyId' => $regReceiving->ReceivingHistoryId));

@@ -89,18 +89,18 @@
 		    <div class="uk-container uk-container-expand">
 		    	<ul class="uk-breadcrumb">
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
-				    <li><span>払出内容入力</span></li>
+				    <li><span>カード内容入力</span></li>
 				</ul>
-		    	<h2 class="page_title">払出内容入力</h2>
+		    	<h2 class="page_title">カード内容入力</h2>
 		    	<hr>
 		    	<div class="uk-child-width-1-3@m" uk-grid>
 		    		<div>
-		    			<label class="uk-form-label">払出元部署</label>
+		    			<label class="uk-form-label">部署</label>
 		    			<div class="uk-form-controls">
-				            <select class="uk-width-3-4 uk-select uk-inline" name="sourceDivision">
+				            <select class="uk-width-3-4 uk-select uk-inline" id="divisionId" v-model="divisionId">
 				                <option value="">----- 部署選択 -----</option>
 		                        <?php
-		                        foreach($source_division->data as $data)
+		                        foreach($division->data as $data)
 		                        {
 		                            if($data->divisionType === '1')
 		                            {
@@ -108,7 +108,7 @@
 		                                echo '<option value="" disabled>--------------------</option>';
 		                            }
 		                        }
-		                        foreach($source_division->data as $data)
+		                        foreach($division->data as $data)
 		                        {
 		                            if($data->divisionType === '2')
 		                            {
@@ -118,51 +118,14 @@
 		                        ?>
 				            </select>
 			            </div>
-			        </div>
-		    		<div>
-		    			<label class="uk-form-label" >払出先部署</label>
-		    			<div class="uk-form-controls">
-				            <select class="uk-select uk-width-3-4" name="targetDivision">
-				                <option value="">----- 部署選択 -----</option>
-		                        <?php
-		                        foreach($target_division->data as $data)
-		                        {
-		                            if($data->divisionType === '1')
-		                            {
-		                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
-		                                echo '<option value="" disabled>--------------------</option>';
-		                            }
-		                        }
-		                        foreach($target_division->data as $data)
-		                        {
-		                            if($data->divisionType === '2')
-		                            {
-		                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
-		                            }
-		                        }
-		                        ?>
-				            </select>
-			            </div>
-			        </div>
-		    		<div>
-		    			<label class="uk-form-label" >払出日指定</label>
-		    			<div class="uk-form-controls">
-				            <input type="date" value="" class="uk-input" name="payoutDate">
-			            </div>
-			            <span class="uk-text-danger">※入力なしで現在時刻を取得します</span>
 			        </div>
 		    	</div>
 		    	<div class="uk-margin-bottom" uk-grid>
 		    		<div class="uk-width-1-2@m" uk-margin>
 			    		<button class="uk-button uk-button-default" v-on:click="sanshouClick">商品マスタを開く</button>
 			    		<button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
-			    		<button class="uk-button uk-button-primary uk-margin-small-top" v-on:click="sendPayout">払出実行</button>
+			    		<button class="uk-button uk-button-primary uk-margin-small-top" v-on:click="regCard">カード登録</button>
 		    		</div>
-		    		<?php /*
-		    		<div class="uk-inline uk-width-1-2@m">
-	    				<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." autofocus="true"> 
-		    			<button class="uk-button uk-button-default uk-float-right uk-width-1-5 uk-padding-remove">検索</button>
-		    		</div>*/ ?>
 		    	</div>
 		    	
 			    <div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky" class="uk-padding-top uk-background-muted uk-padding-small">
@@ -171,11 +134,6 @@
 		    			<button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
 					</form>	
 				</div>
-		    	
-					<div class="uk-margin uk-text-right">
-						<button type="button" class="uk-button uk-button-primary"  uk-toggle="target: #gs1-128">GS1-128で照合</button>
-					</div>
-		    	
 		    	<div class="shouhin-table uk-width-expand uk-overflow-auto">
 		    		<table class="uk-table uk-table-striped uk-text-nowrap">
 		    			<thead>
@@ -185,16 +143,13 @@
 		    					<th>商品名</th>
 		    					<th>製品コード</th>
 		    					<th>規格</th>
-		    					<th>入数</th>
-		    					<th class="uk-table-shrink">数量</th>
-		    					<th class="uk-table-shrink"></th>
-		    					<th class="uk-table-shrink">個数（ラベル枚数）</th>
-		    					<th class="uk-table-shrink">合計払出数</th>
 		    					<th>JANコード</th>
-		    					<th>ロット番号</th>
-		    					<th>使用期限</th>
-		    					<th></th>
-		    					<th></th>
+		    					<th>入数</th>
+		    					<th class="uk-table-shrink">数量
+		    						<input type="button" class="uk-button uk-button-default uk-button-small" v-on:click="countToIrisu" value="入数を反映" >
+		    					</th>
+		    					<th style="width:100px"></th>
+		    					<th style="width:100px"></th>
 		    				</tr>
 		    			</thead>
 		    			<tbody>
@@ -204,28 +159,16 @@
 								<td>{{list.shouhinName}}</td>
 								<td>{{list.code}}</td>
 								<td>{{list.kikaku}}</td>
+								<td>{{list.jan}}</td>
 								<td>{{list.irisu}}{{list.unit}}</td>
 								<td>
 									<input type="number" step="1" class="uk-input" min="0" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.countNum" v-on:change="addCountStyle(key)">
 									<span class="uk-text-bottom">{{list.unit}}</span>
 								</td>
-								<td>×</td>
-								<td>
-									<input type="number" step="1" class="uk-input" min="1" style="width: 96px;" v-bind:style="list.labelCountStyle" v-model="list.countLabelNum" v-on:change="addLabelCountStyle(key)">
-									<span class="uk-text-bottom">枚</span>
-								</td>
-								<td>{{list.countNum * list.countLabelNum}}{{list.unit}}</td>
-								<td>{{list.jan}}</td>
-								<td>
-									<input type="text" class="uk-input lot" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
-								</td>
-								<td>
-									<input type="date" class="uk-input lotDate" v-model="list.lotDate" v-bind:style="list.lotDateStyle" v-on:change="addLotDateStyle(key)">
-								</td>
-								<td>
+								<td uk-margin class="uk-text-center">
 									<input type="button" class="uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)">
 								</td>
-								<td>
+								<td uk-margin class="uk-text-center">
 									<input type="button" class="uk-button uk-button-default uk-button-small" value="追加" v-on:click="copyList(key)">
 								</td>
 							</tr>
@@ -242,11 +185,6 @@
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
 		    				</tr>
 		    				<tr>
 		    					<td>&emsp;</td>
@@ -259,18 +197,8 @@
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
 		    				</tr>
 		    				<tr>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
@@ -288,13 +216,6 @@
 		    </div>
 		</div>
 	</div>
-	
-	<form action="%url/rel:mpgt:createLabel%" target="_blank" method="post" class="uk-hidden" name="createLabelForm">
-		<input type="hidden" value="" name="itemsData" id="itemsData">
-		<input type="hidden" value="" name="sourceDivision">
-		<input type="hidden" value="" name="targetDivision">
-		<input type="hidden" value="payout" name="pattern">
-	</form>
 	
 	
 	<!-- This is a button toggling the modal with the default close button -->
@@ -357,21 +278,23 @@
 	    </div>
 	</div>
 </div>
+
+<form action="<?php echo $api_url ?>" target="_blank" method="post" class="print_hidden uk-inline" id="createLabelForm">
+	<input type="hidden" value="" name="card_ids">
+	<input type="hidden" value="cardLabelPrint" name="Action">
+</form>
 	
 <script>
 
 var app = new Vue({
 	el: '#app',
 	data: {
-		lists: []
+		lists: [],
+		divisionId: '',
 	},
 	methods: {
 		addList: function(object) {
 			object.countNum = ((object.count == null)? 0 : object.count); 
-			object.countLabelNum = ((object.countLabelNum == null)? 1 : object.countLabelNum);
-			object.lotNumber = ((object.lotNumber == null)? '': object.lotNumber); 
-			object.lotDate = ((object.lotDate == null)? '' : object.lotDate);
-			
 			this.lists.push(object);
 		},
 		copyList: function(key) {
@@ -385,13 +308,7 @@ var app = new Vue({
 			
 			let copy = JSON.parse(JSON.stringify(original[key]));
 			copy.countNum = 0;
-			copy.countLabelNum = null;
-			copy.lotNumber = null;
-			copy.lotDate = null;
 			copy.countStyle = {};
-			copy.labelCountStyle = {};
-			copy.lotNumberStyle = {};
-			copy.lotDateStyle = {};
 			
 			this.addList(copy); //コピー
 			
@@ -399,7 +316,6 @@ var app = new Vue({
 			{
 				this.addList(JSON.parse(JSON.stringify(original[num])));
 			}
-			
 		},
 		deleteList: function(key) {
 			this.lists.splice(key, 1);
@@ -407,8 +323,8 @@ var app = new Vue({
 		sanshouClick: function() {
 			window.open('%url/rel:mpgt:page_175973%', '_blank','scrollbars=yes,width=1220,height=600');
 		},
-		sendPayout: function(){
-			if(! this.payoutCheck()){
+		regCard: function(){
+			if(! this.check()){
 				return false;
 			}
 			
@@ -420,34 +336,30 @@ var app = new Vue({
                 type:'POST',
                 data:{
                     _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-                    payoutDate : $('input[name=payoutDate]').val(),
-                	Action : 'payoutRegistApi',
-                	payout : JSON.stringify( objectValueToURIencode(this.lists) ),
-                	sourceDivisionId : $('select[name="sourceDivision"]').val(),
-                	sourceDivisionName : encodeURI($('select[name="sourceDivision"] option:selected').text()),
-                	targetDivisionId : $('select[name="targetDivision"]').val(),
-                	targetDivisionName : encodeURI($('select[name="targetDivision"] option:selected').text()),
+                	Action : 'cardRegistrationApi',
+                	cardItems : JSON.stringify( objectValueToURIencode(this.lists) ),
+                	divisionId : app.divisionId,
                 },
                 dataType: 'json'
             })
             // Ajaxリクエストが成功した時発動
             .done( (data) => {
                 if(data.code != '0'){
-            		UIkit.modal.alert("払出に失敗しました").then(function(){
+            		UIkit.modal.alert("カード登録に失敗しました").then(function(){
 					});
             		return false;
                 }
-                UIkit.modal.alert("払出が完了しました").then(function(){
-					UIkit.modal.confirm("ラベルを発行しますか<br>※履歴から発行も可能です").then(function () {
-						app.lists.splice(0, app.lists.length);
-					}, function() {
-						app.lists.splice(0, app.lists.length);
+                UIkit.modal.alert("カード登録が完了しました").then(function(){
+					UIkit.modal.confirm("カードを印刷しますか。カード一覧からも可能です。").then(function () {
+						$('input[name=card_ids]').val(JSON.stringify( data.data ));
+						$('form#createLabelForm').submit();
 					});
+					app.lists.splice(0, app.lists.length);
 				});
             })
             // Ajaxリクエストが失敗した時発動
             .fail( (data) => {
-                UIkit.modal.alert("払出に失敗しました").then(function(){
+                UIkit.modal.alert("カード登録に失敗しました").then(function(){
 				});
             })
             // Ajaxリクエストが成功・失敗どちらでも発動
@@ -455,24 +367,17 @@ var app = new Vue({
 				loading_remove();
             });
 		},
-		payoutCheck: function(){
-			if($('select[name="sourceDivision"]').val()){
-			} else {
-				UIkit.modal.alert('払出元部署を選択してください');
+		checkDivision: function(){
+			if(app.divisionId == ''){
+				UIkit.modal.alert('部署を選択してください');
 				return false ;
 			}
+			return true;
+		},
+		check: function(){
 			
-			
-			if($('select[name="targetDivision"]').val()){
-			} else {
-				UIkit.modal.alert('払出先部署を選択してください');
-				return false ;
-			}
-			
-			
-			if($('select[name="sourceDivision"]').val() != $('select[name="targetDivision"]').val() ){
-			} else {
-				UIkit.modal.alert('払出元部署と払出先部署は同一のものを選択しないでください');
+			if(app.divisionId == ''){
+				UIkit.modal.alert('部署を選択してください');
 				return false ;
 			}
 			
@@ -494,152 +399,30 @@ var app = new Vue({
 				return false ;
 			}
 			
-			checkflg = false;
-			app.lists.forEach(function (elem, index) {
-			  if(app.lists[index].countLabelNum !== 0){
-			  	checkflg = true;
-			  }
-			});
-			if(checkflg){
-			} else {
-				UIkit.modal.alert('個数を入力してください');
-				return false ;
-			}
-			
-			let chkLot = true;
-			app.lists.forEach(function (elem, index) {
-				if(app.lists[index].countNum > 0) {
-					if((!app.lists[index].lotNumber && app.lists[index].lotDate) || (app.lists[index].lotNumber && !app.lists[index].lotDate)) {
-			    	chkLot = false;
-					}
-				}
-			});
-			
-			if(!chkLot){
-				UIkit.modal.alert('ロット情報を入力してください');
-				return false ;
-			}
-			
-			chkLot = true;
-			let regex = /^[0-9a-zA-Z]+$/;
-			app.lists.forEach(function (elem, index) {
-				if(app.lists[index].lotNumber) {
-					if((!regex.test(app.lists[index].lotNumber)) ||
-					   (encodeURI(app.lists[index].lotNumber).replace(/%../g, '*').length > 20)) {
-			    	chkLot = false;
-					}
-				}
-			});
-			
-			if(!chkLot){
-				UIkit.modal.alert('ロット番号の入力を確認してください');
-				return false ;
-			}
-			
 			return true;
-		},
-		addLabelCountStyle: function(index){
-			let changeObject = app.lists[index];
-			changeObject.labelCountStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-			app.$set(app.lists, index, changeObject);
 		},
 		addCountStyle: function(index){
 			let changeObject = app.lists[index];
 			changeObject.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
 			app.$set(app.lists, index, changeObject);
 		},
-		addLotNumberStyle: function(index){
-			let changeObject = app.lists[index];
-			changeObject.lotNumberStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-			app.$set(app.lists, index, changeObject);
-		},
-		addLotDateStyle: function(index){
-			let changeObject = app.lists[index];
-			changeObject.lotDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-			app.$set(app.lists, index, changeObject);
-		},
-		search: function(searchJan,objLotNumber,objLotDate){
-			//商品が存在するかつロットが同一
-			let existflg = false;
-			app.lists.forEach(function(elem, index) {
-				let changeObject = null;
-				if(!existflg){
-					if(searchJan == app.lists[index].jan && app.lists[index].lotNumber == objLotNumber && app.lists[index].lotDate == objLotDate ){
-						changeObject = app.lists[index];
-						changeObject.countLabelNum++;
-						app.$set(app.lists, index, changeObject);
-						app.addLabelCountStyle(index);
-						existflg = true;
-						$(window).scrollTop($("#tr_"+index).offset().top - 100);
-
-					}
-				}
-			});
-			
-			//商品が存在するかつロットの記入がされていない
-			if(!existflg){
+		countToIrisu: function(){
+			UIkit.modal.confirm("数量に入数を自動挿入しますか。すべて上書きされます").then(function () {
 				app.lists.forEach(function(elem, index) {
 					let changeObject = null;
-					if(!existflg){
-						if(searchJan == app.lists[index].jan && app.lists[index].lotNumber == null && app.lists[index].lotDate == null ){
-							changeObject = app.lists[index];
-							changeObject.lotNumber = objLotNumber;
-							changeObject.lotDate = objLotDate;
-							
-							app.$set(app.lists, index, changeObject);
-							app.addLotNumberStyle(index);
-							app.addLotDateStyle(index);
-							existflg = true;
-							$(window).scrollTop($("#tr_"+index).offset().top - 100);
-
-						}
-					}
+					changeObject = app.lists[index];
+					changeObject.countNum = changeObject.irisu;
+					app.$set(app.lists, index, changeObject);
+            		app.addCountStyle(index);
 				});
-			}
-			
-			//商品をaddする
-			if(!existflg){
-				app.lists.forEach(function(elem, index) {
-					let changeObject = null;
-					if(!existflg){
-						if(searchJan == app.lists[index].jan){
-							changeObject = app.lists[index];
-							changeObject.lotNumber = objLotNumber;
-							changeObject.lotDate = objLotDate;
-							
-							app.addList(changeObject);
-							app.addLotNumberStyle(index);
-							app.addLotDateStyle(index);
-							existflg = true;
-							$(window).scrollTop($("#tr_"+index).offset().top - 100);
-						}
-					}
-				});
-			}
-			
-			return existflg;
-		},
-		labelSearch: function(object) {
-			let existflg = false;
-			app.lists.forEach(function(elem, index) {
-				let changeObject = null;
-				if(!existflg){
-					if(object.jan == app.lists[index].jan && app.lists[index].countNum == object.countNum){
-						if(object.lotNumber == app.lists[index].lotNumber && object.lotDate == app.lists[index].lotDate){
-							changeObject = app.lists[index];
-							changeObject.countLabelNum++;
-							
-							app.$set(app.lists, index, changeObject);
-							app.addLabelCountStyle(index);
-							existflg = true;
-							$(window).scrollTop($("#tr_"+index).offset().top - 100);
-						}
-					}
-				}
+			}, function() {
 			});
-			return existflg;
 		},
 		barcodeSearch: function(barcode , lotNumber , lotDate) {
+			if(!app.checkDivision())
+			{
+				return false;
+			}
 			if(barcode.length > 14)
 			{
 				gs1_128.check_gs1_128(barcode);
@@ -661,6 +444,7 @@ var app = new Vue({
             		UIkit.modal.alert("商品が見つかりませんでした");
             		return false;
                 }
+            	$('#divisionId').prop('disabled',true);
                 if(data.count == 1)
                 {
                 	data = data.data;
@@ -670,15 +454,8 @@ var app = new Vue({
                 	if(lotDate != ''){
                 		data.lotDate = lotDate;
                 	}
-	                data.countNum = data.irisu;
-	                let existflg = this.labelSearch(data);
-	                if(!existflg){
-						data.labelCountStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-						data.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-						data.lotNumberStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-						data.lotDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-	                	this.addList(data);
-	                }
+					data.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+                	this.addList(data);
 	                
 	                $('input[name="barcode"]').val('');
                 } else {
@@ -721,7 +498,7 @@ var modal_sections = new Vue({
 			this.select_items.push(object);
 		},
 		addObject: function(index){
-			app.addList(this.select_items[index]);
+			app.addList(JSON.parse(JSON.stringify(this.select_items[index])));
 		},
 		openModal: function(){
         	UIkit.modal('#modal-sections').show();
@@ -774,9 +551,6 @@ var gs1_128 = new Vue({
 			let objLotDate = (obj["17"] === void 0) ? "" : this.changeDate(obj["17"]); //lotDate
 			let existflg = false;
 			let changeObject = null;
-			
-			
-			existflg = app.search(searchJan,objLotNumber,objLotDate);
 			
 			if(!existflg){
 				app.barcodeSearch(searchJan,objLotNumber,objLotDate);

@@ -18,7 +18,7 @@ class View {
         return new \View($file,$data,$filter);
     }
 
-    public function ser_filename(string $file = null): void
+    public function set_filename(string $file = null): void
     {
         $this->file = $file;
     }

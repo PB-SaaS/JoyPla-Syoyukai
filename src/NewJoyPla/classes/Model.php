@@ -15,6 +15,8 @@ class Model
     public static $fillable = [];
     public static $attributes = [];
     public static $primary_key = null;
+    public static $page = 1;
+    public $sort = [];
     
     public function __construct()
     {
@@ -52,6 +54,13 @@ class Model
         return $result;
     }
 
+    public static function getNewInstance()
+    {
+        $instance = new static;
+        self::$instances[static::class] = $instance;
+        return self::$instances[static::class];
+    }
+    
     public static function getInstance()
     {
         if (!isset(self::$instances[static::class])) {
@@ -131,6 +140,77 @@ class Model
         
         return new Collection($result);
     }
+    
+    public static function sort(string $fieldTitle , string $order = 'asc')
+    {
+        $instance = self::getInstance();
+        if($order == 'asc' || $order == 'desc'){
+            $this->sort[] = array( 'name' => $fieldTitle , 'order' => $order );
+        }
+        return $instance;
+    }
+    
+    public static function sortLink(string $fieldTitle)
+    {
+        $instance = self::getInstance();
+        $linkparam = [];
+        $checked = false;
+        foreach($instance->sort as $sort)
+        {
+            $order = 'asc';
+            if($sort['name'] == $fieldTitle)
+            {
+                $checked = true;
+                if($sort['order'] == 'asc'){
+                    $order = 'desc';
+                }
+                $linkparam[] = [$fieldTitle => "desc"];
+            }
+        }
+        if(!$checked)
+        {
+            $linkparam[] = [$fieldTitle => "desc"];
+        }
+        return http_build_query($linkparam);
+    }
+    
+    public static function paginate(int $lines_per_page)
+    {
+        $instance = self::getInstance();
+        foreach($instance->sort as $sort)
+        {
+            $instance->spiralDataBase->addSortField($sort['name'],$sort['order']);
+        }
+        $instance->spiralDataBase->setDataBase($instance::$spiral_db_name);
+        $column = array_merge($instance::$fillable,$instance::$guarded);
+        $instance->spiralDataBase->addSelectFieldsToArray($column);
+        $instance->spiralDataBase->setLinesPerPage($lines_per_page);
+        $result = $instance->spiralDataBase->doSelect();
+        if($result['count'] > 0){
+            $result['data'] = $instance->spiralDataBase->arrayToNameArray($result['data'],$column);
+            $result['data'] = $instance->getDataToInstance($result['data']);
+        }
+        
+        if($result['code'] != 0)
+        {
+            throw new Exception(FactoryApiErrorCode::factory((int)$result['code'])->getMessage(),FactoryApiErrorCode::factory((int)$result['code'])->getCode());
+        }
+        return new Collection($result);
+    }
+    
+    public static function page(int $page)
+    {
+        $instance = self::getInstance();
+        $instance->spiralDataBase->setPage($page);
+        $instance->page = $page;
+        return $instance;
+    }
+    
+    public static function current_page()
+    {
+        $instance = self::getInstance();
+        return $instance->page;
+    }
 
     public static function update(array $update_data)
     {
@@ -164,6 +244,10 @@ class Model
         $instance->spiralDataBase->setDataBase($instance::$spiral_db_name);
         $update_data = $instance->makeBulkUpdateArray($update_data);
         $result = $instance->spiralDataBase->doBulkUpdate($key , $update_data['fillable'], $update_data['data']);
+        if($result['code'] != 0)
+        {
+            throw new Exception(FactoryApiErrorCode::factory((int)$result['code'])->getMessage(),FactoryApiErrorCode::factory((int)$result['code'])->getCode());
+        }
         return new Collection($result);
     }
 
@@ -182,23 +266,28 @@ class Model
     private function makeBulkUpdateArray(array $update_data)
     {
         $update_array = [];
-        $update_fillable = $this::$fillable;
+        $update_fillable = [];
 
         foreach($update_data as $index => $data)
         {
+            $datas = [];
             foreach($this::$fillable as $column)
             {
-                $def = '';
-                if(static::CREATED_AT == $column){
-                    $update_fillable = array_diff($update_fillable, array(static::CREATED_AT));
-                    $update_fillable = array_values($update_fillable);
-                    continue;
-                }
                 if(static::UPDATED_AT == $column){
-                    $def = 'now';
+                    if(! in_array($column, $update_fillable)) {
+                        $update_fillable[] = $column;
+                    }
+                    $datas[] = 'now' ;
                 }
-                $update_array[$index][] = (isset($data[$column]))? $data[$column] : ((isset($this::$attributes[$column]))? $attributes[$column]: $def) ;
+                else if(array_key_exists($column, $data))
+                {
+                    if(! in_array($column, $update_fillable)) {
+                        $update_fillable[] = $column;
+                    }
+                    $datas[] = $data[$column];
+                }
             }
+            $update_array[] = $datas;
         }
         $result = [
             'data' => $update_array,
@@ -246,7 +335,6 @@ class Model
         $instance->spiralDataBase->setDataBase($instance::$spiral_db_name);
         $insert_data = $instance->makeInsertArray($insert_data);
         $result = $instance->spiralDataBase->doBulkInsert($instance::$fillable,$insert_data);
-
         if($result['code'] != 0)
         {
             throw new Exception(FactoryApiErrorCode::factory((int)$result['code'])->getMessage(),FactoryApiErrorCode::factory((int)$result['code'])->getCode());

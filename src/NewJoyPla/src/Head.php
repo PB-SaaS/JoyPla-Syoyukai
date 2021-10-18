@@ -283,6 +283,14 @@
 			display:none;
 		}
     	@media print{
+	    	.no_print{
+		        display: none;
+		    }
+        	.printarea{
+                page-break-after: always;
+                font-size: 12px;
+            }
+		<?php if($labelPrint != true): ?>
 			.print-width-1-1{
 				width:100% !important;
 			}
@@ -319,13 +327,6 @@
 			.uk-table th{
 				white-space: nowrap !important;
 			}
-	    	.no_print{
-		        display: none;
-		    }
-        	.printarea{
-                page-break-after: always;
-                font-size: 12px;
-            }
             body{
             	zoom: 60%; /* Equal to scaleX(0.7) scaleY(0.7) */
             }
@@ -440,6 +441,7 @@
 			.uk-table .fix .uk-button, .uk-table .no_fix .uk-button, .uk-table .labelCreate .uk-button{
 				display: none;
 			}
+		<?php endif; ?>
     	}
 /*
  * Primary

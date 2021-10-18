@@ -1,5 +1,6 @@
 <?php
 
+$labelPrint = true;
 $pattern = '';
 $inHpItemMaster = array();
 
@@ -301,6 +302,7 @@ EOM;
 							$design = str_replace('%JoyPla:rackName%',			$item['rackName'], 							$design);//払い出し先部署棚
 							$design = str_replace('%JoyPla:constantByDiv%',		$item['constantByDiv'], 					$design);//払い出し先部署定数
 							$design = str_replace('%JoyPla:officialFlag%',		$officialFlag,								$design);//償還フラグ
+							$design = str_replace('%JoyPla:officialFlag:id%',	$inHpItemMaster[$inHPId]['officialFlag'],	$design);//償還フラグ
 
 							echo $design;
 
@@ -356,7 +358,7 @@ EOM;
 					width:`+label_setting["labelwidth"]+`mm;
 					min-height:`+label_setting["labelmheight"]+`mm;
 					display: inline-block;
-					break-after: none !important;
+					page-break-after: auto !important;
 				}
 				`;
 			}

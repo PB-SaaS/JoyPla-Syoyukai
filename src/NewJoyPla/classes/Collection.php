@@ -12,18 +12,23 @@ class Collection
     private function setVariable($ary)
     {
         $tmp = [];
-        foreach($ary as $key => $val)
+        if(is_array($ary))
         {
-            if(is_array($val))
+            foreach($ary as $key => $val)
             {
-                $this->{$key} = new Collection($val);
-                $tmp[$key] = new Collection($val);
-            } 
-            else 
-            {
-                $this->{$key} = $val;
-                $tmp[$key] = $val;
+                if(is_array($val))
+                {
+                    $this->{$key} = new Collection($val);
+                    $tmp[$key] = new Collection($val);
+                } 
+                else 
+                {
+                    $this->{$key} = $val;
+                    $tmp[$key] = $val;
+                }
             }
+        } else {
+            $tmp = $ary;
         }
         $this->array = $tmp;
     }

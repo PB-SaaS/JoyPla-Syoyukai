@@ -151,10 +151,8 @@ if($userInfo->getUserPermission() == "1"){
 		    </div>
 		</div>
 	</div>
-	<form action="%url/rel:@mpgt:createLabel%" target="_blank" method="post" class="uk-hidden" name="createLabelForm">
-		<input type="hidden" value="" name="itemsData" id="itemsData">
-		<input type="hidden" value="%val:usr:sourceDivisionId%" name="sourceDivision">
-		<input type="hidden" value="%val:usr:targetDivisionId%" name="targetDivision">
+	<form action="%url/rel:@mpgt:Payout%&Action=payoutLabel" target="_blank" method="post" class="uk-hidden" name="LabelCreate">
+		<input type="hidden" value="%val:usr:payoutHistoryId%" name="payoutHistoryId" id="payoutHistoryId">
 		<input type="hidden" value="payout" name="pattern">
 	</form>
 	<script>
@@ -219,25 +217,7 @@ if($userInfo->getUserPermission() == "1"){
 		
 		function createLabel(){
 			UIkit.modal.confirm("ラベル発行を行います").then(function(){
-				console.log(<?php echo json_encode($payoutData); ?>);
-				payoutData = objectValueToURIencode( <?php echo json_encode($payoutData); ?> );
-				createLabelData = {};
-				Object.keys(payoutData).forEach(function (key) {
-					id = payoutData[key].inHospitalItemId;
-					createLabelData[id] = payoutData[key];
-					createLabelData[id].printCount = payoutData[key].payoutLabelCount;//ラベル枚数
-					createLabelData[id].quantity = payoutData[key].payoutCount; //入数
-					createLabelData[id].distributorId = payoutData[key].distributorId; //業者ID
-					createLabelData[id].distributorName = ''; //業者名
-					createLabelData[id].itemName = payoutData[key].itemName; //商品名
-					createLabelData[id].maker = payoutData[key].makerName;
-					createLabelData[id].catalogNo = payoutData[key].catalogNo; 
-					createLabelData[id].unit = payoutData[key].quantityUnit;
-				});
-
-				$("#itemsData").val(JSON.stringify(createLabelData));
-				document.createLabelForm.submit();
-				
+				$('form[name=LabelCreate]').submit();
 			});
 			return true;
 		}

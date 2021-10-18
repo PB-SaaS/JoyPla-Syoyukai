@@ -73,4 +73,13 @@ class UserInfo{
         }
         return false;
     }
+    
+    
+    public function isApprover(){
+        if($this->getUserPermission() == '3')
+        {
+            return true;
+        }
+        return false;
+    }
 }

@@ -47,7 +47,7 @@ class BorrowingRegistrationController extends Controller
 
         $user_info = new UserInfo($SPIRAL);
 
-        if( ($user_info->isHospitalUser() && $user_info->getUserPermission() == '1')
+        if( ($user_info->isHospitalUser() && $user_info->isAdmin())
         || $user_info->isDistributorUser() ) {
             $divisionData = Division::where('hospitalId',$user_info->getHospitalId())->get();
         } else {
@@ -64,11 +64,27 @@ class BorrowingRegistrationController extends Controller
         $header = $this->view('NewJoyPla/src/HeaderForMypage', [
             'SPIRAL' => $SPIRAL
         ], false);
+        
+        if($user_info->isAdmin())
+        {
+            $borrowingAction = 'borrowingRegistrationToUsedReportApi';
+        }
+        if($user_info->isUser()) 
+        {
+            $borrowingAction = 'borrowingRegistrationToUnapprovedUsedSlipApi';
+        }
+        if($user_info->isDistributorUser())
+        {
+            $borrowingAction = '';
+        }
+        
+        
         $content = $this->view('NewJoyPla/view/BorrowingRegistration', [
             'api_url' => $api_url,
             'user_info' => $user_info,
             'divisionData'=> $divisionData,
-            'csrf_token' => Csrf::generate(16)
+            'csrf_token' => Csrf::generate(16),
+            'borrowingAction' => $borrowingAction,
             ] , false);
         
         // テンプレートにパラメータを渡し、HTMLを生成し返却
@@ -231,7 +247,6 @@ class BorrowingRegistrationController extends Controller
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
-            
             $borrowing_regist_result = $this->borrowingRegist();
 
             $used_slip_create_data = $this->usedSlipHisotoyRegist($borrowing_regist_result->insert_data , 2);
@@ -277,6 +292,45 @@ class BorrowingRegistrationController extends Controller
                 'content'   => $content,
             ],false);
         }
+    }
+    
+    public function borrowingRegistrationToUnapprovedUsedSlipApi()
+    {
+        global $SPIRAL;
+        try{
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+
+            $user_info = new UserInfo($SPIRAL);
+
+            if( $user_info->isDistributorUser() )
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            
+            if(! ( $user_info->isHospitalUser() && $user_info->isUser() ))
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            $borrowing_regist_result = $this->borrowingRegist();
+
+            $used_slip_create_data = $this->usedSlipHisotoyRegist($borrowing_regist_result->insert_data , 1);
+
+            $all_create_data = $this->usedReportApi($borrowing_regist_result->insert_data);
+
+            $result = $this->association($used_slip_create_data['ids'],$all_create_data['ids']);
+        
+            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+            $content = $content->toJson();
+
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+            $content = $content->toJson();
+        }finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        } 
     }
 
     private function association(array $used_slip_ids , array $other_ids)
@@ -579,9 +633,9 @@ class BorrowingRegistrationController extends Controller
         $facility_name = "";
         if( $user_info->isHospitalUser())
         {
-            $hostpiral_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
-            $hostpiral_data = $hostpiral_data->data->all();
-            $facility_name = $hostpiral_data[0]->hospitalName;
+            $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+            $hospital_data = $hospital_data->data->all();
+            $facility_name = $hospital_data[0]->hospitalName;
         } 
         else if( $user_info->isDistributorUser())
         {
@@ -618,7 +672,7 @@ class BorrowingRegistrationController extends Controller
                 'facility_name' => $facility_name
             ];
         }
-        $all_create_data['history_data'] = $used_slip_insert_data;
+        
         $result = Borrowing::bulkUpdate('borrowingId',$update_data);
 
         $result = UsedSlipHistoy::insert($used_slip_insert_data);
@@ -958,38 +1012,52 @@ $action = $SPIRAL->getParam('Action');
 {
     if($action === 'borrowingRegistApi')
     {
+        //貸出品の登録
         echo $BorrowingRegistrationController->borrowingRegistApi()->render();
     } 
     else if($action === 'borrowingRegistrationToUsedReportApi')
     {
+        //貸出品登録と承認を同時実行
         echo $BorrowingRegistrationController->borrowingRegistrationToUsedReportApi()->render();
     } 
+    else if($action === 'borrowingRegistrationToUnapprovedUsedSlipApi')
+    {
+        //貸出品登録と承認を同時実行
+        echo $BorrowingRegistrationController->borrowingRegistrationToUnapprovedUsedSlipApi()->render();
+    }
     else if($action === 'usedTemporaryReportApi')
     {
+        //貸出品使用申請
         echo $BorrowingRegistrationController->usedTemporaryReportApi()->render();
     } 
     else if($action === 'borrowingList')
     {
+        //貸出品リスト
         echo $BorrowingRegistrationController->borrowingList()->render();
     }
     else if($action === 'unapprovedUsedSlip')
     {
+        //承認リスト
         echo $BorrowingRegistrationController->unapprovedUsedSlip()->render();
     }
     else if($action === 'approvedUsedSlip')
     {
+        //未承認リスト
         echo $BorrowingRegistrationController->approvedUsedSlip()->render();
     }
     else if($action === 'usedSlipApprovalApi')
     {
+        //承認
         echo $BorrowingRegistrationController->usedSlipApprovalApi()->render();
     }
     else if($action === 'cancelApi')
     {
+        //キャンセル
         echo $BorrowingRegistrationController->cancelApi()->render();
     }
     else 
     {
+        //貸出品登録
         echo $BorrowingRegistrationController->index()->render();
     }
 }

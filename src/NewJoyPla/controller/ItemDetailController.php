@@ -51,7 +51,7 @@ class ItemDetailController extends Controller
             }
 
             $content = $this->view('NewJoyPla/view/ProductInformationDetail', [
-                'user_info' => $user_info,
+                'userInfo' => $user_info,
                 'csrf_token' => Csrf::generate(16),
                 'tenantKind' => $tenantKind
             ] , false);
