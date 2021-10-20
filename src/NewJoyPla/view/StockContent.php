@@ -95,7 +95,6 @@
 		    	<hr>
 		    	<div class="uk-child-width-1-3@m" uk-grid>
 		    		<div>
-		    			<label class="uk-form-label">部署</label>
 		    			<div class="uk-form-controls">
 				            <select class="uk-width-3-4 uk-select uk-inline" id="divisionId" v-model="divisionId">
 				                <option value="">----- 部署選択 -----</option>
@@ -124,11 +123,12 @@
 		    		<div class="uk-width-1-2@m" uk-margin>
 			    		<button class="uk-button uk-button-default" v-on:click="sanshouClick">商品マスタを開く</button>
 			    		<button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
+			    		<button class="uk-button uk-button-primary" type="submit" v-on:click="stockRegister">在庫調整実行</button>
 		    		</div>
 		    	</div>
 		    	
 			    <div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky" class="uk-padding-top uk-background-muted uk-padding-small">
-		            <form action='#' method="post" onsubmit="app.barcodeSearch($('input[name=barcode]').val() ,'' , '');$('input[name=barcode]').val('') ; $('input[name=barcode]').focus(); return false;">
+		            <form action='#' method="post" onsubmit="app.barcodeSearch($('input[name=barcode]').val() ,'' , '' , true);$('input[name=barcode]').val('') ; $('input[name=barcode]').focus(); return false;">
 	    				<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." autofocus="true" name="barcode" autocomplete="off">  
 		    			<button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
 					</form>	
@@ -160,7 +160,7 @@
 		    				</tr>
 		    			</thead>
 		    			<tbody>
-							<tr v-for="(list, key) in lists" :id="'tr_' + key">
+							<tr v-for="(list, key) in lists" :id="'tr_' + key" v-bind:class="list.class">
 								<td>{{list.text}}</td>
 								<td>{{list.maker}}</td>
 								<td>{{list.shouhinName}}</td>
@@ -234,22 +234,6 @@
 		</div>
 	</div>
 	
-	
-	<!-- This is a button toggling the modal with the default close button -->
-	<!-- This is the modal with the default close button -->
-	<div id="gs1-128" uk-modal>
-	    <div class="uk-modal-dialog uk-modal-body">
-	    	<form onsubmit="gs1_128.check_gs1_128($('#GS1-128').val());return false;" action="#">
-		        <button class="uk-modal-close" type="button" uk-close></button>
-		        <h2 class="uk-modal-title">GS1-128 読取</h2>
-		        <input type="text" class="uk-input" placeholder="GS1-128" id="GS1-128" autofocus="true">
-				    <p class="uk-text-right">
-		            <button class="uk-button uk-button-primary" type="button" onclick="gs1_128.check_gs1_128($('#GS1-128').val());">反映</button>
-		        </p>
-	        </form>
-	    </div>
-	</div>
-	
 	<div id="modal-sections" class="uk-modal-container" uk-modal>
 	    <div class="uk-modal-dialog">
 	        <button class="uk-modal-close-default" type="button" uk-close></button>
@@ -309,6 +293,27 @@ var app = new Vue({
 		lists: [],
 		divisionId: '',
 	},
+	filters: {
+        number_format: function(value) {
+            if (! value) { return false; }
+            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+        },
+    },
+    watch: {
+        lists: function() {
+            this.$nextTick(function() {
+                if($('.target').length > 0){
+                     $(window).scrollTop($('.target').offset().top - 100);
+                     app.lists.forEach(function(elem, index) {
+        				let changeObject = null;
+    				    changeObject = app.lists[index];
+    					changeObject.class.target = false;
+    					app.$set(app.lists, index, changeObject);
+        			});
+                }
+          })
+        }
+    },
 	methods: {
 		addList: function(object) {
         	$('#divisionId').prop('disabled',true);
@@ -349,6 +354,7 @@ var app = new Vue({
                     object.rackName = data.data.rackName;
                     object.stock = parseInt(data.data.stockQuantity);
                 }
+				object.class = ((object.class == null)? {'target' : true} : object.class);
                 object.stockCountNum = 0;
 		    	app.lists.push(object);
             })
@@ -361,6 +367,42 @@ var app = new Vue({
 				loading_remove();
             });
 			
+		},
+		stockRegister: function() {
+		    if(!app.check()){
+		        return false;
+		    }
+			loading();
+			$.ajax({
+				async: false,
+                url: "<?php echo $api_url ?>",
+                type:'POST',
+                data:{
+                    _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+                	Action : 'stockRegister',
+                	stocks : JSON.stringify( objectValueToURIencode(app.lists) ),
+                	divisionId : app.divisionId,
+                },
+                dataType: 'json'
+            })
+            // Ajaxリクエストが成功した時発動
+            .done( (data) => {
+                if(data.code != 0){
+                    UIkit.modal.alert("在庫調整に失敗しました");
+                    return false;
+                } 
+                UIkit.modal.alert("在庫調整が完了しました").then(function(){
+					app.lists.splice(0, app.lists.length);
+                });
+            })
+            // Ajaxリクエストが失敗した時発動
+            .fail( (data) => {
+                UIkit.modal.alert("在庫調整に失敗しました");
+            })
+            // Ajaxリクエストが成功・失敗どちらでも発動
+            .always( (data) => {
+				loading_remove();
+            });
 		},
 		deleteList: function(key) {
 			this.lists.splice(key, 1);
@@ -391,19 +433,6 @@ var app = new Vue({
 				return false ;
 			}
 			
-			let checkflg = false;
-			app.lists.forEach(function (elem, index) {
-			  if(app.lists[index].countNum !== 0){
-			  	checkflg = true;
-			  }
-			});
-			
-			if(checkflg){
-			} else {
-				UIkit.modal.alert('数量を入力してください');
-				return false ;
-			}
-			
 			return true;
 		},
 		constantByDivStyle: function(index){
@@ -421,33 +450,17 @@ var app = new Vue({
 			changeObject.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
 			app.$set(app.lists, index, changeObject);
 		},
-		countToIrisu: function(){
-			UIkit.modal.confirm("数量に入数を自動挿入しますか。すべて上書きされます").then(function () {
-				app.lists.forEach(function(elem, index) {
-					let changeObject = null;
-					changeObject = app.lists[index];
-					changeObject.countNum = changeObject.irisu;
-					app.$set(app.lists, index, changeObject);
-            		app.addCountStyle(index);
-				});
-			}, function() {
-			});
-		},
-		barcodeSearch: function(barcode , lotNumber , lotDate) {
-			if(!app.checkDivision())
-			{
+		
+		barcodeSearch: function(barcode , lotNumber , lotDate , gs1_128_search_flg) {
+			if(! this.checkDivision()){
 				return false;
-			}
-			if(barcode.length > 14)
-			{
-				gs1_128.check_gs1_128(barcode);
-				return ;
 			}
 			$.ajax({
 				async: false,
                 url:'%url/rel:mpgt:labelBarcodeSAPI%',
                 type:'POST',
                 data:{
+                	divisionId : app.divisionId,
                 	barcode : barcode,
                 },
                 dataType: 'json'
@@ -456,24 +469,23 @@ var app = new Vue({
             .done( (data) => {
             	let value = 0;
                 if(data.code != 0 || data.data.length == 0){
-            		UIkit.modal.alert("商品が見つかりませんでした");
+                	if(gs1_128_search_flg)
+                	{
+						gs1_128.check_gs1_128(barcode);
+                	} else {
+            			UIkit.modal.alert("商品が見つかりませんでした");
+                	}
             		return false;
                 }
-            	$('#divisionId').prop('disabled',true);
                 if(data.count == 1)
                 {
+	            	$('select[name="divisionId"]').attr('disabled',true);
                 	data = data.data;
-                	if(lotNumber != ''){
-                		data.lotNumber = lotNumber;
-                	}
-                	if(lotDate != ''){
-                		data.lotDate = lotDate;
-                	}
-					data.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
                 	this.addList(data);
 	                
 	                $('input[name="barcode"]').val('');
                 } else {
+	            	$('select[name="divisionId"]').attr('disabled',true);
                 	data = data.data;
                 	modal_sections.clear();
                 	for(let num = 0 ; num < data.length ; num++)
@@ -522,7 +534,6 @@ var modal_sections = new Vue({
 });
 
 var gs1_128 = new Vue({
-	el: '#gs1-128',
 	data: {
 		gs1_128: {}
 	},
@@ -558,7 +569,7 @@ var gs1_128 = new Vue({
 				return;
 			}
 			
-			let searchJan = removeCheckDigit(obj["01"]);
+			let searchJan = gs1_01_to_jan(obj["01"]);
 			let objkey = null;
 			let setObj = {};
 			
@@ -568,7 +579,7 @@ var gs1_128 = new Vue({
 			let changeObject = null;
 			
 			if(!existflg){
-				app.barcodeSearch(searchJan,objLotNumber,objLotDate);
+				app.barcodeSearch(searchJan,objLotNumber,objLotDate , false );
 				//UIkit.modal.alert("対象の発注商品が見つかりませんでした。").then(function(){
 				//	UIkit.modal($('#gs1-128')).show();
 				//});

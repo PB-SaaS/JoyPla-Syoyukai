@@ -23,6 +23,6 @@ class ApiResponse {
 
     public function toJson(): string
     {
-        return json_encode(array("data"=> $this->data ,"count"=> $this->count ,"code"=> $this->code ,"message"=> $this->message ,"header"=> $this->header ,"result" => $this->result));
+        return json_encode(array("data"=> $this->data ,"count"=> $this->count ,"code"=> $this->code ,"message"=> $this->message ,"header"=> $this->header ,"result" => $this->result),JSON_UNESCAPED_SLASHES);
     }
 }

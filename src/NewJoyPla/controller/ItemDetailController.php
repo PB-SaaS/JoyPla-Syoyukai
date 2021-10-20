@@ -10,7 +10,6 @@ use Csrf;
 use App\Lib\UserInfo;
 use App\Model\Tenant;
 use ApiErrorCode\FactoryApiErrorCode;
-
 use stdClass;
 use Exception;
 
@@ -23,9 +22,6 @@ class ItemDetailController extends Controller
     public function index()
     {
         global $SPIRAL;
-
-        $title = 'JoyPla 商品情報詳細';
-
         try {
             
             $user_info = new UserInfo($SPIRAL);
@@ -37,7 +33,7 @@ class ItemDetailController extends Controller
 
             $cardId = $SPIRAL->getCardId();
             if($cardId == null)
-            {   
+            {
                 throw new Exception("ページが存在しません",404);
             }
 
@@ -68,7 +64,7 @@ class ItemDetailController extends Controller
         } finally {
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => $title,
+                'title'     => 'JoyPla 商品情報詳細',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),

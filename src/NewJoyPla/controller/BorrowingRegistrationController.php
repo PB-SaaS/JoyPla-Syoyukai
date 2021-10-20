@@ -691,8 +691,35 @@ class BorrowingRegistrationController extends Controller
         $insert_data = [];
         $divisionId = $SPIRAL->getParam('divisionId');
 
+        $in_hospital_item = InHospitalItemView::where('hospitalId', $user_info->getHospitalId());
+        foreach($borrowing_items as $key => $record)
+        {
+            $in_hospital_item->orWhere('inHospitalItemId',$record['recordId']);
+        }
+        $in_hospital_item = $in_hospital_item->get();
         foreach($borrowing_items as $key =>  $item)
         {
+            foreach($in_hospital_item as $in_hp_item)
+            {
+                $lot_flag = 0;
+                if($item['recordId'] == $in_hp_item->inHospitalItemId)
+                {
+                    $lot_flag = $in_hp_item->lotManagement;
+                    break;
+                }
+            }
+            if($lot_flag && $item['lotNumber'] == '' && $item['lotDate'] == '' )
+            {
+                throw new Exception('invalid lot',100);
+            }
+            if( ($item['lotNumber'] != '' && $item['lotDate'] == '' ) || ($item['lotNumber'] == '' && $item['lotDate'] != ''))
+            {
+                throw new Exception('invalid lotNumber',100);
+            }
+            if(strlen($payoutRecord['lotNumber']) > 20)
+            {
+                throw new Exception('invalid lotNumber',100);
+            }
             $insert_data[$key] = [
                 'inHospitalItemId' => $item['recordId'],
                 'borrowingNum' => 1,

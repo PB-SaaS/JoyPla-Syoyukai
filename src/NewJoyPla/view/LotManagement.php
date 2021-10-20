@@ -1,26 +1,4 @@
-<?php
-include_once "NewJoyPla/lib/UserInfo.php";
-include_once "NewJoyPla/lib/Func.php";
-$userInfo = new App\Lib\UserInfo($SPIRAL);
 
-$myPageID = '';
-if(isset($_POST['MyPageID']) && $_POST['MyPageID'] != '' ){
-	$myPageID = $_POST['MyPageID'];
-}
-
-if($userInfo->getUserPermission() != "1" && $myPageID != ''){
-	App\Lib\viewNotPossible();
-	exit;
-}
-?>
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>JoyPla ロット管理</title>
-	<?php include_once "NewJoyPla/src/Head.php"; ?>
-</head>
-<body>
-    <?php include_once "NewJoyPla/src/HeaderForMypage.php"; ?>
     <div class="animsition" uk-height-viewport="expand: true">
 	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
 		    <div class="uk-container uk-container-expand">
@@ -83,5 +61,3 @@ if($userInfo->getUserPermission() != "1" && $myPageID != ''){
 			}
 		});
 	</script>
-</body>
-</html>

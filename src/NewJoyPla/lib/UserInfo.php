@@ -5,6 +5,11 @@ namespace App\Lib;
 class UserInfo{
 
     private $spiral ;
+    public $permissionName = [
+        1 => '管理者',
+        2 => '担当者',
+        3 => '承認者'
+    ];
 
     public function __construct(\Spiral $SPIRAL){
 		$this->spiral = $SPIRAL;
@@ -44,6 +49,9 @@ class UserInfo{
     
     public function getUserPermission(){
         return $this->spiral->getContextByFieldTitle("userPermission");
+    }
+    public function getUserPermissionName(){
+        return $this->permissionName[$this->getUserPermission()];
     }
 
     public function isHospitalUser(){

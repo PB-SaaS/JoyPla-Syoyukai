@@ -211,6 +211,21 @@ class Model
         $instance = self::getInstance();
         return $instance->page;
     }
+    
+    public static function count()
+    {
+        $instance = self::getInstance();
+        $instance->spiralDataBase->setDataBase($instance::$spiral_db_name);
+        $column = array_merge($instance::$fillable,$instance::$guarded);
+        $instance->spiralDataBase->setLinesPerPage(1);
+        $result = $instance->spiralDataBase->doSelect();
+        
+        if($result['code'] != 0)
+        {
+            throw new Exception(FactoryApiErrorCode::factory((int)$result['code'])->getMessage(),FactoryApiErrorCode::factory((int)$result['code'])->getCode());
+        }
+        return (int)$result['count'];
+    }
 
     public static function update(array $update_data)
     {

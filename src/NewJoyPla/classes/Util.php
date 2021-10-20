@@ -502,6 +502,8 @@ namespace ApiErrorCode
                     return new InvalidParametersCode399();
                 case 400:
                     return new InvalidMethod();
+                case 404:
+                    return new NotFound();
                 case 500:
                     return new InvalidHeaders();
                 case 501:
@@ -1583,6 +1585,17 @@ namespace ApiErrorCode
             $code = 400;
             $message = "Invalid method";
             $messageToJapanese = "不正なメソッド（汎用）です";
+            parent::__construct($code, $message, $messageToJapanese);
+        }
+    }
+    
+    class NotFound extends ApiErrorCode
+    {
+        public function __construct()
+        {
+            $code = 404;
+            $message = "Not Found";
+            $messageToJapanese = "ページが見つかりませんでした";
             parent::__construct($code, $message, $messageToJapanese);
         }
     }

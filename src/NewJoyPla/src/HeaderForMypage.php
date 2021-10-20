@@ -21,7 +21,7 @@ if($nav->user_info->isDistributorUser())
 }
 ?>
 
-<nav class="uk-navbar-container no_print" uk-navbar="mode: click" uk-navbar>
+<nav id="nav" class="uk-navbar-container no_print" uk-navbar="mode: click" uk-navbar>
 	<div class="uk-navbar-left"> 
 		<a href="%url/rel:mpg:top%" class="uk-navbar-item uk-logo">
 			<img src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png" />
@@ -44,10 +44,38 @@ if($nav->user_info->isDistributorUser())
 		</p>
 		<ul class="uk-navbar-nav">
 			<li>
-				<a href="#" uk-icon="icon: question; ratio: 1.5" title="ヘルプ" onclick="#"></a>
+				<a href="#" uk-icon="icon: question; ratio: 1.5" title="ヘルプ"></a>
 			</li>
-			<li>
-				<a href="#" uk-icon="icon: bell; ratio: 1.5" title="お知らせ" onclick="#"></a>
+			<li class="uk-inline">
+				<a href="#" uk-icon="icon: bell; ratio: 1.5" title="お知らせ" uk-navbar="mode: click" uk-toggle="animation: uk-animation-fade"></a>
+				<div class="uk-navbar-dropdown uk-card uk-navbar-dropdown-width-2 uk-padding-remove">
+                   <div class="uk-card-body uk-height-max-large" style="overflow-y: scroll; padding: 15px">
+				        <ul class="uk-list">
+				            <li v-for="notification in notifications">
+				                <article class="uk-comment" style="padding:10px">
+								    <header class="uk-comment-header uk-margin-top uk-margin-bottom">
+								        <div class="uk-grid-medium uk-flex-middle" uk-grid>
+								            <div class="uk-width-auto">
+								                <img class="uk-comment-avatar" :src="notification.icon" width="40" height="40" alt="">
+								            </div>
+										    <div class="uk-comment-body uk-width-expand">
+				                                <p v-html="notification.message"></p>
+										    </div>
+								            <div class="">
+								                <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-heading" :href="notification.link">移動</a></h4>
+								                <ul class="uk-comment-meta uk-subnav uk-subnav-divider uk-margin-remove-top">
+								                </ul>
+								            </div>
+								        </div>
+								    </header>
+								</article>
+				            </li>
+						</ul>
+				    </div>
+		        </div>
+		        <div v-show="badge">
+					<span class="uk-badge" style="position: absolute;top: 13px;right: 0px;" v-text='count'></span>
+		        </div>
 			</li>
 			<li>
 				<a uk-icon="icon: menu; ratio: 1.5" uk-navbar="mode: click" uk-toggle="animation: uk-animation-fade"></a>
@@ -67,6 +95,7 @@ if($nav->user_info->isDistributorUser())
 								}
 								?>
 				                </h3>
+								<span class="uk-label uk-padding-small uk-label-success uk-padding-remove-vertical"><?php echo $nav->user_info->getUserPermissionName()?></span>
 								<p><?php echo $nav->user_info->getName();?> 様</p>
 				            </div>
 				        </div>
@@ -105,3 +134,43 @@ if($nav->user_info->isDistributorUser())
 	</div>
 
 </nav>
+<script>
+var nav = new Vue({
+	el: '#nav',
+	data: {
+		badge: false,
+		count: 0,
+		notifications: {},
+	},
+	methods: {
+		window:onload = function() {  
+		   nav.notification();
+		},
+		notification: function ()
+		{
+			$.ajax({
+				async: false,
+                url:'%url/rel:mpgt:Notification%',
+                type:'POST',
+                data:{
+                },
+                dataType: 'json'
+            })
+            // Ajaxリクエストが成功した時発動
+            .done( (data) => {
+            	nav.notifications = data.data;
+            	nav.count = data.count;
+            	nav.badge = (data.count > 0);
+            })
+            // Ajaxリクエストが失敗した時発動
+            .fail( (data) => {
+            	console.log(data);
+            })
+            // Ajaxリクエストが成功・失敗どちらでも発動
+            .always( (data) => {
+            	console.log(data);
+            });
+		}
+	}
+});
+</script>

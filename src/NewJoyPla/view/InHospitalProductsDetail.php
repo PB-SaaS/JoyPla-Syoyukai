@@ -9,7 +9,7 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
-                <li><a href="%url/rel:mpgt:Product%&Action=InHospitalItem">院内商品マスタ</a></li>
+                <li><a href="%url/rel:mpgt:Product%&Action=InHospitalItem&table_cache=true">院内商品マスタ</a></li>
                 <li><span>院内商品情報</span></li>
             </ul>
             <div class="no_print uk-margin">
@@ -39,20 +39,14 @@
                     <input type="hidden" name="quantity" value="%val:usr:quantity%">
                     <input type="hidden" name="quantityUnit" value="%val:usr:quantityUnit%">
                     <input type="hidden" name="itemUnit" value="%val:usr:itemUnit%">
-
                     <input type="hidden" name="price" value="%val:usr:price%">
-
                     <input type="hidden" name="priceId" value="%val:usr:priceId%">
-
                     <input type="hidden" name="medicineCategory" value="%val:usr:medicineCategory%">
                     <input type="hidden" name="homeCategory" value="%val:usr:homeCategory%">
                     <input type="hidden" name="HPstock" value="%val:usr:HPstock%">
                     <input type="hidden" name="notice" value="%val:usr:notice%">
-
                     <input type="hidden" name="unitPrice" value="%val:usr:unitPrice%">
                     <input type="hidden" name="measuringInst" value="%val:usr:measuringInst%">
-                    <input type="hidden" name="lotManagement" value="%val:usr:lotManagement:id%">
-
                     <input type="hidden" name="oldPrice" value="%val:usr:price%">
                     <input type="hidden" name="oldUnitPrice" value="%val:usr:unitPrice%">
                 </form>
@@ -247,21 +241,19 @@ class InHospitalItemDetail
     
         $("#notUsedFlag").addClass(label);
 
-        let itemsToJs =
-        {
-            "%val:usr:inHospitalItemId%":
-            {
-                "receivingCount":"0",
-                "quantity":"%val:usr:quantity%",
-                "makerName":"%val:usr:makerName%",
-                "itemName":"%val:usr:itemName%",
-                "itemCode":"%val:usr:itemCode%",
-                "itemStandard":"%val:usr:itemStandard%",
-                "quantityUnit":"%val:usr:quantityUnit%",
-                "itemUnit":"%val:usr:itemUnit%",
-                "itemJANCode":"%val:usr:itemJANCode%",
-                "totalReturnCount":"0",
-                "labelId":"%val:usr:labelId%"
+        let itemsToJs = {
+            "%val:usr:inHospitalItemId%":{
+            "receivingCount":"0",
+            "quantity":"%val:usr:quantity%",
+            "makerName":"%val:usr:makerName%",
+            "itemName":"%val:usr:itemName%",
+            "itemCode":"%val:usr:itemCode%",
+            "itemStandard":"%val:usr:itemStandard%",
+            "quantityUnit":"%val:usr:quantityUnit%",
+            "itemUnit":"%val:usr:itemUnit%",
+            "itemJANCode":"%val:usr:itemJANCode%",
+            "totalReturnCount":"0",
+            "labelId":"%val:usr:labelId%",
             }
         };
     }
@@ -273,10 +265,10 @@ class InHospitalItemDetail
             UIkit.modal.alert('入力値に不正があります。<br>ご確認ください');
             return false;
         }
-        itemsToJs[inHospitalItemId].receivingCount = $('input[name="printCount"]').val();
-        itemsToJs[inHospitalItemId].quantity = $('input[name="quantity"]').val();
+        this.itemsToJs[inHospitalItemId].receivingCount = $('input[name="printCount"]').val();
+        this.itemsToJs[inHospitalItemId].quantity = $('input[name="quantity"]').val();
       
-        $("#itemsData").val(JSON.stringify( objectValueToURIencode(itemsToJs) ));
+        $("#itemsData").val(JSON.stringify( objectValueToURIencode(this.itemsToJs) ));
         return true;
     }
 

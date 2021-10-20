@@ -8,7 +8,7 @@ use ApiResponse;
 use Csrf;
 
 use App\Lib\UserInfo;
-use App\Model\InHospitalItem;
+use App\Model\InHospitalItemView;
 use App\Model\ReceivingView;
 use App\Model\PayoutView;
 use App\Model\CardInfoView;
@@ -54,7 +54,7 @@ class LabelBarcodeSearchController extends Controller
 					$record = $result->data->get(0);
 				}
 
-				$in_hospital_item = InHospitalItem::where('notUsedFlag','0')->where('inHospitalItemId',$record->inHospitalItemId)->where('hospitalId', $user_info->getHospitalId())->get();	
+				$in_hospital_item = InHospitalItemView::where('notUsedFlag','0')->where('inHospitalItemId',$record->inHospitalItemId)->where('hospitalId', $user_info->getHospitalId())->get();	
 				$in_hospital_item = $in_hospital_item->data->get(0);
 				
 				if($result->count == '0'){
@@ -78,7 +78,9 @@ class LabelBarcodeSearchController extends Controller
 					"labelId" => $in_hospital_item->labelId,
 					"unitPrice" => $in_hospital_item->unitPrice,
 					"lotNumber" => $record->lotNumber,
-					"lotDate" => \App\Lib\changeDateFormat('Y年m月d日' , $record->lotDate , 'Y-m-d')
+					"lotDate" => \App\Lib\changeDateFormat('Y年m月d日' , $record->lotDate , 'Y-m-d'),
+					"lotFlag" => ($in_hospital_item->lotManagement == 1 )? "はい": "",
+					"lotFlagBool" => $in_hospital_item->lotManagement,
 				];
 
 				$content = new ApiResponse($data , $result->count , $result->code, $result->message, ['LabelBarcodeSearchApi']);
@@ -94,17 +96,17 @@ class LabelBarcodeSearchController extends Controller
 				}
 				else
 				{
-					$result = PayoutView::where('payoutId', 'payout_'.$payout_num)->where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
+					$result = PayoutView::where('payoutId', 'payout_'.$payout_num)->where('hospitalId',$user_info->getHospitalId())->where('sourceDivisionId',$user_info->getDivisionId())->get();
 					$record = $result->data->get(0);
 				}
-				$in_hospital_item = InHospitalItem::where('notUsedFlag','0')->where('inHospitalItemId',$record->inHospitalItemId)->where('hospitalId', $user_info->getHospitalId())->get();	
+				$in_hospital_item = InHospitalItemView::where('notUsedFlag','0')->where('inHospitalItemId',$record->inHospitalItemId)->where('hospitalId', $user_info->getHospitalId())->get();	
 				$in_hospital_item = $in_hospital_item->data->get(0);
 
 				if($result->count == '0'){
 					throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
 				}
 				$data = [
-					"divisionId" => $record->divisionId,
+					"divisionId" => $record->sourceDivisionId,
 					"maker" => $in_hospital_item->makerName,
 					"shouhinName" => $in_hospital_item->itemName,
 					"code" => $in_hospital_item->itemCode,
@@ -121,7 +123,9 @@ class LabelBarcodeSearchController extends Controller
 					"labelId" => $in_hospital_item->labelId,
 					"unitPrice" => $in_hospital_item->unitPrice,
 					"lotNumber" => $record->lotNumber,
-					"lotDate" => \App\Lib\changeDateFormat('Y年m月d日' , $record->lotDate , 'Y-m-d')
+					"lotDate" => \App\Lib\changeDateFormat('Y年m月d日' , $record->lotDate , 'Y-m-d'),
+					"lotFlag" => ($in_hospital_item->lotManagement == 1 )? "はい": "",
+					"lotFlagBool" => $in_hospital_item->lotManagement,
 				];
 
 				$content = new ApiResponse($data , $result->count , $result->code, $result->message, ['LabelBarcodeSearchApi']);
@@ -129,22 +133,21 @@ class LabelBarcodeSearchController extends Controller
 
 			} else if(preg_match('/^90/', $barcode) && strlen($barcode) == 18){
 				
-				$divisionId = $SPIRAL->getParam('divisionId');
-				
 				if($user_info->isAdmin())
 				{
-					$result = CardInfoView::where('cardId', $barcode)->where('hospitalId',$user_info->getHospitalId())->where('divisionId',$divisionId)->get();
+					$result = CardInfoView::where('cardId', $barcode)->where('hospitalId',$user_info->getHospitalId())->get();
 					$record = $result->data->get(0);
 				}
 				else
 				{
-					$result = CardInfoView::where('cardId', $barcode)->where('hospitalId',$user_info->getHospitalId())->where('divisionId',$divisionId)->where('divisionId',$user_info->getDivisionId())->get();
+					$result = CardInfoView::where('cardId', $barcode)->where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
 					$record = $result->data->get(0);
 				}
 
 				if($result->count == '0'){
 					throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
 				}
+				
 				$data = [
 					"divisionId" => $record->divisionId,
 					"maker" => $record->makerName,
@@ -164,7 +167,9 @@ class LabelBarcodeSearchController extends Controller
 					"labelId" => $record->labelId,
 					"unitPrice" => $record->unitPrice,
 					"lotNumber" => $record->lotNumber,
-					"lotDate" => \App\Lib\changeDateFormat('Y年m月d日' , $record->lotDate , 'Y-m-d')
+					"lotDate" => \App\Lib\changeDateFormat('Y年m月d日' , $record->lotDate , 'Y-m-d'),
+					"lotFlag" => ($record->lotManagement == 1 )? "はい": "",
+					"lotFlagBool" => $record->lotManagement,
 				];
 
 				$content = new ApiResponse($data , $result->count , $result->code, $result->message, ['LabelBarcodeSearchApi']);
@@ -172,7 +177,7 @@ class LabelBarcodeSearchController extends Controller
 
 			} else if(strlen($barcode) == 13) {
 				//JANコード検索（複数件返却される）
-				$result = InHospitalItem::where('notUsedFlag','0')->where('itemJANCode',$barcode)->where('hospitalId', $user_info->getHospitalId())->get();
+				$result = InHospitalItemView::where('notUsedFlag','0')->where('itemJANCode',$barcode)->where('hospitalId', $user_info->getHospitalId())->get();
 				if($result->count == '0'){
 					throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
 				}
@@ -195,7 +200,9 @@ class LabelBarcodeSearchController extends Controller
 						"distributorId" => $record->distributorId,
 						"count" => (int)0,
 						"labelId" => $record->labelId,
-						"unitPrice" => $record->unitPrice
+						"unitPrice" => $record->unitPrice,
+						"lotFlag" => ($record->lotManagement == 1 )? "はい": "",
+						"lotFlagBool" => $record->lotManagement,
 					];
 				} else {
 					foreach($result->data->all() as $record){
@@ -215,7 +222,9 @@ class LabelBarcodeSearchController extends Controller
 							"distributorId" => $record->distributorId,
 							"count" => (int)0,
 							"labelId" => $record->labelId,
-							"unitPrice" => $record->unitPrice
+							"unitPrice" => $record->unitPrice,
+							"lotFlag" => ($record->lotManagement == 1 )? "はい": "",
+							"lotFlagBool" => $record->lotManagement,
 						];
 					}
 				}
@@ -223,7 +232,7 @@ class LabelBarcodeSearchController extends Controller
 				$content = new ApiResponse($data , $result->count , $result->code, $result->message, ['LabelBarcodeSearchApi']);
 				$content = $content->toJson();
 				
-			} else {
+			} else if((preg_match('/^1/', $barcode) && strlen($barcode) == 14 ) || (preg_match('/^01/', $barcode) && strlen($barcode) == 14)){
 				//在庫表等で発行されたラベル
 				if(preg_match('/^1/', $barcode) && strlen($barcode) == 14){
 					$label_id = substr($barcode, 1 , 5);
@@ -235,13 +244,14 @@ class LabelBarcodeSearchController extends Controller
 					$custom_quantity = substr($barcode, 10 , 4);
 				}
 	
-				$result = InHospitalItem::where('notUsedFlag','0')->where('labelId',$label_id)->where('hospitalId', $user_info->getHospitalId())->get();
+				$result = InHospitalItemView::where('notUsedFlag','0')->where('labelId',$label_id)->where('hospitalId', $user_info->getHospitalId())->get();
 				if($result->count == '0'){
 					throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
 				}
 				$record = $result->data->get(0);
 				
 				$data = [
+					"divisionId" => '',
 					"maker" => $record->makerName,
 					"shouhinName" => $record->itemName,
 					"code" => $record->itemCode,
@@ -257,10 +267,15 @@ class LabelBarcodeSearchController extends Controller
 					"count" => (int)$custom_quantity,//ラベルの入数
 					"countNum" => (int)$custom_quantity,//ラベルの入数
 					"labelId" => $record->labelId,
-					"unitPrice" => $record->unitPrice
+					"unitPrice" => $record->unitPrice,
+					"lotFlag" => ($record->lotManagement == 1 )? "はい": "",
+					"lotFlagBool" => $record->lotManagement,
 				];
 		
 				$content = new ApiResponse($data , $result->count , $result->code, $result->message, ['LabelBarcodeSearchApi']);
+				$content = $content->toJson();
+			} else {
+				$content = new ApiResponse([] , 0 , 0, 'not data', ['LabelBarcodeSearchApi']);
 				$content = $content->toJson();
 			}
 		} catch ( Exception $ex ) {

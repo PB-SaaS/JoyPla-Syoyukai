@@ -1,4 +1,4 @@
-
+disabele
 <?php
 include_once 'NewJoyPla/lib/ApiSpiral.php';
 include_once "NewJoyPla/lib/Define.php";

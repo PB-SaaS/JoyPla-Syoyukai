@@ -1,39 +1,4 @@
 
-<?php
-include_once 'NewJoyPla/lib/ApiSpiral.php';
-include_once "NewJoyPla/lib/Define.php";
-include_once 'NewJoyPla/lib/SpiralDataBase.php';
-include_once 'NewJoyPla/lib/UserInfo.php';
-include_once 'NewJoyPla/api/GetDivision.php';
-
-$userInfo = new App\Lib\UserInfo($SPIRAL);
-
-$myPageID = '';
-if(isset($_POST['MyPageID']) && $_POST['MyPageID'] != '' ){
-	$myPageID = $_POST['MyPageID'];
-}
-
-if($userInfo->getUserPermission() != "1" && $myPageID != ''){
-	App\Lib\viewNotPossible();
-	exit;
-}
-
-$spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
-$spiralApiRequest = new SpiralApiRequest();
-$spiralDataBase = new App\Lib\SpiralDataBase($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
-
-$getDivision = new App\Api\GetDivision($spiralDataBase,$userInfo);
-
-$divisionData = $getDivision->select();
-?>
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>JoyPla 在庫管理表</title>
-	<?php include_once 'NewJoyPla/src/Head.php'; ?>	
-  </head>
-  <body>
-    <?php include_once 'NewJoyPla/src/HeaderForMypage.php'; ?>
     <div class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
 	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove" id="page_top">
 		    <div class="uk-container uk-container-expand">
@@ -162,7 +127,7 @@ $divisionData = $getDivision->select();
 	        </form>
 	    </div>
    <script>
-	const divisitonData = <?php echo json_encode($divisionData); ?>;
+	const divisitonData = <?php echo json_encode($division); ?>;
 	$(function(){
 		$('p.stock_barcode').each(function(i, o){
 			let num = $(o).text();
@@ -187,19 +152,11 @@ $divisionData = $getDivision->select();
 	    //<span class="uk-text-bottom">個</span>
 		select.appendChild(option);
 	    
-	    option = document.createElement("option");
-	    option.value = divisitonData['store'][0][1];
-	    option.text = divisitonData['store'][0][3];
-	    
-	    
-	    //input.step = listObject[object.recordId].irisu;
-	    //<span class="uk-text-bottom">個</span>
-		select.appendChild(option);
-		Object.keys(divisitonData['division']).forEach(function (key) {
+		Object.keys(divisitonData).forEach(function (key) {
 		    
 		    option = document.createElement("option");
-		    option.value = divisitonData['division'][key][1];
-		    option.text = divisitonData['division'][key][3];
+		    option.value = divisitonData[key].divisionId;
+		    option.text = divisitonData[key].divisionName;
 		    //input.step = listObject[object.recordId].irisu;
 		    //<span class="uk-text-bottom">個</span>
 		    
@@ -228,26 +185,15 @@ $divisionData = $getDivision->select();
 	    //<span class="uk-text-bottom">個</span>
 		select.appendChild(option);
 	    
-	    option = document.createElement("option");
-	    option.value = divisitonData['store'][0][3];
-	    option.text = divisitonData['store'][0][3];
-	    
-	    if(divisitonData['store'][0][3] == selectval){
-	    	option.selected = 'selected';
-	    }
-	    
-	    //input.step = listObject[object.recordId].irisu;
-	    //<span class="uk-text-bottom">個</span>
-		select.appendChild(option);
-		Object.keys(divisitonData['division']).forEach(function (key) {
+		Object.keys(divisitonData).forEach(function (key) {
 		    
 		    option = document.createElement("option");
-		    option.value = divisitonData['division'][key][3];
-		    option.text = divisitonData['division'][key][3];
+		    option.value = divisitonData[key].divisionName;
+		    option.text = divisitonData[key].divisionName;
 		    //input.step = listObject[object.recordId].irisu;
 		    //<span class="uk-text-bottom">個</span>
 		    
-		    if(divisitonData['division'][key][3] == selectval){
+		    if(divisitonData[key].divisionName == selectval){
 		    	option.selected = 'selected';
 		    }
 			select.appendChild(option);
@@ -340,5 +286,3 @@ $divisionData = $getDivision->select();
 		return flg;
 	}
    </script>
-  </body>
-</html>

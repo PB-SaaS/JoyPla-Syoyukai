@@ -111,6 +111,7 @@ class InHospitalItemsListForReferenceController extends Controller
 				"unitPrice" => $result->unitPrice,
 				"lotFlag" => ($result->lotManagement == 1 )? "はい": "",
 				"lotFlagBool" => $result->lotManagement,
+				"itemId" => $result->itemId
 			];
 	
 			$content = new ApiResponse($data , $in_hospital_item->count , $in_hospital_item->code, $in_hospital_item->message, ['searchApi']);

@@ -245,9 +245,22 @@ class CardController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
             
-            $content = $this->view('NewJoyPla/view/CardList', [
+            if($user_info->isUser())
+            {
+                $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
+                    'title' => 'カード一覧 - 部署選択',
+                    'table' => '%sf:usr:search35:table%',
+                    'api_url' => $api_url,
+                    'user_info' => $user_info,
+                    'param' => 'cardListForDivision',
+                    'csrf_token' => Csrf::generate(16)
+                    ] , false); 
+            } else {
+                
+                $content = $this->view('NewJoyPla/view/CardList', [
                 'api_url' => $api_url
                 ] , false);
+            }
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
@@ -282,6 +295,60 @@ class CardController extends Controller
         }
 	}
 	
+	public function cardListForDivision()
+	{
+        global $SPIRAL;
+        try {
+            $api_url = "%url/rel:mpgt:Card%";
+            
+            $user_info = new UserInfo($SPIRAL);
+            
+            if($user_info->isDistributorUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            
+            if(! $user_info->isUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+                
+            $content = $this->view('NewJoyPla/view/CardList', [
+                'api_url' => $api_url
+            ] , false);
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
+            
+            $head   = $this->view('NewJoyPla/view/template/parts/Head', [
+                'new' => true
+                ] , false);
+                
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            
+            $style   = $this->view('NewJoyPla/view/template/parts/LabelsCss', [] , false)->render();
+                
+            $style   .= $this->view('NewJoyPla/view/template/parts/StyleCss', [] , false)->render();
+                
+            $script   = $this->view('NewJoyPla/view/template/parts/Script', [] , false)->render();
+                
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla カード一覧',
+                'script' => $script,
+                'style' => $style,
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
+	}
 	private function defaultDesign()
 	{
 	    return <<<EOM
@@ -331,6 +398,10 @@ $action = $SPIRAL->getParam('Action');
     else if($action == 'cardList')
     {
         echo $CardController->cardList()->render();  
+    }
+    else if($action == 'cardListForDivision')
+    {
+        echo $CardController->cardListForDivision()->render();  
     }
     else 
     {

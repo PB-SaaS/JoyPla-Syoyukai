@@ -16,7 +16,7 @@ use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
 use Exception;
 
-class StockController extends Controller
+class LotController extends Controller
 {
     public function __construct()
     {
@@ -34,16 +34,18 @@ class StockController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
             
-            if($user_info->isUser())
+            if( $user_info->isHospitalUser() && $user_info->isAdmin() )
             {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+                $division = Division::where('hospitalId',$user_info->getHospitalId())->get();
+            } 
+            else 
+            {
+                $division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
             }
-            
-            $division = Division::where('hospitalId',$user_info->getHospitalId())->get();
     
-            $api_url = "%url/rel:mpgt:Stock%";
+            $api_url = "%url/rel:mpgt:Lots%";
     
-            $content = $this->view('NewJoyPla/view/StockContent', [
+            $content = $this->view('NewJoyPla/view/LotContent', [
                 'api_url' => $api_url,
                 'user_info' => $user_info,
                 'division'=> $division,
@@ -64,7 +66,7 @@ class StockController extends Controller
             
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 在庫調整',
+                'title'     => 'JoyPla ロット調整',
                 'script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),
@@ -74,7 +76,7 @@ class StockController extends Controller
         }
     }
     
-    public function stockSearchApi(): View
+    public function lotRegisterApi(): View
     {
         global $SPIRAL;
         try {
@@ -83,55 +85,6 @@ class StockController extends Controller
 
             $user_info = new UserInfo($SPIRAL);
             
-            if($user_info->isDistributorUser())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
-            }
-            
-            $division_id = $SPIRAL->getParam('divisionId');
-            $in_hospital_item_id = $SPIRAL->getParam('inHospitalItemId');
-            
-            if( $user_info->isHospitalUser() )
-            {
-                if( $user_info->isUser() && $user_info->getDivisionId() != $division_id )
-                {
-                    throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
-                }
-                $stock = Stock::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$division_id)->where('inHospitalItemId',$in_hospital_item_id)->get();
-            } 
-            else 
-            {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
-            }
-            
-            $content = new ApiResponse($stock->data->get(0) , $stock->count , $stock->code, $stock->message, ['stockSearch']);
-            $content = $content->toJson();
-            /** TODO
-             *  spiralDatabaseのレスポンスをApiResponseに変更 
-             **/
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['stockSearch']);
-            $content = $content->toJson();
-        }finally {
-            return $this->view('NewJoyPla/view/template/ApiResponse', [
-                'content'   => $content,
-            ],false);
-        }
-    }
-    
-    public function stockRegisterApi(): View
-    {
-        global $SPIRAL;
-        try {
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
-
-            $user_info = new UserInfo($SPIRAL);
-            
-            if($user_info->isUser())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
-            }
             if($user_info->isDistributorUser())
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
@@ -143,64 +96,45 @@ class StockController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
             
-            $stocks = $SPIRAL->getParam('stocks');
+            $lots = $SPIRAL->getParam('lots');
             
             $insert_data = [];
-            $stock_instance = Stock::where('hospitalId',$user_info->getHospitalId());
-            $items = [];
-            foreach($stocks as $stock)
+            
+            foreach($lots as $lot)
             {
+                if($lot['lotNumber'] == "" || $lot['lotDate'] == "")
+                {
+                    throw new Exception('Invalid LotData',FactoryApiErrorCode::factory(100)->getCode());
+                }
+                if(strlen($lot['lotNumber']) > 20)
+                {
+                    throw new Exception('Invalid LotData',FactoryApiErrorCode::factory(100)->getCode());
+                }
                 $insert_data[] = [
                     'divisionId'=>$division_id,
-                    'inHospitalItemId'=>$stock['recordId'],
-                    'count'=>$stock['stockCountNum'],
+                    'inHospitalItemId'=>$lot['recordId'],
+                    'count'=>0,
                     'hospitalId'=>$user_info->getHospitalId(),
                     'orderWithinCount'=>'',
-                    'pattern'=>'10',
-                    'lotUniqueKey'=>'',
-                    'lotNumber'=>'',
-                    'lotDate'=>'',
-                    'stockQuantity'=>'',
-                    'rackName'=>$stock['rackName'],
-                    'constantByDiv'=>$stock['constantByDiv'],
+                    'pattern'=>'11',
+                    'lotUniqueKey'=>$user_info->getHospitalId().$division_id.$lot['recordId'].$lot['lotNumber'].$lot['lotDate'],
+                    'lotNumber'=>$lot['lotNumber'],
+                    'lotDate'=>$lot['lotDate'],
+                    'stockQuantity'=>$lot['lotCountNum'],
+                    'rackName'=>'',
+                    'constantByDiv'=>'',
                     'loginId'=>$user_info->getLoginId(),
-                    'previousStock' => $stock['stock'],
                 ];
-                if(array_search($stock['recordId'], $items) === false)
-                {
-                    $items[] = $stock['recordId'];
-                    $stock_instance->orWhere('inHospitalItemId',$stock['recordId']);
-                }
             }
-            
             $result = InventoryAdjustmentTransaction::insert($insert_data);
             
-            $stock_instance = $stock_instance->get();//InventoryAdjustmentTransactionの後にすることが重要
-            
-            $update_data = [];
-            
-            foreach($items as $in_hp_id)
-            {
-                $count = 0;
-                foreach($stock_instance->data->all() as $stock)
-                {
-                    if($stock->inHospitalItemId == $in_hp_id)
-                    {
-                        $count = $count + (int)$stock->stockQuantity;
-                    }
-                }
-                $update_data[] = ['inHospitalItemId' => $in_hp_id , 'HPstock' => $count ];
-            }
-            
-            InHospitalItem::bulkUpdate('inHospitalItemId',$update_data);
-            
-            $content = new ApiResponse($result->ids, $result->count , $result->code, $result->message, ['stockRegisterApi']);
+            $content = new ApiResponse($result->ids, $result->count , $result->code, $result->message, ['lotRegisterApi']);
             $content = $content->toJson();
             /** TODO
              *  spiralDatabaseのレスポンスをApiResponseに変更 
              **/
         } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['stockRegisterApi']);
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['lotRegisterApi']);
             $content = $content->toJson();
         }finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
@@ -209,7 +143,7 @@ class StockController extends Controller
         }
     }
     
-    public function stockManagementList() :View
+    public function lotManagementList() :View
     {
         global $SPIRAL;
         try {
@@ -221,23 +155,24 @@ class StockController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
             
-            $api_url = "%url/rel:mpgt:Stock%";
+            $api_url = "%url/rel:mpgt:Lots%";
             if($user_info->isUser())
             {
-                $title = "在庫管理表 - 部署選択";
+                $title = "ロット管理表 - 部署選択";
                 $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
-                    'title' => '在庫管理表 - 部署選択',
-                    'table' => '%sf:usr:search84:table%',
+                    'title' => 'ロット管理 - 部署選択',
+                    'table' => '%sf:usr:search104:table%',
                     'api_url' => $api_url,
                     'user_info' => $user_info,
+                    'param' => 'lotManagementListForDivision',
                     'csrf_token' => Csrf::generate(16)
                     ] , false);
             }
             else
             {
-                $title = "在庫管理表";
+                $title = "ロット管理表";
                 $division = Division::where('hospitalId',$user_info->getHospitalId())->get();
-                $content = $this->view('NewJoyPla/view/InventoryControlTable', [
+                $content = $this->view('NewJoyPla/view/LotManagement', [
                     'api_url' => $api_url,
                     'user_info' => $user_info,
                     'division'=> $division->data->all(),
@@ -268,7 +203,7 @@ class StockController extends Controller
         }
     }
     
-    public function stockManagementListForDivision()
+    public function lotManagementListForDivision()
     {
         global $SPIRAL;
         try {
@@ -285,11 +220,11 @@ class StockController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
             
-            $api_url = "%url/rel:mpgt:Stock%";
+            $api_url = "%url/rel:mpgt:Lots%";
             $division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
                
             $title = "在庫管理表";
-            $content = $this->view('NewJoyPla/view/InventoryControlTable', [
+            $content = $this->view('NewJoyPla/view/LotManagement', [
                 'api_url' => $api_url,
                 'user_info' => $user_info,
                 'division' => $division->data->all(),
@@ -331,15 +266,71 @@ class StockController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
             
-            if( $user_info->isHospitalUser() && $user_info->isUser() )
+            $api_url = "%url/rel:mpgt:Lots%";
+            if( $user_info->isUser() )
+            {
+                
+                $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
+                    'title' => 'ロット管理 - 部署選択',
+                    'table' => '%sf:usr:search104:table%',
+                    'api_url' => $api_url,
+                    'user_info' => $user_info,
+                    'param' => 'adjustmentHistoryForDivision',
+                    'csrf_token' => Csrf::generate(16)
+                    ] , false); 
+            } else 
+            {
+                
+                $content = $this->view('NewJoyPla/view/LotAdjustmentHistory', [
+                    'api_url' => $api_url,
+                    'user_info' => $user_info,
+                    'csrf_token' => Csrf::generate(16)
+                    ] , false);
+            }
+            
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage()
+                ] , false);
+        } finally {
+            
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla ロット調整ログ',
+                'script' => '',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
+    }
+    
+    public function adjustmentHistoryForDivision()
+    {
+        global $SPIRAL;
+        try {
+
+            $user_info = new UserInfo($SPIRAL);
+            
+            if($user_info->isDistributorUser())
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
-    
-            $api_url = "%url/rel:mpgt:Stock%";
             
-    
-            $content = $this->view('NewJoyPla/view/StockAdjustmentHistory', [
+            $api_url = "%url/rel:mpgt:Lots%";
+            if( ! $user_info->isUser() )
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            } 
+                
+            $content = $this->view('NewJoyPla/view/LotAdjustmentHistory', [
                 'api_url' => $api_url,
                 'user_info' => $user_info,
                 'csrf_token' => Csrf::generate(16)
@@ -359,7 +350,7 @@ class StockController extends Controller
             
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 在庫調整ログ',
+                'title'     => 'JoyPla ロット調整ログ',
                 'script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),
@@ -370,34 +361,34 @@ class StockController extends Controller
     }
 }
 
-$StockController = new StockController();
+$LotController = new LotController();
 
 
 $action = $SPIRAL->getParam('Action');
 
 {
-    if($action == "stockSearch")
+    if($action == "lotRegister")
     {
-        echo $StockController->stockSearchApi()->render();
+        echo $LotController->lotRegisterApi()->render();
     }
-    else if($action == "stockRegister")
+    else if($action == "lotManagementList")
     {
-        echo $StockController->stockRegisterApi()->render();
+        echo $LotController->LotManagementList()->render();
     }
-    else if($action == "stockManagementList")
+    else if($action == "lotManagementListForDivision")
     {
-        echo $StockController->stockManagementList()->render();
-    }
-    else if($action == "stockManagementListForDivision")
-    {
-        echo $StockController->stockManagementListForDivision()->render();
+        echo $LotController->LotManagementListForDivision()->render();
     }
     else if($action == "adjustmentHistory")
     {
-        echo $StockController->adjustmentHistory()->render();
+        echo $LotController->adjustmentHistory()->render();
+    }
+    else if($action == "adjustmentHistoryForDivision")
+    {
+        echo $LotController->adjustmentHistoryForDivision()->render();
     }
     else
     {
-        echo $StockController->index()->render();
+        echo $LotController->index()->render();
     }
 }

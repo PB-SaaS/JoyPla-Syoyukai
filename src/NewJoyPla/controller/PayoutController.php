@@ -9,6 +9,7 @@ use Csrf;
 use App\Lib\UserInfo;
 use App\Model\Division;
 use App\Model\Hospital;
+use App\Model\InHospitalItemView;
 use App\Model\PayoutHistory;
 use App\Model\Payout;
 use App\Model\PayoutView;
@@ -47,14 +48,14 @@ class PayoutController extends Controller
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
-            $source_division = Division::where('hospitalId',$user_info->getHospitalId())->get();
+            $target_division = Division::where('hospitalId',$user_info->getHospitalId())->get();
             if( ($user_info->isHospitalUser() && $user_info->getUserPermission() == '1')) 
             {
-                $target_division = $source_division;
+                $source_division = $target_division;
             } 
             else 
             {
-                $target_division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
+                $source_division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
             }
     
             $api_url = "%url/rel:mpgt:Payout%";
@@ -107,24 +108,28 @@ class PayoutController extends Controller
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
-            $source_division = Division::where('hospitalId',$user_info->getHospitalId())->get();
+            $target_division = Division::where('hospitalId',$user_info->getHospitalId())->get();
             if( ($user_info->isHospitalUser() && $user_info->getUserPermission() == '1')) 
             {
-                $target_division = $source_division;
+                $source_division = $target_division;
             } 
             else 
             {
-                $target_division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
+                $source_division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
             }
     
             $api_url = "%url/rel:mpgt:Payout%";
     
+            $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+            $hospital_data = $hospital_data->data->get(0);
+            $useUnitPrice = $hospital_data->payoutUnitPrice;
             
             $content = $this->view('NewJoyPla/view/PayoutContent2', [
                 'api_url' => $api_url,
                 'user_info' => $user_info,
                 'source_division'=> $source_division,
                 'target_division'=> $target_division,
+                'useUnitPrice'=> $useUnitPrice,
                 'csrf_token' => Csrf::generate(16)
                 ] , false);
             
@@ -178,9 +183,10 @@ class PayoutController extends Controller
             }
             else
             {
-                $payout_items = PayoutView::where('payoutHistoryId', $payout_history_id)->where('hospitalId',$user_info->getHospitalId())->where('targetDivisionId',$user_info->getDivisionId())->get();
+                $payout_items = PayoutView::where('payoutHistoryId', $payout_history_id)->where('hospitalId',$user_info->getHospitalId())->where('sourceDivisionId',$user_info->getDivisionId())->get();
                 $payout_items = $payout_items->data->all();
             }
+            
             
 	        Stock::where('hospitalId',$user_info->getHospitalId());
 	        
@@ -300,6 +306,8 @@ class PayoutController extends Controller
 					<span>%JoyPla:itemMaker%</span><br>
 					<span>%JoyPla:catalogNo% %JoyPla:itemStandard%</span><br>
 					<span>%JoyPla:inHPId%</span><br>
+					<span>%JoyPla:lotNumber%</span><br>
+					<span>%JoyPla:lotDate%</span><br>
 				</div>
 				<div class='uk-text-right uk-padding-remove'>
 					<b>%JoyPla:sourceDivisionName%</b> <span>元棚番:%JoyPla:sourceRackName%</span><br>
@@ -336,7 +344,28 @@ EOM;
                 $payout_date = 'now';
             }
             
-            foreach($payout as $key => $record){
+            $in_hospital_item = InHospitalItemView::where('hospitalId', $user_info->getHospitalId());
+            foreach($payout as $key => $record)
+            {
+                $in_hospital_item->orWhere('inHospitalItemId',$record['recordId']);
+            }
+            $in_hospital_item = $in_hospital_item->get();
+            
+            foreach($payout as $key => $record)
+            {
+                foreach($in_hospital_item as $in_hp_item)
+                {
+                    $lot_flag = 0;
+                    if($record['recordId'] == $in_hp_item->inHospitalItemId)
+                    {
+                        $lot_flag = $in_hp_item->lotManagement;
+                        break;
+                    }
+                }
+                if($lot_flag && ( $record['lotNumber'] == '' || $record['lotDate'] == '' ) )
+                {
+                    throw new Exception('invalid lot',100);
+                }
                 if( ($record['lotNumber'] != '' && $record['lotDate'] == '' ) || ($record['lotNumber'] == '' && $record['lotDate'] != ''))
                 {
                     throw new Exception('invalid lotNumber',100);
@@ -392,7 +421,7 @@ EOM;
 						'itemUnit' => $data['itemUnit'],
 						'price' => str_replace(',', '', $data['kakaku']),
 						'payoutQuantity' => (int)$data['countNum'],
-						'payoutAmount' => (int)$unit_price * (int)$data['countNum'],
+						'payoutAmount' => (float)$unit_price * (int)$data['countNum'],
 						'payoutCount' => $data['payoutCount'],
 						'payoutLabelCount' => $data['countLabelNum'],
 						'lotNumber' => $data['lotNumber'],
@@ -409,7 +438,7 @@ EOM;
 					{
 					    $label_create_flg = true; //一つでもあれば発行する
 					}
-					$total_amount = $total_amount + ((int)$unit_price * (int)$data['countNum']);
+					$total_amount = $total_amount + ((float)$unit_price * (int)$data['countNum']);
 				}
     		}
     		
@@ -438,6 +467,7 @@ EOM;
                         'divisionId' => $record['targetDivisionId'],
                         'inHospitalItemId' => $record['inHospitalItemId'],
                         'count' => $record['payoutQuantity'],
+                        'pattern' => 5,
                         'hospitalId' => $user_info->getHospitalId(),
         		        'lotUniqueKey' => $user_info->getHospitalId().$record['targetDivisionId'].$record['inHospitalItemId'].$record['lotNumber'].$record['lotDate'],
         		        'stockQuantity' => $record['payoutQuantity'],
@@ -448,6 +478,7 @@ EOM;
                         'divisionId' => $record['sourceDivisionId'],
                         'inHospitalItemId' => $record['inHospitalItemId'],
                         'count' => -$record['payoutQuantity'],
+                        'pattern' => 4,
                         'hospitalId' => $user_info->getHospitalId(),
         		        'lotUniqueKey' => $user_info->getHospitalId().$record['sourceDivisionId'].$record['inHospitalItemId'].$record['lotNumber'].$record['lotDate'],
         		        'stockQuantity' => $record['payoutQuantity'],
@@ -460,17 +491,18 @@ EOM;
         		    $inventory_adjustment_trdata[] = [
                         'divisionId' => $record['targetDivisionId'],
                         'inHospitalItemId' => $record['inHospitalItemId'],
+                        'pattern' => 5,
                         'count' => $record['payoutQuantity'],
                         'hospitalId' => $user_info->getHospitalId(),
         		    ];   
         		    $inventory_adjustment_trdata[] = [
                         'divisionId' => $record['sourceDivisionId'],
                         'inHospitalItemId' => $record['inHospitalItemId'],
+                        'pattern' => 4,
                         'count' => -$record['payoutQuantity'],
                         'hospitalId' => $user_info->getHospitalId(),
         		    ];   
     		    }
-    		    
     		}
     		
     		$result = PayoutHistory::insert($insert_history_data);

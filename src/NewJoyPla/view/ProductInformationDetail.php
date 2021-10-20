@@ -9,7 +9,7 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
-                <li><a href="%url/rel:mpgt:Product%&Action=Item">商品マスタ</a></li>
+                <li><a href="%url/rel:mpgt:Product%&Action=Item&table_cache=true">商品マスタ</a></li>
                 <li><span>商品情報詳細</span></li>
             </ul>
             <div class="no_print uk-margin" uk-margin>
@@ -74,7 +74,6 @@
                     <input type="hidden" name="hospitalId" value="%val:@usr:hospitalId%">
                     <input type="hidden" name="catalogNo" value="%val:usr:catalogNo%">
                     <input type="hidden" name="serialNo" value="%val:usr:serialNo%">
-                    <input type="hidden" name="lotManagement" value="%val:usr:lotManagement:id%">
                 </form>
 
             <?php endif ?>

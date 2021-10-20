@@ -21,7 +21,7 @@
 	    	</div>
 	    	<hr>
 	    	<div class="uk-margin">
-	    	    %sf:usr:search32%
+	    	    %sf:usr:search32:mstfilter%
 			</div>
 		</div>
 	</div>

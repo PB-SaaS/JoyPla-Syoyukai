@@ -16,6 +16,7 @@
 	
     <script src="https://i02.smp.ne.jp/u/joypla/new/js/JsBarcode.all.min.js"></script>
     <script src="https://i02.smp.ne.jp/u/joypla/new/js/BarcodeParser.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     
     <script>
 	$(function(){
@@ -110,13 +111,28 @@
         let evenNum = 0, oddNum = 0;
         for (var i = 0; i < barcodeStr.length - 1; i++) {
             if (i % 2 == 0) { // 「奇数」かどうか（0から始まるため、iの偶数と奇数が逆）
+                oddNum += parseInt(barcodeStr[i]);//奇数
+            } else {
+                evenNum += parseInt(barcodeStr[i]);//偶数
+            }
+        }
+        // 結果
+        return String(barcodeStr.slice(0,12)) + String(10 - parseInt((evenNum * 3 + oddNum).toString().slice(-1)));
+    }
+    
+    function eanCheckDigit(barcodeStr) { // 引数は文字列
+        // 短縮用処理
+        barcodeStr = ('00000' + barcodeStr).slice(-13);
+        let evenNum = 0, oddNum = 0;
+        for (var i = 0; i < barcodeStr.length - 1; i++) {
+            if (i % 2 == 0) { // 「奇数」かどうか（0から始まるため、iの偶数と奇数が逆）
                 oddNum += parseInt(barcodeStr[i]);
             } else {
                 evenNum += parseInt(barcodeStr[i]);
             }
         }
         // 結果
-        return String(barcodeStr.slice(0,12)) + String(10 - parseInt((evenNum * 3 + oddNum).toString().slice(-1)));
+        return 10 - parseInt((evenNum * 3 + oddNum).toString().slice(-1));
     }
     
     
@@ -126,6 +142,13 @@
         	return barcodeStr = barcodeStr.slice(0,13);	
         }
         return barcodeStr;
+    }
+    
+    function gs1_01_to_jan(gs1_01)
+    {
+    	gs1_01 = gs1_01.slice(1);
+    	gs1_01 = gs1_01.slice( 0, -1 );
+    	return gs1_01 + eanCheckDigit(gs1_01);
     }
 	/*
 	function check_gs1128(code){

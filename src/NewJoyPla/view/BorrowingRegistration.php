@@ -143,6 +143,7 @@
                             <th class="uk-text-bottom">単価</th>
                             <th class="uk-text-bottom">卸業者</th>
                             <th class="uk-text-bottom">貸出数</th>
+	    					<th class="uk-text-bottom">ロット管理</th>
                             <th class="uk-text-bottom">ロット番号</th>
                             <th class="uk-text-bottom" style="width:146px">使用期限</th>
                             <th>
@@ -169,6 +170,10 @@
 							<td>{{list.unitPrice}}</td>
 							<td>{{list.oroshi}}</td>
 							<td>1{{ list.itemUnit }}</td>
+							<td class="uk-text-center">
+								<span v-if="list.lotFlagBool == 1" class="uk-text-danger">必須</span>
+								<span v-else >任意</span>
+							</td>
 							<td>
 								<input type="text" class="uk-input lot" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
 							</td>
@@ -270,6 +275,7 @@
 						<th>単価</a></th>
 						<th>JANコード</a></th>
 						<th>卸業者</a></th>
+						<th>ロット管理フラグ</a></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -287,6 +293,7 @@
 						<td class="uk-text-middle">￥{{list.unitPrice}}</td>
 						<td class="uk-text-middle">{{list.jan}}</td>
 						<td class="uk-text-middle">{{list.oroshi}}</td>
+						<td class="uk-text-middle">{{list.lotFlag}}</td>
 					</tr>
 				</tbody>
 			</table>   
@@ -309,6 +316,8 @@ var app = new Vue({
 			object.countNum = 1;
 			object.lotNumber = ((object.lotNumber == null)? '': object.lotNumber); 
 			object.lotDate = ((object.lotDate == null)? '' : object.lotDate);
+			object.lotDateStyle = {};
+			object.lotNumberStyle = {};
 			this.lists.push(object);
 		},
 		copyList: function(key) {
@@ -385,38 +394,73 @@ var app = new Vue({
 			changeObject.lotDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
 			app.$set(app.lists, index, changeObject);
 		},
-		LotCheck: function(){
-            let chkLot = true;
+		lotCheck: function(){
+			
+			let chkLot = true;
 			app.lists.forEach(function (elem, index) {
-                if(app.lists[index].countNum > 0) {
-                    if((!app.lists[index].lotNumber && app.lists[index].lotDate) || (app.lists[index].lotNumber && ! app.lists[index].lotDate)) {
-                    chkLot = false;
-                    }
-                }
-            });
-            
-            if(!chkLot){
-                UIkit.modal.alert('ロット情報を入力してください');
-                return false ;
-            }
-            
-            chkLot = true;
-            let regex = /^[0-9a-zA-Z]+$/;
+				elem.lotNumberStyle.border = '';
+				elem.lotDateStyle.border = '';
+				if(app.lists[index].countNum > 0 && app.lists[index].lotFlagBool == 1) {
+					if( !( app.lists[index].lotNumber && app.lists[index].lotDate)) {
+						let changeObject = app.lists[index];
+						changeObject.lotNumberStyle.border = 'red 2px solid';
+						changeObject.lotDateStyle.border = 'red 2px solid';
+						app.$set(app.lists, index, changeObject);
+				    	chkLot = false;
+					}
+				}
+			});
+			if(!chkLot){
+				UIkit.modal.alert('ロット管理が必須のものはすべてロット情報を入力してください');
+				return false ;
+			}
+			
+			chkLot = true;
 			app.lists.forEach(function (elem, index) {
-                if(app.lists[index].lotNumber) {
-                    if((!regex.test(app.lists[index].lotNumber)) ||
-                        (encodeURI(app.lists[index].lotNumber).replace(/%../g, '*').length > 20)) {
-                        chkLot = false;
-                    }
-                }
-            });
-            
-            if(!chkLot){
-                UIkit.modal.alert('ロット番号の入力を確認してください');
-                return false ;
-            }
-
-            return true;
+				elem.lotNumberStyle.border = '';
+				elem.lotDateStyle.border = '';
+				if(app.lists[index].countNum > 0) {
+					if(!app.lists[index].lotNumber && app.lists[index].lotDate){
+						let changeObject = app.lists[index];
+						changeObject.lotNumberStyle.border = 'red 2px solid';
+						app.$set(app.lists, index, changeObject);
+			    		chkLot = false;
+					}
+					else if(app.lists[index].lotNumber && !app.lists[index].lotDate) {
+						let changeObject = app.lists[index];
+						changeObject.lotDateStyle.border = 'red 2px solid';
+						app.$set(app.lists, index, changeObject);
+			    		chkLot = false;
+					}
+				}
+			});
+			
+			if(!chkLot){
+				UIkit.modal.alert('ロット情報を入力してください');
+				return false ;
+			}
+			
+			chkLot = true;
+			let regex = /^[0-9a-zA-Z]+$/;
+			app.lists.forEach(function (elem, index) {
+				elem.lotNumberStyle.border = '';
+				if(app.lists[index].lotNumber) {
+					if((!regex.test(app.lists[index].lotNumber)) ||
+					   (encodeURI(app.lists[index].lotNumber).replace(/%../g, '*').length > 20)) {
+						let changeObject = app.lists[index];
+						changeObject.lotNumberStyle.border = 'red 2px solid';
+						app.$set(app.lists, index, changeObject);
+			    		chkLot = false;
+					}
+				}
+			});
+			
+			if(!chkLot){
+				UIkit.modal.alert('ロット番号の入力を確認してください');
+				return false ;
+			}
+			
+			return true;
         },
         usedDateCheck: function(){
             let usedDate = true;
@@ -445,7 +489,7 @@ var app = new Vue({
     			if(! app.check()){
     				return false;
     			}
-    			if(! app.LotCheck()){
+    			if(! app.lotCheck()){
     			    return false;
     			}
                 loading();
@@ -495,7 +539,7 @@ var app = new Vue({
     			if(! app.check()){
     				return false;
     			}
-    			if(! app.LotCheck()){
+    			if(! app.lotCheck()){
     			    return false;
     			}
     			if(! app.usedDateCheck()){

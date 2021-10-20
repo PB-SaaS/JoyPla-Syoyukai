@@ -722,11 +722,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin()) : ?>
-			                            <a href="%url/rel:mpgt:goodsBillingList%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php else : ?>
-			                            <a href="%url/rel:mpgt:page_266881%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php endif ?>
+			                            <a href="%url/rel:mpgt:Consume%&Action=unorderedList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -932,7 +928,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:page_263613%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:Inventory%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1042,6 +1038,7 @@ $hospitalData = $getHospitalData->select();
 				    		<p class="uk-width-1-1 content-6-1 category-title">在庫</p>
 			    		</div>
 				    	<div class="uk-child-width-1-2@m uk-text-center" uk-grid>
+							<?php if($userInfo->isAdmin() || $userInfo->isApprover()) : ?>
 						    <div>
 						        <div class="nj_card content-6-1">
 			                        <div class="menu-content">
@@ -1063,6 +1060,23 @@ $hospitalData = $getHospitalData->select();
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
+				                                <span class="title">在庫調整ログ</span><br>
+				                                <span class="text">Stock Adjustment Log</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:Stock%&Action=adjustmentHistory" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+							<?php endif ?>
+						    <div>
+						        <div class="nj_card content-6-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
 				                                <span class="title">在庫管理表</span><br>
 				                                <span class="text">Stock Management List</span>
 			                                </p>
@@ -1070,31 +1084,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin()) : ?>
-			                            <a href="%url/rel:mpgt:page_169195%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-			                            <?php else : ?>
-			                            <a href="%url/rel:mpgt:page_267320%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php endif ?>
-			                        </div>
-						        </div>
-						    </div>
-						    <div>
-						        <div class="nj_card content-6-1">
-			                        <div class="menu-content">
-			                            <div class="menu-body">
-			                                <p>
-				                                <span class="title">ロット管理</span><br>
-				                                <span class="text">Lot List</span>
-			                                </p>
-			                            </div>
-			                            <div class="menu-foot">
-			                                <span>More Info</span>
-			                            </div>
-										<?php if($userInfo->isAdmin()) : ?>
-			                            <a href="%url/rel:mpgt:page_296575%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php else : ?>
-			                            <a href="%url/rel:mpgt:page_266925%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php endif ?>
+			                            <a href="%url/rel:mpgt:Stock%&Action=stockManagementList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1136,6 +1126,61 @@ $hospitalData = $getHospitalData->select();
 			                                <span>More Info</span>
 			                            </div>
 			                            <a href="%url/rel:mpgt:Card%&Action=cardList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						</div>
+					</div>
+		    		<div>
+			    		<div>	
+				    		<p class="uk-width-1-1 content-6-1 category-title">ロット管理</p>
+			    		</div>
+				    	<div class="uk-child-width-1-2@m uk-text-center" uk-grid>
+						    <div>
+						        <div class="nj_card content-6-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">ロット調整</span><br>
+				                                <span class="text">Lot Adjustment</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:Lots%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-6-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">ロット調整ログ</span><br>
+				                                <span class="text">Lot Adjustment Log</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:Lots%&Action=adjustmentHistory" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-6-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">ロット管理表</span><br>
+				                                <span class="text">Lot List</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:Lots%&Action=lotManagementList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>

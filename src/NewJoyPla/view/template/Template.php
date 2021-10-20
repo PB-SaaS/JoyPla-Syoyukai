@@ -7,10 +7,10 @@
     <?php echo $script; ?>
 </head>
 <body>
-    <header>
+    <div>
         <!-- header.phpファイルを読み込む-->
     <?php echo $header ?>
-    </header>
+    </div>
     <div id="content">
         <!-- 各アクションの内容を読み込む-->
         <?php echo $content; ?>
