@@ -1,56 +1,14 @@
-<?php
-include_once 'NewJoyPla/lib/ApiSpiral.php';
-include_once "NewJoyPla/lib/Define.php";
-include_once 'NewJoyPla/lib/SpiralDataBase.php';
-include_once 'NewJoyPla/lib/UserInfo.php';
-include_once 'NewJoyPla/api/GetDivision.php';
-include_once 'NewJoyPla/api/GetUnordered.php';
-include_once "NewJoyPla/lib/Func.php";
 
-$userInfo = new App\Lib\UserInfo($SPIRAL);
-
-$myPageID = '';
-if(isset($_POST['MyPageID']) && $_POST['MyPageID'] != '' ){
-	$myPageID = $_POST['MyPageID'];
-}
-
-if($userInfo->getUserPermission() != "1" && $myPageID != ''){
-	App\Lib\viewNotPossible();
-	exit;
-}
-
-$spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
-$spiralApiRequest = new SpiralApiRequest();
-$spiralDataBase = new App\Lib\SpiralDataBase($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
-
-$getDivision = new App\Api\GetDivision($spiralDataBase,$userInfo);
-
-$divisionData = $getDivision->select();
-
-
-$getUnordered = new App\Api\GetUnordered($spiralDataBase,$userInfo);
-
-$getUnorderedData = $getUnordered->select();
-
-?>
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>JoyPla 発注調整</title>
-	<?php include_once 'NewJoyPla/src/Head.php'; ?>
-  </head>
-  <body>
-    <?php include_once 'NewJoyPla/src/HeaderForMypage.php'; ?>
     <div class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
 	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove" id="page_top">
 		    <div class="uk-container uk-container-expand">
 		    	<?php
-		    	if($getUnorderedData['count'] > 0):
+		    	if($isExistUnorder):
 		    	?>	
 		    	<script>
 		    		$(function(){
 		    			UIkit.modal.alert('未発注伝票があります。<br>未発注伝票一覧へ移動します。').then(function(){
-							location.href="%url/rel:mpgt:unorderedList%";
+							location.href="%url/rel:mpgt:Order%&Action=unorderedList";
 						});
 		    		});
 		    	</script>
@@ -69,7 +27,7 @@ $getUnorderedData = $getUnordered->select();
 		    	<h2 class="page_title">発注調整</h2>
 		    	<hr>
 		    	<div class="" id="tablearea">
-		    		%sf:usr:search75%
+		    		%sf:usr:search75:mstfilter%
 		    	</div>
 		    	
 		    	<?php	
@@ -83,14 +41,12 @@ $getUnorderedData = $getUnordered->select();
    const divisitonData = <?php echo json_encode($divisionData); ?>;
    let listObject = {};
    $(function(){
-	  getItemsList();
       makeDivitionSelect();
    })
 
 
    function makeDivitionSelect(){
    		let selectval = $('#divisionName').val();
-		//html = '<input type="number" class="uk-input" style="width:72px" step="10">';
 	    html = document.createElement("div");
 	    select = document.createElement("select");
 	    select.className = 'uk-select';
@@ -101,41 +57,16 @@ $getUnorderedData = $getUnordered->select();
 	    option = document.createElement("option");
 	    option.value = '';
 	    option.text = '----- 部署を選択してください -----';
-	    //input.step = listObject[object.recordId].irisu;
-	    //<span class="uk-text-bottom">個</span>
 		select.appendChild(option);
 	    
-	    option = document.createElement("option");
-	    option.value = divisitonData['store'][0][3];
-	    option.text = divisitonData['store'][0][3] + "(大倉庫)";
-	    
-	    if(divisitonData['store'][0][3] == selectval){
-	    	option.selected = 'selected';
-	    }
-	    
-	    //input.step = listObject[object.recordId].irisu;
-	    //<span class="uk-text-bottom">個</span>
-		select.appendChild(option);
-		
-	    option = document.createElement("option");
-	    option.value = "";
-	    option.text = "---------------------------------------";
-	    option.disabled = "disabled";
-		select.appendChild(option);
-	    
-		Object.keys(divisitonData['division']).forEach(function (key) {
-		    if(divisitonData['division'][key][5] != '1'){
-			    option = document.createElement("option");
-			    option.value = divisitonData['division'][key][3];
-			    option.text = divisitonData['division'][key][3];
-			    //input.step = listObject[object.recordId].irisu;
-			    //<span class="uk-text-bottom">個</span>
-			    
-			    if(divisitonData['division'][key][3] == selectval){
-			    	option.selected = 'selected';
-			    }
-				select.appendChild(option);
+		Object.keys(divisitonData).forEach(function (key) {
+		    option = document.createElement("option");
+		    option.value = divisitonData[key].divisionName;
+		    option.text = divisitonData[key].divisionName;
+		    if(divisitonData[key].divisionName == selectval){
+		    	option.selected = 'selected';
 		    }
+			select.appendChild(option);
 		});
 	
 		html.appendChild(select);
@@ -143,65 +74,63 @@ $getUnorderedData = $getUnordered->select();
 		$('#divisionNameDiv').append(html);
    }
    
-   function onchangeSelect(val){
-   	$('#divisionName').val(val);
-   }
-   
-   function active(elm,id,totalZaiko,quantity,busyoId,inHospitalItemId){
-   	elm.style.backgroundColor = 'rgb(255, 204, 153)';
-   	orderQuantity = quantity * elm.value;
-   	$('#orderQuantityPerCarton_'+id).text(orderQuantity);
-   	$('#adjustmentStock_'+id).text(totalZaiko + orderQuantity);
-   	listObject[busyoId][inHospitalItemId]['countNum'] = orderQuantity;
-   }
-   
-   
-    function getItemsList(){
-		$('#tablearea td.json').each(function() {
-			json = JSON.parse($(this).text().replace(/\r?\n/g, '').trim());
-			if(! listObject[json.divisionId]){
-				listObject[json.divisionId] = {};
-			}
-			listObject[json.divisionId][json.inHospitalItemId] = json;
-		});
+	function onchangeSelect(val){
+		$('#divisionName').val(val);
 	}
-	
+   
+	function active(elm,id,totalZaiko,quantity,busyoId,inHospitalItemId){
+	   	elm.style.backgroundColor = 'rgb(255, 204, 153)';
+	   	orderQuantity = quantity * elm.value;
+	   	$('#orderQuantityPerCarton_'+id).text(orderQuantity);
+	   	$('#adjustmentStock_'+id).text(totalZaiko + orderQuantity);
+	}
 	function validateChack(){
 		let flag = false;
-		Object.keys(listObject).forEach(function(divkey) {
- 
-			Object.keys(listObject[divkey]).forEach(function(key) {
-	 
-			    if(listObject[divkey][key].countNum != 0){
-			    	flag = true;
-			    }
-			})
-		 
-		})
+		elm = $('input.orderQuantity');
+		for(index = 0 ; index < elm.length ; index++)
+		{
+		    if(elm[index].value != 0){
+		    	flag = true;
+		    }
+		}
 		if(!flag){
 			UIkit.modal.alert("発注する商品がありません");
 		}
 		
 		return flag;
 	}
+	
+	function getItems()
+	{
+		let lists = [];
+		item = $('input.inHospitalItemId');
+		elm = $('input.orderQuantity');
+		ids = $('input.id');
+		for(index = 0 ; index < elm.length ; index++)
+		{
+		    if(elm[index].value != 0){
+		    	lists.push({
+		    		'inHospitalItemId' : item[index].value,
+		    		'orderQuantity' : elm[index].value,
+		    		'id' : ids[index].value,
+		    	});
+		    }
+		}
+		return lists;
+	}
 
 	function sendUnorderedSlip(){
-		if(!canAjax) { 
-			console.log('通信中');
-			return;
-		}
 		if(!validateChack()){
 			return;
 		}
 		loading();
-		canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
 		$.ajax({
 			async: false,
-            url:'%url/rel:mpgt:regUnordereByDiv%',
+            url:'%url/rel:mpgt:Order%&Action=regUnorderedDivisionApi',
             type:'POST',
             data:{
-            	ordered : JSON.stringify( objectValueToURIencode(listObject) ),
-            	divisionId : $('select[name="busyo"]').val()
+            	_csrf: "<?php echo $csrf_token ?>",
+            	ordered : JSON.stringify( objectValueToURIencode(getItems()) ),
             },
             dataType: 'json'
         })
@@ -217,7 +146,7 @@ $getUnorderedData = $getUnordered->select();
             
             UIkit.modal.alert("未発注伝票を作成しました").then(function(){
 				UIkit.modal.alert("未発注伝票一覧へ移動します").then(function(){
-					location.href="%url/rel:mpgt:unorderedList%";
+					location.href="%url/rel:mpgt:Order%&Action=unorderedList";
 				});
 			});
         })
@@ -234,5 +163,3 @@ $getUnorderedData = $getUnordered->select();
 	}
 	
    </script>
-  </body>
-</html>

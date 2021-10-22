@@ -79,7 +79,7 @@ $tenantData = $getTenantData->select($hospitalData['data'][0]['tenantId']);
 				</div>
 				<form name="reqItemsReg" action="/regist/is" target="_blank" method="POST">
 					%SMPAREA%
-					<input type="hidden" name="SMPFORM" value="%smpform:310a_reqItemsReg%">
+					<input type="hidden" name="SMPFORM" value="%smpform:330_reqItemsReg%">
 					<input type="hidden" name="requestId" value="%val:usr:requestId%">
 					<input type="hidden" name="tenantId" value="%val:usr:tenantId%">
 					<input type="hidden" name="distributorId" value="%val:usr:distributorId%">

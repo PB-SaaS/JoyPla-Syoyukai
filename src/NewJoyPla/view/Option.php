@@ -1,24 +1,19 @@
 
 <!DOCTYPE html>
 <?php
-include_once 'NewJoyPla/lib/ApiSpiral.php';
-include_once "NewJoyPla/lib/Define.php";
-include_once 'NewJoyPla/lib/SpiralDataBase.php';
-include_once 'NewJoyPla/lib/UserInfo.php';
-include_once 'NewJoyPla/api/GetHospitalData.php';
-include_once 'NewJoyPla/api/GetTenantData.php';
+include_once 'NewJoyPla/autoload.php';
 
-$spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
-$spiralApiRequest = new SpiralApiRequest();
-$spiralDataBase = new App\Lib\SpiralDataBase($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
-$userInfo = new App\Lib\UserInfo($SPIRAL);
+use App\Lib\UserInfo;
+use App\Model\Hospital;
+use App\Model\Tenant;
 
-$getHospitalData = new App\Api\GetHospitalData($spiralDataBase,$userInfo);
-$hospitalData = $getHospitalData->select();
+global $SPIRAL;
+$user_info = new UserInfo($SPIRAL);
+$hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+$hospital = $hospital->data->get(0);
 
-$getTenantData = new App\Api\GetTenantData($spiralDataBase,$userInfo);
-$tenantData = $getTenantData->select();
-
+$tenant = Tenant::where('tenantId',$hospital->tenantId)->get();
+$tenant = $tenant->data->get(0);
 ?>
 <html>
   <head>
@@ -35,8 +30,6 @@ $tenantData = $getTenantData->select();
 				    <li><span>オプション情報</span></li>
 				</ul>
 				
-				
-				
 		    	<div class='uk-width-1-1' uk-grid>
 		    		<div class="uk-width-5-6@m uk-width-2-3">
 		    			<h2>オプション情報</h2>
@@ -47,15 +40,27 @@ $tenantData = $getTenantData->select();
 		    		<table class="uk-table uk-table-divider uk-table-responsive">
 					        <tr>
 					            <th>テナント種別</th>
-					            <td><?php echo ($tenantData['data'][0]['tenantKind'] == '1')? "シングルテナント" : "マルチテナント" ;?></td>
+					            <td><?php echo ($tenant->tenantKind == '1')? "シングルテナント" : "マルチテナント" ;?></td>
 					        </tr>
 					        <tr>
 					            <th>入庫先設定</th>
-					            <td><?php echo ($hospitalData['data'][0]['receivingTarget'] == '1')? "大倉庫" : "発注部署" ;?></td>
+					            <td><?php echo ($hospital->receivingTarget == '1')? "大倉庫" : "発注部署" ;?></td>
 					        </tr>
 					        <tr>
 					            <th>登録可能ユーザー数</th>
-					            <td><?php echo $hospitalData['data'][0]['registerableNum'] ?> 人まで</td>
+					            <td><?php echo $hospital->registerableNum ?> 人まで</td>
+					        </tr>
+					        <tr>
+					            <th>消費計算方法</th>
+					            <td><?php echo ($hospital->billingUnitPrice == '1')? '単価フィールドを使用する' : '購買価格を使用する' ?></td>
+					        </tr>
+					        <tr>
+					            <th>払出計算方法</th>
+					            <td><?php echo ($hospital->payoutUnitPrice == '1')? '単価フィールドを使用する' : '購買価格を使用する' ?></td>
+					        </tr>
+					        <tr>
+					            <th>棚卸計算方法</th>
+					            <td><?php echo ($hospital->invUnitPrice == '1')? '単価フィールドを使用する' : '購買価格を使用する' ?></td>
 					        </tr>
 					</table>
 		    	</div>

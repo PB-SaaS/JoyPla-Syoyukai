@@ -722,7 +722,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:Consume%&Action=unorderedList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:Consume%&Action=consumeList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -738,11 +738,9 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin()) : ?>
-			                            <a href="%url/rel:mpgt:unorderedList%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php else : ?>
-			                            <a href="%url/rel:mpgt:page_266849%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php endif ?>
+										
+			                            <a href="%url/rel:mpgt:Order%&Action=unorderedList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+										
 			                        </div>
 						        </div>
 						    </div>
@@ -758,11 +756,8 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin()) : ?>
-			                            <a href="%url/rel:mpgt:Receipt%&Action=OrederList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php else : ?>
-			                            <a href="%url/rel:mpgt:page_266883%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php endif ?>
+			                            <a href="%url/rel:mpgt:Order%&Action=orderedList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+										
 			                        </div>
 						        </div>
 						    </div>
@@ -779,11 +774,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin()) : ?>
-			                            <a href="%url/rel:mpgt:page_264502%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php else : ?>
-			                            <a href="%url/rel:mpgt:page_266885%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php endif ?>
+			                            <a href="%url/rel:mpgt:Order%&Action=orderAdjustment" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1022,11 +1013,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin()) : ?>
-			                            <a href="%url/rel:mpgt:page_263579%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-			                            <?php else : ?>
-			                            <a href="%url/rel:mpgt:page_267442%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php endif ?>
+										<a href="%url/rel:mpgt:Payout%&Action=payoutList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1296,7 +1283,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin()) : ?>
+										<?php if($userInfo->isAdmin() || $userInfo->isApprover()) : ?>
 											<a href="%url/rel:mpgt:page_177035%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 										<?php else : ?>
 											<a href="%url/rel:mpgt:page_177068%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
@@ -1316,7 +1303,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin()) : ?>
+										<?php if($userInfo->isAdmin() || $userInfo->isApprover()) : ?>
 											<a href="%url/rel:mpgt:page_169065%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 										<?php else : ?>
 											<a href="%url/rel:mpgt:page_169061%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
@@ -1336,7 +1323,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin()) : ?>
+										<?php if($userInfo->isAdmin() || $userInfo->isApprover()) : ?>
 											<a href="%url/rel:mpgt:page_168793%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 										<?php else : ?>
 											<a href="%url/rel:mpgt:page_168846%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
@@ -1356,7 +1343,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin()) : ?>
+										<?php if($userInfo->isAdmin() || $userInfo->isApprover()) : ?>
 											<a href="%url/rel:mpgt:page_301356%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 										<?php else : ?>
 											<a href="%url/rel:mpgt:page_168844%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
@@ -1535,7 +1522,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:page_169094%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:Price%&Action=QuoteList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1574,7 +1561,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:page_169004%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:Price%&Action=Price" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1677,7 +1664,7 @@ $hospitalData = $getHospitalData->select();
 											<input type="hidden" name="nameKana" value="%val:usr:nameKana%">
 											<input type="hidden" name="mailAddress" value="%val:usr:mailAddress%">
 											<input type="hidden" name="remarks" value="%val:usr:remarks%">
-											<?php if($userInfo->getUserPermission() == '1') : ?>
+											<?php if($userInfo->isAdmin()) : ?>
 											<input type="hidden" name="SMPFORM" value="%smpform:hpUserChange%">
 											<?php else: ?>
 											<input type="hidden" name="SMPFORM" value="%smpform:hpUserCForD%">

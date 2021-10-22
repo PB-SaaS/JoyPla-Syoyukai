@@ -12,12 +12,11 @@ use App\Model\Division;
 use App\Model\Hospital;
 use App\Model\InHospitalItemView;
 use App\Model\Stock;
+use App\Model\Card;
 use App\Model\Billing;
 use App\Model\BillingHistory;
 use App\Model\InventoryAdjustmentTransaction;
 use App\Model\Distributor;
-use App\Model\Order;
-use App\Model\OrderHistory;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -62,9 +61,11 @@ class ConsumeController extends Controller
             $useUnitPrice = $hospital_data->billingUnitPrice;
     
             $api_url = "%url/rel:mpgt:Consume%";
+            $order_api_url = "%url/rel:mpgt:Order%";
     
             $content = $this->view('NewJoyPla/view/GoodsBillingContentEntry', [
                 'api_url' => $api_url,
+                'order_api_url' => $order_api_url,
                 'userInfo' => $user_info,
                 'divisionData'=> $divisionData,
                 'useUnitPrice'=> $useUnitPrice,
@@ -94,7 +95,7 @@ class ConsumeController extends Controller
         }
     }
     
-    public function unorderedList(): View
+    public function consumeList(): View
     {
         global $SPIRAL;
         try {
@@ -117,7 +118,7 @@ class ConsumeController extends Controller
                 $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
                     'table' => '%sf:usr:search96:table%',
                     'title' => '消費登録一覧 - 部署選択',
-                    'param' => 'unorderedListForDivision',
+                    'param' => 'consumeListForDivision',
                     ] , false);
             }
     
@@ -144,7 +145,7 @@ class ConsumeController extends Controller
         }
     }
     
-    public function unorderedListForDivision(): View
+    public function consumeListForDivision(): View
     {
         global $SPIRAL;
         try {
@@ -157,6 +158,11 @@ class ConsumeController extends Controller
             }
             
             if ($user_info->isHospitalUser() && ( $user_info->isApprover() || $user_info->isAdmin()) )
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+            
+            if ( \App\lib\isMypage() )
             {
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             }
@@ -176,6 +182,7 @@ class ConsumeController extends Controller
                 'SPIRAL' => $SPIRAL
             ], false);
             // テンプレートにパラメータを渡し、HTMLを生成し返却
+            
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 消費一覧',
                 'script' => '',
@@ -186,7 +193,6 @@ class ConsumeController extends Controller
             ],false);
         }
     }
-    
         
     public function regGoodsBillingAPI()
     {
@@ -219,7 +225,7 @@ class ConsumeController extends Controller
             }
             $in_hospital_item = $in_hospital_item->get();
             
-
+            $card_update = [];
             foreach ($billingData as $record)
             {
                 foreach($in_hospital_item as $in_hp_item)
@@ -247,7 +253,14 @@ class ConsumeController extends Controller
                         throw new Exception('invalid lotNumber format',102);
                     }
                 }
+                if($record['card']){
+                    $card_update[] = [
+                        'cardId' => $record['card'],
+                        'payoutId' => '',
+                        ];
+                }
             }
+            
 
             $useUnitPrice = '';
             $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
@@ -303,7 +316,7 @@ class ConsumeController extends Controller
                         'pattern' => 1,
                         'hospitalId' => $user_info->getHospitalId(),
         		        'lotUniqueKey' => $user_info->getHospitalId().$record['divisionId'].$record['inHospitalItemId'].$record['lotNumber'].$record['lotDate'],
-        		        'stockQuantity' => $record['billingQuantity'],
+        		        'stockQuantity' => -$record['billingQuantity'],
                         'lotNumber' =>  $record['lotNumber'],
                         'lotDate' =>    $record['lotDate'],
         		    ];
@@ -362,8 +375,11 @@ class ConsumeController extends Controller
                 ];
             }
 */
-            $result = BillingHistory::insert($history_data);
-            $result = Billing::insert($insert_data);
+            BillingHistory::insert($history_data);
+            Billing::insert($insert_data);
+            if(count($card_update) != 0){
+                Card::bulkUpdate('cardId',$card_update);
+            }
             $result = InventoryAdjustmentTransaction::insert($inventory_adjustment_trdata);
 
             $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
@@ -379,138 +395,6 @@ class ConsumeController extends Controller
             ],false);
         }
     }
-
-
-    public function regUnorderedAPI()
-    {
-        global $SPIRAL;
-        $content = '';
-        try{
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
-
-            $user_info = new UserInfo($SPIRAL);
-
-            if($user_info->isDistributorUser())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
-            }
-            if ($user_info->isHospitalUser() && $user_info->isApprover())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
-            }
-
-            $getOrdered = $SPIRAL->getParam('ordered');
-            $ordered = $this->requestUrldecode($getOrdered);
-            $divisionId = $SPIRAL->getParam('divisionId');
-
-            $arrayEachDistributor = [];
-            
-            //個数を合算する+業者情報を取得
-            $remaked = [];
-            $distributorDB = Distributor::where('hospitalId',$user_info->getHospitalId());
-            foreach( $ordered as $key => $order)
-            {
-                if (array_key_exists($order['recordId'], $remaked) === false) {
-                    $remaked[$order['recordId']] = $order;
-                } 
-                else 
-                {
-                    $remaked[$order['recordId']]['countNum'] = (int)$remaked[$order['recordId']]['countNum'] + (int)$order['countNum'];
-                }
-                $distributorDB->orWhere('distributorId',$order['distributorId']);
-            }
-            
-            $distributorDB = $distributorDB->get();
-            
-            $distributorDB = $distributorDB->data->all();
-            
-            $ordered = $remaked;
-            
-            foreach ($distributorDB as $distributor)
-            {
-                $distributorId = $distributor->distributorId;
-                if (array_search($distributorId, $arrayEachDistributor) === false) {
-                    $arrayEachDistributor[$distributorId] = [];
-                }
-                
-                foreach ($ordered as $order)
-                {
-                    if ($order['distributorId'] == $distributorId) { $arrayEachDistributor[$distributorId][] = $order; }
-                }
-            }
-            
-                
-            $insert_data = [];
-            $history_data = [];
-
-            foreach ($arrayEachDistributor as $distributor_id => $order_data)
-            {
-                $in_hospital_item_ids = [];
-                $total_amount = 0;
-                $ordered_id = $this->makeId('03');
-                foreach($order_data as $data)
-                {
-                    $sign = '';
-                    $inHPItemid = $data['recordId'];
-                    if ((int)$data['countNum'] < 0) { $sign = '-'; }
-                    if (floor(abs((int)$data['countNum']) / (int)$data['irisu']) > 0)
-                    {
-                        $insert_data[] = [
-                            'hospitalId' => $user_info->getHospitalId(),
-                            'inHospitalItemId' => $inHPItemid,
-                            'orderNumber' => $ordered_id,
-                            'price' => str_replace(',', '', $data['kakaku']),
-                            'orderQuantity' => $sign.floor(abs((int)$data['countNum']) / (int)$data['irisu']),
-                            'orderPrice' => $sign.str_replace(',', '', $data['kakaku']) * floor(abs((int)$data['countNum']) / (int)$data['irisu']),
-                            'receivingFlag' => '0',
-                            'quantity' => $data['irisu'],
-                            'quantityUnit' => $data['unit'],
-                            'itemUnit' => $data['itemUnit'],
-                            'divisionId' => $divisionId,
-                            'distributorId' => $distributor_id,
-                            'itemId' => $data['itemId']
-    //                            'lotManagement' => (int)$data['lotFlag']
-                        ];
-                        $total_amount = $total_amount + ($sign.str_replace(',', '', $data['kakaku']) * floor(abs((int)$data['countNum']) / (int)$data['irisu']));
-                    }
-                    if (array_search($inHPItemid, $in_hospital_item_ids) === false) {
-                        $in_hospital_item_ids[] = $inHPItemid;
-                    }
-                }
-                if (count($insert_data) == 0) {
-                   continue;
-                }
-                $history_data[] = [
-                    'orderNumber' => $ordered_id,
-                    'hospitalId' => $user_info->getHospitalId(),
-                    'divisionId' => $divisionId,
-                    'itemsNumber' => count($in_hospital_item_ids),//院内商品マスタID数
-                    'totalAmount' => $total_amount,
-                    'orderStatus' => '1',
-                    'hachuRarrival' => '未入庫',
-                    'distributorId' => $distributor_id,
-                    'ordererUserName' => $user_info->getName()
-                ];
-            }
-            if(count($history_data) == 0 ){
-                $content = new ApiResponse([] , 0 , 0, '登録するデータがありませんでした', ['insert']);
-            }
-            $result = OrderHistory::insert($history_data);
-            $result = Order::insert($insert_data);
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
-            $content = $content->toJson();
-
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
-            $content = $content->toJson();
-        } finally {
-            return $this->view('NewJoyPla/view/template/ApiResponse', [
-                'content'   => $content,
-            ],false);
-        }
-    }
-
 
     private function makeId($id = '00')
     {
@@ -554,17 +438,13 @@ $action = $SPIRAL->getParam('Action');
     {
         echo $ConsumeController->regGoodsBillingAPI()->render();
     }
-    else if($action === 'regUnorderedAPI')
+    else if($action === 'consumeList')
     {
-        echo $ConsumeController->regUnorderedAPI()->render();
+        echo $ConsumeController->consumeList()->render();
     }
-    else if($action === 'unorderedList')
+    else if($action === 'consumeListForDivision')
     {
-        echo $ConsumeController->unorderedList()->render();
-    }
-    else if($action === 'unorderedListForDivision')
-    {
-        echo $ConsumeController->unorderedListForDivision()->render();
+        echo $ConsumeController->consumeListForDivision()->render();
     }
     else 
     {

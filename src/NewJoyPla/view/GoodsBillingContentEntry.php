@@ -177,7 +177,7 @@
 							    <span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
 							</td>
 							<td>
-								<input type="number" step="1" class="uk-input" min="0" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.countNum" v-bind:disabled="list.countNumDisabled" v-on:change="addCountStyle(key)">
+								<input type="number" step="1" class="uk-input" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.countNum" v-bind:disabled="list.countNumDisabled" v-on:change="addCountStyle(key)">
 								<span class="uk-text-bottom">{{list.unit}}</span>
 							</td>
 							<td>
@@ -279,22 +279,22 @@
 	        <div class="uk-modal-header">
 	            <h2 class="uk-modal-title">商品選択</h2>
 	        </div>
-	        <div class="uk-modal-body">
+	        <div class="uk-modal-body uk-width-expand uk-overflow-auto">
 	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-nowrap uk-table-divider">
 					<thead>
 						<tr>
 							<th class="uk-table-shrink">id</th>
 							<th class="uk-table-shrink"></th>
 							<th>メーカー</th>
-							<th>商品名</a></th>
-							<th>製品コード</a></th>
-							<th>規格</a></th>
-							<th>入数</a></th>
-							<th>価格</a></th>
-							<th>単価</a></th>
-							<th>JANコード</a></th>
-							<th>卸業者</a></th>
-							<th>ロット管理フラグ</a></th>
+							<th>商品名</th>
+							<th>製品コード</th>
+							<th>規格</th>
+							<th>入数</th>
+							<th>価格</th>
+							<th>単価</th>
+							<th>JANコード</th>
+							<th>卸業者</th>
+							<th>ロット管理フラグ</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -436,10 +436,32 @@ var app = new Vue({
 			changeObject.lotDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
 			app.$set(app.lists, index, changeObject);
 		},
+		isCard: function(barcode){
+		    return (barcode.length == 18 && barcode.startsWith('90'));
+		},
+		
+		cardCheck: function(barcode){
+		    let exist = false;
+		    app.lists.forEach(function(elem, index) {
+				let changeObject = null;
+			    if(app.lists[index].card == barcode){
+			        exist = true;
+			    }
+			});
+			return exist;
+		},
 		barcodeSearch: function(barcode , lotNumber , lotDate , gs1_128_search_flg) {
 			if(! this.divisionCheck()){
 				return false;
 			}
+			
+			if(this.isCard(barcode)){
+			    if(this.cardCheck(barcode)){
+			       UIkit.modal.alert("すでに読み込んでいるカードです");
+			       return false;
+			    }
+			}
+			
 			$.ajax({
 				async: false,
                 url:'%url/rel:mpgt:labelBarcodeSAPI%',
@@ -462,9 +484,9 @@ var app = new Vue({
                 	}
             		return false;
                 }
+	            this.division_disabled = true;
                 if(data.count == 1)
                 {
-	            	this.division_disabled = true;
                 	data = data.data;
                 	
                 	if(data.divisionId != "" && this.divisionId != data.divisionId )
@@ -483,11 +505,13 @@ var app = new Vue({
 					data.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
 					data.lotNumberStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
 					data.lotDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+        			if(app.isCard(barcode)){
+        			    data.card = barcode;
+        			}
                 	this.addList(data);
 	                
 	                $('input[name="barcode"]').val('');
                 } else {
-	            	this.division_disabled = true;
                 	data = data.data;
                 	modal_sections.clear();
                 	for(let num = 0 ; num < data.length ; num++)
@@ -530,6 +554,22 @@ var app = new Vue({
 			
 			if(!checkflg){
 				UIkit.modal.alert('数量を入力してください');
+				return false ;
+			}
+			
+			checkflg = true;
+			app.lists.forEach(function (elem, index) {
+				elem.countStyle.border = '';
+				if(app.lists[index].countNum < 0){
+					let changeObject = app.lists[index];
+					changeObject.countStyle.border = 'red 2px solid';
+					app.$set(app.lists, index, changeObject);
+					checkflg = false;
+				}
+			});
+			
+			if(!checkflg){
+				UIkit.modal.alert('消費の場合はプラスの値を入力してください');
 				return false ;
 			}
           
@@ -663,7 +703,7 @@ var app = new Vue({
             
                 $.ajax({
                     async: false,
-                    url:'<?php echo $api_url ?>',
+                    url:'<?php echo $order_api_url ?>',
                     type:'POST',
                     data:{
                         _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信

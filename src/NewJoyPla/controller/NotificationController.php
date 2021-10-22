@@ -24,12 +24,6 @@ class NotificationController extends Controller
         'lot' => '%url/rel:mpgt:Lots%&Action=lotManagementList'
         ];
     
-    public $links_division = [
-        'unorderedList' => '%url/rel:mpgt:page_266849%',
-        'stock' => '%url/rel:mpgt:Stock%&Action=stockManagementList',
-        'lot' => '%url/rel:mpgt:Lots%&Action=lotManagementList'
-        ];
-        
     public $icons = [
         'unorderedList' => "https://i02.smp.ne.jp/u/joypla/images/menu_icon/1.png",
         'stock' => "https://i02.smp.ne.jp/u/joypla/images/menu_icon/6.png",
@@ -48,7 +42,6 @@ class NotificationController extends Controller
             $notification = [];
             if($user_info->isHospitalUser())
             {
-                
                 $instance =  Stock::where('hospitalId',$user_info->getHospitalId())->where('stockQuantity', 0 , '<');
                 if($user_info->isUser()){$instance = $instance->where('divisionId',$user_info->getDivisionId());}
                 $count = $instance->count();

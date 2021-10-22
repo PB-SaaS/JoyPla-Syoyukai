@@ -10,7 +10,7 @@
                 <input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
                 <?php if($used_slip_history->usedSlipStatus == '1'): ?>
                     <input class="print_hidden uk-button uk-button-default uk-button-danger" type="button" value="取消" onclick="used_slip.cancel()">
-                    <?php if($user_info->isHospitalUser() && $user_info->isAdmin()): ?>
+                    <?php if($user_info->isHospitalUser() && !$user_info->isUser()): ?>
                         <input class="print_hidden uk-button uk-button-default uk-button-primary" type="button" value="承認" onclick="used_slip.usedSlipApproval()">
                     <?php endif; ?>
                 <?php endif; ?>

@@ -1,62 +1,4 @@
-<?php
-include_once 'NewJoyPla/lib/ApiSpiral.php';
-include_once "NewJoyPla/lib/Define.php";
-include_once 'NewJoyPla/lib/SpiralDataBase.php';
-include_once 'NewJoyPla/lib/UserInfo.php';
-include_once 'NewJoyPla/lib/Func.php';
-include_once 'NewJoyPla/api/UpdateUnordered.php';
-include_once 'NewJoyPla/api/GetCardInfo.php';
-include_once 'NewJoyPla/api/GetItemBilling.php';
 
-
-$userInfo = new App\Lib\UserInfo($SPIRAL);
-
-$spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
-$spiralApiRequest = new SpiralApiRequest();
-$spiralDataBase = new App\Lib\SpiralDataBase($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
-
-$cardInfo = new App\Api\GetCardInfo($spiralDataBase);
-$card = $cardInfo->select('NJ_BillingHDB',$SPIRAL->getCardId(),'billingNumber','billingAuthKey',"divisionId");
-
-if($userInfo->getUserPermission() != "1" && $card["data"][0][2] != $userInfo->getDivisionId()){
-	App\Lib\viewNotPossible();
-	exit;
-}
-
-$getItemBilling = new App\Api\GetItemBilling($spiralDataBase,$userInfo);
-$billingData = $getItemBilling->getItemBilling($card['data'][0][0]);
-
-$billingData = $spiralDataBase->arrayToNameArray($billingData['data'],array('registrationTime','updateTime','inHospitalItemId','billingNumber','price','billingQuantity','billingAmount','hospitalId','divisionId','itemId','itemName','itemCode','itemStandard','itemJANCode','quantityUnit','makerName','itemUnit','quantity','lotNumber','lotDate','unitPrice'));
-
-foreach($billingData as $record){
-	$ItemsToJs[] = array(
-		'inHospitalItemId'=> $record['inHospitalItemId'],
-		'billingQuantity'=> $record['billingQuantity'],
-		'quantity'=> $record['quantity'],
-		'lotNumber'=> $record['lotNumber'],
-		'lotDate'=> $record['lotDate']
-		);
-}
-
-$crypt   = $SPIRAL->getSpiralCryptOpenSsl();
-$billingAuthKey = $crypt->encrypt($card['data'][0][1], 'JoyPla');
-
-
-if($userInfo->getUserPermission() == "1"){
-	$link = '%url/table:back%';
-}else{
-	$link = '%url/rel:mpgt:page_266881%';
-} 
-?>
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>JoyPla 消費物品</title>
-	<?php include_once 'NewJoyPla/src/Head.php'; ?>
-
-  </head>
-  <body>
-    <?php include_once 'NewJoyPla/src/HeaderForMypage.php'; ?>
     <div class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
 	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
 		    <div class="uk-container uk-container-expand">
@@ -67,7 +9,9 @@ if($userInfo->getUserPermission() == "1"){
 				</ul>
 				<div class="no_print uk-margin">
 					<input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
+					<?php if($userInfo->isAdmin() || $userInfo->isUser()):?>
 					<input class="print_hidden uk-button uk-button-danger" type="submit" value="消費取消" onclick="billingDelete();return false;">
+					<?php endif ?>
 				</div>
 		    	<div class="uk-text-center uk-text-large">
 		    		<p class="uk-text-bold" style="font-size: 32px">消　費　物　品</p>
@@ -122,17 +66,17 @@ if($userInfo->getUserPermission() == "1"){
 				    					foreach($billingData as $record){
 				    						echo '<tr>';
 				    						echo '<td>'.$num.'</td>';
-				    						echo '<td>'.$record['makerName'].'</td>';
-				    						echo '<td>'.$record['itemName'].'</td>';
-				    						echo '<td>'.$record['itemCode'].'</td>';
-				    						echo '<td>'.$record['itemStandard'].'</td>';
-				    						echo '<td>'.$record['lotNumber'].'</td>';
-				    						echo '<td>'.$record['lotDate'].'</td>';
-				    						echo '<td>'.$record['quantity'].$record['quantityUnit'].'</td>';
-				    						echo '<td>￥<script>price(fixed("'.$record['price'].'"))</script> / '.$record['itemUnit'].'</td>';
-				    						echo '<td>￥<script>price(fixed("'.$record['unitPrice'].'"))</script></td>';
-				    						echo '<td>'.$record['billingQuantity'].$record['quantityUnit'].'</td>';
-				    						echo '<td>￥<script>price(fixed("'.$record['billingAmount'].'"))</script></td>';
+				    						echo '<td>'.$record->makerName.'</td>';
+				    						echo '<td>'.$record->itemName.'</td>';
+				    						echo '<td>'.$record->itemCode.'</td>';
+				    						echo '<td>'.$record->itemStandard.'</td>';
+				    						echo '<td>'.$record->lotNumber.'</td>';
+				    						echo '<td>'.$record->lotDate.'</td>';
+				    						echo '<td>'.$record->quantity.$record->quantityUnit.'</td>';
+				    						echo '<td>￥<script>price(fixed("'.$record->price.'"))</script> / '.$record->itemUnit.'</td>';
+				    						echo '<td>￥<script>price(fixed("'.$record->unitPrice.'"))</script></td>';
+				    						echo '<td>'.$record->billingQuantity.$record->quantityUnit.'</td>';
+				    						echo '<td>￥<script>price(fixed("'.$record->billingAmount.'"))</script></td>';
 				    						echo '</tr>';
 				    						$num++;
 				    					}
@@ -149,7 +93,6 @@ if($userInfo->getUserPermission() == "1"){
 	</div>
 	<script>
 		let canAjax = true;
-		let itemsToJs = objectValueToURIencode( <?php echo json_encode($ItemsToJs); ?> );
 		function billingDelete(){
 			if(!canAjax) { 
 				console.log('通信中');
@@ -161,13 +104,11 @@ if($userInfo->getUserPermission() == "1"){
 				canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
 				$.ajax({
 					async: false,
-	                url:'%url/card:page_267234%',
+	                url:'<?php echo $api_url ?>',
 	                type:'POST',
 	                data:{
-	                	divisionId:"%val:usr:divisionId%",
-	                	billingData : JSON.stringify( itemsToJs ),
-	                	billingAuthKey: "<?php echo $billingAuthKey ?>",
-	                	billingNumber: "%val:usr:billingNumber%",
+	                	Action : "consumeSlipDeleteApi",
+	                	_csrf: "<?php echo $csrf_token ?>",
 	                },
 	                dataType: 'json'
 	            })
@@ -201,5 +142,3 @@ if($userInfo->getUserPermission() == "1"){
 		}
 		
 	</script>
-  </body>
-</html>

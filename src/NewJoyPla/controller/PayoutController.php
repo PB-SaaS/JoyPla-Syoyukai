@@ -109,7 +109,7 @@ class PayoutController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
             $target_division = Division::where('hospitalId',$user_info->getHospitalId())->get();
-            if( ($user_info->isHospitalUser() && $user_info->getUserPermission() == '1')) 
+            if( ($user_info->isHospitalUser() && !$user_info->isUser())) 
             {
                 $source_division = $target_division;
             } 
@@ -152,6 +152,101 @@ class PayoutController extends Controller
         }
     }
     
+    
+    public function payoutList(): View
+    {
+        global $SPIRAL;
+        try {
+
+            $user_info = new UserInfo($SPIRAL);
+            
+            if($user_info->isDistributorUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            
+            if ($user_info->isHospitalUser() && ( $user_info->isAdmin() || $user_info->isApprover() ))
+            {
+                $content = $this->view('NewJoyPla/view/PayoutHistoryList', [] , false);
+            } else {
+                $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
+                    'table' => '%sf:usr:search105:table%',
+                    'title' => '払出履歴一覧覧 - 部署選択',
+                    'param' => 'payoutListForDivision',
+                    ] , false);
+            }
+            
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla 払出履歴一覧',
+                'script' => '',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
+    }
+    
+    public function payoutListForDivision(): View
+    {
+        global $SPIRAL;
+        try {
+
+            $user_info = new UserInfo($SPIRAL);
+            
+            if ($user_info->isDistributorUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+            
+            if ($user_info->isHospitalUser() && ( $user_info->isApprover() || $user_info->isAdmin()) )
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+            
+            if ( \App\lib\isMypage() )
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+    
+            $api_url = "%url/rel:mpgt:Payout%";
+            
+            $content = $this->view('NewJoyPla/view/GoodsBillingList', [] , false);
+    
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla 消費一覧',
+                'script' => '',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
+    }
     
     public function payoutLabel(): View
     {
@@ -481,7 +576,7 @@ EOM;
                         'pattern' => 4,
                         'hospitalId' => $user_info->getHospitalId(),
         		        'lotUniqueKey' => $user_info->getHospitalId().$record['sourceDivisionId'].$record['inHospitalItemId'].$record['lotNumber'].$record['lotDate'],
-        		        'stockQuantity' => $record['payoutQuantity'],
+        		        'stockQuantity' => -$record['payoutQuantity'],
                         'lotNumber' =>  $record['lotNumber'],
                         'lotDate' =>    $record['lotDate'],
         		    ];
@@ -583,8 +678,16 @@ $action = $SPIRAL->getParam('Action');
     {
         echo $PayoutController->payoutLabel()->render();
     }
+    else if($action === 'payoutList')
+    {
+        echo $PayoutController->payoutList()->render();
+    }
+    else if($action === 'payoutListForDivision')
+    {
+        echo $PayoutController->payoutListForDivision()->render();
+    }
     else 
     {
-        echo $PayoutController->index()->render();
+        echo $PayoutController->newPayout()->render();
     }
 }

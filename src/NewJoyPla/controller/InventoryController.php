@@ -9,14 +9,10 @@ use Csrf;
 use App\Lib\UserInfo;
 use App\Model\Division;
 use App\Model\Hospital;
-use App\Model\InHospitalItemView;
-use App\Model\PayoutHistory;
-use App\Model\Payout;
-use App\Model\PayoutView;
-use App\Model\Card;
-use App\Model\Stock;
-use App\Model\Distributor;
-use App\Model\InventoryAdjustmentTransaction;
+use App\Model\Inventory;
+use App\Model\InventoryEnd;
+use App\Model\InventoryHistory;
+use App\Model\StockTakingTransaction;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -106,14 +102,136 @@ class InventoryController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
             
+
+            $getInventory = $SPIRAL->getParam('inventory');
+            $inventory = $this->requestUrldecode($getInventory);
+            $divisionId = $SPIRAL->getParam('divisionId');
+
+            foreach ($inventory as $rows)
+            {
+                foreach ($rows as $record)
+                {
+                    if ((int)$record['lotFlag'])
+                    {
+                        if (($record['lotNumber'] == '') || ($record['lotDate'] == ''))
+                        {
+                            throw new Exception('invalid lot',100);
+                        }
+                    }
+                    if (($record['lotNumber'] != '' && $record['lotDate'] == '' ) || ($record['lotNumber'] == '' && $record['lotDate'] != ''))
+                    {
+                        throw new Exception('invalid lotNumber input',101);
+                    }
+                    if (($record['lotNumber'] != '') && ($record['lotDate'] != '')) 
+                    {
+                        if ((!ctype_alnum($record['lotNumber'])) || (strlen($record['lotNumber']) > 20))
+                        {
+                            throw new Exception('invalid lotNumber format',102);
+                        }
+                    }
+                }
+            }
+
+            $inventoryEnd = InventoryEnd::where('hospitalId',$user_info->getHospitalId())->where('inventoryStatus','1')->get();
+            if ($inventoryEnd->count == 0)
+            {
+                $invEndId = $this->makeId('09');
+                $result = InventoryEnd::create(['hospitalId' => $user_info->getHospitalId(), 'inventoryEndId' => $invEndId]);
+            } else {
+                $invEndId = $inventoryEnd->data->all()[0]->inventoryEndId;
+            }
+
+            $inventoryHistory = InventoryHistory::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$divisionId)->where('inventoryEndId',$invEndId)->get();
+            if ($inventoryHistory->count == 0)
+            {
+                $invHistId = $this->makeId('08');
+                $create_data = [];
+                $create_data = [
+                    'inventoryHId' => $invHistId,
+                    'inventoryEndId' => $invEndId,
+                    'hospitalId' => $user_info->getHospitalId(),
+                    'divisionId' => $divisionId,
+                    'itemsNumber' => 0,
+                    'totalAmount' => 0
+                ];
+                $result = InventoryHistory::create($create_data);
+            } else {
+                $invHistId = $inventoryHistory->data->all()[0]->inventoryHId;
+            }
+
+            $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+            $hospital_data = $hospital_data->data->all();
+            $useUnitPrice = $hospital_data[0]->invUnitPrice;
     
-            $content = new ApiResponse(['payoutHistoryId'=>$payout_id,'labelCreateFlg' => $label_create_flg] , $result->count , $result->code, $result->message, ['insert']);
+            $stock_taking_trdata = [];
+            foreach ($inventory as $rows)
+            {
+                foreach ($rows as $key => $data)
+                {
+                    if( (int)$data['countNum']  >= 0 )
+                    {
+                        $unitPrice = $useUnitPrice
+                            ? (str_replace(',', '', $data['unitPrice']))
+                            : (str_replace(',', '', $data['kakaku']) / $data['irisu']);
+                        $stock_taking_trdata[] = [
+                            'registrationTime' => 'now',
+                            'inventoryEndId' => $invEndId,
+                            'inventoryHId' => $invHistId,
+                            'inHospitalItemId' => $data['recordId'],
+                            'hospitalId' => $user_info->getHospitalId(),
+                            'divisionId' => $divisionId,
+                            'price' => str_replace(',', '', $data['kakaku']),
+                            'inventryNum' => (int)$data['countNum'],
+                            'inventryAmount' => (int)$unitPrice * (int)$data['countNum'],
+                            'quantity' => $data['irisu'],
+                            'quantityUnit' => $data['unit'],
+                            'itemUnit' => $data['itemUnit'],
+                            'unitPrice' => $unitPrice,
+                            'invUnitPrice' => (int)$useUnitPrice,
+                            'lotNumber' => $data['lotNumber'],
+                            'lotDate' => $data['lotDate'],
+                            'lotUniqueKey' => $user_info->getHospitalId().$divisionId.$data['recordId'].$data['lotNumber'].$data['lotDate']
+                        ];
+                    }
+                }
+            }
+
+            $result = StockTakingTransaction::insert($stock_taking_trdata);
+
+            $inventory_history_data = Inventory::where('hospitalId',$user_info->getHospitalId())->where('inventoryHId',$invHistId)->get();
+            $inventory_history_data = $inventory_history_data->data->all();
+            $history_ids = [];
+            $history_total_amount = 0;
+            foreach ($inventory_history_data as $val)
+            {
+                $history_total_amount += (float)$val->inventryAmount;
+                if (!in_array($val->inHospitalItemId, $history_ids)) {
+                    $history_ids[] = $val->inHospitalItemId;
+                }
+            }
+
+            $end_inventory_data = Inventory::where('hospitalId',$user_info->getHospitalId())->where('inventoryEndId',$invEndId)->get();
+            $end_inventory_data = $end_inventory_data->data->all();
+            $end_ids = [];
+            $end_total_amount = 0;
+            foreach ($end_inventory_data as $val)
+            {
+                $end_total_amount += (float)$val->inventryAmount;
+                if (!in_array($val->inHospitalItemId, $end_ids)) {
+                    $end_ids[] = $val->inHospitalItemId;
+                }
+            }
+
+            $result = InventoryHistory::where('inventoryHId',$invHistId)->update(['updateTime' => 'now', 'itemsNumber' => count($history_ids), 'totalAmount' => $history_total_amount]);
+            $result = InventoryEnd::where('inventoryEndId',$invEndId)->where('hospitalId',$user_info->getHospitalId())->update(['itemsNumber' => count($end_ids), 'totalAmount' => $end_total_amount]);
+
+            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
             $content = $content->toJson();
             
         } catch ( Exception $ex ) {
             $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['payoutRegistApi']);
             $content = $content->toJson();
-        }finally {
+        } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
             ],false);
@@ -130,11 +248,25 @@ class InventoryController extends Controller
         '06' => HP_RETERN_PAGE,
         '05' => HP_PAYOUT_PAGE,
         */
-		$id .= date("ymdHis");
-		$id .= str_pad(substr(rand(),0,3) , 4, "0"); 
-		
-		return $id;
+        $id .= date("ymdHis");
+        $id .= str_pad(substr(rand(),0,3) , 4, "0"); 
+    
+        return $id;
     }
+
+    private function requestUrldecode(array $array)
+    {
+        $result = [];
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $result[$key] = $this->requestUrldecode($value);
+            } else {
+                $result[$key] = urldecode($value);
+            }
+        }
+        return $result;
+    }
+
 }
 
 /***
@@ -147,9 +279,9 @@ $action = $SPIRAL->getParam('Action');
 {
     if($action === 'inventoryRegistAPI')
     {
-        echo $InventoryController->inventoryRegistAPI()()->render();
+        echo $InventoryController->inventoryRegistAPI()->render();
     }
-    else 
+    else
     {
         echo $InventoryController->index()->render();
     }

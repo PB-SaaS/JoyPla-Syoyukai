@@ -259,7 +259,6 @@ class InventoryRegister {
     }
 
     addTr(object, type, count) {
-console.log(object);
         let tmp = this;
         if ( type === 1 ) { //商品マスタ
             let chk = tmp.chkNotLotRow(object.recordId);
@@ -279,7 +278,6 @@ console.log(object);
         tmp.listObject[tmp.index] = object;
         tmp.listObject[tmp.index].no = tmp.index;
         tmp.listObject[tmp.index].countNum = count;
-//        if (object.lotFlag === 'はい') { 
         if (object.lotFlagBool === '1') { 
             tmp.listObject[tmp.index].lotFlag = 1;
         } else {
@@ -434,10 +432,13 @@ console.log(object);
         let chkLot = true;
         Object.keys(tmp.listObject).forEach(function (key) {
             if (tmp.listObject[key]['lotFlag']) {
-                if ((!tmp.listObject[key]['lotNumber'] && tmp.listObject[key]['lotDate'])
-                  || (tmp.listObject[key]['lotNumber'] && !tmp.listObject[key]['lotDate'])) {
+                if (!tmp.listObject[key]['lotNumber'] || !tmp.listObject[key]['lotDate']) {
                     chkLot = false;
                 }
+            }
+            if ((!tmp.listObject[key]['lotNumber'] && tmp.listObject[key]['lotDate'])
+              || (tmp.listObject[key]['lotNumber'] && !tmp.listObject[key]['lotDate'])) {
+                chkLot = false;
             }
         });
       
@@ -519,7 +520,7 @@ console.log(object);
     }
 
     dataReset(){
-        ('table.uk-table tbody tr').remove();
+        $('table.uk-table tbody tr').remove();
         this.listObject = {};
         loading_remove();
     }
@@ -664,5 +665,9 @@ $(document).on('change', 'input[type="number"]', function() {
     $(window).scrollTop($(this).offset().top - 100);
 });
 
+function addTr(object, type, count)
+{
+    inventory.addTr(object, type, count);
+}
 
 </script>

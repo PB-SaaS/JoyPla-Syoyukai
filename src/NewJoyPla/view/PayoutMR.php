@@ -33,7 +33,7 @@ if(isset($_POST['endMonth'])){
 	$endMonth = App\Lib\html($_POST['endMonth']);
 }
 
-if($userInfo->getUserPermission() == '1'){
+if(!$userInfo->isUser()){
 	if(isset($_POST['divisionId'])){
 		$divisionId = App\Lib\html($_POST['divisionId']);
 	}
@@ -118,7 +118,7 @@ $divisionData = $getDivision->select();
 							    </div>
 							</div>
 							
-							<?php if($userInfo->getUserPermission() == '1'): ?>
+							<?php if(!$userInfo->isUser()): ?>
 							<div class="uk-form-controls uk-margin">
 								<label class="uk-form-label">
 							      部署

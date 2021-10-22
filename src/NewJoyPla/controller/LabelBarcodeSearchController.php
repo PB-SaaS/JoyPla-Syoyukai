@@ -147,29 +147,30 @@ class LabelBarcodeSearchController extends Controller
 				if($result->count == '0'){
 					throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
 				}
-				
+				$in_hospital_item = InHospitalItemView::where('hospitalId',$user_info->getHospitalId())->where('inHospitalItemId',$record->inHospitalItemId)->get();
+				$in_hospital_item = $in_hospital_item->data->get(0);
 				$data = [
 					"divisionId" => $record->divisionId,
-					"maker" => $record->makerName,
-					"shouhinName" => $record->itemName,
-					"code" => $record->itemCode,
-					"kikaku" => $record->itemStandard,
-					"irisu" => $record->quantity,
-					"kakaku" => $record->price,
-					"jan" => $record->itemJANCode,
-					"oroshi" => $record->distributorName,
-					"recordId" => $record->inHospitalItemId,
-					"unit" => $record->quantityUnit,
-					"itemUnit" => $record->itemUnit,
-					"distributorId" => $record->distributorId,
+					"maker" => $in_hospital_item->makerName,
+					"shouhinName" => $in_hospital_item->itemName,
+					"code" => $in_hospital_item->itemCode,
+					"kikaku" => $in_hospital_item->itemStandard,
+					"irisu" => $in_hospital_item->quantity,
+					"kakaku" => $in_hospital_item->price,
+					"jan" => $in_hospital_item->itemJANCode,
+					"oroshi" => $in_hospital_item->distributorName,
+					"recordId" => $in_hospital_item->inHospitalItemId,
+					"unit" => $in_hospital_item->quantityUnit,
+					"itemUnit" => $in_hospital_item->itemUnit,
+					"distributorId" => $in_hospital_item->distributorId,
 					"count" => $record->quantity,
 					"countNum" => $record->quantity,
-					"labelId" => $record->labelId,
-					"unitPrice" => $record->unitPrice,
+					"labelId" => $in_hospital_item->labelId,
+					"unitPrice" => $in_hospital_item->unitPrice,
 					"lotNumber" => $record->lotNumber,
 					"lotDate" => \App\Lib\changeDateFormat('Y年m月d日' , $record->lotDate , 'Y-m-d'),
-					"lotFlag" => ($record->lotManagement == 1 )? "はい": "",
-					"lotFlagBool" => $record->lotManagement,
+					"lotFlag" => ($in_hospital_item->lotManagement == 1 )? "はい": "",
+					"lotFlagBool" => $in_hospital_item->lotManagement,
 				];
 
 				$content = new ApiResponse($data , $result->count , $result->code, $result->message, ['LabelBarcodeSearchApi']);

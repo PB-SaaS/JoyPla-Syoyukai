@@ -149,7 +149,7 @@ var nav = new Vue({
 		notification: function ()
 		{
 			$.ajax({
-				async: false,
+				async: true,
                 url:'%url/rel:mpgt:Notification%',
                 type:'POST',
                 data:{

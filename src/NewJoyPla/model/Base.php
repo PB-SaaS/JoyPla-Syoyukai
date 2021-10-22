@@ -116,6 +116,55 @@ class Billing extends Model
     public static $attributes = [];
 }
 
+class BillingView extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "updateTime";
+
+    public static $spiral_db_name = "billingDetailv2";
+    public static $guarded = ["id"];
+    public static $primary_key = "id";
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "inHospitalItemId",
+        "billingNumber",
+        "billingQuantity",
+        "billingAmount",
+        "hospitalId",
+        "divisionId",
+        "authKey",
+        "distributorId",
+        "catalogNo",
+        "serialNo",
+        "medicineCategory",
+        "homeCategory",
+        "notUsedFlag",
+        "itemId",
+        "itemName",
+        "itemCode",
+        "itemStandard",
+        "itemJANCode",
+        "notice",
+        "HPstock",
+        "makerName",
+        "quantity",
+        "quantityUnit",
+        "itemUnit",
+        "price",
+        "oldPrice",
+        "lotNumber",
+        "lotDate",
+        "unitPrice",
+        "officialFlag",
+        "measuringInst",
+        "divisionName",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+}
+
 class BillingHistory extends Model
 {
     const CREATED_AT = "registrationTime";
@@ -206,7 +255,6 @@ class OrderHistory extends Model
         "ordercomment",
         "orderAuthKey",
         "staffName",
-        
     ];
 
     //デフォルト値
@@ -742,6 +790,7 @@ class Hospital extends Model
         "registerableNum",
         "labelDesign1",
         "labelDesign2",
+        "labelDesign3",
         "billingUnitPrice",
         "payoutUnitPrice",
         "invUnitPrice",
@@ -928,6 +977,67 @@ class Stock extends Model
 
     public static $select = [];
 }
+
+class StockView extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "updateTime";
+
+    public static $spiral_db_name = "stockManagement";
+    public static $guarded = ["id"];
+    public static $primary_key = "id";
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "hospitalId",
+        "divisionId",
+        "inHospitalItemId",
+        "stockQuantity",
+        "authKey",
+        "orderWithinCount",
+        "rackName",
+        "distributorId",
+        "distributorName",
+        "postalCode",
+        "prefectures",
+        "address",
+        "phoneNumber",
+        "faxNumber",
+        "catalogNo",
+        "serialNo",
+        "quantity",
+        "quantityUnit",
+        "itemUnit",
+        "medicineCategory",
+        "homeCategory",
+        "notUsedFlag",
+        "itemId",
+        "itemName",
+        "itemCode",
+        "itemStandard",
+        "itemJANCode",
+        "notice",
+        "HPstock",
+        "makerName",
+        "divisionName",
+        "divisionType",
+        "invFinishTime",
+        "planInventoryCnt",
+        "constantByDiv",
+        "requiredOrderNum",
+        "price",
+        "oldPrice",
+        "minPrice",
+        "labelId",
+        "barcode",  
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
+
 
 
 class Card extends Model
@@ -1136,5 +1246,265 @@ class Lot extends Model
 
     public static $select = [];
 
+    
+}
+
+class Inventory extends Model
+{
+    
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "updateTime";
+
+    public static $spiral_db_name = "NJ_InventoryDB";
+    public static $guarded = ["id"];
+    public static $primary_key = "id";
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "inventoryHId",
+        "inHospitalItemId",
+        "hospitalId",
+        "price",
+        "calculatingStock",
+        "inventryNum",
+        "quantity",
+        "quantityUnit",
+        "itemUnit",
+        "divisionId",
+        "inventryAmount",
+        "distributorId",
+        "inventoryEndId",
+        "lotNumber",
+        "lotDate",
+        "lotUniqueKey",
+        "unitPrice",
+        "invUnitPrice"
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
+class InventoryEnd extends Model
+{
+    
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "";
+
+    public static $spiral_db_name = "NJ_InventoryEDB";
+    public static $guarded = ["id"];
+    public static $primary_key = "inventoryEndId";
+    public static $fillable = [
+        "registrationTime",
+        "inventoryTime",
+        "inventoryEndId",
+        "hospitalId",
+        "itemsNumber",
+        "totalAmount",
+        "inventoryStatus",
+        "invEndAuthKey"
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [
+        "inventoryStatus" => [
+            1 => "棚卸中",
+            2 => "棚卸完了"
+        ]
+    ];
+    
+}
+
+class InventoryHistory extends Model
+{
+    
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "updateTime";
+
+    public static $spiral_db_name = "NJ_InventoryHDB";
+    public static $guarded = ["id"];
+    public static $primary_key = "inventoryHId";
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "inventoryHId",
+        "inventoryEndId",
+        "hospitalId",
+        "divisionId",
+        "itemsNumber",
+        "totalAmount",
+        "invHAuthKey"
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
+class StockTakingTransaction extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "";
+
+    public static $spiral_db_name = "NJ_stocktakingTR";
+    public static $guarded = ["id"];
+    public static $primary_key = "id";
+    public static $fillable = [
+        "registrationTime",
+        "inventoryEndId",
+        "inventoryHId",
+        "inHospitalItemId",
+        "hospitalId",
+        "divisionId",
+        "price",
+        "calculatingStock",
+        "inventryNum",
+        "inventryAmount",
+        "quantity",
+        "quantityUnit",
+        "itemUnit",
+        "lotNumber",
+        "lotDate",
+        "lotUniqueKey",
+        "unitPrice",
+        "invUnitPrice"
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
+
+class QuoteRequest extends Model
+{
+    
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "";
+
+    public static $spiral_db_name = "NJ_QRequestDB";
+    public static $guarded = ["id"];
+    public static $primary_key = "requestId";
+    public static $fillable = [
+        "registrationTime",
+        "quotePeriod",
+        "requestId",
+        "requestTitle",
+        "requestDetail",
+        "requestStatus",
+        "distributorId",
+        "hospitalId",
+        "requestUName",
+        "distributorUName",
+        "tenantId",
+        "mail"
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [
+        "requestStatus" => [
+            1 => "未開封",
+            2 => "開封",
+            3 => "商品記載有",
+            4 => "一部却下",
+            5 => "一部採用",
+            6 => "却下",
+            7 => "採用"
+        ]
+    ];
+    
+}
+
+class Price extends Model
+{
+    
+    const CREATED_AT = "";
+    const UPDATED_AT = "";
+
+    public static $spiral_db_name = "NJ_PriceDB";
+    public static $guarded = ["id"];
+    public static $primary_key = "priceId";
+    public static $fillable = [
+        "priceId",
+        "authKey",
+        "itemId",
+        "distributorId",
+        "quantity",
+        "price",
+        "hospitalId",
+        "requestFlg",
+        "quantityUnit",
+        "itemUnit",
+        "notice",
+        "notUsedFlag",
+        "requestId"
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [
+        "requestFlg" => [
+            1 => "採用",
+            2 => "不採用",
+            3 => "見積中",
+            4 => "業者記入済"
+        ]
+    ];
+    
+}
+
+class QuoteItem extends Model
+{
+    
+    const CREATED_AT = "";
+    const UPDATED_AT = "";
+
+    public static $spiral_db_name = "NJ_reqItemDB";
+    public static $guarded = ["id"];
+    public static $primary_key = "requestItemId";
+    public static $fillable = [
+        "requestId",
+        "reqitemsAuthKey",
+        "requestItemId",
+        "itemName",
+        "itemCode",
+        "itemStandard",
+        "itemJANCode",
+        "makerName",
+        "tenantId",
+        "quantity",
+        "quantityUnit",
+        "itemUnit",
+        "minPrice",
+        "distributorId",
+        "officialFlag",
+        "requestFlg",
+        "officialprice",
+        "officialpriceOld",
+        "catalogNo",
+        "serialNo"
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [
+        "requestFlg" => [
+            1 => "採用",
+            2 => "不採用",
+            3 => "見積中",
+            4 => "業者記入済"
+        ]
+    ];
     
 }

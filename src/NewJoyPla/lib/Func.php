@@ -27,6 +27,16 @@ function requestUrldecode(array $array){
     return $result;
 }
 
+function isMypage(){
+    global $_POST;
+    $myPageID = '';
+    if(isset($_POST['MyPageID']) && $_POST['MyPageID'] != '' ){
+    	$myPageID = $_POST['MyPageID'];
+    }
+    
+    return ($myPageID != '');
+}
+
 function viewNotPossible(){
     ?>
     <!DOCTYPE html>

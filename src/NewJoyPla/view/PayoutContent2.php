@@ -241,7 +241,7 @@
 									</td>
 									<td>{{list.countNum * list.countLabelNum}}{{list.unit}}</td>
 									<td>
-										<input type="text" class="uk-input card" v-model="list.cardNum" readonly v-bind:style="list.cardStyle" >
+										<input type="text" class="uk-input card" v-model="list.cardNum" style="width:180px" readonly v-bind:style="list.cardStyle" >
 									</td>
 									<td>
 										<input type="button" class="uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)">
@@ -270,7 +270,7 @@
 	        <div class="uk-modal-header">
 	            <h2 class="uk-modal-title">商品選択</h2>
 	        </div>
-	        <div class="uk-modal-body">
+	        <div class="uk-modal-body uk-width-expand uk-overflow-auto">
 	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-nowrap uk-table-divider">
 					<thead>
 						<tr>

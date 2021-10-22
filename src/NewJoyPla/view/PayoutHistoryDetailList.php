@@ -1,3 +1,18 @@
+<?php
+include_once "NewJoyPla/lib/UserInfo.php";
+include_once "NewJoyPla/lib/Func.php";
+$userInfo = new App\Lib\UserInfo($SPIRAL);
+
+$myPageID = '';
+if(isset($_POST['MyPageID']) && $_POST['MyPageID'] != '' ){
+	$myPageID = $_POST['MyPageID'];
+}
+
+if($userInfo->isUser() && $myPageID != ''){
+	App\Lib\viewNotPossible();
+	exit;
+}
+?>
 <!DOCTYPE html>
 <html>
   <head>

@@ -15,7 +15,7 @@
             <div class="no_print uk-margin">
                 <input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
 
-            <?php if ($userInfo->getUserPermission() == "1"): ?>
+            <?php if ($userInfo->isAdmin() || $userInfo->isApprover()): ?>
 
                 <input class="print_hidden uk-button uk-button-primary" type="submit" value="院内商品情報変更" onclick="document.itemsChange.submit()">
                 <form action="/regist/is" method="post" name="itemsChange" target="_blank" class="uk-hidden">
@@ -96,8 +96,10 @@
                         <td colspan="3">%val:usr:serialNo%</td>
                     </tr>
                     <tr>
+                        <th>分類</th>
+                        <td>%val:usr:category%</td>
                         <th>ロット管理フラグ</th>
-                        <td colspan="5">%val:usr:lotManagement:v%</td>
+                        <td colspan="3">%val:usr:lotManagement:v%</td>
                     </tr>
                     <tr>
                         <th>保険請求分類（医科）</th>

@@ -27,7 +27,7 @@ use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
 use Exception;
 
-class BorrowingRegistrationController extends Controller
+class BorrowingController extends Controller
 {
     private $in_hospital_items = null ;
     public function __construct()
@@ -47,7 +47,7 @@ class BorrowingRegistrationController extends Controller
 
         $user_info = new UserInfo($SPIRAL);
 
-        if( ($user_info->isHospitalUser() && $user_info->isAdmin())
+        if( ($user_info->isHospitalUser() && !$user_info->isUser())
         || $user_info->isDistributorUser() ) {
             $divisionData = Division::where('hospitalId',$user_info->getHospitalId())->get();
         } else {
@@ -65,7 +65,7 @@ class BorrowingRegistrationController extends Controller
             'SPIRAL' => $SPIRAL
         ], false);
         
-        if($user_info->isAdmin())
+        if($user_info->isAdmin() || $user_info->isApprover())
         {
             $borrowingAction = 'borrowingRegistrationToUsedReportApi';
         }
@@ -243,7 +243,7 @@ class BorrowingRegistrationController extends Controller
 
             $user_info = new UserInfo($SPIRAL);
 
-            if(! ( $user_info->isHospitalUser() && $user_info->isAdmin() ))
+            if(! ( $user_info->isHospitalUser() && !$user_info->isUser() ))
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
@@ -265,8 +265,8 @@ class BorrowingRegistrationController extends Controller
                     'used_date' => $history['usedTime'],
                     'used_slip_number' => $history['usedSlipId'],
                     'used_item_num' => $history['itemsNumber'],
-                    'total_price' => "￥".number_format((int)$history['totalAmount']),
-                    'login_url' => '',
+                    'total_price' => "￥".number_format((float)$history['totalAmount']),
+                    'login_url' => OROSHI_LOGIN_URL,
                 ] , false)->render();
                 $select_name = $this->makeId($history['distributorId']);
 
@@ -391,8 +391,8 @@ class BorrowingRegistrationController extends Controller
                         'used_date' => $history['usedTime'],
                         'used_slip_number' => $history['usedSlipId'],
                         'used_item_num' => $history['itemsNumber'],
-                        'total_price' => "￥".number_format((int)$history['totalAmount']),
-                        'login_url' => '',
+                        'total_price' => "￥".number_format((float)$history['totalAmount']),
+                        'login_url' => LOGIN_URL,
                     ] , false)->render();
                     $select_name = $this->makeId($history['hospitalId']);
 
@@ -486,8 +486,8 @@ class BorrowingRegistrationController extends Controller
                     'used_date' => $used_slip_history->usedTime,
                     'used_slip_number' => $used_slip_history->usedSlipId,
                     'used_item_num' => $used_slip_history->itemsNumber,
-                    'total_price' => "￥".number_format((int)$used_slip_history->totalAmount),
-                    'login_url' => '',
+                    'total_price' => "￥".number_format((float)$used_slip_history->totalAmount),
+                    'login_url' => OROSHI_LOGIN_URL,
                 ] , false)->render();
                 
                 $select_name = $this->makeId($used_slip_history->distributorId);
@@ -1032,7 +1032,7 @@ class BorrowingRegistrationController extends Controller
 /***
  * 実行
  */
-$BorrowingRegistrationController = new BorrowingRegistrationController();
+$BorrowingController = new BorrowingController();
 
 $action = $SPIRAL->getParam('Action');
 
@@ -1040,51 +1040,51 @@ $action = $SPIRAL->getParam('Action');
     if($action === 'borrowingRegistApi')
     {
         //貸出品の登録
-        echo $BorrowingRegistrationController->borrowingRegistApi()->render();
+        echo $BorrowingController->borrowingRegistApi()->render();
     } 
     else if($action === 'borrowingRegistrationToUsedReportApi')
     {
         //貸出品登録と承認を同時実行
-        echo $BorrowingRegistrationController->borrowingRegistrationToUsedReportApi()->render();
+        echo $BorrowingController->borrowingRegistrationToUsedReportApi()->render();
     } 
     else if($action === 'borrowingRegistrationToUnapprovedUsedSlipApi')
     {
         //貸出品登録と承認を同時実行
-        echo $BorrowingRegistrationController->borrowingRegistrationToUnapprovedUsedSlipApi()->render();
+        echo $BorrowingController->borrowingRegistrationToUnapprovedUsedSlipApi()->render();
     }
     else if($action === 'usedTemporaryReportApi')
     {
         //貸出品使用申請
-        echo $BorrowingRegistrationController->usedTemporaryReportApi()->render();
+        echo $BorrowingController->usedTemporaryReportApi()->render();
     } 
     else if($action === 'borrowingList')
     {
         //貸出品リスト
-        echo $BorrowingRegistrationController->borrowingList()->render();
+        echo $BorrowingController->borrowingList()->render();
     }
     else if($action === 'unapprovedUsedSlip')
     {
         //承認リスト
-        echo $BorrowingRegistrationController->unapprovedUsedSlip()->render();
+        echo $BorrowingController->unapprovedUsedSlip()->render();
     }
     else if($action === 'approvedUsedSlip')
     {
         //未承認リスト
-        echo $BorrowingRegistrationController->approvedUsedSlip()->render();
+        echo $BorrowingController->approvedUsedSlip()->render();
     }
     else if($action === 'usedSlipApprovalApi')
     {
         //承認
-        echo $BorrowingRegistrationController->usedSlipApprovalApi()->render();
+        echo $BorrowingController->usedSlipApprovalApi()->render();
     }
     else if($action === 'cancelApi')
     {
         //キャンセル
-        echo $BorrowingRegistrationController->cancelApi()->render();
+        echo $BorrowingController->cancelApi()->render();
     }
     else 
     {
         //貸出品登録
-        echo $BorrowingRegistrationController->index()->render();
+        echo $BorrowingController->index()->render();
     }
 }

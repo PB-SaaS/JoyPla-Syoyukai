@@ -96,7 +96,7 @@
 		    	<div class="uk-child-width-1-3@m" uk-grid>
 		    		<div>
 		    			<div class="uk-form-controls">
-				            <select class="uk-width-3-4 uk-select uk-inline" id="divisionId" v-model="divisionId">
+				            <select class="uk-width-3-4 uk-select uk-inline" id="divisionId" v-model="divisionId" v-bind:disabled="division_disabled">
 				                <option value="">----- 部署選択 -----</option>
 		                        <?php
 		                        foreach($division->data as $data)
@@ -161,7 +161,7 @@
 								<td>{{list.jan}}</td>
 								<td>{{list.irisu}}{{list.unit}}</td>
 								<td>
-									<input type="number" step="1" class="uk-input" min="0" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.countNum" v-on:change="addCountStyle(key)">
+									<input type="number" step="1" class="uk-input" min="0" style="width: 180px;" v-bind:style="list.countStyle" v-model="list.countNum" v-on:change="addCountStyle(key)">
 									<span class="uk-text-bottom">{{list.unit}}</span>
 								</td>
 								<td uk-margin class="uk-text-center">
@@ -290,6 +290,7 @@ var app = new Vue({
 	data: {
 		lists: [],
 		divisionId: '',
+		division_disabled: false,
 	},
 	filters: {
         number_format: function(value) {
@@ -468,7 +469,7 @@ var app = new Vue({
             		UIkit.modal.alert("商品が見つかりませんでした");
             		return false;
                 }
-            	$('#divisionId').prop('disabled',true);
+            	this.division_disabled = true;
                 if(data.count == 1)
                 {
                 	data = data.data;
@@ -483,6 +484,7 @@ var app = new Vue({
 	                
 	                $('input[name="barcode"]').val('');
                 } else {
+            	
                 	data = data.data;
                 	modal_sections.clear();
                 	for(let num = 0 ; num < data.length ; num++)

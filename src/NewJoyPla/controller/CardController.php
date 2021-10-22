@@ -188,9 +188,9 @@ class CardController extends Controller
             $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
             $hospital_data = $hospital_data->data->get(0);
         
-            if($hospital_data->labelDesign2 != '')
+            if($hospital_data->labelDesign3 != '')
             {
-                $default_design = htmlspecialchars_decode($hospital_data->labelDesign1);
+                $default_design = htmlspecialchars_decode($hospital_data->labelDesign3);
             }
      
             $content = $this->view('NewJoyPla/view/CardLabel', [
@@ -312,6 +312,11 @@ class CardController extends Controller
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
+            
+            if ( \App\lib\isMypage() )
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
                 
             $content = $this->view('NewJoyPla/view/CardList', [
                 'api_url' => $api_url
@@ -352,16 +357,24 @@ class CardController extends Controller
 	private function defaultDesign()
 	{
 	    return <<<EOM
-        	<div class="printarea uk-margin-remove">
-        		<span>%JoyPla:distributorName%</span><br>
-        		<span>メーカー名：%JoyPla:itemMaker%</span><br>
-        		<span>商品名：%JoyPla:itemName%</span><br>
-        		<span>規格：%JoyPla:itemStandard%</span><br>
-        		<span>商品コード：%JoyPla:itemCode%</span>
-        		<span>入数：%JoyPla:quantity%%JoyPla:quantityUnit%</span><br>
-        		<span>%JoyPla:nowTime%</span><br>
-        		<div class="uk-text-center" id="barcode_%JoyPla:num%">%JoyPla:barcodeId%</div>
-        	</div>
+	<div class='printarea uk-margin-remove'>
+		<div>
+			<b class='font-size-16'>%JoyPla:itemName%</b>
+			<div class='uk-child-width-1-2' uk-grid>
+				<div class=''>
+					<span>%JoyPla:itemMaker%</span><br>
+					<span>%JoyPla:catalogNo% %JoyPla:itemStandard%</span><br>
+					<span>%JoyPla:inHPId%</span><br>
+				</div>
+				<div class='uk-text-right uk-padding-remove'>
+					<b>%JoyPla:divisionName%</b>
+					<span class='uk-text-bold' style='font-size:1.25em'>入数:%JoyPla:quantity%%JoyPla:quantityUnit%</span><br>
+				</div>
+			</div>
+			<div class='uk-text-center' id='barcode_%JoyPla:num%'>%JoyPla:barcodeId%</div>
+			<div class='uk-text-right'>%JoyPla:distributorName%</div>
+		</div>
+	</div>
 EOM;
 	}
 	

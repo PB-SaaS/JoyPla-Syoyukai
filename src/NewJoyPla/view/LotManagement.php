@@ -13,7 +13,7 @@
 		    	<h2 class="page_title">ロット管理</h2>
 		    	<hr>
 		    	<div class="" id="tablearea">
-					%sf:usr:search22:mstfilter%
+					%sf:usr:search38:mstfilter%
 		    	</div>
 			</div>
 		</div>

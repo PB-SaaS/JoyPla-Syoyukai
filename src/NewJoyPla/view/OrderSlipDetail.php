@@ -1,24 +1,20 @@
-<div class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
+<div id="app" class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
     <div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
-                <li><a href="%url/rel:mpgt:Receipt%&Action=OrederList&table_cache=true"><span>発注書一覧</span></a></li>
+                <li><a href="<?php echo $link ?>&table_cache=true"><span>発注書一覧</span></a></li>
                 <li><span>発注書</span></li>
             </ul>
-            <form action="#" method="post">
                 <div class="uk-child-width-1-2@m no_print uk-margin" uk-grid>
                     <div class="uk-text-left">
                         <input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
-                        <input class="print_hidden uk-button uk-button-danger" type="button" value="発注書取消" onclick="order_slip_detail.orderedDelete();return false;">
-                        <input class="print_hidden uk-button uk-button-primary" type="button" value="納品照合" onclick="order_slip_detail.deliveryCheck();return false;">
-                    </div>
-                    <div class="uk-text-right">
-                        <button type="button" class="uk-button uk-button-primary" uk-toggle="target: #modal-gs1128">GS1-128で照合</button>
+                        <input class="print_hidden uk-button uk-button-danger" type="button" value="発注書取消" v-on:click="slipDelete" v-bind:disabled="delete_disabled">
+                        <input class="print_hidden uk-button uk-button-primary" type="button" value="納品照合" v-on:click="receiving">
                     </div>
                 </div>
                 <div class="uk-text-center uk-text-large">
-                    <p class="uk-text-bold" style="font-size: 32px">発　　注　　書</p>
+                    <p class="uk-text-bold title_spacing" style="font-size: 32px">発注書</p>
                 </div>
                 <div uk-grid>
                     <div class="uk-width-1-2@m">
@@ -30,7 +26,7 @@
                             </tr>
                             <tr class="uk-text-large">
                                 <td>合計金額</td>
-                                <td class="uk-text-right">￥<script>price("%val:usr:totalAmount%")</script> - </td>
+                                <td class="uk-text-right">￥{{ totalAmount | number_format }} - </td>
                             </tr>
                         </table>
                     </div>
@@ -77,78 +73,93 @@
                                     <th>入数</th>
                                     <th>発注数</th>
                                     <th>入庫数</th>
+                                    <th>入庫可能数</th>
                                     <th>今回入庫数</th>
                                     <th>納期</th>
                                     <th>金額</th>
-                                    <th>ロット番号</th>
-                                    <th>使用期限</th>
-                                    <th>入庫情報追加</th>
+                                    <th>入庫リストへ転記</th>
                                 </tr>
                             </thead>
                             <tbody>
-                    <?php
-                        $num = 1;
-                      
-                        foreach($orderItems as $record){
-                          $barcodeId = "01".$record->inHospitalItemId."X".$record->quantity;
-                        
-                          echo "<tr id='tr_".$num."'>";
-                          echo "<td>".$num."</td>";
-                          echo "<td>".$record->makerName."</td>";
-                          echo "<td>".$record->itemName."</td>";
-                          echo "<td>".$record->itemCode."</td>";
-                          echo "<td>".$record->itemStandard."</td>";
-                          echo "<td>".$record->itemJANCode."</td>";
-                          echo "<td>￥<script>price('".$record->price."')</script><span class='uk-text-small'></span> / <span class='uk-text-small'>".$record->itemUnit."</span></td>";
-                          echo "<td>".$record->quantity."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
-                          echo "<td>".$record->orderQuantity."<span class='uk-text-small'>".$record->itemUnit."</span></td>";
-                        
-                          echo "<td>".$record->receivingNowCount."<span class='uk-text-remove uk-text-small'>".$record->itemUnit."</span></td>";
-                          if($record->receivingFlag){
-                            echo "<td>入庫完了</td>";
-                          } else {
-                          if( $record->orderQuantity > 0 )
-                          {
-                            $attr['min'] = 0;
-                            $attr['max'] = $record->remainingCount;
-                          }
-                          else if( $record->orderQuantity < 0 )
-                          {
-                            $attr['min'] = $record->remainingCount;
-                            $attr['max'] = 0;
-                          } 
-                          else 
-                          {
-                            $attr['min'] = 0;
-                            $attr['max'] = 0;
-                          }
-                            echo "<td><input type='number' class='uk-input receiving_".$record->inHospitalItemId."' name='count'";
-                          foreach($attr as $key => $val) echo " $key='$val' ";
-                          echo "style='width:82px' value='0' onchange='order_slip_detail.active(this);order_slip_detail.countChange(this,\"".$record->inHospitalItemId."\");'><span class='uk-text-small uk-text-middle'>".$record->itemUnit."</span></td>";
-                          }
-                          echo "<td>".$record->dueDate."</td>";
-                          echo "<td>￥<script>price('".$record->orderPrice."')</script></td>";
-                          //echo "<td id="barcode_".$num."" class="uk-text-center">".$barcodeId."</td>";
-
-                          if($record->receivingFlag){
-                            echo "<td class='uk-text-center'></td>";
-                            echo "<td class='uk-text-center'></td>";
-                          } else {
-                            echo "<td class='uk-text-small uk-text-break' style='white-space: break-spaces;'><input type='text' class='uk-input lot_{$record->inHospitalItemId}' style='width:184px;' onchange='order_slip_detail.active(this)' maxlength='20'></td>";
-                            echo "<td class='uk-text-small uk-text-break' style='white-space: break-spaces;'><input type='date' class='uk-input lotDate_{$record->inHospitalItemId}' style='width:184px;' onchange='order_slip_detail.active(this)'></td>";
-                          }
-
-                          if($record->receivingFlag){
-                            echo "<td class='uk-text-center'>入庫済み</td>";
-                          } else {
-                            echo "<td class='uk-text-center'><button type='button' class='uk-button uk-button-default uk-button-small' onclick='order_slip_detail.addLotInput(".$num.",\"".$record->inHospitalItemId."\",null,null)'>追加</button></td>";
-                          }
-                          echo "</tr>";
-                          $num++;
-                        }
-                    ?>
+						        <tr v-for="(item, key) in items" :id="'tr_' + key" v-bind:class="item.class">
+							        <td>{{key + 1 }}</td>
+                                    <td>{{item.makerName}}</td>
+                                    <td>{{item.itemName}}</td>
+                                    <td>{{item.itemCode}}</td>
+                                    <td>{{item.itemStandard}}</td>
+                                    <td>{{item.itemJANCode}}</td>
+                                    <td>￥{{item.price | number_format}}</td>
+                                    <td>{{item.quantity}}{{item.quantityUnit}}</td>
+                                    <td>{{item.orderQuantity}}{{item.itemUnit}}</td>
+                                    <td>{{item.receivingNum}}{{item.itemUnit}}</td>
+                                    <td>{{item.possibleNumber}}{{item.itemUnit}}</td>
+                                    <td v-bind:class="item.nowCountClass">{{item.nowCount}}{{item.itemUnit}}</td>
+                                    <td>{{item.dueDate}}</td>
+                                    <td>￥{{item.orderPrice | number_format}}</td>
+                                    <td><button type="button" class="uk-button uk-button-primary" v-on:click="add(item)">転記</td>
+                                </tr>
                             </tbody>
-
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="uk-margin" id="receivingTable">
+                    <p class="uk-text-bold uk-text-large">入庫リスト</p>
+                    <div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky" class="uk-padding-top uk-background-muted uk-padding-small">
+                        <form action='#' method="post" onsubmit="gs1_128.check_gs1_128();$('input[name=barcode]').focus();return false;">
+                            <input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." name="barcode" autocomplete="off" v-model="barcode">
+                            <button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="button" onclick="gs1_128.check_gs1_128()">検索</button>
+                        </form>
+                    </div>
+                    
+                    <div class="uk-overflow-auto">
+                        <table class="uk-table uk-table-hover uk-table-middle uk-table-divider uk-text-nowrap" id="tbl-Items">
+                            <thead>
+                                <tr>
+                                    <th>NO</th>
+                                    <th style="min-width:60px">メーカー</th>
+                                    <th style="min-width:150px">商品名</th>
+                                    <th>製品コード</th>
+                                    <th>規格</th>
+                                    <th>JANコード</th>
+                                    <th>価格</th>
+                                    <th>入数</th>
+                                    <th>入庫数</th>
+                                    <th>ロット管理</th>
+                                    <th>ロット番号</th>
+                                    <th>使用期限</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+						        <tr v-for="(list, key) in lists" :id="'tr_' + key" v-bind:class="list.class">
+							        <td>{{key + 1 }}</td>
+                                    <td>{{list.makerName}}</td>
+                                    <td>{{list.itemName}}</td>
+                                    <td>{{list.itemCode}}</td>
+                                    <td>{{list.itemStandard}}</td>
+                                    <td>{{list.itemJANCode}}</td>
+                                    <td>￥{{list.price | number_format}}</td>
+                                    <td>{{list.quantity}}{{list.quantityUnit}}</td>
+        							<td>
+        								<input type="number" step="1" class="uk-input" style="width: 96px;" v-bind:max="list.max" v-bind:min="list.min" v-bind:style="list.countStyle" v-model="list.countNum" v-bind:disabled="list.countNumDisabled" v-on:change="addCountStyle(key);changeCountNum(key)">
+        								<span class="uk-text-bottom">{{list.itemUnit}}</span>
+        							</td>
+        							<td>
+        								<span v-if="list.lotManagement == 1" class="uk-text-danger">必須</span>
+        								<span v-else >任意</span>
+        							</td>
+        							<td>
+        								<input type="text" class="uk-input lot" style="width:180px" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
+        							</td>
+							        <td>
+                                        <input type="date" class="uk-input lotDate" v-model="list.lotDate" v-bind:style="list.lotDateStyle" v-on:change="addLotDateStyle(key)">
+							        </td>
+							        <td>
+								        <input type="button" class="uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)">
+                                    </td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -171,7 +182,6 @@
                         </tbody>
                     </table>
                 </div>
-            </form>
         </div>
     </div>
 </div>
@@ -181,656 +191,525 @@
     <input type="hidden" value="%val:usr:distributorName%" name="distributorName">
 </form>
 
-<!-- This is a button toggling the modal with the default close button -->
-<!-- This is the modal with the default close button -->
-<div id="modal-gs1128" uk-modal>
-    <div class="uk-modal-dialog uk-modal-body">
-        <form onsubmit="order_slip_detail.gs1_128($('#GS1-128').val());return false;" action="#">
-            <button class="uk-modal-close" type="button" uk-close></button>
-            <h2 class="uk-modal-title">GS1-128 読取</h2>
-            <input type="text" class="uk-input" placeholder="GS1-128" id="GS1-128" autofocus="true">
-            <div class="uk-margin-top select_items" style="display:none">
-                <p>商品特定</p>
-                <select name="not_items_info" id="not_items_info" class="uk-select">
-                    <option value=""> --- 選択してください --- </option>
-                    <?php
-              /*
-              $stringDom = '';
-                  foreach($ItemsToJs as $key => $val){
-                    $stringDom .= "<option value='".$key."'>".$val["itemName"]."</option>";
-              }
-              echo $stringDom;
-                  */
-                  ?>
-                </select>
-            </div>
-            <p class="uk-text-right">
-                <button class="uk-button uk-button-primary" type="button" onclick="order_slip_detail.gs1_128($('#GS1-128').val());">反映</button>
-            </p>
-        </form>
-    </div>
-</div>
+	<div id="modal-sections" class="uk-modal-container" uk-modal>
+	    <div class="uk-modal-dialog">
+	        <button class="uk-modal-close-default" type="button" uk-close></button>
+	        <div class="uk-modal-header">
+	            <h2 class="uk-modal-title">商品選択</h2>
+	        </div>
+	        <div class="uk-modal-body uk-width-expand uk-overflow-auto">
+	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-nowrap uk-table-divider">
+					<thead>
+						<tr>
+                            <th>NO</th>
+                            <th style="min-width:60px">メーカー</th>
+                            <th style="min-width:150px">商品名</th>
+                            <th>製品コード</th>
+                            <th>規格</th>
+                            <th>JANコード</th>
+                            <th>価格</th>
+                            <th>入数</th>
+                            <th>発注数</th>
+                            <th>入庫数</th>
+                            <th>入庫可能数</th>
+                            <th>今回入庫数</th>
+                            <th>納期</th>
+                            <th>金額</th>
+                            <th>入庫リストへ転記</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="(list , key) in select_items" >
+					        <td>{{key + 1 }}</td>
+                            <td>{{list.makerName}}</td>
+                            <td>{{list.itemName}}</td>
+                            <td>{{list.itemCode}}</td>
+                            <td>{{list.itemStandard}}</td>
+                            <td>{{list.itemJANCode}}</td>
+                            <td>￥{{list.price | number_format}}</td>
+                            <td>{{list.quantity}}{{list.quantityUnit}}</td>
+                            <td>{{list.orderQuantity}}{{list.itemUnit}}</td>
+                            <td>{{list.receivingNum}}{{list.itemUnit}}</td>
+                            <td>{{list.possibleNumber}}{{list.itemUnit}}</td>
+                            <td v-bind:class="list.nowCountClass">{{list.nowCount}}{{list.itemUnit}}</td>
+                            <td>{{list.dueDate}}</td>
+                            <td>￥{{list.orderPrice | number_format}}</td>
+                            <td><button type="button" class="uk-button uk-button-primary" v-on:click="addObject(key)">転記</td>
+						</tr>
+					</tbody>
+				</table>   
+	        </div>
+	    </div>
+	</div>
 
 <script>
-    upToData = <?php echo json_encode($ItemsToJs); ?>;
-
-
-    class OrderSlipDetail {
-        constructor(phpData) {
-            this.phpData = phpData;
-            this.back();
-
-            this.canAjax = true;
-            this.gs1128_object = {};
-            this.order_num = $("#hacchu_num").text();
-            $("#order_barcode").html("<svg id='barcode_hacchu'></svg>");
-            this.notItemsInfo("");
-            generateBarcode("barcode_hacchu", this.order_num);
+    
+var app = new Vue({
+	el: '#app',
+	data: {
+	    totalAmount: "%val:usr:totalAmount%",
+	    status: "%val:usr:orderStatus%",
+	    delete_disabled: (this.status != 2),
+		items: <?php echo json_encode($orderItems); ?>,
+		lists: [],
+		divisionId: '',
+		division_disabled: false,
+		barcode : '',
+	},
+	filters: {
+        number_format: function(value) {
+            if (! value ) { return false; }
+            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+        },
+    },
+    watch: {
+        lists: function() {
+            this.$nextTick(function() {
+                if($('.target').length > 0){
+                    $(window).scrollTop($('.target').offset().top - 100);
+                    app.lists.forEach(function(elem, index) {
+                        let changeObject = null;
+                        changeObject = app.lists[index];
+        				changeObject.class.target = false;
+        				app.$set(app.lists, index, changeObject);
+    			    });
+                }
+            })
         }
-
-        back() {
-            if (this.phpData.slipDetailPattern == "delete") {
-                UIkit.modal.alert("発注商品が0件となりました。<br>発注書一覧へ戻ります。").then(function() {
-                    location.href = this.phpData.backToLink + "&table_cache=true";
-                });
-            }
-
-            if (this.phpData.slipDetailPattern == "1") {
-                UIkit.modal.alert("未発注書です。<br>発注書一覧へ戻ります。").then(function() {
-                    location.href = this.phpData.backToLink + "&table_cache=true";
-                });
-            }
-
-        }
-
-        notItemsInfo(jancode) {
-            let select = document.querySelector("#not_items_info");
-            while (select.firstChild) {
-                select.removeChild(select.firstChild)
-            }
-            let option = "";
-            option = document.createElement("option");
-            option.value = "";
-            option.text = " ----- 選択してください -----";
-            select.appendChild(option);
-            for (var key in this.phpData['phpItemsData']) {
-                if (parseInt(this.phpData['phpItemsData'][key]["orderQuantity"]) > 0) {
-                    if (parseInt(this.phpData['phpItemsData'][key]["orderQuantity"]) <= parseInt(this.phpData['phpItemsData'][key]["receivingCount"])) {
-                        continue;
-                    }
-                } else if (parseInt(this.phpData['phpItemsData'][key]["orderQuantity"]) < 0) {
-                    if (parseInt(this.phpData['phpItemsData'][key]["orderQuantity"]) >= parseInt(this.phpData['phpItemsData'][key]["receivingCount"])) {
-                        continue;
-                    }
+    },
+	methods: {
+	    add: function(item){
+	        item = JSON.parse(JSON.stringify(item));
+	        item.lotNumber = '';
+	        item.lotDate = '';
+	        item.countNum = 0;
+	        this.addItemToList(item);
+	    },
+	    addItemToList : function(itemObject) {
+	        let existflg = false;
+			itemObject = JSON.parse(JSON.stringify(itemObject));
+            app.lists.forEach(function(elem, index) {
+                let changeObject = app.lists[index];
+                if( !existflg &&
+                    changeObject.orderCNumber == itemObject.orderCNumber && 
+                    changeObject.lotDate == itemObject.lotDate && 
+                    changeObject.lotNumber == itemObject.lotNumber)
+                {
+                    changeObject.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+                    changeObject.countNum = parseInt(changeObject.countNum) + parseInt(itemObject.countNum);
+                    existflg = true;
+           	        app.$set(app.lists, index, changeObject);
                 }
-
-                if (jancode !== "" && jancode !== this.phpData['phpItemsData'][key]["itemJANCode"]) {
-                    continue;
+		    });
+			if(!existflg)
+			{
+			    this.addList(itemObject);
+			}
+			
+           	this.nowCountUpdate();
+	    },
+		deleteList: function(key) {
+			this.lists.splice(key, 1);
+           	this.nowCountUpdate();
+		},
+		addList: function(object) {
+			object.class = ((!object.class)? {'target' : true} : object.class);
+			object.countNum = ((!object.countNum)? 0 : object.countNum);
+			object.lotNumber = ((!object.lotNumber)? '': object.lotNumber); 
+			object.lotDate = ((!object.lotDate)? '' : object.lotDate);
+			object.countStyle =  ((!object.countStyle)? {} : object.countStyle);
+			object.lotDateStyle =  ((!object.lotDateStyle)? {} : object.lotDateStyle);
+			object.lotNumberStyle =  ((!object.lotNumberStyle)? {} : object.lotNumberStyle);
+			this.lists.push(object);
+		},
+		changeCountNum : function(index){
+            let changeObject = app.lists[index];
+            if( ! ( parseInt(changeObject.countNum) >= parseInt(changeObject.min) && parseInt(changeObject.countNum) <= parseInt(changeObject.max) ) ) { 
+                if(! ( parseInt(changeObject.countNum) >= parseInt(changeObject.min)) )
+                {
+                    changeObject.countNum = parseInt(changeObject.min) ;
+                } 
+                else if(! ( parseInt(changeObject.countNum) <= parseInt(changeObject.max)) )
+                {
+                    changeObject.countNum = parseInt(changeObject.max) ;
                 }
-                option = document.createElement("option");
-                option.value = key;
-                option.text = this.phpData['phpItemsData'][key]["itemName"];
-                select.appendChild(option);
-
-            };
-        }
-
-        chkReceivingCount(inHospitalItemId) {
-            let flg = true;
-            if (parseInt(this.phpData['phpItemsData'][inHospitalItemId]["orderQuantity"]) > 0) {
-                if (parseInt(this.phpData['phpItemsData'][inHospitalItemId]["orderQuantity"]) <= parseInt(this.phpData['phpItemsData'][inHospitalItemId].lotNum)) {
-                    flg = false;
-                }
-                if (parseInt(this.phpData['phpItemsData'][inHospitalItemId].remainingCount) <= parseInt(this.phpData['phpItemsData'][inHospitalItemId].receivingCount)) {
-                    flg = false;
-                }
-                return flg;
-            } else if (parseInt(this.phpData['phpItemsData'][inHospitalItemId]["orderQuantity"]) < 0) {
-                if (parseInt(this.phpData['phpItemsData'][inHospitalItemId]["orderQuantity"]) >= parseInt(this.phpData['phpItemsData'][inHospitalItemId].lotNum)) {
-                    flg = false;
-                }
-                if (parseInt(this.phpData['phpItemsData'][inHospitalItemId].remainingCount) >= parseInt(this.phpData['phpItemsData'][inHospitalItemId].receivingCount)) {
-                    flg = false;
-                }
-                return flg;
             }
-        }
-
-        addLotInput(num, inHospitalItemId, lotval, lotDate, lotQuantity) {
-            let itemId = inHospitalItemId;
-            if (this.chkReceivingCount(inHospitalItemId) == false) {
-                UIkit.modal.alert("発注数より多くはできません。ご確認ください");
-                return;
-            }
-
-            this.phpData['phpItemsData'][inHospitalItemId].receivingCount = parseInt(this.phpData['phpItemsData'][inHospitalItemId].receivingCount) + 1;
-
-            let trElm = document.createElement("tr");
-            let tdElm = document.createElement("td");
-            tdElm.colSpan = "10";
-            trElm.appendChild(tdElm);
-
-            tdElm = document.createElement("td");
-            tdElm.className = "uk-text-small uk-text-break";
-            tdElm.style = "white-space: break-spaces";
-
-            tdElm.appendChild(document.createTextNode("今回入庫数"));
-            tdElm.appendChild(document.createElement("br"));
-
-            let numinput = document.createElement("input");
-            numinput.className = "uk-input receiving_" + inHospitalItemId;
-            numinput.name = "count";
-            numinput.type = "number";
-            if (parseInt(this.phpData['phpItemsData'][inHospitalItemId]["orderQuantity"]) > 0) {
-                numinput.value = 1;
-                numinput.min = 0;
-            } else {
-                numinput.value = -1;
-                numinput.max = 0;
-            }
-            numinput.style.width = "82px";
-            numinput.style.backgroundColor = "rgb(255, 204, 153)";
-
-            numinput.onchange = function() {
-                order_slip_detail.countChange(this, inHospitalItemId);
-            }
-
-            let span = document.createElement("span");
-            span.className = "uk-text-small uk-text-middle";
-
-            let itemUnit = document.createTextNode(this.phpData['phpItemsData'][inHospitalItemId].itemUnit);
-            span.appendChild(itemUnit);
-
-            tdElm.appendChild(numinput);
-            tdElm.appendChild(span);
-            trElm.appendChild(tdElm);
-
-
-            tdElm = document.createElement("td");
-            tdElm.colSpan = "2";
-            trElm.appendChild(tdElm);
-
-
-            tdElm = document.createElement("td");
-            tdElm.className = "uk-text-small uk-text-break";
-            tdElm.style = "white-space: break-spaces";
-
-            tdElm.appendChild(document.createTextNode("ロット番号"));
-            tdElm.appendChild(document.createElement("br"));
-            tdElm.className = "uk-text-small";
-            let lotinput = document.createElement("input");
-            lotinput.className = "uk-input lot_" + inHospitalItemId;
-            lotinput.type = "text";
-            lotinput.maxLength = 20;
-            if (lotval) {
-                lotinput.value = lotval;
-                lotinput.style.backgroundColor = "rgb(255, 204, 153)";
-            }
-            lotinput.onchange = function() {
-                $(this).css({
-                    'background': 'rgb(255, 204, 153)'
-                });
-            };
-
-            tdElm.appendChild(lotinput);
-            trElm.appendChild(tdElm);
-
-
-            tdElm = document.createElement("td");
-            tdElm.className = "uk-text-small uk-text-break";
-            tdElm.style = "white-space: break-spaces";
-
-            tdElm.appendChild(document.createTextNode("使用期限"));
-            tdElm.appendChild(document.createElement("br"));
-            let dateinput = document.createElement("input");
-
-            dateinput.className = "uk-input lotDate_" + inHospitalItemId;
-            dateinput.type = "date";
-            if (lotDate) {
-                dateinput.value = lotDate;
-                dateinput.style.backgroundColor = "rgb(255, 204, 153)";
-            }
-            dateinput.onchange = function() {
-                $(this).css({
-                    'background': 'rgb(255, 204, 153)'
-                });
-            };
-
-            tdElm.appendChild(dateinput);
-            trElm.appendChild(tdElm);
-
-
-            tdElm = document.createElement("td");
-            tdElm.className = "uk-text-center";
-            let btninput = document.createElement("input");
-            btninput.className = "uk-button uk-button-danger uk-button-small";
-            btninput.type = "button";
-            btninput.value = "削除";
-            let tmp = this;
-            btninput.onclick = function() {
-                var elm = $(this).parent().parent().find(".receiving_" + inHospitalItemId)[0];
-                elm.min = 0;
-                elm.value = 0;
-                tmp.countChange(elm, inHospitalItemId);
-                $(this).parent().parent().remove();
-            };
-
-            tdElm.appendChild(btninput);
-
-            trElm.appendChild(tdElm);
-
-            $("#tr_" + num).after(trElm);
-
-            this.countChange(numinput, inHospitalItemId); //初期化
-
-        }
-
-        deliveryCheck() {
-            if (!this.canAjax) {
-                console.log('通信中');
-                return;
-            }
-            //$_POST["orderHistoryId"],$_POST["divisionId"],$_POST["receiving"]
-
-            let flg = true;
-            let tmp = this;
-            let labelCreateFlg = false;
-            UIkit.modal.confirm("入力された値で納品照合を行います。<br>よろしいですか").then(function() {
-                let receivingItem = {};
-                let receivingData = tmp.makeRegData();
-
-                if (Object.keys(receivingData).length == 0) {
-                    UIkit.modal.alert("納品対象がありません。<br>入庫数を入力して下さい");
-                    return false;
-                }
-
-                Object.keys(receivingData).forEach(function(inHPItemKey) {
-                    receivingItem[inHPItemKey] = tmp.phpData['phpItemsData'][inHPItemKey];
-                    /*
-                    Object.keys(receivingData[inHPItemKey]).forEach(function (lotKey) {
-                      receivingItem[inHPItemKey]['receivingCount'] = (receivingItem[inHPItemKey]['receivingCount'] + receivingData[inHPItemKey][lotKey]['receivingCount']);
-                    });
-                    */
-                    //if(this.phpData['phpItemsData'][key].changeReceiving != "0"){
-                    if (tmp.phpData['phpItemsData'][inHPItemKey]['receivingCount'] > 0) {
-                        labelCreateFlg = true;
-                    }
-
-                    if (Math.abs(parseInt(tmp.phpData['phpItemsData'][inHPItemKey]['remainingCount'])) < Math.abs(parseInt(receivingItem[inHPItemKey]['receivingCount']))) {
-                        UIkit.modal.alert("入庫数が発注数を超えています<br>今回入庫数を確認して下さい");
-                        return false;
+           	app.$set(app.lists, index, changeObject);
+           	this.nowCountUpdate();
+		},
+		nowCountUpdate: function(){
+            let changeItem = {};
+            app.lists.forEach(function(elem, index) {
+                if (! (elem.orderCNumber in changeItem) ){ changeItem[elem.orderCNumber] = 0 }
+				changeItem[elem.orderCNumber] = changeItem[elem.orderCNumber] + parseInt(elem.countNum);
+		    });
+		    
+            app.items.forEach(function(elem, index) {
+                let changeObject = null;
+                let num = 0
+                Object.keys(changeItem).forEach(function (key) {
+                    if(elem.orderCNumber == key )
+                    {
+                        num = changeItem[key];
                     }
                 });
-
-
-                if (Object.keys(receivingData).length == 0) {
-                    UIkit.modal.alert("ロット情報の入力を確認してください");
-                    return false;
+                changeObject = app.items[index];
+                changeObject.nowCount = num;
+                changeObject.nowCountClass = {'uk-text-danger' : false};
+                if(
+                    ( ( changeObject.possibleNumber >= 0 ) && ! (changeObject.possibleNumber >= changeObject.nowCount) ) ||
+                    ( ( changeObject.possibleNumber < 0 ) && ! (changeObject.possibleNumber <= changeObject.nowCount) )
+                )
+                {
+                    changeObject.nowCountClass = {'uk-text-danger' : true};
+                    UIkit.modal.alert("今回入庫数が入庫可能数を上回っています。<br>ご確認ください。")
                 }
-
-console.log(receivingData);
-console.log(receivingItem);
-                loading();
-                tmp.canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
-                $.ajax({
+				app.$set(app.items , index, changeObject);
+            });
+		},
+		addCountStyle: function(index){
+			let changeObject = app.lists[index];
+			changeObject.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+			app.$set(app.lists, index, changeObject);
+		},
+		addLotNumberStyle: function(index){
+			let changeObject = app.lists[index];
+			changeObject.lotNumberStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+			app.$set(app.lists, index, changeObject);
+		},
+		addLotDateStyle: function(index){
+			let changeObject = app.lists[index];
+			changeObject.lotDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+			app.$set(app.lists, index, changeObject);
+		},
+		slipDelete: function(){
+		    if(this.status != 2)
+		    {
+		        UIkit.modal.alert("取り消しは行えません");
+		        return false;
+		    }
+            UIkit.modal.confirm("発注を取り消しますか").then(function () {
+                
+    			$.ajax({
                     async: false,
-                    url: "<?php echo $api_url ?>",
-                    type: "POST",
-                    data: {
+                    url:'<?php echo $api_url ?>',
+                    type:'POST',
+                    data:{
                         _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-                        Action : "RegReceivingAPI",
-                        orderHistoryId: "%val:usr:orderNumber%",
-                        distributorId: "%val:usr:distributorId%",
-                        receiving: JSON.stringify(receivingData),
-                        receivingItem: JSON.stringify(receivingItem),
-                        divisionIdCrypt: tmp.phpData.divisionIdCrypt
+                    	Action : "orderedDeleteAPI",
                     },
-                    dataType: "json"
+                    dataType: 'json'
                 })
                 // Ajaxリクエストが成功した時発動
-                .done((data) => {
-                    if (!data.result) {
-                        UIkit.modal.alert("納品照合に失敗しました").then(function() {
-                            tmp.canAjax = true; // 再びAjaxできるようにする
-                        });
+                .done( (data) => {
+                    if(data.code != 0){
+                        UIkit.modal.alert("発注取消に失敗しました");
                         return false;
                     }
-                    UIkit.modal.alert("納品照合が完了しました").then(function() {
-                        if (labelCreateFlg) {
-                            UIkit.modal.confirm("ラベル発行を行いますか").then(function() {
-                                tmp.createLabel(data.historyId);
-                            }, function() {
-                               location.reload();
-                            });
-                        } else {
-                            location.reload();
-                        }
+                
+                    UIkit.modal.alert("発注を取り消しました").then(function(){
+                        location.href = "<?php echo $link ?>&table_cache=true";
                     });
                 })
                 // Ajaxリクエストが失敗した時発動
-                .fail((data) => {
-                    UIkit.modal.alert("納品照合に失敗しました").then(function() {
-                       tmp.canAjax = true; // 再びAjaxできるようにする
-                    });
-                    return false;
+                .fail( (data) => {
+                    UIkit.modal.alert("発注取消に失敗しました");
                 })
                 // Ajaxリクエストが成功・失敗どちらでも発動
-                .always((data) => {
-console.log(data);
-                    loading_remove();
+                .always( (data) => {
+    				loading_remove();
                 });
-            }, function() {
-                UIkit.modal.alert("中止します");
             });
-        }
-
-        orderedDelete() {
-            if (!this.canAjax) {
-                console.log('通信中');
-                return;
-            }
-            if ("%val:usr:orderStatus:id%" == "5" || "%val:usr:orderStatus:id%" == "6") {
-                UIkit.modal.alert("すでに入庫済みの情報があります。削除はできません");
-                return false;
-            }
-            let tmp = this;
-            UIkit.modal.confirm("発注書を削除します。<br>よろしいですか").then(function() {
-                loading();
-                tmp.canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
-                $.ajax({
+		},
+		lotCheck: function(){
+			
+			let chkLot = true;
+			app.lists.forEach(function (elem, index) {
+				elem.lotNumberStyle.border = '';
+				elem.lotDateStyle.border = '';
+				if(app.lists[index].lotManagement == 1) {
+					if( !( app.lists[index].lotNumber && app.lists[index].lotDate)) {
+						let changeObject = app.lists[index];
+						changeObject.lotNumberStyle.border = 'red 2px solid';
+						changeObject.lotDateStyle.border = 'red 2px solid';
+						app.$set(app.lists, index, changeObject);
+				    	chkLot = false;
+					}
+				}
+			});
+			if(!chkLot){
+				UIkit.modal.alert('ロット管理が必須のものはすべてロット情報を入力してください');
+				return false ;
+			}
+			
+			chkLot = true;
+			app.lists.forEach(function (elem, index) {
+				elem.lotNumberStyle.border = '';
+				elem.lotDateStyle.border = '';
+				if(app.lists[index].countNum != 0) {
+					if(!app.lists[index].lotNumber && app.lists[index].lotDate){
+						let changeObject = app.lists[index];
+						changeObject.lotNumberStyle.border = 'red 2px solid';
+						app.$set(app.lists, index, changeObject);
+			    		chkLot = false;
+					}
+					else if(app.lists[index].lotNumber && !app.lists[index].lotDate) {
+						let changeObject = app.lists[index];
+						changeObject.lotDateStyle.border = 'red 2px solid';
+						app.$set(app.lists, index, changeObject);
+			    		chkLot = false;
+					}
+				}
+			});
+			
+			if(!chkLot){
+				UIkit.modal.alert('ロット情報を入力してください');
+				return false ;
+			}
+			
+			chkLot = true;
+			let regex = /^[0-9a-zA-Z]+$/;
+			app.lists.forEach(function (elem, index) {
+				elem.lotNumberStyle.border = '';
+				if(app.lists[index].lotNumber) {
+					if((!regex.test(app.lists[index].lotNumber)) ||
+					   (encodeURI(app.lists[index].lotNumber).replace(/%../g, '*').length > 20)) {
+						let changeObject = app.lists[index];
+						changeObject.lotNumberStyle.border = 'red 2px solid';
+						app.$set(app.lists, index, changeObject);
+			    		chkLot = false;
+					}
+				}
+			});
+			
+			if(!chkLot){
+				UIkit.modal.alert('ロット番号の入力を確認してください');
+				return false ;
+			}
+			
+			return true;
+        },
+		check: function(){
+			
+			if(app.lists.length === 0){
+				UIkit.modal.alert('入庫リストに商品を追加してください');
+				return false ;
+			}
+			
+			app.items.forEach(function (elem, index) {
+			    if(elem.possibleNumber < elem.nowCount )
+			    {
+    				UIkit.modal.alert('入庫数が入庫可能数を上回っています');
+    				return false ;
+			    }
+			});
+			
+			let checkflg = false;
+			app.lists.forEach(function (elem, index) {
+			    if(elem.countNum != 0)
+			    {
+			        checkflg = true;
+			    }
+			});
+			
+			if(!checkflg){
+				UIkit.modal.alert('入庫数を確認してください');
+				return false ;
+			}
+			
+			return true;
+		},
+		label_create_check: function(){
+			let checkflg = false;
+			app.lists.forEach(function (elem, index) {
+			    if(elem.countNum > 0)
+			    {
+			        checkflg = true; // 一つでも+があればOK
+			    }
+			});
+			return checkflg;
+		},
+		receiving: function(){
+            UIkit.modal.confirm("納品照合を行いますか").then(function () {
+                if(!app.check())
+                {
+                    return false;
+                }
+                if(!app.lotCheck())
+                {
+                    return false;
+                }
+    			$.ajax({
                     async: false,
-                    url: "<?php echo $api_url ?>",
-                    type: "POST",
-                    data: {
+                    url:'<?php echo $api_url ?>',
+                    type:'POST',
+                    data:{
                         _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-                        Action : "OrderedDeleteAPI",
-                        orderData: JSON.stringify(tmp.phpData['phpItemsData']),
-                        orderAuthKey: tmp.phpData['authKeyCrypt'],
-                        countFlg: true,
-                        OrderDataViewId : tmp.phpData['OrderDataViewId']
+                    	Action : "receivingAPI",
+                        receiving : JSON.stringify( objectValueToURIencode(app.lists) ),
                     },
-                    dataType: "json"
+                    dataType: 'json'
                 })
                 // Ajaxリクエストが成功した時発動
-                .done((data) => {
-                    if (!data.result) {
-                        UIkit.modal.alert("発注書取消に失敗しました").then(function() {
-                            tmp.canAjax = true; // 再びAjaxできるようにする
-                        });
+                .done( (data) => {
+                    if(data.code != 0){
+                        UIkit.modal.alert("納品照合に失敗しました");
                         return false;
                     }
-                    UIkit.modal.alert("発注書取消が完了しました").then(function() {
-                        location.href = tmp.phpData.backToLink + "&table_cache=true";
+                
+                    UIkit.modal.alert("納品照合が完了しました").then(function(){
+                        if(app.label_create_check()){
+                            UIkit.modal.alert("ラベル発行を行いますか").then(function(){
+                                $("#receivingId").val(data.data.historyId);
+                                $("#createLabelForm").submit();
+                            });
+                        }
+                        location.reload();
                     });
                 })
                 // Ajaxリクエストが失敗した時発動
-                .fail((data) => {
-                    UIkit.modal.alert("伝票削除に失敗しました").then(function() {
-                        tmp.canAjax = true; // 再びAjaxできるようにする
-                    });
-                    return false;
+                .fail( (data) => {
+                    UIkit.modal.alert("納品照合に失敗しました");
                 })
                 // Ajaxリクエストが成功・失敗どちらでも発動
-                .always((data) => {
-console.log(data);
-                    loading_remove();
-                });
-            }, function() {
-                UIkit.modal.alert("中止します");
-            });
-        }
-
-        active(elm) {
-            if (elm.style) {
-                elm.style.backgroundColor = "rgb(255, 204, 153)";
-            }
-        }
-
-        countChange(elm, itemId) {
-            let target = parseInt($(elm).val());
-            $(elm).css({
-                'background': 'rgb(255, 204, 153)'
-            });
-            //let itemId = $.trim(($(elm).attr("class")).replace("uk-input receiving_", ""));
-            let total = 0;
-            $(document).find('.receiving_' + itemId).each(function() {
-                total = total + parseInt($(this).val());
-            });
-            this.phpData['phpItemsData'][itemId].receivingCount = total;
-            let remaining = Math.abs(parseInt(this.phpData['phpItemsData'][itemId].remainingCount)) - Math.abs(total);
-            if (remaining < 0) {
-                $(elm).val(1);
-                UIkit.modal.alert("発注数より多くはできません。ご確認ください");
-                return;
-            } else {
-                if (this.phpData['phpItemsData'][itemId]['orderQuantity'] > 0) {
-                    this.setMaxNum(remaining, itemId);
-                } else {
-                    this.setMinNum(-remaining, itemId);
-                }
-            }
-        }
-
-        createLabel(historyId) {
-            //$("#itemsData").val(JSON.stringify( this.phpData['phpItemsData'] ));
-            $("#receivingId").val(historyId);
-
-            $("#createLabelForm").submit();
-            location.reload();
-        }
-
-        gs1_128(gs1128) {
-            this.gs1128_object = {};
-            if (gs1128.indexOf("]C1") !== 0) {
-                //UIkit.modal.alert("GS1-128ではありません");
-                //return ;
-                return this.gs1_128("]C1" + gs1128);
-            } else {
-                let obj = check_gs1128(gs1128);
-                let chkflg = false;
-                let objkey = $(".select_items select").val();
-                let tmp = this;
-
-                if (objkey == "" && !obj.hasOwnProperty("01")) {
-                    UIkit.modal.alert("商品情報が含まれておりませんでした<br>選択肢からお選びいただき再度、反映をクリックしてください。").then(function() {
-                        $(".select_items").show();
-                        UIkit.modal($('#modal-gs1128')).show();
-                    });
-                    return;
-                }
-
-                if (objkey == "") {
-                    let searchJan = addCheckDigit(obj["01"]);
-                    console.log(searchJan);
-                    Object.keys(this.phpData['phpItemsData']).forEach(function(key) {
-                        if (searchJan == tmp.phpData['phpItemsData'][key]["itemJANCode"]) {
-                            chkflg = true;
-                            objkey = key;
-                        }
-                    });
-                } else {
-                    chkflg = true;
-                }
-
-                if (!chkflg) {
-                    UIkit.modal.alert("対象の発注商品が見つかりませんでした").then(function() {
-                        UIkit.modal($('#modal-gs1128')).show();
-                    });
-                    return false;
-                }
-
-                if (this.chkReceivingCount(objkey) == false) {
-                    UIkit.modal.alert("発注数より多くはできません。ご確認ください");
-                    return;
-                }
-
-                let existflg = false;
-                let objLot = (obj["10"] === void 0) ? "" : obj["10"]; //lotNumber
-                let objLotDate = (obj["17"] === void 0) ? "" : this.changeDate(obj["17"]); //lotDate 
-
-                $(document).find(".lot_" + objkey).each(function() {
-                    let addRowLot = $(this).val();
-                    let addRowLotDate = $(this).parents("tr").find(".lotDate_" + objkey).val();
-                    let addRowNum = parseInt($(this).parents("tr").find(".receiving_" + objkey).val());
-                    let mathNum = 1;
-                    if (tmp.phpData['phpItemsData'][objkey]["orderQuantity"] <= 0) {
-                        mathNum = -1;
-                    }
-
-                    if ((addRowLot == objLot) && (addRowLotDate == objLotDate)) {
-                        $(this).parents("tr").find(".receiving_" + objkey).val(addRowNum + mathNum).css({
-                            'background': 'rgb(255, 204, 153)'
-                        });
-                        let elm = $(this).parents("tr").find(".receiving_" + objkey)[0];
-                        tmp.countChange(elm, objkey);
-                        existflg = true;
-                        return false;
-                    }
-
-                    if (addRowNum === 0 && !addRowLot && !addRowLotDate) {
-                        let trId = $(this).parents("tr").attr("id");
-                        if (trId) {
-                            $(this).val(objLot).css({
-                                'background': 'rgb(255, 204, 153)'
-                            });
-                            $(this).parents("tr").find(".lotDate_" + objkey).val(objLotDate).css({
-                                'background': 'rgb(255, 204, 153)'
-                            });
-                            $(this).parents("tr").find(".receiving_" + objkey).val(mathNum).css({
-                                'background': 'rgb(255, 204, 153)'
-                            });
-                            existflg = true;
-                            return false;
-                        }
-                    }
-                });
-
-                if (existflg) {
-                    /*
-                    this.phpData['phpItemsData'][objkey].receivingCount = parseInt(this.phpData['phpItemsData'][objkey].receivingCount) + 1;
-                    let remaining = parseInt(this.phpData['phpItemsData'][objkey].remainingCount) - parseInt(this.phpData['phpItemsData'][objkey].receivingCount);
-                    if(remaining <= 0){
-                      setMinNum(remaining, objkey);
-                    }
-                    if(remaining >= 0){
-                      setMaxNum(remaining, objkey);
-                    }
-                    */
-                }
-                if (!existflg) {
-                    this.addLotInput(this.phpData['phpItemsData'][objkey]["num"], objkey, objLot, objLotDate, obj["30"]);
-                }
-
-                $(".select_items").hide();
-                $(".select_items select").val("");
-                $("#GS1-128").val("");
-                document.getElementById("GS1-128").focus();
-            }
-        }
-        changeDate(text) {
-            if (text == null) {
-                return "";
-            }
-            if (text.length == "6") {
-                text = 20 + text;
-            }
-            let date = text.slice(6, 8);
-            if (parseInt(text.slice(6, 8)) == 0) {
-                date = '01';
-            }
-            return text.slice(0, 4) + "-" + text.slice(4, 6) + "-" + date;
-        }
-
-        setMaxNum(remaining, itemId) {
-            $(document).find('.receiving_' + itemId).each(function() {
-                let maxNum = parseInt(remaining) + parseInt($(this).val());
-                $(this).attr("max", maxNum);
-            });
-        }
-        setMinNum(remaining, itemId) {
-            $(document).find('.receiving_' + itemId).each(function() {
-                let minNum = parseInt(remaining) + parseInt($(this).val());
-                $(this).attr("min", minNum);
-            });
-        }
-
-        makeRegData() {
-            let regObj = {};
-            let flg = true;
-            let regex = /^[0-9a-zA-Z]+$/;
-            let tmp = this;
-            Object.keys(this.phpData['phpItemsData']).forEach(function(inHPItemKey) {
-                let i = 1;
-                regObj[inHPItemKey] = {};
-                $(document).find(".receiving_" + inHPItemKey).each(function() {
-                    let rowNum = parseInt($(this).val());
-                    if (rowNum != 0) {
-                        let rowLotNum = $(this).parents("tr").find(".lot_" + inHPItemKey).val();
-                        let rowLotDate = $(this).parents("tr").find(".lotDate_" + inHPItemKey).val();
-                        let lotFlag = tmp.phpData['phpItemsData'][inHPItemKey]["lotFlag"];
-console.log(lotFlag);
-                        if (rowLotNum && rowLotDate) {
-                            let lotKey = rowLotNum + rowLotDate;
-                            let temp = Object.entries(regObj[inHPItemKey]);
-                            let chkLotDup = temp.findIndex(([id, data]) => data.lotNumber == rowLotNum && data.lotDate == rowLotDate);
-                            if (chkLotDup === -1) {
-                                regObj[inHPItemKey][lotKey] = {};
-                                regObj[inHPItemKey][lotKey]["inHPItemid"] = inHPItemKey;
-                                regObj[inHPItemKey][lotKey]["lotFlag"] = lotFlag;
-                                regObj[inHPItemKey][lotKey]["orderCNumber"] = tmp.phpData['phpItemsData'][inHPItemKey]["orderCNumber"];
-                                regObj[inHPItemKey][lotKey]["quantity"] = tmp.phpData['phpItemsData'][inHPItemKey]["quantity"];
-                                regObj[inHPItemKey][lotKey]["price"] = tmp.phpData['phpItemsData'][inHPItemKey]["price"];
-                                regObj[inHPItemKey][lotKey]["lotNumber"] = rowLotNum;
-                                regObj[inHPItemKey][lotKey]["lotDate"] = rowLotDate;
-                                regObj[inHPItemKey][lotKey]["receivingCount"] = rowNum;
-                                i++;
-                            } else {
-                                regObj[inHPItemKey][lotKey]["receivingCount"] = parseInt(regObj[inHPItemKey][lotKey]["receivingCount"]) + rowNum;
-                            }
-                        }
-
-                        if (!rowLotNum && !rowLotDate) {
-                            if (regObj[inHPItemKey][0] === void 0) {
-                                regObj[inHPItemKey][0] = {};
-                                regObj[inHPItemKey][0]["inHPItemid"] = inHPItemKey;
-                                regObj[inHPItemKey][0]["lotFlag"] = lotFlag;
-                                regObj[inHPItemKey][0]["orderCNumber"] = tmp.phpData['phpItemsData'][inHPItemKey]["orderCNumber"];
-                                regObj[inHPItemKey][0]["quantity"] = tmp.phpData['phpItemsData'][inHPItemKey]["quantity"];
-                                regObj[inHPItemKey][0]["price"] = tmp.phpData['phpItemsData'][inHPItemKey]["price"];
-                                regObj[inHPItemKey][0]["receivingCount"] = rowNum;
-                            } else {
-                                regObj[inHPItemKey][0]["receivingCount"] = parseInt(regObj[inHPItemKey][0]["receivingCount"]) + rowNum;
-                            }
-                        }
-
-                        if (lotFlag) {
-                            if (!rowLotNum || !rowLotDate) { flg = false; }
-                        }
-                        if ((!rowLotNum && rowLotDate) || (rowLotNum && !rowLotDate)) {
-                            flg = false;
-                        }
-                        if ((!regex.test(rowLotNum)) || (encodeURI(rowLotNum).replace(/%../g, "*").length > 20)) {
-                            flg = false;
-                        }
-                    }
+                .always( (data) => {
+    				loading_remove();
                 });
             });
-            if (!flg) {
-                regObj = {};
-            }
-            return regObj;
-        }
+		}
+	},
+}); 
 
 
-    }
+var modal_sections = new Vue({
+	el:	'#modal-sections',
+	data: {
+		select_items: [],
+        useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
+	},
+	filters: {
+        number_format: function(value) {
+            if (! value) { return false; }
+            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+        },
+    },
+	methods: {
+		clear: function(){
+			let original = JSON.parse(JSON.stringify(this.select_items));
+			this.select_items.splice(0, original.length);
+		},
+		addList: function(object){
+			this.select_items.push(object);
+		},
+		addObject: function(index){
+		    if(this.select_items[index].possibleNumber > 0){
+		        this.select_items[index].countNum = 1;
+		    } 
+		    else if(this.select_items[index].possibleNumber < 0){
+		        this.select_items[index].countNum = -1;
+		    }
+		    this.select_items[index].countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+		    this.select_items[index].lotDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+		    this.select_items[index].lotNumberStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+			app.addItemToList(JSON.parse(JSON.stringify(this.select_items[index])));
+		},
+		openModal: function(){
+        	UIkit.modal('#modal-sections').show();
+		}
+	}
+});
 
-    let phpData = {
-        'phpItemsData': JSON.parse('<?php echo json_encode($ItemsToJs); ?>'),
-        'slipDetailPattern': '<?php echo $pattern; ?>',
-        'backToLink': '<?php echo $link; ?>',
-        'divisionIdCrypt': '<?php echo $divisionIdCrypt; ?>',
-        'authKeyCrypt': '<?php echo $authKeyCrypt; ?>',
-        'OrderDataViewId': '<?php echo $cardId; ?>'
-    };
-    let order_slip_detail = new OrderSlipDetail(phpData);
+var gs1_128 = new Vue({
+	data: {
+		gs1_128: {}
+	},
+	methods: {
+		changeDate: function (text){
+			if(text == null){
+				return "";
+			}
+			if(text.length == "6"){
+				text = 20 + text;
+			}
+			let date = text.slice(6, 8);
+			if(parseInt(text.slice(6, 8)) == 0){
+				date = '01';
+			}
+			return text.slice(0, 4) + "-" + text.slice(4, 6) + "-" + date;
+		},
+		check_gs1_128: function ()
+		{
+		    gs1128 = app.barcode;
+		    app.barcode = '';
+		    
+	        let searchJan = '';
+	        let objLotNumber = '';
+	        let objLotDate = '';
+		    if(gs1128.length != 13){
+    		        
+    		    if(gs1128 == ''){
+    		        return false;
+    		    }
+    			if(gs1128.indexOf("]C1") !== 0){
+    				gs1128 = "]C1"+gs1128;
+    			}
+    			
+    			gs1128 = gs1128.slice( 3 );
+    			let obj = check_gs1128(gs1128);
+    				
+    			if(!obj.hasOwnProperty("01")){
+    				UIkit.modal.alert("商品情報が含まれておりませんでした。").then(function(){
+    				});
+    				return;
+    			}
+                searchJan = gs1_01_to_jan(obj["01"]);
+                objLotNumber = (obj["10"] === void 0) ? "" : obj["10"]; //lotNumber
+                objLotDate = (obj["17"] === void 0) ? "" : this.changeDate(obj["17"]); //lotDate
+		    } else {
+		        searchJan = gs1128;
+		        objLotNumber = '';
+		        objLotDate = '';
+		    }
+			
+        	modal_sections.clear();
+        	let check_count = 0;
+        	let item = null ;
+        	app.items.forEach(function(elem, index){
+        	    if(elem.itemJANCode == searchJan && elem.possibleNumber != 0)
+        	    {
+        	        check_count++;
+        	        elem.lotNumber = objLotNumber;
+        	        elem.lotDate = objLotDate;
+        		    modal_sections.addList(elem);
+        	        item = elem;
+        	    }
+        	});
+        	if(check_count == 0)
+        	{
+        	    UIkit.modal.alert("一致する商品が見つかりませんでした");
+        	}
+        	else if(check_count > 1)
+        	{
+        		UIkit.modal.alert("複数の商品が見つかりました").then(function(){
+        			modal_sections.openModal();
+        		});
+        	}
+        	else if(check_count == 1)
+        	{
+			    item.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+			    item.lotDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+			    item.lotNumberStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+			    item.countNum = 1;
+        	    app.addItemToList(JSON.parse(JSON.stringify(item)));
+        	}
+        	
+		}
+	}
+});
+
+
+ let order_num = $('#hacchu_num').text();
+ //$('#hacchu_num').remove();
+ $('#order_barcode').html('<svg id="barcode_hacchu"></svg>');
+ generateBarcode('barcode_hacchu',order_num);
 </script>

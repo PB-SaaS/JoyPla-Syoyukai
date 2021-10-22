@@ -1,58 +1,4 @@
-<?php
-include_once 'NewJoyPla/lib/ApiSpiral.php';
-include_once "NewJoyPla/lib/Define.php";
-include_once "NewJoyPla/lib/Func.php";
-include_once "NewJoyPla/lib/SpiralDataBase.php";
-include_once "NewJoyPla/lib/UserInfo.php";
-include_once "NewJoyPla/api/GetCardInfo.php";
-include_once "NewJoyPla/api/GetItemPayout.php";
 
-$userInfo = new App\Lib\UserInfo($SPIRAL);
-
-$spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
-$spiralApiRequest = new SpiralApiRequest();
-$spiralDataBase = new App\Lib\SpiralDataBase($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
-
-$cardInfo = new App\Api\GetCardInfo($spiralDataBase);
-$card = $cardInfo->select("NJ_PayoutHDB",$SPIRAL->getCardId(),"payoutHistoryId","payoutAuthKey","sourceDivisionId");
-
-if($userInfo->getUserPermission() != "1" && $card["data"][0][2] != $userInfo->getDivisionId()){
-	App\Lib\viewNotPossible();
-	exit;
-}
-
-$getItemPayout = new App\Api\GetItemPayout($spiralDataBase,$userInfo);
-$payoutData = $getItemPayout->getItemPayout($card["data"][0][0]);
-
-$payoutData = $spiralDataBase->arrayToNameArray($payoutData["data"],array("registrationTime","payoutHistoryId","price","itemId","itemName","itemCode","itemStandard","itemJANCode","quantityUnit","payoutQuantity","payoutAmount","itemUnit","quantity","makerName","inHospitalItemId","payoutCount","payoutLabelCount","distributorId","catalogNo","labelId","lotNumber","lotDate","unitPrice"));
-
-foreach($payoutData as $record){
-	$ItemsToJs[] = array(
-		'inHospitalItemId' => $record['inHospitalItemId'],
-		'payoutQuantity' => $record['payoutQuantity'],
-		'lotNumber' => $record['lotNumber'],
-		'lotDate' => $record['lotDate']
-		);
-}
-
-$crypt   = $SPIRAL->getSpiralCryptOpenSsl();
-$payoutAuthKey = $crypt->encrypt($card["data"][0][1], "JoyPla");
-
-if($userInfo->getUserPermission() == "1"){
-	$link = '%url/table:back%';
-}else{
-	$link = '%url/rel:mpgt:page_267442%';
-} 
-?>
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>JoyPla 払出伝票</title>
-	<?php include_once "NewJoyPla/src/Head.php"; ?>
-
-  </head>
-  <body>
-    <?php include_once "NewJoyPla/src/HeaderForMypage.php"; ?>
     <div class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
 	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
 		    <div class="uk-container uk-container-expand">
@@ -121,22 +67,22 @@ if($userInfo->getUserPermission() == "1"){
 										foreach($payoutData as $record){
 				    						echo "<tr>";
 				    						echo "<td>".$num."</td>";
-				    						echo "<td>".$record["makerName"]."</td>";
-				    						echo "<td>".$record["itemName"]."</td>";
-				    						echo "<td>".$record["itemCode"]."</td>";
-				    						echo "<td>".$record["itemStandard"]."</td>";
-				    						echo "<td>".$record["lotNumber"]."</td>";
-				    						echo "<td>".$record["lotDate"]."</td>";
-				    						echo "<td>".$record["quantity"].$record["quantityUnit"]."</td>";
-				    						echo "<td><script>price(\"".($record["price"] / $record["quantity"] )."\")</script>円 / ".$record["quantityUnit"]."</td>";
-				    						echo "<td>￥<script>price(\"".$record["unitPrice"]."\")</script></td>";
-											echo "<td>".$record["payoutCount"].$record["quantityUnit"]."</td>";
+				    						echo "<td>".$record->makerName."</td>";
+				    						echo "<td>".$record->itemName."</td>";
+				    						echo "<td>".$record->itemCode."</td>";
+				    						echo "<td>".$record->itemStandard."</td>";
+				    						echo "<td>".$record->lotNumber."</td>";
+				    						echo "<td>".$record->lotDate."</td>";
+				    						echo "<td>".$record->quantity.$record->quantityUnit."</td>";
+				    						echo "<td><script>price(\"".($record->price / $record->quantity )."\")</script>円 / ".$record->quantityUnit."</td>";
+				    						echo "<td>￥<script>price(\"".$record->unitPrice."\")</script></td>";
+											echo "<td>".$record->payoutCount.$record->quantityUnit."</td>";
 											
 											echo "<td>×</td>";
-											echo "<td>".$record["payoutLabelCount"]."枚</td>";
+											echo "<td>".$record->payoutLabelCount."枚</td>";
 
-				    						echo "<td>".$record["payoutQuantity"].$record["quantityUnit"]."</td>";
-				    						echo "<td>￥<script>price(\"".$record["payoutAmount"]."\")</script></td>";
+				    						echo "<td>".$record->payoutQuantity.$record->quantityUnit."</td>";
+				    						echo "<td>￥<script>price(\"".$record->payoutAmount."\")</script></td>";
 				    						echo "</tr>";
 				    						$num++;
 										}
@@ -157,7 +103,6 @@ if($userInfo->getUserPermission() == "1"){
 	</form>
 	<script>
 		let canAjax = true;
-		let itemsToJs = objectValueToURIencode( <?php echo json_encode($ItemsToJs); ?> );
 		let lotdata = {};
 
 		function payoutDelete(){
@@ -173,14 +118,11 @@ if($userInfo->getUserPermission() == "1"){
 				canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
 				$.ajax({
 					async: false,
-	                url:"%url/card:page_267245%",
+	                url:"<?php echo $api_url ?>",
 	                type:"POST",
 	                data:{
-	                	sourceDivisionId:"%val:usr:sourceDivisionId%",
-	                	targetDivisionId:"%val:usr:targetDivisionId%",
-	                	payoutData : JSON.stringify( itemsToJs ),
-	                	payoutAuthKey: "<?php echo $payoutAuthKey ?>",
-	                	payoutHistoryId: "%val:usr:payoutHistoryId%",
+	                	Action : "payoutSlipDeleteApi",
+	                	_csrf : "<?php echo $csrf_token ?>",
 	                },
 	                dataType: "json"
 	            })

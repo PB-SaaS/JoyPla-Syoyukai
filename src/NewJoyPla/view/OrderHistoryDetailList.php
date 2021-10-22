@@ -20,7 +20,7 @@ if(isset($_POST['MyPageID']) && $_POST['MyPageID'] != '' ){
 	$myPageID = $_POST['MyPageID'];
 }
 
-if($userInfo->getUserPermission() != "1" && $myPageID != ''){
+if($userInfo->isUser() && $myPageID != ''){
 	App\Lib\viewNotPossible();
 	exit;
 }

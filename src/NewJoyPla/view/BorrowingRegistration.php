@@ -88,7 +88,7 @@
             <hr>
             <div class="uk-width-1-3@m">
                 <div class="uk-margin">
-                    <select class="uk-select" name="busyo" v-model="divisionId">
+                    <select class="uk-select" name="busyo" v-model="divisionId" v-bind:disabled="division_disabled">
                         <option value="">----- 部署選択 -----</option>
                         <?php
                         foreach($divisionData->data as $data)
@@ -175,7 +175,7 @@
 								<span v-else >任意</span>
 							</td>
 							<td>
-								<input type="text" class="uk-input lot" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
+								<input type="text" class="uk-input lot" style="width:180px" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
 							</td>
 							<td>
 								<input type="date" class="uk-input lotDate" v-model="list.lotDate" v-bind:style="list.lotDateStyle" v-on:change="addLotDateStyle(key)">
@@ -260,7 +260,7 @@
         <div class="uk-modal-header">
             <h2 class="uk-modal-title">商品選択</h2>
         </div>
-        <div class="uk-modal-body">
+        <div class="uk-modal-body uk-width-expand uk-overflow-auto">
          	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-nowrap uk-table-divider">
 				<thead>
 					<tr>
@@ -309,6 +309,7 @@ var app = new Vue({
 		lists: [],
 		divisionId: '',
 		allUsedDate: now_date,
+		division_disabled: false,
 	},
 	methods: {
 		addList: function(object) {
@@ -344,6 +345,9 @@ var app = new Vue({
 			this.lists.splice(key, 1);
 		},
 		sanshouClick: function() {
+			if(! app.divisionCheck()){
+			    return false;
+			}
 			window.open('%url/rel:mpgt:page_175973%', '_blank','scrollbars=yes,width=1220,height=600');
 		},
 		divisionCheck: function(){
@@ -592,7 +596,7 @@ var app = new Vue({
                 url:'%url/rel:mpgt:labelBarcodeSAPI%',
                 type:'POST',
                 data:{
-                	divisionId : $('select[name="sourceDivision"]').val(),
+                	divisionId :app.divisionId,
                 	barcode : barcode,
                 },
                 dataType: 'json'
@@ -609,9 +613,9 @@ var app = new Vue({
                 	}
             		return false;
                 }
+            	this.division_disabled = true;
                 if(data.count == 1)
                 {
-	            	$('select[name="sourceDivision"]').attr('disabled',true);
                 	data = data.data;
                 	if(lotNumber != ''){
                 		data.lotNumber = lotNumber;
@@ -619,18 +623,14 @@ var app = new Vue({
                 	if(lotDate != ''){
                 		data.lotDate = lotDate;
                 	}
-	                let existflg = this.labelSearch(data);
-	                if(!existflg){
-						data.labelCountStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-						data.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-						data.lotNumberStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-						data.lotDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-	                	this.addList(data);
-	                }
+					data.labelCountStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+					data.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+					data.lotNumberStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+					data.lotDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+                	this.addList(data);
 	                
 	                $('input[name="barcode"]').val('');
                 } else {
-	            	$('select[name="sourceDivision"]').attr('disabled',true);
                 	data = data.data;
                 	modal_sections.clear();
                 	for(let num = 0 ; num < data.length ; num++)
@@ -698,10 +698,12 @@ var gs1_128 = new Vue({
 		},
 		check_gs1_128: function (gs1128)
 		{
+		    if(gs1128 == ''){
+		        return false;
+		    }
+		    
 			if(gs1128.indexOf("]C1") !== 0){
-				//UIkit.modal.alert("GS1-128ではありません");
-				//return ;
-				return this.check_gs1_128("]C1"+gs1128);
+				gs1128 = "]C1"+gs1128;
 			}
 			
 			gs1128 = gs1128.slice( 3 );

@@ -1,73 +1,11 @@
-<?php
-include_once 'NewJoyPla/lib/ApiSpiral.php';
-include_once "NewJoyPla/lib/Define.php";
-include_once "NewJoyPla/lib/Func.php";
-include_once "NewJoyPla/lib/SpiralDataBase.php";
-include_once "NewJoyPla/lib/UserInfo.php";
-include_once "NewJoyPla/api/UpdateUnordered.php";
-include_once "NewJoyPla/api/GetCardInfo.php";
-include_once "NewJoyPla/api/GetOrderItems.php";
 
-$userInfo = new App\Lib\UserInfo($SPIRAL);
-
-$spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
-$spiralApiRequest = new SpiralApiRequest();
-$spiralDataBase = new App\Lib\SpiralDataBase($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
-
-$cardInfo = new App\Api\GetCardInfo($spiralDataBase);
-$card = $cardInfo->select("orderdataDB",$SPIRAL->getCardId(),"orderNumber","orderStatus","orderAuthKey","divisionId");
-
-if($userInfo->getUserPermission() != "1" && $card["data"][0][3] != $userInfo->getDivisionId()){
-	App\Lib\viewNotPossible();
-	exit;
-}
-$getOrderItems = new App\Api\GetOrderItems($spiralDataBase);
-$orderItems = $getOrderItems->select($card["data"][0][0],"orderNumber","makerName","itemName","itemCode","itemStandard","price","quantity","orderQuantity","orderPrice","itemJANCode","quantityUnit","itemUnit","orderCNumber","inHospitalItemId");
-$orderItems = $spiralDataBase->arrayToNameArray($orderItems["data"],array("orderNumber","makerName","itemName","itemCode","itemStandard","price","quantity","orderQuantity","orderPrice","itemJANCode","quantityUnit","itemUnit","orderCNumber","inHospitalItemId"));
-
-//,"makerName","itemName","itemCode","itemStandard","price","quantity","orderQuantity","orderPrice","itemJANCode"
-
-$updateUnordered = new App\Api\UpdateUnordered($spiralDataBase);
-$result = $updateUnordered->update($card["data"][0][0]);
-
-$ItemsToJs = array();
-foreach($orderItems as $record){
-	$ItemsToJs[$record["inHospitalItemId"]] = array(
-		"countNum"=> $record["orderQuantity"],
-		"quantity" => $record["quantity"]
-		);
-	
-}
-
-$crypt   = $SPIRAL->getSpiralCryptOpenSsl();
-$authKeyCrypt = $crypt->encrypt($card["data"][0][2], "JoyPla");
-
-
-if($userInfo->getUserPermission() == "1"){
-	$link = '%url/table:back%';
-}else{
-	$link = '%url/rel:mpgt:page_266849%';
-} 
-?> 
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>JoyPla 未発注書</title>
-	<?php include_once "NewJoyPla/src/Head.php"; ?>
-  </head>
-
-  <body>
-
-	<?php if($result["pattern"] == "delete" || $card["data"][0][1] == "2"){ ?>
+	<?php if($is_deleted): ?>
 		<script>
 			UIkit.modal.alert("発注商品が0件となりました。<br>未発注書一覧へ戻ります。").then(function(){
 				location.href ="<?php echo $link ?>&table_cache=true";
 			});
 		</script>
-	<?php exit; } ?>
-
-
-    <?php include_once "NewJoyPla/src/HeaderForMypage.php"; ?>
+	<?php  else: ?>
     <div class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
 	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
 		    <div class="uk-container uk-container-expand">
@@ -78,8 +16,10 @@ if($userInfo->getUserPermission() == "1"){
 				</ul>
 				<div class="no_print uk-margin" uk-margin>
 					<input class="print_hidden uk-button uk-button-default uk-margin-small-top" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
+					<?php if($userInfo->isAdmin() || $userInfo->isUser()): ?>
 					<input class="print_hidden uk-button uk-button-danger uk-margin-small-top" type="submit" value="発注伝票取消" onclick="orderedDelete();return false;">
-					<?php if($userInfo->getUserPermission() == "1"): ?>
+					<?php endif; ?>
+					<?php if(!$userInfo->isUser()): ?>
 					<input class="print_hidden uk-button uk-button-primary uk-margin-small-top" type="submit" id="orderFixButton" value="発注確定" onclick="orderFix();return false;">
 					<?php endif; ?>
 				</div>
@@ -154,32 +94,31 @@ if($userInfo->getUserPermission() == "1"){
 				    			<tbody>
 				    				<?php
 										$num = 1;
-										foreach($orderItems as $record){
+										foreach($order_data as $record){
 											$attr = [];
-	  										$barcodeId = "01".$record["inHospitalItemId"]."X".$record["quantity"];
 				    						echo "<tr>";
 				    						echo "<td>".$num."</td>";
 				    						echo "<td class='no_print'><input type='checkbox' class='uk-checkbox itemsCheckBox' name='check".$num."'></td>";
-				    						echo "<td>".$record["makerName"]."</td>";
-				    						echo "<td>".$record["itemName"]."</td>";
-				    						echo "<td>".$record["itemCode"]."</td>";
-				    						echo "<td>".$record["itemStandard"]."</td>";
-				    						echo "<td>￥<script>price('".$record["price"]."')</script><span class='uk-text-small'> / 1".$record["itemUnit"]."</span></td>";
-				    						echo "<td>".$record["quantity"]."<span class='uk-text-small'>".$record["quantityUnit"]."</span></td>";
-				    						if( $record["orderQuantity"] > 0 )
+				    						echo "<td>".$record->makerName."</td>";
+				    						echo "<td>".$record->itemName."</td>";
+				    						echo "<td>".$record->itemCode."</td>";
+				    						echo "<td>".$record->itemStandard."</td>";
+				    						echo "<td>￥<script>price('".$record->price."')</script><span class='uk-text-small'> / 1".$record->itemUnit."</span></td>";
+				    						echo "<td>".$record->quantity."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
+				    						if( $record->orderQuantity > 0 )
 											{
 												$attr['min'] = 1;
 											}
-											else if( $record["orderQuantity"] < 0 )
+											else if( $record->orderQuantity < 0 )
 											{
 												$attr['max'] = -1;
 											}
 				    						echo "<td><input type='number' step='1' class='uk-input' style='color:#444444;width:100px;' onchange='active(this,".$num.")' ";
 											foreach($attr as $key => $val) echo " $key='$val' ";
-											echo "value='".$record["orderQuantity"]."'><span class='uk-text-small uk-text-middle'>".$record["itemUnit"]."</span></td>";
+											echo "value='".$record->orderQuantity."'><span class='uk-text-small uk-text-middle'>".$record->itemUnit."</span></td>";
 
-				    						echo "<td>￥<script>price('".$record["orderPrice"]."')</script></td>";
-				    						echo "<td style='display:none'>".$record["orderCNumber"]."</td>";
+				    						echo "<td>￥<script>price('".$record->orderPrice."')</script></td>";
+				    						echo "<td style='display:none'>".$record->orderCNumber."</td>";
 				    						echo "</tr>";
 				    						$num++;
 				    					}
@@ -216,7 +155,7 @@ if($userInfo->getUserPermission() == "1"){
 	</div>
     <script>
 		let canAjax = true;
-    	let upToData = {};
+    	let upToData = [];
 		$(function(){
 		 
 		 let order_num = $("#hacchu_num").text();
@@ -242,14 +181,14 @@ if($userInfo->getUserPermission() == "1"){
 				console.log('通信中');
 				return;
 			}
+			upToData = [];
 			$("#tbl-Items tbody tr").map(function () {
 				let td = $(this).children();
 				if($(td[1]).children("input")[0].checked ){
-					upToData[$(td[10]).text()] = {
+					upToData.push({
+						orderCNumber: $(td[10]).text(),
 						num: $(td[8]).children("input").val(),
-					};
-				} else {
-					delete upToData[$(td[11]).text()] ;
+					});
 				}
 			});
 			if(Object.keys(upToData).length == 0){
@@ -263,9 +202,13 @@ if($userInfo->getUserPermission() == "1"){
 				canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
 				$.ajax({
 					async: false,
-	                url:"%url/card:page_267235%",
+	                url:"<?php echo $api_url ?>",
 	                type:"POST",
-	                data:{data:JSON.stringify(upToData)},
+	                data:{
+	                	data:JSON.stringify(upToData),
+	                	_csrf : '<?php echo $csrf_token ?>',
+	                	Action : 'itemUpdate',
+	                },
 	                dataType: "json"
 		        })
 	            // Ajaxリクエストが成功した時発動
@@ -301,14 +244,14 @@ if($userInfo->getUserPermission() == "1"){
 				console.log('通信中');
 				return;
 			}
+			upToData = [];
 			$("#tbl-Items tbody tr").map(function () {
 				let td = $(this).children();
 				if($(td[1]).children("input")[0].checked){
-					upToData[$(td[10]).text()] = {
+					upToData.push({
+						orderCNumber: $(td[10]).text(),
 						num: $(td[8]).children("input").val(),
-					};
-				} else {
-					delete upToData[$(td[10]).text()] ;
+					});
 				}
 			});
 			if(Object.keys(upToData).length == 0){
@@ -320,9 +263,13 @@ if($userInfo->getUserPermission() == "1"){
 				canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
 				$.ajax({
 					async: false,
-	                url:"%url/card:page_267236%",
+	                url:"<?php echo $api_url ?>",
 	                type:"POST",
-	                data:{data:JSON.stringify(upToData)},
+	                data:{
+	                	data:JSON.stringify(upToData),
+	                	_csrf : '<?php echo $csrf_token ?>',
+	                	Action : 'itemDelete',
+	                },
 	                dataType: "json"
 		        })
 	            // Ajaxリクエストが成功した時発動
@@ -363,10 +310,11 @@ if($userInfo->getUserPermission() == "1"){
 				canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
 				$.ajax({
 					async: false,
-	                url:"%url/card:page_162483%",
+	                url:"<?php echo $api_url ?>",
 	                type:"POST",
 	                data:{
-                		orderAuthKey: "<?php echo $authKeyCrypt ?>" ,
+	                	Action : 'orderCommentApi',
+	                	_csrf : '<?php echo $csrf_token ?>',
 	                	ordercomment: encodeURI($("textarea[name='ordercomment']").val()),
 	                },
 	                dataType: "json"
@@ -397,7 +345,6 @@ if($userInfo->getUserPermission() == "1"){
 				UIkit.modal.alert("中止します");
 			});
 		}
-		<?php if($userInfo->getUserPermission() == "1"): ?>
 		function orderFix(){
 			if(!canAjax) { 
 				console.log('通信中');
@@ -409,12 +356,11 @@ if($userInfo->getUserPermission() == "1"){
 				canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
 				$.ajax({
 					async: false,
-	                url:"%url/card:page_267202%",
+	                url:"<?php echo $api_url ?>",
 	                type:"POST",
 	                data:{
-                		orderAuthKey: "<?php echo $authKeyCrypt ?>" ,
-	                	order:JSON.stringify(itemsToJs),
-	                	ordercomment: encodeURI($("textarea[name='ordercomment']").val()),
+	                	_csrf : '<?php echo $csrf_token ?>',
+	                	Action : 'orderFix',
 	                },
 	                dataType: "json"
 		        })
@@ -446,7 +392,6 @@ if($userInfo->getUserPermission() == "1"){
 				UIkit.modal.alert("中止します");
 			});
 		}
-		<?php endif; ?>
 		
 		function orderedDelete(){
 			if(!canAjax) { 
@@ -459,13 +404,11 @@ if($userInfo->getUserPermission() == "1"){
 				canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
 				$.ajax({
 					async: false,
-					url:"%url/card:page_267227%",
+	                url:"<?php echo $api_url ?>",
 					type:"POST",
 					data:{
-						orderAuthKey: "<?php echo $authKeyCrypt ?>" ,
-						orderData : JSON.stringify( objectValueToURIencode(itemsToJs) ),
-						divisionId : "%val:usr:divisionId%",
-						countFlg : null
+						Action: "orderDelete",
+	                	_csrf : '<?php echo $csrf_token ?>',
 					},
 					dataType: "json"
 				})
@@ -500,5 +443,4 @@ if($userInfo->getUserPermission() == "1"){
 			});
 		}
     </script>
-  </body>
-</html>
+	<?php  endif ?>
