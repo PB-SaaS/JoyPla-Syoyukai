@@ -18,37 +18,8 @@
             <?php if ($userInfo->isAdmin() || $userInfo->isApprover()): ?>
 
                 <input class="print_hidden uk-button uk-button-primary" type="submit" value="院内商品情報変更" onclick="document.itemsChange.submit()">
-                <form action="/regist/is" method="post" name="itemsChange" target="_blank" class="uk-hidden">
-                    %SMPAREA%
-                    <input type="hidden" name="SMPFORM" value="%smpform:330_inHpItemsC%">
-                    <input type="hidden" name="hospitalId" value="%val:usr:hospitalId%">
-                    <input type="hidden" name="makerName" value="%val:usr:makerName%">
-                    <input type="hidden" name="itemId" value="%val:usr:itemId%">
-                    <input type="hidden" name="itemName" value="%val:usr:itemName%">
-                    <input type="hidden" name="itemCode" value="%val:usr:itemCode%">
-                    <input type="hidden" name="itemStandard" value="%val:usr:itemStandard%">
-                    <input type="hidden" name="itemJANCode" value="%val:usr:itemJANCode%">
-                    <input type="hidden" name="price" value="%val:usr:price%">
-                    <input type="hidden" name="inHospitalItemId" value="%val:usr:inHospitalItemId%">
-                    <input type="hidden" name="authKey" value="%val:usr:authKey%">
-
-                    <input type="hidden" name="notUsedFlag" value="%val:usr:notUsedFlag%">
-                    <input type="hidden" name="distributorId" value="%val:usr:distributorId%">
-                    <input type="hidden" name="catalogNo" value="%val:usr:catalogNo%">
-                    <input type="hidden" name="serialNo" value="%val:usr:serialNo%">
-                    <input type="hidden" name="quantity" value="%val:usr:quantity%">
-                    <input type="hidden" name="quantityUnit" value="%val:usr:quantityUnit%">
-                    <input type="hidden" name="itemUnit" value="%val:usr:itemUnit%">
-                    <input type="hidden" name="price" value="%val:usr:price%">
-                    <input type="hidden" name="priceId" value="%val:usr:priceId%">
-                    <input type="hidden" name="medicineCategory" value="%val:usr:medicineCategory%">
-                    <input type="hidden" name="homeCategory" value="%val:usr:homeCategory%">
-                    <input type="hidden" name="HPstock" value="%val:usr:HPstock%">
-                    <input type="hidden" name="notice" value="%val:usr:notice%">
-                    <input type="hidden" name="unitPrice" value="%val:usr:unitPrice%">
-                    <input type="hidden" name="measuringInst" value="%val:usr:measuringInst%">
-                    <input type="hidden" name="oldPrice" value="%val:usr:price%">
-                    <input type="hidden" name="oldUnitPrice" value="%val:usr:unitPrice%">
+                <form action="<?php echo $api_url ?>" method="post" name="itemsChange" class="uk-hidden">
+                    <input type="hidden" name="Action" value="InHospitalItemUpdate">
                 </form>
 
             <?php endif ?>
@@ -168,7 +139,7 @@
         <div class="uk-modal-header">
             <h2 class="uk-modal-title">ラベル発行</h2>
         </div>
-        <form action="%url/rel:@mpgt:createLabel%" target="_blank" method="post" class="uk-form-horizontal">
+        <form action="<?php echo $api_url ?>" target="_blank" method="post" class="uk-form-horizontal">
             <div class="uk-modal-body">
                 <div class="uk-margin">
                     <label class="uk-form-label">入数指定</label>
@@ -222,7 +193,7 @@
             <div class="uk-modal-footer uk-text-right">
                 <button class="uk-button uk-button-default uk-modal-close" type="button">閉じる</button>
                 <input class="print_hidden uk-button uk-button-primary" type="submit" value="ラベル発行" onclick='return inHP_detail.createLabel("%val:usr:inHospitalItemId%")'>
-                <input type="hidden" value="" name="itemsData" id="itemsData">
+                <input type="hidden" value="createLabel" name="Action" id="itemsData">
                 <input type="hidden" value="%val:usr:distributorName%" name="distributorName">
             </div>
         </form>
@@ -243,21 +214,6 @@ class InHospitalItemDetail
     
         $("#notUsedFlag").addClass(label);
 
-        let itemsToJs = {
-            "%val:usr:inHospitalItemId%":{
-            "receivingCount":"0",
-            "quantity":"%val:usr:quantity%",
-            "makerName":"%val:usr:makerName%",
-            "itemName":"%val:usr:itemName%",
-            "itemCode":"%val:usr:itemCode%",
-            "itemStandard":"%val:usr:itemStandard%",
-            "quantityUnit":"%val:usr:quantityUnit%",
-            "itemUnit":"%val:usr:itemUnit%",
-            "itemJANCode":"%val:usr:itemJANCode%",
-            "totalReturnCount":"0",
-            "labelId":"%val:usr:labelId%",
-            }
-        };
     }
 
     createLabel(inHospitalItemId)
@@ -267,10 +223,7 @@ class InHospitalItemDetail
             UIkit.modal.alert('入力値に不正があります。<br>ご確認ください');
             return false;
         }
-        this.itemsToJs[inHospitalItemId].receivingCount = $('input[name="printCount"]').val();
-        this.itemsToJs[inHospitalItemId].quantity = $('input[name="quantity"]').val();
       
-        $("#itemsData").val(JSON.stringify( objectValueToURIencode(this.itemsToJs) ));
         return true;
     }
 

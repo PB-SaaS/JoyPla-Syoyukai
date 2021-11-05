@@ -24,7 +24,7 @@
 					<?php endif; ?>
 				</div>
 		    	<div class="uk-text-center uk-text-large">
-		    		<p class="uk-text-bold" style="font-size: 32px">（ 未 ）発　　注　　書</p>
+		    		<p class="uk-text-bold title_spacing" style="font-size: 32px">（未）発注書</p>
 		    	</div>
 		    	<div uk-grid>
 			    	<div class="uk-width-1-2@m">

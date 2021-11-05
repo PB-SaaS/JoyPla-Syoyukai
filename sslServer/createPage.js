@@ -1,76 +1,104 @@
 
 function createClosePage(){
-	const html = `
-	<nav class="uk-navbar-container" uk-navbar>
-<div class="uk-navbar-left">
- <a href="#" class="uk-navbar-item uk-logo">
-  <img src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png" />
- </a>
-</div>
-</nav>
-<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove">
-<div class="uk-container uk-container-expand" uk-height-viewport="expand: true">
- <div class="uk-width-2-3@m uk-margin-auto uk-margin-remove-top uk-margin-bottom uk-text-center" id="mainPage">
-  <h1><span uk-icon="icon: warning; ratio: 2.5" class="uk-margin-right"></span><span class="uk-text-middle">’÷‚ßØ‚è‚Ü‚µ‚½</span></h1>
-  <div class="uk-card uk-card-default uk-text-center">
-	  <div class="uk-card-body">
-		  <p class="uk-card-title uk-text-warning">Œ»İ“o˜^E•ÏX‚ª‚Å‚«‚Ü‚¹‚ñ</p>
-	  </div>
-	  <div class="uk-card-footer">
-		  <p class="uk-background-muted uk-width-middle uk-text-bold uk-text-left uk-padding-small">‚¨–â‡‚¹</p>
-		  <p class="uk-text-left">
-			  Š”®‰ïĞƒpƒCƒvƒhƒrƒbƒc<br>
-			  ƒzƒXƒsƒ^ƒ‹ƒ\ƒŠƒ…[ƒVƒ‡ƒ“–‹Æ•”<br>
-			  TEL 03-5575-6601<br>
-			  Mail@JoyPla-spd@pi-pe.co.jp<br>
-			  URL@https://www.pi-pe.co.jp<br>
-		  </p>
-	  </div>
-  </div>
- </div>
-</div>
-</div>`;
+	let html = '<nav class="uk-navbar-container" uk-navbar>';
+	html += '<div class="uk-navbar-left">';
+	html += '<a href="#" class="uk-navbar-item uk-logo">';
+	html += '<img src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png" />';
+	html += '</a>';
+	html += '</div>';
+	html += '</nav>';
+	html += '<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove">';
+	html += '<div class="uk-container uk-container-expand" uk-height-viewport="expand: true">';
+	html += '<div class="uk-width-2-3@m uk-margin-auto uk-margin-remove-top uk-margin-bottom uk-text-center" id="mainPage">';
+	html += '<h1><span uk-icon="icon: warning; ratio: 2.5" class="uk-margin-right"></span><span class="uk-text-middle">ç· ã‚åˆ‡ã‚Šã¾ã—ãŸ</span></h1>';
+	html += '<div class="uk-card uk-card-default uk-text-center">';
+	html += '<div class="uk-card-body">';
+	html += '<p class="uk-card-title uk-text-warning">ç¾åœ¨ç™»éŒ²ãƒ»å¤‰æ›´ãŒã§ãã¾ã›ã‚“</p>';
+	html += '</div>';
+	html += '<div class="uk-card-footer">';
+	html += '<p class="uk-background-muted uk-width-middle uk-text-bold uk-text-left uk-padding-small">ãŠå•åˆã›</p>';
+	html += '<p class="uk-text-left">';
+	html += 'æ ªå¼ä¼šç¤¾ãƒ‘ã‚¤ãƒ—ãƒ‰ãƒ“ãƒƒãƒ„<br>';
+	html += 'ãƒ›ã‚¹ãƒ”ã‚¿ãƒ«ã‚½ãƒªãƒ¥ãƒ¼ã‚·ãƒ§ãƒ³äº‹æ¥­éƒ¨<br>';
+	html += 'TEL 03-5575-6601<br>';
+	html += 'Mailã€€JoyPla-spd@pi-pe.co.jp<br>';
+	html += 'URLã€€https://www.pi-pe.co.jp<br>';
+	html += '</p>';
+	html += '</div>';
+	html += '</div>';
+	html += '</div>';
+	html += '</div>';
+	html += '</div>';
 	$('body').html(html);
-	$('title').text('JoyPla “o˜^E•ÏX‚ğ’÷‚ßØ‚è‚Ü‚µ‚½');
+	$('title').text('JoyPla ç™»éŒ²ãƒ»å¤‰æ›´ã‚’ç· ã‚åˆ‡ã‚Šã¾ã—ãŸ');
 	$('head').append('<link rel="icon" href="https://i02.smp.ne.jp/u/joypla/new/favicon.ico">');
 }
 
 
-function createErrorPage(code,message){
-	const html = `
-	<nav class="uk-navbar-container" uk-navbar>
-<div class="uk-navbar-left">
- <a href="#" class="uk-navbar-item uk-logo">
-  <img src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png" />
- </a>
-</div>
-</nav>
-<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove">
-<div class="uk-container uk-container-expand" uk-height-viewport="expand: true">
- <div class="uk-width-2-3@m uk-margin-auto uk-margin-remove-top uk-margin-bottom uk-text-center" id="mainPage">
-  <h1><span uk-icon="icon: warning; ratio: 2.5" class="uk-margin-right"></span><span class="uk-text-middle">ƒVƒXƒeƒ€ƒGƒ‰[</span></h1>
-  <div class="uk-card uk-card-default uk-text-center">
-	  <div class="uk-card-body">
-		  <p class="uk-card-title uk-text-danger">ƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½B<br>
-		  ƒuƒ‰ƒEƒU‚ğ•Â‚¶Ä“xƒAƒNƒZƒX‚µ‚Ä‚­‚¾‚³‚¢B</p>
-		  <p class="uk-text-danger">${code} : ${message}</p>
-	  </div>
-	  <div class="uk-card-footer">
-		  <p class="uk-background-muted uk-width-middle uk-text-bold uk-text-left uk-padding-small">‚¨–â‡‚¹</p>
-		  <p class="uk-text-left">
-			  Š”®‰ïĞƒpƒCƒvƒhƒrƒbƒc<br>
-			  ƒzƒXƒsƒ^ƒ‹ƒ\ƒŠƒ…[ƒVƒ‡ƒ“–‹Æ•”<br>
-			  TEL 03-5575-6601<br>
-			  Mail@JoyPla-spd@pi-pe.co.jp<br>
-			  URL@https://www.pi-pe.co.jp<br>
-		  </p>
-	  </div>
-  </div>
- </div>
-</div>
-</div>`;
+function createErrorPage2(code,message){
+	let html = '<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove">';
+	html += '<div class="uk-container uk-container-expand" uk-height-viewport="expand: true">';
+	html += '<div class="uk-width-2-3@m uk-margin-auto uk-margin-remove-top uk-margin-bottom uk-text-center" id="mainPage">';
+	html += '<h1><span uk-icon="icon: warning; ratio: 2.5" class="uk-margin-right"></span><span class="uk-text-middle">ã‚·ã‚¹ãƒ†ãƒ ã‚¨ãƒ©ãƒ¼</span></h1>';
+	html += '<div class="uk-card uk-card-default uk-text-center">';
+	html += '<div class="uk-card-body">';
+	html += '<p class="uk-card-title uk-text-danger">ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚<br>';
+	html += 'ãƒ–ãƒ©ã‚¦ã‚¶ã‚’é–‰ã˜å†åº¦ã‚¢ã‚¯ã‚»ã‚¹ã—ã¦ãã ã•ã„ã€‚</p>';
+	html += '<p class="uk-text-danger">'+code+' : '+message+'</p>';
+	html += '</div>';
+	html += '<div class="uk-card-footer">';
+	html += '<p class="uk-background-muted uk-width-middle uk-text-bold uk-text-left uk-padding-small">ãŠå•åˆã›</p>';
+	html += '<p class="uk-text-left">';
+	html += 'æ ªå¼ä¼šç¤¾ãƒ‘ã‚¤ãƒ—ãƒ‰ãƒ“ãƒƒãƒ„<br>';
+	html += 'ãƒ›ã‚¹ãƒ”ã‚¿ãƒ«ã‚½ãƒªãƒ¥ãƒ¼ã‚·ãƒ§ãƒ³äº‹æ¥­éƒ¨<br>';
+	html += 'TEL 03-5575-6601<br>';
+	html += 'Mailã€€JoyPla-spd@pi-pe.co.jp<br>';
+	html += 'URLã€€https://www.pi-pe.co.jp<br>';
+	html += '</p>';
+	html += '</div>';
+	html += '</div>';
+	html += '</div>';
+	html += '</div>';
+	html += '</div>';
 	$('body').html(html);
-	$('title').text('JoyPla ƒVƒXƒeƒ€ƒGƒ‰[');
+	$('title').text('JoyPla ã‚·ã‚¹ãƒ†ãƒ ã‚¨ãƒ©ãƒ¼');
+	$('head').append('<link rel="icon" href="https://i02.smp.ne.jp/u/joypla/new/favicon.ico">');
+}
+
+function createErrorPage(code,message){
+	let html = '<nav class="uk-navbar-container" uk-navbar>';
+	html += '<div class="uk-navbar-left">';
+	html += '<a href="#" class="uk-navbar-item uk-logo">';
+	html += '<img src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png" />';
+	html += '</a>';
+	html += '</div>';
+	html += '</nav>';
+	html += '<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove">';
+	html += '<div class="uk-container uk-container-expand" uk-height-viewport="expand: true">';
+	html += '<div class="uk-width-2-3@m uk-margin-auto uk-margin-remove-top uk-margin-bottom uk-text-center" id="mainPage">';
+	html += '<h1><span uk-icon="icon: warning; ratio: 2.5" class="uk-margin-right"></span><span class="uk-text-middle">ã‚·ã‚¹ãƒ†ãƒ ã‚¨ãƒ©ãƒ¼</span></h1>';
+	html += '<div class="uk-card uk-card-default uk-text-center">';
+	html += '<div class="uk-card-body">';
+	html += '<p class="uk-card-title uk-text-danger">ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚<br>';
+	html += 'ãƒ–ãƒ©ã‚¦ã‚¶ã‚’é–‰ã˜å†åº¦ã‚¢ã‚¯ã‚»ã‚¹ã—ã¦ãã ã•ã„ã€‚</p>';
+	html += '<p class="uk-text-danger">'+code+' : '+message+'</p>';
+	html += '</div>';
+	html += '<div class="uk-card-footer">';
+	html += '<p class="uk-background-muted uk-width-middle uk-text-bold uk-text-left uk-padding-small">ãŠå•åˆã›</p>';
+	html += '<p class="uk-text-left">';
+	html += 'æ ªå¼ä¼šç¤¾ãƒ‘ã‚¤ãƒ—ãƒ‰ãƒ“ãƒƒãƒ„<br>';
+	html += 'ãƒ›ã‚¹ãƒ”ã‚¿ãƒ«ã‚½ãƒªãƒ¥ãƒ¼ã‚·ãƒ§ãƒ³äº‹æ¥­éƒ¨<br>';
+	html += 'TEL 03-5575-6601<br>';
+	html += 'Mailã€€JoyPla-spd@pi-pe.co.jp<br>';
+	html += 'URLã€€https://www.pi-pe.co.jp<br>';
+	html += '</p>';
+	html += '</div>';
+	html += '</div>';
+	html += '</div>';
+	html += '</div>';
+	html += '</div>';
+	$('body').html(html);
+	$('title').text('JoyPla ã‚·ã‚¹ãƒ†ãƒ ã‚¨ãƒ©ãƒ¼');
 	$('head').append('<link rel="icon" href="https://i02.smp.ne.jp/u/joypla/new/favicon.ico">');
 }
 //createLoginErrorPage('1','%val:error:msg%','%val:error:referrer%','%area:hidden%','%area_rereg_url%');
@@ -80,54 +108,52 @@ function createLoginPage(pagetype,msg,referrer,hidden,area_rereg_url){
 	afterMsg = '';
 	alertMsg = '';
 	if(pagetype == 2){
-		afterMsg = 'ƒGƒ‰[';
-		alertMsg = `<p class="uk-text-danger">${msg}</p>`;
+		afterMsg = 'ã‚¨ãƒ©ãƒ¼';
+		alertMsg = '<p class="uk-text-danger">'+msg+'</p>';
 	}
-	const html = `
-	<nav class="uk-navbar-container" uk-navbar>
-	<div class="uk-navbar-left">
-	<a href="#" class="uk-navbar-item uk-logo">
-	<img src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png" />
-	</a>
-	</div>
-	</nav>
-	<div class="uk-section uk-section-default uk-preserve-color">
-			<div class="uk-container uk-container-small" uk-height-viewport="expand: true">
-				<div class="uk-card uk-card-default">
-					<div class="uk-card-header">
-						<h3 class="uk-card-title">JoyPla •a‰@—lƒƒOƒCƒ“</h3>
-					</div>
-					<div class="uk-card-body">
-						${alertMsg}
-						<form class="uk-form-stacked" action="/area/Login" autocomplete="off" method="post">
-							<div class="uk-margin">
-								<label class="uk-form-label" for="SMPID">ƒƒOƒCƒ“ID</label>
-								<div class="uk-form-controls">
-									<input class="uk-input" type="text" name="SMPID" id="SMPID" placeholder="ƒƒOƒCƒ“ID">
-								</div>
-							</div>
-							<div class="uk-margin">
-								<label class="uk-form-label" for="SMPID">ƒpƒXƒ[ƒh</label>
-								<div class="uk-form-controls">
-									<input class="uk-input uk-password" type="password" id="SMPPASSWORD" name="SMPPASSWORD">
-								</div>
-							</div>
-							<div class="uk-text-center">
-								<button class="uk-button uk-button-primary">ƒƒOƒCƒ“</button>
-							</div>
-							<input name="SMPBACKURL" type="hidden" value="${referrer}"><br>
-							<div class="uk-text-center uk-margin-top">
-								<a href="${area_rereg_url}">ƒpƒXƒ[ƒh“o˜^E•ÏXè‘±‚«</a>
-							</div>
-							<div class="uk-hidden">${hidden}</div>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-	`;
+	let html = '<nav class="uk-navbar-container" uk-navbar>';
+	html += '<div class="uk-navbar-left">';
+	html += '<a href="#" class="uk-navbar-item uk-logo">';
+	html += '<img src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png" />';
+	html += '</a>';
+	html += '</div>';
+	html += '</nav>';
+	html += '<div class="uk-section uk-section-default uk-preserve-color">';
+	html += '<div class="uk-container uk-container-small" uk-height-viewport="expand: true">';
+	html += '<div class="uk-card uk-card-default">';
+	html += '<div class="uk-card-header">';
+	html += '<h3 class="uk-card-title">JoyPla ç—…é™¢æ§˜ãƒ­ã‚°ã‚¤ãƒ³</h3>';
+	html += '</div>';
+	html += '<div class="uk-card-body">';
+	html += alertMsg;
+	html += '<form class="uk-form-stacked" action="/area/Login" autocomplete="off" method="post">';
+	html += '<div class="uk-margin">';
+	html += '<label class="uk-form-label" for="SMPID">ãƒ­ã‚°ã‚¤ãƒ³ID</label>';
+	html += '<div class="uk-form-controls">';
+	html += '<input class="uk-input" type="text" name="SMPID" id="SMPID" placeholder="ãƒ­ã‚°ã‚¤ãƒ³ID">';
+	html += '</div>';
+	html += '</div>';
+	html += '<div class="uk-margin">';
+	html += '<label class="uk-form-label" for="SMPID">ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰</label>';
+	html += '<div class="uk-form-controls">';
+	html += '<input class="uk-input uk-password" type="password" id="SMPPASSWORD" name="SMPPASSWORD">';
+	html += '</div>';
+	html += '</div>';
+	html += '<div class="uk-text-center">';
+	html += '<button class="uk-button uk-button-primary">ãƒ­ã‚°ã‚¤ãƒ³</button>';
+	html += '</div>';
+	html += '<input name="SMPBACKURL" type="hidden" value="'+referrer+'"><br>';
+	html += '<div class="uk-text-center uk-margin-top">';
+	html += '<a href="'+area_rereg_url+'">ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ç™»éŒ²ãƒ»å¤‰æ›´æ‰‹ç¶šã</a>';
+	html += '</div>';
+	html += '<div class="uk-hidden">'+hidden+'</div>';
+	html += '</form>';
+	html += '</div>';
+	html += '</div>';
+	html += '</div>';
+	html += '</div>';
 	$('body').html(html);
-	$('title').text('JoyPla ƒƒOƒCƒ“'+afterMsg);
+	$('title').text('JoyPla ãƒ­ã‚°ã‚¤ãƒ³'+afterMsg);
 	$('head').append('<link rel="icon" href="https://i02.smp.ne.jp/u/joypla/new/favicon.ico">');
 }
 
@@ -136,54 +162,52 @@ function createOroshiLoginPage(pagetype,msg,referrer,hidden,area_rereg_url){
 	afterMsg = '';
 	alertMsg = '';
 	if(pagetype == 2){
-		afterMsg = 'ƒGƒ‰[';
-		alertMsg = `<p class="uk-text-danger">${msg}</p>`;
+		afterMsg = 'ã‚¨ãƒ©ãƒ¼';
+		alertMsg = '<p class="uk-text-danger">'+msg+'</p>';
 	}
-	const html = `
-	<nav class="uk-navbar-container" uk-navbar>
-	<div class="uk-navbar-left">
-	<a href="#" class="uk-navbar-item uk-logo">
-	<img src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png" />
-	</a>
-	</div>
-	</nav>
-	<div class="uk-section uk-section-default uk-preserve-color">
-			<div class="uk-container uk-container-small" uk-height-viewport="expand: true">
-				<div class="uk-card uk-card-default">
-					<div class="uk-card-header">
-						<h3 class="uk-card-title">JoyPla ‰µ‹ÆÒ—lƒƒOƒCƒ“</h3>
-					</div>
-					<div class="uk-card-body">
-						${alertMsg}
-						<form class="uk-form-stacked" action="/area/Login" autocomplete="off" method="post">
-							<div class="uk-margin">
-								<label class="uk-form-label" for="SMPID">ƒƒOƒCƒ“ID</label>
-								<div class="uk-form-controls">
-									<input class="uk-input" type="text" name="SMPID" id="SMPID" placeholder="ƒƒOƒCƒ“ID">
-								</div>
-							</div>
-							<div class="uk-margin">
-								<label class="uk-form-label" for="SMPID">ƒpƒXƒ[ƒh</label>
-								<div class="uk-form-controls">
-									<input class="uk-input uk-password" type="password" id="SMPPASSWORD" name="SMPPASSWORD">
-								</div>
-							</div>
-							<div class="uk-text-center">
-								<button class="uk-button uk-button-primary">ƒƒOƒCƒ“</button>
-							</div>
-							<input name="SMPBACKURL" type="hidden" value="${referrer}"><br>
-							<div class="uk-text-center uk-margin-top">
-								<a href="${area_rereg_url}">ƒpƒXƒ[ƒh“o˜^E•ÏXè‘±‚«</a>
-							</div>
-							<div class="uk-hidden">${hidden}</div>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-	`;
+	let html = '<nav class="uk-navbar-container" uk-navbar>';
+	html += '<div class="uk-navbar-left">';
+	html += '<a href="#" class="uk-navbar-item uk-logo">';
+	html += '<img src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png" />';
+	html += '</a>';
+	html += '</div>';
+	html += '</nav>';
+	html += '<div class="uk-section uk-section-default uk-preserve-color">';
+	html += '<div class="uk-container uk-container-small" uk-height-viewport="expand: true">';
+	html += '<div class="uk-card uk-card-default">';
+	html += '<div class="uk-card-header">';
+	html += '<h3 class="uk-card-title">JoyPla å¸æ¥­è€…æ§˜ãƒ­ã‚°ã‚¤ãƒ³</h3>';
+	html += '</div>';
+	html += '<div class="uk-card-body">';
+	html += alertMsg;
+	html += '<form class="uk-form-stacked" action="/area/Login" autocomplete="off" method="post">';
+	html += '<div class="uk-margin">';
+	html += '<label class="uk-form-label" for="SMPID">ãƒ­ã‚°ã‚¤ãƒ³ID</label>';
+	html += '<div class="uk-form-controls">';
+	html += '<input class="uk-input" type="text" name="SMPID" id="SMPID" placeholder="ãƒ­ã‚°ã‚¤ãƒ³ID">';
+	html += '</div>';
+	html += '</div>';
+	html += '<div class="uk-margin">';
+	html += '<label class="uk-form-label" for="SMPID">ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰</label>';
+	html += '<div class="uk-form-controls">';
+	html += '<input class="uk-input uk-password" type="password" id="SMPPASSWORD" name="SMPPASSWORD">';
+	html += '</div>';
+	html += '</div>';
+	html += '<div class="uk-text-center">';
+	html += '<button class="uk-button uk-button-primary">ãƒ­ã‚°ã‚¤ãƒ³</button>';
+	html += '</div>';
+	html += '<input name="SMPBACKURL" type="hidden" value="'+referrer+'"><br>';
+	html += '<div class="uk-text-center uk-margin-top">';
+	html += '<a href="'+area_rereg_url+'">ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ç™»éŒ²ãƒ»å¤‰æ›´æ‰‹ç¶šã</a>';
+	html += '</div>';
+	html += '<div class="uk-hidden">'+hidden+'</div>';
+	html += '</form>';
+	html += '</div>';
+	html += '</div>';
+	html += '</div>';
+	html += '</div>';
+
 	$('body').html(html);
-	$('title').text('JoyPla ƒƒOƒCƒ“'+afterMsg);
+	$('title').text('JoyPla ãƒ­ã‚°ã‚¤ãƒ³'+afterMsg);
 	$('head').append('<link rel="icon" href="https://i02.smp.ne.jp/u/joypla/new/favicon.ico">');
-	
-	}
+}

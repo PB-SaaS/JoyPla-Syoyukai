@@ -13,6 +13,8 @@ use App\Model\OrderHistory;
 use App\Model\ReceivingHistory;
 use App\Model\ReturnHistory;
 use App\Model\PayoutHistory;
+use App\Model\InventoryHistory;
+use App\Model\InventoryEnd;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use StdClass;
@@ -33,6 +35,8 @@ class SlipBarcodeSearchController extends Controller
                   '04' => HP_RECEIVING_PAGE,
                   '06' => HP_RETERN_PAGE,
                   '05' => HP_PAYOUT_PAGE,
+                  '08' => HP_DIVISION_INVENTORY_PAGE,
+                  '09' => HP_END_INVENTORY_PAGE,
             );
             
             $this->jsessonId = '';
@@ -143,6 +147,36 @@ class SlipBarcodeSearchController extends Controller
                               $card_title = $this->card_title['05'];
                         }
                   }
+                  else if(preg_match('/^08/', $search_value) && strlen($search_value) == 18)
+                  {
+                        //棚卸
+                        $result = InventoryHistory::where('inventoryHId',$search_value)->where('hospitalId',$user_info->getHospitalId())->get();
+
+                        if($result->count == '0'){
+                              throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+                        }
+
+                        $record = $result->data->get(0);
+
+                        if(isset($this->card_title['08'])){
+                              $card_title = $this->card_title['08'];
+                        }
+                  }
+                  else if(preg_match('/^09/', $search_value) && strlen($search_value) == 18)
+                  {
+                        //棚卸
+                        $result = InventoryEnd::where('inventoryEndId',$search_value)->where('hospitalId',$user_info->getHospitalId())->get();
+
+                        if($result->count == '0'){
+                              throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+                        }
+
+                        $record = $result->data->get(0);
+
+                        if(isset($this->card_title['09'])){
+                              $card_title = $this->card_title['09'];
+                        }
+                  }
 
                   if($card_title != '' && $record != '')
                   {
@@ -155,7 +189,7 @@ class SlipBarcodeSearchController extends Controller
                   }
                   else 
                   {
-                        throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+                        throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
                   }
 
             } catch ( Exception $ex ) {

@@ -165,8 +165,6 @@
                     data:{
                         _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
                         Action : "cancelApi",
-                        usedSlipId : "%val:usr:usedSlipId%",
-                        authKey : "%val:usr:authKey%"
                     },
                     dataType: 'json'
                 })
@@ -206,8 +204,6 @@
                     data:{
                         _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
                         Action : "usedSlipApprovalApi",
-                        usedSlipId : "%val:usr:usedSlipId%",
-                        authKey : "%val:usr:authKey%"
                     },
                     dataType: 'json'
                 })

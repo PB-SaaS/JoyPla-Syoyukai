@@ -1,5 +1,6 @@
 <?php
 //院内商品情報の一括登録
+/*
 include_once 'NewJoyPla/lib/ApiSpiral.php';
 include_once "NewJoyPla/lib/Define.php";
 include_once 'NewJoyPla/lib/SpiralDataBase.php';

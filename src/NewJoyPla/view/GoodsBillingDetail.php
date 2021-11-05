@@ -14,7 +14,7 @@
 					<?php endif ?>
 				</div>
 		    	<div class="uk-text-center uk-text-large">
-		    		<p class="uk-text-bold" style="font-size: 32px">消　費　物　品</p>
+		    		<p class="uk-text-bold title_spacing" style="font-size: 32px">消費物品</p>
 		    	</div>
 		    	<div uk-grid>
 			    	<div class="uk-width-1-2">
@@ -50,6 +50,7 @@
 										<th style="min-width:150px">商品名</th>
 										<th>製品コード</th>
 										<th>規格</th>
+										<th>JANコード</th>
 										<th>ロット番号</th>
 										<th>使用期限</th>
 										<th>入数</th>
@@ -70,6 +71,7 @@
 				    						echo '<td>'.$record->itemName.'</td>';
 				    						echo '<td>'.$record->itemCode.'</td>';
 				    						echo '<td>'.$record->itemStandard.'</td>';
+				    						echo '<td>'.$record->itemJANCode.'</td>';
 				    						echo '<td>'.$record->lotNumber.'</td>';
 				    						echo '<td>'.$record->lotDate.'</td>';
 				    						echo '<td>'.$record->quantity.$record->quantityUnit.'</td>';

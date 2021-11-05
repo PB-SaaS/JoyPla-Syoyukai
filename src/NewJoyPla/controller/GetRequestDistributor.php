@@ -1,5 +1,6 @@
 <?php
 //卸業者データの取得
+/*
 include_once 'NewJoyPla/lib/ApiSpiral.php';
 include_once "NewJoyPla/lib/Define.php";
 include_once 'NewJoyPla/lib/SpiralDataBase.php';

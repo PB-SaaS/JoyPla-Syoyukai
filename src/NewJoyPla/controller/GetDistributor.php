@@ -1,5 +1,6 @@
 <?php
 //卸業者データの取得
+/*
 include_once 'NewJoyPla/lib/ApiSpiral.php';
 include_once "NewJoyPla/lib/Define.php";
 include_once 'NewJoyPla/lib/SpiralDataBase.php';
@@ -21,3 +22,4 @@ if($result['code'] != '0'){
 }
 //結果を返却
 echo json_encode(array('result'=>true,'data'=>$result['data']));
+*/

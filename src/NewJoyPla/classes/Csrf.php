@@ -5,7 +5,7 @@ class Csrf
     public static function generate($length = 16)
     {
         global $SPIRAL;
-        $session   = $SPIRAL->getSession();
+        $session   = $SPIRAL->getSession(false,3600);
         $string = $session->get('csrf');
         if($string == null)
         {
@@ -14,7 +14,7 @@ class Csrf
                 $bytes = random_bytes($size);
                 $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
             }
-            $session   = $SPIRAL->getSession();
+            $session   = $SPIRAL->getSession(false,3600);
             $session->put('csrf', $string);
         }
         return $string;
@@ -23,7 +23,7 @@ class Csrf
     public static function validate($token, $throw = false)
     {
         global $SPIRAL;
-        $session   = $SPIRAL->getSession();
+        $session   = $SPIRAL->getSession(false,3600);
         $success = $session->get('csrf') === $token;
         if( !$success && $throw )
         {

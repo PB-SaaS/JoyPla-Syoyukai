@@ -111,6 +111,7 @@ class Model
     {
         $instance = self::getInstance();
         $instance->spiralDataBase->addSearchCondition($field , $val , $op);
+        $instance->search[] = [$field , $val , $op , 'and'];
         return $instance;
     }
 
@@ -118,6 +119,19 @@ class Model
     {
         $instance = self::getInstance();
         $instance->spiralDataBase->addSearchCondition($field , $val , $op , 'or');
+        $instance->search[] = [$field , $val , $op , 'or'];
+        return $instance;
+    }
+    
+    public static function whereDeleted()
+    {
+        $instance = self::getInstance();
+        
+        if($instance::DELETED_AT !== '')
+        {
+            $instance->orWhere($instance::DELETED_AT,'1')->orWhere($instance::DELETED_AT,'0')->orWhere($instance::DELETED_AT,'0','ISNULL');
+            $instance->search[] = [$instance::DELETED_AT , '1' , '!=' , 'and']; 
+        }
         return $instance;
     }
 
@@ -125,6 +139,25 @@ class Model
     {
         $instance = self::getInstance();
         $instance->spiralDataBase->setDataBase($instance::$spiral_db_name);
+        
+        $delete_field_flg = false;
+        if($instance::DELETED_AT !== '')
+        {
+            foreach($instance->search as $field)
+            {
+                if($field[0] === $instance::DELETED_AT)
+                {
+                    $delete_field_flg = true;
+                }
+            }
+        }
+        
+        if(!$delete_field_flg)
+        {
+            $instance->orWhere($instance::DELETED_AT , false , 'ISNULL');
+            $instance->orWhere($instance::DELETED_AT , 0 , '=');
+        }
+        
         $column = array_merge($instance::$fillable,$instance::$guarded);
         $instance->spiralDataBase->addSelectFieldsToArray($column);
         $result = $instance->spiralDataBase->doSelectLoop();

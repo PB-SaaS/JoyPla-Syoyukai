@@ -9,10 +9,14 @@ use Csrf;
 use App\Lib\UserInfo;
 use App\Model\Division;
 use App\Model\Hospital;
+use App\Model\InHospitalItemView;
 use App\Model\Inventory;
 use App\Model\InventoryEnd;
 use App\Model\InventoryHistory;
 use App\Model\StockTakingTransaction;
+use App\Model\StockView;
+use App\Model\Lot;
+
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -35,17 +39,17 @@ class InventoryController extends Controller
 
             $user_info = new UserInfo($SPIRAL);
             
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
-            ], false);
-            
             if($user_info->isDistributorUser())
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
+            
+            if($user_info->isApprover())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
 
-            if (($user_info->isHospitalUser() && $user_info->getUserPermission() == '1')) 
+            if ($user_info->isAdmin()) 
             {
                 $division = Division::where('hospitalId',$user_info->getHospitalId())->get();
             } 
@@ -60,7 +64,6 @@ class InventoryController extends Controller
     
             $api_url = "%url/rel:mpgt:Inventory%";
     
-            
             $content = $this->view('NewJoyPla/view/InventoryContentEntry', [
                 'api_url' => $api_url,
                 'user_info' => $user_info,
@@ -76,6 +79,11 @@ class InventoryController extends Controller
                 'csrf_token' => Csrf::generate(16)
                 ] , false);
         } finally {
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 棚卸内容入力',
@@ -102,49 +110,67 @@ class InventoryController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
             
-
-            $getInventory = $SPIRAL->getParam('inventory');
-            $inventory = $this->requestUrldecode($getInventory);
+            $inventory = $SPIRAL->getParam('inventory');
+            $inventory = $this->requestUrldecode($inventory);
             $divisionId = $SPIRAL->getParam('divisionId');
-
-            foreach ($inventory as $rows)
+            
+            if($divisionId == '')
             {
-                foreach ($rows as $record)
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            
+            
+            $in_hospital_item = InHospitalItemView::where('hospitalId', $user_info->getHospitalId());
+            foreach($inventory as $key => $record)
+            {
+                $in_hospital_item->orWhere('inHospitalItemId',$record['recordId']);
+            }
+            $in_hospital_item = $in_hospital_item->get();
+            
+            foreach ($inventory as $item)
+            {
+                foreach($in_hospital_item as $in_hp_item)
                 {
-                    if ((int)$record['lotFlag'])
+                    $lot_flag = 0;
+                    if($record['recordId'] == $in_hp_item->inHospitalItemId)
                     {
-                        if (($record['lotNumber'] == '') || ($record['lotDate'] == ''))
-                        {
-                            throw new Exception('invalid lot',100);
-                        }
+                        $lot_flag = $in_hp_item->lotManagement;
+                        break;
                     }
-                    if (($record['lotNumber'] != '' && $record['lotDate'] == '' ) || ($record['lotNumber'] == '' && $record['lotDate'] != ''))
+                }
+                if($lot_flag && ($record['lotNumber'] == '' || $record['lotDate'] == '' ))
+                {
+                    throw new Exception('invalid lot',100);
+                }
+                
+                if (($record['lotNumber'] != '' && $record['lotDate'] == '' ) || ($record['lotNumber'] == '' && $record['lotDate'] != ''))
+                {
+                    throw new Exception('invalid lotNumber input',101);
+                }
+                if (($record['lotNumber'] != '') && ($record['lotDate'] != '')) 
+                {
+                    if ((!ctype_alnum($record['lotNumber'])) || (strlen($record['lotNumber']) > 20))
                     {
-                        throw new Exception('invalid lotNumber input',101);
-                    }
-                    if (($record['lotNumber'] != '') && ($record['lotDate'] != '')) 
-                    {
-                        if ((!ctype_alnum($record['lotNumber'])) || (strlen($record['lotNumber']) > 20))
-                        {
-                            throw new Exception('invalid lotNumber format',102);
-                        }
+                        throw new Exception('invalid lotNumber format',102);
                     }
                 }
             }
 
             $inventoryEnd = InventoryEnd::where('hospitalId',$user_info->getHospitalId())->where('inventoryStatus','1')->get();
+            $invEndId = $this->makeId('09');
             if ($inventoryEnd->count == 0)
             {
-                $invEndId = $this->makeId('09');
                 $result = InventoryEnd::create(['hospitalId' => $user_info->getHospitalId(), 'inventoryEndId' => $invEndId]);
             } else {
-                $invEndId = $inventoryEnd->data->all()[0]->inventoryEndId;
+                $invEndId = $inventoryEnd->data->get(0)->inventoryEndId;
             }
 
             $inventoryHistory = InventoryHistory::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$divisionId)->where('inventoryEndId',$invEndId)->get();
+            
+            $invHistId = $this->makeId('08');
+            
             if ($inventoryHistory->count == 0)
             {
-                $invHistId = $this->makeId('08');
                 $create_data = [];
                 $create_data = [
                     'inventoryHId' => $invHistId,
@@ -156,43 +182,67 @@ class InventoryController extends Controller
                 ];
                 $result = InventoryHistory::create($create_data);
             } else {
-                $invHistId = $inventoryHistory->data->all()[0]->inventoryHId;
+                $invHistId = $inventoryHistory->data->get(0)->inventoryHId;
             }
 
             $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
-            $hospital_data = $hospital_data->data->all();
-            $useUnitPrice = $hospital_data[0]->invUnitPrice;
+            $hospital_data = $hospital_data->data->get(0);
+            $useUnitPrice = $hospital_data->invUnitPrice;
     
             $stock_taking_trdata = [];
-            foreach ($inventory as $rows)
+            
+            $stock = StockView::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$divisionId)->get();
+            
+            foreach ($stock->data->all() as $data)
             {
-                foreach ($rows as $key => $data)
+                $unitPrice = $useUnitPrice
+                    ? (str_replace(',', '', $data->unitPrice))
+                    : (str_replace(',', '', $data->price) / $data->quantity);
+                $stock_taking_trdata[] = [
+                    'inventoryEndId' => $invEndId,
+                    'inventoryHId' => $invHistId,
+                    'inHospitalItemId' => $data->inHospitalItemId,
+                    'hospitalId' => $user_info->getHospitalId(),
+                    'divisionId' => $data->divisionId,
+                    'price' => str_replace(',', '', $data->price),
+                    'inventryNum' => 0,
+                    'inventryAmount' => (float)$unitPrice * 0,
+                    'quantity' => $data->quantity,
+                    'quantityUnit' => $data->quantityUnit,
+                    'itemUnit' => $data->itemUnit,
+                    'unitPrice' => $unitPrice,
+                    'invUnitPrice' => (int)$useUnitPrice,
+                    'lotNumber' => '',
+                    'lotDate' => '',
+                    'lotUniqueKey' => $user_info->getHospitalId().$divisionId.$data->inHospitalItemId.''.''//ロット情報を入力していない場合は、
+                ];
+            }
+            
+            foreach ($inventory as $data)
+            {
+                if( (int)$data['countNum']  >= 0 )
                 {
-                    if( (int)$data['countNum']  >= 0 )
-                    {
-                        $unitPrice = $useUnitPrice
-                            ? (str_replace(',', '', $data['unitPrice']))
-                            : (str_replace(',', '', $data['kakaku']) / $data['irisu']);
-                        $stock_taking_trdata[] = [
-                            'registrationTime' => 'now',
-                            'inventoryEndId' => $invEndId,
-                            'inventoryHId' => $invHistId,
-                            'inHospitalItemId' => $data['recordId'],
-                            'hospitalId' => $user_info->getHospitalId(),
-                            'divisionId' => $divisionId,
-                            'price' => str_replace(',', '', $data['kakaku']),
-                            'inventryNum' => (int)$data['countNum'],
-                            'inventryAmount' => (int)$unitPrice * (int)$data['countNum'],
-                            'quantity' => $data['irisu'],
-                            'quantityUnit' => $data['unit'],
-                            'itemUnit' => $data['itemUnit'],
-                            'unitPrice' => $unitPrice,
-                            'invUnitPrice' => (int)$useUnitPrice,
-                            'lotNumber' => $data['lotNumber'],
-                            'lotDate' => $data['lotDate'],
-                            'lotUniqueKey' => $user_info->getHospitalId().$divisionId.$data['recordId'].$data['lotNumber'].$data['lotDate']
-                        ];
-                    }
+                    $unitPrice = $useUnitPrice
+                        ? (str_replace(',', '', $data['unitPrice']))
+                        : (str_replace(',', '', $data['kakaku']) / $data['irisu']);
+                    $stock_taking_trdata[] = [
+                        'inventoryEndId' => $invEndId,
+                        'inventoryHId' => $invHistId,
+                        'inHospitalItemId' => $data['recordId'],
+                        'hospitalId' => $user_info->getHospitalId(),
+                        'divisionId' => $divisionId,
+                        'price' => str_replace(',', '', $data['kakaku']),
+                        'inventryNum' => (int)$data['countNum'],
+                        'inventryAmount' => (float)$unitPrice * (float)$data['countNum'],
+                        'quantity' => $data['irisu'],
+                        'quantityUnit' => $data['unit'],
+                        'itemUnit' => $data['itemUnit'],
+                        'unitPrice' => $unitPrice,
+                        'invUnitPrice' => (int)$useUnitPrice,
+                        'lotNumber' => $data['lotNumber'],
+                        'lotDate' => $data['lotDate'],
+                        'lotUniqueKey' => $user_info->getHospitalId().$divisionId.$data['recordId'].$data['lotNumber'].$data['lotDate']//ロット情報を入力していない場合は、
+                    ];
                 }
             }
 
@@ -222,14 +272,22 @@ class InventoryController extends Controller
                 }
             }
 
-            $result = InventoryHistory::where('inventoryHId',$invHistId)->update(['updateTime' => 'now', 'itemsNumber' => count($history_ids), 'totalAmount' => $history_total_amount]);
-            $result = InventoryEnd::where('inventoryEndId',$invEndId)->where('hospitalId',$user_info->getHospitalId())->update(['itemsNumber' => count($end_ids), 'totalAmount' => $end_total_amount]);
+            $result = InventoryHistory::where('inventoryHId',$invHistId)->update([
+                'updateTime' => 'now', 
+                'itemsNumber' => count($history_ids), 
+                'totalAmount' => $history_total_amount
+            ]);
+            
+            $result = InventoryEnd::where('inventoryEndId',$invEndId)->where('hospitalId',$user_info->getHospitalId())->update([
+                'itemsNumber' => count($end_ids), 
+                'totalAmount' => $end_total_amount
+            ]);
 
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+            $content = new ApiResponse($result->ids , $result->count , $result->code, $result->message, ['inventoryEntry']);
             $content = $content->toJson();
             
         } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['payoutRegistApi']);
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['inventoryEntry']);
             $content = $content->toJson();
         } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
@@ -237,34 +295,175 @@ class InventoryController extends Controller
             ],false);
         }
     }
-
-    private function makeId($id = '00')
-    {
-        /*
-        '02' => HP_BILLING_PAGE,
-        '03_unorder' => HP_UNORDER_PAGE,
-        '03_order' => HP_ORDER_PAGE,
-        '04' => HP_RECEIVING_PAGE,
-        '06' => HP_RETERN_PAGE,
-        '05' => HP_PAYOUT_PAGE,
-        */
-        $id .= date("ymdHis");
-        $id .= str_pad(substr(rand(),0,3) , 4, "0"); 
     
-        return $id;
-    }
-
-    private function requestUrldecode(array $array)
+    public function getLotAndStockApi()
     {
-        $result = [];
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $result[$key] = $this->requestUrldecode($value);
-            } else {
-                $result[$key] = urldecode($value);
+        global $SPIRAL;
+        try{
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+
+            $user_info = new UserInfo($SPIRAL);
+
+            if($user_info->isDistributorUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
+            
+            $divisionId = $SPIRAL->getParam('divisionId');
+            
+            if($divisionId == '')
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            
+            $stock = StockView::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$divisionId)->where('stockQuantity',0,">")->get();
+            
+            $lot = Lot::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$divisionId)->where('stockQuantity',0,">")->get();
+            
+            $list = [];
+            
+			$in_hospital_item = InHospitalItemView::where('hospitalId',$user_info->getHospitalId());
+			
+            foreach($stock->data->all() as $stock_item )
+            {
+			    $in_hospital_item->orWhere('inHospitalItemId',$stock_item->inHospitalItemId);
+            }
+            foreach($lot->data->all() as $lot_item )
+            {
+			    $in_hospital_item->orWhere('inHospitalItemId',$lot_item->inHospitalItemId);
+            }
+            
+			$in_hospital_item = $in_hospital_item->get();
+            $data = [];
+            foreach($stock->data->all() as $stock_item )
+            {
+                $stockQuantity = (int)$stock_item->stockQuantity;
+                $lotManagement = 0;
+                foreach($in_hospital_item->data->all() as $in_hp_item)
+                {
+                    if($in_hp_item->inHospitalItemId == $stock_item->inHospitalItemId)
+                    {
+                        $lotManagement = $in_hp_item->lotManagement;
+                        break;
+                    }
+                }
+                
+                foreach($lot->data->all() as $lot_item)
+                {
+                    if($lot_item->inHospitalItemId == $stock_item->inHospitalItemId)
+                    {
+                        $stockQuantity = $stockQuantity - (int)$lot_item->stockQuantity;
+                        $data[] = [
+        					"divisionId" => '',
+        					"maker" => $stock_item->makerName,
+        					"shouhinName" => $stock_item->itemName,
+        					"code" => $stock_item->itemCode,
+        					"kikaku" => $stock_item->itemStandard,
+        					"irisu" => $stock_item->quantity,
+        					"kakaku" => $stock_item->price,
+        					"jan" => $stock_item->itemJANCode,
+        					"oroshi" => $stock_item->distributorName,
+        					"recordId" => $stock_item->inHospitalItemId,
+        					"unit" => $stock_item->quantityUnit,
+        					"itemUnit" => $stock_item->itemUnit,
+        					"distributorId" => $stock_item->distributorId,
+        					"count" => (int)$lot_item->stockQuantity,
+        					"countNum" => (int)$lot_item->stockQuantity,
+        					"labelId" => $stock_item->labelId,
+        					"unitPrice" => $stock_item->unitPrice,
+        					"lotNumber" => $lot_item->lotNumber,
+        					"lotDate" => \App\Lib\changeDateFormat('Y年m月d日' , $lot_item->lotDate , 'Y-m-d'),
+        					"lotFlag" => ($lotManagement == 1 )? "はい": "",
+        					"lotFlagBool" => $lotManagement,
+        				];
+                    }
+                }
+                
+                if($stockQuantity != 0)
+                {
+                    $data[] = [
+    					"divisionId" => '',
+    					"maker" => $stock_item->makerName,
+    					"shouhinName" => $stock_item->itemName,
+    					"code" => $stock_item->itemCode,
+    					"kikaku" => $stock_item->itemStandard,
+    					"irisu" => $stock_item->quantity,
+    					"kakaku" => $stock_item->price,
+    					"jan" => $stock_item->itemJANCode,
+    					"oroshi" => $stock_item->distributorName,
+    					"recordId" => $stock_item->inHospitalItemId,
+    					"unit" => $stock_item->quantityUnit,
+    					"itemUnit" => $stock_item->itemUnit,
+    					"distributorId" => $stock_item->distributorId,
+    					"count" => (int)$stockQuantity,
+    					"countNum" => (int)$stockQuantity,
+    					"labelId" => $stock_item->labelId,
+    					"unitPrice" => $stock_item->unitPrice,
+    					"lotNumber" => '',
+    					"lotDate" => '',
+    					"lotFlag" => ($lotManagement == 1 )? "はい": "",
+    					"lotFlagBool" => $lotManagement,
+    				];
+                }
+            }
+
+            $content = new ApiResponse($data , count($data) , 0 , $result->message, ['getLotAndStockApi']);
+            $content = $content->toJson();
+            
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['getLotAndStockApi']);
+            $content = $content->toJson();
+        } finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
         }
-        return $result;
+    }
+    
+    public function inventoryEndList()
+    {
+        global $SPIRAL;
+        // GETで呼ばれた
+        //$mytable = new mytable();
+        // テンプレートにパラメータを渡し、HTMLを生成し返却
+        $param = array();
+        try {
+
+            $user_info = new UserInfo($SPIRAL);
+            
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            
+            if($user_info->isDistributorUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            
+            $content = $this->view('NewJoyPla/view/InventoryHistoryList', [
+                'api_url' => $api_url,
+                'user_info' => $user_info,
+                'csrf_token' => Csrf::generate(16)
+                ] , false);
+            
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla 棚卸履歴一覧',
+                'script' => '',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
     }
 
 }
@@ -277,9 +476,17 @@ $InventoryController = new InventoryController();
 $action = $SPIRAL->getParam('Action');
 
 {
-    if($action === 'inventoryRegistAPI')
+    if($action === 'inventoryRegistApi')
     {
         echo $InventoryController->inventoryRegistAPI()->render();
+    }
+    else if($action === 'getLotAndStockApi')
+    {
+        echo $InventoryController->getLotAndStockApi()->render();
+    }
+    else if($action === 'inventoryEndList')
+    {
+        echo $InventoryController->inventoryEndList()->render();
     }
     else
     {

@@ -13,7 +13,7 @@
 					<input class="print_hidden uk-button uk-button-primary" type="button" value="払出ラベル発行" onclick="createLabel();return false;">
 				</div>
 		    	<div class="uk-text-center uk-text-large">
-		    		<p class="uk-text-bold" style="font-size: 32px">払　出　伝　票</p>
+		    		<p class="uk-text-bold title_spacing" style="font-size: 32px">払出伝票</p>
 		    	</div>
 		    	<div uk-grid>
 			    	<div class="uk-width-1-2@m">

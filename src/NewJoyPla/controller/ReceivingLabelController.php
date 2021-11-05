@@ -78,9 +78,9 @@ class ReceivingLabelController extends Controller
                 'title'     => 'JoyPla カード一覧',
                 'script' => $script,
                 'style' => $style,
-                'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),
+                'content'   => $content->render(),
                 'baseUrl' => '',
             ],false);
         }

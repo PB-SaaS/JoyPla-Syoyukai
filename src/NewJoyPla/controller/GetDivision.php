@@ -1,5 +1,6 @@
 <?php
 //部署データの取得
+/*
 include_once 'NewJoyPla/lib/ApiSpiral.php';
 include_once "NewJoyPla/lib/Define.php";
 include_once 'NewJoyPla/lib/SpiralDataBase.php';
@@ -15,3 +16,4 @@ $userInfo = new App\Lib\UserInfo($SPIRAL);
 $getDivision= new App\Api\GetDivision($spiralDataBase,$userInfo);
 $result = $getDivision->select();//結果を返却
 echo json_encode(array('result'=>true,'data'=>$result));
+*/

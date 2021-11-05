@@ -22,6 +22,7 @@ use App\Model\HospitalUser;
 use App\Model\Distributor;
 use App\Model\DistributorUser;
 use App\Model\AssociationTR;
+use App\Model\InHospitalItemView;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -40,61 +41,68 @@ class BorrowingController extends Controller
     public function index(): View
     {
         global $SPIRAL;
-        // GETで呼ばれた
-        //$mytable = new mytable();
-        // テンプレートにパラメータを渡し、HTMLを生成し返却
-        $param = array();
-
-        $user_info = new UserInfo($SPIRAL);
-
-        if( ($user_info->isHospitalUser() && !$user_info->isUser())
-        || $user_info->isDistributorUser() ) {
-            $divisionData = Division::where('hospitalId',$user_info->getHospitalId())->get();
-        } else {
-            $divisionData = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
+        try {
+            // GETで呼ばれた
+            //$mytable = new mytable();
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            $param = array();
+    
+            $user_info = new UserInfo($SPIRAL);
+    
+            if( ($user_info->isHospitalUser() && !$user_info->isUser())
+            || $user_info->isDistributorUser() ) {
+                $divisionData = Division::where('hospitalId',$user_info->getHospitalId())->get();
+            } else {
+                $divisionData = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
+            }
+    
+            $api_url = "%url/rel:mpgt:Borrowing%";
+            if( $user_info->isDistributorUser())
+            {
+                $api_url = "%url/rel:mpgt:BorrowingForD%";
+            }
+    
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            
+            if($user_info->isAdmin() || $user_info->isApprover())
+            {
+                $borrowingAction = 'borrowingRegistrationToUsedReportApi';
+            }
+            if($user_info->isUser()) 
+            {
+                $borrowingAction = 'borrowingRegistrationToUnapprovedUsedSlipApi';
+            }
+            if($user_info->isDistributorUser())
+            {
+                $borrowingAction = '';
+            }
+            
+            
+            $content = $this->view('NewJoyPla/view/BorrowingRegistration', [
+                'api_url' => $api_url,
+                'user_info' => $user_info,
+                'divisionData'=> $divisionData,
+                'csrf_token' => Csrf::generate(16),
+                'borrowingAction' => $borrowingAction,
+                ] , false);
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla 貸出登録',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
         }
-
-        $api_url = "%url/rel:mpgt:Borrowing%";
-        if( $user_info->isDistributorUser())
-        {
-            $api_url = "%url/rel:mpgt:BorrowingForD%";
-        }
-
-        $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
-        $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-            'SPIRAL' => $SPIRAL
-        ], false);
-        
-        if($user_info->isAdmin() || $user_info->isApprover())
-        {
-            $borrowingAction = 'borrowingRegistrationToUsedReportApi';
-        }
-        if($user_info->isUser()) 
-        {
-            $borrowingAction = 'borrowingRegistrationToUnapprovedUsedSlipApi';
-        }
-        if($user_info->isDistributorUser())
-        {
-            $borrowingAction = '';
-        }
-        
-        
-        $content = $this->view('NewJoyPla/view/BorrowingRegistration', [
-            'api_url' => $api_url,
-            'user_info' => $user_info,
-            'divisionData'=> $divisionData,
-            'csrf_token' => Csrf::generate(16),
-            'borrowingAction' => $borrowingAction,
-            ] , false);
-        
-        // テンプレートにパラメータを渡し、HTMLを生成し返却
-        return $this->view('NewJoyPla/view/template/Template', [
-            'title'     => 'JoyPla 貸出登録',
-            'content'   => $content->render(),
-            'head' => $head->render(),
-            'header' => $header->render(),
-            'baseUrl' => '',
-        ],false);
     }
 
     /**
@@ -103,38 +111,46 @@ class BorrowingController extends Controller
     public function borrowingList(): View
     {
         global $SPIRAL;
-        // GETで呼ばれた
-        //$mytable = new mytable();
+        try {
+            // GETで呼ばれた
+            //$mytable = new mytable();
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            $param = array();
+    
+            $user_info = new UserInfo($SPIRAL);
+    
+            $api_url = "%url/rel:mpgt:Borrowing%";
+            if( $user_info->isDistributorUser())
+            {
+                $api_url = "%url/rel:mpgt:BorrowingForD%";
+            }
+    
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+    
+            $content = $this->view('NewJoyPla/view/BorrowingList', [
+                'api_url' => $api_url,
+                'user_info' => $user_info,
+                'csrf_token' => Csrf::generate(16)
+            ] , false);
+            
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
         // テンプレートにパラメータを渡し、HTMLを生成し返却
-        $param = array();
-
-        $user_info = new UserInfo($SPIRAL);
-
-        $api_url = "%url/rel:mpgt:Borrowing%";
-        if( $user_info->isDistributorUser())
-        {
-            $api_url = "%url/rel:mpgt:BorrowingForD%";
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla 貸出登録',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
         }
-
-        $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
-        $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-            'SPIRAL' => $SPIRAL
-        ], false);
-
-        $content = $this->view('NewJoyPla/view/BorrowingList', [
-            'api_url' => $api_url,
-            'user_info' => $user_info,
-            'csrf_token' => Csrf::generate(16)
-        ] , false);
-        
-        // テンプレートにパラメータを渡し、HTMLを生成し返却
-        return $this->view('NewJoyPla/view/template/Template', [
-            'title'     => 'JoyPla 貸出登録',
-            'content'   => $content->render(),
-            'head' => $head->render(),
-            'header' => $header->render(),
-            'baseUrl' => '',
-        ],false);
     }
 
     /**
@@ -143,30 +159,39 @@ class BorrowingController extends Controller
     public function unapprovedUsedSlip(): View
     {
         global $SPIRAL;
-        // GETで呼ばれた
-        //$mytable = new mytable();
-        // テンプレートにパラメータを渡し、HTMLを生成し返却
-        $param = array();
-
-        $user_info = new UserInfo($SPIRAL);
-
-        $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
-        $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-            'SPIRAL' => $SPIRAL
-        ], false);
-        $content = $this->view('NewJoyPla/view/UnapprovedUsedSlip', [
-            'user_info' => $user_info,
-            'csrf_token' => Csrf::generate(16)
-            ] , false);
+        try {
+    
+            $user_info = new UserInfo($SPIRAL);
+    
+            
+            $content = $this->view('NewJoyPla/view/template/List', [
+                    'title' => '未承認使用伝票一覧',
+                    'table' => '%sf:usr:search27%',
+                    'csrf_token' => Csrf::generate(16),
+                    'print' => true
+                    ] , false);
+                
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
         
-        // テンプレートにパラメータを渡し、HTMLを生成し返却
-        return $this->view('NewJoyPla/view/template/Template', [
-            'title'     => 'JoyPla 未承認使用伝票一覧',
-            'content'   => $content->render(),
-            'head' => $head->render(),
-            'header' => $header->render(),
-            'baseUrl' => '',
-        ],false);
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla 未承認使用伝票一覧',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
     }
     /**
      * 使用済みリスト（承認）
@@ -174,31 +199,42 @@ class BorrowingController extends Controller
     public function approvedUsedSlip(): View
     {
         global $SPIRAL;
-        // GETで呼ばれた
-        //$mytable = new mytable();
-        // テンプレートにパラメータを渡し、HTMLを生成し返却
-        $param = array();
-
-        $user_info = new UserInfo($SPIRAL);
-
-        $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
-        $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-            'SPIRAL' => $SPIRAL
-        ], false);
-
-        $content = $this->view('NewJoyPla/view/ApprovedUsedSlip', [
-            'user_info' => $user_info,
-            'csrf_token' => Csrf::generate(16)
-        ] , false);
+        try {
+            // GETで呼ばれた
+            //$mytable = new mytable();
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            $param = array();
+    
+            $user_info = new UserInfo($SPIRAL);
+    
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            
+            
+            $content = $this->view('NewJoyPla/view/template/List', [
+                    'title' => '承認済み使用伝票一覧',
+                    'table' => '%sf:usr:search28%',
+                    'csrf_token' => Csrf::generate(16),
+                    'print' => true
+                    ] , false);
         
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
         // テンプレートにパラメータを渡し、HTMLを生成し返却
-        return $this->view('NewJoyPla/view/template/Template', [
-            'title'     => 'JoyPla 承認済み使用伝票一覧',
-            'content'   => $content->render(),
-            'head' => $head->render(),
-            'header' => $header->render(),
-            'baseUrl' => '',
-        ],false);
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla 承認済み使用伝票一覧',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
     }
     /**
      * 貸出品登録
@@ -257,7 +293,7 @@ class BorrowingController extends Controller
 
             /** メールを作成 */
             foreach($used_slip_create_data['history_data'] as $history)
-            {  
+            {
                 $mail_body = $this->view('NewJoyPla/view/Mail/UsingRegistration', [
                     'name' => '%val:usr:name%',
                     'hospital_name' => $history['facility_name'],
@@ -269,12 +305,13 @@ class BorrowingController extends Controller
                     'login_url' => OROSHI_LOGIN_URL,
                 ] , false)->render();
                 $select_name = $this->makeId($history['distributorId']);
-
-                $test = DistributorUser::selectName($select_name)->rule(
+                
+                $distributor = DistributorUser::getNewInstance();
+                $test = $distributor->selectName($select_name)->rule(
                     ['name'=>'distributorId','label'=>'name_'.$history['distributorId'],'value1'=>$history['distributorId'],'condition'=>'matches']
                     )->filterCreate();
 
-                $test = DistributorUser::selectRule($select_name)
+                $test = $distributor->selectRule($select_name)
                     ->body($mail_body)
                     ->subject("[JoyPla] 貸出品の使用登録がありました")
                     ->from(FROM_ADDRESS,FROM_NAME)
@@ -349,218 +386,6 @@ class BorrowingController extends Controller
         $result = AssociationTR::insert($insert_data);
 
         return $result;
-    }
-
-    public function usedTemporaryReportApi()
-    {
-        global $SPIRAL;
-        try{
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
-
-            $user_info = new UserInfo($SPIRAL);
-
-            $used_ids = $SPIRAL->getParam('used_ids');
-            $used_date = $SPIRAL->getParam('used_date');
-
-            $model = Borrowing::getInstance();
-            foreach($used_ids as $id)
-            {
-                Borrowing::orWhere('id',$id);
-            }
-            $result = Borrowing::get();
-            
-            $borrowing_items = [];
-            foreach($result->data->all() as $key => $record)
-            {
-                $record->usedDate = $used_date;
-                $borrowing_items[$key] = $record;
-            }
-
-            $used_slip_create_data = $this->usedSlipHisotoyRegist($borrowing_items , 1);
-
-            /** メールを作成 */
-            if($user_info->isDistributorUser())
-            {
-                foreach($used_slip_create_data['history_data'] as $history)
-                {  
-                    $mail_body = $this->view('NewJoyPla/view/Mail/UsingRequest', [
-                        'name' => '%val:usr:name%',
-                        'distributor_name' => $history['facility_name'],
-                        'distributor_user_name' => $user_info->getName(),
-                        'used_date' => $history['usedTime'],
-                        'used_slip_number' => $history['usedSlipId'],
-                        'used_item_num' => $history['itemsNumber'],
-                        'total_price' => "￥".number_format((float)$history['totalAmount']),
-                        'login_url' => LOGIN_URL,
-                    ] , false)->render();
-                    $select_name = $this->makeId($history['hospitalId']);
-
-                    $test = HospitalUser::selectName($select_name)->rule(
-                        ['name'=>'hospitalId','label'=>'name_'.$history['hospitalId'],'value1'=>$history['hospitalId'],'condition'=>'matches']
-                        )->filterCreate();
-
-                    $test = HospitalUser::selectRule($select_name)
-                        ->body($mail_body)
-                        ->subject("[JoyPla] 貸出品の使用申請がありました")
-                        ->from(FROM_ADDRESS,FROM_NAME)
-                        ->send();
-                }
-            }
-
-            $result->data = $all_create_data;
-            $result->code = 0 ;
-            $result->message = 'OK' ;
-            $result->count = 0;
-
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
-            $content = $content->toJson();
-         
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
-            $content = $content->toJson();
-        }finally {
-            return $this->view('NewJoyPla/view/template/ApiResponse', [
-                'content'   => $content,
-            ],false);
-        }
-    }
-
-    public function usedSlipApprovalApi()
-    {
-        global $SPIRAL;
-        try{
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
-
-            $user_info = new UserInfo($SPIRAL);
-
-            $used_slip_id = $SPIRAL->getParam('usedSlipId');
-            $auth_key = $SPIRAL->getParam('authKey');
-            if($used_slip_id == null || $auth_key == null)
-            {
-                throw new Exception(FactoryApiErrorCode::factory(203)->getMessage(),FactoryApiErrorCode::factory(203)->getCode());
-            }
-             
-            $used_slip_history = UsedSlipHistoy::where('usedSlipId' , $used_slip_id)->where('authKey' , $auth_key)->where('hospitalId',$user_info->getHospitalId())->get();
-
-            if($used_slip_history->count == 0 )
-            {
-                throw new Exception(FactoryApiErrorCode::factory(203)->getMessage(),FactoryApiErrorCode::factory(203)->getCode());
-            }
-
-            $used_slip_history = $used_slip_history->data->all()[0];
-
-            if($used_slip_history->usedSlipStatus == 1 )
-            {
-                throw new Exception(FactoryApiErrorCode::factory(900)->getMessage(),FactoryApiErrorCode::factory(900)->getCode());
-            }
-
-            $borrowing = Borrowing::where('usedSlipId' , $used_slip_id)->get();
-            $borrowing = $borrowing->data->all();
-
-            $all_create_data = $this->usedReportApi($borrowing);
-
-            $used_slip_create_data = ['ids' => []];
-            foreach($borrowing as $item)
-            {
-                if(! isset($used_slip_create_data['ids'][$item->divisionId . $item->distributorId . $item->usedDate]) || 
-                ! $used_slip_create_data['ids'][$item->divisionId . $item->distributorId . $item->usedDate])
-                {
-                    $used_slip_create_data['ids'][$item->divisionId . $item->distributorId . $item->usedDate] = [ 
-                        'usedSlipId' => $item->usedSlipId,
-                    ];
-                }
-            }
-            
-            $result = $this->association($used_slip_create_data['ids'],$all_create_data['ids']);
-
-            
-            /** メールを作成 */
-            foreach($used_slip_create_data['history_data'] as $history)
-            {  
-                $mail_body = $this->view('NewJoyPla/view/Mail/UsingRegistration', [
-                    'name' => '%val:usr:name%',
-                    'hospital_name' => $used_slip_history,
-                    'hospital_user_name' => $user_info->getName(),
-                    'used_date' => $used_slip_history->usedTime,
-                    'used_slip_number' => $used_slip_history->usedSlipId,
-                    'used_item_num' => $used_slip_history->itemsNumber,
-                    'total_price' => "￥".number_format((float)$used_slip_history->totalAmount),
-                    'login_url' => OROSHI_LOGIN_URL,
-                ] , false)->render();
-                
-                $select_name = $this->makeId($used_slip_history->distributorId);
-                
-                $test = DistributorUser::selectName($select_name)->rule(
-                    ['name'=>'distributorId','label'=>'name_'.$used_slip_history->distributorId,'value1'=>$used_slip_history->distributorId,'condition'=>'matches']
-                    )->filterCreate();
-
-                $test = DistributorUser::selectRule($select_name)
-                    ->body($mail_body)
-                    ->subject("[JoyPla] 貸出品の使用登録がありました")
-                    ->from(FROM_ADDRESS,FROM_NAME)
-                    ->send();
-            }
-
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
-            $content = $content->toJson();
-         
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
-            $content = $content->toJson();
-        }finally {
-            return $this->view('NewJoyPla/view/template/ApiResponse', [
-                'content'   => $content,
-            ],false);
-        }
-    }
-
-    public function cancelApi()
-    {
-        global $SPIRAL;
-        try{
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
-
-            $used_slip_id = $SPIRAL->getParam('usedSlipId');
-            $auth_key = $SPIRAL->getParam('authKey');
-            if($used_slip_id == null || $auth_key == null)
-            {
-                throw new Exception(FactoryApiErrorCode::factory(900)->getMessage(),FactoryApiErrorCode::factory(900)->getCode());
-            }
-            
-            $user_info = new UserInfo($SPIRAL);    
-
-            $used_slip_history = UsedSlipHistoy::where('usedSlipId' , $used_slip_id)->where('authKey' , $auth_key)->where('hospitalId',$user_info->getHospitalId())->get();
-
-            if($used_slip_history->count == 0 )
-            {
-                throw new Exception(FactoryApiErrorCode::factory(203)->getMessage(),FactoryApiErrorCode::factory(203)->getCode());
-            }
-
-            $used_slip_history = $used_slip_history->data->all()[0];
-
-            if($used_slip_history->usedSlipStatus == 2 )
-            {
-                throw new Exception(FactoryApiErrorCode::factory(900)->getMessage(),FactoryApiErrorCode::factory(900)->getCode());
-            }
-
-            $result = Borrowing::where('usedSlipId' , $used_slip_id)->update(['usedSlipId' => '']);
-            
-            $result = UsedSlipHistoy::where('usedSlipId' , $used_slip_id)->where('authKey' , $auth_key)->where('hospitalId',$user_info->getHospitalId())->delete();
-
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
-            $content = $content->toJson();
-         
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
-            $content = $content->toJson();
-        }finally {
-            return $this->view('NewJoyPla/view/template/ApiResponse', [
-                'content'   => $content,
-            ],false);
-        }
     }
 
     private function usedSlipHisotoyRegist(array $borrowing_insert_items , int $used_slip_status = 1)
@@ -673,6 +498,8 @@ class BorrowingController extends Controller
             ];
         }
         
+        $all_create_data['history_data'] = $used_slip_insert_data;
+        
         $result = Borrowing::bulkUpdate('borrowingId',$update_data);
 
         $result = UsedSlipHistoy::insert($used_slip_insert_data);
@@ -682,6 +509,8 @@ class BorrowingController extends Controller
     private function borrowingRegist()
     {
         global $SPIRAL;
+        $user_info = new UserInfo($SPIRAL);
+        
         $borrowing_items = $SPIRAL->getParam('borrowing');
         $borrowing_items = array_merge($borrowing_items); // 連番の再採番
         if(( ! is_array($borrowing_items) || ! count($borrowing_items) > 0) )
@@ -1011,21 +840,77 @@ class BorrowingController extends Controller
         
         return $all_create_data;
     }
-
-    private function makeId($id = '00')
+    
+    public function usedTemporaryReportApi()
     {
-        /*
-        '02' => HP_BILLING_PAGE,
-        '03_unorder' => HP_UNORDER_PAGE,
-        '03_order' => HP_ORDER_PAGE,
-        '04' => HP_RECEIVING_PAGE,
-        '06' => HP_RETERN_PAGE,
-        '05' => HP_PAYOUT_PAGE,
-        */
-		$id .= date("ymdHis");
-		$id .= str_pad(substr(rand(),0,3) , 4, "0"); 
-		
-		return $id;
+        global $SPIRAL;
+        try{
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+
+            $user_info = new UserInfo($SPIRAL);
+
+            $used_ids = $SPIRAL->getParam('used_ids');
+            $used_date = $SPIRAL->getParam('used_date');
+
+            $model = Borrowing::getInstance();
+            foreach($used_ids as $id)
+            {
+                Borrowing::orWhere('id',$id);
+            }
+            $result = Borrowing::get();
+            
+            $borrowing_items = [];
+            foreach($result->data->all() as $key => $record)
+            {
+                $record->usedDate = $used_date;
+                $borrowing_items[$key] = $record;
+            }
+
+            $used_slip_create_data = $this->usedSlipHisotoyRegist($borrowing_items , 1);
+            /** メールを作成 */
+            foreach($used_slip_create_data['history_data'] as $history)
+            {  
+                $mail_body = $this->view('NewJoyPla/view/Mail/UsingRequest', [
+                    'name' => '%val:usr:name%',
+                    'distributor_name' => $history['facility_name'],
+                    'distributor_user_name' => $user_info->getName(),
+                    'used_date' => $history['usedTime'],
+                    'used_slip_number' => $history['usedSlipId'],
+                    'used_item_num' => $history['itemsNumber'],
+                    'total_price' => "￥".number_format((float)$history['totalAmount']),
+                    'login_url' => LOGIN_URL,
+                ] , false)->render();
+                $select_name = $this->makeId($history['hospitalId']);
+
+                $hospital_user = HospitalUser::getNewInstance();
+                $test = $hospital_user::selectName($select_name)->rule(
+                    ['name'=>'hospitalId','label'=>'name_'.$history['hospitalId'],'value1'=>$history['hospitalId'],'condition'=>'matches']
+                    )->filterCreate();
+
+                $test = $hospital_user::selectRule($select_name)
+                    ->body($mail_body)
+                    ->subject("[JoyPla] 貸出品の使用申請がありました")
+                    ->from(FROM_ADDRESS,FROM_NAME)
+                    ->send();
+            }
+
+            $result->data = $all_create_data;
+            $result->code = 0 ;
+            $result->message = 'OK' ;
+            $result->count = 0;
+
+            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+            $content = $content->toJson();
+         
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+            $content = $content->toJson();
+        }finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
     }
 }
 
@@ -1042,6 +927,11 @@ $action = $SPIRAL->getParam('Action');
         //貸出品の登録
         echo $BorrowingController->borrowingRegistApi()->render();
     } 
+    else if($action === 'usedTemporaryReportApi')
+    {
+        //貸出品リストから申請
+        echo $BorrowingController->usedTemporaryReportApi()->render();
+    }
     else if($action === 'borrowingRegistrationToUsedReportApi')
     {
         //貸出品登録と承認を同時実行
@@ -1049,14 +939,9 @@ $action = $SPIRAL->getParam('Action');
     } 
     else if($action === 'borrowingRegistrationToUnapprovedUsedSlipApi')
     {
-        //貸出品登録と承認を同時実行
+        //貸出品登録と未承認を同時実行
         echo $BorrowingController->borrowingRegistrationToUnapprovedUsedSlipApi()->render();
     }
-    else if($action === 'usedTemporaryReportApi')
-    {
-        //貸出品使用申請
-        echo $BorrowingController->usedTemporaryReportApi()->render();
-    } 
     else if($action === 'borrowingList')
     {
         //貸出品リスト
@@ -1071,16 +956,6 @@ $action = $SPIRAL->getParam('Action');
     {
         //未承認リスト
         echo $BorrowingController->approvedUsedSlip()->render();
-    }
-    else if($action === 'usedSlipApprovalApi')
-    {
-        //承認
-        echo $BorrowingController->usedSlipApprovalApi()->render();
-    }
-    else if($action === 'cancelApi')
-    {
-        //キャンセル
-        echo $BorrowingController->cancelApi()->render();
     }
     else 
     {

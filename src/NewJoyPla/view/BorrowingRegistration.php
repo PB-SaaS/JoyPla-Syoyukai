@@ -115,9 +115,9 @@
                     <div>
                         <button class="uk-button uk-button-default"  v-on:click="sanshouClick">商品マスタを開く</button>
                         <button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
-                        <button class="uk-button uk-button-primary goodsBillingButton" v-on:click="borrowingRegist">貸出リスト登録</button>
+                        <button class="uk-button uk-button-primary " v-on:click="borrowingRegist">貸出リスト登録</button>
                         <?php if(!$user_info->isDistributorUser()): ?>
-                        <button class="uk-button uk-button-primary unorderedSlipButton"  v-on:click="usedReport">使用済み報告</button>
+                        <button class="uk-button uk-button-primary "  v-on:click="usedReport">使用済み報告</button>
                         <?php endif ?>
                     </div>
                 </div>

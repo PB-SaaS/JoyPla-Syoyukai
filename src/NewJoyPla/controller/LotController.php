@@ -172,12 +172,17 @@ class LotController extends Controller
             {
                 $title = "ロット管理表";
                 $division = Division::where('hospitalId',$user_info->getHospitalId())->get();
-                $content = $this->view('NewJoyPla/view/LotManagement', [
-                    'api_url' => $api_url,
-                    'user_info' => $user_info,
-                    'division'=> $division->data->all(),
-                    'csrf_token' => Csrf::generate(16)
-                    ] , false);
+                $division = $division->data->all();
+                $content = $this->view('NewJoyPla/view/template/List', [
+                        'title' => $title,
+                        'table' => '%sf:usr:search38:mstfilter%',
+                        'csrf_token' => Csrf::generate(16),
+                        'print' => true,
+                        'export' => true,
+                        'script' => $this->view('NewJoyPla/view/Script/LotManagement', [
+                            'division' => $division,
+                            ] , false)->render()
+                        ] , false);
             }
             
         } catch ( Exception $ex ) {
@@ -193,7 +198,7 @@ class LotController extends Controller
             ], false);
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => $title,
+                'title'     => 'JoyPla '.$title,
                 'script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),
@@ -226,14 +231,19 @@ class LotController extends Controller
             
             $api_url = "%url/rel:mpgt:Lots%";
             $division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
-               
-            $title = "在庫管理表";
-            $content = $this->view('NewJoyPla/view/LotManagement', [
-                'api_url' => $api_url,
-                'user_info' => $user_info,
-                'division' => $division->data->all(),
-                'csrf_token' => Csrf::generate(16)
-                ] , false);
+            $division = $division->data->all();
+            $title = "ロット管理";
+            
+            $content = $this->view('NewJoyPla/view/template/List', [
+                    'title' => $title,
+                    'table' => '%sf:usr:search38:mstfilter%',
+                    'csrf_token' => Csrf::generate(16),
+                    'print' => true,
+                    'export' => true,
+                    'script' => $this->view('NewJoyPla/view/Script/LotManagement', [
+                        'division' => $division,
+                        ] , false)->render()
+                    ] , false);
             
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
@@ -248,7 +258,7 @@ class LotController extends Controller
             ], false);
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => $title,
+                'title'     => 'JoyPla '.$title,
                 'script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),
@@ -285,11 +295,11 @@ class LotController extends Controller
             } else 
             {
                 
-                $content = $this->view('NewJoyPla/view/LotAdjustmentHistory', [
-                    'api_url' => $api_url,
-                    'user_info' => $user_info,
-                    'csrf_token' => Csrf::generate(16)
-                    ] , false);
+                $content = $this->view('NewJoyPla/view/template/List', [
+                        'title' => 'ロット調整ログ',
+                        'table' => '%sf:usr:search34:table%',
+                        'csrf_token' => Csrf::generate(16)
+                        ] , false);
             }
             
         } catch ( Exception $ex ) {
@@ -334,11 +344,11 @@ class LotController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             } 
                 
-            $content = $this->view('NewJoyPla/view/LotAdjustmentHistory', [
-                'api_url' => $api_url,
-                'user_info' => $user_info,
-                'csrf_token' => Csrf::generate(16)
-                ] , false);
+            $content = $this->view('NewJoyPla/view/template/List', [
+                    'title' => 'ロット調整ログ',
+                    'table' => '%sf:usr:search34:table%',
+                    'csrf_token' => Csrf::generate(16)
+                    ] , false);
             
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [

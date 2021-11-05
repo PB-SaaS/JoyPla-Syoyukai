@@ -1,48 +1,4 @@
-<?php
-include_once 'NewJoyPla/lib/ApiSpiral.php';
-include_once "NewJoyPla/lib/Define.php";
-include_once "NewJoyPla/lib/Func.php";
-include_once "NewJoyPla/lib/SpiralDataBase.php";
-include_once "NewJoyPla/lib/UserInfo.php";
-include_once "NewJoyPla/api/GetCardInfo.php";
-include_once "NewJoyPla/api/GetReturnData.php";
-
-$userInfo = new App\Lib\UserInfo($SPIRAL);
-
-$spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
-$spiralApiRequest = new SpiralApiRequest();
-$spiralDataBase = new App\Lib\SpiralDataBase($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
-
-$cardInfo = new App\Api\GetCardInfo($spiralDataBase);
-$card = $cardInfo->select("NJ_ReturnHDB",$SPIRAL->getCardId(),"returnHistoryID","divisionId");
-
-if($userInfo->getUserPermission() != "1" && $card["data"][0][1] != $userInfo->getDivisionId()){
-	App\Lib\viewNotPossible();
-	exit;
-}
-
-$getReturnData = new App\Api\GetReturnData($spiralDataBase,$userInfo);
-
-$returnItem = $getReturnData->select($card["data"][0][0]);
-//$receivingData = $spiralDataBase->arrayToNameArray($receiptItem["data"],array("id","makerName","itemName","itemCode","itemStandard","quantity","quantityUnit","itemUnit","itemJANCode","orderQuantity","receivingCount","orderCNumber","inHospitalItemId"));
-$returnItem = $returnItem["data"];
-
-if($userInfo->getUserPermission() == "1"){
-	$link = '%url/table:back%';
-}else{
-	$link = '%url/rel:mpgt:page_266910%';
-} 
-?>
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>JoyPla 返品伝票</title>
-	<?php include_once "NewJoyPla/src/Head.php"; ?>
-
-  </head>
-  <body>
-    <?php include_once "NewJoyPla/src/HeaderForMypage.php"; ?>
-    <div class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
+<div class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
 	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
 		    <div class="uk-container uk-container-expand">
 		    	<ul class="uk-breadcrumb no_print">
@@ -54,7 +10,7 @@ if($userInfo->getUserPermission() == "1"){
 					<input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
 				</div>
 		    	<div class="uk-text-center uk-text-large">
-		    		<p class="uk-text-bold" style="font-size: 32px">返　品　伝　票</p>
+		    		<p class="uk-text-bold title_spacing" style="font-size: 32px">返品伝票</p>
 		    	</div>
 		    	<div uk-grid>
 			    	<div class="uk-width-1-2@m">
@@ -125,19 +81,19 @@ if($userInfo->getUserPermission() == "1"){
 				    			<tbody>
 				    				<?php
 				    					$num = 1;
-										foreach($returnItem as $record){
+										foreach($return_items as $record){
 				    						echo "<tr>";
 				    						echo "<td>".$num."</td>";
-				    						echo "<td>".$record["makerName"]."</td>";
-				    						echo "<td>".$record["itemName"]."</td>";
-				    						echo "<td>".$record["itemCode"]."</td>";
-				    						echo "<td>".$record["itemStandard"]."</td>";
-				    						echo "<td>".$record["lotNumber"]."</td>";
-				    						echo "<td>".$record["lotDate"]."</td>";
-				    						echo "<td>".$record["quantity"].$record["quantityUnit"]."</td>";
-				    						echo "<td>".$record["receivingCount"].$record["itemUnit"]."</td>";
-				    						echo "<td>".$record["returnCount"].$record["itemUnit"]."</td>";
-				    						echo "<td>￥<script>price(fixed(".$record["returnPrice"]."));</script></td>";
+				    						echo "<td>".$record->makerName."</td>";
+				    						echo "<td>".$record->itemName."</td>";
+				    						echo "<td>".$record->itemCode."</td>";
+				    						echo "<td>".$record->itemStandard."</td>";
+				    						echo "<td>".$record->lotNumber."</td>";
+				    						echo "<td>".$record->lotDate."</td>";
+				    						echo "<td>".$record->quantity.$record->quantityUnit."</td>";
+				    						echo "<td>".$record->receivingCount.$record->itemUnit."</td>";
+				    						echo "<td>".$record->returnCount.$record->itemUnit."</td>";
+				    						echo "<td>￥<script>price(fixed(".$record->returnPrice."));</script></td>";
 				    						echo "</tr>";
 				    						$num++;
 										}
@@ -162,5 +118,3 @@ if($userInfo->getUserPermission() == "1"){
 		 //$("td#order_barcode div").barcode({code:order_num, crc:false }, "int25",{barWidth: 3 ,barHeight: 40 , output: "css"});
 		});
 	</script>
-  </body>
-</html>

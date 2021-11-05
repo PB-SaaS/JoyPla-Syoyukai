@@ -18,13 +18,13 @@
 		    	?>
 		    	<ul class="uk-breadcrumb no_print uk-margin-top">
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
-				    <li><span>発注調整</span></li>
+				    <li><span>定数発注</span></li>
 				</ul>
 				<div class="no_print uk-margin">
 					<input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
 					<input class="print_hidden uk-button uk-button-primary" type="submit" value="表示内容で未発注伝票を作成" onclick="sendUnorderedSlip();return false;">
 				</div>
-		    	<h2 class="page_title">発注調整</h2>
+		    	<h2 class="page_title">定数発注</h2>
 		    	<hr>
 		    	<div class="" id="tablearea">
 		    		%sf:usr:search75:mstfilter%

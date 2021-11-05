@@ -119,16 +119,17 @@ class PayoutSlipController extends Controller
     		{
     		    if($record->lotNumber && $record->lotDate)
     		    {
+                    $lot_date = \App\Lib\changeDateFormat('Y年m月d日',$item->lotDate,'Y-m-d');
         		    $inventory_adjustment_trdata[] = [
                         'divisionId' => $record->targetDivisionId,
                         'inHospitalItemId' => $record->inHospitalItemId,
                         'count' => -$record->payoutQuantity,
                         'pattern' => 5,
                         'hospitalId' => $user_info->getHospitalId(),
-        		        'lotUniqueKey' => $user_info->getHospitalId().$record->targetDivisionId.$record->inHospitalItemId.$record->lotNumber.$record->lotDate,
+        		        'lotUniqueKey' => $user_info->getHospitalId().$record->targetDivisionId.$record->inHospitalItemId.$record->lotNumber.$lot_date,
         		        'stockQuantity' => -$record->payoutQuantity,
                         'lotNumber' =>  $record->lotNumber,
-                        'lotDate' =>    $record->lotDate,
+                        'lotDate' =>    $lot_date,
         		    ];
         		    $inventory_adjustment_trdata[] = [
                         'divisionId' => $record->sourceDivisionId,
@@ -136,10 +137,10 @@ class PayoutSlipController extends Controller
                         'count' => $record->payoutQuantity,
                         'pattern' => 4,
                         'hospitalId' => $user_info->getHospitalId(),
-        		        'lotUniqueKey' => $user_info->getHospitalId().$record->sourceDivisionId.$record->inHospitalItemId.$record->lotNumber.$record->lotDate,
+        		        'lotUniqueKey' => $user_info->getHospitalId().$record->sourceDivisionId.$record->inHospitalItemId.$record->lotNumber.$lot_date,
         		        'stockQuantity' => $record->payoutQuantity,
                         'lotNumber' =>  $record->lotNumber,
-                        'lotDate' =>    $record->lotDate,
+                        'lotDate' =>    $lot_date,
         		    ];
     		    }
     		    else

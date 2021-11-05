@@ -1,27 +1,4 @@
 
-<?php
-include_once 'NewJoyPla/lib/ApiSpiral.php';
-include_once "NewJoyPla/lib/Define.php";
-include_once 'NewJoyPla/lib/UserInfo.php';
-include_once 'NewJoyPla/api/GetTenantData.php';
-include_once 'NewJoyPla/api/GetHospitalData.php';
-include_once 'NewJoyPla/lib/SpiralDataBase.php';
-
-$userInfo = new App\Lib\UserInfo($SPIRAL);
-$spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
-$spiralApiRequest = new SpiralApiRequest();
-
-$spiralDataBase = new App\Lib\SpiralDataBase($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
-$getTenantData = new App\Api\GetTenantData($spiralDataBase,$userInfo);
-$tenantData = $getTenantData->select();
-$getHospitalData = new App\Api\GetHospitalData($spiralDataBase,$userInfo);
-$hospitalData = $getHospitalData->select();
-?>
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>JoyPla TOP</title>
-	<?php include_once 'NewJoyPla/src/Head.php'; ?>
     <style>
     	.nj_card{
     		background: #fff;
@@ -421,14 +398,11 @@ $hospitalData = $getHospitalData->select();
 		});
     	
     </script>
-  </head>
-  <body>
-    <?php include_once 'NewJoyPla/src/HeaderForMypage.php'; ?>
     <div class="animsition" uk-height-viewport="expand: true">
 	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-small uk-padding-remove-horizontal" id="page_top">
 		    <div class="uk-container uk-container-large	">
 	    		<?php
-	    		if($hospitalData['data'][0]['function1'] == '1'):
+	    		if($hospital->function1 == '1'):
 	    		?>
 		    	<div class="uk-margin">
 		    		<form action="#" onsubmit="hospitalTop.search(); return false;" method="post">
@@ -443,7 +417,7 @@ $hospitalData = $getHospitalData->select();
 	    		?>
 		    	<div class="uk-child-width-1-4@m uk-text-center" uk-grid>
 		    		<?php
-		    		if($hospitalData['data'][0]['function1'] == '1'):
+		    		if($hospital->function1 == '1'):
 		    		?>
 				    <div>
 				        <div class="nj_card content-1">
@@ -466,7 +440,7 @@ $hospitalData = $getHospitalData->select();
 		    		endif;
 		    		?>
 		    		<?php
-		    		if($hospitalData['data'][0]['function2'] == '1'):
+		    		if($hospital->function2 == '1'):
 		    		?>
 				    <div>
 				        <div class="nj_card content-2">
@@ -489,7 +463,7 @@ $hospitalData = $getHospitalData->select();
 		    		endif;
 		    		?>
 		    		<?php
-		    		if($hospitalData['data'][0]['function3'] == '1'):
+		    		if($hospital->function3 == '1'):
 		    		?>
 				    <div>
 				        <div class="nj_card content-3">
@@ -512,7 +486,7 @@ $hospitalData = $getHospitalData->select();
 		    		endif;
 		    		?>
 		    		<?php
-		    		if($hospitalData['data'][0]['function4'] == '1'):
+		    		if($hospital->function4 == '1'):
 		    		?>
 				    <div>
 				        <div class="nj_card content-4">
@@ -527,7 +501,7 @@ $hospitalData = $getHospitalData->select();
 	                            <div class="menu-foot">
 	                                <span>More Info</span>
 	                            </div>
-	                            <a href="%url/rel:mpgt:option%" class="slide4 animsition-link"  data-animsition-out-class="fade-out"></a>
+	                            <a href="<?php echo $url ?>&Action=option" class="slide4 animsition-link"  data-animsition-out-class="fade-out"></a>
 	                        </div>
 				        </div>
 				    </div>
@@ -535,7 +509,7 @@ $hospitalData = $getHospitalData->select();
 		    		endif;
 		    		?>
 		    		<?php
-		    		if($hospitalData['data'][0]['function5'] == '1'):
+		    		if($hospital->function5 == '1'):
 		    		?>
 				    <div>
 				        <div class="nj_card content-5">
@@ -558,7 +532,7 @@ $hospitalData = $getHospitalData->select();
 		    		endif;
 		    		?>
 		    		<?php
-		    		if($hospitalData['data'][0]['function6'] == '1'):
+		    		if($hospital->function6 == '1'):
 		    		?>
 				    <div>
 				        <div class="nj_card content-6">
@@ -581,7 +555,7 @@ $hospitalData = $getHospitalData->select();
 		    		endif;
 		    		?>
 		    		<?php
-		    		if($hospitalData['data'][0]['function7'] == '1'):
+		    		if($hospital->function7 == '1'):
 		    		?>
 				    <div>
 				        <div class="nj_card content-7">
@@ -604,7 +578,7 @@ $hospitalData = $getHospitalData->select();
 		    		endif;
 		    		?>
 		    		<?php
-		    		if($hospitalData['data'][0]['function8'] == '1'):
+		    		if($hospital->function8 == '1'):
 		    		?>
 				    <div>
 				        <div class="nj_card content-8">
@@ -653,7 +627,7 @@ $hospitalData = $getHospitalData->select();
 					    				<span>新着トピック</span>
 					    			</p>
 					    			<p class="uk-width-1-2 uk-text-right">
-					    				<a href="%url/rel:mpgt:page_266278%" class="uk-link" style="color:#ffffff">More Info</a>
+					    				<a href="%url/rel:mpgt:Topic%" class="uk-link" style="color:#ffffff">More Info</a>
 					    			</p>	
 				    			</div>
 				    		</div>
@@ -668,7 +642,7 @@ $hospitalData = $getHospitalData->select();
 		
 	
 		<?php
-		if($hospitalData['data'][0]['function1'] == '1'):
+		if($hospital->function1 == '1'):
 		?>	
 		
 		<div class="uk-section uk-section-default uk-preserve-color uk-padding-small uk-padding-remove-horizontal" id="page1">
@@ -692,7 +666,7 @@ $hospitalData = $getHospitalData->select();
 				    		<p class="uk-width-1-1 content-1-1 category-title">注文</p>
 			    		</div>
 				    	<div class="uk-child-width-1-2@m uk-text-center" uk-grid>
-				    		<?php if($userInfo->isAdmin() || $userInfo->isUser()) : ?>
+				    		<?php if($user_info->isAdmin() || $user_info->isUser()) : ?>
 						    <div>
 						        <div class="nj_card content-1-1">
 			                        <div class="menu-content">
@@ -767,7 +741,7 @@ $hospitalData = $getHospitalData->select();
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
-				                                <span class="title">発注調整</span><br>
+				                                <span class="title">定数発注</span><br>
 				                                <span class="text">Order Adjustment</span>
 			                                </p>
 			                            </div>
@@ -798,15 +772,11 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin() || $userInfo->isApprover()) : ?>
-			                            <a href="%url/rel:mpgt:Receipt%&Action=OrederList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php else : ?>
-			                            <a href="%url/rel:mpgt:page_266883%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php endif ?>
+			                            <a href="%url/rel:mpgt:Order%&Action=arrivalVerification" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
-						    <?php if($userInfo->isAdmin()) : ?>
+						    <?php if($user_info->isAdmin()) : ?>
 						    
 						    <div>
 						        <div class="nj_card content-1-2">
@@ -820,7 +790,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:page_263495%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:Receipt%&Action=verificationListByProduct" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -838,11 +808,8 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin()) : ?>
-			                            <a href="%url/rel:mpgt:page_266891%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php else : ?>
-			                            <a href="%url/rel:mpgt:page_266908%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php endif ?>
+			                            <a href="%url/rel:mpgt:Receipt%&Action=acceptanceList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+										
 			                        </div>
 						        </div>
 						    </div>
@@ -859,11 +826,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin()) : ?>
-			                            <a href="%url/rel:mpgt:page_265603%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php else : ?>
-			                            <a href="%url/rel:mpgt:page_266910%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php endif ?>
+			                            <a href="%url/rel:mpgt:Return%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -882,7 +845,7 @@ $hospitalData = $getHospitalData->select();
 		?>
 
 		<?php
-		if($hospitalData['data'][0]['function2'] == '1'):
+		if($hospital->function2 == '1'):
 		?>			
 		
 		<div class="uk-section uk-section-default uk-preserve-color uk-padding-small uk-padding-remove-horizontal" id="page2">
@@ -906,7 +869,7 @@ $hospitalData = $getHospitalData->select();
 				    		<p class="uk-width-1-1 content-2-1 category-title">棚卸</p>
 			    		</div>
 				    	<div class="uk-child-width-1-4@m uk-text-center" uk-grid>
-				    		<?php if($userInfo->isAdmin() || $userInfo->isUser()) : ?>
+				    		<?php if($user_info->isAdmin() || $user_info->isUser()) : ?>
 						    <div>
 						        <div class="nj_card content-2-1">
 			                        <div class="menu-content">
@@ -936,7 +899,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:page_263631%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:Inventory%&Action=inventoryEndList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1025,7 +988,7 @@ $hospitalData = $getHospitalData->select();
 				    		<p class="uk-width-1-1 content-6-1 category-title">在庫</p>
 			    		</div>
 				    	<div class="uk-child-width-1-2@m uk-text-center" uk-grid>
-							<?php if($userInfo->isAdmin() || $userInfo->isApprover()) : ?>
+							<?php if($user_info->isAdmin() || $user_info->isApprover()) : ?>
 						    <div>
 						        <div class="nj_card content-6-1">
 			                        <div class="menu-content">
@@ -1183,7 +1146,7 @@ $hospitalData = $getHospitalData->select();
 		?>
 
 		<?php
-		if($hospitalData['data'][0]['function3'] == '1'):
+		if($hospital->function3 == '1'):
 		?>			
 		
 		<div class="uk-section uk-section-default uk-preserve-color uk-padding-small uk-padding-remove-horizontal" id="page3">
@@ -1219,7 +1182,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:goodsBillingMR%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:GoodsBillingMR%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1235,7 +1198,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:orderMR%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:OrderMR%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1251,7 +1214,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:receivingMR%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:ReceivingMR%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1267,7 +1230,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:payoutMR%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:PayoutMR%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1283,11 +1246,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin() || $userInfo->isApprover()) : ?>
-											<a href="%url/rel:mpgt:page_177035%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php else : ?>
-											<a href="%url/rel:mpgt:page_177068%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php endif ?>
+			                            <a href="%url/rel:mpgt:ConsumeHistList%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1303,11 +1262,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin() || $userInfo->isApprover()) : ?>
-											<a href="%url/rel:mpgt:page_169065%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php else : ?>
-											<a href="%url/rel:mpgt:page_169061%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php endif ?>
+			                            <a href="%url/rel:mpgt:OrderHistList%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1323,11 +1278,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin() || $userInfo->isApprover()) : ?>
-											<a href="%url/rel:mpgt:page_168793%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php else : ?>
-											<a href="%url/rel:mpgt:page_168846%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php endif; ?>
+			                            <a href="%url/rel:mpgt:ReceiveHistList%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1343,11 +1294,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-										<?php if($userInfo->isAdmin() || $userInfo->isApprover()) : ?>
-											<a href="%url/rel:mpgt:page_301356%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php else : ?>
-											<a href="%url/rel:mpgt:page_168844%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
-										<?php endif; ?>
+			                            <a href="%url/rel:mpgt:PayoutHistList%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1362,7 +1309,7 @@ $hospitalData = $getHospitalData->select();
 		?>
 
 		<?php
-		if($hospitalData['data'][0]['function5'] == '1'):
+		if($hospital->function5 == '1'):
 		?>			
 		
 		<div class="uk-section uk-section-default uk-preserve-color uk-padding-small uk-padding-remove-horizontal" id="page5">
@@ -1461,7 +1408,7 @@ $hospitalData = $getHospitalData->select();
 		?>
 
 		<?php
-		if($hospitalData['data'][0]['function7'] == '1'):
+		if($hospital->function7 == '1'):
 		?>	
 		
 		<div class="uk-section uk-section-default uk-preserve-color uk-padding-small uk-padding-remove-horizontal" id="page7">
@@ -1498,15 +1445,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="#" onclick="javascript:document.quoteRequest.submit();"></a>
-										<form action="/regist/is" method="post" name="quoteRequest" target="_blank">
-											%SMPAREA%
-											<input type="hidden" name="tenantId" value="%val:usr:tenantId%">
-											<input type="hidden" name="SMPFORM" value="%smpform:310_quoteReques%">
-											<input type="hidden" name="hospitalId" value="%val:usr:hospitalId%">
-											<input type="hidden" name="requestUName" value="%val:usr:name%">
-											<input type="hidden" name="mail" value="%val:usr:mailAddress%">
-										</form>
+			                            <a href="<?php echo $url ?>&Action=quoteRequest"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1581,7 +1520,7 @@ $hospitalData = $getHospitalData->select();
 			                        </div>
 						        </div>
 						    </div>
-							<?php if(( $userInfo->isAdmin() || $userInfo->isApprover() ) && $tenantData['data'][0]['tenantKind'] == '1') : ?>
+							<?php if(( $user_info->isAdmin() || $user_info->isApprover() ) && $tenant->tenantKind == '1') : ?>
 						    <div>
 						        <div class="nj_card content-7-1">
 			                        <div class="menu-content">
@@ -1617,7 +1556,7 @@ $hospitalData = $getHospitalData->select();
 		?>
 
 		<?php
-		if($hospitalData['data'][0]['function8'] == '1'):
+		if($hospital->function8 == '1'):
 		?>	
 		
 		<div class="uk-section uk-section-default uk-preserve-color uk-padding-small uk-padding-remove-horizontal" id="page8">
@@ -1653,29 +1592,12 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="#" onclick="document.userInfoChange.submit();" class="slide1"></a>
+			                            <a href="<?php echo $url ?>&Action=userInfoChange" class="slide1"></a>
 			                            
-										<form method="post" action="/regist/is" name="userInfoChange" target="_blank">
-											%SMPAREA%
-											<input type="hidden" name="divisionId" value="%val:usr:divisionId%">
-											<input type="hidden" name="userPermission" value="%val:usr:userPermission:id%">
-											<input type="hidden" name="loginId" value="%val:usr:loginId%">
-											<input type="hidden" name="name" value="%val:usr:name%">
-											<input type="hidden" name="nameKana" value="%val:usr:nameKana%">
-											<input type="hidden" name="mailAddress" value="%val:usr:mailAddress%">
-											<input type="hidden" name="remarks" value="%val:usr:remarks%">
-											<?php if($userInfo->isAdmin()) : ?>
-											<input type="hidden" name="SMPFORM" value="%smpform:hpUserChange%">
-											<?php else: ?>
-											<input type="hidden" name="SMPFORM" value="%smpform:hpUserCForD%">
-											<?php endif ?>
-											<input type="hidden" name="id" value="%val:sys:id%">
-											<input type="hidden" name="authKey" value="%val:usr:authKey%" >
-										</form>
 			                        </div>
 						        </div>
 						    </div>
-							<?php if($userInfo->isAdmin()) : ?>
+							<?php if($user_info->isAdmin()) : ?>
 						    <div>
 						        <div class="nj_card content-8-1">
 			                        <div class="menu-content">
@@ -1693,7 +1615,7 @@ $hospitalData = $getHospitalData->select();
 						        </div>
 						    </div>
 							<?php endif; ?>
-							<?php if($userInfo->isAdmin()) : ?>
+							<?php if($user_info->isAdmin()) : ?>
 						    <div>
 						        <div class="nj_card content-8-1">
 			                        <div class="menu-content">
@@ -1706,7 +1628,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:page_265018%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:userManagement%&Action=divisionList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1723,11 +1645,11 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:page_265118%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:DistributorList%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
-							<?php if($userInfo->isAdmin()) : ?>
+							<?php if($user_info->isAdmin()) : ?>
 						    <div>
 						        <div class="nj_card content-8-1">
 			                        <div class="menu-content">
@@ -1740,7 +1662,7 @@ $hospitalData = $getHospitalData->select();
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:ContractConfirm%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="<?php echo $url ?>&Action=contractConfirm" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
@@ -1756,5 +1678,3 @@ $hospitalData = $getHospitalData->select();
 		?>
 		
 	</div>
-  </body>
-</html>

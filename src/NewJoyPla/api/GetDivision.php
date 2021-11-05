@@ -11,6 +11,7 @@ namespace App\Api;
  * @author ito.shun <ito.shun@pi-pe.co.jp>
  * @copyright  PipedBits All Rights Reserved
  */
+/*
 class GetDivision{
 
     private $spiralDataBase;

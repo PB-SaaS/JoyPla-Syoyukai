@@ -11,6 +11,7 @@ namespace App\Api;
  * @copyright  PipedBits All Rights Reserved
  */
 
+/*
 class GetDistributor{
 
   private $spiralDataBase;
@@ -25,6 +26,7 @@ class GetDistributor{
    * @param SpiralDataBase
    * @param UserInfo
    */
+/*
   public function __construct(\App\Lib\SpiralDataBase $spiralDataBase, \App\Lib\UserInfo $userInfo){
     $this->spiralDataBase = $spiralDataBase;
     $this->userInfo = $userInfo;
@@ -36,6 +38,7 @@ class GetDistributor{
 	 * @access public
 	 * @return array
 	 */
+/*
   public function getDistributor(){
     $result = $this->getDistributorDB();
     return $result;
@@ -47,6 +50,7 @@ class GetDistributor{
 	 * @access private
 	 * @return array
 	 */
+/*
   private function getDistributorDB(){
     $this->spiralDataBase->setDataBase($this->distributorDB);
     $this->spiralDataBase->addSelectFields('distributorName','distributorId');
@@ -62,6 +66,7 @@ class GetDistributor{
 　 * @param string $distributorId 卸業者ID
 	 * @return array
 	 */
+/*
   public function getMyDistributor(string $distributorId){
     $result = $this->getMyDistributorDB($distributorId);
     return $result;
@@ -74,6 +79,7 @@ class GetDistributor{
 　 * @param string $distributorId 卸業者ID
 	 * @return array
 	 */
+/*
   private function getMyDistributorDB(string $distributorId){
     $this->spiralDataBase->setDataBase($this->distributorDB);
     $this->spiralDataBase->addSelectFields('distributorName','distributorId');

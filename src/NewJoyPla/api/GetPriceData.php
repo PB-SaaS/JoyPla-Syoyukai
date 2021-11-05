@@ -1,5 +1,6 @@
 <?php
 
+/*
 namespace App\Api;
 
 class GetPriceData{
@@ -11,6 +12,7 @@ class GetPriceData{
     * @access public
     * @param SpiralDataBase
     */
+/*
     public function __construct(\App\Lib\SpiralDataBase $spiralDataBase){
         $this->spiralDataBase = $spiralDataBase;
     }

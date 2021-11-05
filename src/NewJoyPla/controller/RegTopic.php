@@ -1,5 +1,6 @@
 <?php
 //トピック登録後通知　サンクスページに挿入
+/*
 include_once 'NewJoyPla/lib/ApiSpiral.php';
 include_once "NewJoyPla/lib/Define.php";
 include_once "NewJoyPla/lib/SpiralDBFilter.php";
@@ -11,6 +12,7 @@ include_once "NewJoyPla/lib/Define.php";
 /****
  * 病院ユーザーへの送信 
  */
+/*
 if($SPIRAL->getContextByFieldTitle("hospitalId") != ''){
 
 	$spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
@@ -78,6 +80,7 @@ EOM;
 /****
  * 卸ユーザーへの送信 
  */
+/*
 if($SPIRAL->getContextByFieldTitle("distributorId")  != '' ){
 		
 	$spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
@@ -141,3 +144,4 @@ EOM;
 	$SpiralSendMail->regist();
 
 }
+*/

@@ -44,10 +44,11 @@ class InHospitalItemsListForReferenceController extends Controller
             $head   = $this->view('NewJoyPla/view/template/parts/Head', [
                 'new' => true
                 ] , false);
-                
+            /*
             $header = $this->view('NewJoyPla/view/template/parts/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
+            */
             
             $style   = $this->view('NewJoyPla/view/template/parts/LabelsCss', [] , false)->render();
                 
@@ -62,7 +63,7 @@ class InHospitalItemsListForReferenceController extends Controller
                 'style' => $style,
                 'content'   => $content->render(),
                 'head' => $head->render(),
-                'header' => $header->render(),
+                'header' => '',
                 'baseUrl' => '',
             ],false);
         }

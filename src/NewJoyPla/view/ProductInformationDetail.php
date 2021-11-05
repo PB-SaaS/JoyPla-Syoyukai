@@ -18,64 +18,21 @@
 
                 <?php if ($tenantKind == "1" && $userInfo->isAdmin()): ?>
                 <input class="print_hidden uk-button uk-button-primary" type="submit" value="商品情報変更" onclick="document.itemsChange.submit()">
-                <form action="/regist/is" method="post" name="itemsChange" target="_blank" class="uk-hidden">
-                    %SMPAREA%
-                    <input type="hidden" name="itemId" value="%val:usr:itemId%">
-                    <input type="hidden" name="itemName" value="%val:usr:itemName%">
-                    <input type="hidden" name="itemCode" value="%val:usr:itemCode%">
-                    <input type="hidden" name="itemStandard" value="%val:usr:itemStandard%">
-                    <input type="hidden" name="itemJANCode" value="%val:usr:itemJANCode%">
-                    <input type="hidden" name="officialFlag" value="%val:usr:officialFlag%">
-                    <input type="hidden" name="officialpriceOld" value="%val:usr:officialpriceOld%">
-                    <input type="hidden" name="officialprice" value="%val:usr:officialprice%">
-                    <input type="hidden" name="quantity" value="%val:usr:quantity%">
-                    <input type="hidden" name="quantityUnit" value="%val:usr:quantityUnit%">
-                    <input type="hidden" name="itemUnit" value="%val:usr:itemUnit%">
-                    <input type="hidden" name="tenantId" value="%val:usr:tenantId%">
-                    <input type="hidden" name="itemsAuthKey" value="%val:usr:itemsAuthKey%">
-                    <input type="hidden" name="makerName" value="%val:usr:makerName%">
-                    <input type="hidden" name="catalogNo" value="%val:usr:catalogNo%">
-                    <input type="hidden" name="serialNo" value="%val:usr:serialNo%">
-                    <input type="hidden" name="minPrice" value="%val:usr:minPrice%">
-                    <input type="hidden" name="lotManagement" value="%val:usr:lotManagement%">
-                    <input type="hidden" name="SMPFORM" value="%smpform:330_itemChange%">
+                <form action="<?php echo $api_url ?>" method="post" name="itemsChange" class="uk-hidden">
+                    <input type="hidden" value="itemChangeForm" name="Action">
                 </form>
                 <?php endif ?>
                 <?php if($tenantKind == "1" && ($userInfo->isAdmin() || $userInfo->isApprover())): ?>
                 <input class="print_hidden uk-button uk-button-primary" type="submit" value="金額情報登録" onclick="document.priceReg.submit()">
-                <form action="/regist/is" method="post" name="priceReg" target="_blank" class="uk-hidden">
-                    %SMPAREA%
-                    <input type="hidden" name="itemName" value="%val:usr:itemName%">
-                    <input type="hidden" name="itemCode" value="%val:usr:itemCode%">
-                    <input type="hidden" name="itemStandard" value="%val:usr:itemStandard%">
-                    <input type="hidden" name="itemJANCode" value="%val:usr:itemJANCode%">
-                    <input type="hidden" name="makerName" value="%val:usr:makerName%">
-                    <input type="hidden" name="itemId" value="%val:usr:itemId%">
-                    <input type="hidden" name="quantity" value="%val:usr:quantity%">
-                    <input type="hidden" name="quantityUnit" value="%val:usr:quantityUnit%">
-                    <input type="hidden" name="itemUnit" value="%val:usr:itemUnit%">
-                    <input type="hidden" name="SMPFORM" value="%smpform:310_priceReg%">
-                    <input type="hidden" name="hospitalId" value="%val:@usr:hospitalId%">
+                <form action="<?php echo $api_url ?>" method="post" name="priceReg" class="uk-hidden">
+                    <input type="hidden" value="priceRegist" name="Action">
                 </form>
                 <?php endif ?>
                 <?php if($tenantKind == "1" && ($userInfo->isAdmin() || $userInfo->isApprover())): ?>
 
                 <input class="print_hidden uk-button uk-button-primary" type="submit" value="院内商品として追加" onclick="document.inHPItemsReg.submit()">
-                <form action="/regist/is" method="post" name="inHPItemsReg" target="_blank" class="uk-hidden">
-                    %SMPAREA%
-                    <input type="hidden" name="SMPFORM" value="%smpform:330_inHpItemsR%">
-                    <input type="hidden" name="itemId" value="%val:usr:itemId%">
-                    <input type="hidden" name="itemName" value="%val:usr:itemName%">
-                    <input type="hidden" name="itemCode" value="%val:usr:itemCode%">
-                    <input type="hidden" name="itemStandard" value="%val:usr:itemStandard%">
-                    <input type="hidden" name="itemJANCode" value="%val:usr:itemJANCode%">
-                    <input type="hidden" name="quantity" value="%val:usr:quantity%">
-                    <input type="hidden" name="quantityUnit" value="%val:usr:quantityUnit%">
-                    <input type="hidden" name="itemUnit" value="%val:usr:itemUnit%">
-                    <input type="hidden" name="makerName" value="%val:usr:makerName%">
-                    <input type="hidden" name="hospitalId" value="%val:@usr:hospitalId%">
-                    <input type="hidden" name="catalogNo" value="%val:usr:catalogNo%">
-                    <input type="hidden" name="serialNo" value="%val:usr:serialNo%">
+                <form action="<?php echo $api_url ?>"  method="post" name="inHPItemsReg" class="uk-hidden">
+                    <input type="hidden" name="Action" value="inHospitalItemRegist">
                 </form>
                 <?php endif ?>
             </div>
@@ -145,9 +102,15 @@
                     <h2>金額情報</h2>
                 </div>
             </div>
-            <div class="uk-width-1-1 uk-margin-top">
+            <div class="uk-width-1-1 uk-margin-top price_list">
                 %sf:usr:search36:table:mstfilter%
             </div>
+            <script>
+            	let elem = $('.price_list table tbody a');
+            	for(let index = 0 ; index < elem.length ; index++){
+            		elem[index].href += "&Action=itemSlip";
+            	};
+            </script>
 
             <div uk-grid>
                 <div class="uk-width-3-4@m">

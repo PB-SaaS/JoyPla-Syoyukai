@@ -47,10 +47,4 @@ class InHospitalItemsListForReference {
 }
 
 let in_hp_items_list_reference = new InHospitalItemsListForReference();
-
-function hanei(elm){
-	let shouhinTr = $(elm.parentNode.parentNode);
-	shouhinObject = JSON.parse($('.json',shouhinTr).text().replace(/\r?\n/g, '').trim());
-	window.opener.addTr(shouhinObject, 1, 0);
-}
 </script>

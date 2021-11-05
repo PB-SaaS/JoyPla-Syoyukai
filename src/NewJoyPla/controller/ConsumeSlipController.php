@@ -124,16 +124,17 @@ class ConsumeSlipController extends Controller
     		{
     		    if($record->lotNumber && $record->lotDate)
     		    {
+                    $lot_date = \App\Lib\changeDateFormat('Y年m月d日',$item->lotDate,'Y-m-d');
         		    $inventory_adjustment_trdata[] = [
                         'divisionId' => $record->divisionId,
                         'inHospitalItemId' => $record->inHospitalItemId,
                         'count' => $record->billingQuantity,
                         'pattern' => 1,
                         'hospitalId' => $user_info->getHospitalId(),
-        		        'lotUniqueKey' => $user_info->getHospitalId().$record->divisionId.$record->inHospitalItemId.$record->lotNumber.$record->lotDate,
+        		        'lotUniqueKey' => $user_info->getHospitalId().$record->divisionId.$record->inHospitalItemId.$record->lotNumber.$lot_date,
         		        'stockQuantity' => $record->billingQuantity,
                         'lotNumber' =>  $record->lotNumber,
-                        'lotDate' =>    $record->lotDate,
+                        'lotDate' =>    $lot_date,
         		    ];
     		    }
     		    else

@@ -36,15 +36,15 @@ class QuoteDetailController extends Controller
                 throw new Exception("ページが存在しません",404);
             }
 
-            $tenantKind = '';
+            $tenant_kind = '';
             $tenantId = $user_info->getTenantId();
             if ($tenantId)
             {
                 $tenant = Tenant::where('tenantId',$tenantId)->get();
                 $tenant = $tenant->data->all()[0];
-                $tenantKind = $tenant->tenantKind;
+                $tenant_kind = $tenant->tenantKind;
             }
-
+            
             $card = QuoteRequest::find($cardId)->get();
             $card = $card->data->all()[0];
 
@@ -69,13 +69,13 @@ class QuoteDetailController extends Controller
                 $result = QuoteRequest::where('requestId',$card->requestId)->update(['requestStatus' => $status]);
             }
 
-            $api_url = "%url/rel:mpgt:Price%";
+            $api_url = "%url/card:page_169095%";
 
             $content = $this->view('NewJoyPla/view/QuoteOrderDetail', [
-                'userInfo' => $user_info,
+                'user_info' => $user_info,
                 'api_url' => $api_url,
                 'csrf_token' => Csrf::generate(16),
-                'tenantKind' => $tenantKind
+                'tenant_kind' => $tenant_kind
             ] , false);
 
         } catch ( Exception $ex ) {
@@ -137,6 +137,58 @@ class QuoteDetailController extends Controller
         if ($not > 0) { return 4; }
         return 0;
     }
+    
+    public function regRequestItems()
+    {
+        global $SPIRAL;
+        try {
+            
+            $user_info = new UserInfo($SPIRAL);
+            
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+    
+            $cardId = (int)$SPIRAL->getCardId();
+            
+            $card = QuoteRequest::find($cardId)->get();
+            $card = $card->data->get(0);
+            
+            $items = $SPIRAL->getParam('items');
+            $items = $this->requestUrldecode($items);
+            $insert_data = [];
+            foreach($items as $item){
+                if($item['quantity'] == "0"){
+                    continue;
+                }
+                $insert_data[] = [
+                    'requestFlg' => '3',
+                    'requestId' => $card->requestId,
+                    'distributorId' => $card->distributorId,
+                    'itemId' => $item['itemId'],
+                    'quantity' => $item['quantity'],
+                    'hospitalId' => $user_info->getHospitalId(),
+                    'quantityUnit' => $item['quantityUnit'],
+                    'itemUnit' => $item['itemUnit'],
+                    'notice' => $item['notice']
+                ];
+            }
+            
+            $result = Price::insert($insert_data);
+            
+            $content = new ApiResponse($result->ids , $result->count , $result->code, $result->message, ['insert']);
+            $content = $content->toJson();
+            /** TODO
+             *  spiralDatabaseのレスポンスをApiResponseに変更 
+             **/
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+            $content = $content->toJson();
+        }finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+    }
 }
 
 /***
@@ -147,5 +199,12 @@ $QuoteDetailController = new QuoteDetailController();
 $action = $SPIRAL->getParam('Action');
 
 {
-    echo $QuoteDetailController->index()->render();
+    if($action === 'regRequestItems')
+    {
+        echo $QuoteDetailController->regRequestItems()->render();
+    } 
+    else 
+    {
+        echo $QuoteDetailController->index()->render();
+    }
 }

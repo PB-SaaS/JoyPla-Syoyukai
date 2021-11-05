@@ -1,5 +1,6 @@
 <?php
 //見積商品不採用　サンクスページに挿入
+/*
 include_once 'NewJoyPla/lib/ApiSpiral.php';
 include_once 'NewJoyPla/lib/Define.php';
 include_once 'NewJoyPla/lib/SpiralDataBase.php';

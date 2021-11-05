@@ -656,7 +656,7 @@ var app = new Vue({
                 url:'%url/rel:mpgt:labelBarcodeSAPI%',
                 type:'POST',
                 data:{
-                	divisionId : $('select[name="targetDivision"]').val(),
+                	divisionId : app.targetDivision,
                 	barcode : barcode,
                 },
                 dataType: 'json'
@@ -665,6 +665,11 @@ var app = new Vue({
             .done( (data) => {
             	if(data.count > 0)
             	{
+            		if(data.data.divisionId != app.targetDivision)
+            		{
+	                	UIkit.modal.alert("払出先のカードではありません");
+	                	return false;
+            		}
 	            	$('select[name="targetDivision"]').attr('disabled',true);
 	            	let checked = false;
 	            	app.lists.forEach(function(elem, index) {

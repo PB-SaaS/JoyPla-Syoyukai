@@ -46,11 +46,16 @@ class PriceController extends Controller
                 ];
             }
 
-            $content = $this->view('NewJoyPla/view/PriceList', [
-                'userInfo' => $user_info,
-                'csrf_token' => Csrf::generate(16),
-                'distributor' => $distributor
-            ] , false);
+            $content = $this->view('NewJoyPla/view/template/List', [
+                    'title' => '金額情報一覧',
+                    'print' => true,
+                    'export' => true,
+                    'table' => '%sf:usr:search36%',
+                    'userInfo' => $user_info,
+                    'csrf_token' => Csrf::generate(16),
+                    'distributor' => $distributor,
+                    'script' => $this->view('NewJoyPla/view/Script/PriceList', ['distributor' => $distributor,] , false)->render()
+                    ] , false);
         
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
@@ -90,10 +95,12 @@ class PriceController extends Controller
 
             $user_info = new UserInfo($SPIRAL);
 
-            $content = $this->view('NewJoyPla/view/QuoteOrderList', [
-                'userInfo' => $user_info,
-                'csrf_token' => Csrf::generate(16)
-            ] , false);
+            $content = $this->view('NewJoyPla/view/template/List', [
+                    'title' => '見積依頼一覧',
+                    'table' => '<div class="uk-margin-auto uk-width-4-5@m">%sf:usr:search10%</div>',
+                    'userInfo' => $user_info,
+                    'csrf_token' => Csrf::generate(16)
+                    ] , false);
         
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [

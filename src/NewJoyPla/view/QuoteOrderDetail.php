@@ -43,11 +43,10 @@
                     </div>
                 </article>
             </div>
-
-        <?php if ($tenantKind == "1" && $userInfo->isAdmin()): ?>
+        <?php if ($tenant_kind == "1" && $user_info->isAdmin()): ?>
             <div class="uk-margin">
                 <p>見積商品一覧</p>
-                <div>%sf:usr:search19:mstfilter:table%</div>
+                <div>%sf:usr:search39:mstfilter:table%</div>
             </div>
         <?php endif; ?>
 
@@ -72,8 +71,8 @@
     <div class="uk-modal-dialog uk-width-1-1 uk-padding" uk-height-viewport="offset-bottom: 20">
         <h2 class="uk-modal-title">金額見積の対象商品を追加</h2>
         <button class="uk-modal-close-outside" type="button" uk-close></button>
-        <button class="uk-button uk-button-default" type="button" onclick="sanshouClick()">商品マスタを開く</button>
-        <button class="uk-button uk-button-primary" type="submit" onclick="regRequestItemList()">追加確定</button>
+        <button class="uk-button uk-button-default" type="button" v-on:click="sanshouClick">商品マスタを開く</button>
+        <button class="uk-button uk-button-primary" type="submit" v-on:click="regRequestItemList()">追加確定</button>
         <form onsubmit="return false" action="#" method="post">
             <div class="shouhin-table uk-width-expand uk-modal-body uk-overflow-auto">
                 <table class="uk-table uk-table-striped uk-table-striped uk-table-condensed uk-text-nowrap">
@@ -81,10 +80,12 @@
                         <tr>
                             <th>ID</th>
                             <th>メーカー</th>
+                            <th>分類</th>
                             <th>商品名</th>
                             <th>製品コード</th>
                             <th>規格</th>
                             <th>JANコード</th>
+                            <th>ロット管理フラグ</th>
                             <th>入数</th>
                             <th>個数単位</th>
                             <th>特記事項</th>
@@ -92,9 +93,34 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr v-for="(list, key) in lists" :id="'tr_' + key">
+                            <td>{{list.text}}</td>
+                            <td>{{list.maker}}</td>
+                            <td>{{list.category}}</td>
+                            <td>{{list.itemName}}</td>
+                            <td>{{list.itemCode}}</td>
+                            <td>{{list.itemStandard}}</td>
+                            <td>{{list.itemJANCode}}</td>
+                            <td>{{list.lotFlag}}</td>
+                            <td>
+                                <input type="number" step="1" class="uk-input" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.quantity" v-on:change="addCountStyle(key)">
+                                <span class="uk-text-bottom">{{list.quantityUnit}}</span>
+                            </td>
+                            <td>
+                                <input type="text" class="uk-input" style="width: 96px;" v-bind:style="list.unitStyle" v-model="list.itemUnit" v-on:change="addUnitStyle(key)">
+                            </td>
+                            <td>
+                                <textarea class="uk-textarea uk-width-medium" v-bind:style="list.noticeStyle" v-model="list.notice" v-on:change="addNoticeStyle(key)" maxlength="256"></textarea>
+                            </td>
+                            <td uk-margin class="uk-text-center">
+                                <input type="button" class="uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)">
+                            </td>
+                        </tr>
                     </tbody>
                     <tfoot>
                         <tr>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
                             <td>&emsp;</td>
                             <td>&emsp;</td>
                             <td>&emsp;</td>
@@ -112,224 +138,128 @@
         </form>
     </div>
 </div>
+
 <script>
-    // 参照ボタンクリック
-    function sanshouClick() {
-        // 参照マスタを別ウィンドウで開く
-        window.open('%url/rel:mpgt:page_169089%', '_blank', 'scrollbars=yes,width=1220,height=600');
-    }
-    let listObject = {};
-    let num = 0;
-    let dataKey = ['id', 'makerName', 'itemName', 'itemCode', 'itemStandard', 'itemJANCode', 'quantity', 'itemUnit', 'notice'];
 
-    function delTr(object, elm) {
-        elm.parentElement.parentElement.remove()
-        delete listObject[object.num];
-        console.log(listObject);
-    }
-
-    function addTr(object) {
-        num++;
-        object.num = num;
-        listObject[object.num] = object;
-        //listObject[object.num].quantity = 0;
-        listObject[object.num].notice = "";
-        //listObject[object.num].itemUnit = "";
-
-        let trElm = document.createElement("tr");
-        let tdElm = '';
-        for (let i = 0; i < dataKey.length; i++) {
-            tdElm = document.createElement("td");
-            html = document.createTextNode('');
-
-            if (dataKey[i] === 'id') {
-                //html = document.createTextNode(listObject[object.recordId].row);
-            } else if (dataKey[i] === 'itemUnit') {
-                //html = '<input type="number" class="uk-input" style="width:72px" step="10">';
-                html = document.createElement("div");
-                input = document.createElement("input");
-                input.type = 'text';
-                input.className = 'uk-input';
-                input.id = 'itemUnit_' + num;
-                input.style = 'width:96px';
-                input.value = listObject[num][dataKey[i]];
-
-                input.onchange = function() {
-                    listObject[object.num].itemUnit = this.value;
-                    $('#itemUnit_' + object.num).css({
-                        "color": "rgb(68, 68, 68)",
-                        "background-color": "rgb(255, 204, 153)",
-                        "width": "96px"
-                    });
-                };
-                html.appendChild(input);
-            } else if (dataKey[i] === 'notice') {
-
-                //html = '<input type="number" class="uk-input" style="width:72px" step="10">';
-                html = document.createElement("div");
-                textarea = document.createElement("textarea");
-                textarea.className = 'uk-textarea uk-width-medium';
-                textarea.id = 'notice_' + num;
-                textarea.maxLength = "256";
-
-                textarea.onchange = function() {
-                    listObject[object.num].notice = this.value;
-                    $('#notice_' + object.num).css({
-                        "color": "rgb(68, 68, 68)",
-                        "background-color": "rgb(255, 204, 153)"
-                    });
-                };
-
-                html.appendChild(textarea);
-
-            } else if (dataKey[i] === 'quantity') {
-                //html = '<input type="number" class="uk-input" style="width:72px" step="10">';
-                html = document.createElement("div");
-                input = document.createElement("input");
-                input.type = 'number';
-                input.step = "1"
-                input.className = 'uk-input';
-                input.id = 'q_' + num;
-                input.style = 'width:96px';
-                input.min = 0;
-                input.value = listObject[num][dataKey[i]];
-
-                input.onchange = function() {
-                    changeForInputNumber(this);
-                    listObject[object.num].quantity = this.value;
-                    $('#q_' + object.num).css({
-                        "color": "rgb(68, 68, 68)",
-                        "background-color": "rgb(255, 204, 153)",
-                        "width": "96px"
-                    });
-                };
-                span = document.createElement("span");
-                span.innerText = listObject[num].quantityUnit;
-                span.className = 'uk-text-bottom';
-                html.appendChild(input);
-                html.appendChild(span);
-            } else {
-                text = '';
-                text += listObject[num][dataKey[i]];
-                html = document.createTextNode(text);
-            }
-
-            tdElm.appendChild(html);
-            trElm.appendChild(tdElm);
-        }
-        tdElm = document.createElement("td");
-
-        input = document.createElement("input");
-        input.type = 'button';
-        input.value = '削除';
-        input.className = 'uk-button uk-button-danger uk-button-small';
-        input.onclick = function() {
-            delTr(object, this);
-        }
-
-        tdElm.appendChild(input);
-        trElm.appendChild(tdElm);
-        $(".shouhin-table table tbody").append(trElm);
-    }
-
-    let canAjax = true;
-
-    function regRequestItemList() {
-        UIkit.modal.confirm("見積商品の登録を行います").then(function() {
-
-            if (!canAjax) {
-                console.log('通信中');
-                return;
-            }
-            if (!itemsCheck()) {
-                loading_remove();
-                return false;
-            }
-
-            canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
-            loading();
-            $.ajax({
+var app = new Vue({
+    el: '#modal-RQItems',
+    data: {
+        lists: []
+    },
+    methods: {
+        addList: function(object) {
+            object.countStyle = {};
+            app.lists.push(object);
+            
+        },
+        regRequestItemList: function() {
+            UIkit.modal.confirm("見積商品の登録を行います").then(function() {
+                if(!app.check()){
+                    return false;
+                }
+                loading();
+                $.ajax({
                     async: false,
-                    url: '%url/card:page_169096%',
-                    type: 'POST',
+                    url: "<?php echo $api_url ?>",
+                    type:'POST',
                     data: {
-                        items: JSON.stringify(objectValueToURIencode(listObject))
+                        _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+                        Action : 'regRequestItems',
+                        items : JSON.stringify( objectValueToURIencode(app.lists) )
                     },
                     dataType: 'json'
                 })
                 // Ajaxリクエストが成功した時発動
-                .done((data) => {
-                    if (!data.result) {
+                .done( (data) => {
+                    if (data.code != 0) {
                         UIkit.modal.alert("見積商品の登録に失敗しました").then(function() {
                             UIkit.modal($('#modal-RQItems')).show();
                         });
                         return false;
                     }
-                    UIkit.modal.alert('見積商品の登録が完了しました').then(function() {
+                    UIkit.modal.alert("見積商品の登録が完了しました").then(function(){
+                        app.lists.splice(0, app.lists.length);
                         location.reload();
                     });
                 })
                 // Ajaxリクエストが失敗した時発動
-                .fail((data) => {
-                    console.log(data.responseText);
+                .fail( (data) => {
                     UIkit.modal.alert("見積商品の登録に失敗しました").then(function() {
                         UIkit.modal($('#modal-RQItems')).show();
                     });
                 })
                 // Ajaxリクエストが成功・失敗どちらでも発動
-                .always((data) => {
-                    canAjax = true; // 再びAjaxできるようにする
+                .always( (data) => {
                     loading_remove();
                 });
+            }, function() {
+                UIkit.modal($('#modal-RQItems')).show();
+            });
+        },
+        deleteList: function(key) {
+            this.lists.splice(key, 1);
+        },
+        sanshouClick: function() {
+            window.open('%url/rel:mpgt:page_177993%', '_blank','scrollbars=yes,width=1220,height=600');
+        },
+        check: function(){
+            
+            if (app.lists.length === 0) {
+                UIkit.modal.alert('見積商品がありません').then(function() {
+                    UIkit.modal($('#modal-RQItems')).show();
+                });
+                return false ;
+            }
+ 
+            let checkflg = true;
+            app.lists.forEach(function(elem, index) {
+                if (Math.floor(app.lists[index].quantity) <= 0) {
+                    checkflg = false;
+                }
+            });
+            if (!checkflg) {
+                UIkit.modal.alert('入数を0以上で入力してください').then(function() {
+                    UIkit.modal($('#modal-RQItems')).show();
+                });
+                return false;
+            }
 
-        }, function() {
-            UIkit.modal($('#modal-RQItems')).show();
-        });
-    }
-
-    function itemsCheck() {
-        let checkflg = false;
-        Object.keys(listObject).forEach(function(key) {
             checkflg = true;
-        });
-
-        if (checkflg) {} else {
-            UIkit.modal.alert('見積商品がありません').then(function() {
-                UIkit.modal($('#modal-RQItems')).show();
+            app.lists.forEach(function(elem, index) {
+                console.log(app.lists[index].itemUnit);
+                if (app.lists[index].itemUnit == '') {
+                    checkflg = false;
+                }
             });
-            return false;
-        }
-
-        checkflg = true;
-        Object.keys(listObject).forEach(function(key) {
-            if (Math.floor(listObject[key].quantity) <= 0) {
-                checkflg = false;
+            if (!checkflg) {
+                UIkit.modal.alert('個数単位を入力してください').then(function() {
+                    UIkit.modal($('#modal-RQItems')).show();
+                });
+                return false;
             }
-        });
 
-        if (checkflg) {} else {
-            UIkit.modal.alert('入数を0以上で入力してください').then(function() {
-                UIkit.modal($('#modal-RQItems')).show();
-            });
-            return false;
+            return true;
+        },
+        addCountStyle: function(index){
+            let changeObject = app.lists[index];
+            changeObject.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+            app.$set(app.lists, index, changeObject);
+        },
+        addUnitStyle: function(index){
+            let changeObject = app.lists[index];
+            changeObject.unitStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+            app.$set(app.lists, index, changeObject);
+        },
+        addNoticeStyle: function(index){
+            let changeObject = app.lists[index];
+            changeObject.noticeStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+            app.$set(app.lists, index, changeObject);
         }
-
-        checkflg = true;
-        Object.keys(listObject).forEach(function(key) {
-            console.log(listObject[key].itemUnit);
-            if (listObject[key].itemUnit == '') {
-                checkflg = false;
-            }
-        });
-
-        if (checkflg) {} else {
-            UIkit.modal.alert('個数単位を入力してください').then(function() {
-                UIkit.modal($('#modal-RQItems')).show();
-            });
-            return false;
-        }
-
-        return true;
-
     }
+});
+
+function addTr(object, type, count)
+{
+    app.addList(object);
+}
 </script>

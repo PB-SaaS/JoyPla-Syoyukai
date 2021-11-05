@@ -260,7 +260,10 @@ class OrderController extends Controller
     
             if ($user_info->isHospitalUser() && ( $user_info->isAdmin() || $user_info->isApprover() ))
             {
-                $content = $this->view('NewJoyPla/view/UnorderedList', [
+                
+                $content = $this->view('NewJoyPla/view/template/List', [
+                    'title' => '未発注書一覧',
+                    'table' => '%sf:usr:unorderedSlip:mstfilter%',
                     'csrf_token' => Csrf::generate(16)
                     ] , false);
             } else {
@@ -320,7 +323,11 @@ class OrderController extends Controller
     
             $api_url = "%url/rel:mpgt:Order%";
             
-            $content = $this->view('NewJoyPla/view/UnorderedList', [] , false);
+            $content = $this->view('NewJoyPla/view/template/List', [
+                    'title' => '未発注書一覧',
+                    'table' => '%sf:usr:unorderedSlip:mstfilter%',
+                    'csrf_token' => Csrf::generate(16)
+                    ] , false);
     
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
@@ -345,7 +352,7 @@ class OrderController extends Controller
         }
     }
     
-    public function orderedList()
+    public function orderedList($arrival_verification_flg = false)
     {
         global $SPIRAL;
         try {
@@ -358,17 +365,31 @@ class OrderController extends Controller
             }
             
             $api_url = "%url/rel:mpgt:Order%";
-    
+            
+            $title = "発注書一覧";
+            $division_param = "orderedListForDivision";
+            $param = "";
+            if($arrival_verification_flg)
+            {
+                $title = "入荷照合";
+                $division_param = "arrivalVerificationForDivision";
+                $param = "receipt";
+            }
+            
             if ($user_info->isHospitalUser() && ( $user_info->isAdmin() || $user_info->isApprover() ))
             {
-                $content = $this->view('NewJoyPla/view/PurchaseOrderList', [
-                    'csrf_token' => Csrf::generate(16)
-                    ] , false);
+                
+                $content = $this->view('NewJoyPla/view/template/List', [
+                        'title' => $title,
+                        'table' => '%sf:usr:orederList:mstfilter%',
+                        'param' => $param,
+                        'csrf_token' => Csrf::generate(16)
+                        ] , false);
             } else {
                 $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
                     'table' => '%sf:usr:search99:table%',
-                    'title' => '発注書一覧 - 部署選択',
-                    'param' => 'orderedListForDivision',
+                    'title' => $title.' - 部署選択',
+                    'param' => $division_param,
                     ] , false);
             }
     
@@ -385,7 +406,7 @@ class OrderController extends Controller
             ], false);
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 発注書一覧',
+                'title'     => 'JoyPla '.$title,
                 'script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),
@@ -396,7 +417,7 @@ class OrderController extends Controller
         
     }
     
-    public function orderedListForDivision(): View
+    public function orderedListForDivision($arrival_verification_flg = false): View
     {
         global $SPIRAL;
         try {
@@ -420,13 +441,27 @@ class OrderController extends Controller
     
             $api_url = "%url/rel:mpgt:Order%";
             
-            $content = $this->view('NewJoyPla/view/PurchaseOrderList', [] , false);
-    
+            $title = "発注書一覧";
+            $param = "";
+            if($arrival_verification_flg)
+            {
+                $title = "入荷照合";
+                $param = "receipt";
+            }
+            
+            $content = $this->view('NewJoyPla/view/template/List', [
+                    'title' => $title,
+                    'table' => '%sf:usr:orederList:mstfilter%',
+                    'param' => $param,
+                    'csrf_token' => Csrf::generate(16)
+                    ] , false);
+                    
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message'=> $ex->getMessage(),
                 ] , false);
+                
         } finally {
             $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
@@ -435,7 +470,7 @@ class OrderController extends Controller
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 発注書一覧',
+                'title'     => 'JoyPla '.$title,
                 'script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),
@@ -471,7 +506,7 @@ class OrderController extends Controller
             } else {
                 $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
                     'table' => '%sf:usr:search98:table%',
-                    'title' => '発注調整 - 部署選択',
+                    'title' => '定数発注 - 部署選択',
                     'param' => 'orderAdjustmentForDivision',
                     ] , false);
             }
@@ -489,7 +524,7 @@ class OrderController extends Controller
             ], false);
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 発注調整',
+                'title'     => 'JoyPla 定数発注',
                 'script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),
@@ -555,35 +590,6 @@ class OrderController extends Controller
             ],false);
         }
     }
-    
-    private function makeId($id = '00')
-    {
-        /*
-        '02' => HP_BILLING_PAGE,
-        '03_unorder' => HP_UNORDER_PAGE,
-        '03_order' => HP_ORDER_PAGE,
-        '04' => HP_RECEIVING_PAGE,
-        '06' => HP_RETERN_PAGE,
-        '05' => HP_PAYOUT_PAGE,
-        */
-        $id .= date("ymdHis");
-        $id .= str_pad(substr(rand(),0,3) , 4, "0"); 
-        
-        return $id;
-    }
-    
-    private function requestUrldecode(array $array)
-    {
-        $result = [];
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $result[$key] = $this->requestUrldecode($value);
-            } else {
-                $result[$key] = urldecode($value);
-            }
-        }
-        return $result;
-    }
 }
 /***
  * 実行
@@ -611,11 +617,11 @@ $action = $SPIRAL->getParam('Action');
     }
     else if($action === 'orderedList')
     {
-        echo $OrderController->orderedList()->render();
+        echo $OrderController->orderedList(false)->render();
     }
     else if($action === 'orderedListForDivision')
     {
-        echo $OrderController->orderedListForDivision()->render();
+        echo $OrderController->orderedListForDivision(false)->render();
     }
     else if($action === 'orderAdjustment')
     {
@@ -624,6 +630,14 @@ $action = $SPIRAL->getParam('Action');
     else if($action === 'orderAdjustmentForDivision')
     {
         echo $OrderController->orderAdjustmentForDivision()->render();
+    }
+    else if($action === 'arrivalVerification')
+    {
+        echo $OrderController->orderedList(true)->render();
+    }
+    else if($action === 'arrivalVerificationForDivision')
+    {
+        echo $OrderController->orderedListForDivision(true)->render();
     }
     else 
     {

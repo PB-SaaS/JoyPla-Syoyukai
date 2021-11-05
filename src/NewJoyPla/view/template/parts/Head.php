@@ -18,7 +18,7 @@
 <script src="https://i02.smp.ne.jp/u/joypla/new/js/BarcodeParser.js"></script>
 
 
-<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script src="https://i02.smp.ne.jp/u/joypla/new/js/vue.js"></script>
 <?php
 
 if($new == '')

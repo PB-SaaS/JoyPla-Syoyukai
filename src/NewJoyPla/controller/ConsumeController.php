@@ -111,13 +111,15 @@ class ConsumeController extends Controller
     
             if ($user_info->isHospitalUser() && ( $user_info->isAdmin() || $user_info->isApprover() ))
             {
-                $content = $this->view('NewJoyPla/view/GoodsBillingList', [
-                    'csrf_token' => Csrf::generate(16)
-                    ] , false);
+                $content = $this->view('NewJoyPla/view/template/List', [
+                        'title' => '消費一覧',
+                        'table' => '%sf:usr:goodsBillingList:mstfilter%',
+                        'csrf_token' => Csrf::generate(16),
+                        ] , false);
             } else {
                 $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
                     'table' => '%sf:usr:search96:table%',
-                    'title' => '消費登録一覧 - 部署選択',
+                    'title' => '消費一覧 - 部署選択',
                     'param' => 'consumeListForDivision',
                     ] , false);
             }
@@ -169,7 +171,11 @@ class ConsumeController extends Controller
     
             $api_url = "%url/rel:mpgt:Consume%";
             
-            $content = $this->view('NewJoyPla/view/GoodsBillingList', [] , false);
+            $content = $this->view('NewJoyPla/view/template/List', [
+                    'title' => '消費一覧',
+                    'table' => '%sf:usr:goodsBillingList:mstfilter%',
+                    'csrf_token' => Csrf::generate(16),
+                    ] , false);
     
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
@@ -396,34 +402,6 @@ class ConsumeController extends Controller
         }
     }
 
-    private function makeId($id = '00')
-    {
-        /*
-        '02' => HP_BILLING_PAGE,
-        '03_unorder' => HP_UNORDER_PAGE,
-        '03_order' => HP_ORDER_PAGE,
-        '04' => HP_RECEIVING_PAGE,
-        '06' => HP_RETERN_PAGE,
-        '05' => HP_PAYOUT_PAGE,
-        */
-        $id .= date("ymdHis");
-        $id .= str_pad(substr(rand(),0,3) , 4, "0"); 
-        
-        return $id;
-    }
-
-    private function requestUrldecode(array $array)
-    {
-        $result = [];
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $result[$key] = $this->requestUrldecode($value);
-            } else {
-                $result[$key] = urldecode($value);
-            }
-        }
-        return $result;
-    }
 }
 
 /***

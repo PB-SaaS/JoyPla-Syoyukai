@@ -257,9 +257,21 @@ class CardController extends Controller
                     ] , false); 
             } else {
                 
-                $content = $this->view('NewJoyPla/view/CardList', [
-                'api_url' => $api_url
-                ] , false);
+                $add_button = <<<EOM
+<input type="button" onclick="card_list.cardPrint()" class="uk-button uk-button-primary" value="カード発行">
+<form action="{$api_url}" target="_blank" method="post" name="cardCreate">
+<input type="hidden" name="Action" value="cardLabelPrint">
+<input type="hidden" name="card_ids" value="">
+</form>
+EOM;
+                $content = $this->view('NewJoyPla/view/template/List', [
+                        'title' => 'カード一覧',
+                        'table' => '%sf:usr:search32:mstfilter%',
+                        'csrf_token' => Csrf::generate(16),
+                        'add_button' => $add_button,
+                        'print' => true,
+                        'script' => $this->view('NewJoyPla/view/Script/CardList', [] , false)->render(),
+                        ] , false);
             }
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
@@ -318,9 +330,22 @@ class CardController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             }
                 
-            $content = $this->view('NewJoyPla/view/CardList', [
-                'api_url' => $api_url
-            ] , false);
+            $add_button = <<<EOM
+<input type="button" onclick="card_list.cardPrint()" class="uk-button uk-button-primary" value="カード発行">
+<form action="{$api_url}" target="_blank" method="post" name="cardCreate">
+<input type="hidden" name="Action" value="cardLabelPrint">
+<input type="hidden" name="card_ids" value="">
+</form>
+EOM;
+            $content = $this->view('NewJoyPla/view/template/List', [
+                    'title' => 'カード一覧',
+                    'table' => '%sf:usr:search32:mstfilter%',
+                    'csrf_token' => Csrf::generate(16),
+                    'add_button' => $add_button,
+                    'print' => true,
+                    'script' => $this->view('NewJoyPla/view/Script/CardList', [] , false)->render(),
+                    ] , false);
+                    
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
@@ -378,21 +403,6 @@ class CardController extends Controller
 EOM;
 	}
 	
-    private function makeId($id = '00')
-    {
-        /*
-        '02' => HP_BILLING_PAGE,
-        '03_unorder' => HP_UNORDER_PAGE,
-        '03_order' => HP_ORDER_PAGE,
-        '04' => HP_RECEIVING_PAGE,
-        '06' => HP_RETERN_PAGE,
-        '05' => HP_PAYOUT_PAGE,
-        */
-		$id .= date("ymdHis"); //YYMMDDHHIISS 12
-		$id .= str_pad(substr(rand(),0,3) , 4, "0"); // 4
-		
-		return $id; // 18
-    }
 }
 
 $CardController = new CardController();

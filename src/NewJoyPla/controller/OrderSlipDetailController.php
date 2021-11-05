@@ -33,7 +33,7 @@ class OrderSlipDetailController extends Controller
     {
     }
     
-    public function index()
+    public function index($receipt_flg = false)
     {
         global $SPIRAL;
 
@@ -94,10 +94,21 @@ class OrderSlipDetailController extends Controller
             
             $api_url = '%url/card:page_263320%';
 
-        	$link = '%url/rel:mpgt:Order%&Action=orderedList';
-            if($user_info->isUser()){
-                if (preg_match("/Action=orderedListForDivision/", $_SERVER['HTTP_REFERER'])) {
-            	    $link = $_SERVER['HTTP_REFERER'];
+            if($receipt_flg){
+                $link_title = "入荷照合";
+            	$link = '%url/rel:mpgt:Order%&Action=arrivalVerification';
+                if($user_info->isUser()){
+                    if (preg_match("/Action=arrivalVerificationForDivision/", $_SERVER['HTTP_REFERER'])) {
+                	    $link = $_SERVER['HTTP_REFERER'];
+                    }
+                }
+            } else {
+                $link_title = "発注書一覧";
+            	$link = '%url/rel:mpgt:Order%&Action=orderedList';
+                if($user_info->isUser()){
+                    if (preg_match("/Action=orderedListForDivision/", $_SERVER['HTTP_REFERER'])) {
+                	    $link = $_SERVER['HTTP_REFERER'];
+                    }
                 }
             }
             
@@ -115,6 +126,7 @@ class OrderSlipDetailController extends Controller
                 'csrf_token' => Csrf::generate(16),
                 'orderItems' => $order_items,
                 'pattern' => $pattern,
+                'link_title' => $link_title,
                 'link' => $link,
                 'cardId' => $cardId
             ] , false);
@@ -293,6 +305,7 @@ class OrderSlipDetailController extends Controller
                             'lotUniqueKey' => $user_info->getHospitalId().$divisionId.$item['inHospitalItemId'].$item['lotNumber'].$item['lotDate'],
                             'lotNumber' => $item['lotNumber'],
                             'lotDate' => $item['lotDate'],
+                            'pattern' => 3,
                             'stockQuantity' => (int)$item['quantity'] * (int)$item['countNum']
                         ];
                     } 
@@ -300,6 +313,7 @@ class OrderSlipDetailController extends Controller
                     {
                         $inventory_adjustment_trdata[] = [
                             'divisionId' => $divisionId,
+                            'pattern' => 3,
                             'inHospitalItemId' => $item['inHospitalItemId'],
                             'count' => (int)$item['quantity'] * (int)$item['countNum'],
                             'orderWithinCount' => ((int)$item['countNum'] < 0) ? 0 : -((int)$item['quantity'] * (int)$item['countNum']),
@@ -368,6 +382,8 @@ class OrderSlipDetailController extends Controller
     {
         global $SPIRAL;
         try{
+            $user_info = new UserInfo($SPIRAL);
+            
             $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
             Csrf::validate($token,true);
             
@@ -442,34 +458,6 @@ class OrderSlipDetailController extends Controller
             ],false);
         }
     }
-    
-    private function makeId($id = '00')
-    {
-        /*
-        '02' => HP_BILLING_PAGE,
-        '03_unorder' => HP_UNORDER_PAGE,
-        '03_order' => HP_ORDER_PAGE,
-        '04' => HP_RECEIVING_PAGE,
-        '06' => HP_RETERN_PAGE,
-        '05' => HP_PAYOUT_PAGE,
-        */
-        $id .= date("ymdHis");
-        $id .= str_pad(substr(rand(),0,3) , 4, "0"); 
-        
-        return $id;
-    }
-    private function requestUrldecode(array $array)
-    {
-        $result = [];
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $result[$key] = $this->requestUrldecode($value);
-            } else {
-                $result[$key] = urldecode($value);
-            }
-        }
-        return $result;
-    }
 }
 
 /***
@@ -488,8 +476,12 @@ $action = $SPIRAL->getParam('Action');
     {
         echo $OrderSlipDetailControllerController->receivingAPI()->render();
     }
+    else if($action === 'receipt')
+    {
+        echo $OrderSlipDetailControllerController->index(true)->render();
+    }
     else
     {
-        echo $OrderSlipDetailControllerController->index()->render();
+        echo $OrderSlipDetailControllerController->index(false)->render();
     }
 }

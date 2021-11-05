@@ -7,6 +7,7 @@ class UsedSlipHistoy extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_UsedSlipHDB";
     public static $guarded = ["id"];
@@ -37,6 +38,7 @@ class Borrowing extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_Borrowing";
     public static $guarded = ["id"];
@@ -67,6 +69,7 @@ class Division extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "deleteFlag";
 
     public static $spiral_db_name = "NJ_divisionDB";
     public static $guarded = ["id"];
@@ -83,12 +86,14 @@ class Division extends Model
 
     //デフォルト値
     public static $attributes = [];
+    
 }
 
 class Billing extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_BillingDB";
     public static $guarded = ["id"];
@@ -109,7 +114,8 @@ class Billing extends Model
         "lotNumber",
         "lotDate",
         "unitPrice",
-        "lotManagement"
+        "lotManagement",
+        "itemId"
     ];
 
     //デフォルト値
@@ -120,6 +126,7 @@ class BillingView extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "billingDetailv2";
     public static $guarded = ["id"];
@@ -159,16 +166,28 @@ class BillingView extends Model
         "officialFlag",
         "measuringInst",
         "divisionName",
+        "category"
     ];
 
     //デフォルト値
     public static $attributes = [];
+    
+    public static $select = [
+        "category" => [
+            1 => "医療材料",
+            2 => "薬剤",
+            3 => "試薬",
+            4 => "日用品",
+            99 => "その他"
+        ]
+    ];    
 }
 
 class BillingHistory extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_BillingHDB";
     public static $guarded = ["id"];
@@ -197,6 +216,7 @@ class Order extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_OrderDB";
     public static $guarded = ["id"];
@@ -234,6 +254,7 @@ class OrderHistory extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_OrderHDB";
     public static $guarded = ["id"];
@@ -278,6 +299,7 @@ class Receiving extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_ReceivingDB";
     public static $guarded = ["id"];
@@ -300,6 +322,7 @@ class Receiving extends Model
         "priceAfterAdj",
         "lotNumber",
         "lotDate",
+        "itemId"
     ];
 
     //デフォルト値
@@ -312,8 +335,9 @@ class ReceivingView extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
-    public static $spiral_db_name = "310_receItems";
+    public static $spiral_db_name = "330_receItems";
     public static $guarded = ["id"];
     public static $primary_key = "receivingNumber";
     public static $fillable = [
@@ -345,20 +369,77 @@ class ReceivingView extends Model
         "quantityUnit",
         "itemUnit",
         "unitPrice",
+        "orderQuantity",
+        "orderPrice",
+        "category"
     ];
 
     //デフォルト値
     public static $attributes = [];
 
-    public static $select = [];
-
+    public static $select = [
+        "category" => [
+            1 => "医療材料",
+            2 => "薬剤",
+            3 => "試薬",
+            4 => "日用品",
+            99 => "その他"
+        ]
+    ];
 }
 
+class ReceivingHistoryView extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "receiptHDB";
+    public static $guarded = ["id"];
+    public static $primary_key = "receivingHId";
+    public static $fillable = [
+        "registrationTime",
+        "receivingHId",
+        "distributorId",
+        "orderHistoryId",
+        "hospitalId",
+        "itemsNumber",
+        "authKey",
+        "divisionId",
+        "divisionName",
+        "receivingTime",
+        "orderNumber",
+        "totalAmount",
+        "orderStatus",
+        "hachuRarrival",
+        "distributorName",
+        "hospitalName",
+        "ordererUserName",
+        "ordercomment",
+        "orderAuthKey",
+        "postalCode",
+        "prefectures",
+        "address",
+        "phoneNumber",
+        "faxNumber",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [
+        "recevingStatus" => [
+            1 =>"通常入庫",
+            2 =>"貸出品",
+        ]
+    ];
+}
 
 class ReceivingHistory extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_ReceivingHDB";
     public static $guarded = ["id"];
@@ -391,7 +472,7 @@ class ReturnItem extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
-
+    const DELETED_AT = "";
     public static $spiral_db_name = "NJ_ReturnDB";
     public static $guarded = ["id"];
     public static $primary_key = "receivingNumber";
@@ -417,10 +498,51 @@ class ReturnItem extends Model
     public static $select = [];
 }
 
+class ReturnItemView extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "returnData";
+    public static $guarded = ["id"];
+    public static $primary_key = "returnID";
+    public static $fillable = [
+        "registrationTime",
+        "orderCNumber",
+        "receivingHId",
+        "inHospitalItemId",
+        "receivingNumber",
+        "price",
+        "returnID",
+        "returnCount",
+        "returnPrice",
+        "hospitalId",
+        "returnHistoryID",
+        "receivingCount",
+        "itemName",
+        "itemCode",
+        "itemStandard",
+        "itemJANCode",
+        "minPrice",
+        "makerName",
+        "quantity",
+        "quantityUnit",
+        "itemUnit",
+        "divisionId",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
+
 class ReturnHistory extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_ReturnHDB";
     public static $guarded = ["id"];
@@ -448,6 +570,7 @@ class PayoutView extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "310_payoutItems";
     public static $guarded = ["id"];
@@ -505,6 +628,7 @@ class Payout extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_PayoutDB";
     public static $guarded = ["id"];
@@ -532,6 +656,7 @@ class Payout extends Model
         "lotDate",
         "unitPrice",
         "cardId",
+        "itemId"
     ];
 
     //デフォルト値
@@ -545,6 +670,7 @@ class PayoutHistory extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_PayoutHDB";
     public static $guarded = ["id"];
@@ -573,6 +699,7 @@ class Item extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_itemDB";
     public static $guarded = ["id"];
@@ -601,7 +728,8 @@ class Item extends Model
         "officialprice",
         "catalogNo",
         "serialNo",
-        "lotManagement"
+        "lotManagement",
+        "category"
     ];
 
     //デフォルト値
@@ -613,6 +741,13 @@ class Item extends Model
             2 => "不採用",
             3 => "見積中",
             4 => "業者記入済"
+        ],
+        "category" => [
+            1 => "医療材料",
+            2 => "薬剤",
+            3 => "試薬",
+            4 => "日用品",
+            99 => "その他"
         ]
     ];
 }
@@ -621,6 +756,7 @@ class InventoryAdjustmentTransaction extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_inventoryTRDB";
     public static $guarded = ["id"];
@@ -653,6 +789,7 @@ class InHospitalItem extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_inHPItemDB";
     public static $guarded = ["id"];
@@ -702,6 +839,7 @@ class InHospitalItemView extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "itemInHospitalv2";
     public static $guarded = ["id"];
@@ -742,13 +880,22 @@ class InHospitalItemView extends Model
         "unitPrice",
         "measuringInst",
         "lotManagement",
+        "category"
 
     ];
 
     //デフォルト値
     public static $attributes = [];
 
-    public static $select = [];
+    public static $select = [
+        "category" => [
+            1 => "医療材料",
+            2 => "薬剤",
+            3 => "試薬",
+            4 => "日用品",
+            99 => "その他"
+        ]
+    ];
 }
 
 
@@ -757,6 +904,7 @@ class Hospital extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_HospitalDB";
     public static $guarded = ["id"];
@@ -807,6 +955,7 @@ class HospitalUser extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_HUserDB";
     public static $guarded = ["id"];
@@ -841,6 +990,7 @@ class DistributorUser extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_OUserDB";
     public static $guarded = ["id"];
@@ -874,6 +1024,7 @@ class Distributor extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_distributorDB";
     public static $guarded = ["id"];
@@ -903,6 +1054,7 @@ class Tenant extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_TenantAdminDB";
     public static $guarded = ["id"];
@@ -927,6 +1079,7 @@ class AssociationTR extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_associationTR";
     public static $guarded = ["id"];
@@ -949,6 +1102,7 @@ class Stock extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_stockDB";
     public static $guarded = ["id"];
@@ -982,8 +1136,9 @@ class StockView extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
-    public static $spiral_db_name = "stockManagement";
+    public static $spiral_db_name = "310_stockMg";
     public static $guarded = ["id"];
     public static $primary_key = "id";
     public static $fillable = [
@@ -1030,6 +1185,7 @@ class StockView extends Model
         "minPrice",
         "labelId",
         "barcode",  
+        "unitPrice",
     ];
 
     //デフォルト値
@@ -1044,6 +1200,7 @@ class Card extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_CardDB";
     public static $guarded = ["id"];
@@ -1069,6 +1226,7 @@ class CardInfoView extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "CardInfo";
     public static $guarded = ["id"];
@@ -1124,6 +1282,7 @@ class OrderDataView extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "orderdataDB";
     public static $guarded = ["id"];
@@ -1166,6 +1325,7 @@ class OrderedItemView extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "330_hacchuS";
     public static $guarded = ["id"];
@@ -1223,6 +1383,7 @@ class Lot extends Model
     
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "330_NJ_LotDB";
     public static $guarded = ["id"];
@@ -1238,7 +1399,8 @@ class Lot extends Model
         "hospitalId",
         "lotUniqueKey",
         "stockQuantity",
-        "lotAuthKey"
+        "lotAuthKey",
+        "itemId"
     ];
 
     //デフォルト値
@@ -1254,6 +1416,7 @@ class Inventory extends Model
     
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_InventoryDB";
     public static $guarded = ["id"];
@@ -1293,6 +1456,7 @@ class InventoryEnd extends Model
     
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_InventoryEDB";
     public static $guarded = ["id"];
@@ -1325,6 +1489,7 @@ class InventoryHistory extends Model
     
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_InventoryHDB";
     public static $guarded = ["id"];
@@ -1348,10 +1513,45 @@ class InventoryHistory extends Model
     
 }
 
+
+class InventoryView extends Model
+{
+    
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "invInvEndData";
+    public static $guarded = ["id"];
+    public static $primary_key = "inventoryHId";
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "inventoryHId",
+        "inventoryEndId",
+        "hospitalId",
+        "divisionId",
+        "inHospitalItemId",
+        "price",
+        "unitPrice",
+        "inventryAmount",
+        "inventryNum",
+        "invUnitPrice",
+        "inventoryStatus",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
 class StockTakingTransaction extends Model
 {
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_stocktakingTR";
     public static $guarded = ["id"];
@@ -1388,6 +1588,7 @@ class QuoteRequest extends Model
     
     const CREATED_AT = "registrationTime";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_QRequestDB";
     public static $guarded = ["id"];
@@ -1429,6 +1630,7 @@ class Price extends Model
     
     const CREATED_AT = "";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_PriceDB";
     public static $guarded = ["id"];
@@ -1463,11 +1665,63 @@ class Price extends Model
     
 }
 
+
+class PriceView extends Model
+{
+    
+    const CREATED_AT = "";
+    const UPDATED_AT = "";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "330_ItemsPrice";
+    public static $guarded = ["id"];
+    public static $primary_key = "priceId";
+    public static $fillable = [
+        "priceId",
+        "authKey",
+        "itemId",
+        "distributorId",
+        "quantity",
+        "price",
+        "hospitalId",
+        "requestFlg",
+        "notice",
+        "quantityUnit",
+        "itemUnit",
+        "notUsedFlag",
+        "distributorName",
+        "itemName",
+        "itemCode",
+        "itemStandard",
+        "itemJANCode",
+        "makerName",
+        "officialpriceOld",
+        "officialprice",
+        "catalogNo",
+        "serialNo",
+        "category",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [
+        "requestFlg" => [
+            1 => "採用",
+            2 => "不採用",
+            3 => "見積中",
+            4 => "業者記入済"
+        ]
+    ];
+    
+}
+
 class QuoteItem extends Model
 {
     
     const CREATED_AT = "";
     const UPDATED_AT = "";
+    const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_reqItemDB";
     public static $guarded = ["id"];
@@ -1492,7 +1746,8 @@ class QuoteItem extends Model
         "officialprice",
         "officialpriceOld",
         "catalogNo",
-        "serialNo"
+        "serialNo",
+        "category"
     ];
 
     //デフォルト値
@@ -1504,7 +1759,100 @@ class QuoteItem extends Model
             2 => "不採用",
             3 => "見積中",
             4 => "業者記入済"
+        ],
+        "category" => [
+            1 => "医療材料",
+            2 => "薬剤",
+            3 => "試薬",
+            4 => "日用品",
+            99 => "その他"
         ]
     ];
+    
+}
+
+
+class Comment extends Model
+{
+    
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "NJ_comment";
+    public static $guarded = ["id"];
+    public static $primary_key = "id";
+    public static $fillable = [
+        "registrationTime",
+        "topicId",
+        "name",
+        "comment",
+        "authKey",
+        "commentCount",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
+
+class Topic extends Model
+{
+    
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "NJ_TopicDB";
+    public static $guarded = ["id"];
+    public static $primary_key = "topicId";
+    public static $fillable = [
+        "hospitalId",
+        "distributorId",
+        "registrationTime",
+        "topicId",
+        "topicTitle",
+        "topicName",
+        "updateTime",
+        "topicContent",
+        "authKey",
+        "lastName",
+        "commentCount",
+        "distributorName",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
+class TenantMaster extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "NJ_MasterDB";
+    public static $guarded = ["id"];
+    public static $primary_key = "loginId";
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "mailAddress",
+        "name",
+        "loginId",
+        "password",
+        "tenantId",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
     
 }

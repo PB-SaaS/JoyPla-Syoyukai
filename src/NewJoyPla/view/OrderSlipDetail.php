@@ -3,14 +3,16 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
-                <li><a href="<?php echo $link ?>&table_cache=true"><span>発注書一覧</span></a></li>
+                <li><a href="<?php echo $link ?>&table_cache=true"><span><?php echo $link_title ?></span></a></li>
                 <li><span>発注書</span></li>
             </ul>
                 <div class="uk-child-width-1-2@m no_print uk-margin" uk-grid>
                     <div class="uk-text-left">
                         <input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
+                        <?php if($user_info->isUser() || $user_info->isAdmin()): ?>
                         <input class="print_hidden uk-button uk-button-danger" type="button" value="発注書取消" v-on:click="slipDelete" v-bind:disabled="delete_disabled">
                         <input class="print_hidden uk-button uk-button-primary" type="button" value="納品照合" v-on:click="receiving">
+                        <?php endif ?>
                     </div>
                 </div>
                 <div class="uk-text-center uk-text-large">
@@ -77,7 +79,9 @@
                                     <th>今回入庫数</th>
                                     <th>納期</th>
                                     <th>金額</th>
+                                    <?php if($user_info->isUser() || $user_info->isAdmin()): ?>
                                     <th>入庫リストへ転記</th>
+                                    <?php endif ?>
                                 </tr>
                             </thead>
                             <tbody>
@@ -96,13 +100,16 @@
                                     <td v-bind:class="item.nowCountClass">{{item.nowCount}}{{item.itemUnit}}</td>
                                     <td>{{item.dueDate}}</td>
                                     <td>￥{{item.orderPrice | number_format}}</td>
+                                    <?php if($user_info->isUser() || $user_info->isAdmin()): ?>
                                     <td><button type="button" class="uk-button uk-button-primary" v-on:click="add(item)">転記</td>
+                                    <?php endif ?>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
                 
+                <?php if($user_info->isUser() || $user_info->isAdmin()): ?>
                 <div class="uk-margin" id="receivingTable">
                     <p class="uk-text-bold uk-text-large">入庫リスト</p>
                     <div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky" class="uk-padding-top uk-background-muted uk-padding-small">
@@ -163,6 +170,7 @@
                         </table>
                     </div>
                 </div>
+                <?php endif ?>
                 <div class="uk-width-3-4 uk-margin">
                     <table class="uk-table uk-table-middle uk-table-divider">
                         <thead>
@@ -248,8 +256,7 @@ var app = new Vue({
 	el: '#app',
 	data: {
 	    totalAmount: "%val:usr:totalAmount%",
-	    status: "%val:usr:orderStatus%",
-	    delete_disabled: (this.status != 2),
+	    delete_disabled: ("%val:usr:orderStatus:id%" != "2"),
 		items: <?php echo json_encode($orderItems); ?>,
 		lists: [],
 		divisionId: '',
@@ -383,7 +390,7 @@ var app = new Vue({
 			app.$set(app.lists, index, changeObject);
 		},
 		slipDelete: function(){
-		    if(this.status != 2)
+		    if(this.delete_disabled)
 		    {
 		        UIkit.modal.alert("取り消しは行えません");
 		        return false;
@@ -496,15 +503,21 @@ var app = new Vue({
 				return false ;
 			}
 			
+			let checkflg = false;
 			app.items.forEach(function (elem, index) {
 			    if(elem.possibleNumber < elem.nowCount )
 			    {
-    				UIkit.modal.alert('入庫数が入庫可能数を上回っています');
-    				return false ;
+			        checkflg = true;
 			    }
 			});
 			
-			let checkflg = false;
+			
+			if(checkflg){
+			    UIkit.modal.alert('入庫数が入庫可能数を上回っています');
+				return false ;
+			}
+			
+			checkflg = false;
 			app.lists.forEach(function (elem, index) {
 			    if(elem.countNum != 0)
 			    {
@@ -559,12 +572,16 @@ var app = new Vue({
                 
                     UIkit.modal.alert("納品照合が完了しました").then(function(){
                         if(app.label_create_check()){
-                            UIkit.modal.alert("ラベル発行を行いますか").then(function(){
+                            UIkit.modal.confirm("ラベル発行を行いますか").then(function(){
                                 $("#receivingId").val(data.data.historyId);
                                 $("#createLabelForm").submit();
+                                location.reload();
+                            },function(){
+                                location.reload();
                             });
+                        } else {
+                            location.reload();
                         }
-                        location.reload();
                     });
                 })
                 // Ajaxリクエストが失敗した時発動

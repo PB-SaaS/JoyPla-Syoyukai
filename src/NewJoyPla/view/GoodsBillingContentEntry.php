@@ -257,21 +257,6 @@
     </div>
 </div>
 
-<!-- This is a button toggling the modal with the default close button -->
-<!-- This is the modal with the default close button -->
-<div id="modal-gs1128" uk-modal>
-    <div class="uk-modal-dialog uk-modal-body">
-        <form onsubmit="consume.gs1_128($('#GS1-128').val());return false;" action="#">
-            <button class="uk-modal-close" type="button" uk-close></button>
-            <h2 class="uk-modal-title">GS1-128 読取</h2>
-            <input type="text" class="uk-input" placeholder="GS1-128" id="GS1-128" autofocus="true">
-            <p class="uk-text-right">
-                <button class="uk-button uk-button-primary" type="button" onclick="consume.gs1_128($('#GS1-128').val());">反映</button>
-            </p>
-        </form>
-    </div>
-</div>
-
 	
 	<div id="modal-sections" class="uk-modal-container" uk-modal>
 	    <div class="uk-modal-dialog">

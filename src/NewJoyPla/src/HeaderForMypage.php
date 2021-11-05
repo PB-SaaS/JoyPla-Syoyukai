@@ -18,7 +18,18 @@ if($nav->user_info->isDistributorUser())
 {
 	$nav->distributor = Distributor::where('distributorId',$nav->user_info->getDistributorId())->get();
 	$nav->distributor = $nav->distributor->data->get(0);
+	$nav->hospital = Hospital::where('hospitalId',$nav->distributor->hospitalId)->get();
+	$nav->hospital = $nav->hospital->data->get(0);
 }
+
+$top_api_url = "%url/rel:mpgt:page_262241%";
+$api_url = "%url/rel:mpgt:Notification%";
+if(! $nav->user_info->isHospitalUser())
+{
+	$top_api_url = "%url/rel:mpgt:oroshiTopPage%";
+	$api_url = "%url/rel:mpgt:NotificationDist%";
+}
+
 ?>
 
 <nav id="nav" class="uk-navbar-container no_print" uk-navbar="mode: click" uk-navbar>
@@ -38,6 +49,7 @@ if($nav->user_info->isDistributorUser())
 			if($nav->user_info->isDistributorUser())
 			{
 				echo $nav->distributor->distributorName.'<br>';
+				echo '<span class="uk-text-small">担当施設：'.$nav->hospital->hospitalName. '</span><br>';
 			}
 			?>
 			<?php echo $nav->user_info->getName();?> 様
@@ -50,7 +62,7 @@ if($nav->user_info->isDistributorUser())
 				<a href="#" uk-icon="icon: bell; ratio: 1.5" title="お知らせ" uk-navbar="mode: click" uk-toggle="animation: uk-animation-fade"></a>
 				<div class="uk-navbar-dropdown uk-card uk-navbar-dropdown-width-2 uk-padding-remove">
                    <div class="uk-card-body uk-height-max-large" style="overflow-y: scroll; padding: 15px">
-				        <ul class="uk-list">
+				        <ul class="uk-list" v-if="notifications.length > 0 ">
 				            <li v-for="notification in notifications">
 				                <article class="uk-comment" style="padding:10px">
 								    <header class="uk-comment-header uk-margin-top uk-margin-bottom">
@@ -71,6 +83,7 @@ if($nav->user_info->isDistributorUser())
 								</article>
 				            </li>
 						</ul>
+			            <p v-else>最新の通知はありません</p>
 				    </div>
 		        </div>
 		        <div v-show="badge">
@@ -92,6 +105,7 @@ if($nav->user_info->isDistributorUser())
 								if($nav->user_info->isDistributorUser())
 								{
 									echo $nav->distributor->distributorName.'<br>';
+									echo '<span class="uk-text-small">担当施設：'.$nav->hospital->hospitalName. '</span><br>';
 								}
 								?>
 				                </h3>
@@ -110,29 +124,21 @@ if($nav->user_info->isDistributorUser())
 			</li>
 		</ul>
 		
-		<form method="post" action="/regist/is" name="userInfoChange_nav" target="_blank">
-			%SMPAREA%
-			<input type="hidden" name="divisionId" value="%val:usr:divisionId%">
-			<input type="hidden" name="userPermission" value="%val:usr:userPermission:id%">
-			<input type="hidden" name="loginId" value="%val:usr:loginId%">
-			<input type="hidden" name="name" value="%val:usr:name%">
-			<input type="hidden" name="nameKana" value="%val:usr:nameKana%">
-			<input type="hidden" name="mailAddress" value="%val:usr:mailAddress%">
-			<input type="hidden" name="remarks" value="%val:usr:remarks%">
-			<?php if($nav->user_info->getUserPermission() == '1') : ?>
-			<input type="hidden" name="SMPFORM" value="%smpform:hpUserChange%">
-			<?php else: ?>
-			<input type="hidden" name="SMPFORM" value="%smpform:hpUserCForD%">
-			<?php endif ?>
-			<input type="hidden" name="id" value="%val:sys:id%">
-			<input type="hidden" name="authKey" value="%val:usr:authKey%" >
+		<?php if($nav->user_info->isHospitalUser()) : ?>
+		<form method="post" action="<?php echo $top_api_url ?>" name="userInfoChange_nav">
+			<input type="hidden" name="Action" value="userInfoChange">
 		</form>
-	    <form method="post" action="/regist/is" name="contactUs" target="_blank">
-			%SMPAREA%
-			<input type="hidden" name="SMPFORM" value="%smpform:contactUs%">
+		<?php endif ?>
+		<?php if($nav->user_info->isDistributorUser()) : ?>
+		<form method="post" action="<?php echo $top_api_url ?>" name="userInfoChange_nav">
+			<input type="hidden" name="Action" value="userInfoChange">
+		</form>
+		<?php endif ?>
+		
+	    <form method="post" action="<?php echo $top_api_url ?>" name="contactUs">
+			<input type="hidden" name="Action" value="contactUs">
 		</form>
 	</div>
-
 </nav>
 <script>
 var nav = new Vue({
@@ -150,7 +156,7 @@ var nav = new Vue({
 		{
 			$.ajax({
 				async: true,
-                url:'%url/rel:mpgt:Notification%',
+				url : "<?php echo $api_url ?>",
                 type:'POST',
                 data:{
                 },

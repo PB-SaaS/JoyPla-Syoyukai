@@ -106,7 +106,7 @@ class LabelBarcodeSearchController extends Controller
 					throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
 				}
 				$data = [
-					"divisionId" => $record->sourceDivisionId,
+					"divisionId" => $record->targetDivisionId,
 					"maker" => $in_hospital_item->makerName,
 					"shouhinName" => $in_hospital_item->itemName,
 					"code" => $in_hospital_item->itemCode,
@@ -132,7 +132,6 @@ class LabelBarcodeSearchController extends Controller
 				$content = $content->toJson();
 
 			} else if(preg_match('/^90/', $barcode) && strlen($barcode) == 18){
-				
 				if($user_info->isAdmin())
 				{
 					$result = CardInfoView::where('cardId', $barcode)->where('hospitalId',$user_info->getHospitalId())->get();

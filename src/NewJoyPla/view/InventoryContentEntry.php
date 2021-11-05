@@ -73,7 +73,7 @@
       content: counter(rowCount);
     }
 </style>
-<div class="animsition" uk-height-viewport="expand: true">
+<div id="app" class="animsition" uk-height-viewport="expand: true">
     <div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb">
@@ -108,23 +108,19 @@
             </div>
             <div class="uk-margin-bottom">
                 <div class="" uk-margin>
-                    <button class="uk-button uk-button-default " onclick="inventory.sanshouClick()">商品マスタを開く</button>
+                        <button class="uk-button uk-button-default" v-on:click="sanshouClick">商品マスタを開く</button>
                     <button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
-                    <button class="uk-button uk-button-primary" onclick="inventory.sendInventory()">棚卸入力</button>
+                    <button class="uk-button uk-button-primary" v-on:click="sendInventory">棚卸一時保存</button>
+                    <button class="uk-button uk-button-primary" v-on:click="getLotAndStock" v-bind:disabled="lists.length > 0">理論在庫から表を作成</button>
                 </div>
             </div>
 
             <div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky" class="uk-padding-top uk-background-muted uk-padding-small">
-                <form action='#' method="post" onsubmit="inventory.barcodeSearch(); return false">
-                    <input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." autofocus="true" name="barcode" autocomplete="off">
+                <form action='#' method="post"  onsubmit="app.barcodeSearch($('input[name=barcode]').val() , '' ,'' ,true);$('input[name=barcode]').val('') ; $('input[name=barcode]').focus();return false;">
+                    <input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." name="barcode" autocomplete="off">
                     <button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
                 </form>
             </div>
-
-            <div class="uk-margin uk-text-right">
-                <button type="button" class="uk-button uk-button-primary" uk-toggle="target: #modal-gs1128">GS1-128で照合</button>
-            </div>
-
             <div class="shouhin-table uk-width-expand uk-overflow-auto">
                 <table class="uk-table uk-table-striped uk-text-nowrap">
                     <thead>
@@ -134,12 +130,15 @@
                             <th>商品名</th>
                             <th>製品コード</th>
                             <th>規格</th>
-                            <th>入数</th>
-                            <th>棚卸数量</th>
-                            <th>価格</th>
-                            <th>単価</th>
                             <th>JANコード</th>
                             <th>卸業者</th>
+                            <th>入数</th>
+                            <th>価格</th>
+                            <th>単価</th>
+                            <th>棚卸数量
+		    						<input type="button" class="uk-button uk-button-default uk-button-small" v-on:click="countToIrisu" value="入数を反映" >
+		    				</th>
+                            <th>ロット管理</th>
                             <th>ロット番号</th>
                             <th>使用期限</th>
                             <th></th>
@@ -147,6 +146,41 @@
                         </tr>
                     </thead>
                     <tbody>
+						<tr v-for="(list, key) in lists" :id="'tr_' + key" v-bind:class="list.class">
+							<td></td>
+							<td>{{list.maker}}</td>
+							<td>{{list.shouhinName}}</td>
+							<td>{{list.code}}</td>
+							<td>{{list.kikaku}}</td>
+							<td>{{list.jan}}</td>
+							<td>{{list.oroshi}}</td>
+							<td>{{list.irisu}}{{list.unit}}</td>
+							<td>￥{{list.kakaku | number_format}}</td>
+							<td>
+							    ￥<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
+							    <span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
+							</td>
+							<td>
+								<input type="number" step="1" class="uk-input" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.countNum" v-bind:disabled="list.countNumDisabled" v-on:change="addCountStyle(key)">
+								<span class="uk-text-bottom">{{list.unit}}</span>
+							</td>
+							<td>
+								<span v-if="list.lotFlagBool == 1" class="uk-text-danger">必須</span>
+								<span v-else >任意</span>
+							</td>
+							<td>
+								<input type="text" class="uk-input lot" style="width:180px" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
+							</td>
+							<td>
+								<input type="date" class="uk-input lotDate" v-model="list.lotDate" v-bind:style="list.lotDateStyle" v-on:change="addLotDateStyle(key)">
+							</td>
+							<td>
+								<input type="button" class="uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)">
+							</td>
+							<td>
+								<input type="button" class="uk-button uk-button-default uk-button-small" value="追加" v-on:click="copyList(key)">
+							</td>
+						</tr>
                     </tbody>
                     <tfoot>
                         <tr>
@@ -165,25 +199,28 @@
                             <td>&emsp;</td>
                             <td>&emsp;</td>
                             <td>&emsp;</td>
-                        </tr>
-                        <tr>
-                            <td>&emsp;</td>
-                            <td>&emsp;</td>
-                            <td>&emsp;</td>
-                            <td>&emsp;</td>
-                            <td>&emsp;</td>
-                            <td>&emsp;</td>
-                            <td>&emsp;</td>
-                            <td>&emsp;</td>
-                            <td>&emsp;</td>
-                            <td>&emsp;</td>
-                            <td>&emsp;</td>
-                            <td>&emsp;</td>
-                            <td>&emsp;</td>
-                            <td>&emsp;</td>
                             <td>&emsp;</td>
                         </tr>
                         <tr>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                        </tr>
+                        <tr>
+                            <td>&emsp;</td>
                             <td>&emsp;</td>
                             <td>&emsp;</td>
                             <td>&emsp;</td>
@@ -207,467 +244,530 @@
     </div>
 </div>
 
-<!-- This is a button toggling the modal with the default close button -->
-<!-- This is the modal with the default close button -->
-<div id="modal-gs1128" uk-modal>
-    <div class="uk-modal-dialog uk-modal-body">
-        <form onsubmit="inventory.gs1_128($('#GS1-128').val());return false;" action="#">
-            <button class="uk-modal-close" type="button" uk-close></button>
-            <h2 class="uk-modal-title">GS1-128 読取</h2>
-            <input type="text" class="uk-input" placeholder="GS1-128" id="GS1-128" autofocus="true">
-            <p class="uk-text-right">
-                <button class="uk-button uk-button-primary" type="button" onclick="inventory.gs1_128($('#GS1-128').val());">反映</button>
-            </p>
-        </form>
-    </div>
-</div>
+	<div id="modal-sections" class="uk-modal-container" uk-modal>
+	    <div class="uk-modal-dialog">
+	        <button class="uk-modal-close-default" type="button" uk-close></button>
+	        <div class="uk-modal-header">
+	            <h2 class="uk-modal-title">商品選択</h2>
+	        </div>
+	        <div class="uk-modal-body uk-width-expand uk-overflow-auto">
+	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-nowrap uk-table-divider">
+					<thead>
+						<tr>
+							<th class="uk-table-shrink">id</th>
+							<th class="uk-table-shrink"></th>
+							<th>メーカー</th>
+							<th>商品名</th>
+							<th>製品コード</th>
+							<th>規格</th>
+							<th>入数</th>
+							<th>価格</th>
+							<th>単価</th>
+							<th>JANコード</th>
+							<th>卸業者</th>
+							<th>ロット管理フラグ</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="(list , key) in select_items" >
+							<td></td>
+							<td><button type="button" v-on:click="addObject(key)" class="uk-button uk-button-primary uk-button-small">反映</button></td>
+							<td class="uk-text-middle">{{list.maker}}</td>
+							<td class="uk-text-middle">{{list.shouhinName}}</td>
+							<td class="uk-text-middle">{{list.code}}</td>
+							<td class="uk-text-middle">{{list.kikaku}}</td>
+							<td class="uk-text-middle">
+							<span class="irisu">{{list.irisu}}</span><span class="unit uk-text-small">{{list.unit}}</span>
+							</td>
+							<td class="uk-text-middle">￥{{list.kakaku}}</td>
+							<td>
+							    ￥<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
+							    <span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
+							</td>
+							<td class="uk-text-middle">{{list.jan}}</td>
+							<td class="uk-text-middle">{{list.oroshi}}</td>
+							<td class="uk-text-middle">{{list.lotFlag}}</td>
+						</tr>
+					</tbody>
+				</table>   
+	        </div>
+	    </div>
+	</div>
 
 <script>
-class InventoryRegister {
-    constructor()
-    {
-        this.canAjax = true;
-        this.gs1128_object = {};
-        this.listObject = {};
-        this.dataKey = ['id','maker','shouhinName','code','kikaku','irisu','count','kakaku','unitPrice','jan','oroshi'];
-        this.index = 1;
-        this.useUnitPrice = parseInt(<?php echo json_encode($useUnitPrice); ?>);
-    }
-
-    sanshouClick(){
-    // 参照マスタを別ウィンドウで開く
-        window.open('%url/rel:mpgt:page_175973%', '_blank','scrollbars=yes,width=1220,height=600');
-    }
-
-    delTr(index , elm){
-        elm.parentElement.parentElement.remove();
-        delete this.listObject[index];
-    }
-
-    chkNotLotRow(itemKey) {
-        let index = null;
-        $(document).find('.item_' + itemKey).each(function() {
-            let lotNum = $(this).parents('tr').find('.lot_' + itemKey).val();
-            let lotDate = $(this).parents('tr').find('.lotDate_' + itemKey).val();
-            if (!lotNum && !lotDate) {
-                let target = $(this).parents('tr');
-                index = $(document).find('.shouhin-table table tbody tr').index(target);
-                return false;
-            }
-        });
-        return index;
-    }
-
-    addTr(object, type, count) {
-        let tmp = this;
-        if ( type === 1 ) { //商品マスタ
-            let chk = tmp.chkNotLotRow(object.recordId);
-            if ( chk !== null ) { return; }
-        }
-        if ( type === 2 ) { //バーコード検索
-            let chk = tmp.chkNotLotRow(object.recordId);
-            if ( chk !== null ) {
-                let target = $('.shouhin-table table tbody tr').eq(chk).find('.item_' + object.recordId);
-                let setCount = parseInt(target.val()) + count;
-                target.val(setCount).css({'color':'rgb(68, 68, 68)', 'background-color':'rgb(255, 204, 153)'});
-                $(window).scrollTop($(target).offset().top - 100);
-                return;
-            }
-        }
-      
-        tmp.listObject[tmp.index] = object;
-        tmp.listObject[tmp.index].no = tmp.index;
-        tmp.listObject[tmp.index].countNum = count;
-        if (object.lotFlagBool === '1') { 
-            tmp.listObject[tmp.index].lotFlag = 1;
-        } else {
-            tmp.listObject[tmp.index].lotFlag = 0;
-        }
-        let trElm = document.createElement('tr'); 
-        trElm.id = 'tr_' + tmp.index;
-        let tdElm = '';
-        let html = '';
-        let input = '';
-        let span = '';
-        let text = '';
-        for (let i = 0 ; i < tmp.dataKey.length; i++) {
-            tdElm = document.createElement('td');
-            html = document.createTextNode('');
-        
-            if (tmp.dataKey[i] === 'id') {
-            //html = document.createTextNode(listObject[object.recordId].row);
-            } else if (tmp.dataKey[i] === 'count') {
-                html = document.createElement('div');
-                input = document.createElement('input');
-                input.type = 'number';
-                input.step = '1';
-                input.className = 'uk-input item_' + object.recordId;
-                input.name = 'count';
-                input.style = 'width:96px';
-                input.min = 0;
-                input.value = count;
-                if (count > 0) { 
-                    input.style.backgroundColor = 'rgb(255, 204, 153)';
-                    input.style.color = 'rgb(68, 68, 68)';
+var app = new Vue({
+	el: '#app',
+	data: {
+		lists: [],
+		divisionId: '',
+		division_disabled: false,
+        useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
+	},
+	filters: {
+        number_format: function(value) {
+            if (! value ) { return false; }
+            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+        },
+    },
+    watch: {
+        lists: function() {
+            this.$nextTick(function() {
+                if($('.target').length > 0){
+                     $(window).scrollTop($('.target').offset().top - 100);
+                     app.lists.forEach(function(elem, index) {
+        				let changeObject = null;
+    				    changeObject = app.lists[index];
+    					changeObject.class.target = false;
+    					app.$set(app.lists, index, changeObject);
+        			});
                 }
-                input.onchange  = function () {
-                      changeForInputNumber(this);
-                  };
-                span = document.createElement('span');
-                span.innerText = tmp.listObject[tmp.index].unit;
-                span.className = 'uk-text-bottom';
-                html.appendChild(input);
-                html.appendChild(span);
-            } else {
-                text = '';
-                if (tmp.dataKey[i] === 'kakaku') {
-                    text += '￥';
-                    text += price_text(tmp.listObject[tmp.index][tmp.dataKey[i]]);
-                    text += '/'+ tmp.listObject[tmp.index].itemUnit;
-                } else if (tmp.dataKey[i] === 'unitPrice') {
-                    text += '￥';
-                    text += (tmp.useUnitPrice)
-                      ? price_text(tmp.listObject[tmp.index][tmp.dataKey[i]]) 
-                      : price_text( String(parseInt(tmp.listObject[tmp.index]['kakaku']) / parseInt(tmp.listObject[tmp.index]['irisu'])) );
-                } else if(tmp.dataKey[i] === 'teisu' || tmp.dataKey[i] === 'irisu') {
-                    text += tmp.listObject[tmp.index][tmp.dataKey[i]];
-                    text += tmp.listObject[tmp.index].unit;
+          })
+        }
+    },
+	methods: {
+		addList: function(object) {
+			object.class = ((object.class == null)? {'target' : true} : object.class);
+			object.countNum = ((object.countNum == null)? 0 : object.countNum);
+			object.lotNumber = ((object.lotNumber == null)? '': object.lotNumber); 
+			object.lotDate = ((object.lotDate == null)? '' : object.lotDate);
+			object.countStyle =  ((object.countStyle == null)? {} : object.countStyle);
+			object.lotDateStyle =  ((object.lotDateStyle == null)? {} : object.lotDateStyle);
+			object.lotNumberStyle =  ((object.lotNumberStyle == null)? {} : object.lotNumberStyle);
+			this.lists.push(object);
+		},
+		copyList: function(key) {
+			let original = JSON.parse(JSON.stringify(this.lists));
+			this.lists.splice(0, original.length);
+			let num = 0;
+			for(num ; num <= key ; num++)
+			{
+				this.addList(JSON.parse(JSON.stringify(original[num])));
+			}
+			
+			let copy = JSON.parse(JSON.stringify(original[key]));
+			copy.countNum = 0;
+			copy.class.target = true;
+			copy.lotNumber = null;
+			copy.lotDate = null;
+			copy.countStyle = null;
+			copy.lotDateStyle =  null;
+			copy.lotNumberStyle =  null;
+			
+			this.addList(copy); //コピー
+			
+			for(num ; num < original.length ; num++)
+			{
+				this.addList(JSON.parse(JSON.stringify(original[num])));
+			}
+			
+		},
+		deleteList: function(key) {
+			this.lists.splice(key, 1);
+		},
+		sanshouClick: function() {
+			if(! this.divisionCheck()){
+				return false;
+			}
+			window.open('%url/rel:mpgt:page_175973%', '_blank','scrollbars=yes,width=1220,height=600');
+		},
+		
+		divisionCheck : function(){
+			if(!this.divisionId){
+				UIkit.modal.alert('部署を選択してください');
+				return false ;
+			}
+			return true;
+		},
+		countToIrisu: function(){
+			UIkit.modal.confirm("数量に入数を自動挿入しますか。<br>数量0に設定されている商品が対象です").then(function () {
+				app.lists.forEach(function(elem, index) {
+					let changeObject = null;
+				    if(app.lists[index].countNum == 0){
+					    changeObject = app.lists[index];
+    					changeObject.countNum = changeObject.irisu;
+    					app.$set(app.lists, index, changeObject);
+                		app.addCountStyle(index);
+				    }
+				});
+			}, function() {
+			});
+		},
+		addCountStyle: function(index){
+			let changeObject = app.lists[index];
+			changeObject.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+			app.$set(app.lists, index, changeObject);
+		},
+		addLotNumberStyle: function(index){
+			let changeObject = app.lists[index];
+			changeObject.lotNumberStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+			app.$set(app.lists, index, changeObject);
+		},
+		addLotDateStyle: function(index){
+			let changeObject = app.lists[index];
+			changeObject.lotDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+			app.$set(app.lists, index, changeObject);
+		},
+		isCard: function(barcode){
+		    return (barcode.length == 18 && barcode.startsWith('90'));
+		},
+		
+		cardCheck: function(barcode){
+		    let exist = false;
+		    app.lists.forEach(function(elem, index) {
+				let changeObject = null;
+			    if(app.lists[index].card == barcode){
+			        exist = true;
+			    }
+			});
+			return exist;
+		},
+		barcodeSearch: function(barcode , lotNumber , lotDate , gs1_128_search_flg) {
+			if(! this.divisionCheck()){
+				return false;
+			}
+			
+			if(this.isCard(barcode)){
+			    if(this.cardCheck(barcode)){
+			       UIkit.modal.alert("すでに読み込んでいるカードです");
+			       return false;
+			    }
+			}
+			
+			$.ajax({
+				async: false,
+                url:'%url/rel:mpgt:labelBarcodeSAPI%',
+                type:'POST',
+                data:{
+                	divisionId : app.divisionId,
+                	barcode : barcode,
+                },
+                dataType: 'json'
+            })
+            // Ajaxリクエストが成功した時発動
+            .done( (data) => {
+            	let value = 0;
+                if(data.code != 0 || data.data.length == 0){
+                	if(gs1_128_search_flg)
+                	{
+						gs1_128.check_gs1_128(barcode);
+                	} else {
+            			UIkit.modal.alert("商品が見つかりませんでした");
+                	}
+            		return false;
+                }
+	            this.division_disabled = true;
+                if(data.count == 1)
+                {
+                	data = data.data;
+                	
+                	if(data.divisionId != "" && this.divisionId != data.divisionId )
+                	{
+	            		UIkit.modal.alert("読み込んだバーコードの部署が払出元の部署と一致しません");
+	            		return false;
+                	}
+                	if(lotNumber != ''){
+                		data.lotNumber = lotNumber;
+                	}
+                	if(lotDate != ''){
+                		data.lotDate = lotDate;
+                	}
+                	data.countNum = data.count;
+					data.labelCountStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+					data.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+					data.lotNumberStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+					data.lotDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+        			if(app.isCard(barcode)){
+        			    data.card = barcode;
+        			}
+                	this.addList(data);
+	                
+	                $('input[name="barcode"]').val('');
                 } else {
-                   text += tmp.listObject[tmp.index][tmp.dataKey[i]];
+                	data = data.data;
+                	modal_sections.clear();
+                	for(let num = 0 ; num < data.length ; num++)
+                	{
+	                	data[num].lotNumber = lotNumber;
+	                	data[num].lotDate = lotDate;
+                		modal_sections.addList(data[num]);
+                	}
+            		UIkit.modal.alert("複数の商品が見つかりました").then(function(){
+            			modal_sections.openModal();
+            		});
                 }
-                html = document.createTextNode(text);
+            })
+            // Ajaxリクエストが失敗した時発動
+            .fail( (data) => {
+                UIkit.modal.alert("商品が見つかりませんでした");
+            })
+            // Ajaxリクエストが成功・失敗どちらでも発動
+            .always( (data) => {
+				loading_remove();
+            });
+		},
+		
+        validationCheck:function(){
+            if (app.lists.length == 0) {
+                UIkit.modal.alert('商品を選択してください');
+                return false ;
             }
-        
-            tdElm.appendChild(html);
-            trElm.appendChild(tdElm);
-        }
-
-        tdElm = document.createElement('td');
-        input = document.createElement('input');
-        input.className = 'uk-input lot_' + object.recordId;
-        input.name = 'lot';
-        input.type = 'text';
-        input.maxLength = 20;
-        input.style.width = '184px';
-        if ( type === 4 && object.lot ) {
-            input.value = object.lot;
-            input.style.backgroundColor = 'rgb(255, 204, 153)';
-            input.style.color = 'rgb(68, 68, 68)';
-        }
-        input.onchange  = function () {  
-              $(this).css({'background-color':'rgb(255, 204, 153)'});
-          };
-        tdElm.appendChild(input); 
-        trElm.appendChild(tdElm); 
-      
-        tdElm = document.createElement('td');
-        input = document.createElement('input');
-        input.className = 'uk-input lotDate_' + object.recordId;
-        input.name = 'lotDate';
-        input.type = 'date';
-        input.style.width = '184px';
-        if ( type === 4 && object.lotDate ) {
-            input.value = object.lotDate;
-            input.style.backgroundColor = 'rgb(255, 204, 153)';
-            input.style.color = 'rgb(68, 68, 68)';
-        }
-        input.onchange  = function () {  
-              $(this).css({'background-color':'rgb(255, 204, 153)'});
-          };
-        tdElm.appendChild(input); 
-        trElm.appendChild(tdElm);
-      
-        if ( type === 4 ) {
-            delete object['lot'];
-            delete object['lotDate'];
-        }
-      
-        tdElm = document.createElement('td');
-        input = document.createElement('input');
-        input.type = 'button';
-        input.value = '削除';
-        input.className = 'uk-button uk-button-danger uk-button-small';
-        input.onclick = function() {
-              tmp.delTr(object.no, this);
-          }
-        tdElm.appendChild(input);
-        trElm.appendChild(tdElm);
-      
-        tdElm = document.createElement('td');
-        input = document.createElement('input');
-        input.type = 'button';
-        input.value = '追加';
-        input.className = 'uk-button uk-button-default uk-button-small';
-        input.onclick = function(){
-            let copy = { ...object };
-            tmp.addTr(copy, 3, 1);
-        }
-        tdElm.appendChild(input);
-        trElm.appendChild(tdElm);
-      
-        if ( type === 3 ) { //追加ボタン
-            var from = event.target;
-            $('.shouhin-table table tbody').find(from).parents('tr').after(trElm);
-        } else {
-            $('.shouhin-table table tbody').append(trElm);
-        }
-      
-        if ( count > 0 ) { $(window).scrollTop($(trElm).offset().top - 100); }
-        tmp.index++;
-    }
-
-    inventoryCheck(){
-        let tmp = this;
-        if ($('select[name="busyo"]').val()){ 
-        } else {
-            UIkit.modal.alert('部署を選択してください');
-            return false ;
-        }
-      
-        if (Object.keys(tmp.listObject).length === 0) {
-            UIkit.modal.alert('商品を選択してください');
-            return false ;
-        }
-      
-        let chkLot = true;
-        Object.keys(tmp.listObject).forEach(function (key) {
-            if (tmp.listObject[key]['lotFlag']) {
-                if (!tmp.listObject[key]['lotNumber'] || !tmp.listObject[key]['lotDate']) {
-                    chkLot = false;
-                }
-            }
-            if ((!tmp.listObject[key]['lotNumber'] && tmp.listObject[key]['lotDate'])
-              || (tmp.listObject[key]['lotNumber'] && !tmp.listObject[key]['lotDate'])) {
-                chkLot = false;
-            }
-        });
-      
-        if (!chkLot) {
-            UIkit.modal.alert('ロット情報を入力してください');
-            return false ;
-        }
-      
-        chkLot = true;
-        let regex = /^[0-9a-zA-Z]+$/;
-        Object.keys(tmp.listObject).forEach(function (key) {
-            if (tmp.listObject[key]['lotNumber']) {
-                if ((!regex.test(tmp.listObject[key]['lotNumber'])) ||
-                    (encodeURI(tmp.listObject[key]['lotNumber']).replace(/%../g, '*').length > 20)) {
-                    chkLot = false;
-                }
-            }
-        });
-      
-        if (!chkLot) {
-            UIkit.modal.alert('ロット番号の入力を確認してください');
-            return false ;
-        }
-      
-        return true;
-      
-    }
-
-    sendInventory(){
-        let tmp = this;
-        if (!tmp.canAjax) { 
-            console.log('通信中');
-            return;
-        }
-        loading();
-        tmp.setRegData();
-        if (!tmp.inventoryCheck()) {
-            loading_remove();
-            return false;
-        }
-      
-        let inventory = tmp.mergeLot();
-        tmp.canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
-        $.ajax({
-            async: false,
-            url: "<?php echo $api_url ?>",
-            type:'POST',
-            data: {
-                _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-                Action : "inventoryRegistAPI",
-                inventory : JSON.stringify( objectValueToURIencode(inventory) ),
-                divisionId : $('select[name="busyo"]').val()
-            },
-            dataType: 'json'
-        })
-        // Ajaxリクエストが成功した時発動
-        .done( (data) => {
-            if (!data.result) {
-                UIkit.modal.alert("棚卸登録に失敗しました").then(function(){
-                    tmp.canAjax = true; // 再びAjaxできるようにする
+			
+			checkflg = true;
+			app.lists.forEach(function (elem, index) {
+				elem.countStyle.border = '';
+				if(app.lists[index].countNum < 0){
+					let changeObject = app.lists[index];
+					changeObject.countStyle.border = 'red 2px solid';
+					app.$set(app.lists, index, changeObject);
+					checkflg = false;
+				}
+			});
+			
+			if(!checkflg){
+				UIkit.modal.alert('プラスの値を入力してください');
+				return false ;
+			}
+          
+			let chkLot = true;
+			app.lists.forEach(function (elem, index) {
+				elem.lotNumberStyle.border = '';
+				elem.lotDateStyle.border = '';
+				if(app.lists[index].countNum > 0 && app.lists[index].lotFlagBool == 1) {
+					if( !( app.lists[index].lotNumber && app.lists[index].lotDate)) {
+						let changeObject = app.lists[index];
+						changeObject.lotNumberStyle.border = 'red 2px solid';
+						changeObject.lotDateStyle.border = 'red 2px solid';
+						app.$set(app.lists, index, changeObject);
+				    	chkLot = false;
+					}
+				}
+			});
+			if(!chkLot){
+				UIkit.modal.alert('ロット管理が必須のものはすべてロット情報を入力してください');
+				return false ;
+			}
+			
+			chkLot = true;
+			app.lists.forEach(function (elem, index) {
+				elem.lotNumberStyle.border = '';
+				elem.lotDateStyle.border = '';
+				if(app.lists[index].countNum > 0) {
+					if(!app.lists[index].lotNumber && app.lists[index].lotDate){
+						let changeObject = app.lists[index];
+						changeObject.lotNumberStyle.border = 'red 2px solid';
+						app.$set(app.lists, index, changeObject);
+			    		chkLot = false;
+					}
+					else if(app.lists[index].lotNumber && !app.lists[index].lotDate) {
+						let changeObject = app.lists[index];
+						changeObject.lotDateStyle.border = 'red 2px solid';
+						app.$set(app.lists, index, changeObject);
+			    		chkLot = false;
+					}
+				}
+			});
+			
+			if(!chkLot){
+				UIkit.modal.alert('ロット情報を入力してください');
+				return false ;
+			}
+			
+          
+			chkLot = true;
+			let regex = /^[0-9a-zA-Z]+$/;
+			app.lists.forEach(function (elem, index) {
+				elem.lotNumberStyle.border = '';
+				if(app.lists[index].lotNumber) {
+					if((!regex.test(app.lists[index].lotNumber)) ||
+					   (encodeURI(app.lists[index].lotNumber).replace(/%../g, '*').length > 20)) {
+						let changeObject = app.lists[index];
+						changeObject.lotNumberStyle.border = 'red 2px solid';
+						app.$set(app.lists, index, changeObject);
+			    		chkLot = false;
+					}
+				}
+			});
+			
+			if(!chkLot){
+				UIkit.modal.alert('ロット番号の入力を確認してください');
+				return false ;
+			}
+			
+			return true;
+          
+        },
+        sendInventory: function(){
+            UIkit.modal.confirm('棚卸の一時保存を行います').then(function(){
+    			if(! app.validationCheck()){
+    				return false;
+    			}
+	            app.division_disabled = true;
+                $.ajax({
+                    async: false,
+                    url: "<?php echo $api_url ?>",
+                    type:'POST',
+                    data: {
+                        _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+                        Action : "inventoryRegistApi",
+                        inventory : JSON.stringify( objectValueToURIencode(app.lists) ),
+                        divisionId : app.divisionId,
+                    },
+                    dataType: 'json'
+                })
+                // Ajaxリクエストが成功した時発動
+                .done( (data) => {
+                    if (!data.result) {
+                        UIkit.modal.alert("棚卸一時登録に失敗しました");
+                        return false;
+                    }
+                    UIkit.modal.alert("棚卸一時登録が完了しました").then(function(){
+						app.lists.splice(0, app.lists.length);
+                    });
+                })
+                // Ajaxリクエストが失敗した時発動
+                .fail( (data) => {
+                    UIkit.modal.alert("棚卸一時登録に失敗しました");
+                })
+                // Ajaxリクエストが成功・失敗どちらでも発動
+                .always( (data) => {
+                    loading_remove();
                 });
-                return false;
-            }
-            UIkit.modal.alert("棚卸登録が完了しました").then(function(){
-                tmp.canAjax = true; // 再びAjaxできるようにする
-                tmp.dataReset();
+            
             });
-        })
-        // Ajaxリクエストが失敗した時発動
-        .fail( (data) => {
-            UIkit.modal.alert("棚卸登録に失敗しました").then(function(){
-                tmp.canAjax = true; // 再びAjaxできるようにする
-            });
-        })
-        // Ajaxリクエストが成功・失敗どちらでも発動
-        .always( (data) => {
-            loading_remove();
-        });
-    }
-
-    dataReset(){
-        $('table.uk-table tbody tr').remove();
-        this.listObject = {};
-        loading_remove();
-    }
-
-    gs1_128(gs1128){
-        let tmp = this;
-        this.gs1128_object = {};
+        },
         
-        if (Object.keys(tmp.listObject).length === 0) {
-            UIkit.modal.alert('先に商品を選択してください。');
-            return false ;
-        }
-        
-        if (gs1128.indexOf("]C1") !== 0) {
-        //UIkit.modal.alert("GS1-128ではありません");
-        //return ;
-            return gs1_128("]C1"+gs1128);
-        } else {
-            gs1128 = gs1128.slice( 3 );
-            let obj = check_gs1128(gs1128);
-            let objkey = null;
-            let setObj = {};
-        
-            if(!obj.hasOwnProperty("01")) {
-                UIkit.modal.alert("商品情報が含まれておりませんでした。").then(function(){
-                UIkit.modal($('#modal-gs1128')).show();
-            });
-            return;
-        }
-        
-        let searchJan = addCheckDigit(obj["01"]);
-        console.log(searchJan);
-        Object.keys(tmp.listObject).forEach(function (key) {
-            if (searchJan == tmp.listObject[key]["jan"]) {
-                objkey = tmp.listObject[key]["recordId"];
-                setObj = { ...tmp.listObject[key] };
-            }
-        });
-        
-        if (!objkey) {
-            UIkit.modal.alert("対象の発注商品が見つかりませんでした。").then(function(){
-                UIkit.modal($('#modal-gs1128')).show();
-            });
-            return;
-        }
-
-        let existflg = false;
-        let objLot = (obj["10"] === void 0) ? "" : obj["10"]; //lotNumber
-        let objLotDate = (obj["17"] === void 0) ? "" : changeDate(obj["17"]); //lotDate
-
-        $(document).find('.lot_' + objkey).each(function() {
-            let addRowLot = $(this).val();
-            let addRowLotDate = $(this).parents('tr').find('.lotDate_' + objkey).val();
-            let addRowNum = parseInt($(this).parents('tr').find('.item_' + objkey).val());
-
-            if (addRowNum === 0 && !addRowLot && !addRowLotDate) {
-                $(this).val(objLot).css({'color':'rgb(68, 68, 68)', 'background-color':'rgb(255, 204, 153)'});
-                $(this).parents('tr').find('.lotDate_' + objkey).val(objLotDate).css({'color':'rgb(68, 68, 68)', 'background-color':'rgb(255, 204, 153)'});
-                $(this).parents('tr').find('.item_' + objkey).val(parseInt(setObj.irisu)).css({'color':'rgb(68, 68, 68)', 'background-color':'rgb(255, 204, 153)'});
-                $(window).scrollTop($(this).offset().top - 100);
-                existflg = true;
-               return false;
-            }
-            if ((addRowLot == objLot) && (addRowLotDate == objLotDate)) {
-                let num = addRowNum + parseInt(setObj.irisu);
-                $(this).parents('tr').find('.item_' + objkey).val(num).css({'color':'rgb(68, 68, 68)', 'background-color':'rgb(255, 204, 153)'});
-                $(window).scrollTop($(this).offset().top - 100);
-                existflg = true;
-                return false;
-            }
-        });
-
-        if (!existflg) {
-            setObj.lot = objLot;
-            setObj.lotDate = objLotDate;
-            tmp.addTr(setObj, 4, parseInt(setObj.irisu));
-        }
-
-        $('.select_items').hide();
-        $('.select_items select').val('');
-        $('#GS1-128').val('');
-        document.getElementById('GS1-128').focus();
-      }
-    }
-
-    changeDate(text) {
-        if (text == null) { return ""; }
-        if (text.length == "6") { text = 20 + text; }
-        let date = text.slice(6, 8);
-        if (parseInt(text.slice(6, 8)) == 0) { date = '01'; }
-        return text.slice(0, 4) + "-" + text.slice(4, 6) + "-" + date;
-    }
-
-    setRegData() {
-        let tmp = this;
-        $(document).find('.shouhin-table table tbody tr').each(function() {
-            let row = $.trim(($(this).attr('id')).replace('tr_', ''));
-            let num = $(this).find('input[name="count"]').val();
-            let lot = $(this).find('input[name="lot"]').val();
-            let date = $(this).find('input[name="lotDate"]').val();
-            tmp.listObject[row].countNum = parseInt(num);
-            tmp.listObject[row].lotNumber = lot;
-            tmp.listObject[row].lotDate = date;
-        });
-    }
-
-    mergeLot(){
-        let tmp = this;
-        let regObj = {};
-        Object.keys(tmp.listObject).forEach(function (key) {
-            let itemId = tmp.listObject[key]['recordId'];
-            if (regObj[itemId] === void 0) { regObj[itemId] = {}; }
-            if (tmp.listObject[key].lotNumber && tmp.listObject[key].lotDate) {
-                let lotKey = tmp.listObject[key].lotNumber + tmp.listObject[key].lotDate;
-                let temp = Object.entries(regObj[itemId]);
-                let chkLotDup = temp.findIndex(([id, data]) => data.lotNumber == tmp.listObject[key].lotNumber && data.lotDate == tmp.listObject[key].lotDate);
-                if (chkLotDup === -1) {
-                    regObj[itemId][lotKey] = { ...tmp.listObject[key] };
-                } else {
-                    regObj[itemId][lotKey]['countNum'] = regObj[itemId][lotKey]['countNum'] + tmp.listObject[key].countNum;
+        getLotAndStock: function(){
+            UIkit.modal.confirm('在庫表とロット一覧から理論在庫を取得します').then(function(){
+                if(!app.divisionCheck()){
+                    return false;
                 }
-            }
-        
-            if (!tmp.listObject[key].lotNumber && !tmp.listObject[key].lotDate) {
-                if (regObj[itemId][0] === void 0) {
-                    regObj[itemId][0] = {};
-                    regObj[itemId][0] = { ...tmp.listObject[key] };
-                } else {
-                    regObj[itemId][0]['countNum'] = regObj[itemId][0]['countNum'] + tmp.listObject[key].countNum;
-                }
-            }
-        });
-        return regObj;
-    }
+                $.ajax({
+                    async: false,
+                    url: "<?php echo $api_url ?>",
+                    type:'POST',
+                    data: {
+                        _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+                        Action : "getLotAndStockApi",
+                        divisionId : app.divisionId,
+                    },
+                    dataType: 'json'
+                })
+                // Ajaxリクエストが成功した時発動
+                .done( (data) => {
+                    if (!data.result) {
+                        UIkit.modal.alert("取得に失敗しました");
+                        return false;
+                    }
+                    if(data.count > 0)
+                    {
+                        data.data.forEach(function(elem,index){
+                            app.addList(elem);
+                        });
+                    } else 
+                    {
+                        UIkit.modal.alert("データがありませんでした");
+                    }
+                })
+                // Ajaxリクエストが失敗した時発動
+                .fail( (data) => {
+                    UIkit.modal.alert("取得に失敗しました");
+                })
+                // Ajaxリクエストが成功・失敗どちらでも発動
+                .always( (data) => {
+                    loading_remove();
+                });
+            
+            });
+        },
+	}
+});
 
-}
+var modal_sections = new Vue({
+	el:	'#modal-sections',
+	data: {
+		select_items: [],
+        useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
+	},
+	filters: {
+        number_format: function(value) {
+            if (! value) { return false; }
+            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+        },
+    },
+	methods: {
+		clear: function(){
+			let original = JSON.parse(JSON.stringify(this.select_items));
+			this.select_items.splice(0, original.length);
+		},
+		addList: function(object){
+			this.select_items.push(object);
+		},
+		addObject: function(index){
+			app.addList(JSON.parse(JSON.stringify(this.select_items[index])));
+		},
+		openModal: function(){
+        	UIkit.modal('#modal-sections').show();
+		}
+	}
+});
 
-let inventory = new InventoryRegister();
-
-$(document).on('change', 'input[type="number"]', function() {
-    $(this).css({'color':'rgb(68, 68, 68)', 'background-color':'rgb(255, 204, 153)'});
-    $(window).scrollTop($(this).offset().top - 100);
+var gs1_128 = new Vue({
+	data: {
+		gs1_128: {}
+	},
+	methods: {
+		changeDate: function (text){
+			if(text == null){
+				return "";
+			}
+			if(text.length == "6"){
+				text = 20 + text;
+			}
+			let date = text.slice(6, 8);
+			if(parseInt(text.slice(6, 8)) == 0){
+				date = '01';
+			}
+			return text.slice(0, 4) + "-" + text.slice(4, 6) + "-" + date;
+		},
+		check_gs1_128: function (gs1128)
+		{
+			if(gs1128.indexOf("]C1") !== 0){
+				//UIkit.modal.alert("GS1-128ではありません");
+				//return ;
+				return this.check_gs1_128("]C1"+gs1128);
+			}
+			
+			gs1128 = gs1128.slice( 3 );
+			let obj = check_gs1128(gs1128);
+				
+			if(!obj.hasOwnProperty("01")){
+				UIkit.modal.alert("商品情報が含まれておりませんでした。").then(function(){
+				});
+				return;
+			}
+			
+			let searchJan = gs1_01_to_jan(obj["01"]);
+			let objkey = null;
+			let setObj = {};
+			
+			let objLotNumber = (obj["10"] === void 0) ? "" : obj["10"]; //lotNumber
+			let objLotDate = (obj["17"] === void 0) ? "" : this.changeDate(obj["17"]); //lotDate
+			let existflg = false;
+			let changeObject = null;
+		
+			
+			if(!existflg){
+				app.barcodeSearch(searchJan,objLotNumber,objLotDate , false);
+				//UIkit.modal.alert("対象の発注商品が見つかりませんでした。").then(function(){
+				//	UIkit.modal($('#gs1-128')).show();
+				//});
+			}
+		}
+	}
 });
 
 function addTr(object, type, count)
 {
-    inventory.addTr(object, type, count);
+	app.addList(object);
 }
-
 </script>

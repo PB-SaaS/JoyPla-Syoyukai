@@ -64,4 +64,28 @@ class View {
 
         return $html;
     }
+    
+    
+    public function form_render( string $file = null ): string
+    {
+        global $SPIRAL;
+        
+        $is_error = ( $SPIRAL->getParam('detect') != '' && $SPIRAL->getParam('confirm') == '');
+        
+        $html = $this->render();
+        
+        $pattern = "/<!--SMP:DISP:ERR:START-->(.*)<!--SMP:DISP:ERR:END-->/s";
+        
+        if($is_error)
+        {
+            $pattern = "/<!--SMP:DISP:REG:START-->(.*)<!--SMP:DISP:REG:END-->/s";
+        }
+        
+        if (preg_match($pattern, $html)) 
+        {
+            $html = preg_replace($pattern, '', $html);
+        }
+
+        return $html;
+    }
 }

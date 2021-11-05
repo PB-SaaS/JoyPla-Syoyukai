@@ -37,8 +37,13 @@ class ProductController extends Controller
         $header = $this->view('NewJoyPla/src/HeaderForMypage', [
             'SPIRAL' => $SPIRAL
         ], false);
-        $content = $this->view('NewJoyPla/view/ProductMaster', [
-            'userInfo' => $user_info,
+        
+        
+        $content = $this->view('NewJoyPla/view/template/List', [
+            'title' => '商品マスタ',
+            'table' => '%sf:usr:search31%',
+            'print' => true,
+            'export' => true,
             'csrf_token' => Csrf::generate(16)
             ] , false);
         
@@ -84,6 +89,48 @@ class ProductController extends Controller
             'baseUrl' => '',
         ],false);
     }
+    
+    
+    public function registPrice(): View
+    {
+        global $SPIRAL;
+        //iframe でＳＰＩＲＡＬフォームを呼び出す
+        try{
+            $user_info = new UserInfo($SPIRAL);
+            
+            $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
+                'title' => 'XXXXXX',
+                'width' => '100%',
+                'height'=> '100%',
+                'url' => '/regist/is',
+                'hiddens' => [
+                //hiddenに値を設定する
+                        'SMPFORM'=> '%smpform:xxxxxx%',
+                    ]
+                ] , false);
+            
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
+            
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla xxxx',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
+    }
 }
 
 /***
@@ -98,7 +145,7 @@ $action = $SPIRAL->getParam('Action');
     {
         echo $ProductController->Item()->render();
     } 
-    else if($action === 'InHospitalItem')
+    else 
     {
         echo $ProductController->InHospitalItem()->render();
     }
