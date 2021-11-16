@@ -12,6 +12,7 @@ use App\Model\Hospital;
 use App\Model\Inventory;
 use App\Model\InventoryEnd;
 use App\Model\InventoryHistory;
+use App\Model\InventoryItemView;
 use App\Model\StockView;
 
 use ApiErrorCode\FactoryApiErrorCode;
@@ -43,10 +44,10 @@ class InventoryDivisionSlipController extends Controller
             $end_slip = InventoryEnd::where('hospitalId',$user_info->getHospitalId())->where('inventoryEndId',$division_history_slip->inventoryEndId)->get();
             $end_slip = $end_slip->data->get(0);
             
-            $inventory_items = Inventory::where('hospitalId',$user_info->getHospitalId())->where('inventoryHId',$division_history_slip->inventoryHId)->get();
+            $inventory_items = InventoryItemView::where('hospitalId',$user_info->getHospitalId())->where('inventoryHId',$division_history_slip->inventoryHId)->get();
             
             $inventory_remake_items = [];
-            
+            /*
             $stock = StockView::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$division_history_slip->divisionId);
 
             foreach($inventory_items->data->all() as $item )
@@ -55,26 +56,34 @@ class InventoryDivisionSlipController extends Controller
             }
             
             $stock = $stock->get();
-            
+            */
             foreach($inventory_items->data->all() as $item )
             {
-                if(array_key_exists($item->inHospitalItemId , $inventory_remake_items) == false)
+                if(array_key_exists($item->inHospitalItemId , $inventory_remake_items) === false)
                 {
+                    $inventory_remake_items[$item->inHospitalItemId] = $item;
+                    /*
                     foreach($stock->data->all() as $stock_item){
                         if($stock_item->inHospitalItemId == $item->inHospitalItemId)
                         {
-                            $inventory_remake_items[$item->inHospitalItemId] = $stock_item;
                             $inventory_remake_items[$item->inHospitalItemId]->inventryNum = $item->inventryNum;
                             $inventory_remake_items[$item->inHospitalItemId]->inventryAmount = $item->inventryAmount;
                             break;
                         }
                     }
+                    */
                 } 
                 else 
                 {
                     $inventory_remake_items[$item->inHospitalItemId]->inventryNum = (int)$inventory_remake_items[$item->inHospitalItemId]->inventryNum + (int)$item->inventryNum;
                     $inventory_remake_items[$item->inHospitalItemId]->inventryAmount = (float)$inventory_remake_items[$item->inHospitalItemId]->inventryAmount + (float)$item->inventryAmount;
                 }
+            }
+            
+            
+            if(count($inventory_remake_items) != 0)
+            {
+                array_multisort(array_column($inventory_remake_items, 'inHospitalItemId'), SORT_ASC, $inventory_remake_items);
             }
             
             if($end_slip->inventoryStatus != 2)
@@ -139,7 +148,6 @@ class InventoryDivisionSlipController extends Controller
                     $delete_button_view_flg = true;
                 }
             }
-            
             $api_url = "%url/card:page_263632%";
             $content = $this->view('NewJoyPla/view/InventorySlip', [
                 'api_url' => $api_url,

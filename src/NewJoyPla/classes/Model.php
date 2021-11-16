@@ -17,7 +17,7 @@ class Model
     public static $primary_key = null;
     public static $page = 1;
     public $sort = [];
-    
+
     public function __construct()
     {
         global $SPIRAL;
@@ -38,7 +38,7 @@ class Model
             $this->{$column} = null;
         }
     }
-
+    
     private function getDataToInstance(array $data)
     {
         $result = [];

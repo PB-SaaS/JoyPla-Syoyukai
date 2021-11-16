@@ -83,10 +83,11 @@
 				    						echo "<td>".$record->itemJANCode."</td>";
 				    						echo "<td>￥<script>price(\"".$record->price."\")</script></td>";
 				    						echo "<td>￥<script>price(\"".$record->unitPrice."\")</script></td>";
-				    						echo "<td>".(int)$record->stockQuantity."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
+				    						//echo "<td>".(int)$record->stockQuantity."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
+				    						echo "<td>".(int)$record->calculatingStock."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
 				    						echo "<td>".$record->inventryNum."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
 				    						echo "<td>￥<script>price(\"".$record->inventryAmount."\")</script></td>";
-				    						echo "<td>".((int)$record->stockQuantity - (int)$record->inventryNum)."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
+				    						echo "<td>".((int)$record->calculatingStock - (int)$record->inventryNum)."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
 				    						echo "</tr>";
 				    						$num++;
 										}

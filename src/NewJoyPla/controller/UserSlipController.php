@@ -109,6 +109,7 @@ EOM;
         		"mailAddress" => "%val:usr:mailAddress%",
         		"remarks" => "%val:usr:remarks%",
         		"SMPFORM" => "%smpform:HpUserDelete%",
+        		"authKey" => "%val:usr:authKey%",
                 "user_id" => "%val:@sys:id%",
                 "user_auth_key" => "%val:@usr:authKey%",
                 ];

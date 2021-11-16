@@ -31,6 +31,7 @@ class AgreePageController extends Controller
                         'loginId' => '%val:usr:loginId%',
                         'SMPFORM'=> '%smpform:OtermsAgreement%',
                         'authKey' => '%val:usr:authKey%',
+                        'autoloadCheckSkip' => true,
                     ]
                 ] , false);
             
@@ -42,7 +43,7 @@ class AgreePageController extends Controller
         } finally {
             
             $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+            $header = $this->view('NewJoyPla/src/Header', [
                 'SPIRAL' => $SPIRAL
             ], false);
             

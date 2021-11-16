@@ -66,15 +66,17 @@
                                             if ($divisionId == $data->divisionId) { $selected = 'selected'; }
                                             if ($data->divisionType === '1')
                                             {
-                                                echo '<option value="'.$data->divisionId.'"' .$selected .'>'.$data->divisionName.'(大倉庫)</option>';
+                                                echo '<option value="'.$data->divisionId.'" ' .$selected .'>'.$data->divisionName.'(大倉庫)</option>';
                                                 echo '<option value="" disabled>--------------------</option>';
                                             }
                                         }
                                         foreach ($division->data as $data)
                                         {
+                                            $selected = '';
+                                            if ($divisionId == $data->divisionId) { $selected = 'selected'; }
                                             if ($data->divisionType === '2')
                                             {
-                                                echo '<option value="'.$data->divisionId.'"' .$selected .'>'.$data->divisionName.'</option>';
+                                                echo '<option value="'.$data->divisionId.'" ' .$selected .'>'.$data->divisionName.'</option>';
                                             }
                                         }
                                     ?>

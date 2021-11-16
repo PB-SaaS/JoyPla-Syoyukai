@@ -267,15 +267,15 @@
 						<th class="uk-table-shrink">id</th>
 						<th class="uk-table-shrink"></th>
 						<th>メーカー</th>
-						<th>商品名</a></th>
-						<th>製品コード</a></th>
-						<th>規格</a></th>
-						<th>入数</a></th>
-						<th>価格</a></th>
-						<th>単価</a></th>
-						<th>JANコード</a></th>
-						<th>卸業者</a></th>
-						<th>ロット管理フラグ</a></th>
+						<th>商品名</th>
+						<th>製品コード</th>
+						<th>規格</th>
+						<th>入数</th>
+						<th>価格</th>
+						<th>単価</th>
+						<th>JANコード</th>
+						<th>卸業者</th>
+						<th>ロット管理フラグ</th>
 					</tr>
 				</thead>
 				<tbody>

@@ -10,6 +10,7 @@ use Csrf;
 use App\Lib\UserInfo;
 use App\Model\Tenant;
 use App\Model\DistributorUser;
+use App\Model\DistributorAffiliationView;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -46,25 +47,20 @@ class DistributorUserSlipController extends Controller
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
             <li><a href="{$link}">卸業者一覧</a></li>
             <li><a href="{$_SERVER['HTTP_REFERER']}">卸業者情報詳細</a></li>
-            <li><span>卸業者ユーザー変更</span></li>
+            <li><span>卸業者ユーザー招待情報更新</span></li>
 EOM;
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
                 'breadcrumb' => $breadcrumb,
-                'title' => '卸業者ユーザー変更',
+                'title' => '卸業者ユーザー招待情報更新',
                 'width' => '100%',
                 'height'=> '100%',
                 'url' => '/regist/is',
                 'hiddens' => [
-                    	"deletionFlag" => "%val:usr:deletionFlag%",
-                    	"userPermission" => "%val:usr:userPermission:id%",
-                    	"loginId" => "%val:usr:loginId%",
-                    	"name" => "%val:usr:name%",
-                    	"nameKana" => "%val:usr:nameKana%",
-                    	"mailAddress" => "%val:usr:mailAddress%",
-                    	"remarks" => "%val:usr:remarks%",
-                    	"SMPFORM" => "%smpform:oroshiUserChange%",
-                    	"id" => "%val:sys:id%",
-                    	"authKey" => "%val:usr:authKey%" ,
+            		"SMPFORM" => "%smpform:affiliationUp%",
+            		"id" => "%val:sys:id%",
+            		"authKey" => "%val:usr:authKey%" ,
+            		"OUserPermission" => "%val:usr:OUserPermission:id%",
+            		"affiliationId" => "%val:usr:affiliationId%",
                     ]
                 ] , false);
             
@@ -82,7 +78,7 @@ EOM;
             
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 卸業者ユーザー変更',
+                'title'     => 'JoyPla 卸業者ユーザー招待情報更新',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),
@@ -105,7 +101,7 @@ EOM;
             }
             
             $card_id = (int)$SPIRAL->getCardId();
-            $distributor_user = DistributorUser::find($card_id)->get();
+            $distributor_user = DistributorAffiliationView::find($card_id)->get();
             $distributor_user = $distributor_user->data->get(0);
             
             if($user_info->isDistributorUser() && $user_info->getLoginId() === $distributor_user->loginId)
@@ -125,25 +121,20 @@ EOM;
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
             <li><a href="{$link}">卸業者一覧</a></li>
             <li><a href="{$_SERVER['HTTP_REFERER']}">卸業者情報詳細</a></li>
-            <li><span>卸業者ユーザー削除</span></li>
+            <li><span>卸業者ユーザー招待情報削除</span></li>
 EOM;
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
                 'breadcrumb' => $breadcrumb,
-                'title' => '卸業者ユーザー削除',
+                'title' => '卸業者ユーザー招待情報削除',
                 'width' => '100%',
                 'height'=> '100%',
                 'url' => '/regist/is',
                 'hiddens' => [
-            		"deletionFlag" => "%val:usr:deletionFlag%",
-            		"userPermission" => "%val:usr:userPermission:id%",
-            		"loginId" => "%val:usr:loginId%",
-            		"name" => "%val:usr:name%",
-            		"nameKana" => "%val:usr:nameKana%",
-            		"mailAddress" => "%val:usr:mailAddress%",
-            		"remarks" => "%val:usr:remarks%",
-            		"SMPFORM" => "%smpform:oroshiUserDelete%",
+            		"SMPFORM" => "%smpform:affiliationDel%",
             		"id" => "%val:sys:id%",
             		"authKey" => "%val:usr:authKey%" ,
+            		"OUserPermission" => "%val:usr:OUserPermission:id%",
+            		"affiliationId" => "%val:usr:affiliationId%",
                     ]
                 ] , false);
             
@@ -161,7 +152,7 @@ EOM;
             
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 卸業者ユーザー削除',
+                'title'     => 'JoyPla 卸業者ユーザー招待情報削除',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),

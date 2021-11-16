@@ -50,12 +50,27 @@ class UserInfo{
     public function getUserPermission(){
         return $this->spiral->getContextByFieldTitle("userPermission");
     }
+    
+    
+    public function getTermsAgreement(){
+        return $this->spiral->getContextByFieldTitle("termsAgreement");
+    }
+    
+    public function getAffiliationId(){
+        return $this->spiral->getContextByFieldTitle("affiliationId");
+    }
+    
+    public function getUserCheck(){
+        return $this->spiral->getContextByFieldTitle("userCheck");
+    }
+    
+    
     public function getUserPermissionName(){
         return $this->permissionName[$this->getUserPermission()];
     }
 
     public function isHospitalUser(){
-        if($this->getDistributorId() == null)
+        if($this->getUserCheck() == '1')
         {
             return true;
         }
@@ -63,7 +78,11 @@ class UserInfo{
     }
 
     public function isDistributorUser(){
-        return !$this->isHospitalUser();
+        if($this->getUserCheck() == '2')
+        {
+            return true;
+        }
+        return false;
     }
     
     public function isAdmin(){

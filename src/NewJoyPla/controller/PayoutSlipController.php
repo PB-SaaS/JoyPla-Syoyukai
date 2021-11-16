@@ -77,7 +77,7 @@ class PayoutSlipController extends Controller
             ], false);
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 消費物品',
+                'title'     => 'JoyPla 払出伝票',
                 'script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),

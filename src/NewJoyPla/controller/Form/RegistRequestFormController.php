@@ -10,6 +10,7 @@ use App\Lib\UserInfo;
 use App\Model\DistributorUser;
 use App\Model\Distributor;
 use App\Model\HospitalUser;
+use App\Model\DistributorAffiliationView;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -130,14 +131,20 @@ class RegistRequestFormController extends Controller
             
             $select_name = $this->makeId($distributorId);
 
-            $test = DistributorUser::selectName($select_name)->rule([
+            $test = DistributorAffiliationView::selectName($select_name)->rule([
                 'name'=>'distributorId',
                 'label'=>'name_'.$distributorId,
                 'value1'=>$distributorId,
                 'condition'=>'matches'
+            ])
+            ->rule([
+                'name'=>'invitingAgree',
+                'label'=>'invitingAgree',
+                'value1'=>'t',
+                'condition'=>'is_boolean'
             ])->filterCreate();
 
-            $test = DistributorUser::selectRule($select_name)
+            $test = DistributorAffiliationView::selectRule($select_name)
                 ->body($mail_body)
                 ->subject("[JoyPla] ".$requestUName."さんが見積依頼「".$requestTitle."」を作成しました")
                 ->from(FROM_ADDRESS,FROM_NAME)

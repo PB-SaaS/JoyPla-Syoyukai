@@ -31,6 +31,7 @@ class AgreePageController extends Controller
                         'loginId' => '%val:usr:loginId%',
                         'SMPFORM'=> '%smpform:termsAgreement%',
                         'authKey' => '%val:usr:authKey%',
+                        'autoloadCheckSkip' => true,
                     ]
                 ] , false);
             

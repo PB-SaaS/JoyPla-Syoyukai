@@ -274,6 +274,7 @@ class OrderSlipDetailController extends Controller
             $receiving_history_id = $this->makeId('04');
             $receiving_items = $receiving_ary;
             $in_hospital_item_ids = [];
+            $total_price = [];
             
             foreach ($receiving_items as $item)
             {
@@ -294,7 +295,8 @@ class OrderSlipDetailController extends Controller
                         'lotNumber' => $item['lotNumber'],
                         'lotDate' => $item['lotDate']
                     ];
-
+                    $total_price[] = (float)$item['countNum'] * (float)$item['price'];
+                    
                     if ($data['lotNumber'] && $data['lotDate']) {
                         $inventory_adjustment_trdata[] = [
                             'divisionId' => $divisionId,
@@ -329,6 +331,7 @@ class OrderSlipDetailController extends Controller
                 'orderHistoryId' => $card->orderNumber,
                 'hospitalId' => $user_info->getHospitalId(),
                 'itemsNumber' => count($in_hospital_item_ids),//院内商品マスタID数
+                'totalAmount' => collect($total_price)->sum(),//院内商品マスタID数
             ];
 
             $update_data = [];

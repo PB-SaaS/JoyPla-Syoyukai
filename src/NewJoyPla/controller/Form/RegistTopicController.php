@@ -9,6 +9,7 @@ use Csrf;
 use App\Lib\UserInfo;
 use App\Model\DistributorUser;
 use App\Model\HospitalUser;
+use App\Model\DistributorAffiliationView;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -88,10 +89,16 @@ class RegistTopicController extends Controller
                 
                 $select_name = $this->makeId($distributor);
 
-                $distributor_user = DistributorUser::getNewInstance();
+                $distributor_user = DistributorAffiliationView::getNewInstance();
                 $test = $distributor_user::selectName($select_name)->rule(
                     ['name'=>'distributorId','label'=>'name_'.$distributor,'value1'=>$distributor,'condition'=>'matches']
-                    )->filterCreate();
+                    )
+                    ->rule([
+                        'name'=>'invitingAgree',
+                        'label'=>'invitingAgree',
+                        'value1'=>'t',
+                        'condition'=>'is_boolean'
+                    ])->filterCreate();
 
                 $test = $distributor_user::selectRule($select_name)
                     ->body($mail_body)

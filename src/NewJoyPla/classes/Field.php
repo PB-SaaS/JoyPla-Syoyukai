@@ -69,7 +69,8 @@ namespace field {
                 throw new Exception("not empty variable name \$fieldType: " . $fieldType);
             }
 
-            if ($replaceKey === "" || $replaceKey === null) {
+            //if ($replaceKey === "" || $replaceKey === null) {
+            if ($replaceKey === null) {
                 throw new Exception("not empty variable name \$replaceKey: " . $replaceKey);
             }
 
@@ -116,6 +117,8 @@ namespace field {
                     return TextFieldType128Bytes::of($value);
                 case TextArea256Bytes::FIELD_NAME:
                     return TextArea256Bytes::of($value);
+                case TextArea512Bytes::FIELD_NAME:
+                    return TextArea512Bytes::of($value);
                 case TextArea1024Bytes::FIELD_NAME:
                     return TextArea1024Bytes::of($value);
                 case TextArea4096bytes::FIELD_NAME:
@@ -140,6 +143,8 @@ namespace field {
                     return MessageDigestSHA256::of($value);
                 case SimplePassword::FIELD_NAME:
                     return SimplePassword::of($value);
+                case JanCode::FIELD_NAME:
+                    return JanCode::of($value);
                 default:
                     throw new Exception("dont match variable name \$fieldType: " . $fieldType);
             }
@@ -582,6 +587,35 @@ namespace field {
             });
         }
     }
+    
+    
+    /**
+     * テキストエリア(512 bytes)
+     */
+    class TextArea512Bytes extends DbFieldType
+    {
+        const FIELD_NAME = "TextArea512Bytes";
+
+        const LIMIT_BYTES_NUMBER = 512;
+
+        private function __construct($value)
+        {
+            parent::__construct($value);
+        }
+
+        public static function of($value): Try_
+        {
+            return DbFieldTypeService::fieldValueEmpty($value, function($v) {
+                if (isLimitOverMultiByteSentence($v, TextArea512Bytes::LIMIT_BYTES_NUMBER)) {
+                    return new Failed(new InputValueLimitError(
+                        "文字数が上限を超えています※ 512ytesまで許容"
+                    ));
+                } else {
+                    return new Success(new TextArea512Bytes($v));
+                }
+            });
+        }
+    }
 
     /**
      * テキストエリア(1024 bytes)
@@ -801,7 +835,7 @@ namespace field {
         const REPLACE_LIST = array("+", "-", ".");
         const commaLimit = 1;
 
-        const FORMAT_ERROR_MESSAGE = "「フィールド名」の入力値に誤りがあります ※ フォーマット: 「+-.」を除いた15桁の半角数字まで許容、「.」の連続使用は不可";
+        const FORMAT_ERROR_MESSAGE = "入力値に誤りがあります ※ フォーマット: 「+-.」を除いた15桁の半角数字まで許容、「.」の連続使用は不可";
 
         private function __construct($value)
         {
@@ -1020,6 +1054,48 @@ namespace field {
             });
         }
     }
-}
+    
+    
+    /**
+     * JoyPla専用 JANコード 数字13桁のみ
+     */
+    class JanCode extends DbFieldType
+    {
+        const FIELD_NAME = "JanCode";
 
-?>
+        const LENGTH = 13;
+
+        private function __construct($value)
+        {
+            parent::__construct($value);
+        }
+
+        public static function of($value): Try_
+        {
+            return DbFieldTypeService::fieldValueEmpty($value, function($v) {
+                $errorSentenceList = array();
+
+                /*
+                 * 半角数字以外の文字列が含まれている場合失敗
+                 */
+                if (preg_match("/[^0-9]/", $v)) {
+                    $errorSentenceList[] = "入力値に不正な値があります。半角数字以外の値が入力されています";
+                }
+
+                /*
+                 * 桁数を超えていた場合失敗
+                 */
+                if (strlen($v) !== JanCode::LENGTH ) {
+                    $errorSentenceList[] = "入力値に誤りがあります。半角数字13桁で入力してください";
+                }
+
+                if (count($errorSentenceList) === 0) {
+                    return new Success(new JanCode($v));
+                } else {
+                    return new Failed(new DbFieldError(implode("、", $errorSentenceList)));
+                }
+            });
+        }
+    }
+
+}

@@ -270,6 +270,13 @@
 		}
 	</script>
     <style>
+    
+		table .smp-row-data {
+		  border-top: 1px solid #e5e5e5;
+		}
+		table .smp-row-data{
+		  border-bottom: 1px solid #e5e5e5;
+		}
 		.uk-input[type="number"]{
 			text-align: right;
 		}

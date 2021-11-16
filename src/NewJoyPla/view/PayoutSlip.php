@@ -1,68 +1,67 @@
+<div class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
+    <div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
+        <div class="uk-container uk-container-expand">
+            <ul class="uk-breadcrumb no_print">
+                <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                <li><a href="<?php echo $link ?>&table_cache=true"><span>払出履歴一覧</span></a></li>
+                <li><span>払出伝票</span></li>
+            </ul>
+            <div class="no_print uk-margin" uk-margin>
+                <input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
+                <input class="print_hidden uk-button uk-button-danger" type="button" value="払出伝票取消" onclick="payoutDelete();return false;">
+                <input class="print_hidden uk-button uk-button-primary" type="button" value="払出ラベル発行" onclick="createLabel();return false;">
+            </div>
+            <div class="uk-text-center uk-text-large">
+                <p class="uk-text-bold title_spacing" style="font-size: 32px">払出伝票</p>
+            </div>
+            <div uk-grid>
+                <div class="uk-width-1-2@m">
+                    <table class="uk-table uk-width-1-1 uk-width-2-3@m uk-table-divider">
+                        <tr>
+                            <td class="uk-text-bold">払出日時</td>
+                            <td class="uk-text-right">%val:usr:registrationTime%</td>
+                        </tr>
+                        <tr>
+                            <td class="uk-text-bold">払出部署</td>
+                            <td class="uk-text-right">%val:usr:sourceDivision%<span uk-icon="icon: arrow-right"></span>%val:usr:targetDivision%</td>
+                        </tr>
+                        <tr>
+                            <td class="uk-text-bold">品目数</td>
+                            <td class="uk-text-right">%val:usr:itemsNumber%</td>
+                        </tr>
+                        <tr>
+                            <td class="uk-text-bold">合計金額</td>
+                            <td class="uk-text-right">￥<script>price("%val:usr:totalAmount%")</script> - </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
 
-    <div class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
-	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
-		    <div class="uk-container uk-container-expand">
-		    	<ul class="uk-breadcrumb no_print">
-				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
-				    <li><a href="<?php echo $link ?>&table_cache=true"><span>払出履歴一覧</span></a></li>
-				    <li><span>払出伝票</span></li>
-				</ul>
-				<div class="no_print uk-margin" uk-margin>
-					<input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
-					<input class="print_hidden uk-button uk-button-danger" type="button" value="払出伝票取消" onclick="payoutDelete();return false;">
-					<input class="print_hidden uk-button uk-button-primary" type="button" value="払出ラベル発行" onclick="createLabel();return false;">
-				</div>
-		    	<div class="uk-text-center uk-text-large">
-		    		<p class="uk-text-bold title_spacing" style="font-size: 32px">払出伝票</p>
-		    	</div>
-		    	<div uk-grid>
-			    	<div class="uk-width-1-2@m">
-		    			<table class="uk-table uk-width-1-1 uk-width-2-3@m uk-table-divider">
-		    				<tr>
-		    					<td class="uk-text-bold">払出日時</td>
-		    					<td class="uk-text-right">%val:usr:registrationTime%</td>
-		    				</tr>
-		    				<tr>
-		    					<td class="uk-text-bold">払出部署</td>
-		    					<td class="uk-text-right">%val:usr:sourceDivision%<span uk-icon="icon: arrow-right"></span>%val:usr:targetDivision%</td>
-		    				</tr>
-		    				<tr>
-		    					<td class="uk-text-bold">品目数</td>
-		    					<td class="uk-text-right">%val:usr:itemsNumber%</td>
-		    				</tr>
-		    				<tr>
-		    					<td class="uk-text-bold">合計金額</td>
-		    					<td class="uk-text-right">￥<script>price("%val:usr:totalAmount%")</script> - </td>
-		    				</tr>
-		    			</table>
-			    	</div>
-			    </div>
-		    	
-		    	<div class="uk-margin" id="tablearea">
-		    		<form>
-			    		<div class="uk-overflow-auto">
-				    		<table class="uk-table uk-table-hover uk-table-middle uk-table-divider uk-text-nowrap" id="tbl-Items">
-				    			<thead>
-				    				<tr>
-										<th>NO</th>
-										<th style="min-width:150px">メーカー</th>
-										<th style="min-width:150px">商品名</th>
-										<th>製品コード</th>
-										<th>規格</th>
-										<th>ロット番号</th>
-										<th>使用期限</th>
-										<th>入数</th>
-										<th>価格</th>
-										<th>単価</th>
-										<th class="uk-table-shrink">数量</th>
-										<th class="uk-table-shrink"></th>
-										<th class="uk-table-shrink">個数（ラベル枚数）</th>
-										<th class="uk-table-shrink">合計払出数</th>
-										<th>払出金額</th>
-				    				</tr>
-				    			</thead>
-				    			<tbody>
-				    				<?php
+            <div class="uk-margin" id="tablearea">
+                <form>
+                    <div class="uk-overflow-auto">
+                        <table class="uk-table uk-table-hover uk-table-middle uk-table-divider uk-text-nowrap" id="tbl-Items">
+                            <thead>
+                                <tr>
+                                    <th>NO</th>
+                                    <th style="min-width:150px">メーカー</th>
+                                    <th style="min-width:150px">商品名</th>
+                                    <th>製品コード</th>
+                                    <th>規格</th>
+                                    <th>ロット番号</th>
+                                    <th>使用期限</th>
+                                    <th>入数</th>
+                                    <th>価格</th>
+                                    <th>単価</th>
+                                    <th class="uk-table-shrink">数量</th>
+                                    <th class="uk-table-shrink"></th>
+                                    <th class="uk-table-shrink">個数（ラベル枚数）</th>
+                                    <th class="uk-table-shrink">合計払出数</th>
+                                    <th>払出金額</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
 				    					$num = 1;
 										foreach($payoutData as $record){
 				    						echo "<tr>";
@@ -87,20 +86,20 @@
 				    						$num++;
 										}
 				    				?>
-				    			</tbody>
-				    			
-				    		</table>
-				    	</div>
-			    	
-		    		</form>
-		    	</div>
-		    </div>
-		</div>
-	</div>
-	<form action="%url/rel:@mpgt:Payout%&Action=payoutLabel" target="_blank" method="post" class="uk-hidden" name="LabelCreate">
-		<input type="hidden" value="%val:usr:payoutHistoryId%" name="payoutHistoryId" id="payoutHistoryId">
-		<input type="hidden" value="payout" name="pattern">
-	</form>
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<form action="%url/rel:@mpgt:Payout%&Action=payoutLabel" target="_blank" method="post" class="uk-hidden" name="LabelCreate">
+    <input type="hidden" value="%val:usr:payoutHistoryId%" name="payoutHistoryId" id="payoutHistoryId">
+    <input type="hidden" value="payout" name="pattern">
+</form>
 	<script>
 		let canAjax = true;
 		let lotdata = {};
@@ -164,5 +163,3 @@
 			return true;
 		}
 	</script>
-  </body>
-</html>

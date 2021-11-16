@@ -135,12 +135,12 @@ class PayoutMRController extends Controller
         global $SPIRAL;
         
         $user_info = new UserInfo($SPIRAL);
-        
+        /*
         $useUnitPrice = '';
         $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
         $hospital_data = $hospital_data->data->get(0);
         $useUnitPrice = $hospital_data->payoutUnitPrice;
-    
+        */
         $report = [];
         $total_amount = 0;
     
@@ -161,7 +161,6 @@ class PayoutMRController extends Controller
         foreach ($this->payout_data as $payout)
         {
             InHospitalItemView::orWhere('inHospitalItemId',$payout->inHospitalItemId);
-            $total_amount += (float)$payout->priceAfterAdj;
         }
         if ($itemName) { InHospitalItemView::where('itemName',"%$itemName%",'LIKE'); }
         if ($itemCode) { InHospitalItemView::where('itemCode',"%$itemCode%",'LIKE'); }
@@ -177,9 +176,10 @@ class PayoutMRController extends Controller
         $inHPItem = InHospitalItemView::paginate($maxCount);
         $inHPItem_data = $inHPItem->data->all();
 
+        $report['data'] = [];
         foreach ($inHPItem_data as $row)
         {
-            $getInformationByPrice = $this->getInformationByPrice($row->inHospitalItemId, $useUnitPrice);
+            $getInformationByPrice = $this->getInformationByPrice($row->inHospitalItemId);
             $report['data'][] = [
                 'id' => $row->id,
                 'inHospitalItemId' => $row->inHospitalItemId,
@@ -197,17 +197,25 @@ class PayoutMRController extends Controller
                 'priceAfterAdj' => $getInformationByPrice['priceAfterAdj'],
                 'quantityUnit'=> $getInformationByPrice['quantityUnit']
             ];
+            
+            foreach($getInformationByPrice['priceAfterAdj'] as $p)
+            {
+                $total_amount += (float)$p;
+            }
         }
-        array_multisort(array_column($report['data'], 'id'), SORT_ASC, $report['data']);
+        if(count($report['data']) != 0){
+            array_multisort(array_column($report['data'], 'id'), SORT_ASC, $report['data']);
+        }
         $report['count'] = $inHPItem->count;
         $report['totalAmount'] = $total_amount;
 
         return $report;
     }
     
-    private function getInformationByPrice(string $inHospitalItemId, bool $useUnitPrice)
+    private function getInformationByPrice(string $inHospitalItemId)
     {
         $payoutDataByPrice = [
+            'key' => [],
             'price' => [],
             'quantity' => [],
             'payoutQuantity' => [],
@@ -221,23 +229,30 @@ class PayoutMRController extends Controller
         {
             if ($inHospitalItemId == $payoutItem->inHospitalItemId)
             {
-                $key = array_search($payoutItem->price, $payoutDataByPrice['price']);
+                $search_key = $payoutItem->price .'_'.$payoutItem->unitPrice .'_'. $payoutItem->quantity . '_' . $payoutItem->quantityUnit ;
+                
+                $key = array_search($search_key, $payoutDataByPrice['key']);
+                
                 if ($key === false)
                 {
-                    $payoutDataByPrice['price'][] = $payoutItem->price;
-                    $key = array_search($payoutItem->price, $payoutDataByPrice['price']);
-                    $payoutDataByPrice['quantity'][$key] = 0;
+                    $payoutDataByPrice['key'][] = $search_key;
+                    $key = array_search($search_key, $payoutDataByPrice['key']);
+                    $payoutDataByPrice['price'][$key] = $payoutItem->price;
+                    $payoutDataByPrice['unitPrice'][$key] = $payoutItem->unitPrice;
+                    $payoutDataByPrice['quantity'][$key] = $payoutItem->quantity;
+                    $payoutDataByPrice['quantityUnit'][$key] = $payoutItem->quantityUnit;
                     $payoutDataByPrice['payoutQuantity'][$key] = 0;
-                    $payoutDataByPrice['unitPrice'][$key] = 0;
+                    $payoutDataByPrice['adjAmount'][$key] = 0;
+                    $payoutDataByPrice['priceAfterAdj'][$key] = 0;
+                    $payoutDataByPrice['totalAmount'][$key] = 0;
                 }
-                $payoutDataByPrice['quantity'][$key] = $payoutItem->quantity;
-                $payoutDataByPrice['quantityUnit'][$key] = $payoutItem->quantityUnit;
+                $payoutDataByPrice['totalAmount'][$key] = $payoutDataByPrice['totalAmount'][$key] + $payoutItem->payoutAmount;
                 $payoutDataByPrice['payoutQuantity'][$key] = $payoutDataByPrice['payoutQuantity'][$key] + $payoutItem->payoutQuantity;
-                $payoutDataByPrice['unitPrice'][$key] = $payoutItem->unitPrice;
                 $payoutDataByPrice['adjAmount'][$key] = $payoutDataByPrice['adjAmount'][$key] + $payoutItem->adjAmount;
+                $payoutDataByPrice['priceAfterAdj'][$key] = $payoutDataByPrice['priceAfterAdj'][$key] + $payoutItem->priceAfterAdj;
             }
         }
-        
+        /*
         if (!$useUnitPrice)
         {
             foreach ($payoutDataByPrice['price'] as $key => $byPriceData)
@@ -254,6 +269,7 @@ class PayoutMRController extends Controller
                 $payoutDataByPrice['priceAfterAdj'][$key] = $payoutDataByPrice['totalAmount'][$key] + $payoutDataByPrice['adjAmount'][$key];
             }
         }
+        */
         return $payoutDataByPrice;
     }
 

@@ -16,7 +16,7 @@
 				</form>
 				<?php endif ?>
 				<?php if($user_info->isAdmin()): ?>
-				<input class="print_hidden uk-button uk-button-primary" type="submit" value="卸業者ユーザー登録" onclick="document.distributorUserReg.submit()">
+				<input class="print_hidden uk-button uk-button-primary" type="submit" value="卸業者ユーザー招待" onclick="document.distributorUserReg.submit()">
 				<form action="<?php echo $api_url ?>" method="post" class="uk-hidden" name="distributorUserReg">
 					<input type="hidden" name="Action" value="distributorUserReg">
 				</form>
@@ -64,14 +64,14 @@
 	    	</div>
 	    	<div uk-grid>
 	    		<div class="uk-width-3-4@m uk-width-2-3">
-	    			<h2>卸業者ユーザー情報</h2>
+	    			<h2>卸業者ユーザー招待情報</h2>
 				</div>
 			</div>
 	    	<div class="uk-width-1-1 uk-margin-top">
 				<?php if($user_info->isAdmin()): ?>
-	    		%sf:usr:search79:mstfilter:table%
+	    		%sf:usr:search14:mstfilter:table%
 				<?php else: ?>
-				%sf:usr:oroshiUserList:mstfilter:table%
+				%sf:usr:search16:mstfilter:table%
 				<?php endif ?>
            </div>
 		</div>

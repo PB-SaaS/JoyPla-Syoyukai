@@ -61,9 +61,9 @@
 
                                     <select class="$errorInputColor:userPermission$" name="userPermission">
                                         <option value="">----- 選択してください -----</option>
-                                        <option value="1" $userpermission:1$="$userPermission:1$">管理者</option>
-                                        <option value="2" $userpermission:2$="$userPermission:2$">担当者</option>
-                                        <option value="3" $userpermission:3$="$userPermission:3$">承認者</option>
+                                        <option value="1" $userPermission:1$="$userPermission:1$">管理者</option>
+                                        <option value="2" $userPermission:2$="$userPermission:2$">担当者</option>
+                                        <option value="3" $userPermission:3$="$userPermission:3$">承認者</option>
                                     </select>
                                     <br>
                                     <span class="msg">$error:userPermission$</span>

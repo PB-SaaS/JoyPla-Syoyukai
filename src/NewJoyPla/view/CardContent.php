@@ -161,7 +161,7 @@
 								<td>{{list.jan}}</td>
 								<td>{{list.irisu}}{{list.unit}}</td>
 								<td>
-									<input type="number" step="1" class="uk-input" min="0" style="width: 180px;" v-bind:style="list.countStyle" v-model="list.countNum" v-on:change="addCountStyle(key)">
+									<input type="number" step="1" class="uk-input" min="0" style="width: 100px;" v-bind:style="list.countStyle" v-model="list.countNum" v-on:change="addCountStyle(key)">
 									<span class="uk-text-bottom">{{list.unit}}</span>
 								</td>
 								<td uk-margin class="uk-text-center">
@@ -217,42 +217,27 @@
 	</div>
 	
 	
-	<!-- This is a button toggling the modal with the default close button -->
-	<!-- This is the modal with the default close button -->
-	<div id="gs1-128" uk-modal>
-	    <div class="uk-modal-dialog uk-modal-body">
-	    	<form onsubmit="gs1_128.check_gs1_128($('#GS1-128').val());return false;" action="#">
-		        <button class="uk-modal-close" type="button" uk-close></button>
-		        <h2 class="uk-modal-title">GS1-128 読取</h2>
-		        <input type="text" class="uk-input" placeholder="GS1-128" id="GS1-128" autofocus="true">
-				    <p class="uk-text-right">
-		            <button class="uk-button uk-button-primary" type="button" onclick="gs1_128.check_gs1_128($('#GS1-128').val());">反映</button>
-		        </p>
-	        </form>
-	    </div>
-	</div>
-	
 	<div id="modal-sections" class="uk-modal-container" uk-modal>
 	    <div class="uk-modal-dialog">
 	        <button class="uk-modal-close-default" type="button" uk-close></button>
 	        <div class="uk-modal-header">
 	            <h2 class="uk-modal-title">商品選択</h2>
 	        </div>
-	        <div class="uk-modal-body">
+	        <div class="uk-modal-body uk-width-expand uk-overflow-auto">
 	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-nowrap uk-table-divider">
 					<thead>
 						<tr>
 							<th class="uk-table-shrink">id</th>
 							<th class="uk-table-shrink"></th>
 							<th>メーカー</th>
-							<th>商品名</a></th>
-							<th>製品コード</a></th>
-							<th>規格</a></th>
-							<th>入数</a></th>
-							<th>価格</a></th>
-							<th>JANコード</a></th>
-							<th>卸業者</a></th>
-							<th>ロット管理フラグ</a></th>
+							<th>商品名</th>
+							<th>製品コード</th>
+							<th>規格</th>
+							<th>入数</th>
+							<th>価格</th>
+							<th>JANコード</th>
+							<th>卸業者</th>
+							<th>ロット管理フラグ</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -276,7 +261,7 @@
 	        </div>
 	    </div>
 	</div>
-</div>
+
 
 <form action="<?php echo $api_url ?>" target="_blank" method="post" class="print_hidden uk-inline" id="createLabelForm">
 	<input type="hidden" value="" name="card_ids">
@@ -316,7 +301,7 @@ var app = new Vue({
 	methods: {
 		addList: function(object) {
 			object.class = ((object.class == null)? {'target' : true} : object.class);
-			object.countNum = ((object.count == null)? 0 : object.count); 
+			object.countNum = ((object.countNum == null)? 0 : object.countNum); 
 			this.lists.push(object);
 		},
 		copyList: function(key) {
@@ -539,7 +524,6 @@ var modal_sections = new Vue({
 });
 
 var gs1_128 = new Vue({
-	el: '#gs1-128',
 	data: {
 		gs1_128: {}
 	},

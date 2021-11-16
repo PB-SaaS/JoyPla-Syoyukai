@@ -25,6 +25,9 @@ class StockController extends Controller
     public function index(): View
     {
         global $SPIRAL;
+
+        $title = '在庫調整';
+
         try {
 
             $user_info = new UserInfo($SPIRAL);
@@ -64,7 +67,7 @@ class StockController extends Controller
             
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 在庫調整',
+                'title'     => 'JoyPla '.$title,
                 'script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),
@@ -224,7 +227,7 @@ class StockController extends Controller
             $api_url = "%url/rel:mpgt:Stock%";
             if($user_info->isUser())
             {
-                $title = "在庫管理表 - 部署選択";
+                $title = '在庫管理表 - 部署選択';
                 $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
                     'title' => '在庫管理表 - 部署選択',
                     'table' => '%sf:usr:search84:table%',
@@ -235,7 +238,7 @@ class StockController extends Controller
             }
             else
             {
-                $title = "在庫管理表";
+                $title = '在庫管理表';
                 $division = Division::where('hospitalId',$user_info->getHospitalId())->get();
                 $content = $this->view('NewJoyPla/view/InventoryControlTable', [
                     'api_url' => $api_url,
@@ -258,7 +261,7 @@ class StockController extends Controller
             ], false);
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => $title,
+                'title'     => 'JoyPla '.$title,
                 'script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),
@@ -271,6 +274,9 @@ class StockController extends Controller
     public function stockManagementListForDivision()
     {
         global $SPIRAL;
+
+        $title = '在庫管理表';
+
         try {
 
             $user_info = new UserInfo($SPIRAL);
@@ -292,7 +298,6 @@ class StockController extends Controller
             $api_url = "%url/rel:mpgt:Stock%";
             $division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
                
-            $title = "在庫管理表";
             $content = $this->view('NewJoyPla/view/InventoryControlTable', [
                 'api_url' => $api_url,
                 'user_info' => $user_info,
@@ -313,7 +318,7 @@ class StockController extends Controller
             ], false);
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => $title,
+                'title'     => 'JoyPla '.$title,
                 'script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),
@@ -326,6 +331,9 @@ class StockController extends Controller
     public function adjustmentHistory()
     {
         global $SPIRAL;
+
+        $title = '在庫調整ログ';
+
         try {
 
             $user_info = new UserInfo($SPIRAL);
@@ -340,15 +348,12 @@ class StockController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
     
-            $api_url = "%url/rel:mpgt:Stock%";
-            
+            $content = $this->view('NewJoyPla/view/template/List', [
+                    'title' => $title,
+                    'table' => '%sf:usr:search33:table%',
+                    'csrf_token' => Csrf::generate(16)
+                    ] , false);
     
-            $content = $this->view('NewJoyPla/view/StockAdjustmentHistory', [
-                'api_url' => $api_url,
-                'user_info' => $user_info,
-                'csrf_token' => Csrf::generate(16)
-                ] , false);
-            
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
@@ -363,7 +368,7 @@ class StockController extends Controller
             
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 在庫調整ログ',
+                'title'     => 'JoyPla '.$title,
                 'script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),

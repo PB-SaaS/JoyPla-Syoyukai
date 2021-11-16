@@ -30,7 +30,7 @@ class AgreeFormController extends Controller
             
             $content = $this->view('NewJoyPla/view/Form/AgreeForm/Input', [
                     'csrf_token' => Csrf::generate(16),
-                    'agreementText' => $agreementText
+                    'agreementText' => $agreementText,
                     ] , false);
         
         } catch ( Exception $ex ) {

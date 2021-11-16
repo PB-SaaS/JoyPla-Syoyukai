@@ -185,7 +185,7 @@
 								<span v-else >任意</span>
 							</td>
 							<td>
-								<input type="text" class="uk-input lot" style="width:180px" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
+								<input type="text" class="uk-input lot" style="width:180px" maxlength="20" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
 							</td>
 							<td>
 								<input type="date" class="uk-input lotDate" v-model="list.lotDate" v-bind:style="list.lotDateStyle" v-on:change="addLotDateStyle(key)">

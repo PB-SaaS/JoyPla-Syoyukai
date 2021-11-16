@@ -163,7 +163,6 @@ class ReceivingMRController extends Controller
         foreach ($this->receiving_data as $receiving)
         {
             InHospitalItemView::orWhere('inHospitalItemId',$receiving->inHospitalItemId);
-            $total_amount += (float)$receiving->priceAfterAdj;
         }
         if ($itemName) { InHospitalItemView::where('itemName',"%$itemName%",'LIKE'); }
         if ($itemCode) { InHospitalItemView::where('itemCode',"%$itemCode%",'LIKE'); }
@@ -180,7 +179,7 @@ class ReceivingMRController extends Controller
         $inHPItem = InHospitalItemView::paginate($maxCount);
 
         $inHPItem_data = $inHPItem->data->all();
-
+        $report['data'] = [] ;
         foreach ($inHPItem_data as $row)
         {
             $getInformationByPrice = $this->getInformationByPrice($row->inHospitalItemId);
@@ -202,8 +201,15 @@ class ReceivingMRController extends Controller
                 'adjAmount' => $getInformationByPrice['adjAmount'],
                 'priceAfterAdj' => $getInformationByPrice['priceAfterAdj']
             ];
+            foreach($getInformationByPrice['priceAfterAdj'] as $p)
+            {
+                $total_amount += (float)$p;
+            }
         }
-        array_multisort(array_column($report['data'], 'id'), SORT_ASC, $report['data']);
+        if(count($report['data']) != 0)
+        {
+            array_multisort(array_column($report['data'], 'id'), SORT_ASC, $report['data']);
+        }
         $report['count'] = $inHPItem->count;
         $report['totalAmount'] = $total_amount;
 

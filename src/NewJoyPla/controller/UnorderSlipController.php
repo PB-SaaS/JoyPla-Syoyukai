@@ -16,6 +16,8 @@ use App\Model\OrderDataView;
 use App\Model\Order;
 use App\Model\OrderHistory;
 use App\Model\InventoryAdjustmentTransaction;
+use App\Model\DistributorAffiliationView;
+
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -335,14 +337,15 @@ class UnorderSlipController extends Controller
                 ] , false)->render();
                 $select_name = $this->makeId($order_history->distributorId);
 
-                $test = DistributorUser::selectName($select_name)->rule([
-                    'name'=>'distributorId',
-                    'label'=>'name_'.$order_history->distributorId,
-                    'value1'=>$order_history->distributorId,
-                    'condition'=>'matches'
-                ])->filterCreate();
+                $test = DistributorAffiliationView::selectName($select_name)
+                    ->rule(
+                        ['name'=>'distributorId','label'=>'name_'.$order_history->distributorId,'value1'=>$order_history->distributorId,'condition'=>'matches']
+                    )
+                    ->rule(
+                        ['name'=>'invitingAgree','label'=>'invitingAgree','value1'=>'t','condition'=>'is_boolean']
+                    )->filterCreate();
 
-                $test = DistributorUser::selectRule($select_name)
+                $test = DistributorAffiliationView::selectRule($select_name)
                     ->body($mail_body)
                     ->subject("[JoyPla] 発注が行われました")
                     ->from(FROM_ADDRESS,FROM_NAME)

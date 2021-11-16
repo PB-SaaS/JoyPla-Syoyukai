@@ -135,12 +135,12 @@ class GoodsBillingMRController extends Controller
         global $SPIRAL;
         
         $user_info = new UserInfo($SPIRAL);
-        
+        /*
         $useUnitPrice = '';
         $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
         $hospital_data = $hospital_data->data->get(0);
         $useUnitPrice = $hospital_data->billingUnitPrice;
-    
+        */
         $report = [];
         $total_amount = 0;
     
@@ -161,7 +161,6 @@ class GoodsBillingMRController extends Controller
         foreach ($this->billing_data as $billing)
         {
             InHospitalItemView::orWhere('inHospitalItemId',$billing->inHospitalItemId);
-            $total_amount += (float)$billing->billingAmount;
         }
         if ($itemName) { InHospitalItemView::where('itemName',"%$itemName%",'LIKE'); }
         if ($itemCode) { InHospitalItemView::where('itemCode',"%$itemCode%",'LIKE'); }
@@ -177,10 +176,10 @@ class GoodsBillingMRController extends Controller
         $inHPItem = InHospitalItemView::paginate($maxCount);
 
         $inHPItem_data = $inHPItem->data->all();
-
+        $report['data'] = [];
         foreach ($inHPItem_data as $row)
         {
-            $getInformationByPrice = $this->getInformationByPrice($row->inHospitalItemId, $useUnitPrice);
+            $getInformationByPrice = $this->getInformationByPrice($row->inHospitalItemId);
             $report['data'][] = [
                 'id' => $row->id,
                 'inHospitalItemId' => $row->inHospitalItemId,
@@ -196,17 +195,24 @@ class GoodsBillingMRController extends Controller
                 'billingQuantity' => $getInformationByPrice['billingQuantity'],
                 'totalAmount' => $getInformationByPrice['totalAmount']
             ];
+            foreach($getInformationByPrice['totalAmount'] as $p)
+            {
+                $total_amount += $p;
+            }
         }
-        array_multisort(array_column($report['data'], 'id'), SORT_ASC, $report['data']);
+        if(count($report['data']) != 0){
+            array_multisort(array_column($report['data'], 'id'), SORT_ASC, $report['data']);
+        }
         $report['count'] = $inHPItem->count;
         $report['totalAmount'] = $total_amount;
 
         return $report;
     }
     
-    private function getInformationByPrice(string $inHospitalItemId, bool $useUnitPrice)
+    private function getInformationByPrice(string $inHospitalItemId)
     {
         $goodsDataByPrice = [
+            'key' => [],
             'price' => [],
             'quantity' => [],
             'billingQuantity' => [],
@@ -218,22 +224,25 @@ class GoodsBillingMRController extends Controller
         {
             if ($inHospitalItemId == $billingItem->inHospitalItemId)
             {
-                $key = array_search($billingItem->price, $goodsDataByPrice['price']);
+                $search_key = $billingItem->price .'_'.$billingItem->unitPrice .'_'. $billingItem->quantity . '_' . $billingItem->quantityUnit ;
+                
+                $key = array_search($search_key, $goodsDataByPrice['key']);
                 if ($key === false)
                 {
-                    $goodsDataByPrice['price'][] = $billingItem->price;
-                    $key = array_search($billingItem->price, $goodsDataByPrice['price']);
-                    $goodsDataByPrice['quantity'][$key] = 0;
+                    $goodsDataByPrice['key'][] = $search_key;
+                    $key = array_search($search_key, $goodsDataByPrice['key']);
+                    $goodsDataByPrice['price'][$key] = $billingItem->price;
+                    $goodsDataByPrice['unitPrice'][$key] = $billingItem->unitPrice;
+                    $goodsDataByPrice['quantity'][$key] = $billingItem->quantity;
+                    $goodsDataByPrice['quantityUnit'][$key] = $billingItem->quantityUnit;
                     $goodsDataByPrice['billingQuantity'][$key] = 0;
-                    $goodsDataByPrice['unitPrice'][$key] = 0;
                 }
-                $goodsDataByPrice['quantity'][$key] = $billingItem->quantity;
-                $goodsDataByPrice['quantityUnit'][$key] = $billingItem->quantityUnit;
-                $goodsDataByPrice['unitPrice'][$key] = $billingItem->unitPrice;
+                
                 $goodsDataByPrice['billingQuantity'][$key] = $goodsDataByPrice['billingQuantity'][$key] + $billingItem->billingQuantity;
+                $goodsDataByPrice['totalAmount'][$key] = $goodsDataByPrice['totalAmount'][$key] + (float)$billingItem->billingAmount;
             }
         }
-        
+        /*
         if (!$useUnitPrice)
         {
             foreach ($goodsDataByPrice['price'] as $key => $byPriceData)
@@ -248,6 +257,7 @@ class GoodsBillingMRController extends Controller
                 $goodsDataByPrice['totalAmount'][$key] = $goodsDataByPrice['unitPrice'][$key] * $goodsDataByPrice['billingQuantity'][$key];
             }
         }
+        */
         return $goodsDataByPrice;
     }
 

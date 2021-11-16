@@ -32,7 +32,7 @@
                 <!-- SMP_TEMPLATE_HEADER start -->
                 <h1>見積商品追加 - 確認</h1>
 
-                <p class="header_text">変更内容をご確認の上、変更ボタンをクリックしてください。<br>
+                <p class="header_text">変更内容をご確認の上、追加ボタンをクリックしてください。<br>
                     <p class="uk-alert-danger uk-alert">内容を修正する場合は、戻るボタンをクリックしてください。</p>
                 </p>
 
@@ -159,7 +159,7 @@
                         $form:hidden$
                         <!-- HIDDEN_PARAM END -->
                         <input class="submit" type="submit" name="SMPFORM_BACK" value="戻る">
-                        <input class="submit" type="submit" name="submit" value="変更">
+                        <input class="submit" type="submit" name="submit" value="追加">
                 </form>
                 <!-- SMP_TEMPLATE_FORM end -->
             </div>

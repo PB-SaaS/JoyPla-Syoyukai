@@ -159,39 +159,65 @@ class OrderController extends Controller
         foreach( $order_data as $divisionId => $ordered )
         {
             $remaked = [];
+            $remaked_mainasu = [];
             $arrayEachDistributor = [];
             foreach( $ordered as $key => $order)
             {
-                if (array_key_exists($order['recordId'], $remaked) === false) {
-                    $remaked[$order['recordId']] = $order;
-                } 
-                else 
+                if((int)$order['countNum'] > 0)
                 {
-                    $remaked[$order['recordId']]['countNum'] = (int)$remaked[$order['recordId']]['countNum'] + (int)$order['orderQuantity'];
+                    if (array_key_exists($order['recordId'], $remaked) === false) {
+                        $remaked[$order['recordId']] = $order;
+                    } 
+                    else 
+                    {
+                        $remaked[$order['recordId']]['countNum'] = (int)$remaked[$order['recordId']]['countNum'] + (int)$order['countNum'];
+                    }
                 }
+                else if((int)$order['countNum'] < 0)
+                {
+                    if (array_key_exists($order['recordId'], $remaked_mainasu) === false) {
+                        $remaked_mainasu[$order['recordId']] = $order;
+                    } 
+                    else 
+                    {
+                        $remaked_mainasu[$order['recordId']]['countNum'] = (int)$remaked_mainasu[$order['recordId']]['countNum'] + (int)$order['countNum'];
+                    }
+                }
+                
             }
             
             $ordered = $remaked;
+            $ordered_mainasu = $remaked_mainasu;
             
             foreach ($distributorDB as $distributor)
             {
                 $distributorId = $distributor->distributorId;
                 if (array_search($distributorId, $arrayEachDistributor) === false) {
                     $arrayEachDistributor[$distributorId] = [];
+                    $arrayEachDistributor["-".$distributorId] = [];
                 }
                 
                 foreach ($ordered as $order)
                 {
                     if ($order['distributorId'] == $distributorId) { $arrayEachDistributor[$distributorId][] = $order; }
                 }
+                
+                foreach ($ordered_mainasu as $order)
+                {
+                    if ($order['distributorId'] == $distributorId) { $arrayEachDistributor["-".$distributorId][] = $order; }
+                }
             }
-            foreach ($arrayEachDistributor as $distributor_id => $order_data)
+            
+            foreach ($arrayEachDistributor as $key => $order_data)
             {
                 $in_hospital_item_ids = [];
                 $total_amount = 0;
                 $ordered_id = $this->makeId('03');
+                $distributorId = '';
+                $history_create_flag = false;
                 foreach($order_data as $data)
                 {
+                    $distributorId = $data['distributorId'];
                     $sign = '';
                     $inHPItemid = $data['recordId'];
                     if ((int)$data['countNum'] < 0) { $sign = '-'; }
@@ -209,10 +235,11 @@ class OrderController extends Controller
                             'quantityUnit' => $data['unit'],
                             'itemUnit' => $data['itemUnit'],
                             'divisionId' => $divisionId,
-                            'distributorId' => $distributor_id,
+                            'distributorId' => $data['distributorId'],
                             'itemId' => $data['itemId']
                         ];
                         $total_amount = $total_amount + ($sign.str_replace(',', '', $data['kakaku']) * floor(abs((int)$data['countNum']) / (int)$data['irisu']));
+                        $history_create_flag = true;
                     }
                     if (array_search($inHPItemid, $in_hospital_item_ids) === false) {
                         $in_hospital_item_ids[] = $inHPItemid;
@@ -221,17 +248,20 @@ class OrderController extends Controller
                 if (count($insert_data) == 0) {
                    continue;
                 }
-                $history_data[] = [
-                    'orderNumber' => $ordered_id,
-                    'hospitalId' => $user_info->getHospitalId(),
-                    'divisionId' => $divisionId,
-                    'itemsNumber' => count($in_hospital_item_ids),//院内商品マスタID数
-                    'totalAmount' => $total_amount,
-                    'orderStatus' => '1',
-                    'hachuRarrival' => '未入庫',
-                    'distributorId' => $distributor_id,
-                    'ordererUserName' => $user_info->getName()
-                ];
+                if($history_create_flag)
+                {
+                    $history_data[] = [
+                        'orderNumber' => $ordered_id,
+                        'hospitalId' => $user_info->getHospitalId(),
+                        'divisionId' => $divisionId,
+                        'itemsNumber' => count($in_hospital_item_ids),//院内商品マスタID数
+                        'totalAmount' => $total_amount,
+                        'orderStatus' => '1',
+                        'hachuRarrival' => '未入庫',
+                        'distributorId' => $distributorId,
+                        'ordererUserName' => $user_info->getName()
+                    ];
+                }
             }
         }
         if(count($history_data) == 0 ){

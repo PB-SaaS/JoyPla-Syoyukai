@@ -115,6 +115,9 @@ if(! $nav->user_info->isHospitalUser())
 				        </div>
 				        <ul class="uk-list uk-navbar-dropdown-nav uk-list-large">
 	                        <li><a href="%url/rel:mpg:top%" ><span class="uk-margin-small-right" uk-icon="icon:home; ratio:1.5"></span>TOPへ戻る</a></li>
+	                        <?php if($nav->user_info->isDistributorUser()): ?>
+	                        <li><a href="#" onclick="document.accountSelect_nav.submit();"><span class="uk-margin-small-right" uk-icon="icon:pencil; ratio:1.5"></span>卸業者アカウント切り替え</a></li>
+	                        <?php endif ?>
 	                        <li><a href="#" onclick="document.userInfoChange_nav.submit();"><span class="uk-margin-small-right" uk-icon="icon:pencil; ratio:1.5"></span>ユーザー情報変更</a></li>
 	                        <li><a href="#" onclick="document.contactUs.submit()"><span class="uk-margin-small-right" uk-icon="icon:mail; ratio:1.5"></span>お問合せ</a></li>
 	                        <li><a href="%form:act:logout%" ><span class="uk-margin-small-right" uk-icon="icon:sign-out; ratio:1.5"></span>ログアウト</a></li>
@@ -132,6 +135,9 @@ if(! $nav->user_info->isHospitalUser())
 		<?php if($nav->user_info->isDistributorUser()) : ?>
 		<form method="post" action="<?php echo $top_api_url ?>" name="userInfoChange_nav">
 			<input type="hidden" name="Action" value="userInfoChange">
+		</form>
+		<form method="post" action="<?php echo $top_api_url ?>" name="accountSelect_nav">
+			<input type="hidden" name="Action" value="accountSelect">
 		</form>
 		<?php endif ?>
 		

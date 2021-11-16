@@ -10,6 +10,7 @@ use Csrf;
 use App\Lib\UserInfo;
 use App\Model\Tenant;
 use App\Model\Hospital;
+use App\Model\Distributor;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -65,13 +66,17 @@ class DistributorSlipController extends Controller
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
+            
+            $script = $this->view('NewJoyPla/view/template/parts/TableScript', [], false);
+            
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 卸業者一覧',
+                'title'     => 'JoyPla 卸業者情報詳細',
                 'script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),
+                'before_script' => $script->render(),
                 'baseUrl' => '',
             ],false);
         }
@@ -158,6 +163,14 @@ EOM;
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             }
             
+            $card_id = $SPIRAL->getCardId();
+            
+            $card_id = Distributor::find($card_id)->get();
+            $card = $card_id->data->get(0);
+            
+            $hospital = Hospital::where('hospitalId',$card->hospitalId)->get();
+            $hospital = $hospital->data->get(0);
+            
             $link = "%url/rel:mpgt:DistributorList%";
             $api_url = "%url/card:page_265119%";
             
@@ -170,19 +183,21 @@ EOM;
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
             <li><a href="{$link}">卸業者一覧</a></li>
             <li><a href="%url/card:page_265119%">卸業者情報詳細</a></li>
-            <li><span>卸業者ユーザー登録</span></li>
+            <li><span>卸業者ユーザー招待</span></li>
 EOM;
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
                 'breadcrumb' => $breadcrumb,
-                'title' => '卸業者ユーザー登録',
+                'title' => '卸業者ユーザー招待',
                 'width' => '100%',
                 'height'=> '100%',
                 'url' => '/regist/is',
                 'hiddens' => [
-    					"distributorId" => "%val:usr:distributorId%",
-    					"SMPFORM" => "%smpform:oroshiUserReg%",
+    					"SMPFORM" => "%smpform:distUserInv%",
     					"distAuthKey" => "%val:usr:authKey%",
     					"hospitalId" => "%val:usr:hospitalId%",
+    					"distributorId" => "%val:usr:distributorId%",
+    					"hospitalName" => $hospital->hospitalName,
+    					"distributorName" => "%val:usr:distributorName%",
                     ]
                 ] , false);
             
@@ -200,7 +215,7 @@ EOM;
             
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 卸業者ユーザー登録',
+                'title'     => 'JoyPla 卸業者ユーザー招待',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),

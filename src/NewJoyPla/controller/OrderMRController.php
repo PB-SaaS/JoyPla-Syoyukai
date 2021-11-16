@@ -163,7 +163,6 @@ class OrderMRController extends Controller
         foreach ($this->order_data as $order)
         {
             InHospitalItemView::orWhere('inHospitalItemId',$order->inHospitalItemId);
-            $total_amount += (float)$order->orderPrice;
         }
         if ($itemName) { InHospitalItemView::where('itemName',"%$itemName%",'LIKE'); }
         if ($itemCode) { InHospitalItemView::where('itemCode',"%$itemCode%",'LIKE'); }
@@ -181,6 +180,7 @@ class OrderMRController extends Controller
 
         $inHPItem_data = $inHPItem->data->all();
 
+        $report['data'] = [] ;
         foreach ($inHPItem_data as $row)
         {
             $getInformationByPrice = $this->getInformationByPrice($row->inHospitalItemId);
@@ -198,8 +198,15 @@ class OrderMRController extends Controller
                 'itemUnit'=> $getInformationByPrice['itemUnit'],
                 'distributorName'=> $getInformationByPrice['distributorName']
             ];
+            foreach($getInformationByPrice['totalAmount'] as $p)
+            {
+                $total_amount += (float)$p;
+            }
         }
-        array_multisort(array_column($report['data'], 'id'), SORT_ASC, $report['data']);
+        if(count($report['data']) != 0)
+        {
+            array_multisort(array_column($report['data'], 'id'), SORT_ASC, $report['data']);
+        }
         $report['count'] = $inHPItem->count;
         $report['totalAmount'] = $total_amount;
 

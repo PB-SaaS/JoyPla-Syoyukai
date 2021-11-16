@@ -101,7 +101,7 @@
                                     <td>{{item.dueDate}}</td>
                                     <td>￥{{item.orderPrice | number_format}}</td>
                                     <?php if($user_info->isUser() || $user_info->isAdmin()): ?>
-                                    <td><button type="button" class="uk-button uk-button-primary" v-on:click="add(item)">転記</td>
+                                    <td><button type="button" class="uk-button uk-button-primary" v-on:click="add(item)">転記</button></td>
                                     <?php endif ?>
                                 </tr>
                             </tbody>
@@ -242,7 +242,7 @@
                             <td v-bind:class="list.nowCountClass">{{list.nowCount}}{{list.itemUnit}}</td>
                             <td>{{list.dueDate}}</td>
                             <td>￥{{list.orderPrice | number_format}}</td>
-                            <td><button type="button" class="uk-button uk-button-primary" v-on:click="addObject(key)">転記</td>
+                            <td><button type="button" class="uk-button uk-button-primary" v-on:click="addObject(key)">転記</button></td>
 						</tr>
 					</tbody>
 				</table>   

@@ -24,6 +24,8 @@ use App\Model\Distributor;
 use App\Model\DistributorUser;
 use App\Model\AssociationTR;
 use App\Model\InHospitalItemView;
+use App\Model\DistributorAffiliationView;
+
 use ApiErrorCode\FactoryApiErrorCode;
 
 use stdClass;
@@ -217,11 +219,14 @@ class UsedSlipController extends Controller
                 
                 $select_name = $this->makeId($used_slip_history->distributorId);
                 
-                $test = DistributorUser::selectName($select_name)->rule(
+                $test = DistributorAffiliationView::selectName($select_name)->rule(
                     ['name'=>'distributorId','label'=>'name_'.$used_slip_history->distributorId,'value1'=>$used_slip_history->distributorId,'condition'=>'matches']
+                    )
+                    ->rule(
+                        ['name'=>'invitingAgree','label'=>'invitingAgree','value1'=>'t','condition'=>'is_boolean']
                     )->filterCreate();
 
-                $test = DistributorUser::selectRule($select_name)
+                $test = DistributorAffiliationView::selectRule($select_name)
                     ->body($mail_body)
                     ->subject("[JoyPla] 貸出品の使用登録がありました")
                     ->from(FROM_ADDRESS,FROM_NAME)
@@ -419,13 +424,13 @@ class UsedSlipController extends Controller
         $receiving_history_insert_data = [];
         foreach($history_ids as $divisionId_distributorId_usedDate => $history_data)
         {
-            //$receiving_price = [];
+            $receiving_price = [];
             $in_hospital_item_ids = [];
             foreach($receiving_insert_data as $insert_record)
             {
                 if($insert_record['receivingHId'] === $history_data['receivingHistoryId'])
                 {
-                    //$receiving_price[] = (int)$insert_record['receivingPrice'];
+                    $receiving_price[] = (int)$insert_record['receivingPrice'];
                     if(! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids))
                     {
                         $in_hospital_item_ids[] = $insert_record['inHospitalItemId'];
@@ -439,6 +444,7 @@ class UsedSlipController extends Controller
                 'orderHistoryId' => $history_data['orderHistoryId'],
                 'hospitalId' => $user_info->getHospitalId(),
                 'itemsNumber' => collect($in_hospital_item_ids)->count(),
+                'totalAmount' => collect($receiving_price)->sum(),
                 'divisionId' => $history_data['divisionId'],
                 'recevingStatus' => 2,
             ];
@@ -490,7 +496,8 @@ class UsedSlipController extends Controller
                 'hospitalId' => $user_info->getHospitalId(),
                 'divisionId' => $history_data['divisionId'],
                 'itemsNumber' => collect($in_hospital_item_ids)->count(),
-                'totalAmount' => collect($total_amount)->sum()
+                'totalAmount' => collect($total_amount)->sum(),
+                'billingStatus' => 2
             ];
         }
 

@@ -455,6 +455,8 @@ class ReceivingHistory extends Model
         /*"f002664878",*/ //ルックアップキーは除外
         "divisionId",
         "recevingStatus",
+        "slipCategory",
+        "totalAmount",
     ];
 
     //デフォルト値
@@ -572,7 +574,7 @@ class PayoutView extends Model
     const UPDATED_AT = "updateTime";
     const DELETED_AT = "";
 
-    public static $spiral_db_name = "310_payoutItems";
+    public static $spiral_db_name = "payoutDatav2";
     public static $guarded = ["id"];
     public static $primary_key = "payoutId";
     public static $fillable = [
@@ -584,8 +586,6 @@ class PayoutView extends Model
         "hospitalId",
         "sourceDivisionId",
         "targetDivisionId",
-        "sourceDivision",
-        "targetDivision",
         "quantity",
         "quantityUnit",
         "itemUnit",
@@ -598,6 +598,7 @@ class PayoutView extends Model
         "priceAfterAdj",
         "lotNumber",
         "lotDate",
+        "unitPrice",
         "distributorId",
         "catalogNo",
         "serialNo",
@@ -613,7 +614,14 @@ class PayoutView extends Model
         "HPstock",
         "makerName",
         "labelId",
+        "minPrice",
         "officialFlag",
+        "payoutAuthKey",
+        "sourceDivision",
+        "targetDivision",
+        "itemsNumber",
+        "totalAmount",
+        "category"
     ];
 
     //デフォルト値
@@ -986,6 +994,42 @@ class HospitalUser extends Model
     public static $select = [];
 }
 
+
+class DistributorAffiliationView extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "invitingDB";
+    public static $guarded = ["id"];
+    public static $primary_key = "affiliationId";
+    public static $mail_field_title = "mailAddress";
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "authKey",
+        "affiliationId",
+        "distributorId",
+        "OUserPermission",
+        "loginId",
+        "hospitalId",
+        "invitingTime",
+        "invitingAgree",
+        "hospitalName",
+        "distributorName",
+        "mailAddress",
+        "name",
+        "nameKana",
+        "tenantId",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
+
 class DistributorUser extends Model
 {
     const CREATED_AT = "registrationTime";
@@ -1011,7 +1055,7 @@ class DistributorUser extends Model
         "hospitalId",
         "termsAgreement",
         "agreementDate",
-        "distAuthKey"
+        "affiliationId",
     ];
 
     //デフォルト値
@@ -1064,7 +1108,12 @@ class Tenant extends Model
         "tenantId",
         "tenantName",
         "note",
-        "tenantKind"
+        "tenantKind",
+        "postalCode",
+        "prefectures",
+        "address",
+        "phoneNumber",
+        "faxNumber",
     ];
 
     //デフォルト値
@@ -1442,6 +1491,57 @@ class Inventory extends Model
         "lotUniqueKey",
         "unitPrice",
         "invUnitPrice"
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
+class InventoryItemView extends Model
+{
+    
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "inventoryData";
+    public static $guarded = ["id"];
+    public static $primary_key = "id";
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "inventoryHId",
+        "inHospitalItemId",
+        "hospitalId",
+        "price",
+        "calculatingStock",
+        "inventryNum",
+        "quantity",
+        "quantityUnit",
+        "itemUnit",
+        "divisionId",
+        "inventryAmount",
+        "distributorId",
+        "distributorName",
+        "catalogNo",
+        "serialNo",
+        "medicineCategory",
+        "homeCategory",
+        "notUsedFlag",
+        "itemId",
+        "itemName",
+        "itemCode",
+        "itemStandard",
+        "itemJANCode",
+        "notice",
+        "HPstock",
+        "makerName",
+        "oldPrice",
+        "unitPrice",
+
     ];
 
     //デフォルト値
@@ -1848,6 +1948,93 @@ class TenantMaster extends Model
         "loginId",
         "password",
         "tenantId",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
+
+class ItemBulkUpsertTrDB extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "T_itemBulkUpsert";
+    public static $guarded = ["id"];
+    public static $primary_key = "id";
+    public static $fillable = [
+        "registrationTime",
+        "itemName",
+        "o_itemName",
+        "itemCode",
+        "o_itemCode",
+        "itemStandard",
+        "o_itemStandard",
+        "itemJANCode",
+        "o_itemJANCode",
+        "makerName",
+        "o_makerName",
+        "catalogNo",
+        "o_catalogNo",
+        "minPrice",
+        "o_minPrice",
+        "officialFlag",
+        "o_officialFlag",
+        "officialprice",
+        "o_officialprice",
+        "quantity",
+        "o_quantity",
+        "quantityUnit",
+        "o_quantityUnit",
+        "itemUnit",
+        "o_itemUnit",
+        "tenantId",
+        "updateText",
+        "itemId",
+        "officialpriceOld",
+        "o_officialpriceO",
+        "serialNo",
+        "o_serialNo",
+        "lotManagement",
+        "o_lotManagement",
+        "category",
+        "o_category",
+        "itemsAuthKey",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
+
+class PriceUpsertTrDB extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "T_Price";
+    public static $guarded = ["id"];
+    public static $primary_key = "id";
+    public static $fillable = [
+        "registrationTime",
+        "priceId",
+        "itemId",
+        "hospitalId",
+        "distributorId",
+        "quantity",
+        "quantityUnit",
+        "itemUnit",
+        "price",
+        "notice",
     ];
 
     //デフォルト値

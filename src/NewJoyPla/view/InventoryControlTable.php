@@ -1,131 +1,132 @@
+<div class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
+    <div class="uk-section uk-section-default uk-preserve-color uk-padding-remove" id="page_top">
+        <div class="uk-container uk-container-expand">
+            <ul class="uk-breadcrumb no_print uk-margin-top">
+                <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                <li><span>在庫管理表</span></li>
+            </ul>
+            <div class="no_print uk-margin" uk-margin>
+                <input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
+                <input class="print_hidden uk-button uk-button-primary" type="button" value="出力" onclick="$('#exportButton').click()">
+            </div>
+            <h2 class="page_title uk-margin">在庫管理表</h2>
+            <hr>
+            <div class="" id="tablearea">
+                %sf:usr:search18:mstfilter%
+            </div>
+        </div>
+    </div>
+</div>
 
-    <div class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
-	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove" id="page_top">
-		    <div class="uk-container uk-container-expand">
-		    	<ul class="uk-breadcrumb no_print uk-margin-top">
-				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
-				    <li><span>在庫管理表</span></li>
-				</ul>
-				<div class="no_print uk-margin" uk-margin>
-					<input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
-				  <input class="print_hidden uk-button uk-button-primary" type="button" value="出力" onclick="$('#exportButton').click()">
-				</div>
-		    	<h2 class="page_title uk-margin">在庫管理表</h2>
-		    	<hr>
-		    	<div class="" id="tablearea">
-		    		%sf:usr:search18:mstfilter%
-		    	</div>
-		    </div>
-		</div>
-	</div>
-	
-	<div id="modal-label" uk-modal>
-	    <div class="uk-modal-dialog">
-	        <button class="uk-modal-close-default" type="button" uk-close></button>
-	        <div class="uk-modal-header">
-	            <h2 class="uk-modal-title">払出ラベル発行</h2>
-	        </div>
-			<form action="%url/rel:mpgt:createLabel%" target="_blank" method="post" class="uk-form-horizontal" name="createLabelForm">
-		        <div class="uk-modal-body">
-				    <div class="uk-margin">
-				        <div class="uk-form-label">卸業者名</div>
-				        <div class="uk-form-controls uk-form-controls-text">
-				        	<span class="modal-distributorName"></span>
-				        </div>
-				    </div>
-				    <hr>
-		            <div class="uk-margin">
-				        <label class="uk-form-label">払出元部署</label>
-				        <div class="uk-form-controls sourceDivision">
-				        </div>
-				    </div>
-				    <hr>
-				    <div class="uk-margin">
-				        <div class="uk-form-label">部署名</div>
-				        <div class="uk-form-controls uk-form-controls-text">
-				        	<span class="modal-divisionName"></span>
-				        </div>
-				    </div>
-				    <hr>
-				    <div class="uk-margin">
-				        <div class="uk-form-label">部署棚名</div>
-				        <div class="uk-form-controls uk-form-controls-text">
-				        	<span class="modal-divisionRackNumber"></span>
-				        </div>
-				    </div>
-				    <hr>
-				    <div class="uk-margin">
-				        <div class="uk-form-label">部署別定数</div>
-				        <div class="uk-form-controls uk-form-controls-text">
-				        	<span class="modal-constantByDiv"></span><span class="modal-quantityUnit"></span>
-				        </div>
-				    </div>
-				    <hr>
-		            <div class="uk-margin">
-				        <label class="uk-form-label">入数指定</label>
-				        <div class="uk-form-controls">
-				            <input class="uk-input" type="number" step="1" value="" min="0" name="quantity">
-				        </div>
-				    </div>
-				    <hr>
-		            <div class="uk-margin">
-				        <label class="uk-form-label">個数（印刷枚数）</label>
-				        <div class="uk-form-controls">
-				            <input class="uk-input" type="number" step="1" value="" min="0" name="printCount">
-				        </div>
-				    </div>
-				    <hr>
-				    <div class="uk-margin">
-				        <div class="uk-form-label">JANコード</div>
-				        <div class="uk-form-controls uk-form-controls-text">
-				        	<span class="modal-itemJANCode"></span>
-				        </div>
-				    </div>
-				    <hr>
-				    <div class="uk-margin">
-				        <div class="uk-form-label">メーカー名</div>
-				        <div class="uk-form-controls uk-form-controls-text">
-				        	<span class="modal-makerName"></span>
-				        </div>
-				    </div>
-					<hr>
-				    <div class="uk-margin">
-				        <div class="uk-form-label">カタログNo</div>
-				        <div class="uk-form-controls uk-form-controls-text">
-				        	<span class="modal-catalogNo"></span>
-				        </div>
-				    </div>
-				    <hr>
-				    <div class="uk-margin">
-				        <div class="uk-form-label">商品名</div>
-				        <div class="uk-form-controls uk-form-controls-text">
-				        	<span class="modal-itemName"></span>
-				        </div>
-				    </div>
-				    <hr>
-				    <div class="uk-margin">
-				        <div class="uk-form-label">製品コード</div>
-				        <div class="uk-form-controls uk-form-controls-text">
-				        	<span class="modal-itemCode"></span>
-				        </div>
-				    </div>
-				    <hr>
-				    <div class="uk-margin">
-				        <div class="uk-form-label">規格</div>
-				        <div class="uk-form-controls uk-form-controls-text">
-				        	<span class="modal-itemStandard"></span>
-				        </div>
-				    </div>
-		        </div>
-		        <div class="uk-modal-footer uk-text-right">
-		            <button class="uk-button uk-button-default uk-modal-close" type="button">閉じる</button>
-					<input class="print_hidden uk-button uk-button-primary" type="button" value="ラベル発行" onclick="return createLabel()">
-					<input type="hidden" value="" name="itemsData" id="itemsData">
-					<input type="hidden" value="" name="inHospitalItemId">
-					<input type="hidden" value="payout" name="pattern">
-		        </div>
-	        </form>
-	    </div>
+<div id="modal-label" uk-modal>
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <div class="uk-modal-header">
+            <h2 class="uk-modal-title">払出ラベル発行</h2>
+        </div>
+        <form action="%url/rel:mpgt:createLabel%" target="_blank" method="post" class="uk-form-horizontal" name="createLabelForm">
+            <div class="uk-modal-body">
+                <div class="uk-margin">
+                    <div class="uk-form-label">卸業者名</div>
+                    <div class="uk-form-controls uk-form-controls-text">
+                        <span class="modal-distributorName"></span>
+                    </div>
+                </div>
+                <hr>
+                <div class="uk-margin">
+                    <label class="uk-form-label">払出元部署</label>
+                    <div class="uk-form-controls sourceDivision">
+                    </div>
+                </div>
+                <hr>
+                <div class="uk-margin">
+                    <div class="uk-form-label">部署名</div>
+                    <div class="uk-form-controls uk-form-controls-text">
+                        <span class="modal-divisionName"></span>
+                    </div>
+                </div>
+                <hr>
+                <div class="uk-margin">
+                    <div class="uk-form-label">部署棚名</div>
+                    <div class="uk-form-controls uk-form-controls-text">
+                        <span class="modal-divisionRackNumber"></span>
+                    </div>
+                </div>
+                <hr>
+                <div class="uk-margin">
+                    <div class="uk-form-label">部署別定数</div>
+                    <div class="uk-form-controls uk-form-controls-text">
+                        <span class="modal-constantByDiv"></span><span class="modal-quantityUnit"></span>
+                    </div>
+                </div>
+                <hr>
+                <div class="uk-margin">
+                    <label class="uk-form-label">入数指定</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" type="number" step="1" value="" min="0" name="quantity">
+                    </div>
+                </div>
+                <hr>
+                <div class="uk-margin">
+                    <label class="uk-form-label">個数（印刷枚数）</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" type="number" step="1" value="" min="0" name="printCount">
+                    </div>
+                </div>
+                <hr>
+                <div class="uk-margin">
+                    <div class="uk-form-label">JANコード</div>
+                    <div class="uk-form-controls uk-form-controls-text">
+                        <span class="modal-itemJANCode"></span>
+                    </div>
+                </div>
+                <hr>
+                <div class="uk-margin">
+                    <div class="uk-form-label">メーカー名</div>
+                    <div class="uk-form-controls uk-form-controls-text">
+                        <span class="modal-makerName"></span>
+                    </div>
+                </div>
+                <hr>
+                <div class="uk-margin">
+                    <div class="uk-form-label">カタログNo</div>
+                    <div class="uk-form-controls uk-form-controls-text">
+                        <span class="modal-catalogNo"></span>
+                    </div>
+                </div>
+                <hr>
+                <div class="uk-margin">
+                    <div class="uk-form-label">商品名</div>
+                    <div class="uk-form-controls uk-form-controls-text">
+                        <span class="modal-itemName"></span>
+                    </div>
+                </div>
+                <hr>
+                <div class="uk-margin">
+                    <div class="uk-form-label">製品コード</div>
+                    <div class="uk-form-controls uk-form-controls-text">
+                        <span class="modal-itemCode"></span>
+                    </div>
+                </div>
+                <hr>
+                <div class="uk-margin">
+                    <div class="uk-form-label">規格</div>
+                    <div class="uk-form-controls uk-form-controls-text">
+                        <span class="modal-itemStandard"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="uk-modal-footer uk-text-right">
+                <button class="uk-button uk-button-default uk-modal-close" type="button">閉じる</button>
+                <input class="print_hidden uk-button uk-button-primary" type="button" value="ラベル発行" onclick="return createLabel()">
+                <input type="hidden" value="" name="itemsData" id="itemsData">
+                <input type="hidden" value="" name="inHospitalItemId">
+                <input type="hidden" value="payout" name="pattern">
+            </div>
+        </form>
+    </div>
+</div>
+
    <script>
 	const divisitonData = <?php echo json_encode($division); ?>;
 	$(function(){

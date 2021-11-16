@@ -1,6 +1,6 @@
-    <style>
-		
-		a.top-to-icon {
+<style>
+
+    a.top-to-icon {
 			zoom : 1.4;
 		}
 		
@@ -84,21 +84,21 @@
 			content: counter(rowCount);
 		}
     </style>
-    <div id="app" class="animsition" uk-height-viewport="expand: true">
-	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
-		    <div class="uk-container uk-container-expand">
-		    	<ul class="uk-breadcrumb">
-				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
-				    <li><span>在庫調整</span></li>
-				</ul>
-		    	<h2 class="page_title">在庫調整</h2>
-		    	<hr>
-		    	<div class="uk-child-width-1-3@m" uk-grid>
-		    		<div>
-		    			<div class="uk-form-controls">
-				            <select class="uk-width-3-4 uk-select uk-inline" id="divisionId" v-model="divisionId">
-				                <option value="">----- 部署選択 -----</option>
-		                        <?php
+<div id="app" class="animsition" uk-height-viewport="expand: true">
+    <div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
+        <div class="uk-container uk-container-expand">
+            <ul class="uk-breadcrumb">
+                <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                <li><span>在庫調整</span></li>
+            </ul>
+            <h2 class="page_title">在庫調整</h2>
+            <hr>
+            <div class="uk-child-width-1-3@m" uk-grid>
+                <div>
+                    <div class="uk-form-controls">
+                        <select class="uk-width-3-4 uk-select uk-inline" id="divisionId" v-model="divisionId">
+                            <option value="">----- 部署選択 -----</option>
+                            <?php
 		                        foreach($division->data as $data)
 		                        {
 		                            if($data->divisionType === '1')
@@ -115,176 +115,175 @@
 		                            }
 		                        }
 		                        ?>
-				            </select>
-			            </div>
-			        </div>
-		    	</div>
-		    	<div class="uk-margin-bottom" uk-grid>
-		    		<div class="uk-width-1-2@m" uk-margin>
-			    		<button class="uk-button uk-button-default" v-on:click="sanshouClick">商品マスタを開く</button>
-			    		<button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
-			    		<button class="uk-button uk-button-primary" type="submit" v-on:click="stockRegister">在庫調整実行</button>
-		    		</div>
-		    	</div>
-		    	
-			    <div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky" class="uk-padding-top uk-background-muted uk-padding-small">
-		            <form action='#' method="post" onsubmit="app.barcodeSearch($('input[name=barcode]').val() ,'' , '' , true);$('input[name=barcode]').val('') ; $('input[name=barcode]').focus(); return false;">
-	    				<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." autofocus="true" name="barcode" autocomplete="off">  
-		    			<button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
-					</form>	
-				</div>
-		    	<div class="shouhin-table uk-width-expand uk-overflow-auto">
-		    		<table class="uk-table uk-table-striped uk-text-nowrap">
-		    			<thead>
-		    				<tr>
-		    					<th class="uk-table-shrink">id</th>
-		    					<th>メーカー</th>
-		    					<th>商品名</th>
-		    					<th>製品コード</th>
-		    					<th>規格</th>
-		    					<th>JANコード</th>
-		    					<th>入数</th>
-		    					<th>棚名</th>
-		    					<th>部署別定数</th>
-		    					<th class="uk-table-shrink">
-		    					    現在在庫数
-		    					</th>
-		    					<th class="uk-table-shrink">
-		    					    調整数
-		    					</th>
-		    					<th class="uk-table-shrink">
-		    					    調整後在庫数
-		    					</th>
-		    					<th>
-		    					</th>
-		    				</tr>
-		    			</thead>
-		    			<tbody>
-							<tr v-for="(list, key) in lists" :id="'tr_' + key" v-bind:class="list.class">
-								<td>{{list.text}}</td>
-								<td>{{list.maker}}</td>
-								<td>{{list.shouhinName}}</td>
-								<td>{{list.code}}</td>
-								<td>{{list.kikaku}}</td>
-								<td>{{list.jan}}</td>
-								<td>{{list.irisu}}{{list.unit}}</td>
-								<td>
-								    <input type="text" step="1" class="uk-input" v-bind:style="list.rackNameStyle" v-model="list.rackName" v-on:change="rackNameStyle(key)">
-								</td>
-								<td>
-								    <input type="number" step="1" min="0" class="uk-input" style="width: 96px;" v-bind:style="list.constantByDivStyle" v-model="list.constantByDiv" v-on:change="constantByDivStyle(key)">
-								    <span class="uk-text-bottom">{{list.unit}}</span>
-								</td>
-								<td>
-								    {{ list.stock }}{{list.unit}}
-								</td>
-								<td>
-									<input type="number" step="1" class="uk-input" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.stockCountNum" v-on:change="addCountStyle(key)">
-									<span class="uk-text-bottom">{{list.unit}}</span>
-								</td>
-								<td>
-								    {{ list.stock + parseInt(list.stockCountNum) }}{{list.unit}}
-								</td>
-								<td uk-margin class="uk-text-center">
-									<input type="button" class="uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)">
-								</td>
-							</tr>
-		    			</tbody>
-		    			<tfoot>
-		    				<tr>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    				</tr>
-		    				<tr>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    				</tr>
-		    				<tr>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    				</tr>
-		    			</tfoot>
-		    		</table>
-		    	</div>
-		    </div>
-		</div>
-	</div>
-	
-	<div id="modal-sections" class="uk-modal-container" uk-modal>
-	    <div class="uk-modal-dialog">
-	        <button class="uk-modal-close-default" type="button" uk-close></button>
-	        <div class="uk-modal-header">
-	            <h2 class="uk-modal-title">商品選択</h2>
-	        </div>
-	        <div class="uk-modal-body">
-	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-nowrap uk-table-divider">
-					<thead>
-						<tr>
-							<th class="uk-table-shrink">id</th>
-							<th class="uk-table-shrink"></th>
-							<th>メーカー</th>
-							<th>商品名</a></th>
-							<th>製品コード</a></th>
-							<th>規格</a></th>
-							<th>入数</a></th>
-							<th>価格</a></th>
-							<th>単価</a></th>
-							<th>JANコード</a></th>
-							<th>卸業者</a></th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="(list , key) in select_items">
-							<td></td>
-							<td><button type="button" v-on:click="addObject(key)" class="uk-button uk-button-primary uk-button-small">反映</button></td>
-							<td class="uk-text-middle">{{list.maker}}</td>
-							<td class="uk-text-middle">{{list.shouhinName}}</td>
-							<td class="uk-text-middle">{{list.code}}</td>
-							<td class="uk-text-middle">{{list.kikaku}}</td>
-							<td class="uk-text-middle">
-							<span class="irisu">{{list.irisu}}</span><span class="unit uk-text-small">{{list.unit}}</span>
-							</td>
-							<td class="uk-text-middle">￥{{list.kakaku}}</td>
-							<td class="uk-text-middle">￥{{list.unitPrice}}</td>
-							<td class="uk-text-middle">{{list.jan}}</td>
-							<td class="uk-text-middle">{{list.oroshi}}</td>
-						</tr>
-					</tbody>
-				</table>   
-	        </div>
-	    </div>
-	</div>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="uk-margin-bottom" uk-grid>
+                <div class="uk-width-1-2@m" uk-margin>
+                    <button class="uk-button uk-button-default" v-on:click="sanshouClick">商品マスタを開く</button>
+                    <button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
+                    <button class="uk-button uk-button-primary" type="submit" v-on:click="stockRegister">在庫調整実行</button>
+                </div>
+            </div>
+
+            <div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky" class="uk-padding-top uk-background-muted uk-padding-small">
+                <form action='#' method="post" onsubmit="app.barcodeSearch($('input[name=barcode]').val() ,'' , '' , true);$('input[name=barcode]').val('') ; $('input[name=barcode]').focus(); return false;">
+                    <input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." autofocus="true" name="barcode" autocomplete="off">
+                    <button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
+                </form>
+            </div>
+            <div class="shouhin-table uk-width-expand uk-overflow-auto">
+                <table class="uk-table uk-table-striped uk-text-nowrap">
+                    <thead>
+                        <tr>
+                            <th class="uk-table-shrink">id</th>
+                            <th>メーカー</th>
+                            <th>商品名</th>
+                            <th>製品コード</th>
+                            <th>規格</th>
+                            <th>JANコード</th>
+                            <th>入数</th>
+                            <th>棚名</th>
+                            <th>部署別定数</th>
+                            <th class="uk-table-shrink">
+                                現在在庫数
+                            </th>
+                            <th class="uk-table-shrink">
+                                調整数
+                            </th>
+                            <th class="uk-table-shrink">
+                                調整後在庫数
+                            </th>
+                            <th>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(list, key) in lists" :id="'tr_' + key" v-bind:class="list.class">
+                            <td>{{list.text}}</td>
+                            <td>{{list.maker}}</td>
+                            <td>{{list.shouhinName}}</td>
+                            <td>{{list.code}}</td>
+                            <td>{{list.kikaku}}</td>
+                            <td>{{list.jan}}</td>
+                            <td>{{list.irisu}}{{list.unit}}</td>
+                            <td>
+                                <input type="text" step="1" class="uk-input" style="width: 180px;" v-bind:style="list.rackNameStyle" v-model="list.rackName" v-on:change="rackNameStyle(key)">
+                            </td>
+                            <td>
+                                <input type="number" step="1" min="0" class="uk-input" style="width: 96px;" v-bind:style="list.constantByDivStyle" v-model="list.constantByDiv" v-on:change="constantByDivStyle(key)">
+                                <span class="uk-text-bottom">{{list.unit}}</span>
+                            </td>
+                            <td>
+                                {{ list.stock }}{{list.unit}}
+                            </td>
+                            <td>
+                                <input type="number" step="1" class="uk-input" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.stockCountNum" v-on:change="addCountStyle(key)">
+                                <span class="uk-text-bottom">{{list.unit}}</span>
+                            </td>
+                            <td>
+                                {{ list.stock + parseInt(list.stockCountNum) }}{{list.unit}}
+                            </td>
+                            <td uk-margin class="uk-text-center">
+                                <input type="button" class="uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)">
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                        </tr>
+                        <tr>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                        </tr>
+                        <tr>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                            <td>&emsp;</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-sections" class="uk-modal-container" uk-modal>
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <div class="uk-modal-header">
+            <h2 class="uk-modal-title">商品選択</h2>
+        </div>
+        <div class="uk-modal-body uk-width-expand uk-overflow-auto">
+            <table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-nowrap uk-table-divider">
+                <thead>
+                    <tr>
+                        <th class="uk-table-shrink">id</th>
+                        <th class="uk-table-shrink"></th>
+                        <th>メーカー</th>
+                        <th>商品名</th>
+                        <th>製品コード</th>
+                        <th>規格</th>
+                        <th>入数</th>
+                        <th>価格</th>
+                        <th>単価</th>
+                        <th>JANコード</th>
+                        <th>卸業者</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(list , key) in select_items">
+                        <td></td>
+                        <td><button type="button" v-on:click="addObject(key)" class="uk-button uk-button-primary uk-button-small">反映</button></td>
+                        <td class="uk-text-middle">{{list.maker}}</td>
+                        <td class="uk-text-middle">{{list.shouhinName}}</td>
+                        <td class="uk-text-middle">{{list.code}}</td>
+                        <td class="uk-text-middle">{{list.kikaku}}</td>
+                        <td class="uk-text-middle">
+                            <span class="irisu">{{list.irisu}}</span><span class="unit uk-text-small">{{list.unit}}</span>
+                        </td>
+                        <td class="uk-text-middle">￥{{list.kakaku}}</td>
+                        <td class="uk-text-middle">￥{{list.unitPrice}}</td>
+                        <td class="uk-text-middle">{{list.jan}}</td>
+                        <td class="uk-text-middle">{{list.oroshi}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <form action="<?php echo $api_url ?>" target="_blank" method="post" class="print_hidden uk-inline" id="createLabelForm">
-	<input type="hidden" value="" name="card_ids">
-	<input type="hidden" value="cardLabelPrint" name="Action">
+    <input type="hidden" value="" name="card_ids">
+    <input type="hidden" value="cardLabelPrint" name="Action">
 </form>
-	
+
 <script>
 
 var app = new Vue({

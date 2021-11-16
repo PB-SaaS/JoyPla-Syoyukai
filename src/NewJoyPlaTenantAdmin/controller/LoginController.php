@@ -29,13 +29,11 @@ class LoginController extends Controller
             ] , false)->render();
         } finally {
             $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [] , false)->render();
-            $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'title'     => 'JoyPla-Tenant-Master ログイン',
                 'content'   => $content,
                 'head' => $head,
-                'header' => $header,
                 'baseUrl' => '',
             ],false);
         }

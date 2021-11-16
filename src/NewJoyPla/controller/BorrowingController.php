@@ -23,6 +23,7 @@ use App\Model\Distributor;
 use App\Model\DistributorUser;
 use App\Model\AssociationTR;
 use App\Model\InHospitalItemView;
+use App\Model\DistributorAffiliationView;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -144,7 +145,7 @@ class BorrowingController extends Controller
         } finally {
         // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 貸出登録',
+                'title'     => 'JoyPla 貸出リスト',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),
@@ -306,9 +307,11 @@ class BorrowingController extends Controller
                 ] , false)->render();
                 $select_name = $this->makeId($history['distributorId']);
                 
-                $distributor = DistributorUser::getNewInstance();
+                $distributor = DistributorAffiliationView::getNewInstance();
                 $test = $distributor->selectName($select_name)->rule(
                     ['name'=>'distributorId','label'=>'name_'.$history['distributorId'],'value1'=>$history['distributorId'],'condition'=>'matches']
+                    )->rule(
+                        ['name'=>'invitingAgree','label'=>'invitingAgree','value1'=>'t','condition'=>'is_boolean']
                     )->filterCreate();
 
                 $test = $distributor->selectRule($select_name)
@@ -734,8 +737,8 @@ class BorrowingController extends Controller
                 'receivingCount' => (int)$item->countNum,
                 'receivingHId' => $history_ids[$item->divisionId . $item->distributorId . $item->usedDate]['receivingHistoryId'],
                 'inHospitalItemId' => $item->inHospitalItemId,
-                'price' => (int)$item->price,
-                'receivingPrice' => (int)$item->price * (int)$item->countNum,
+                'price' => (float)$item->price,
+                'receivingPrice' => (float)$item->price * (int)$item->countNum,
                 'hospitalId' => $item->hospitalId,
                 'totalReturnCount' => 0,
                 'divisionId' => $item->divisionId,
@@ -750,13 +753,13 @@ class BorrowingController extends Controller
         $receiving_history_insert_data = [];
         foreach($history_ids as $divisionId_distributorId_usedDate => $history_data)
         {
-            //$receiving_price = [];
+            $receiving_price = [];
             $in_hospital_item_ids = [];
             foreach($receiving_insert_data as $insert_record)
             {
                 if($insert_record['receivingHId'] === $history_data['receivingHistoryId'])
                 {
-                    //$receiving_price[] = (int)$insert_record['receivingPrice'];
+                    $receiving_price[] = (int)$insert_record['receivingPrice'];
                     if(! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids))
                     {
                         $in_hospital_item_ids[] = $insert_record['inHospitalItemId'];
@@ -770,6 +773,7 @@ class BorrowingController extends Controller
                 'orderHistoryId' => $history_data['orderHistoryId'],
                 'hospitalId' => $user_info->getHospitalId(),
                 'itemsNumber' => collect($in_hospital_item_ids)->count(),
+                'totalAmount' => collect($receiving_price)->sum(),
                 'divisionId' => $history_data['divisionId'],
                 'recevingStatus' => 2,
             ];
@@ -821,7 +825,8 @@ class BorrowingController extends Controller
                 'hospitalId' => $user_info->getHospitalId(),
                 'divisionId' => $history_data['divisionId'],
                 'itemsNumber' => collect($in_hospital_item_ids)->count(),
-                'totalAmount' => collect($total_amount)->sum()
+                'totalAmount' => collect($total_amount)->sum(),
+                'billingStatus' => 2
             ];
         }
 
