@@ -65,7 +65,7 @@ class Collection
         $sum_tmp = 0;
         foreach($this->array as $key => $val){
             if(!is_numeric($val)){ throw new Exception('not numeric'); }
-            $sum_tmp += $val;
+            $sum_tmp = $sum_tmp + (float)$val;
         }
         return $sum_tmp;
     }

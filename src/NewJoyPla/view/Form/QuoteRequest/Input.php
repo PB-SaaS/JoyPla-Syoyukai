@@ -129,7 +129,8 @@
                 <!-- HIDDEN_PARAM START -->
                 $form:hidden$<input type="hidden" name="hospitalId" value="$hospitalId$">
                 <input type="hidden" name="requestUName" value="$requestUName$">
-                <input type="hidden" name="requestUser" value="$mail$">
+                <input type="hidden" name="mail" value="$mail$">
+                <input type="hidden" name="tenantId" value="$tenantId$">
                 <!-- HIDDEN_PARAM END -->
                 <input class="submit" type="submit" name="submit" value="確認">
             </form>

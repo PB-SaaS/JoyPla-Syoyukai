@@ -234,12 +234,12 @@ class ConsumeController extends Controller
             $card_update = [];
             foreach ($billingData as $record)
             {
-                foreach($in_hospital_item as $in_hp_item)
+                foreach($in_hospital_item->data->all() as $in_hp_item)
                 {
                     $lot_flag = 0;
                     if($record['recordId'] == $in_hp_item->inHospitalItemId)
                     {
-                        $lot_flag = $in_hp_item->lotManagement;
+                        $lot_flag = (int)$in_hp_item->lotManagement;
                         break;
                     }
                 }
@@ -301,7 +301,7 @@ class ConsumeController extends Controller
                         'lotNumber' => $data['lotNumber'],
                         'lotDate' => $data['lotDate'],
                         'unitPrice' => $unitPrice,
-                        'lotManagement' => (int)$data['lotFlag']
+                        'lotManagement' => (int)$data['lotFlagBool']
                     ];
                     $total_amount = $total_amount + ((float)$unitPrice * (int)$data['countNum']);
 

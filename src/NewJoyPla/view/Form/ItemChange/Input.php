@@ -191,7 +191,7 @@
                                                 type="checkbox"
                                                 name="lotManagement"
                                                 value="1"
-                                                $lotmanagement$="$lotManagement$">
+                                                $lotManagement$>
                                                 <span>はい</span></label>
                                         </li>
                                     </ul>
@@ -211,7 +211,7 @@
                                                 type="checkbox"
                                                 name="officialFlag"
                                                 value="1"
-                                                $officialflag$="$officialFlag$">
+                                                $officialFlag$>
                                                 <span>はい</span></label>
                                         </li>
                                     </ul>

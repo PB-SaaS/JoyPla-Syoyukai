@@ -147,7 +147,7 @@ class PayoutMRController extends Controller
         Payout::where('hospitalId',$user_info->getHospitalId());
         if ($startMonth) { Payout::where('registrationTime', $startMonth, '>='); }
         if ($endMonth) { Payout::where('registrationTime', (date('Y-m-d', strtotime($endMonth . '+1 day'))), '<='); }
-        if ($divisionId) { Payout::where('divisionId', $divisionId); }
+        if ($divisionId) { Payout::where('targetDivisionId', $divisionId); }
         $payoutDB = Payout::get();
 
         if ($payoutDB->count == 0)

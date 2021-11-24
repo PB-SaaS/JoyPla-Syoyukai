@@ -814,7 +814,7 @@ class BorrowingController extends Controller
                     'used_date' => $history['usedTime'],
                     'used_slip_number' => $history['usedSlipId'],
                     'used_item_num' => $history['itemsNumber'],
-                    'total_price' => "￥".number_format((float)$history['totalAmount']),
+                    'total_price' => "￥".number_format((float)$history['totalAmount'],2),
                     'login_url' => LOGIN_URL,
                 ] , false)->render();
                 $select_name = $this->makeId($history['hospitalId']);

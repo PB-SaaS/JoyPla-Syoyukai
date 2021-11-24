@@ -10,10 +10,10 @@
 				<div class="no_print uk-margin" uk-margin>
 					<input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
 					<?php if(! $end_flg ): ?>
-					<?php if($user_info->isAdmin() || $user_info->isApprover()): ?>
-					<input class="print_hidden uk-button uk-button-danger" type="submit" value="棚卸情報削除" onclick="inventoryDelete();return false;">
-					<input class="print_hidden uk-button uk-button-primary" type="submit" value="棚卸終了" onclick="inventoryFinish();return false;">
-					<?php endif ?>
+						<?php if($user_info->isAdmin() || $user_info->isApprover()): ?>
+						<input class="print_hidden uk-button uk-button-danger" type="submit" value="棚卸情報削除" onclick="inventoryDelete();return false;">
+						<input class="print_hidden uk-button uk-button-primary" type="submit" value="棚卸完了" onclick="inventoryFinish();return false;">
+						<?php endif ?>
 					<?php endif ?>
 				</div>
 				<div class="no_print">
@@ -27,7 +27,7 @@
 			    	<div class="uk-width-1-2@m">
 		    			<table class="uk-table uk-width-1-1 uk-width-2-3@m uk-table-divider">
 		    				<tr>
-		    					<td class="uk-text-bold">棚卸終了日時</td>
+		    					<td class="uk-text-bold">棚卸完了日時</td>
 		    					<td class="uk-text-right">%val:usr:inventoryTime%</td>
 		    				</tr>
 		    				<tr>
@@ -120,12 +120,12 @@
 	        // Ajaxリクエストが成功した時発動
 	        .done( (data) => {
 	            if(! data.result){
-	        		UIkit.modal.alert("棚卸終了に失敗しました").then(function(){
+	        		UIkit.modal.alert("棚卸完了に失敗しました").then(function(){
 						canAjax = true; // 再びAjaxできるようにする
 					});
 	        		return false;
 	            }
-	            UIkit.modal.alert("棚卸を終了しました").then(function(){
+	            UIkit.modal.alert("棚卸を完了しました").then(function(){
 					location.href ="<?php echo $link ?>&table_cache=true";
 				});
 				
@@ -133,7 +133,7 @@
 	        // Ajaxリクエストが失敗した時発動
 	        .fail( (data) => {
 	        	
-	    		UIkit.modal.alert("棚卸終了に失敗しました").then(function(){
+	    		UIkit.modal.alert("棚卸完了に失敗しました").then(function(){
 					canAjax = true; // 再びAjaxできるようにする
 				});
 	    		return false;

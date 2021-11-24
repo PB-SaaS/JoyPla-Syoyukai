@@ -211,11 +211,17 @@ class itemDB extends FieldTypeValidate
 
 class PriceTrDB extends FieldTypeValidate
 {
-    const TARGET_NAME = "items";
+    const TARGET_NAME = "PriceTrDB";
     
     const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
     
     public $dbFieldInfo =[ 
+        [   
+            'key' => '金額管理ID',
+            'fieldType' => 'NumberSymbolAlphabet32bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
         [   
             'key' => '卸業者ID',
             'fieldType' => 'NumberSymbolAlphabet32bytes',
@@ -282,6 +288,378 @@ class PriceTrDB extends FieldTypeValidate
         $columnObj = $field->getValue();
         if ($columnObj->isNotNullFlg() && isValueEmpty($columnObj->getValue())) {
             return new Failed(new FormatError(itemDB::SENTENCE_INPUT_REQUIRED));
+        }
+
+        return $field;
+    }
+    
+    
+    
+}
+
+
+class InHospitalNewInsertDb extends FieldTypeValidate
+{
+    const TARGET_NAME = "InHospitalTrDb";
+    
+    const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
+    
+    public $dbFieldInfo =[ 
+        [   
+            'key' => '商品ID',
+            'fieldType' => 'NumberSymbolAlphabet32bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => '卸業者ID',
+            'fieldType' => 'NumberSymbolAlphabet32bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => '不使用フラグ',
+            'fieldType' => 'Boolean_',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '定価',
+            'fieldType' => 'RealNumber',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '単価',
+            'fieldType' => 'RealNumber',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '測定機器名',
+            'fieldType' => 'TextField128bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '入数',
+            'fieldType' => 'Integer_',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => '入数単位',
+            'fieldType' => 'TextField32bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => '個数単位',
+            'fieldType' => 'TextField32bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => '購買価格',
+            'fieldType' => 'RealNumber',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => '特記事項',
+            'fieldType' => 'TextArea512Bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+    ];
+    
+    public $rowData = [
+        //"商品名\t商品コード（製品コード）\t商品規格\t1235\tメーカー名\tカタログNo\tあ000\t1\t100\t10\t枚\t個",
+        ];
+
+    public function __construct()
+    {
+        $this->rowData = $_POST['rowData'];
+        
+        $this->startRowNumber = $_POST['startRowNumber'];
+        parent::__construct();
+        $this->validate();
+    }
+
+    public function personalValidate(Try_ $field): Try_
+    {
+        if ($field->isFailed()) {
+            return $field;
+        }
+
+        $columnObj = $field->getValue();
+        if ($columnObj->isNotNullFlg() && isValueEmpty($columnObj->getValue())) {
+            return new Failed(new FormatError(InHospitalNewInsertDb::SENTENCE_INPUT_REQUIRED));
+        }
+
+        return $field;
+    }
+    
+    
+    
+}
+
+
+class DistributorDB extends FieldTypeValidate
+{
+    const TARGET_NAME = "DistributorDB";
+    
+    const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
+    
+    public $dbFieldInfo =[ 
+        [   
+            'key' => '卸業者名',
+            'fieldType' => 'TextField128bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => '卸業者ID',
+            'fieldType' => 'TextField128bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '共有ID',
+            'fieldType' => 'NumberSymbolAlphabet32bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '郵便番号',
+            'fieldType' => 'ZipNumber',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '都道府県',
+            'fieldType' => 'Pref',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '住所',
+            'fieldType' => 'TextField128bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '電話番号',
+            'fieldType' => 'PhoneNumber',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => 'FAX番号',
+            'fieldType' => 'PhoneNumber',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '見積対応可能フラグ',
+            'fieldType' => 'Select_',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+    ];
+    
+    public $rowData = [
+        //"商品名\t商品コード（製品コード）\t商品規格\t1235\tメーカー名\tカタログNo\tあ000\t1\t100\t10\t枚\t個",
+        ];
+
+    public function __construct()
+    {
+        $this->rowData = $_POST['rowData'];
+        
+        $this->startRowNumber = $_POST['startRowNumber'];
+        parent::__construct();
+        $this->validate();
+    }
+
+    public function personalValidate(Try_ $field): Try_
+    {
+        if ($field->isFailed()) {
+            return $field;
+        }
+
+        $columnObj = $field->getValue();
+        if ($columnObj->isNotNullFlg() && isValueEmpty($columnObj->getValue())) {
+            return new Failed(new FormatError(DistributorDB::SENTENCE_INPUT_REQUIRED));
+        }
+
+        return $field;
+    }
+}
+
+
+class AllNewItemInsertDB extends FieldTypeValidate
+{
+    const TARGET_NAME = "AllNewItemInsertDB";
+    
+    const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
+    
+    public $dbFieldInfo =[ 
+        [   
+            'key' => '卸業者ID',
+            'fieldType' => 'NumberSymbolAlphabet32bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => '商品名',
+            'fieldType' => 'TextField128bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => '分類',
+            'fieldType' => 'Select_',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '製品コード',
+            'fieldType' => 'TextField128bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '規格',
+            'fieldType' => 'TextField128bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => 'JANコード',
+            'fieldType' => 'JanCode',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => 'メーカー名',
+            'fieldType' => 'TextField128bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => 'ロット管理フラグ',
+            'fieldType' => 'Boolean_',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '償還価格フラグ',
+            'fieldType' => 'Boolean_',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '償還価格',
+            'fieldType' => 'RealNumber',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => 'カタログNo',
+            'fieldType' => 'TextField128bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => 'シリアルNo',
+            'fieldType' => 'TextField128bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '保険請求分類（医科）',
+            'fieldType' => 'TextArea512Bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '保険請求分類（在宅）',
+            'fieldType' => 'TextArea512Bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '入数',
+            'fieldType' => 'Integer_',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => '入数単位',
+            'fieldType' => 'TextField32bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => '個数単位',
+            'fieldType' => 'TextField32bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => '購買価格',
+            'fieldType' => 'RealNumber',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => '定価',
+            'fieldType' => 'RealNumber',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '単価',
+            'fieldType' => 'RealNumber',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '測定機器名',
+            'fieldType' => 'TextField128bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '特記事項',
+            'fieldType' => 'TextArea512Bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+    ];
+    
+    public $rowData = [
+        //"商品名\t商品コード（製品コード）\t商品規格\t1235\tメーカー名\tカタログNo\tあ000\t1\t100\t10\t枚\t個",
+        ];
+
+    public function __construct()
+    {
+        $this->rowData = $_POST['rowData'];
+        
+        $this->startRowNumber = $_POST['startRowNumber'];
+        parent::__construct();
+        $this->validate();
+    }
+
+    public function personalValidate(Try_ $field): Try_
+    {
+        if ($field->isFailed()) {
+            return $field;
+        }
+
+        $columnObj = $field->getValue();
+        if ($columnObj->isNotNullFlg() && isValueEmpty($columnObj->getValue())) {
+            return new Failed(new FormatError(AllNewItemInsertDB::SENTENCE_INPUT_REQUIRED));
         }
 
         return $field;

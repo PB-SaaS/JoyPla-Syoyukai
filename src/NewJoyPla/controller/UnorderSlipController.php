@@ -132,7 +132,7 @@ class UnorderSlipController extends Controller
 
             $id = (int)$SPIRAL->getCardId();
             $comment = $SPIRAL->getParam('ordercomment');
-            
+            $comment = urldecode($comment);
             if(strlen($comment) > 512)
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
@@ -281,6 +281,8 @@ class UnorderSlipController extends Controller
 
             $id = (int)$SPIRAL->getCardId();
             $comment = $SPIRAL->getParam('ordercomment');
+            $comment = urldecode($comment);
+            
             if(strlen($comment) > 512)
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());

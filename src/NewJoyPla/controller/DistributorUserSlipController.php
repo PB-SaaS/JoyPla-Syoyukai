@@ -61,6 +61,9 @@ EOM;
             		"authKey" => "%val:usr:authKey%" ,
             		"OUserPermission" => "%val:usr:OUserPermission:id%",
             		"affiliationId" => "%val:usr:affiliationId%",
+            		"loginId" => "%val:usr:loginId%",
+            		"name" => "%val:usr:name%",
+            		"mailAddress" => "%val:usr:mailAddress%",
                     ]
                 ] , false);
             
@@ -135,6 +138,9 @@ EOM;
             		"authKey" => "%val:usr:authKey%" ,
             		"OUserPermission" => "%val:usr:OUserPermission:id%",
             		"affiliationId" => "%val:usr:affiliationId%",
+            		"loginId" => "%val:usr:loginId%",
+            		"name" => "%val:usr:name%",
+            		"mailAddress" => "%val:usr:mailAddress%",
                     ]
                 ] , false);
             

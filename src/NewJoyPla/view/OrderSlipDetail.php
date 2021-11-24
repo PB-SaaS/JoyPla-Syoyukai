@@ -157,7 +157,7 @@
         								<span v-else >任意</span>
         							</td>
         							<td>
-        								<input type="text" class="uk-input lot" style="width:180px" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
+        								<input type="text" maxlength="20" class="uk-input lot" style="width:180px" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
         							</td>
 							        <td>
                                         <input type="date" class="uk-input lotDate" v-model="list.lotDate" v-bind:style="list.lotDateStyle" v-on:change="addLotDateStyle(key)">
@@ -265,7 +265,7 @@ var app = new Vue({
 	},
 	filters: {
         number_format: function(value) {
-            if (! value ) { return false; }
+            if (! value ) { return 0; }
             return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
         },
     },
@@ -302,7 +302,10 @@ var app = new Vue({
                     changeObject.lotDate == itemObject.lotDate && 
                     changeObject.lotNumber == itemObject.lotNumber)
                 {
-                    changeObject.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+                    if( ( parseInt(changeObject.countNum) + parseInt(itemObject.countNum) ) !== parseInt(changeObject.countNum))
+                    {
+                        changeObject.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+                    }
                     changeObject.countNum = parseInt(changeObject.countNum) + parseInt(itemObject.countNum);
                     existflg = true;
            	        app.$set(app.lists, index, changeObject);
@@ -396,7 +399,7 @@ var app = new Vue({
 		        return false;
 		    }
             UIkit.modal.confirm("発注を取り消しますか").then(function () {
-                
+                loading();
     			$.ajax({
                     async: false,
                     url:'<?php echo $api_url ?>',
@@ -410,7 +413,7 @@ var app = new Vue({
                 // Ajaxリクエストが成功した時発動
                 .done( (data) => {
                     if(data.code != 0){
-                        UIkit.modal.alert("発注取消に失敗しました");
+                        UIkit.modal.alert("発注の取り消しに失敗しました");
                         return false;
                     }
                 
@@ -420,12 +423,14 @@ var app = new Vue({
                 })
                 // Ajaxリクエストが失敗した時発動
                 .fail( (data) => {
-                    UIkit.modal.alert("発注取消に失敗しました");
+                    UIkit.modal.alert("発注の取り消しに失敗しました");
                 })
                 // Ajaxリクエストが成功・失敗どちらでも発動
                 .always( (data) => {
-    				loading_remove();
+                    loading_remove();
                 });
+            }, function () {
+                UIkit.modal.alert("中止します");
             });
 		},
 		lotCheck: function(){
@@ -517,11 +522,14 @@ var app = new Vue({
 				return false ;
 			}
 			
-			checkflg = false;
+			checkflg = true;
 			app.lists.forEach(function (elem, index) {
-			    if(elem.countNum != 0)
+			    if(elem.countNum == 0)
 			    {
-			        checkflg = true;
+                    let changeObject = app.lists[index];
+    				changeObject.countStyle = {'border': 'red 2px solid'};
+    				app.$set(app.lists, index, changeObject);
+			        checkflg = false;
 			    }
 			});
 			
@@ -552,6 +560,7 @@ var app = new Vue({
                 {
                     return false;
                 }
+                loading();
     			$.ajax({
                     async: false,
                     url:'<?php echo $api_url ?>',
@@ -592,6 +601,8 @@ var app = new Vue({
                 .always( (data) => {
     				loading_remove();
                 });
+                }, function () {
+                    UIkit.modal.alert("中止します");
             });
 		}
 	},
@@ -606,7 +617,7 @@ var modal_sections = new Vue({
 	},
 	filters: {
         number_format: function(value) {
-            if (! value) { return false; }
+            if (! value ) { return 0; }
             return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
         },
     },

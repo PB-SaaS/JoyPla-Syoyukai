@@ -665,7 +665,7 @@
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
-				                                <span class="title">貸出品リスト</span><br>
+				                                <span class="title">貸出リスト</span><br>
 				                                <span class="text">Borrowing List</span>
 			                                </p>
 			                            </div>
@@ -681,7 +681,7 @@
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
-				                                <span class="title">未承認使用済み伝票</span><br>
+				                                <span class="title">使用申請一覧</span><br>
 				                                <span class="text">Unapproved Used Slip</span>
 			                                </p>
 			                            </div>
@@ -697,7 +697,7 @@
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
-				                                <span class="title">使用済み伝票</span><br>
+				                                <span class="title">貸出伝票一覧</span><br>
 				                                <span class="text">Used Slip</span>
 			                                </p>
 			                            </div>

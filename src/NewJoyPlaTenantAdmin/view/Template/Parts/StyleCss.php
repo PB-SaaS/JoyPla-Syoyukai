@@ -1,10 +1,51 @@
 <style>
+    
+    .uk-label-success {
+      background-color: #7AAE36;
+      color: #fff;
+    }
+
+    /*
+     * Primary
+     */
+    .uk-button-primary {
+      background-color: #7AAE36;
+      color: #fff;
+      border: 1px solid transparent;
+    }
+    /* Hover + Focus */
+    .uk-button-primary:hover,
+    .uk-button-primary:focus {
+      background-color: #93BD5B;
+      color: #fff;
+    }
+    .uk-button-primary:disabled:hover,
+    .uk-button-primary:disabled:focus {
+      background-color: transparent;
+      color: #999;
+    }
+    /* OnClick + Active */
+    .uk-button-primary:active,
+    .uk-button-primary.uk-active {
+      background-color: #B2D08B;
+      color: #fff;
+    }
+    
+    .uk-tab > .uk-active > a {
+        color: #333;
+        border-color: #7AAE36;
+    }
+    
+    
+    h1 {
+        margin: 0 !important;
+    }
     .uk-input[type="number"]{
     	text-align: right;
     }
     
-    ul li {
-        margin-top: 12px;
+    ul.uk-nav-sub li {
+        margin-bottom: 12px;
     }
     
     table .smp-row-data {

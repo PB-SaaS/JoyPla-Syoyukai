@@ -1,8 +1,21 @@
+<?php 
+$auth = new App\Lib\Auth();
+?>
 <div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top">
     <div class="uk-container uk-container-expand">
         <div uk-grid>
             <div class="uk-width-1-2@m">
-                <h1>施設情報詳細[%val:usr:hospitalName%]</h1>
+                <h1>病院情報詳細[%val:usr:hospitalName%]</h1>
+            </div>
+            <div class="uk-width-1-2@m uk-text-right">
+                <form action="<?php echo $form_url ?>" method="post" uk-margin>
+                    <?php if($auth->Gate('FacilityUpdate')): ?>
+        	        <button type="submit" class="uk-button uk-button-primary" name="Action" value="update">病院情報更新</button>
+        	        <?php endif ?>
+        	        <button type="submit" class="uk-button uk-button-primary" name="Action" value="divisionReg">部署登録</button>
+        	        <button type="submit" class="uk-button uk-button-primary" name="Action" value="hospitalUserRegDivisionList">病院ユーザー追加</button>
+        	        <button type="submit" class="uk-button uk-button-primary" name="Action" value="distributorReg">卸業者登録</button>
+                </form>
             </div>
         </div>
         <div>
@@ -167,22 +180,12 @@
             <?php elseif($switch_2 != ""): ?>
            
         	<h3>部署一覧</h3>
-        	<div uk-margin>
-        	    <form action="<?php echo $base_url ?>" method="post">
-        	        <button type="submit" class="uk-button uk-button-primary" name="Action" value="divisionReg">部署登録</button>
-        	    </form>
-        	</div>
     		<div class="uk-margin spiral_table_area" style="display:none">
     			%sf:usr:search6:table:mstfilter%
     		</div>
             <?php elseif($switch_3 != ""): ?>
            
         	<h3>ユーザー一覧</h3>
-        	<div uk-margin>
-        	    <form action="<?php echo $base_url ?>" method="post">
-        	        <button type="submit" class="uk-button uk-button-primary" name="Action" value="hospitalUserRegDivisionList">病院ユーザー追加</button>
-        	    </form>
-        	</div>
     		<div class="uk-margin spiral_table_area" style="display:none">
     			%sf:usr:search9:table:mstfilter%
     		</div>
@@ -190,11 +193,6 @@
             <?php elseif($switch_4 != ""): ?>
            
         	<h3>卸業者一覧</h3>
-        	<div uk-margin>
-        	    <form action="<?php echo $base_url ?>" method="post">
-        	        <button type="submit" class="uk-button uk-button-primary" name="Action" value="distributorReg">卸業者登録</button>
-        	    </form>
-        	</div>
     		<div class="uk-margin spiral_table_area" style="display:none">
     			%sf:usr:search19:table:mstfilter%
     		</div>
@@ -202,6 +200,16 @@
 
 
             <?php endif ?>
+            <script>
+                let elem = $('table tbody a');
+                let param = "FacilitySlip";
+                if(param != "")
+                {
+                	for(let index = 0 ; index < elem.length ; index++){
+                		elem[index].href += "&BACK="+param;
+                	};
+                }
+            </script>
         </div>
     </div>
 </div>

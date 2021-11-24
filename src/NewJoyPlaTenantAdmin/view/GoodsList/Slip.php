@@ -5,9 +5,10 @@
                 <h1>商品情報詳細</h1>
             </div>
             <div class="uk-width-1-2@m uk-text-right">
-                <form action="<?php echo $form_url ?>" method="post">
+                <form action="<?php echo $form_url ?>" method="post" uk-margin>
                     <button class="uk-button uk-button-primary" type="submit" value="itemUpdate" name="Action">商品情報変更</button>
                     <button class="uk-button uk-button-primary" type="submit" value="priceReg" name="Action">金額情報登録</button>
+                    <button class="uk-button uk-button-primary" type="submit" value="inHospitalItemReg" name="Action">院内商品登録</button>
                 </form>
             </div>
         </div>
@@ -16,6 +17,7 @@
                 <li class="<?php echo $switch_1 ?>"><a href="#" onclick="location.href='<?php echo $base_url ?>&table_cache=true'">基本情報</a></li>
                 <li class="<?php echo $switch_2 ?>"><a href="#" onclick="location.href='<?php echo $base_url ?>&Switcher=logs'">登録変更履歴</a></li>
                 <li class="<?php echo $switch_3 ?>"><a href="#" onclick="location.href='<?php echo $base_url ?>&Switcher=priceList'">金額情報一覧</a></li>
+                <li class="<?php echo $switch_4 ?>"><a href="#" onclick="location.href='<?php echo $base_url ?>&Switcher=InHospitalItems'">院内商品情報</a></li>
             </ul>
         </div>
         <?php if($switch_1 != ""): ?>
@@ -178,6 +180,20 @@
 		<div class="uk-margin spiral_table_area" style="display:none">
 			%sf:usr:search29:table:mstfilter%
 		</div>
+        <?php elseif($switch_4 !== ""): ?>
+    	<div class="uk-margin spiral_table_area" style="display:none">
+    		%sf:usr:search47:table:mstfilter%
+    	</div>
         <?php endif ?>
+        <script>
+            let elem = $('table tbody a');
+            let param = "ItemSlip";
+            if(param != "")
+            {
+            	for(let index = 0 ; index < elem.length ; index++){
+            		elem[index].href += "&BACK="+param;
+            	};
+            }
+        </script>
     </div>
 </div>

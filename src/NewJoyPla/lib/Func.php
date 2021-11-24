@@ -92,8 +92,8 @@ function pager($c, $t, $limit) {
     <div id="pagination">
         <ul class="uk-pagination">
             <?php 
-            if ( $current_page > 4 && $total_page > $show_nav ) echo '<li class="prev"><a href="javascript:pageSubmit(1)">1</a></li>';
-            if ( $current_page > 4 && $total_page > $show_nav ) echo '<li class="uk-disabled"><span>...</span></li>';
+            if ( $current_page > 3 && $total_page > $show_nav ) echo '<li class="prev"><a href="javascript:pageSubmit(1)">1</a></li>';
+            if ( $current_page > 3 && $total_page > $show_nav ) echo '<li class="uk-disabled"><span>...</span></li>';
             for ($i=$loop_start; $i <= $loop_end; $i++) {
                 if ($i > 0 && $total_page >= $i) {
                     if($i == $current_page) echo '<li class="uk-active">';
@@ -102,8 +102,8 @@ function pager($c, $t, $limit) {
                     echo '</li>';
                 }
             }
-            if ( $current_page < $total_page - 3 && $total_page > $show_nav ) echo '<li class="uk-disabled"><span>...</span></li>';
-            if ( $current_page < $total_page - 3 && $total_page > $show_nav ) echo '<li class="next"><a href="javascript:pageSubmit('.$total_page.')">'.$total_page.'</a></li>';
+            if ( $current_page < $total_page - 2 && $total_page > $show_nav ) echo '<li class="uk-disabled"><span>...</span></li>';
+            if ( $current_page < $total_page - 2 && $total_page > $show_nav ) echo '<li class="next"><a href="javascript:pageSubmit('.$total_page.')">'.$total_page.'</a></li>';
             ?>
         </ul>
     </div>

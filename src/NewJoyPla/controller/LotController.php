@@ -106,7 +106,7 @@ class LotController extends Controller
                 {
                     throw new Exception('Invalid LotData',FactoryApiErrorCode::factory(100)->getCode());
                 }
-                if(strlen($lot['lotNumber']) > 20)
+                if((!ctype_alnum($lot['lotNumber'])) || strlen($lot['lotNumber']) > 20)
                 {
                     throw new Exception('Invalid LotData',FactoryApiErrorCode::factory(100)->getCode());
                 }

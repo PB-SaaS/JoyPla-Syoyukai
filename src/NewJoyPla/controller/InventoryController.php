@@ -254,7 +254,7 @@ class InventoryController extends Controller
             $history_total_amount = 0;
             foreach ($inventory_history_data as $val)
             {
-                $history_total_amount += (float)$val->inventryAmount;
+                $history_total_amount = $history_total_amount + (float)$val->inventryAmount;
                 if (!in_array($val->inHospitalItemId, $history_ids)) {
                     $history_ids[] = $val->inHospitalItemId;
                 }
@@ -266,7 +266,7 @@ class InventoryController extends Controller
             $end_total_amount = 0;
             foreach ($end_inventory_data as $val)
             {
-                $end_total_amount += (float)$val->inventryAmount;
+                $end_total_amount = $end_total_amount + (float)$val->inventryAmount;
                 if (!in_array($val->inHospitalItemId, $end_ids)) {
                     $end_ids[] = $val->inHospitalItemId;
                 }

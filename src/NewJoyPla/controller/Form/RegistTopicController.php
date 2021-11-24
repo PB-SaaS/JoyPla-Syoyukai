@@ -10,6 +10,7 @@ use App\Lib\UserInfo;
 use App\Model\DistributorUser;
 use App\Model\HospitalUser;
 use App\Model\DistributorAffiliationView;
+use App\Model\TenantMaster;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -37,10 +38,11 @@ class RegistTopicController extends Controller
         
         try{
             $hospital = $SPIRAL->getContextByFieldTitle("hospitalId");
+        	$topicTitle = \App\Lib\html($SPIRAL->getContextByFieldTitle("topicTitle"));
+        	$topicName = \App\Lib\html($SPIRAL->getContextByFieldTitle("topicName"));
+        	
             if($hospital != "")
             {
-            	$topicTitle = \App\Lib\html($SPIRAL->getContextByFieldTitle("topicTitle"));
-            	$topicName = \App\Lib\html($SPIRAL->getContextByFieldTitle("topicName"));
             	
             	$subject = "[JoyPla] ".$topicName."さんがトピック「".$topicTitle."」を作成しました";
             	
@@ -73,12 +75,8 @@ class RegistTopicController extends Controller
             $distributor = $SPIRAL->getContextByFieldTitle("distributorId");
             if($distributor  != '' ){
             		
-            	$topicTitle = \App\Lib\html($SPIRAL->getContextByFieldTitle("topicTitle"));
-            	$topicName = \App\Lib\html($SPIRAL->getContextByFieldTitle("topicName"));
             	
             	$subject = "[JoyPla] ".$topicName."さんがトピック「".$topicTitle."」を作成しました";
-            	
-            	$url = LOGIN_URL;
             	
                 $mail_body = $this->view('NewJoyPla/view/Mail/RegistTopic', [
                     'name' => '%val:usr:name%',
@@ -101,6 +99,34 @@ class RegistTopicController extends Controller
                     ])->filterCreate();
 
                 $test = $distributor_user::selectRule($select_name)
+                    ->body($mail_body)
+                    ->subject($subject)
+                    ->from(FROM_ADDRESS,FROM_NAME)
+                    ->send();
+            }
+            
+            if($SPIRAL->getContextByFieldTitle("adminViewFlg"))
+            {
+            	$subject = "[JoyPla] ".$topicName."さんがトピック「".$topicTitle."」を作成しました";
+                $tenantId = $SPIRAL->getContextByFieldTitle("tenantId");
+                
+                $mail_body = $this->view('NewJoyPla/view/Mail/RegistTopic', [
+                    'name' => '%val:usr:name%',
+                    'topicTitle' => $topicTitle,
+                    'registUser' => $topicName,
+                    'login_url' => TENANT_ADMIN_LOGIN_URL,
+                ] , false)->render();
+                
+                $select_name = $this->makeId($topic->tenantId);
+    
+                $test = TenantMaster::selectName($select_name)->rule([
+                    'name'=>'tenantId',
+                    'label'=>'name_'.$tenantId,
+                    'value1'=>$tenantId,
+                    'condition'=>'matches'
+                ])->filterCreate();
+    
+                $test = TenantMaster::selectRule($select_name)
                     ->body($mail_body)
                     ->subject($subject)
                     ->from(FROM_ADDRESS,FROM_NAME)

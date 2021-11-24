@@ -43,12 +43,21 @@ class Controller
             if (is_array($value)) {
                 $result[$key] = $this->requestUrldecode($value);
             } else {
-                $result[$key] = urldecode($value);
+                $result[$key] = (string)urldecode(preg_replace('/^%EF%BB%BF/', '', $value));
             }
         }
         return $result;
     }
     protected function sanitize($string = '') {
         return htmlspecialchars($string, REPLACE_FLAGS, CHARSET);
+    }
+    
+    protected function makeRandNum($length) {
+        $str = array_merge(range('0', '9'));
+        $r_str = null;
+        for ($i = 0; $i < $length; $i++) {
+            $r_str .= $str[rand(0, count($str) - 1)];
+        }
+        return $r_str;
     }
 }

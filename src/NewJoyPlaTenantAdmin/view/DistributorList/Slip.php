@@ -2,9 +2,14 @@
     class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top">
     <div class="uk-container uk-container-expand">
         <div uk-grid="uk-grid">
-            <div class="uk-width-1-1@m">
+            <div class="uk-width-1-2@m">
                 <h1>卸業者情報詳細[%val:usr:hospitalName% : %val:usr:distributorName%]</h1>
             </div>
+        	<div class="uk-width-1-2@m uk-text-right">
+        	    <form action="<?php echo $base_url ?>" method="post">
+        	        <button type="submit" class="uk-button uk-button-primary" name="Action" value="divisionUserInv">卸業者ユーザー招待</button>
+        	    </form>
+        	</div>
         </div>
         <div>
             <ul class="uk-child-width-expand uk-tab">
@@ -132,14 +137,19 @@
         </table>
         <?php elseif($switch_2 != ""): ?>
         	<h3>招待ユーザー一覧</h3>
-        	<div uk-margin>
-        	    <form action="<?php echo $base_url ?>" method="post">
-        	        <button type="submit" class="uk-button uk-button-primary" name="Action" value="divisionUserInv">卸業者ユーザー招待</button>
-        	    </form>
-        	</div>
     		<div class="uk-margin spiral_table_area" style="display:none">
     			%sf:usr:search22:table:mstfilter%
     		</div>
         <?php endif ?>
+        <script>
+            let elem = $('table tbody a');
+            let param = "<?php echo $_GET['BACK'] ?>";
+            if(param != "")
+            {
+            	for(let index = 0 ; index < elem.length ; index++){
+            		elem[index].href += "&BACK="+param;
+            	};
+            }
+        </script>
     </div>
 </div>

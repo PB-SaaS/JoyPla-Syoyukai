@@ -1,14 +1,25 @@
-<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove" id="app">
+<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="app">
     <div class="uk-container uk-container-expand" uk-height-viewport="expand: true">
         <div class="uk-margin-auto uk-margin-remove-top uk-margin-bottom" id="mainPage">
             <!-- SMP_TEMPLATE_HEADER start -->
-            <h1>商品一括登録・更新</h1>
+            <h1>新規導入用一括登録</h1>
             <div class="js-upload uk-placeholder uk-text-center">
                 <div class="js-upload" uk-form-custom>
                     <input type="file" @change="loadCsvFile" accept=".csv,.tsv,.txt">
                     <span class="uk-link" tabindex="-1" v-if="filename !== ''">{{ filename }}</span>
                     <span class="uk-link" tabindex="-1" v-else> CSV/TSV ファイルを選択してください</span>
                 </div>
+            </div>
+            <div>
+                <select v-model="hospitalId" class="uk-select uk-margin-bottom uk-width-1-2@m" @change="result = false">
+                    <option value="">----- 登録先病院を選択してください -----</option>
+                    <?php
+                        foreach($hospital as $h)
+                        {
+                            echo "<option value='".$h->hospitalId."'>".$h->hospitalName."</option>".PHP_EOL;
+                        }
+                    ?>
+                </select>
             </div>
             <input type="button" v-on:click="validateCheck" value="バリデーションチェック" class="uk-button uk-button-primary" v-bind:disabled="lists.length == 0">
             
@@ -19,25 +30,27 @@
             <p>件数：{{ lists.length }} 件</p>
             <p class="uk-text-danger" v-for="msg in message">{{ msg }}</p>
             <p class="uk-text" >{{ success_message }}</p>
-            <table class="uk-table uk-table-divider">
-                <thead>
-                    <tr>
-                        <th>id</th>
-                        <th v-for="header in headers">{{ header }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(worker, index) in lists" :key="index">
-                        <td>{{ index + 1 }}</td>
-                        <td v-for="(column, index) in worker.data" :key="index">{{ column }}</td>
-                        <td><button type="button" class="uk-button uk-button-danger uk-button-small" v-on:click="deleteList(index)">削除</button></td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr></tr>
-                        
-                </tfoot>
-            </table>
+            <div uk-overflow-auto style="overflow-y: hidden;">
+                <table class="uk-table uk-table-divider uk-text-nowrap">
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th v-for="header in headers">{{ header }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(worker, index) in lists" :key="index">
+                            <td>{{ index + 1 }}</td>
+                            <td v-for="(column, index) in worker.data" :key="index">{{ column }}</td>
+                            <td><button type="button" class="uk-button uk-button-danger uk-button-small" v-on:click="deleteList(index)">削除</button></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr></tr>
+                            
+                    </tfoot>
+                </table>
+            </div>
         </div>
     
     </div>
@@ -55,20 +68,30 @@ var app = new Vue({
             message: "",
             success_message : "",
             filename: "",
+            hospitalId: "",
             headers: [
+                "卸業者ID",
                 "商品名",
+                "分類",
                 "製品コード",
                 "規格",
                 "JANコード",
-                "メーカー",
-                "カタログNo",
-                "定価",
+                "メーカー名",
+                "ロット管理フラグ",
                 "償還価格フラグ",
                 "償還価格",
+                "カタログNo",
+                "シリアルNo",
+                "保険請求分類（医科）",
+                "保険請求分類（在宅）",
                 "入数",
                 "入数単位",
                 "個数単位",
-                "ロット管理フラグ",
+                "購買価格",
+                "定価",
+                "単価",
+                "測定機器名",
+                "特記事項",
                 ],
             workers: [],
             lists: []
@@ -198,6 +221,13 @@ var app = new Vue({
             vm.result = false;
             vm.message = [];
             vm.success_message = "";
+            
+            if(vm.hospitalId == "")
+            {
+                UIkit.modal.alert('病院を選択してください');
+                return false;
+            }
+            
             progress_bar.start(100, 'バリデーションチェックを開始しています...');
             vm.lists.forEach(function(value,index)
             {
@@ -219,9 +249,10 @@ var app = new Vue({
                         type:'POST',
                         data:{
                             startRowNumber : startRowNumber,
+                            hospitalId: vm.hospitalId,
                             rowData : JSON.stringify( vm.objectValueToURIencode(chunk[i]) ),
                             _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-                            Action : "validateCheckApi",
+                            Action : "bulkInsertValidateCheckApi",
                         },
         				dataType: "json"
         			})
@@ -236,6 +267,45 @@ var app = new Vue({
         			})
         			// Ajaxリクエストが失敗した時発動
         			.fail( (data) => {
+        			    vm.message.push("処理に失敗しました");
+        			})
+        			// Ajaxリクエストが成功・失敗どちらでも発動
+        			.always( (data) => {
+        			    let percent = 100;
+        			    if((chunk.length - 1) > 0){
+        			        percent = (1 / ( chunk.length - 1) ) * 100;
+        			    }
+        			    let val = Math.ceil(progress_bar.getVal() + percent);
+                        progress_bar.progress(val, '進捗：'+val+'%');
+        			});
+        		})(forCount);
+        		
+                (function(i){
+                    $.ajax({
+                        async: true,
+                        url: "<?php echo $api_url ?>",
+                        type:'POST',
+                        data:{
+                            startRowNumber : startRowNumber,
+                            hospitalId: vm.hospitalId,
+                            rowData : JSON.stringify( vm.objectValueToURIencode(chunk[i]) ),
+                            _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+                            Action : "bulkInsertValidateCheck2Api",
+                        },
+        				dataType: "json"
+        			})
+        			// Ajaxリクエストが成功した時発動
+        			.done( (data) => {
+        			    if(vm.message.length < 1000){
+            			    for(let j = 0 ; j < data.length ; j++)
+            			    {
+            			        vm.message.push(data[j]);
+            			    }
+        			    }
+        			})
+        			// Ajaxリクエストが失敗した時発動
+        			.fail( (data) => {
+        			    vm.message.push("処理に失敗しました");
         			})
         			// Ajaxリクエストが成功・失敗どちらでも発動
         			.always( (data) => {
@@ -263,6 +333,12 @@ var app = new Vue({
                 vm.success_message = "";
                 vm.result = false;
                 vm.message = [];
+                
+                if(vm.hospitalId == "")
+                {
+                    UIkit.modal.alert('病院を選択してください');
+                    return false;
+                }
                 progress_bar.start(100, '登録を開始しています...');
                 vm.lists.forEach(function(value,index)
                 {
@@ -283,10 +359,11 @@ var app = new Vue({
                             url: "<?php echo $api_url ?>",
                             type:'POST',
                             data:{
+                                hospitalId: vm.hospitalId,
                                 startRowNumber : startRowNumber,
                                 rowData : JSON.stringify( vm.objectValueToURIencode(chunk[i]) ),
                                 _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-                                Action : "regist",
+                                Action : "bulkInsertApi",
                             },
             				dataType: "json"
             			})
@@ -313,7 +390,7 @@ var app = new Vue({
             		})(forCount);
                 }
                 $(document).ajaxStop(function() {
-                    if(vm.message.length == 0 )
+                    if(vm.message.length == 0 && vm.result === true)
                     {
                         vm.success_message = "登録が完了しました";
                         vm.result = false;

@@ -96,7 +96,7 @@
             <div class="uk-child-width-1-3@m" uk-grid>
                 <div>
                     <div class="uk-form-controls">
-                        <select class="uk-width-3-4 uk-select uk-inline" id="divisionId" v-model="divisionId">
+                        <select class="uk-width-3-4 uk-select uk-inline" id="divisionId" v-model="divisionId" v-bind:disabled="division_disabled">
                             <option value="">----- 部署選択 -----</option>
                             <?php
 		                        foreach($division->data as $data)
@@ -291,10 +291,11 @@ var app = new Vue({
 	data: {
 		lists: [],
 		divisionId: '',
+    division_disabled: false
 	},
 	filters: {
         number_format: function(value) {
-            if (! value) { return false; }
+            if (! value ) { return 0; }
             return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
         },
     },
@@ -310,12 +311,16 @@ var app = new Vue({
     					app.$set(app.lists, index, changeObject);
         			});
                 }
+                if (!app.lists.length) { 
+                    app.division_disabled = false;
+                } else {
+                    app.division_disabled = true;
+                }
           })
         }
     },
 	methods: {
 		addList: function(object) {
-        	$('#divisionId').prop('disabled',true);
 			let exist = false;
 			app.lists.forEach(function(elem,index){
 			    if(object.recordId == elem.recordId){
@@ -368,40 +373,42 @@ var app = new Vue({
 			
 		},
 		stockRegister: function() {
-		    if(!app.check()){
-		        return false;
-		    }
-			loading();
-			$.ajax({
-				async: false,
-                url: "<?php echo $api_url ?>",
-                type:'POST',
-                data:{
-                    _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-                	Action : 'stockRegister',
-                	stocks : JSON.stringify( objectValueToURIencode(app.lists) ),
-                	divisionId : app.divisionId,
-                },
-                dataType: 'json'
-            })
-            // Ajaxリクエストが成功した時発動
-            .done( (data) => {
-                if(data.code != 0){
+            UIkit.modal.alert("在庫調整を行います。<br>よろしいでしょうか。").then(function(){
+    		    if(!app.check()){
+    		        return false;
+    		    }
+    			loading();
+    			$.ajax({
+    				async: false,
+                    url: "<?php echo $api_url ?>",
+                    type:'POST',
+                    data:{
+                        _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+                    	Action : 'stockRegister',
+                    	stocks : JSON.stringify( objectValueToURIencode(app.lists) ),
+                    	divisionId : app.divisionId,
+                    },
+                    dataType: 'json'
+                })
+                // Ajaxリクエストが成功した時発動
+                .done( (data) => {
+                    if(data.code != 0){
+                        UIkit.modal.alert("在庫調整に失敗しました");
+                        return false;
+                    } 
+                    UIkit.modal.alert("在庫調整が完了しました").then(function(){
+    					app.lists.splice(0, app.lists.length);
+                    });
+                })
+                // Ajaxリクエストが失敗した時発動
+                .fail( (data) => {
                     UIkit.modal.alert("在庫調整に失敗しました");
-                    return false;
-                } 
-                UIkit.modal.alert("在庫調整が完了しました").then(function(){
-					app.lists.splice(0, app.lists.length);
+                })
+                // Ajaxリクエストが成功・失敗どちらでも発動
+                .always( (data) => {
+    				loading_remove();
                 });
-            })
-            // Ajaxリクエストが失敗した時発動
-            .fail( (data) => {
-                UIkit.modal.alert("在庫調整に失敗しました");
-            })
-            // Ajaxリクエストが成功・失敗どちらでも発動
-            .always( (data) => {
-				loading_remove();
-            });
+		    });
 		},
 		deleteList: function(key) {
 			this.lists.splice(key, 1);
@@ -430,6 +437,32 @@ var app = new Vue({
 			if(app.lists.length === 0){
 				UIkit.modal.alert('商品を選択してください');
 				return false ;
+			}
+			
+			let checkflg = true;
+			app.lists.forEach(function(elem, index) {
+				let checkObject = app.lists[index];
+    			if(! Number.isFinite( Number(checkObject.constantByDiv) ) || checkObject.constantByDiv === "")
+    			{
+			        checkObject.constantByDivStyle = { 'border' : "2px solid red"};
+    			    checkflg = false;
+    			}
+    			if(! Number.isFinite( Number(checkObject.stockCountNum) ) || checkObject.stockCountNum === "")
+    			{
+			        checkObject.countStyle = { 'border' : "2px solid red"};
+    			    checkflg = false;
+    			}
+			    if(checkObject.rackName.bytes() > 64) {
+			        checkObject.rackNameStyle = { 'border' : "2px solid red"};
+    			    checkflg = false;
+			    }
+				app.$set(app.lists, index, checkObject);
+			});
+			
+			if(!checkflg)
+			{
+				UIkit.modal.alert('値が正しくありません');
+			    return false;
 			}
 			
 			return true;
@@ -478,13 +511,11 @@ var app = new Vue({
                 }
                 if(data.count == 1)
                 {
-	            	$('select[name="divisionId"]').attr('disabled',true);
                 	data = data.data;
                 	this.addList(data);
 	                
 	                $('input[name="barcode"]').val('');
                 } else {
-	            	$('select[name="divisionId"]').attr('disabled',true);
                 	data = data.data;
                 	modal_sections.clear();
                 	for(let num = 0 ; num < data.length ; num++)

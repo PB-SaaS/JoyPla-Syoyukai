@@ -345,4 +345,8 @@ class ReceivingMR
 
     let receiving_report = new ReceivingMR();
 
+function pageSubmit(page)
+{
+    receiving_report.pageSubmit(page);
+}
 </script>

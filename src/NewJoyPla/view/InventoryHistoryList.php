@@ -16,7 +16,7 @@
 		    	</div>
 		
 		
-                  <h3>棚卸終了履歴</h3>
+                  <h3>棚卸完了履歴</h3>
 		    	<hr>
                   <div>
 		    		%sf:usr:inventoryComp:table%

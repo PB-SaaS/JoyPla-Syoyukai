@@ -1086,6 +1086,7 @@ class Distributor extends Model
         "hospitalId",
         "authKey",
         "vendorFlag",
+        "distCommonId",
     ];
 
     //デフォルト値
@@ -1872,7 +1873,7 @@ class QuoteItem extends Model
 }
 
 
-class Comment extends Model
+class CommentTr extends Model
 {
     
     const CREATED_AT = "registrationTime";
@@ -1889,6 +1890,9 @@ class Comment extends Model
         "comment",
         "authKey",
         "commentCount",
+        "B_Id",
+        "O_Id",
+        "M_Id",
     ];
 
     //デフォルト値
@@ -1898,6 +1902,35 @@ class Comment extends Model
     
 }
 
+class Comment extends Model
+{
+    
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "NJ_commentDB";
+    public static $guarded = ["id"];
+    public static $primary_key = "commentId";
+    public static $fillable = [
+        "registrationTime",
+        "topicId",
+        "authKey",
+        "commentName",
+        "comment",
+        "deleteFlg",
+        "B_Id",
+        "O_Id",
+        "M_Id",
+        "commentId",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
 
 class Topic extends Model
 {
@@ -1922,6 +1955,8 @@ class Topic extends Model
         "lastName",
         "commentCount",
         "distributorName",
+        "tenantId",
+        "adminViewFlg"
     ];
 
     //デフォルト値
@@ -1940,6 +1975,7 @@ class TenantMaster extends Model
     public static $spiral_db_name = "NJ_MasterDB";
     public static $guarded = ["id"];
     public static $primary_key = "loginId";
+    public static $mail_field_title = "mailAddress";
     public static $fillable = [
         "registrationTime",
         "updateTime",
@@ -1948,6 +1984,8 @@ class TenantMaster extends Model
         "loginId",
         "password",
         "tenantId",
+        "tenantName",
+        "authority",
     ];
 
     //デフォルト値
@@ -2035,6 +2073,208 @@ class PriceUpsertTrDB extends Model
         "itemUnit",
         "price",
         "notice",
+        "hospitalName",
+        "distributorName",
+        "itemsAuthKey",
+        "makerName",
+        "itemName",
+        "itemCode",
+        "itemStandard",
+        "itemJANCode",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
+class InHospitalTrDb extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "T_inHpTrdb";
+    public static $guarded = ["id"];
+    public static $primary_key = "id";
+    public static $fillable = [
+        "registrationTime",
+        "inHospitalItemId",
+        "authKey",
+        "authKey2",
+        "notUsedFlag",
+        "itemId",
+        "hospitalId",
+        "distributorId",
+        "catalogNo",
+        "serialNo",
+        "medicineCategory",
+        "homeCategory",
+        "HPstock",
+        "priceId",
+        "quantity",
+        "quantityUnit",
+        "itemUnit",
+        "price",
+        "minPrice",
+        "unitPrice",
+        "measuringInst",
+        "notice",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
+
+class PriceInfoView extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "T_PriceList";
+    public static $guarded = ["id"];
+    public static $primary_key = "priceId";
+    public static $fillable = [
+        "priceId",
+        "authKey",
+        "itemId",
+        "distributorId",
+        "quantity",
+        "price",
+        "hospitalId",
+        "requestFlg",
+        "quantityUnit",
+        "itemUnit",
+        "notice",
+        "notUsedFlag",
+        "requestId",
+        "hospitalName",
+        "distributorName",
+        "itemName",
+        "itemCode",
+        "itemStandard",
+        "itemJANCode",
+        "makerName",
+        "tenantId",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
+class DistributorAndHospitalDB extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "T_distributor";
+    public static $guarded = ["id"];
+    public static $primary_key = "id";
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "distributorId",
+        "distributorName",
+        "postalCode",
+        "prefectures",
+        "address",
+        "phoneNumber",
+        "faxNumber",
+        "hospitalId",
+        "authKey",
+        "vendorFlag",
+        "distCommonId",
+        "tenantId",
+        "hospitalName",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+class DistributorUpsertDB extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "T_DistributorTr";
+    public static $guarded = ["id"];
+    public static $primary_key = "id";
+    public static $fillable = [
+        "registrationTime",
+        "distributorName",
+        "distributorId",
+        "distCommonId",
+        "postalCode",
+        "prefectures",
+        "address",
+        "phoneNumber",
+        "faxNumber",
+        "vendorFlag",
+        "hospitalId",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
+class AllNewItemInsert extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "T_allNewIns";
+    public static $guarded = ["id"];
+    public static $primary_key = "id";
+    public static $fillable = [
+        "registrationTime",
+        "itemId",
+        "priceId",
+        "inHospitalItemId",
+        "hospitalId",
+        "distributorId",
+        "authKey",
+        "itemName",
+        "category",
+        "itemCode",
+        "itemStandard",
+        "itemJANCode",
+        "makerName",
+        "lotManagement",
+        "officialFlag",
+        "officialprice",
+        "catalogNo",
+        "serialNo",
+        "medicineCategory",
+        "homeCategory",
+        "HPstock",
+        "quantity",
+        "quantityUnit",
+        "itemUnit",
+        "price",
+        "minPrice",
+        "unitPrice",
+        "measuringInst",
+        "notice",
+        "tenantId",
     ];
 
     //デフォルト値

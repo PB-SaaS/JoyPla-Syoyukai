@@ -5,6 +5,7 @@ use Controller;
 use Csrf;
 use App\Lib\Auth;
 use App\Model\Tenant;
+use App\Model\Hospital;
 
 use stdClass;
 use Exception;
@@ -19,6 +20,15 @@ class FacilityController extends Controller
     {
         global $SPIRAL;
         try {
+            $auth = new Auth();
+            $auth->browseAuthority('FacilityList');
+            
+            $hospital = Hospital::where('tenantId',$auth->tenantId)->get();
+            $select_hospital = [['text'=> '----- 選択してください -----' ,'value'=> '' ]];
+            foreach($hospital->data->all() as $h)
+            {
+                $select_hospital[] = ['text'=> $h->hospitalName ,'value'=> $h->hospitalName ];
+            }
             $session = $SPIRAL->getSession(true , 3600);
             $session->remove('back_url');
             $error = $SPIRAL->getParam('errorMsg');
@@ -35,7 +45,9 @@ class FacilityController extends Controller
             ] , false)->render();
             
         } finally {
-            $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [] , false)->render();
+            $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [
+                'select_hospital'=>$select_hospital,
+                ] , false)->render();
             $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [] , false)->render();
             $sidemenu = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/SideMenu', [
                 'n1' => 'uk-active uk-open',
@@ -45,7 +57,7 @@ class FacilityController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 施設管理',
+                'title'     => 'JoyPla-Tenant-Master 病院情報管理',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -62,17 +74,11 @@ class FacilityController extends Controller
         global $SPIRAL;
         try {
             $auth = new Auth();
-            $tenant = Tenant::where('tenantId',$auth->tenantId)->get();
-            $tenant = $tenant->data->get(0);
+            $auth->browseAuthority('FacilityRegist');
+            
             $hidden = [
  					"SMPFORM" => "%smpform:T_HpInfoReg%",
 					"tenantId" => "%val:usr:tenantId%",
-					"distributorName" => $tenant->tenantName,
-					"postalCode" => $tenant->postalCode,
-					"prefectures" => $tenant->prefectures,
-					"address" => $tenant->address,
-					"phoneNumber" => $tenant->phoneNumber,
-					"faxNumber" => $tenant->faxNumber,
                 ];
                 
             $content = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/IframeContent', [
@@ -101,7 +107,7 @@ class FacilityController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 施設登録',
+                'title'     => 'JoyPla-Tenant-Master 病院情報登録',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

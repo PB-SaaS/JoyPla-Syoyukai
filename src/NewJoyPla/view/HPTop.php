@@ -953,7 +953,7 @@
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
-				                                <span class="title">払出（カード対応版）</span><br>
+				                                <span class="title">払出</span><br>
 				                                <span class="text">Payout</span>
 			                                </p>
 			                            </div>
@@ -1354,7 +1354,7 @@
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
-				                                <span class="title">貸出品リスト</span><br>
+				                                <span class="title">貸出リスト</span><br>
 				                                <span class="text">Borrowing List</span>
 			                                </p>
 			                            </div>
@@ -1370,7 +1370,7 @@
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
-				                                <span class="title">未承認使用済み伝票</span><br>
+				                                <span class="title">使用申請一覧</span><br>
 				                                <span class="text">Unapproved Used Slip</span>
 			                                </p>
 			                            </div>
@@ -1386,7 +1386,7 @@
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
-				                                <span class="title">使用済み伝票</span><br>
+				                                <span class="title">貸出伝票一覧</span><br>
 				                                <span class="text">Used Slip</span>
 			                                </p>
 			                            </div>
@@ -1533,14 +1533,8 @@
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="#" onclick="javascript:document.itemsReg.submit();"></a>
+			                            <a href="<?php echo $url ?>&Action=itemReg"></a>
 			                        </div>
-									<form action="/regist/is" method="post" name="itemsReg" target="_blank">
-										%SMPAREA%
-										<input type="hidden" name="tenantId" value="%val:usr:tenantId%">
-										<input type="hidden" name="hospitalId" value="%val:usr:hospitalId%">
-										<input type="hidden" name="SMPFORM" value="%smpform:330_itemReg%">
-									</form>
 						        </div>
 						    </div>
 						    <?php endif; ?>

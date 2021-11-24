@@ -4,13 +4,21 @@
             <div class="uk-width-1-2@m">
                 <h1>金額情報詳細</h1>
             </div>
+            <div class="uk-width-1-2@m uk-text-right">
+                <form action="<?php echo $form_url ?>" method="post">
+                    <input type="hidden" name="distributorId" value="%val:usr:distributorId%">
+                    <button class="uk-button uk-button-primary" type="submit" value="update" name="Action">金額情報変更</button>
+                    <button class="uk-button uk-button-primary" type="submit" value="registInHospitalItem" name="Action">院内商品登録</button>
+                </form>
+            </div>
         </div>
         <div>
             <ul class="uk-child-width-expand uk-tab" >
                 <li class="<?php echo $switch_1 ?>"><a href="#" onclick="location.href='<?php echo $base_url ?>&table_cache=true'">基本情報</a></li>
-                <li class="<?php echo $switch_2 ?>"><a href="#" onclick="location.href='<?php echo $base_url ?>&Switcher=logs'">使用中の院内商品</a></li>
+                <li class="<?php echo $switch_2 ?>"><a href="#" onclick="location.href='<?php echo $base_url ?>&Switcher=InHospitalItem'">使用中の院内商品</a></li>
             </ul>
         </div>
+        <?php if($switch_1 !== ""): ?>
         <table class="uk-table uk-table-divider">
             <tbody>
                 <tr>
@@ -138,5 +146,20 @@
                 <tr></tr>
             </tfoot>
         </table>
+        <?php elseif($switch_2 !== ""): ?>
+    	<div class="uk-margin spiral_table_area" style="display:none">
+    		%sf:usr:search47:table:mstfilter%
+    	</div>
+        <?php endif ?>
+        <script>
+            let elem = $('table tbody a');
+            let param = "<?php echo $back_key ?>";
+            if(param != "")
+            {
+            	for(let index = 0 ; index < elem.length ; index++){
+            		elem[index].href += "&BACK="+param;
+            	};
+            }
+        </script>
     </div>
 </div>

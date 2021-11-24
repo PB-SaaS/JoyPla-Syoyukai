@@ -309,4 +309,8 @@ class GoodBillingMR
 
     let billing_report = new GoodBillingMR();
 
+function pageSubmit(page)
+{
+    billing_report.pageSubmit(page);
+}
 </script>

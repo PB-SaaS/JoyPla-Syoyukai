@@ -23,10 +23,13 @@ class BlukUpsertItemsController extends Controller
     {
         global $SPIRAL;
         try {
+            $auth = new Auth();
+            $auth->browseAuthority('ItemBulkUpsert');
+                
             $api_url = "%url/rel:mpgt:BulkItem%";
             $error = $SPIRAL->getParam('errorMsg');
             
-            $content = $this->view('NewJoyPlaTenantAdmin/view/BlukUpsertItems/Inedx', [
+            $content = $this->view('NewJoyPlaTenantAdmin/view/BlukUpsertItems/Index', [
                 'api_url' => $api_url,
                 'csrf_token' => Csrf::generate(16)
                 ] , false)->render();
@@ -67,6 +70,7 @@ class BlukUpsertItemsController extends Controller
             $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
             Csrf::validate($token,true);
             
+            
             $auth = new Auth();
             
             $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
@@ -88,6 +92,7 @@ class BlukUpsertItemsController extends Controller
                         "quantity" => $rows['data'][9],
                         "quantityUnit" => $rows['data'][10],
                         "itemUnit" => $rows['data'][11],
+                        "lotManagement" => $rows['data'][12],
                         "tenantId" => $auth->tenantId,
                     ];
             }

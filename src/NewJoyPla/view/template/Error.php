@@ -23,7 +23,6 @@
                     TEL 03-5575-6601<br>
                     Mail JoyPla-spd@pi-pe.co.jp<br>
                     URL https://www.pi-pe.co.jp<br></p>
-                    </div>
                 </div>
             </div>
         </div>

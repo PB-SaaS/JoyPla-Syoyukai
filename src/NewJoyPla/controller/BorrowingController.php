@@ -166,7 +166,7 @@ class BorrowingController extends Controller
     
             
             $content = $this->view('NewJoyPla/view/template/List', [
-                    'title' => '未承認使用伝票一覧',
+                    'title' => '使用申請一覧',
                     'table' => '%sf:usr:search27%',
                     'csrf_token' => Csrf::generate(16),
                     'print' => true
@@ -186,7 +186,7 @@ class BorrowingController extends Controller
             
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 未承認使用伝票一覧',
+                'title'     => 'JoyPla 使用申請一覧',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),
@@ -215,7 +215,7 @@ class BorrowingController extends Controller
             
             
             $content = $this->view('NewJoyPla/view/template/List', [
-                    'title' => '承認済み使用伝票一覧',
+                    'title' => '貸出伝票一覧',
                     'table' => '%sf:usr:search28%',
                     'csrf_token' => Csrf::generate(16),
                     'print' => true
@@ -229,7 +229,7 @@ class BorrowingController extends Controller
         } finally {
         // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 承認済み使用伝票一覧',
+                'title'     => 'JoyPla 貸出伝票一覧',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),
@@ -302,7 +302,7 @@ class BorrowingController extends Controller
                     'used_date' => $history['usedTime'],
                     'used_slip_number' => $history['usedSlipId'],
                     'used_item_num' => $history['itemsNumber'],
-                    'total_price' => "￥".number_format((float)$history['totalAmount']),
+                    'total_price' => "￥".number_format((float)$history['totalAmount'],2),
                     'login_url' => OROSHI_LOGIN_URL,
                 ] , false)->render();
                 $select_name = $this->makeId($history['distributorId']);
@@ -531,12 +531,12 @@ class BorrowingController extends Controller
         $in_hospital_item = $in_hospital_item->get();
         foreach($borrowing_items as $key =>  $item)
         {
-            foreach($in_hospital_item as $in_hp_item)
+            foreach($in_hospital_item->data->all() as $in_hp_item)
             {
                 $lot_flag = 0;
                 if($item['recordId'] == $in_hp_item->inHospitalItemId)
                 {
-                    $lot_flag = $in_hp_item->lotManagement;
+                    $lot_flag = (int)$in_hp_item->lotManagement;
                     break;
                 }
             }
@@ -546,11 +546,14 @@ class BorrowingController extends Controller
             }
             if( ($item['lotNumber'] != '' && $item['lotDate'] == '' ) || ($item['lotNumber'] == '' && $item['lotDate'] != ''))
             {
-                throw new Exception('invalid lotNumber',100);
+                throw new Exception('invalid lotNumber',101);
             }
-            if(strlen($payoutRecord['lotNumber']) > 20)
+            if (($item['lotNumber'] != '') && ($item['lotDate'] != '')) 
             {
-                throw new Exception('invalid lotNumber',100);
+                if ((!ctype_alnum($item['lotNumber'])) || (strlen($item['lotNumber']) > 20))
+                {
+                    throw new Exception('invalid lotNumber format',102);
+                }
             }
             $insert_data[$key] = [
                 'inHospitalItemId' => $item['recordId'],
@@ -883,7 +886,7 @@ class BorrowingController extends Controller
                     'used_date' => $history['usedTime'],
                     'used_slip_number' => $history['usedSlipId'],
                     'used_item_num' => $history['itemsNumber'],
-                    'total_price' => "￥".number_format((float)$history['totalAmount']),
+                    'total_price' => "￥".number_format((float)$history['totalAmount'],2),
                     'login_url' => LOGIN_URL,
                 ] , false)->render();
                 $select_name = $this->makeId($history['hospitalId']);

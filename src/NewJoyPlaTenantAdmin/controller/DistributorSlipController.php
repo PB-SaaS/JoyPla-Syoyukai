@@ -24,35 +24,28 @@ class DistributorSlipController extends Controller
         global $SPIRAL;
         try {
             
+            $session = $SPIRAL->getSession();
+            
             $base_url = "%url/card:page_178749%";
             
-            $session = $SPIRAL->getSession(false , 3600);
-            
-            $back_url = $_SERVER['HTTP_REFERER'];
-            
-            if($session->containsKey('back_url'))
-            {
-                $back_url = $session->get('back_url');
-            } 
-            else 
-            {
-                $session->put('back_url',$_SERVER['HTTP_REFERER']);
-            }
-
-            
+            $back_key = $SPIRAL->getParam('BACK');
+            $back_url = "%url/rel:mpgt:Distributor%&table_cache=true";
             $back_text = "卸業者管理";
             $sidemenu = [
-                'n2' => 'uk-active uk-open'];
-            if (preg_match("/&Switcher=Distributor/", $back_url)) {
-                $back_text = "施設情報詳細";
+                'n2' => 'uk-active uk-open',
+                'n2_1' => 'uk-active',
+            ];
+            
+            if($back_key == "FacilitySlip" && $session->containsKey($back_key))
+            {
                 $sidemenu = [
                     'n1' => 'uk-active uk-open',
-                    'n1_1' => 'uk-active']; 
-            } 
-            else 
-            {
-                $back_url = "%url/rel:mpgt:Distributor%&table_cache=true";
+                    'n1_1' => 'uk-active',
+                ];
+                $back_text = "病院情報詳細";
+                $back_url = $session->get($back_key);
             }
+            $base_url = $base_url ."&BACK=".$back_key;
             
             $switcher = $SPIRAL->getParam('Switcher');
             
@@ -102,17 +95,23 @@ class DistributorSlipController extends Controller
             $back_text = "卸業者情報詳細";
             
             $sidemenu = [
-                'n2' => 'uk-active uk-open'];
+                'n2' => 'uk-active uk-open',
+                'n2_1' => 'uk-active'
+            ];
             if (preg_match("/&Switcher=Distributor/", $back_url)) {
                 $back_text = "卸業者情報詳細";
+                $sidemenu = [
+                    'n2' => 'uk-active uk-open',
+                    'n2_1' => 'uk-active']; 
+            }
+            if (preg_match("/&BACK=FacilitySlip/", $back_url)) {
+                $back_text = "病院情報詳細";
                 $sidemenu = [
                     'n1' => 'uk-active uk-open',
                     'n1_1' => 'uk-active']; 
             }
             
             $content = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/IframeContent', [
-                'back_url' => $back_url,
-                'back_text' => '施設情報詳細',
                 'title' => '卸業者ユーザー招待',
                 'width' => '100%',
                 'height'=> '100%',

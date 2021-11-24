@@ -45,6 +45,7 @@ class InventoryDivisionSlipController extends Controller
             $end_slip = $end_slip->data->get(0);
             
             $inventory_items = InventoryItemView::where('hospitalId',$user_info->getHospitalId())->where('inventoryHId',$division_history_slip->inventoryHId)->get();
+            $inventory_items = $inventory_items->data->all();
             
             $inventory_remake_items = [];
             /*
@@ -57,42 +58,15 @@ class InventoryDivisionSlipController extends Controller
             
             $stock = $stock->get();
             */
-            foreach($inventory_items->data->all() as $item )
-            {
-                if(array_key_exists($item->inHospitalItemId , $inventory_remake_items) === false)
-                {
-                    $inventory_remake_items[$item->inHospitalItemId] = $item;
-                    /*
-                    foreach($stock->data->all() as $stock_item){
-                        if($stock_item->inHospitalItemId == $item->inHospitalItemId)
-                        {
-                            $inventory_remake_items[$item->inHospitalItemId]->inventryNum = $item->inventryNum;
-                            $inventory_remake_items[$item->inHospitalItemId]->inventryAmount = $item->inventryAmount;
-                            break;
-                        }
-                    }
-                    */
-                } 
-                else 
-                {
-                    $inventory_remake_items[$item->inHospitalItemId]->inventryNum = (int)$inventory_remake_items[$item->inHospitalItemId]->inventryNum + (int)$item->inventryNum;
-                    $inventory_remake_items[$item->inHospitalItemId]->inventryAmount = (float)$inventory_remake_items[$item->inHospitalItemId]->inventryAmount + (float)$item->inventryAmount;
-                }
-            }
-            
-            
-            if(count($inventory_remake_items) != 0)
-            {
-                array_multisort(array_column($inventory_remake_items, 'inHospitalItemId'), SORT_ASC, $inventory_remake_items);
-            }
-            
             if($end_slip->inventoryStatus != 2)
             {
-                $prices = [];
+                //$prices = [];
+                $total_amount = 0;
                 $in_hospital_item_ids = [];
-                foreach($inventory_items->data->all() as $inventory_item)
+                foreach($inventory_items as $inventory_item)
                 {
-                    $prices[] = (float)$inventory_item->inventryAmount;
+                    //$prices[] = (float)$inventory_item->inventryAmount;
+                    $total_amount = $total_amount + (float)$inventory_item->inventryAmount;
                     if(!in_array( $inventory_item->inHospitalItemId ,$in_hospital_item_ids))
                     {
                         $in_hospital_item_ids[] = $inventory_item->inHospitalItemId;
@@ -100,17 +74,20 @@ class InventoryDivisionSlipController extends Controller
                 }
                 
                 InventoryHistory::where('hospitalId',$user_info->getHospitalId())->find($record_id)->update([
-                    "totalAmount" => collect($prices)->sum(),
+                    //"totalAmount" => collect($prices)->sum(),
+                    "totalAmount" => $total_amount,
                     "itemsNumber" => collect($in_hospital_item_ids)->count(),
                 ]);
                 	
                 $history_items = Inventory::where('hospitalId',$user_info->getHospitalId())->where('inventoryEndId', $division_history_slip->inventoryEndId)->get();
                 
-                $prices = [];
+                //$prices = [];
+                $total_amount = 0;
                 $in_hospital_item_ids = [];
                 foreach($history_items->data->all() as $history_item)
                 {
-                    $prices[] = (float)$history_item->inventryAmount;
+                    //$prices[] = (float)$history_item->inventryAmount;
+                    $total_amount = $total_amount + (float)$history_item->inventryAmount;
                     if(!in_array( $history_item->inHospitalItemId ,$in_hospital_item_ids))
                     {
                         $in_hospital_item_ids[] = $history_item->inHospitalItemId;
@@ -118,7 +95,8 @@ class InventoryDivisionSlipController extends Controller
                 }
                 
                 InventoryEnd::where('hospitalId',$user_info->getHospitalId())->where('inventoryEndId',$division_history_slip->inventoryEndId)->update([
-                    'totalAmount' => collect($prices)->sum(),
+                    //'totalAmount' => collect($prices)->sum(),
+                    'totalAmount' => $total_amount,
                     "itemsNumber" => collect($in_hospital_item_ids)->count(),
                 ]);
             }
@@ -148,6 +126,38 @@ class InventoryDivisionSlipController extends Controller
                     $delete_button_view_flg = true;
                 }
             }
+            
+            //2021/11/19 合計金額の修正
+            foreach($inventory_items as $item )
+            {
+                if(array_key_exists($item->inHospitalItemId , $inventory_remake_items) === false)
+                {
+                    $inventory_remake_items[$item->inHospitalItemId] = $item;
+                    /*
+                    foreach($stock->data->all() as $stock_item){
+                        if($stock_item->inHospitalItemId == $item->inHospitalItemId)
+                        {
+                            $inventory_remake_items[$item->inHospitalItemId]->inventryNum = $item->inventryNum;
+                            $inventory_remake_items[$item->inHospitalItemId]->inventryAmount = $item->inventryAmount;
+                            break;
+                        }
+                    }
+                    */
+                } 
+                else 
+                {
+                    $inventory_remake_items[$item->inHospitalItemId]->inventryNum = (int)$inventory_remake_items[$item->inHospitalItemId]->inventryNum + (int)$item->inventryNum;
+                    $inventory_remake_items[$item->inHospitalItemId]->inventryAmount = (float)$inventory_remake_items[$item->inHospitalItemId]->inventryAmount + (float)$item->inventryAmount;
+                }
+            }
+            
+            if(count($inventory_remake_items) != 0)
+            {
+                array_multisort(array_column($inventory_remake_items, 'inHospitalItemId'), SORT_ASC, $inventory_remake_items);
+            }
+            
+            
+            
             $api_url = "%url/card:page_263632%";
             $content = $this->view('NewJoyPla/view/InventorySlip', [
                 'api_url' => $api_url,

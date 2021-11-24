@@ -54,7 +54,7 @@
                                                 type="checkbox"
                                                 name="notUsedFlag"
                                                 value="1"
-                                                $notusedflag$="$notUsedFlag$">
+                                                $notUsedFlag$>
                                                 <span>未使用</span></label>
                                         </li>
                                     </ul>

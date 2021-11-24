@@ -28,13 +28,14 @@ class LoginController extends Controller
                 'message' => $ex->getMessage(),
             ] , false)->render();
         } finally {
+            $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [] , false)->render();
             $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [] , false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'title'     => 'JoyPla-Tenant-Master ログイン',
                 'content'   => $content,
                 'head' => $head,
-                'baseUrl' => '',
+                'style' => $style,
             ],false);
         }
     }

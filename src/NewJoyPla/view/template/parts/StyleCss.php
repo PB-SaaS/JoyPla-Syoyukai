@@ -1,4 +1,8 @@
  <style>
+ 
+	.uk-button-link {
+		color: #1e87f0;
+	}
 table .smp-row-data {
   border-top: 1px solid #e5e5e5;
 }
@@ -88,5 +92,9 @@ table.uk-table td, table.uk-table th{
 
 .title_spacing {
 	letter-spacing : 1em;
+}
+
+.jp-min-width-150 {
+  min-width : 150px;
 }
 </style>

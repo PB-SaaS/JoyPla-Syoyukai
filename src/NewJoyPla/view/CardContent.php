@@ -144,8 +144,9 @@
 		    					<th>規格</th>
 		    					<th>JANコード</th>
 		    					<th>入数</th>
-		    					<th class="uk-table-shrink">数量
-		    						<input type="button" class="uk-button uk-button-default uk-button-small" v-on:click="countToIrisu" value="入数を反映" >
+		    					<th style="padding-right: 5px;">数量</th>
+		    					<th style="padding-left: 0px;">
+		    					    <input type="button" class="uk-button uk-button-default uk-button-small" v-on:click="countToIrisu" value="入数を反映" >
 		    					</th>
 		    					<th style="width:100px"></th>
 		    					<th style="width:100px"></th>
@@ -160,7 +161,7 @@
 								<td>{{list.kikaku}}</td>
 								<td>{{list.jan}}</td>
 								<td>{{list.irisu}}{{list.unit}}</td>
-								<td>
+								<td colspan="2">
 									<input type="number" step="1" class="uk-input" min="0" style="width: 100px;" v-bind:style="list.countStyle" v-model="list.countNum" v-on:change="addCountStyle(key)">
 									<span class="uk-text-bottom">{{list.unit}}</span>
 								</td>
@@ -184,20 +185,23 @@
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
-		    				</tr>
-		    				<tr>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
-		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    				</tr>
 		    				<tr>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    					<td>&emsp;</td>
+		    				</tr>
+		    				<tr>
+		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
 		    					<td>&emsp;</td>
@@ -279,7 +283,7 @@ var app = new Vue({
 	},
 	filters: {
         number_format: function(value) {
-            if (! value) { return false; }
+            if (! value ) { return 0; }
             return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
         },
     },
@@ -329,6 +333,10 @@ var app = new Vue({
 			this.lists.splice(key, 1);
 		},
 		sanshouClick: function() {
+			if(!app.checkDivision())
+			{
+				return false;
+			}
 			window.open('%url/rel:mpgt:page_175973%', '_blank','scrollbars=yes,width=1220,height=600');
 		},
 		regCard: function(){
@@ -502,7 +510,7 @@ var modal_sections = new Vue({
 	},
 	filters: {
         number_format: function(value) {
-            if (! value) { return false; }
+            if (! value ) { return 0; }
             return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
         },
     },

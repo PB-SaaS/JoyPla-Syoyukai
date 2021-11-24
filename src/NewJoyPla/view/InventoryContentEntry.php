@@ -72,6 +72,7 @@
     table.uk-table > tbody > tr > td:first-child::before {
       content: counter(rowCount);
     }
+    
 </style>
 <div id="app" class="animsition" uk-height-viewport="expand: true">
     <div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
@@ -135,8 +136,9 @@
                             <th>入数</th>
                             <th>価格</th>
                             <th>単価</th>
-                            <th>棚卸数量
-		    						<input type="button" class="uk-button uk-button-default uk-button-small" v-on:click="countToIrisu" value="入数を反映" >
+                            <th style="padding-right: 5px;">棚卸数量</th>
+                            <th style="padding-left: 0px;">
+                                <input type="button" class="uk-button uk-button-default uk-button-small" v-on:click="countToIrisu" value="入数を反映" >
 		    				</th>
                             <th>ロット管理</th>
                             <th>ロット番号</th>
@@ -160,8 +162,8 @@
 							    ￥<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
 							    <span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
 							</td>
-							<td>
-								<input type="number" step="1" class="uk-input" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.countNum" v-bind:disabled="list.countNumDisabled" v-on:change="addCountStyle(key)">
+							<td colspan="2">
+								<input type="number" step="1" min="0" class="uk-input" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.countNum" v-bind:disabled="list.countNumDisabled" v-on:change="addCountStyle(key)">
 								<span class="uk-text-bottom">{{list.unit}}</span>
 							</td>
 							<td>
@@ -184,6 +186,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
+                        	<td>&emsp;</td>
                             <td>&emsp;</td>
                             <td>&emsp;</td>
                             <td>&emsp;</td>
@@ -202,6 +205,7 @@
                             <td>&emsp;</td>
                         </tr>
                         <tr>
+                        	<td>&emsp;</td>
                             <td>&emsp;</td>
                             <td>&emsp;</td>
                             <td>&emsp;</td>
@@ -220,6 +224,7 @@
                             <td>&emsp;</td>
                         </tr>
                         <tr>
+                        	<td>&emsp;</td>
                             <td>&emsp;</td>
                             <td>&emsp;</td>
                             <td>&emsp;</td>
@@ -305,7 +310,7 @@ var app = new Vue({
 	},
 	filters: {
         number_format: function(value) {
-            if (! value ) { return false; }
+            if (! value ) { return 0; }
             return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
         },
     },
@@ -321,6 +326,7 @@ var app = new Vue({
     					app.$set(app.lists, index, changeObject);
         			});
                 }
+                if (!app.lists.length) { app.division_disabled = false; }
           })
         }
     },
@@ -690,7 +696,7 @@ var modal_sections = new Vue({
 	},
 	filters: {
         number_format: function(value) {
-            if (! value) { return false; }
+            if (! value ) { return 0; }
             return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
         },
     },

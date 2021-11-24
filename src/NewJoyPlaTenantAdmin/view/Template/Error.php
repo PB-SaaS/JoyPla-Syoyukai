@@ -1,5 +1,5 @@
-<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove">
-    <div class="uk-container uk-container-expand" uk-height-viewport="expand: true">
+<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top">
+    <div class="uk-container uk-container-expand">
         <div
             class="uk-width-2-3@m uk-margin-auto uk-margin-remove-top uk-margin-bottom uk-text-center"
             id="mainPage">
@@ -23,12 +23,8 @@
                     TEL 03-5575-6601<br>
                     Mail JoyPla-spd@pi-pe.co.jp<br>
                     URL https://www.pi-pe.co.jp<br></p>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script>
-    window.parent.resize();
-</script>

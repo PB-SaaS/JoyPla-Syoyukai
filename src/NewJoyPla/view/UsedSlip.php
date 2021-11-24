@@ -35,7 +35,7 @@
                     <div class="uk-float-right uk-width-2-3@m">
                         <table class="uk-table uk-width-1-1 uk-table-divider">
                             <tr>
-                                <td>使用報告日時</td>
+                                <td>使用申請日時</td>
                                 <td>%val:usr:registrationTime%</td>
                             </tr>
                             <tr>
@@ -43,11 +43,11 @@
                                 <td>%val:usr:usedTime%</td>
                             </tr>
                             <tr>
-                                <td>使用済み番号</td>
+                                <td>貸出伝票番号</td>
                                 <td>%val:usr:usedSlipId%</td>
                             </tr>
                             <tr>
-                                <td>使用報告者</td>
+                                <td>申請者</td>
                                 <td>%val:usr:reportPersonName%</td>
                             </tr>
                         </table>
@@ -97,7 +97,7 @@
                                         echo "<td>".$record->borrowingNum.$record->itemUnit."</td>";
                                         echo "<td>".$record->lotNumber."</td>";
                                         echo "<td>".$record->lotDate."</td>";
-                                        echo "<td>￥".number_format((int)$record->price * (int)$record->borrowingNum)."</td>";
+                                        echo "<td>￥".number_format((int)$record->price * (int)$record->borrowingNum,2)."</td>";
                                         echo "</tr>";
                                         $num++;
                                     }
@@ -171,17 +171,17 @@
                 // Ajaxリクエストが成功した時発動
                 .done( (data) => {
                     if(data.code != 0){
-                        UIkit.modal.alert('使用済み伝票取消に失敗しました').then(function(){
+                        UIkit.modal.alert('使用申請の取り消しに失敗しました').then(function(){
                         });
                         return false;
                     }
-                    UIkit.modal.alert('使用済み伝票取消が完了しました').then(function () {
+                    UIkit.modal.alert('使用申請を取り消しました').then(function () {
                         location.href = "<?php echo $link ?>&table_cache=true";
                     });
                 })
                 // Ajaxリクエストが失敗した時発動
                 .fail( (data) => {
-                    UIkit.modal.alert('使用済み伝票取消に失敗しました').then(function(){
+                    UIkit.modal.alert('使用申請の取り消しに失敗しました').then(function(){
                     });
                 })
                 // Ajaxリクエストが成功・失敗どちらでも発動
@@ -210,17 +210,17 @@
                 // Ajaxリクエストが成功した時発動
                 .done( (data) => {
                     if(data.code != 0){
-                        UIkit.modal.alert('使用済み伝票承認に失敗しました').then(function(){
+                        UIkit.modal.alert('使用申請の承認に失敗しました').then(function(){
                         });
                         return false;
                     }
-                    UIkit.modal.alert('使用済み伝票承認が完了しました').then(function () {
+                    UIkit.modal.alert('使用申請を承認しました').then(function () {
                         location.reload();
                     });
                 })
                 // Ajaxリクエストが失敗した時発動
                 .fail( (data) => {
-                    UIkit.modal.alert('使用済み伝票承認に失敗しました').then(function(){
+                    UIkit.modal.alert('使用申請の承認に失敗しました').then(function(){
                     });
                 })
                 // Ajaxリクエストが成功・失敗どちらでも発動

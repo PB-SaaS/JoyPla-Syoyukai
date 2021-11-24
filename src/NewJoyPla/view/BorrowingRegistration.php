@@ -117,7 +117,7 @@
                         <button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
                         <button class="uk-button uk-button-primary " v-on:click="borrowingRegist">貸出リスト登録</button>
                         <?php if(!$user_info->isDistributorUser()): ?>
-                        <button class="uk-button uk-button-primary "  v-on:click="usedReport">使用済み報告</button>
+                        <button class="uk-button uk-button-primary "  v-on:click="usedReport">使用申請</button>
                         <?php endif ?>
                     </div>
                 </div>
@@ -147,7 +147,7 @@
                             <th class="uk-text-bottom">ロット番号</th>
                             <th class="uk-text-bottom" style="width:146px">使用期限</th>
                             <th>
-                                使用済み日<br>
+                                使用日<br>
                                 <input type="date" class="uk-input uk-form-small" id="allUsedDate" style="width:184px" v-model="allUsedDate">
                                 <div class="uk-text-right" style="width:184px">
                                     <button type="button" class="uk-button uk-button-primary uk-text-small uk-width-1-1" v-on:click='setUsedDate()'>一括反映</button>
@@ -175,7 +175,7 @@
 								<span v-else >任意</span>
 							</td>
 							<td>
-								<input type="text" class="uk-input lot" style="width:180px" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
+								<input type="text" maxlength="20" class="uk-input lot" style="width:180px" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
 							</td>
 							<td>
 								<input type="date" class="uk-input lotDate" v-model="list.lotDate" v-bind:style="list.lotDateStyle" v-on:change="addLotDateStyle(key)">
@@ -311,6 +311,17 @@ var app = new Vue({
 		allUsedDate: now_date,
 		division_disabled: false,
 	},
+    watch: {
+        lists: function() {
+            this.$nextTick(function() {
+                if (!app.lists.length) { 
+                    app.division_disabled = false;
+                } else {
+                    app.division_disabled = true;
+                }
+          })
+        }
+    },
 	methods: {
 		addList: function(object) {
 		    object.usedDate = ((object.usedDate == null)? now_date: object.usedDate); 
@@ -368,7 +379,7 @@ var app = new Vue({
 		},
 		setUsedDate: function()
 		{
-            UIkit.modal.confirm("使用済み日を一括反映しますか").then(function () {
+            UIkit.modal.confirm("使用日を一括反映しますか").then(function () {
 				let original = JSON.parse(JSON.stringify(app.lists));
     			app.lists.splice(0, original.length);
                 original.forEach(function(elem, index) {
@@ -478,7 +489,7 @@ var app = new Vue({
 			});
             
             if(!usedDate){
-                UIkit.modal.alert('使用済み日時の入力を確認してください');
+                UIkit.modal.alert('使用日の入力を確認してください');
                 return false ;
             }
 
@@ -535,7 +546,7 @@ var app = new Vue({
         },
         
         usedReport: function(){
-            UIkit.modal.confirm('使用済み報告を行いますか？').then(function () {
+            UIkit.modal.confirm('使用申請を行いますか？').then(function () {
                 
     			if(! app.divisionCheck()){
     			    return false;
@@ -565,17 +576,17 @@ var app = new Vue({
                 // Ajaxリクエストが成功した時発動
                 .done( (data) => {
                     if(data.code != 0){
-                        UIkit.modal.alert('使用済み報告に失敗しました').then(function(){
+                        UIkit.modal.alert('使用申請に失敗しました').then(function(){
                         });
                         return false;
                     }
-                    UIkit.modal.alert('使用済み報告が完了しました').then(function () {
+                    UIkit.modal.alert('使用申請が完了しました').then(function () {
 					    app.lists.splice(0, app.lists.length);
                     });
                 })
                 // Ajaxリクエストが失敗した時発動
                 .fail( (data) => {
-                    UIkit.modal.alert('使用済み報告に失敗しました').then(function(){
+                    UIkit.modal.alert('使用申請に失敗しました').then(function(){
                     });
                 })
                 // Ajaxリクエストが成功・失敗どちらでも発動
@@ -613,7 +624,6 @@ var app = new Vue({
                 	}
             		return false;
                 }
-            	this.division_disabled = true;
                 if(data.count == 1)
                 {
                 	data = data.data;

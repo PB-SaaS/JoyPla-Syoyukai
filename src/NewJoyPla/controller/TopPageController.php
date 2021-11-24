@@ -313,6 +313,55 @@ EOM;
             ],false);
         }
     }
+    
+    public function itemReg(): View
+    {
+        global $SPIRAL;
+        try {
+            
+            $user_info = new UserInfo($SPIRAL);
+            
+            $breadcrumb = <<<EOM
+            <li><a href="%url/rel:mpg:top%">TOP</a></li>
+            <li><span>商品登録</span></li>
+EOM;
+            $hidden = [
+                "SMPFORM" => "%smpform:330_itemReg%",
+                "tenantId" => "%val:usr:tenantId%",
+                "hospitalId" => "%val:usr:hospitalId%",
+                ];
+                
+            $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
+                'breadcrumb' => $breadcrumb,
+                'title' => '商品登録',
+                'width' => '100%',
+                'height'=> '100%',
+                'url' => '/regist/is',
+                'hiddens' => $hidden
+                ] , false);
+            
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
+            
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla 商品登録',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
+    }
 }
 
 /***
@@ -341,6 +390,10 @@ $action = $SPIRAL->getParam('Action');
     else if($action === 'contactUs')
     {
         echo $TopPageController->contactUs()->render();
+    }
+    else if($action === 'itemReg')
+    {
+        echo $TopPageController->itemReg()->render();
     }
     else 
     {

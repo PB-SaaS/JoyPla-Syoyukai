@@ -70,7 +70,7 @@ EOM;
             		"itemUnit" => "%val:usr:itemUnit%",
             		"minPrice" => "%val:usr:minPrice%",
             		"requestItemId" => "%val:usr:requestItemId%",
-            		"authKey" => "%val:usr:authKey%",
+            		"authKey" => "%val:usr:reqitemsAuthKey%",
             		"tenantId" => "%val:@usr:tenantId%",
             		"distributorId" => "%val:usr:distributorId%",
             		"requestId" => "%val:usr:requestId%",

@@ -323,4 +323,8 @@ class OrderMR
 
     let order_report = new OrderMR();
 
+function pageSubmit(page)
+{
+    order_report.pageSubmit(page);
+}
 </script>

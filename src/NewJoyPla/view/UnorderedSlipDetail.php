@@ -81,14 +81,14 @@
 				    				<tr>
 										<th>NO</th>
 										<th class="no_print"><input type="checkbox" onclick="allItems(this.checked)" class="uk-checkbox"></th>
-										<th style="min-width:150px">メーカー</a></th>
-										<th style="min-width:150px">商品名</a></th>
-										<th>製品コード</a></th>
-										<th>規格</a></th>
-										<th>価格</a></th>
-										<th>入数</a></th>
-										<th style="min-width:150px;max-width: 180px;">数量</a></th>
-										<th>金額</a></th>
+										<th style="min-width:150px">メーカー</th>
+										<th style="min-width:150px">商品名</th>
+										<th>製品コード</th>
+										<th>規格</th>
+										<th>価格</th>
+										<th>入数</th>
+										<th style="min-width:150px;max-width: 180px;">数量</th>
+										<th>金額</th>
 				    				</tr>
 				    			</thead>
 				    			<tbody>

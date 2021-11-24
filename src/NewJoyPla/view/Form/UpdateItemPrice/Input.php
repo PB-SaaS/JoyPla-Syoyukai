@@ -54,8 +54,8 @@
                                                 type="checkbox"
                                                 name="notUsedFlag"
                                                 value="1"
-                                                $notusedflag$="$notUsedFlag$">
-                                                <span>未使用</span></label>
+                                                $notUsedFlag$="$notUsedFlag$">
+                                                <span>不使用</span></label>
                                         </li>
                                     </ul>
                                     <input type="hidden" value="0" name="notUsedFlag">

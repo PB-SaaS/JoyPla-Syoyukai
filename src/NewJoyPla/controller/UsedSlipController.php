@@ -100,8 +100,8 @@ class UsedSlipController extends Controller
             if($used_slip_history->usedSlipStatus == '2')
             {
                 $link = $base."&Action=approvedUsedSlip";
-                $link_name = "承認済み使用伝票一覧";
-                $title = 'JoyPla 承認使用伝票一覧';
+                $link_name = "貸出伝票一覧";
+                $title = 'JoyPla 貸出伝票一覧';
 
                 if( $user_info->isHospitalUser())
                 {
@@ -112,8 +112,8 @@ class UsedSlipController extends Controller
             else 
             {
                 $link = $base."&Action=unapprovedUsedSlip";
-                $link_name = "未承認使用伝票一覧";
-                $title = 'JoyPla 未承認使用伝票一覧';
+                $link_name = "使用申請一覧";
+                $title = 'JoyPla 使用申請一覧';
             }
 
             $content = $this->view('NewJoyPla/view/UsedSlip', [
@@ -125,7 +125,7 @@ class UsedSlipController extends Controller
                 'link' => $link ,
                 'link_name' => $link_name,
                 'association' => $association,
-                'current_name' => '使用伝票',
+                'current_name' => '貸出伝票',
             ] , false);
 
         } catch ( Exception $ex ) {
@@ -213,7 +213,7 @@ class UsedSlipController extends Controller
                     'used_date' => $used_slip_history->usedTime,
                     'used_slip_number' => $used_slip_history->usedSlipId,
                     'used_item_num' => $used_slip_history->itemsNumber,
-                    'total_price' => "￥".number_format((float)$used_slip_history->totalAmount),
+                    'total_price' => "￥".number_format((float)$used_slip_history->totalAmount,2),
                     'login_url' => OROSHI_LOGIN_URL,
                 ] , false)->render();
                 

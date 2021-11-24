@@ -21,4 +21,15 @@
 <script>
 $('form#iframe_form').submit();
 
+$(function(){
+    
+    $('#iframeForm').on('load', function(){
+        var head = this.contentWindow.document.getElementsByTagName('head')[0]; 
+        var script = this.contentWindow.document.createElement('script'); 
+        script.innerText = '$("form").submit(function(){ $(".uk-section").addClass("animsition"); $("form .uk-button").addClass("uk-disabled"); loading(); });'; 
+        script.type = 'text/javascript'; 
+        head.appendChild(script); 
+    });
+});
 </script>
+

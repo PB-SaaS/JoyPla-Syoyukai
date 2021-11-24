@@ -56,7 +56,7 @@ if(! $nav->user_info->isHospitalUser())
 		</p>
 		<ul class="uk-navbar-nav">
 			<li>
-				<a href="#" uk-icon="icon: question; ratio: 1.5" title="ヘルプ"></a>
+				<a href="https://support.joypla.jp/" target="support" uk-icon="icon: question; ratio: 1.5" title="ヘルプ"></a>
 			</li>
 			<li class="uk-inline">
 				<a href="#" uk-icon="icon: bell; ratio: 1.5" title="お知らせ" uk-navbar="mode: click" uk-toggle="animation: uk-animation-fade"></a>

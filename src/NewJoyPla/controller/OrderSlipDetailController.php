@@ -297,7 +297,7 @@ class OrderSlipDetailController extends Controller
                     ];
                     $total_price[] = (float)$item['countNum'] * (float)$item['price'];
                     
-                    if ($data['lotNumber'] && $data['lotDate']) {
+                    if ($item['lotNumber'] && $item['lotDate']) {
                         $inventory_adjustment_trdata[] = [
                             'divisionId' => $divisionId,
                             'inHospitalItemId' => $item['inHospitalItemId'],

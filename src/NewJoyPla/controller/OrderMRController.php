@@ -150,6 +150,7 @@ class OrderMRController extends Controller
         if ($startMonth) { OrderedItemView::where('registrationTime', $startMonth, '>='); }
         if ($endMonth) { OrderedItemView::where('registrationTime', (date('Y-m-d', strtotime($endMonth . '+1 day'))), '<='); }
         if ($divisionId) { OrderedItemView::where('divisionId', $divisionId); }
+        if ($distributorId) { OrderedItemView::where('distributorId',$distributorId); }
         $orderDB = OrderedItemView::get();
 
         if ($orderDB->count == 0)
@@ -167,7 +168,6 @@ class OrderMRController extends Controller
         if ($itemName) { InHospitalItemView::where('itemName',"%$itemName%",'LIKE'); }
         if ($itemCode) { InHospitalItemView::where('itemCode',"%$itemCode%",'LIKE'); }
         if ($itemStandard) { InHospitalItemView::where('itemStandard',"%$itemStandard%",'LIKE'); }
-        if ($distributorId) { InHospitalItemView::where('distributorId',$distributorId); }
         if ($category_ids)
         {
             foreach ($category_ids as $val)

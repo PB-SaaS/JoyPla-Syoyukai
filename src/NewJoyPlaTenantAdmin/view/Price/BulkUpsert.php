@@ -1,8 +1,8 @@
-<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove" id="app">
+<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="app">
     <div class="uk-container uk-container-expand" uk-height-viewport="expand: true">
         <div class="uk-margin-auto uk-margin-remove-top uk-margin-bottom" id="mainPage">
             <!-- SMP_TEMPLATE_HEADER start -->
-            <h1>金額情報一括登録</h1>
+            <h1>金額情報一括登録・更新</h1>
             <div class="js-upload uk-placeholder uk-text-center">
                 <div class="js-upload" uk-form-custom>
                     <input type="file" @change="loadCsvFile" accept=".csv,.tsv,.txt">
@@ -24,10 +24,11 @@
             <input type="button" v-on:click="validateCheck" value="バリデーションチェック" class="uk-button uk-button-primary" v-bind:disabled="lists.length == 0">
             
             <span class="uk-margin-small-right" uk-icon="icon: arrow-right; ratio: 2" v-if="result"></span>
-            <input type="button" v-on:click="regist" value="登録実行" class="uk-button uk-button-primary" v-if="result">
-            
+            <input type="button" v-on:click="regist" value="登録・更新実行" class="uk-button uk-button-primary" v-if="result">
             <h4>読み取り結果</h4>
             <p>件数：{{ lists.length }} 件</p>
+            <br>
+            <span class="uk-text-warning">※金額管理IDが空のものは新規登録として扱います</span>
             <p class="uk-text-danger" v-for="msg in message">{{ msg }}</p>
             <p class="uk-text" >{{ success_message }}</p>
             <table class="uk-table uk-table-divider">
@@ -68,6 +69,7 @@ var app = new Vue({
             filename: "",
             hospitalId: "",
             headers: [
+                "金額管理ID",
                 "卸業者ID",
                 "商品ID",
                 "入数",

@@ -24,6 +24,9 @@
                         </div>
                         %area:hidden%
                         <button type="submit" class="uk-button uk-button-primary uk-width-1-1">ログイン</button>
+                        <div class="uk-margin uk-text-center">
+                            <a href="%url/area:rereg:TenantAdmin%" >パスワードを忘れた方はこちら</a>
+                        </div>
                     </fieldset>
                 </form>
             </div>

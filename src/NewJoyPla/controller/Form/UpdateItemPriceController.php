@@ -148,7 +148,7 @@ class UpdateItemPriceController extends Controller
             <h1>金額情報変更 - 完了</h1>
             <div class="smp_tmpl uk-text-left">
                 <div class="sub_text">
-                    金額情報変更が完了しました。<br><br><a target="_parent" href="%url/rel:mpg:top%">トップへ戻る</a><br>		
+                    金額情報変更が完了しました。
                 </div>
             </div>
 EOM;

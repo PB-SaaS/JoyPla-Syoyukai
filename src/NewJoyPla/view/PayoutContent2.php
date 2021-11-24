@@ -83,15 +83,16 @@
 		table.uk-table > tbody > tr > td:first-child::before {
 			content: counter(rowCount);
 		}
+		
     </style>
     <div id="app" class="animsition" uk-height-viewport="expand: true">
 	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
 		    <div class="uk-container uk-container-expand">
 		    	<ul class="uk-breadcrumb">
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
-				    <li><span>払出内容入力（カード対応版）</span></li>
+				    <li><span>払出内容入力</span></li>
 				</ul>
-		    	<h2 class="page_title">払出内容入力（カード対応版）</h2>
+		    	<h2 class="page_title">払出内容入力</h2>
 		    	<hr>
 	    		<div class="uk-width-auto uk-text-right">
 	    			<div class="uk-form-controls">
@@ -106,7 +107,7 @@
 			    			<div class="uk-width-1-2">
 			    				<label class="uk-form-label">払出元部署</label>
 				    			<div class="uk-form-controls">
-						            <select class="uk-width-4-5 uk-select uk-inline" v-model="sourceDivision" name="sourceDivision">
+						            <select class="uk-width-4-5 uk-select uk-inline" v-model="sourceDivision" name="sourceDivision" v-bind:disabled="source_division_disabled">
 						                <option value="">----- 部署選択 -----</option>
 				                        <?php
 				                        foreach($source_division->data as $data)
@@ -135,7 +136,7 @@
 			    			<div class="uk-width-1-2">
 				    			<label class="uk-form-label" >払出先部署</label>
 				    			<div class="uk-form-controls">
-			    				   <select class="uk-select uk-width-4-5" v-model="targetDivision" name="targetDivision">
+			    				   <select class="uk-select uk-width-4-5" v-model="targetDivision" name="targetDivision" v-bind:disabled="target_division_disabled">
 						                <option value="">----- 部署選択 -----</option>
 				                        <?php
 				                        foreach($target_division->data as $data)
@@ -197,7 +198,8 @@
 			    					<th>ロット管理</th>
 			    					<th>ロット番号</th>
 			    					<th>使用期限</th>
-			    					<th>払出数
+			    					<th style="padding-right: 5px;">払出数</th>
+			    					<th style="padding-left: 0px;">
 			    						<input type="button" class="uk-button uk-button-default uk-button-small" v-on:click="countToIrisu" value="入数を反映" >
 			    					</th>
 			    					<th>個数（ラベル枚数）</th>
@@ -226,12 +228,12 @@
 										<span v-else >任意</span>
 									</td>
 									<td>
-										<input type="text" class="uk-input lot" v-model="list.lotNumber" style="width:180px" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
+										<input type="text" maxlength="20" class="uk-input lot" v-model="list.lotNumber" style="width:180px" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
 									</td>
 									<td>
 										<input type="date" class="uk-input lotDate" v-model="list.lotDate" v-bind:style="list.lotDateStyle" v-on:change="addLotDateStyle(key)">
 									</td>
-									<td>
+									<td colspan="2">
 										<input type="number" step="1" class="uk-input" min="0" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.countNum" v-bind:disabled="list.countNumDisabled" v-on:change="addCountStyle(key)">
 										<span class="uk-text-bottom">{{list.unit}}</span>
 									</td>
@@ -251,6 +253,17 @@
 									</td>
 								</tr>
 			    			</tbody>
+			    	        <tfoot>
+                                <tr>
+                                    <td colspan="19">&emsp;</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="19">&emsp;</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="19">&emsp;</td>
+                                </tr>
+                            </tfoot>
 			    		</table>
 			    	</div>
 		    	</div>
@@ -320,14 +333,14 @@ var app = new Vue({
 	data: {
 		lists: [],
 		sourceDivision: '',
-		sourceDivisionReadonly: false,
+    source_division_disabled: false,
 		targetDivision: '',
-		targetDivisionReadonly: false,
+		target_division_disabled: false,
         useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
 	},
 	filters: {
         number_format: function(value) {
-            if (! value) { return false; }
+            if (! value ) { return 0; }
             return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
         },
     },
@@ -343,22 +356,12 @@ var app = new Vue({
     					app.$set(app.lists, index, changeObject);
         			});
                 }
+                if (!app.lists.length) { app.source_division_disabled = false; }
+                if (!app.lists.length) { app.target_division_disabled = false; }
           })
         }
     },
 	methods: {
-		setSourceDivision : function(elm) {
-			this.sourceDivision = elm.value;
-		},
-		setTargetDivision : function(elm) {
-			this.targetDivision = elm.value;
-		},
-		lock1: function(){
-			this.sourceDivisionReadonly = true;	
-		},
-		lock2: function(){
-			this.targetDivisionReadonly = true;	
-		},
 		addList: function(object) {
 			object.class = ((object.class == null)? {'target' : true} : object.class);
 			object.countNum = ((object.countNum == null)? 0 : object.countNum);
@@ -670,7 +673,7 @@ var app = new Vue({
 	                	UIkit.modal.alert("払出先のカードではありません");
 	                	return false;
             		}
-	            	$('select[name="targetDivision"]').attr('disabled',true);
+	            	app.target_division_disabled = true;
 	            	let checked = false;
 	            	app.lists.forEach(function(elem, index) {
 	            		if(
@@ -693,6 +696,7 @@ var app = new Vue({
 	            	if(!checked)
 	            	{
 	                	UIkit.modal.alert("紐づける対象の商品がリストにありませんでした");
+	            		app.target_division_disabled = false;
 	            	}
             	} else {
                 	UIkit.modal.alert("カード情報が取得できませんでした。カード情報と払出先部署が一致しているか確認してください。");
@@ -735,14 +739,15 @@ var app = new Vue({
                 	}
             		return false;
                 }
+	            	app.source_division_disabled = true;
                 if(data.count == 1)
                 {
-	            	$('select[name="sourceDivision"]').attr('disabled',true);
                 	data = data.data;
                 	
                 	if(data.divisionId != "" && $('select[name="sourceDivision"]').val() != data.divisionId )
                 	{
 	            		UIkit.modal.alert("読み込んだバーコードの部署が払出元の部署と一致しません");
+	            		if (!app.lists.length) { app.source_division_disabled = false; }
 	            		return false;
                 	}
                 	if(lotNumber != ''){
@@ -759,7 +764,6 @@ var app = new Vue({
 	                
 	                $('input[name="barcode"]').val('');
                 } else {
-	            	$('select[name="sourceDivision"]').attr('disabled',true);
                 	data = data.data;
                 	modal_sections.clear();
                 	for(let num = 0 ; num < data.length ; num++)
@@ -793,7 +797,7 @@ var modal_sections = new Vue({
 	},
 	filters: {
         number_format: function(value) {
-            if (! value) { return false; }
+            if (! value ) { return 0; }
             return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
         },
     },

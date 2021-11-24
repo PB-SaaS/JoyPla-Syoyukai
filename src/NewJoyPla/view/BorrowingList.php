@@ -21,7 +21,7 @@
                         </div>
                     </div>
                     <div class="uk-margin uk-text-center">
-                        <input class="print_hidden uk-button uk-button-primary" type="button" value="使用済み仮報告" onclick="borrowing_list.usedTemporaryReport()">
+                        <input class="print_hidden uk-button uk-button-primary" type="button" value="使用申請" onclick="borrowing_list.usedTemporaryReport()">
                     </div>
                 </div>
             </div>
@@ -44,7 +44,7 @@ class BorrowingList
     usedTemporaryReport()
     {
         let tmp = this;
-        UIkit.modal.confirm("未承認の使用済み伝票として登録しますか").then(function () {
+        UIkit.modal.confirm("使用申請を行いますか").then(function () {
             if( ! tmp.is_checked_box_validate() )
             {
                 return UIkit.modal.alert("使用済みとして登録する商品にチェックを入れてください");
@@ -71,16 +71,16 @@ class BorrowingList
             // Ajaxリクエストが成功した時発動
             .done( (data) => {
                 if(data.code != 0){
-                    UIkit.modal.alert('使用済み伝票仮登録に失敗しました');
+                    UIkit.modal.alert('使用申請に失敗しました');
                     return false;
                 }
-                UIkit.modal.alert('使用済み伝票仮登録が完了しました').then(function () {
+                UIkit.modal.alert('使用申請が完了しました').then(function () {
                     location.reload();
                 });
             })
             // Ajaxリクエストが失敗した時発動
             .fail( (data) => {
-                UIkit.modal.alert('使用済み伝票仮登録に失敗しました');
+                UIkit.modal.alert('使用申請に失敗しました');
             })
             // Ajaxリクエストが成功・失敗どちらでも発動
             .always( (data) => {

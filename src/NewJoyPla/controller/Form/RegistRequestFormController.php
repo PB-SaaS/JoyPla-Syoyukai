@@ -11,6 +11,7 @@ use App\Model\DistributorUser;
 use App\Model\Distributor;
 use App\Model\HospitalUser;
 use App\Model\DistributorAffiliationView;
+use App\Model\TenantMaster;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -149,7 +150,32 @@ class RegistRequestFormController extends Controller
                 ->subject("[JoyPla] ".$requestUName."さんが見積依頼「".$requestTitle."」を作成しました")
                 ->from(FROM_ADDRESS,FROM_NAME)
                 ->send();
-                
+             
+             
+			$tenantId = $SPIRAL->getContextByFieldTitle("tenantId");
+            
+            $mail_body = $this->view('NewJoyPla/view/Mail/RegistRequestForm', [
+                'name' => '%val:usr:name%',
+                'request_title' => $requestTitle,
+                'request_Name' => $requestUName,
+                'url' => TENANT_ADMIN_LOGIN_URL,
+            ] , false)->render();
+            
+            $select_name = $this->makeId($tenantId);
+
+            $test = TenantMaster::selectName($select_name)->rule([
+                'name'=>'tenantId',
+                'label'=>'name_'.$tenantId,
+                'value1'=>$tenantId,
+                'condition'=>'matches'
+            ])->filterCreate();
+
+            $test = TenantMaster::selectRule($select_name)
+                ->body($mail_body)
+                ->subject("[JoyPla] ".$requestUName."さんが見積依頼「".$requestTitle."」を作成しました")
+                ->from(FROM_ADDRESS,FROM_NAME)
+                ->send();
+                    
                 
             $breadcrumb = <<<EOM
 		    <li><a target="_parent" href="%url/rel:mpg:top%">TOP</a></li>
@@ -162,7 +188,7 @@ EOM;
             <h1>見積依頼 - 完了</h1>
             <div class="smp_tmpl uk-text-left">
                 <div class="sub_text">
-                    見積依頼が完了しました。<br><br><a target="_parent" href="%url/rel:mpg:top%">トップへ戻る</a><br>		
+                    見積依頼が完了しました。
                 </div>
             </div>
 EOM;

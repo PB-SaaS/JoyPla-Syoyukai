@@ -23,17 +23,25 @@ class BlukUpsertItemsSlipController extends Controller
     {
         global $SPIRAL;
         try {
+            $session = $SPIRAL->getSession();
             
-            $back_url = $_SERVER['HTTP_REFERER'];
-            $back_text = "施設情報詳細";
+            $back_key = $SPIRAL->getParam('BACK');
+            
+            $back_url = "%url/rel:mpgt:BulkItem%&Action=logsList&table_cache=true";
+            $back_text = "商品登録更新履歴";
             $sidemenu = [
                 'n3' => 'uk-active uk-open',
-                'n3_3' => 'uk-active'];
-            if (preg_match("/&Switcher=logs/", $back_url)) {
-                $back_text = "商品情報詳細";
+                'n3_3' => 'uk-active',
+            ];
+            
+            if($back_key == "ItemSlip" && $session->containsKey($back_key))
+            {
                 $sidemenu = [
                     'n3' => 'uk-active uk-open',
-                    'n3_1' => 'uk-active']; 
+                    'n3_1' => 'uk-active',
+                ];
+                $back_text = "商品情報詳細";
+                $back_url = $session->get($back_key);
             }
             
             $content = $this->view('NewJoyPlaTenantAdmin/view/BlukUpsertItemsLogs/Slip', [

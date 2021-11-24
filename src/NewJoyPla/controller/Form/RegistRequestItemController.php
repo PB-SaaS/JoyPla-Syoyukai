@@ -205,7 +205,7 @@ EOM;
             <h1>見積商品追加 - 完了</h1>
             <div class="smp_tmpl uk-text-left">
                 <div class="sub_text">
-                    見積商品追加が完了しました。<br><br><a target="_parent" href="%url/rel:mpg:top%">トップへ戻る</a><br>		
+                    見積商品追加が完了しました。	
                 </div>
             </div>
 EOM;

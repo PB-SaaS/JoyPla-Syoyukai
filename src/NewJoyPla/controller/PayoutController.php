@@ -27,7 +27,7 @@ class PayoutController extends Controller
     public function __construct()
     {
     }
-    
+    /*
     public function index(): View
     {
         global $SPIRAL;
@@ -87,7 +87,7 @@ class PayoutController extends Controller
             ],false);
         }
     }
-    
+    */
     public function newPayout(): View
     {
         global $SPIRAL;
@@ -142,7 +142,7 @@ class PayoutController extends Controller
         } finally {
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 払出登録（カード対応版）',
+                'title'     => 'JoyPla 払出登録',
                 'script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),
@@ -456,12 +456,12 @@ EOM;
             
             foreach($payout as $key => $record)
             {
-                foreach($in_hospital_item as $in_hp_item)
+                foreach($in_hospital_item->data->all() as $in_hp_item)
                 {
                     $lot_flag = 0;
                     if($record['recordId'] == $in_hp_item->inHospitalItemId)
                     {
-                        $lot_flag = $in_hp_item->lotManagement;
+                        $lot_flag = (int)$in_hp_item->lotManagement;
                         break;
                     }
                 }
@@ -471,11 +471,14 @@ EOM;
                 }
                 if( ($record['lotNumber'] != '' && $record['lotDate'] == '' ) || ($record['lotNumber'] == '' && $record['lotDate'] != ''))
                 {
-                    throw new Exception('invalid lotNumber',100);
+                    throw new Exception('invalid lotNumber input',101);
                 }
-                if(strlen($payoutRecord['lotNumber']) > 20)
+                if (($record['lotNumber'] != '') && ($record['lotDate'] != '')) 
                 {
-                    throw new Exception('invalid lotNumber',100);
+                    if((!ctype_alnum($record['lotNumber'])) || strlen($record['lotNumber']) > 20)
+                    {
+                        throw new Exception('invalid lotNumber format',102);
+                    }
                 }
         		$payout[$key]['countNum'] = (int)$record['countNum'] * (int)$record['countLabelNum'] ;
         		$payout[$key]['payoutCount'] = $record['countNum'];
@@ -510,8 +513,9 @@ EOM;
 				    {
 				        $in_hospital_item_ids[] = $data['recordId'];
 				    }
-					if ($use_unit_price) { $unit_price = str_replace(',', '', $data['unitPrice']); }
-					if (!$use_unit_price) { $unit_price = str_replace(',', '', $data['kakaku']) / $data['irisu']; }
+                    $unit_price = $use_unit_price
+                        ? (str_replace(',', '', $data['unitPrice']))
+                        : (str_replace(',', '', $data['kakaku']) / $data['irisu']);
 					$insert_data[] = [
 					    'registrationTime' => $payout_date,
 						'payoutHistoryId' => $payout_id,

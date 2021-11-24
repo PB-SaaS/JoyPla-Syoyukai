@@ -203,7 +203,7 @@ class ReceiptSlipController extends Controller
     		$return_history_id = $this->makeId('06');
     		
         	
-        	$receiving = Receiving::where('hospitalId',$user_info->getHospitalId());
+        	$receiving = ReceivingView::where('hospitalId',$user_info->getHospitalId());
         	foreach($return_items as $data)
         	{
         	    $receiving->orWhere('receivingNumber',$data['receivingNumber']);
@@ -250,6 +250,30 @@ class ReceiptSlipController extends Controller
             			{
             			    $in_hospital_item_ids[] = $item->inHospitalItemId;
             			}
+                        if ($item->lotNumber && $item->lotDate) {
+                            $lot_date = \App\Lib\changeDateFormat('Y年m月d日',$item->lotDate,'Y-m-d');
+                            $inventory_adjustment_trdata[] = [
+                                'divisionId' => $divisionId,
+                                'inHospitalItemId' => $item->inHospitalItemId,
+                                'count' => -((int)$item->quantity * (int)$data['returnCount']),
+                                'hospitalId' => $user_info->getHospitalId(),
+                                'lotUniqueKey' => $user_info->getHospitalId().$divisionId.$item->inHospitalItemId.$item->lotNumber.$lot_date,
+                                'lotNumber' => $item->lotNumber,
+                                'lotDate' => $lot_date,
+                                'pattern' => 6,
+                                'stockQuantity' => -((int)$item->quantity * (int)$data['returnCount']),
+                            ];
+                        }
+                        else 
+                        {
+                            $inventory_adjustment_trdata[] = [
+                                'divisionId' => $divisionId,
+                                'pattern' => 6,
+                                'inHospitalItemId' => $item->inHospitalItemId,
+                                'count' => -((int)$item->quantity * (int)$data['returnCount']),
+                                'hospitalId' => $user_info->getHospitalId()
+                            ];
+                        }
                         $price[] = (float)$item->price * (int)$data['returnCount'];
                         $return_count = $return_count + (int)$data['returnCount'];
             	    }
@@ -260,30 +284,6 @@ class ReceiptSlipController extends Controller
     				'totalReturnCount'=>(int)$item->totalReturnCount + (int)$return_count
 				    ];
 				
-                if ($item->lotNumber && $item->lotDate) {
-                    $lot_date = \App\Lib\changeDateFormat('Y年m月d日',$item->lotDate,'Y-m-d');
-                    $inventory_adjustment_trdata[] = [
-                        'divisionId' => $divisionId,
-                        'inHospitalItemId' => $item->inHospitalItemId,
-                        'count' => -((int)$item->quantity * (int)$return_count),
-                        'hospitalId' => $user_info->getHospitalId(),
-                        'lotUniqueKey' => $user_info->getHospitalId().$divisionId.$item->inHospitalItemId.$item->lotNumber.$lot_date,
-                        'lotNumber' => $item->lotNumber,
-                        'lotDate' => $lot_date,
-                        'pattern' => 6,
-                        'stockQuantity' => -((int)$item->quantity * (int)$return_count)
-                    ];
-                } 
-                else 
-                {
-                    $inventory_adjustment_trdata[] = [
-                        'divisionId' => $divisionId,
-                        'pattern' => 6,
-                        'inHospitalItemId' => $item->inHospitalItemId,
-                        'count' => -((int)$item->quantity * (int)$return_count),
-                        'hospitalId' => $user_info->getHospitalId()
-                    ];
-                }
         	}
         	
         	$history_insert[] = [

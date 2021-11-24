@@ -323,4 +323,8 @@ class PayoutMR
 
     let payout_report = new PayoutMR();
 
+function pageSubmit(page)
+{
+    payout_report.pageSubmit(page);
+}
 </script>

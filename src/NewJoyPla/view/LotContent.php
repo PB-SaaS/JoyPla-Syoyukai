@@ -95,9 +95,8 @@
             <hr>
             <div class="uk-child-width-1-3@m" uk-grid>
                 <div>
-                    <label class="uk-form-label">部署</label>
                     <div class="uk-form-controls">
-                        <select class="uk-width-3-4 uk-select uk-inline" id="divisionId" v-model="divisionId">
+                        <select class="uk-width-3-4 uk-select uk-inline" id="divisionId" v-model="divisionId" v-bind:disabled="division_disabled">
                             <option value="">----- 部署選択 -----</option>
                             <?php
 		                        foreach($division->data as $data)
@@ -164,7 +163,7 @@
                             <td>{{list.jan}}</td>
                             <td>{{list.irisu}}{{list.unit}}</td>
                             <td>
-                                <input type="text" class="uk-input lot" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
+                                <input type="text" maxlength="20" class="uk-input lot" style="width: 180px;" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
                             </td>
                             <td>
                                 <input type="date" class="uk-input lotDate" v-model="list.lotDate" v-bind:style="list.lotDateStyle" v-on:change="addLotDateStyle(key)">
@@ -295,10 +294,21 @@ var app = new Vue({
 	data: {
 		lists: [],
 		divisionId: '',
+    division_disabled: false
 	},
+    watch: {
+        lists: function() {
+            this.$nextTick(function() {
+                if (!app.lists.length) { 
+                    app.division_disabled = false;
+                } else {
+                    app.division_disabled = true;
+                }
+          })
+        }
+    },
 	methods: {
 		addList: function(object) {
-        	$('#divisionId').prop('disabled',true);
         	object.lotCountNum = 0;
         	object.lotDateStyle = {};
         	object.lotNumberStyle = {};
@@ -459,13 +469,11 @@ var app = new Vue({
                 }
                 if(data.count == 1)
                 {
-	            	$('select[name="divisionId"]').attr('disabled',true);
                 	data = data.data;
                 	this.addList(data);
 	                
 	                $('input[name="barcode"]').val('');
                 } else {
-	            	$('select[name="divisionId"]').attr('disabled',true);
                 	data = data.data;
                 	modal_sections.clear();
                 	for(let num = 0 ; num < data.length ; num++)

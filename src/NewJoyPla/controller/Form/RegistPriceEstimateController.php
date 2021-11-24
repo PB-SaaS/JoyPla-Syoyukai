@@ -197,8 +197,6 @@ class RegistPriceEstimateController extends Controller
                 ->from(FROM_ADDRESS,FROM_NAME)
                 ->send();
             
-            
-            
             $breadcrumb = <<<EOM
 		    <li><a target="_parent" href="%url/rel:mpg:top%">TOP</a></li>
 		    <li><a target="_parent" href="{$SPIRAL->getParam('list_link')}">見積依頼一覧</a></li>
@@ -213,7 +211,7 @@ EOM;
             <h1>見積金額登録 - 完了</h1>
             <div class="smp_tmpl uk-text-left">
                 <div class="sub_text">
-                    見積金額登録が完了しました。<br><br><a target="_parent" href="%url/rel:mpg:top%">トップへ戻る</a><br>		
+                    見積金額登録が完了しました。	
                 </div>
             </div>
 EOM;

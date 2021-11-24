@@ -47,7 +47,7 @@ class UpdateInHospitalItemController extends Controller
             
             $priceId = $SPIRAL->getParam('priceId');
             
-            $price = PriceView::where('requestFlg','1')->where('itemId',$itemId)->where('hospitalId',$user_info->hospitalId)->get();
+            $price = PriceView::where('requestFlg','1')->where('notUsedFlag','1','!=')->where('itemId',$itemId)->where('hospitalId',$user_info->hospitalId)->get();
             $price = $price->data->all();
             
             $content = $this->view('NewJoyPla/view/Form/UpdateInHospitalItem/Input', [

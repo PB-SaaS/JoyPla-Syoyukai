@@ -147,6 +147,7 @@ class StockController extends Controller
             }
             
             $stocks = $SPIRAL->getParam('stocks');
+            $stocks = $this->requestUrldecode($stocks);
             
             $insert_data = [];
             $stock_instance = Stock::where('hospitalId',$user_info->getHospitalId());

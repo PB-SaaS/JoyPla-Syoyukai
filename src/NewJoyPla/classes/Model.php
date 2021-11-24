@@ -178,7 +178,7 @@ class Model
     {
         $instance = self::getInstance();
         if($order == 'asc' || $order == 'desc'){
-            $this->sort[] = array( 'name' => $fieldTitle , 'order' => $order );
+            $instance->sort[] = array( 'name' => $fieldTitle , 'order' => $order );
         }
         return $instance;
     }
@@ -373,6 +373,38 @@ class Model
             $create_array[] = ['name' => $field , 'value' => $val];
         }
 
+        return $create_array;
+    }
+
+
+    public static function upsert( $key , array $upsert_data)
+    {
+        $instance = self::getInstance();
+        $instance->spiralDataBase->setDataBase($instance::$spiral_db_name);
+        $upsert_data = $instance->makeUpsertArray($upsert_data);
+        $result = $instance->spiralDataBase->doBulkUpdate($key , $instance::$fillable, $upsert_data);
+        if($result['code'] != 0)
+        {
+            throw new Exception(FactoryApiErrorCode::factory((int)$result['code'])->getMessage(),FactoryApiErrorCode::factory((int)$result['code'])->getCode());
+        }
+        return new Collection($result);
+    }
+
+    private function makeUpsertArray(array $upsert_data)
+    {
+        $create_array = [];
+        foreach($upsert_data as $index => $data)
+        {
+            $create_array[$index] = [];
+            foreach($this::$fillable as $column)
+            {
+                $def = '';
+                if(static::UPDATED_AT == $column){
+                    $def = 'now';
+                }
+                $create_array[$index][] = (isset($data[$column]))? $data[$column] : ((isset($this::$attributes[$column]))? $attributes[$column]: $def) ;
+            }
+        }
         return $create_array;
     }
 
