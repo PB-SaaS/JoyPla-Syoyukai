@@ -40,7 +40,7 @@ class ProductController extends Controller
         
         
         $content = $this->view('NewJoyPla/view/template/List', [
-            'title' => '商品マスタ',
+            'title' => '商品一覧',
             'table' => '%sf:usr:search31%',
             'print' => true,
             'export' => true,
@@ -49,7 +49,7 @@ class ProductController extends Controller
         
         // テンプレートにパラメータを渡し、HTMLを生成し返却
         return $this->view('NewJoyPla/view/template/Template', [
-            'title'     => 'JoyPla 商品マスタ',
+            'title'     => 'JoyPla 商品一覧',
             'content'   => $content->render(),
             'head' => $head->render(),
             'header' => $header->render(),
@@ -82,7 +82,7 @@ class ProductController extends Controller
         
         // テンプレートにパラメータを渡し、HTMLを生成し返却
         return $this->view('NewJoyPla/view/template/Template', [
-            'title'     => 'JoyPla 院内商品マスタ',
+            'title'     => 'JoyPla 院内商品一覧',
             'content'   => $content->render(),
             'head' => $head->render(),
             'header' => $header->render(),

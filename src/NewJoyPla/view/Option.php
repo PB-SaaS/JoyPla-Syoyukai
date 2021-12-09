@@ -16,7 +16,7 @@
 	    		<table class="uk-table uk-table-divider uk-table-responsive">
 				        <tr>
 				            <th>テナント種別</th>
-				            <td><?php echo ($tenant->tenantKind == '1')? "シングルテナント" : "マルチテナント" ;?></td>
+				            <td><?php echo ($tenant->tenantKind == '1')? "シングル" : "マルチ" ;?></td>
 				        </tr>
 				        <tr>
 				            <th>入庫先設定</th>

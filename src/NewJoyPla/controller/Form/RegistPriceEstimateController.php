@@ -201,7 +201,7 @@ class RegistPriceEstimateController extends Controller
 		    <li><a target="_parent" href="%url/rel:mpg:top%">TOP</a></li>
 		    <li><a target="_parent" href="{$SPIRAL->getParam('list_link')}">見積依頼一覧</a></li>
 		    <li><a target="_parent" href="{$SPIRAL->getParam('slip_link')}">見積依頼詳細</a></li>
-		    <li><a target="_parent" href="#">見積商品追加</a></li>
+		    <li><span>見積商品追加</span></li>
 		    <li><span>入力</span></li>
 		    <li><span>確認</span></li>
 		    <li><span>完了</span></li>

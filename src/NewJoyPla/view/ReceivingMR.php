@@ -162,7 +162,7 @@
                     <div>
                         <div class="uk-width-1-3@m">
                             <span class="smp-offset-start">
-                                <?php echo ($limit * ($page - 1)) + 1; ?></span> - <span class="smp-offset-end">
+                                <?php echo ($report['count'] > 0)? ($limit * ($page - 1)) + 1 : 0 ; ?></span> - <span class="smp-offset-end">
                                 <?php echo ($limit * $page > $report['count']) ? $report['count'] : $limit * $page; ?></span>件 / <span class="smp-count">
                                 <?php echo $report['count']; ?></span>件
                         </div>
@@ -178,23 +178,24 @@
                             </div>
                         </div>
                         <div class="uk-overflow-auto">
-                            <table class="uk-table uk-table-hover uk-table-middle uk-table-divider uk-text-nowrap">
+                            <table class="uk-table uk-table-hover uk-table-middle uk-table-divider">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>院内商品ID</th>
-                                        <th>卸業者</th>
-                                        <th>メーカー</th>
-                                        <th>分類</th>
-                                        <th>商品名</th>
-                                        <th>製品コード</th>
-                                        <th>規格</th>
-                                        <th>価格</th>
-                                        <th>入庫数</th>
-                                        <th>返品数</th>
-                                        <th>合計金額</th>
-                                        <th>調整額</th>
-                                        <th>調整後金額</th>
+                                        <th class="uk-text-nowrap">No</th>
+                                        <th class="uk-table-expand">院内商品ID</th>
+                                        <th class="uk-table-expand">卸業者</th>
+                                        <th class="uk-table-expand">メーカー</th>
+                                        <th class="uk-table-expand">分類</th>
+                                        <th class="uk-table-expand">商品名</th>
+                                        <th class="uk-table-expand">製品コード</th>
+                                        <th class="uk-table-expand">規格</th>
+                                        <th class="uk-table-expand">JANコード</th>
+                                        <th class="uk-text-nowrap">価格</th>
+                                        <th class="uk-text-nowrap">入庫数</th>
+                                        <th class="uk-text-nowrap">返品数</th>
+                                        <th class="uk-text-nowrap">合計金額</th>
+                                        <th class="uk-text-nowrap">調整額</th>
+                                        <th class="uk-text-nowrap">調整後金額</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -214,6 +215,7 @@
                                             echo "<td>".$record['itemName']."</td>";
                                             echo "<td>".$record['itemCode']."</td>";
                                             echo "<td>".$record['itemStandard']."</td>";
+                                            echo "<td>".$record['itemJANCode']."</td>";
                                             echo "<td>";
                                             foreach ($record['price'] as $price) {
                                                 echo "￥<script>price(fixed('".$price."'))</script><br>";
@@ -290,7 +292,7 @@ class ReceivingMR
         let k = 0;
         remakeArray[k] = records[0];
         for (let i = 1; i < records.length; i++) {
-            for (let j = 0; j < records[i][7].length; j++) {
+            for (let j = 0; j < records[i][8].length; j++) {
                 k = k + 1;
                 remakeArray[k] = new Array();
                 remakeArray[k][0] = records[i][0];
@@ -300,7 +302,7 @@ class ReceivingMR
                 remakeArray[k][4] = records[i][4];
                 remakeArray[k][5] = records[i][5];
                 remakeArray[k][6] = records[i][6];
-                remakeArray[k][7] = records[i][7][j];
+                remakeArray[k][7] = records[i][7];
                 remakeArray[k][8] = records[i][8][j];
                 remakeArray[k][9] = records[i][9][j];
                 remakeArray[k][10] = records[i][10][j];
@@ -309,12 +311,16 @@ class ReceivingMR
                 remakeArray[k][13] = records[i][13][j];
                 remakeArray[k][14] = records[i][14][j];
                 remakeArray[k][15] = records[i][15][j];
+                remakeArray[k][15] = records[i][16][j];
             }
         }
         let data = remakeArray.map((record) => record.join('\t')).join('\r\n');
-
-        let bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
-        let blob = new Blob([bom, data], {
+        data = Encoding.stringToCode(data);
+        let shiftJisCodeList = Encoding.convert(data, 'sjis', 'unicode');
+        let uInt8List = new Uint8Array(shiftJisCodeList);
+        
+        //let bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+        let blob = new Blob([uInt8List], {
             type: 'text/tab-separated-values'
         });
         let url = (window.URL || window.webkitURL).createObjectURL(blob);
@@ -337,7 +343,7 @@ class ReceivingMR
             });
         }
 
-        result.unshift(['id', 'inHospitalItemId', 'makerName', 'category', 'itemName', 'itemCode', 'itemStandard', 'distributorName', 'quantity', 'price', 'receivingCount', 'totalAmount', 'itemUnit', 'totalReturnCount', 'adjAmount', 'priceAfterAdj']);
+        result.unshift(['id', 'inHospitalItemId', 'makerName', 'category', 'itemName', 'itemCode', 'itemStandard', 'itemJANCode', 'distributorName', 'quantity', 'price', 'receivingCount', 'totalAmount', 'itemUnit', 'totalReturnCount', 'adjAmount', 'priceAfterAdj']);
 
         this.exportCSV(result);
     }

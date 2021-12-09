@@ -107,7 +107,7 @@
 			    			<div class="uk-width-1-2">
 			    				<label class="uk-form-label">払出元部署</label>
 				    			<div class="uk-form-controls">
-						            <select class="uk-width-4-5 uk-select uk-inline" v-model="sourceDivision" name="sourceDivision" v-bind:disabled="source_division_disabled">
+						            <select class="uk-width-4-5 uk-select uk-inline" v-model="sourceDivision" name="sourceDivision" v-bind:disabled="lists.length > 0">
 						                <option value="">----- 部署選択 -----</option>
 				                        <?php
 				                        foreach($source_division->data as $data)
@@ -136,7 +136,7 @@
 			    			<div class="uk-width-1-2">
 				    			<label class="uk-form-label" >払出先部署</label>
 				    			<div class="uk-form-controls">
-			    				   <select class="uk-select uk-width-4-5" v-model="targetDivision" name="targetDivision" v-bind:disabled="target_division_disabled">
+			    				   <select class="uk-select uk-width-4-5" v-model="targetDivision" name="targetDivision" v-bind:disabled="lists.length > 0">
 						                <option value="">----- 部署選択 -----</option>
 				                        <?php
 				                        foreach($target_division->data as $data)
@@ -173,7 +173,7 @@
 			    		</div>
     				</div>
     				<div class=" uk-width-expand uk-overflow-auto">
-			    		<table class="uk-table uk-table-striped uk-text-nowrap">
+			    		<table class="uk-table uk-table-striped">
 			    			<thead>
 			    				<tr>
 			    					<th colspan="9" class="uk-width-1-2">
@@ -186,25 +186,25 @@
 		    				</thead>
 		    				<thead>
 			    				<tr>
-			    					<th>id</th>
-			    					<th>メーカー</th>
-			    					<th>商品名</th>
-			    					<th>製品コード</th>
-			    					<th>規格</th>
-			    					<th>JANコード</th>
-			    					<th>入数</th>
-	                            	<th>価格</th>
-	                            	<th>単価</th>
-			    					<th>ロット管理</th>
-			    					<th>ロット番号</th>
-			    					<th>使用期限</th>
-			    					<th style="padding-right: 5px;">払出数</th>
-			    					<th style="padding-left: 0px;">
+			    					<th class="uk-text-nowrap">id</th>
+			    					<th class="uk-table-expand">メーカー</th>
+			    					<th class="uk-table-expand">商品名</th>
+			    					<th class="uk-table-expand">製品コード</th>
+			    					<th class="uk-table-expand">規格</th>
+			    					<th class="uk-table-expand">JANコード</th>
+			    					<th class="uk-text-nowrap">入数</th>
+	                            	<th class="uk-text-nowrap">価格</th>
+	                            	<th class="uk-text-nowrap">単価</th>
+			    					<th class="uk-text-nowrap">ロット管理</th>
+			    					<th class="uk-table-expand">ロット番号</th>
+			    					<th class="uk-table-expand">使用期限</th>
+			    					<th class="uk-text-nowrap" style="padding-right: 5px;">払出数</th>
+			    					<th class="uk-text-nowrap" style="padding-left: 0px;">
 			    						<input type="button" class="uk-button uk-button-default uk-button-small" v-on:click="countToIrisu" value="入数を反映" >
 			    					</th>
-			    					<th>個数（ラベル枚数）</th>
-			    					<th>合計払出数</th>
-			    					<th>カード番号</th>
+			    					<th class="uk-text-nowrap">個数（ラベル枚数）</th>
+			    					<th class="uk-text-nowrap">合計払出数</th>
+			    					<th class="uk-text-nowrap">カード番号</th>
 			    					<th></th>
 			    					<th></th>
 			    				</tr>
@@ -217,9 +217,9 @@
 									<td>{{list.code}}</td>
 									<td>{{list.kikaku}}</td>
 									<td>{{list.jan}}</td>
-									<td>{{list.irisu}}{{list.unit}}</td>
-									<td>￥{{list.kakaku | number_format}}</td>
-									<td>
+									<td class="uk-text-nowrap">{{list.irisu}}{{list.unit}}</td>
+									<td class="uk-text-nowrap">￥{{list.kakaku | number_format}}</td>
+									<td class="uk-text-nowrap">
 									    ￥<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
 									    <span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
 									</td>
@@ -233,11 +233,11 @@
 									<td>
 										<input type="date" class="uk-input lotDate" v-model="list.lotDate" v-bind:style="list.lotDateStyle" v-on:change="addLotDateStyle(key)">
 									</td>
-									<td colspan="2">
+									<td class="uk-text-nowrap" colspan="2">
 										<input type="number" step="1" class="uk-input" min="0" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.countNum" v-bind:disabled="list.countNumDisabled" v-on:change="addCountStyle(key)">
 										<span class="uk-text-bottom">{{list.unit}}</span>
 									</td>
-									<td>×
+									<td class="uk-text-nowrap">×
 										<input type="number" step="1" class="uk-input" min="1" style="width: 96px;" v-bind:style="list.labelCountStyle" v-model="list.countLabelNum" v-bind:disabled="list.countLabelNumDisabled" v-on:change="addLabelCountStyle(key)">
 										<span class="uk-text-bottom">枚</span>
 									</td>
@@ -248,7 +248,7 @@
 									<td>
 										<input type="button" class="uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)">
 									</td>
-									<td>
+									<td class="uk-text-nowrap">
 										<input type="button" class="uk-button uk-button-default uk-button-small" value="払出元情報複製" v-on:click="copyList(key)">
 									</td>
 								</tr>
@@ -284,40 +284,40 @@
 	            <h2 class="uk-modal-title">商品選択</h2>
 	        </div>
 	        <div class="uk-modal-body uk-width-expand uk-overflow-auto">
-	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-nowrap uk-table-divider">
+	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-table-divider">
 					<thead>
 						<tr>
-							<th class="uk-table-shrink">id</th>
-							<th class="uk-table-shrink"></th>
-							<th>メーカー</th>
-							<th>商品名</th>
-							<th>製品コード</th>
-							<th>規格</th>
-							<th>入数</th>
-							<th>価格</th>
-							<th>単価</th>
-							<th>JANコード</th>
-							<th>卸業者</th>
-							<th>ロット管理フラグ</th>
+							<th class="uk-text-nowrap">id</th>
+							<th class="uk-text-nowrap"></th>
+							<th class="uk-table-expand">メーカー</th>
+							<th class="uk-table-expand">商品名</th>
+							<th class="uk-table-expand">製品コード</th>
+							<th class="uk-table-expand">規格</th>
+							<th class="uk-table-expand">JANコード</th>
+							<th class="uk-table-expand">入数</th>
+							<th class="uk-table-expand">価格</th>
+							<th class="uk-table-expand">単価</th>
+							<th class="uk-table-expand">卸業者</th>
+							<th class="uk-table-expand">ロット管理フラグ</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="(list , key) in select_items">
 							<td></td>
-							<td><button type="button" v-on:click="addObject(key)" class="uk-button uk-button-primary uk-button-small">反映</button></td>
+							<td><button type="button" v-on:click="addObject(key)" class="uk-text-nowrap uk-button uk-button-primary uk-button-small">反映</button></td>
 							<td class="uk-text-middle">{{list.maker}}</td>
 							<td class="uk-text-middle">{{list.shouhinName}}</td>
 							<td class="uk-text-middle">{{list.code}}</td>
 							<td class="uk-text-middle">{{list.kikaku}}</td>
+							<td class="uk-text-middle">{{list.jan}}</td>
 							<td class="uk-text-middle">
-							<span class="irisu">{{list.irisu}}</span><span class="unit uk-text-small">{{list.unit}}</span>
+							<span class="irisu uk-text-nowrap">{{list.irisu}}</span><span class="unit uk-text-small">{{list.unit}}</span>
 							</td>
 							<td class="uk-text-middle">￥{{list.kakaku}}</td>
-							<td>
+							<td class="uk-text-nowrap">
 							    ￥<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
 							    <span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
 							</td>
-							<td class="uk-text-middle">{{list.jan}}</td>
 							<td class="uk-text-middle">{{list.oroshi}}</td>
 							<td class="uk-text-middle">{{list.lotFlag}}</td>
 						</tr>
@@ -333,9 +333,7 @@ var app = new Vue({
 	data: {
 		lists: [],
 		sourceDivision: '',
-    source_division_disabled: false,
 		targetDivision: '',
-		target_division_disabled: false,
         useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
 	},
 	filters: {
@@ -356,8 +354,6 @@ var app = new Vue({
     					app.$set(app.lists, index, changeObject);
         			});
                 }
-                if (!app.lists.length) { app.source_division_disabled = false; }
-                if (!app.lists.length) { app.target_division_disabled = false; }
           })
         }
     },
@@ -365,9 +361,29 @@ var app = new Vue({
 		addList: function(object) {
 			object.class = ((object.class == null)? {'target' : true} : object.class);
 			object.countNum = ((object.countNum == null)? 0 : object.countNum);
+			if(object.countNum != "" || object.countNum != 0)
+			{
+				object.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+			}
+			
 			object.countLabelNum = ((object.countLabelNum == null)? 1 : object.countLabelNum);
+			if(object.countLabelNum != "" || object.countLabelNum != 0)
+			{
+				object.labelCountStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+			}
+			
 			object.lotNumber = ((object.lotNumber == null)? '': object.lotNumber); 
+			if(object.lotNumber != "" || object.lotNumber != 0)
+			{
+				object.lotNumberStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+			}
+			
 			object.lotDate = ((object.lotDate == null)? '' : object.lotDate);
+			if(object.lotDate != "" || object.lotDate != 0)
+			{
+				object.lotDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+			}
+			
 			object.labelCountStyle =  ((object.labelCountStyle == null)? {} : object.labelCountStyle);
 			object.countStyle =  ((object.countStyle == null)? {} : object.countStyle);
 			object.lotDateStyle =  ((object.lotDateStyle == null)? {} : object.lotDateStyle);
@@ -407,82 +423,82 @@ var app = new Vue({
 			window.open('%url/rel:mpgt:page_175973%', '_blank','scrollbars=yes,width=1220,height=600');
 		},
 		sendPayout: function(){
-			if(! this.payoutCheck()){
-				return false;
-			}
-			if(! this.divisionCheck()){
-				return false;
-			}
 			
-			
-            loading();
-			canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
-			$.ajax({
-				async: false,
-                url: "<?php echo $api_url ?>",
-                type:'POST',
-                data:{
-                    _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-                    payoutDate : $('input[name=payoutDate]').val(),
-                	Action : 'payoutRegistApi',
-                	payout : JSON.stringify( objectValueToURIencode(this.lists) ),
-                	sourceDivisionId : $('select[name="sourceDivision"]').val(),
-                	sourceDivisionName : encodeURI($('select[name="sourceDivision"] option:selected').text()),
-                	targetDivisionId : $('select[name="targetDivision"]').val(),
-                	targetDivisionName : encodeURI($('select[name="targetDivision"] option:selected').text()),
-                },
-                dataType: 'json'
-            })
-            // Ajaxリクエストが成功した時発動
-            .done( (data) => {
-                if(data.code != '0'){
-            		UIkit.modal.alert("払出に失敗しました").then(function(){
-					});
-            		return false;
-                }
-                UIkit.modal.alert("払出が完了しました").then(function(){
-                	if(data.data.labelCreateFlg)
-                	{
-						UIkit.modal.confirm("ラベルを発行しますか<br>※履歴から発行も可能です").then(function () {
-							$('input[name=payoutHistoryId]').val(data.data.payoutHistoryId);
-							$('form[name=LabelCreate]').submit();
-							app.lists.splice(0, app.lists.length);
-						}, function() {
-							app.lists.splice(0, app.lists.length);
+			UIkit.modal.confirm('払出を実行します。よろしいですか').then(function(){
+				if(! app.payoutCheck()){
+					return false;
+				}
+				if(! app.divisionCheck()){
+					return false;
+				}
+				
+	            loading();
+				$.ajax({
+					async: false,
+	                url: "<?php echo $api_url ?>",
+	                type:'POST',
+	                data:{
+	                    _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+	                    payoutDate : $('input[name=payoutDate]').val(),
+	                	Action : 'payoutRegistApi',
+	                	payout : JSON.stringify( objectValueToURIencode(app.lists) ),
+	                	sourceDivisionId : app.sourceDivision,
+	                	sourceDivisionName : encodeURI($('select[name="sourceDivision"] option:selected').text()),
+	                	targetDivisionId : app.targetDivision,
+	                	targetDivisionName : encodeURI($('select[name="targetDivision"] option:selected').text()),
+	                },
+	                dataType: 'json'
+	            })
+	            // Ajaxリクエストが成功した時発動
+	            .done( (data) => {
+	                if(data.code != '0'){
+	            		UIkit.modal.alert("払出に失敗しました").then(function(){
 						});
-                	} else 
-                	{
-						app.lists.splice(0, app.lists.length);
-                	}
-				});
-            })
-            // Ajaxリクエストが失敗した時発動
-            .fail( (data) => {
-                UIkit.modal.alert("払出に失敗しました").then(function(){
-				});
-            })
-            // Ajaxリクエストが成功・失敗どちらでも発動
-            .always( (data) => {
-				loading_remove();
-            });
+	            		return false;
+	                }
+	                UIkit.modal.alert("払出が完了しました").then(function(){
+	                	if(data.data.labelCreateFlg)
+	                	{
+							UIkit.modal.confirm("ラベルを発行しますか<br>※履歴から発行も可能です").then(function () {
+								$('input[name=payoutHistoryId]').val(data.data.payoutHistoryId);
+								$('form[name=LabelCreate]').submit();
+								app.lists.splice(0, app.lists.length);
+							}, function() {
+								app.lists.splice(0, app.lists.length);
+							});
+	                	} else 
+	                	{
+							app.lists.splice(0, app.lists.length);
+	                	}
+					});
+	            })
+	            // Ajaxリクエストが失敗した時発動
+	            .fail( (data) => {
+	                UIkit.modal.alert("払出に失敗しました").then(function(){
+					});
+	            })
+	            // Ajaxリクエストが成功・失敗どちらでも発動
+	            .always( (data) => {
+					loading_remove();
+	            });
+			},function(){
+				UIkit.modal.alert("中止しました");
+			});
 		},
 		divisionCheck : function(){
-			if($('select[name="sourceDivision"]').val()){
-			} else {
+			if(! app.sourceDivision){
 				UIkit.modal.alert('払出元部署を選択してください');
 				return false ;
 			}
 			
 			
-			if($('select[name="targetDivision"]').val()){
-			} else {
+			if(!app.targetDivision){
 				UIkit.modal.alert('払出先部署を選択してください');
 				return false ;
 			}
 			
 			
-			if($('select[name="sourceDivision"]').val() != $('select[name="targetDivision"]').val() ){
-			} else {
+			if(app.sourceDivision == app.targetDivision ){
 				UIkit.modal.alert('払出元部署と払出先部署は同一のものを選択しないでください');
 				return false ;
 			}	
@@ -513,6 +529,22 @@ var app = new Vue({
 			
 			checkflg = true;
 			app.lists.forEach(function (elem, index) {
+				elem.countStyle.border = '';
+				if(app.lists[index].countNum < 0){
+					let changeObject = app.lists[index];
+					changeObject.countStyle.border = 'red 2px solid';
+					app.$set(app.lists, index, changeObject);
+					checkflg = false;
+				}
+			});
+			
+			if(!checkflg){
+				UIkit.modal.alert('数量は1以上の数字を入力してください');
+				return false ;
+			}
+			
+			checkflg = true;
+			app.lists.forEach(function (elem, index) {
 				elem.labelCountStyle.border = '';
 			  if(app.lists[index].countLabelNum == 0){
 				let changeObject = app.lists[index];
@@ -521,8 +553,25 @@ var app = new Vue({
 		  		checkflg = false;
 			  }
 			});
+			
 			if(!checkflg){
 				UIkit.modal.alert('個数を入力してください');
+				return false ;
+			}
+			
+			checkflg = true;
+			app.lists.forEach(function (elem, index) {
+				elem.labelCountStyle.border = '';
+			  if(app.lists[index].countLabelNum < 0){
+				let changeObject = app.lists[index];
+				changeObject.labelCountStyle.border = 'red 2px solid';
+				app.$set(app.lists, index, changeObject);
+		  		checkflg = false;
+			  }
+			});
+			
+			if(!checkflg){
+				UIkit.modal.alert('個数は1以上の数字を入力してください');
 				return false ;
 			}
 			
@@ -571,7 +620,7 @@ var app = new Vue({
 			}
 			
 			chkLot = true;
-			let regex = /^[0-9a-zA-Z]+$/;
+			let regex = /^[a-zA-Z0-9!-/:-@¥[-`{-~]+$/;
 			app.lists.forEach(function (elem, index) {
 				elem.lotNumberStyle.border = '';
 				if(app.lists[index].lotNumber) {
@@ -673,7 +722,6 @@ var app = new Vue({
 	                	UIkit.modal.alert("払出先のカードではありません");
 	                	return false;
             		}
-	            	app.target_division_disabled = true;
 	            	let checked = false;
 	            	app.lists.forEach(function(elem, index) {
 	            		if(
@@ -688,15 +736,15 @@ var app = new Vue({
 							changeObject.cardNum = barcode;
 							changeObject.countNumDisabled = true;
 							changeObject.countLabelNumDisabled = true;
+							changeObject.countStyle = {};
+							changeObject.labelCountStyle= {};
 							app.$set(app.lists, index, changeObject);
-		            		app.addCountStyle(index);
 		            		checked = true;
 	            		}
 	            	});
 	            	if(!checked)
 	            	{
 	                	UIkit.modal.alert("紐づける対象の商品がリストにありませんでした");
-	            		app.target_division_disabled = false;
 	            	}
             	} else {
                 	UIkit.modal.alert("カード情報が取得できませんでした。カード情報と払出先部署が一致しているか確認してください。");
@@ -722,7 +770,7 @@ var app = new Vue({
                 url:'%url/rel:mpgt:labelBarcodeSAPI%',
                 type:'POST',
                 data:{
-                	divisionId : $('select[name="sourceDivision"]').val(),
+                	divisionId : app.sourceDivision,
                 	barcode : barcode,
                 },
                 dataType: 'json'
@@ -744,10 +792,9 @@ var app = new Vue({
                 {
                 	data = data.data;
                 	
-                	if(data.divisionId != "" && $('select[name="sourceDivision"]').val() != data.divisionId )
+                	if(data.divisionId != "" && app.sourceDivision != data.divisionId )
                 	{
 	            		UIkit.modal.alert("読み込んだバーコードの部署が払出元の部署と一致しません");
-	            		if (!app.lists.length) { app.source_division_disabled = false; }
 	            		return false;
                 	}
                 	if(lotNumber != ''){
@@ -756,11 +803,7 @@ var app = new Vue({
                 	if(lotDate != ''){
                 		data.lotDate = lotDate;
                 	}
-					data.labelCountStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-					data.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-					data.lotNumberStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-					data.lotDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-                	this.addList(data);
+                	app.addList(data);
 	                
 	                $('input[name="barcode"]').val('');
                 } else {
@@ -824,7 +867,7 @@ var gs1_128 = new Vue({
 	},
 	methods: {
 		changeDate: function (text){
-			if(text == null){
+			if(text == null || text == ""){
 				return "";
 			}
 			if(text.length == "6"){

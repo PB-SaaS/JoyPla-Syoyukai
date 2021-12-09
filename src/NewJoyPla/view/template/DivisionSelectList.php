@@ -17,7 +17,11 @@
 	</div>
 <script>
 	let elem = $('table tbody a');
-	for(let index = 0 ; index < elem.length ; index++){
-		elem[index].href += "&Action=<?php echo $param ?>";
-	};
+	let param = "<?php echo $param ?>";
+	if(param != "")
+	{
+		for(let index = 0 ; index < elem.length ; index++){
+			elem[index].href += "&Action=" + param;
+		};
+	}
 </script>

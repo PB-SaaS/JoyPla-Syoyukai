@@ -62,7 +62,7 @@ class OrderSlipDetailController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             }
             
-            $order_items = OrderedItemView::where('hospitalId',$user_info->getHospitalId())->where('orderNumber',$card->orderNumber)->get();
+            $order_items = OrderedItemView::where('hospitalId',$user_info->getHospitalId())->sort('id','asc')->where('orderNumber',$card->orderNumber)->get();
             $order_items = $order_items->data->all();
 
             if ($card->orderStatus != 8) // 貸出品以外
@@ -224,7 +224,8 @@ class OrderSlipDetailController extends Controller
                 }
                 if (($item['lotNumber'] != '') && ($item['lotDate'] != '')) 
                 {
-                    if ((!ctype_alnum($item['lotNumber'])) || (strlen($item['lotNumber']) > 20))
+                    //if ((!ctype_alnum($item['lotNumber'])) || (strlen($item['lotNumber']) > 20))
+                    if ((!preg_match('/^[a-zA-Z0-9!-\/:-@¥[-`{-~]+$/', $item['lotNumber'])) || (strlen($item['lotNumber']) > 20))
                     {
                         throw new Exception('invalid lotNumber format',102);
                     }
@@ -291,7 +292,8 @@ class OrderSlipDetailController extends Controller
                         'price' => $item['price'],
                         'receivingPrice' => (float)$item['countNum'] * (float)$item['price'],
                         'hospitalId' => $user_info->getHospitalId(),
-                        'divisionId' => $divisionId,
+                        'distributorId' => $card->distributorId,
+                        'divisionId' => $card->divisionId,
                         'lotNumber' => $item['lotNumber'],
                         'lotDate' => $item['lotDate']
                     ];
@@ -352,9 +354,9 @@ class OrderSlipDetailController extends Controller
                 {
                     if($order_item->orderCNumber == $orderCNumber)
                     {
-                        $receiving_flag = ($order_item->orderQuantity - ((int)$order_item->receivingNum + (int)$count) <= 0) ? '1' : '0';
+                        $receiving_flag = (abs($order_item->orderQuantity) - (abs((int)$order_item->receivingNum) + abs((int)$count)) <= 0) ? '1' : '0';
                         $update_data[] = [
-                            'orderCNumber' => $item['orderCNumber'],
+                            'orderCNumber' => $order_item->orderCNumber,
                             'receivingTime' => 'now',
                             'receivingFlag' => $receiving_flag,
                             'receivingNum' => (int)$order_item->receivingNum + (int)$count
@@ -362,7 +364,6 @@ class OrderSlipDetailController extends Controller
                     }
                 }
             }
-
             $result = ReceivingHistory::insert($history_data);
             $result = Receiving::insert($insert_data);
             $result = Order::bulkUpdate('orderCNumber', $update_data);
@@ -432,7 +433,7 @@ class OrderSlipDetailController extends Controller
             foreach ($order_item as $key => $item)
             {
                 $count = (int)$item->orderQuantity * (int)$item->quantity;
-                if ($count <= 0) { continue; } //マイナス発注は発注中個数の計算をしない。
+                if ($count < 0) { continue; } //マイナス発注は発注中個数の計算をしない。
                 if ($count != 0)
                 {
                     $inventory_adjustment_trdata[] = [
@@ -446,14 +447,14 @@ class OrderSlipDetailController extends Controller
                 }
             }
             
-            OrderHistory::where('orderNumber',$card->orderNumber)->delete();
-            $result = InventoryAdjustmentTransaction::insert($inventory_adjustment_trdata);
+            $result = OrderHistory::where('orderNumber',$card->orderNumber)->delete();
+            InventoryAdjustmentTransaction::insert($inventory_adjustment_trdata);
 
-            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['insert']);
+            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['delete']);
             $content = $content->toJson();
 
         } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['insert']);
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['delete']);
             $content = $content->toJson();
         } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [

@@ -12,7 +12,11 @@ require_once "../src/NewJoyPla/classes/Model.php";
 require_once "../src/NewJoyPla/model/Base.php";
 
 $SPIRAL = new \Spiral();
-$ModelName = $argv[1];
+$ModelName = "";
+if(isset($argv[1]))
+{
+    $ModelName = $argv[1];
+}
 foreach(get_declared_classes() as $className)
 {
     if (preg_match("/^App\\\Model/", $className)) {

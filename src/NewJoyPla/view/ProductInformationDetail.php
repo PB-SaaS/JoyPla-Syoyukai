@@ -9,7 +9,7 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
-                <li><a href="%url/rel:mpgt:Product%&Action=Item&table_cache=true">商品マスタ</a></li>
+                <li><a href="%url/rel:mpgt:Product%&Action=Item&table_cache=true">商品一覧</a></li>
                 <li><span>商品情報詳細</span></li>
             </ul>
             <div class="no_print uk-margin" uk-margin>
@@ -28,7 +28,7 @@
                     <input type="hidden" value="priceRegist" name="Action">
                 </form>
                 <?php endif ?>
-                <?php if($tenantKind == "1" && ($userInfo->isAdmin() || $userInfo->isApprover())): ?>
+                <?php if($userInfo->isAdmin() || $userInfo->isApprover()): ?>
 
                 <input class="print_hidden uk-button uk-button-primary" type="submit" value="院内商品として追加" onclick="document.inHPItemsReg.submit()">
                 <form action="<?php echo $api_url ?>"  method="post" name="inHPItemsReg" class="uk-hidden">

@@ -735,6 +735,7 @@
 			                        </div>
 						        </div>
 						    </div>
+				    		<?php if($user_info->isAdmin() || $user_info->isUser()) : ?>
 						    
 						    <div>
 						        <div class="nj_card content-1-1">
@@ -752,6 +753,7 @@
 			                        </div>
 						        </div>
 						    </div>
+				    		<?php endif ?>
 						</div>
 					</div>
 					

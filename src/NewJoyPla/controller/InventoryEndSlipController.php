@@ -60,10 +60,9 @@ class InventoryEndSlipController extends Controller
                         $in_hospital_item_ids[] = $history_item->inHospitalItemId;
                     }
                 }
-                
                 InventoryEnd::where('hospitalId',$user_info->getHospitalId())->find($record_id)->update([
-                    'totalAmount' => collect($prices)->sum(),
-                    "itemsNumber" => collect($in_hospital_item_ids)->count(),
+                    'totalAmount' => (string)collect($prices)->sum(),
+                    "itemsNumber" => (string)collect($in_hospital_item_ids)->count(),
                 ]);
             }
             
@@ -75,7 +74,6 @@ class InventoryEndSlipController extends Controller
                 'user_info' => $user_info,
                 'link' => $link,
                 'end_flg' => ( $end_slip->inventoryStatus == 2 ),
-                'useUnitPrice'=> $useUnitPrice,
                 'csrf_token' => Csrf::generate(16)
                 ] , false);
             

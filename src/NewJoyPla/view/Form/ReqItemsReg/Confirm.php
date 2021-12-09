@@ -158,8 +158,10 @@
                         <!-- HIDDEN_PARAM START -->
                         $form:hidden$
                         <!-- HIDDEN_PARAM END -->
-                        <input class="submit" type="submit" name="SMPFORM_BACK" value="戻る">
-                        <input class="submit" type="submit" name="submit" value="追加">
+                        <div class="uk-text-center">
+                            <input class="submit" type="submit" name="SMPFORM_BACK" value="戻る">
+                            <input class="submit" type="submit" name="submit" value="追加">
+                        </div>
                 </form>
                 <!-- SMP_TEMPLATE_FORM end -->
             </div>

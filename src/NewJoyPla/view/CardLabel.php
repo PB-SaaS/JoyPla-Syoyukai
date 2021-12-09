@@ -115,6 +115,7 @@ html {
                 $design = str_replace('%JoyPla:rackName%',			$item->rackName, 							$design);//払い出し先部署棚
                 $design = str_replace('%JoyPla:constantByDiv%',		$item->constantByDiv, 					    $design);//払い出し先部署定数
                 $design = str_replace('%JoyPla:officialFlag%',		$officialFlag,								$design);//償還フラグ
+                $design = str_replace('%JoyPla:officialFlag:id%',   $item->officialFlag,					    $design);//償還フラグ id
 
                 echo $design;
 

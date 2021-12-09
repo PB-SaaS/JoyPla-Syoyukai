@@ -17,7 +17,7 @@ use Exception;
 
 
 /**
- * 発注書
+ * 見積金額
  */
 class PriceEstimateRequestSlipController extends Controller
 {
@@ -38,7 +38,7 @@ class PriceEstimateRequestSlipController extends Controller
     		    <li><a target="_parent" href="%url/rel:mpg:top%">TOP</a></li>
     		    <li><a target="_parent" href="%url/rel:mpgt:ProductQuotation%&Action=Quotation&table_cache=true">見積依頼一覧</a></li>
     		    <li><a target="_parent" href="{$_SERVER['HTTP_REFERER']}">見積依頼詳細</a></li>
-    		    <li><a target="_parent" href="#">見積金額登録</a></li>
+    		    <li><span>見積金額登録</span></li>
 EOM;
             if($price_data->requestFlg == 1)
             {
@@ -52,7 +52,7 @@ EOM;
                 </div>
 EOM;
                 $content = $this->view('NewJoyPla/view/template/FormDesign', [
-                    'title' => '見積情報登録',
+                    'title' => '見積金額登録',
                     'breadcrumb' => $breadcrumb,
                     'form_content' => $form_content
                     ] , false);
@@ -61,7 +61,7 @@ EOM;
             {
                 $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
                     'breadcrumb' => $breadcrumb,
-                    'title' => '見積情報登録',
+                    'title' => '見積金額登録',
                     'width' => '100%',
                     'height'=> '100%',
                     'url' => '/regist/is',
@@ -88,6 +88,7 @@ EOM;
                     		"itemUnit" => "%val:usr:itemUnit%",
                     		"notice" => "%val:usr:notice%",
                     		"notUsedFlag" => "%val:usr:notUsedFlag%",
+                    		"lotManagement" => "%val:usr:lotManagement:v%"
                         ]
                     ] , false);
             }
@@ -105,7 +106,7 @@ EOM;
             
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 見積情報登録',
+                'title'     => 'JoyPla 見積金額登録',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),

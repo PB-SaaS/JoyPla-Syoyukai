@@ -1,5 +1,5 @@
 <div
-    class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top">
+    class="uk-section uk-section-default uk-preserve-color uk-padding-remove">
     <div class="uk-container uk-container-expand">
         <div uk-grid="uk-grid">
             <div class="uk-width-1-2@m">

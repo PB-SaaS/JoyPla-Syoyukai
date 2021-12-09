@@ -55,7 +55,7 @@
                                                 name="notUsedFlag"
                                                 value="1"
                                                 $notUsedFlag$>
-                                                <span>未使用</span></label>
+                                                <span>不使用</span></label>
                                         </li>
                                     </ul>
                                     <input type="hidden" value="" name="notUsedFlag">

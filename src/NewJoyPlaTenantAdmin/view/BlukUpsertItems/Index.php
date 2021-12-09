@@ -1,4 +1,4 @@
-<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="app">
+<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove" id="app">
     <div class="uk-container uk-container-expand" uk-height-viewport="expand: true">
         <div class="uk-margin-auto uk-margin-remove-top uk-margin-bottom" id="mainPage">
             <!-- SMP_TEMPLATE_HEADER start -->
@@ -56,12 +56,14 @@ var app = new Vue({
             success_message : "",
             filename: "",
             headers: [
+                "メーカー",
                 "商品名",
+                "分類",
                 "製品コード",
                 "規格",
                 "JANコード",
-                "メーカー",
                 "カタログNo",
+                "シリアルNo",
                 "定価",
                 "償還価格フラグ",
                 "償還価格",

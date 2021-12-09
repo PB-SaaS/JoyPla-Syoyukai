@@ -12,6 +12,8 @@ use App\Model\InHospitalItemView;
 use App\Model\ReceivingView;
 use App\Model\PayoutView;
 use App\Model\CardInfoView;
+use App\Model\Hospital;
+use App\Model\Division;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use StdClass;
@@ -41,6 +43,10 @@ class LabelBarcodeSearchController extends Controller
 			}
 			
 			if(preg_match('/^20/', $barcode) && strlen($barcode) == 12){
+				if($user_info->isDistributorUser())
+				{
+                	throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+				}
 				//検収書から発行されたラベル
 				$receiving_num = substr($barcode, 2 , 10);
 				if($user_info->isAdmin())
@@ -53,6 +59,17 @@ class LabelBarcodeSearchController extends Controller
 					$result = ReceivingView::where('receivingNumber', 'rec_'.$receiving_num)->where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
 					$record = $result->data->get(0);
 				}
+				
+				$hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+				$hospital = $hospital->data->get(0);
+				
+				$divisionId = $record->divisionId;
+				
+				if($hospital->receivingTarget == "1"){
+					$division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionType','1')->get();
+					$division = $division->data->get(0);
+					$divisionId = $division->divisionId;
+				}
 
 				$in_hospital_item = InHospitalItemView::where('notUsedFlag','0')->where('inHospitalItemId',$record->inHospitalItemId)->where('hospitalId', $user_info->getHospitalId())->get();	
 				$in_hospital_item = $in_hospital_item->data->get(0);
@@ -61,7 +78,7 @@ class LabelBarcodeSearchController extends Controller
 					throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
 				}
 				$data = [
-					"divisionId" => $record->divisionId,
+					"divisionId" => $divisionId,
 					"maker" => $in_hospital_item->makerName,
 					"shouhinName" => $in_hospital_item->itemName,
 					"code" => $in_hospital_item->itemCode,
@@ -87,6 +104,10 @@ class LabelBarcodeSearchController extends Controller
 				$content = $content->toJson();
 
 			} else if(preg_match('/^30/', $barcode) && strlen($barcode) == 12){
+				if($user_info->isDistributorUser())
+				{
+                	throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+				}
 				//払出から発行されたラベル
 				$payout_num = substr($barcode, 2 , 10);
 				if($user_info->isAdmin())
@@ -132,6 +153,10 @@ class LabelBarcodeSearchController extends Controller
 				$content = $content->toJson();
 
 			} else if(preg_match('/^90/', $barcode) && strlen($barcode) == 18){
+				if($user_info->isDistributorUser())
+				{
+                	throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+				}
 				if($user_info->isAdmin())
 				{
 					$result = CardInfoView::where('cardId', $barcode)->where('hospitalId',$user_info->getHospitalId())->get();
@@ -177,7 +202,13 @@ class LabelBarcodeSearchController extends Controller
 
 			} else if(strlen($barcode) == 13) {
 				//JANコード検索（複数件返却される）
-				$result = InHospitalItemView::where('notUsedFlag','0')->where('itemJANCode',$barcode)->where('hospitalId', $user_info->getHospitalId())->get();
+				$InHospitalItemView = InHospitalItemView::where('notUsedFlag','0')->where('itemJANCode',$barcode)->where('hospitalId', $user_info->getHospitalId());
+				if($user_info->isDistributorUser())
+				{
+					$InHospitalItemView->where('distributorId',$user_info->getDistributorId());
+				}
+				
+				$result = $InHospitalItemView->get();
 				if($result->count == '0'){
 					throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
 				}
@@ -243,8 +274,15 @@ class LabelBarcodeSearchController extends Controller
 					$label_id = substr($barcode, 2 , 8);
 					$custom_quantity = substr($barcode, 10 , 4);
 				}
-	
-				$result = InHospitalItemView::where('notUsedFlag','0')->where('labelId',$label_id)->where('hospitalId', $user_info->getHospitalId())->get();
+				
+				$InHospitalItemView = InHospitalItemView::where('notUsedFlag','0')->where('labelId',$label_id)->where('hospitalId', $user_info->getHospitalId());
+				
+				if($user_info->isDistributorUser())
+				{
+					$InHospitalItemView->where('distributorId',$user_info->getDistributorId());
+				}
+				
+				$result = $InHospitalItemView->get();
 				if($result->count == '0'){
 					throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
 				}

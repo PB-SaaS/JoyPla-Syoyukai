@@ -11,7 +11,7 @@
 				</div>
 	    	</div>
 	    	<hr>
-			<?php if($user_info->isHospitalUser() && $user_info->isAdmin() == '1' && $tenant->tenantKind == '1'): ?>
+			<?php if($user_info->isHospitalUser() && $user_info->isAdmin()): ?>
 	    	<div uk-grid="" uk-margin="" class="uk-grid uk-grid-stack">
 				<div class="uk-width-1-1 uk-grid-margin uk-first-column uk-margin-small-top">
 	    			<form action="<?php echo $api_url ?>" method="post">

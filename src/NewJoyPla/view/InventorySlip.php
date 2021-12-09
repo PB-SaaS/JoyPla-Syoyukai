@@ -11,7 +11,7 @@
 				<div class="no_print uk-margin" uk-margin>
 					<input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
 			    	<?php if($delete_button_view_flg): ?>
-					<input class="print_hidden uk-button uk-button-danger" type="button" value="%val:usr:divisionName% 棚卸取消" onclick="end_inventory_slip.deleteInvForDiv();return false;">
+					<input class="print_hidden uk-button uk-button-danger" type="button" value="%val:usr:divisionName% 棚卸取消" onclick="end_inventory_slip.deleteInvForDiv();return false;" style="text-transform:none;">
 			    	<?php endif ?>
                 	<input class="print_hidden uk-button uk-button-primary" type="button" value="出力" onclick="$('#exportButton').click()">
 				</div>
@@ -41,7 +41,7 @@
 		    				</tr>
 		    				<tr>
 		    					<td class="uk-text-bold">合計金額</td>
-		    					<td class="uk-text-right">￥<script>price("%val:usr:totalAmount%")</script> - </td>
+		    					<td class="uk-text-right">￥<script>price(fixed("%val:usr:totalAmount%"))</script> - </td>
 		    				</tr>
 		    			</table>
 			    	</div>
@@ -51,22 +51,22 @@
 		    		<h3>棚卸総数</h3>
 			  		<div class="uk-margin">
 			  			<div class="uk-overflow-auto">
-			  				<table class="uk-table uk-table-hover uk-table-middle uk-table-divider uk-text-nowrap">
+			  				<table class="uk-table uk-table-hover uk-table-middle uk-table-divider">
 			  					<thead>
 			  						<tr>
-			  							<th>NO</th>
-			  							<th>卸業者</th>
-			  							<th>メーカー名</th>
-			  							<th>商品名</th>
-			  							<th>製品コード</th>
-			  							<th>規格</th>
-			  							<th>JANコード</th>
-			  							<th>購買価格</th>
-			  							<th>単価</th>
-			  							<th>計算上在庫</th>
-			  							<th>棚卸数量</th>
-			  							<th>棚卸金額</th>
-			  							<th>数量差分</th>
+			  							<th class="uk-text-nowrap">id</th>
+			  							<th class="uk-table-expand">卸業者</th>
+			  							<th class="uk-table-expand">メーカー名</th>
+			  							<th class="uk-table-expand">商品名</th>
+			  							<th class="uk-table-expand">製品コード</th>
+			  							<th class="uk-table-expand">規格</th>
+			  							<th class="uk-table-expand">JANコード</th>
+			  							<th class="uk-text-nowrap">購買価格</th>
+			  							<th class="uk-text-nowrap">単価</th>
+			  							<th class="uk-text-nowrap">計算上在庫</th>
+			  							<th class="uk-text-nowrap">棚卸数量</th>
+			  							<th class="uk-text-nowrap">棚卸金額</th>
+			  							<th class="uk-text-nowrap">数量差分</th>
 			  						</tr>
 			  					</thead>
 			  					<tbody>
@@ -81,12 +81,12 @@
 				    						echo "<td>".$record->itemCode."</td>";
 				    						echo "<td>".$record->itemStandard."</td>";
 				    						echo "<td>".$record->itemJANCode."</td>";
-				    						echo "<td>￥<script>price(\"".$record->price."\")</script></td>";
-				    						echo "<td>￥<script>price(\"".$record->unitPrice."\")</script></td>";
+				    						echo "<td>￥".number_format($record->price,2)."</td>";
+				    						echo "<td>￥".number_format($record->unitPrice,2)."</td>";
 				    						//echo "<td>".(int)$record->stockQuantity."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
 				    						echo "<td>".(int)$record->calculatingStock."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
 				    						echo "<td>".$record->inventryNum."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
-				    						echo "<td>￥<script>price(\"".$record->inventryAmount."\")</script></td>";
+				    						echo "<td>￥".number_format($record->inventryAmount,2)."</td>";
 				    						echo "<td>".((int)$record->calculatingStock - (int)$record->inventryNum)."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
 				    						echo "</tr>";
 				    						$num++;

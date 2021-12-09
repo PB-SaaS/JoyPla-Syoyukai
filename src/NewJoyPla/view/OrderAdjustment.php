@@ -120,46 +120,50 @@
 	}
 
 	function sendUnorderedSlip(){
-		if(!validateChack()){
-			return;
-		}
-		loading();
-		$.ajax({
-			async: false,
-            url:'%url/rel:mpgt:Order%&Action=regUnorderedDivisionApi',
-            type:'POST',
-            data:{
-            	_csrf: "<?php echo $csrf_token ?>",
-            	ordered : JSON.stringify( objectValueToURIencode(getItems()) ),
-            },
-            dataType: 'json'
-        })
-        // Ajaxリクエストが成功した時発動
-        .done( (data) => {
-            
-            if(! data.result){
-        		UIkit.modal.alert("未発注伝票の作成に失敗しました").then(function(){
+		UIkit.modal.confirm("未発注伝票を作成します。<br>よろしいですか").then(function(){
+			if(!validateChack()){
+				return;
+			}
+			loading();
+			$.ajax({
+				async: false,
+		        url:'%url/rel:mpgt:Order%&Action=regUnorderedDivisionApi',
+		        type:'POST',
+		        data:{
+		        	_csrf: "<?php echo $csrf_token ?>",
+		        	ordered : JSON.stringify( objectValueToURIencode(getItems()) ),
+		        },
+		        dataType: 'json'
+		    })
+		    // Ajaxリクエストが成功した時発動
+		    .done( (data) => {
+		        
+		        if(! data.result){
+		    		UIkit.modal.alert("未発注伝票の作成に失敗しました").then(function(){
+						canAjax = true; // 再びAjaxできるようにする
+					});
+		    		return false;
+		        }
+		        
+		        UIkit.modal.alert("未発注伝票を作成しました").then(function(){
+					UIkit.modal.alert("未発注伝票一覧へ移動します").then(function(){
+						location.href="%url/rel:mpgt:Order%&Action=unorderedList";
+					});
+				});
+		    })
+		    // Ajaxリクエストが失敗した時発動
+		    .fail( (data) => {
+		    	UIkit.modal.alert("未発注伝票の作成に失敗しました").then(function(){
 					canAjax = true; // 再びAjaxできるようにする
 				});
-        		return false;
-            }
-            
-            UIkit.modal.alert("未発注伝票を作成しました").then(function(){
-				UIkit.modal.alert("未発注伝票一覧へ移動します").then(function(){
-					location.href="%url/rel:mpgt:Order%&Action=unorderedList";
-				});
-			});
-        })
-        // Ajaxリクエストが失敗した時発動
-        .fail( (data) => {
-        	UIkit.modal.alert("未発注伝票の作成に失敗しました").then(function(){
-				canAjax = true; // 再びAjaxできるようにする
-			});
-        })
-        // Ajaxリクエストが成功・失敗どちらでも発動
-        .always( (data) => {
-			loading_remove();
-        });
+		    })
+		    // Ajaxリクエストが成功・失敗どちらでも発動
+		    .always( (data) => {
+				loading_remove();
+		    });
+		},function(){
+			UIkit.modal.alert("中止しました");
+		});
 	}
 	
    </script>

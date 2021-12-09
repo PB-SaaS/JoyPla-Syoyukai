@@ -56,9 +56,14 @@ class UnorderSlipController extends Controller
             
             $order_data = $order_data->data->all();
             $is_deleted = (count($order_data) == 0);
+            
             if($is_deleted)
             {
                 $card_data->destroy($card_data->id);
+            } 
+            else if($card_data->orderStatus != "1")
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             } 
             else
             {
@@ -130,6 +135,10 @@ class UnorderSlipController extends Controller
             $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
             Csrf::validate($token,true);
 
+            if ($user_info->isApprover())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
             $id = (int)$SPIRAL->getCardId();
             $comment = $SPIRAL->getParam('ordercomment');
             $comment = urldecode($comment);
@@ -166,6 +175,11 @@ class UnorderSlipController extends Controller
             $user_info = new UserInfo($SPIRAL);
             $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
             Csrf::validate($token,true);
+
+            if ($user_info->isApprover())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
 
             $id = (int)$SPIRAL->getCardId();
             $items = $SPIRAL->getParam('data');
@@ -205,6 +219,11 @@ class UnorderSlipController extends Controller
             $user_info = new UserInfo($SPIRAL);
             $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
             Csrf::validate($token,true);
+
+            if ($user_info->isApprover())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
 
             $id = (int)$SPIRAL->getCardId();
             $items = $SPIRAL->getParam('data');
@@ -247,6 +266,11 @@ class UnorderSlipController extends Controller
             $user_info = new UserInfo($SPIRAL);
             $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
             Csrf::validate($token,true);
+
+            if ($user_info->isApprover())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
 
             $id = (int)$SPIRAL->getCardId();
             

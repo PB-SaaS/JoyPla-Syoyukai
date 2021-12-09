@@ -155,6 +155,7 @@ class OrderController extends Controller
         }
         $distributorDB = $distributorDB->get();
         $distributorDB = $distributorDB->data->all();
+            
         //個数を合算する
         foreach( $order_data as $divisionId => $ordered )
         {
@@ -207,7 +208,6 @@ class OrderController extends Controller
                     if ($order['distributorId'] == $distributorId) { $arrayEachDistributor["-".$distributorId][] = $order; }
                 }
             }
-            
             foreach ($arrayEachDistributor as $key => $order_data)
             {
                 $in_hospital_item_ids = [];
@@ -220,8 +220,13 @@ class OrderController extends Controller
                     $distributorId = $data['distributorId'];
                     $sign = '';
                     $inHPItemid = $data['recordId'];
-                    if ((int)$data['countNum'] < 0) { $sign = '-'; }
-                    if (floor(abs((int)$data['countNum']) / (int)$data['irisu']) > 0)
+                    if ((int)$data['countNum'] < 0) { 
+                        $sign = '-'; 
+                    }
+                    $count = (abs((int)$data['countNum']) == 0 || (int)$data['irisu'] == 0)
+                        ? 0
+                        : floor(abs((int)$data['countNum']) / (int)$data['irisu']);
+                    if ($count > 0)
                     {
                         $insert_data[] = [
                             'hospitalId' => $user_info->getHospitalId(),
@@ -238,11 +243,12 @@ class OrderController extends Controller
                             'distributorId' => $data['distributorId'],
                             'itemId' => $data['itemId']
                         ];
-                        $total_amount = $total_amount + ($sign.str_replace(',', '', $data['kakaku']) * floor(abs((int)$data['countNum']) / (int)$data['irisu']));
+                        $total_amount = $total_amount + (float)($sign.str_replace(',', '', $data['kakaku']) * floor(abs((int)$data['countNum']) / (int)$data['irisu']));
                         $history_create_flag = true;
-                    }
-                    if (array_search($inHPItemid, $in_hospital_item_ids) === false) {
-                        $in_hospital_item_ids[] = $inHPItemid;
+                        
+                        if (array_search($inHPItemid, $in_hospital_item_ids) === false) {
+                            $in_hospital_item_ids[] = $inHPItemid;
+                        }
                     }
                 }
                 if (count($insert_data) == 0) {
@@ -517,6 +523,10 @@ class OrderController extends Controller
 
             $user_info = new UserInfo($SPIRAL);
             
+            if ($user_info->isApprover())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
             if ($user_info->isDistributorUser())
             {
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());

@@ -114,6 +114,14 @@
                             </dl>
                             <dl class="cf">
                                 <dt class="title">
+                                    ロット管理フラグ
+                                </dt>
+                                <dd class="data ">
+                                    <?= $SPIRAL->getParam('lotManagement'); ?>
+                                </dd>
+                            </dl>
+                            <dl class="cf">
+                                <dt class="title">
                                     入数
                                 </dt>
                                 <dd class="data integer">
@@ -163,7 +171,7 @@
                         $form:hidden$
                         <!-- HIDDEN_PARAM END -->
                         <input class="submit" type="submit" name="SMPFORM_BACK" value="戻る">
-                        <input class="submit" type="submit" name="submit" value="変更">
+                        <input class="submit" type="submit" name="submit" value="登録">
                     </form>
                     <!-- SMP_TEMPLATE_FORM end -->
                 </div>

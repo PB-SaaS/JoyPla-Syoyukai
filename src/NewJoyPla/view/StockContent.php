@@ -93,34 +93,32 @@
             </ul>
             <h2 class="page_title">在庫調整</h2>
             <hr>
-            <div class="uk-child-width-1-3@m" uk-grid>
-                <div>
-                    <div class="uk-form-controls">
-                        <select class="uk-width-3-4 uk-select uk-inline" id="divisionId" v-model="divisionId" v-bind:disabled="division_disabled">
-                            <option value="">----- 部署選択 -----</option>
-                            <?php
-		                        foreach($division->data as $data)
-		                        {
-		                            if($data->divisionType === '1')
-		                            {
-		                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
-		                                echo '<option value="" disabled>--------------------</option>';
-		                            }
-		                        }
-		                        foreach($division->data as $data)
-		                        {
-		                            if($data->divisionType === '2')
-		                            {
-		                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
-		                            }
-		                        }
-		                        ?>
-                        </select>
-                    </div>
+            <div class="uk-width-1-3@m">
+                <div class="uk-margin">
+                    <select class="uk-width-3-4 uk-select uk-inline" id="divisionId" v-model="divisionId" v-bind:disabled="lists.length > 0">
+                        <option value="">----- 部署選択 -----</option>
+                        <?php
+	                        foreach($division->data as $data)
+	                        {
+	                            if($data->divisionType === '1')
+	                            {
+	                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
+	                                echo '<option value="" disabled>--------------------</option>';
+	                            }
+	                        }
+	                        foreach($division->data as $data)
+	                        {
+	                            if($data->divisionType === '2')
+	                            {
+	                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
+	                            }
+	                        }
+	                        ?>
+                    </select>
                 </div>
             </div>
-            <div class="uk-margin-bottom" uk-grid>
-                <div class="uk-width-1-2@m" uk-margin>
+            <div class="uk-margin-bottom">
+                <div uk-margin>
                     <button class="uk-button uk-button-default" v-on:click="sanshouClick">商品マスタを開く</button>
                     <button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
                     <button class="uk-button uk-button-primary" type="submit" v-on:click="stockRegister">在庫調整実行</button>
@@ -134,25 +132,25 @@
                 </form>
             </div>
             <div class="shouhin-table uk-width-expand uk-overflow-auto">
-                <table class="uk-table uk-table-striped uk-text-nowrap">
+                <table class="uk-table uk-table-striped ">
                     <thead>
                         <tr>
-                            <th class="uk-table-shrink">id</th>
-                            <th>メーカー</th>
-                            <th>商品名</th>
-                            <th>製品コード</th>
-                            <th>規格</th>
-                            <th>JANコード</th>
-                            <th>入数</th>
-                            <th>棚名</th>
-                            <th>部署別定数</th>
-                            <th class="uk-table-shrink">
+                            <th class="uk-text-nowrap">id</th>
+                            <th class="uk-table-expand">メーカー</th>
+                            <th class="uk-table-expand">商品名</th>
+                            <th class="uk-table-expand">製品コード</th>
+                            <th class="uk-table-expand">規格</th>
+                            <th class="uk-table-expand">JANコード</th>
+                            <th class="uk-table-expand">入数</th>
+                            <th class="uk-text-nowrap">棚名</th>
+                            <th class="uk-text-nowrap">部署別定数</th>
+                            <th class="uk-text-nowrap">
                                 現在在庫数
                             </th>
-                            <th class="uk-table-shrink">
+                            <th class="uk-text-nowrap">
                                 調整数
                             </th>
-                            <th class="uk-table-shrink">
+                            <th class="uk-text-nowrap">
                                 調整後在庫数
                             </th>
                             <th>
@@ -167,25 +165,25 @@
                             <td>{{list.code}}</td>
                             <td>{{list.kikaku}}</td>
                             <td>{{list.jan}}</td>
-                            <td>{{list.irisu}}{{list.unit}}</td>
-                            <td>
+                            <td class="uk-text-nowrap">{{list.irisu}}{{list.unit}}</td>
+                            <td class="uk-text-nowrap">
                                 <input type="text" step="1" class="uk-input" style="width: 180px;" v-bind:style="list.rackNameStyle" v-model="list.rackName" v-on:change="rackNameStyle(key)">
                             </td>
-                            <td>
+                            <td class="uk-text-nowrap">
                                 <input type="number" step="1" min="0" class="uk-input" style="width: 96px;" v-bind:style="list.constantByDivStyle" v-model="list.constantByDiv" v-on:change="constantByDivStyle(key)">
                                 <span class="uk-text-bottom">{{list.unit}}</span>
                             </td>
-                            <td>
+                            <td class="uk-text-nowrap">
                                 {{ list.stock }}{{list.unit}}
                             </td>
-                            <td>
+                            <td class="uk-text-nowrap">
                                 <input type="number" step="1" class="uk-input" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.stockCountNum" v-on:change="addCountStyle(key)">
                                 <span class="uk-text-bottom">{{list.unit}}</span>
                             </td>
-                            <td>
-                                {{ list.stock + parseInt(list.stockCountNum) }}{{list.unit}}
+                            <td class="uk-text-nowrap">
+                                {{ list.stock + (parseInt(list.stockCountNum) || 0) }}{{list.unit}}
                             </td>
-                            <td uk-margin class="uk-text-center">
+                            <td uk-margin class="uk-text-center uk-text-nowrap">
                                 <input type="button" class="uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)">
                             </td>
                         </tr>
@@ -241,40 +239,40 @@
             <h2 class="uk-modal-title">商品選択</h2>
         </div>
         <div class="uk-modal-body uk-width-expand uk-overflow-auto">
-            <table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-nowrap uk-table-divider">
-                <thead>
-                    <tr>
-                        <th class="uk-table-shrink">id</th>
-                        <th class="uk-table-shrink"></th>
-                        <th>メーカー</th>
-                        <th>商品名</th>
-                        <th>製品コード</th>
-                        <th>規格</th>
-                        <th>入数</th>
-                        <th>価格</th>
-                        <th>単価</th>
-                        <th>JANコード</th>
-                        <th>卸業者</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(list , key) in select_items">
-                        <td></td>
-                        <td><button type="button" v-on:click="addObject(key)" class="uk-button uk-button-primary uk-button-small">反映</button></td>
-                        <td class="uk-text-middle">{{list.maker}}</td>
-                        <td class="uk-text-middle">{{list.shouhinName}}</td>
-                        <td class="uk-text-middle">{{list.code}}</td>
-                        <td class="uk-text-middle">{{list.kikaku}}</td>
-                        <td class="uk-text-middle">
-                            <span class="irisu">{{list.irisu}}</span><span class="unit uk-text-small">{{list.unit}}</span>
-                        </td>
-                        <td class="uk-text-middle">￥{{list.kakaku}}</td>
-                        <td class="uk-text-middle">￥{{list.unitPrice}}</td>
-                        <td class="uk-text-middle">{{list.jan}}</td>
-                        <td class="uk-text-middle">{{list.oroshi}}</td>
-                    </tr>
-                </tbody>
-            </table>
+         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-table-divider">
+				<thead>
+					<tr>
+						<th class="uk-text-nowrap">id</th>
+						<th class="uk-text-nowrap"></th>
+						<th class="uk-table-expand">メーカー</th>
+						<th class="uk-table-expand">商品名</th>
+						<th class="uk-table-expand">製品コード</th>
+						<th class="uk-table-expand">規格</th>
+						<th class="uk-table-expand">JANコード</th>
+						<th class="uk-table-expand">入数</th>
+						<th class="uk-table-expand">価格</th>
+						<th class="uk-table-expand">卸業者</th>
+						<th class="uk-table-expand">ロット管理フラグ</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="(list , key) in select_items">
+						<td></td>
+						<td><button type="button" v-on:click="addObject(key)" class="uk-text-nowrap uk-button uk-button-primary uk-button-small">反映</button></td>
+						<td class="uk-text-middle">{{list.maker}}</td>
+						<td class="uk-text-middle">{{list.shouhinName}}</td>
+						<td class="uk-text-middle">{{list.code}}</td>
+						<td class="uk-text-middle">{{list.kikaku}}</td>
+						<td class="uk-text-middle">{{list.jan}}</td>
+						<td class="uk-text-middle">
+						<span class="irisu uk-text-nowrap">{{list.irisu}}</span><span class="unit uk-text-small">{{list.unit}}</span>
+						</td>
+						<td class="uk-text-middle">￥{{list.kakaku}}</td>
+						<td class="uk-text-middle">{{list.oroshi}}</td>
+						<td class="uk-text-middle">{{list.lotFlag}}</td>
+					</tr>
+				</tbody>
+			</table>   
         </div>
     </div>
 </div>
@@ -291,7 +289,6 @@ var app = new Vue({
 	data: {
 		lists: [],
 		divisionId: '',
-    division_disabled: false
 	},
 	filters: {
         number_format: function(value) {
@@ -310,11 +307,6 @@ var app = new Vue({
     					changeObject.class.target = false;
     					app.$set(app.lists, index, changeObject);
         			});
-                }
-                if (!app.lists.length) { 
-                    app.division_disabled = false;
-                } else {
-                    app.division_disabled = true;
                 }
           })
         }
@@ -373,7 +365,7 @@ var app = new Vue({
 			
 		},
 		stockRegister: function() {
-            UIkit.modal.alert("在庫調整を行います。<br>よろしいでしょうか。").then(function(){
+            UIkit.modal.confirm("在庫調整を行います。<br>よろしいでしょうか。").then(function(){
     		    if(!app.check()){
     		        return false;
     		    }
@@ -408,7 +400,8 @@ var app = new Vue({
                 .always( (data) => {
     				loading_remove();
                 });
-		    });
+            }, function () {
+            });
 		},
 		deleteList: function(key) {
 			this.lists.splice(key, 1);
@@ -440,19 +433,42 @@ var app = new Vue({
 			}
 			
 			let checkflg = true;
+			let errormsg = new Object();
+			errormsg.constantByDiv = "";
+			errormsg.stockCountNum = "";
+			errormsg.rackName = "";
 			app.lists.forEach(function(elem, index) {
 				let checkObject = app.lists[index];
-    			if(! Number.isFinite( Number(checkObject.constantByDiv) ) || checkObject.constantByDiv === "")
+    			if(! Number.isFinite( Number(checkObject.constantByDiv) ) || checkObject.constantByDiv === "" || Number(checkObject.constantByDiv) < -2147483647 || Number(checkObject.constantByDiv) > 2147483647)
     			{
+    				errormsg.constantByDiv = "<br>部署別定数：数字で入力してください";
 			        checkObject.constantByDivStyle = { 'border' : "2px solid red"};
     			    checkflg = false;
     			}
+    			else
+    			if(Number(checkObject.constantByDiv) < -2147483647 || Number(checkObject.constantByDiv) > 2147483647)
+    			{
+    				errormsg.stockCountNum = "<br>部署別定数：-2147483647 から 2147483647 の間で入力してください";
+			        checkObject.constantByDivStyle = { 'border' : "2px solid red"};
+    			    checkflg = false;
+    			}
+    			
     			if(! Number.isFinite( Number(checkObject.stockCountNum) ) || checkObject.stockCountNum === "")
     			{
+    				errormsg.stockCountNum = "<br>調整数：数字で入力してください";
 			        checkObject.countStyle = { 'border' : "2px solid red"};
     			    checkflg = false;
     			}
+    			else
+    			if(Number(checkObject.stockCountNum) < -2147483647 || Number(checkObject.stockCountNum) > 2147483647)
+    			{
+    				errormsg.stockCountNum = "<br>調整数：-2147483647 から 2147483647 の間で入力してください";
+			        checkObject.countStyle = { 'border' : "2px solid red"};
+    			    checkflg = false;
+    			}
+    			
 			    if(checkObject.rackName.bytes() > 64) {
+    				errormsg.rackName = "<br>棚名：半角64文字全角32文字以内で入力してください";
 			        checkObject.rackNameStyle = { 'border' : "2px solid red"};
     			    checkflg = false;
 			    }
@@ -461,7 +477,7 @@ var app = new Vue({
 			
 			if(!checkflg)
 			{
-				UIkit.modal.alert('値が正しくありません');
+				UIkit.modal.alert('値が正しく入力されていません'+ errormsg.rackName + errormsg.constantByDiv + errormsg.stockCountNum );
 			    return false;
 			}
 			

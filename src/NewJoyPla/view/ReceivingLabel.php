@@ -7,6 +7,7 @@ $original_design = <<<EOM
 		<span>規格：%JoyPla:itemStandard%</span><br>
 		<span>商品コード：%JoyPla:itemCode%</span>
 		<span>入数：%JoyPla:quantity%%JoyPla:quantityUnit%</span><br>
+		<span>%JoyPla:lotNumber% %JoyPla:lotDate%</span>
 		<span>%JoyPla:nowTime%</span><br>
 		<div class="uk-text-center" id="barcode_%JoyPla:num%">%JoyPla:barcodeId%</div>
 	</div>
@@ -151,7 +152,9 @@ html {
                     $design = str_replace('%JoyPla:rackName%',			$item->rackName, 							$design);//払い出し先部署棚
                     $design = str_replace('%JoyPla:constantByDiv%',		$item->constantByDiv, 					    $design);//払い出し先部署定数
                     $design = str_replace('%JoyPla:officialFlag%',		$officialFlag,								$design);//償還フラグ
-                    $design = str_replace('%JoyPla:officialFlag%',		$item->officialFlag,						$design);//償還フラグ
+                    $design = str_replace('%JoyPla:officialFlag:id%',   $item->officialFlag,					    $design);//償還フラグ id
+                    $design = str_replace('%JoyPla:lotNumber%',			$item->lotNumber, 		                    $design);//ロット
+                    $design = str_replace('%JoyPla:lotDate%',			$item->lotDate, 		                    $design);//使用期限
 
                     echo $design;
 

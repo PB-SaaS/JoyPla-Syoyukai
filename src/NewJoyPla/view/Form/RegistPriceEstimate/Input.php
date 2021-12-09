@@ -34,7 +34,7 @@
                     <h1>見積金額登録 - 入力</h1>
 
                     <!--SMP:DISP:REG:START-->
-                    <p class="header_rmesg">必要事項をご入力の上、送信ボタンを押してください。</p>
+                    <p class="header_rmesg">必要事項をご入力の上、確認ボタンを押してください。</p>
                     <!--SMP:DISP:REG:END-->
 
                     <!--SMP:DISP:ERR:START-->
@@ -116,6 +116,14 @@
                                 </dt>
                                 <dd class="data ">
                                     <?= $SPIRAL->getParam('serialNo'); ?>
+                                </dd>
+                            </dl>
+                            <dl class="cf">
+                                <dt class="title">
+                                    ロット管理フラグ
+                                </dt>
+                                <dd class="data ">
+                                    <?= $SPIRAL->getParam('lotManagement'); ?>
                                 </dd>
                             </dl>
                             <dl class="cf">

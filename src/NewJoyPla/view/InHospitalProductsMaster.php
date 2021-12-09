@@ -3,7 +3,7 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
-                <li><span>院内商品マスタ</span></li>
+                <li><span>院内商品一覧</span></li>
             </ul>
             <div class="no_print uk-margin">
                 <input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
@@ -11,7 +11,7 @@
             </div>
             <div class="uk-width-1-1 uk-margin-remove-left" uk-grid>
                 <div class="uk-width-3-4@m uk-padding-remove">
-                    <h2>院内商品マスタ</h2>
+                    <h2>院内商品一覧</h2>
                 </div>
                 <div class="uk-width-1-4@m uk-padding-remove no_print">
                     <ul uk-accordion class="uk-background-muted uk-padding-small">

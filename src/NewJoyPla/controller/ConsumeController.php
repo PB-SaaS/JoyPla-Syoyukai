@@ -254,7 +254,8 @@ class ConsumeController extends Controller
                 }
                 if (($record['lotNumber'] != '') && ($record['lotDate'] != '')) 
                 {
-                    if ((!ctype_alnum($record['lotNumber'])) || (strlen($record['lotNumber']) > 20))
+                    //if ((!ctype_alnum($item['lotNumber'])) || (strlen($item['lotNumber']) > 20))
+                    if ((!preg_match('/^[a-zA-Z0-9!-\/:-@¥[-`{-~]+$/', $record['lotNumber'])) || (strlen($record['lotNumber']) > 20))
                     {
                         throw new Exception('invalid lotNumber format',102);
                     }
@@ -271,7 +272,7 @@ class ConsumeController extends Controller
             $useUnitPrice = '';
             $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
             $hospital_data = $hospital_data->data->get(0);
-            $useUnitPrice = $hospital_data->billingUnitPrice;
+            $useUnitPrice = (int)$hospital_data->billingUnitPrice;
             $billing_id = $this->makeId('02');
 
             $insert_data = [];
@@ -285,7 +286,7 @@ class ConsumeController extends Controller
                 if ((int)$data['countNum']  > 0) {
                     $unitPrice = $useUnitPrice
                         ? (str_replace(',', '', $data['unitPrice']))
-                        : (str_replace(',', '', $data['kakaku']) / $data['irisu']);
+                        : (((float)str_replace(',', '', $data['kakaku']) == 0 || (float)$data['irisu'] == 0)? 0 : ((float)str_replace(',', '', $data['kakaku']) / (float)$data['irisu'])) ;
                     $insert_data[] = [
                         'registrationTime' => $consume_date,
                         'inHospitalItemId' => $data['recordId'],

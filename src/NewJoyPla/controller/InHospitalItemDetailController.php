@@ -84,7 +84,7 @@ class InHPItemDetailController extends Controller
             
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
-            <li><a href="%url/rel:mpgt:Product%&Action=Item&table_cache=true">院内商品マスタ</a></li>
+            <li><a href="%url/rel:mpgt:Product%&Action=InHospitalItem&table_cache=true">院内商品一覧</a></li>
             <li><a href="%url/card:page_176013%">院内商品情報</a></li>
             <li><span>院内商品情報変更</span></li>
 EOM;

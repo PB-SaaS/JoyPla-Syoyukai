@@ -1,4 +1,4 @@
-<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top">
+<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove">
     <div class="uk-container uk-container-expand">
         <div uk-grid>
             <div class="uk-width-1-2@m">
@@ -9,7 +9,7 @@
             <thead>
                 <tr>
                     <th>
-                        登録日時
+                        登録変更日時
                     </th>
                     <td>
                         %val:usr:registrationTime%
@@ -54,6 +54,34 @@
             <tbody>
                 <tr>
                     <th>
+                        メーカー名
+                    </th>
+                    <td>
+                        %val:usr:o_makerName%
+                    </td>
+                    <td>
+                        <span uk-icon="arrow-right"></span>
+                    </td>
+                    <td>
+                        %val:usr:makerName%
+                    </td>
+                    <td>
+                        <script>
+                            old = "%val:usr:o_makerName%";
+                            val = "%val:usr:makerName%";
+                            if(old === val)
+                            {
+                                document.write('<span class="uk-label uk-label-success">変更なし</span>');
+                            }
+                            else
+                            {
+                                document.write('<span class="uk-label uk-label-warning">変更あり</span>');
+                            }
+                        </script>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
                         商品名
                     </th>
                     <td>
@@ -69,6 +97,34 @@
                         <script>
                             old = "%val:usr:o_itemName%";
                             val = "%val:usr:itemName%";
+                            if(old === val)
+                            {
+                                document.write('<span class="uk-label uk-label-success">変更なし</span>');
+                            }
+                            else
+                            {
+                                document.write('<span class="uk-label uk-label-warning">変更あり</span>');
+                            }
+                        </script>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        分類
+                    </th>
+                    <td>
+                        %val:usr:o_category%
+                    </td>
+                    <td>
+                        <span uk-icon="arrow-right"></span>
+                    </td>
+                    <td>
+                        %val:usr:category%
+                    </td>
+                    <td>
+                        <script>
+                            old = "%val:usr:o_category%";
+                            val = "%val:usr:category%";
                             if(old === val)
                             {
                                 document.write('<span class="uk-label uk-label-success">変更なし</span>');
@@ -166,62 +222,6 @@
                 </tr>
                 <tr>
                     <th>
-                        分類
-                    </th>
-                    <td>
-                        %val:usr:o_category%
-                    </td>
-                    <td>
-                        <span uk-icon="arrow-right"></span>
-                    </td>
-                    <td>
-                        %val:usr:category%
-                    </td>
-                    <td>
-                        <script>
-                            old = "%val:usr:o_category%";
-                            val = "%val:usr:category%";
-                            if(old === val)
-                            {
-                                document.write('<span class="uk-label uk-label-success">変更なし</span>');
-                            }
-                            else
-                            {
-                                document.write('<span class="uk-label uk-label-warning">変更あり</span>');
-                            }
-                        </script>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        メーカー名
-                    </th>
-                    <td>
-                        %val:usr:o_makerName%
-                    </td>
-                    <td>
-                        <span uk-icon="arrow-right"></span>
-                    </td>
-                    <td>
-                        %val:usr:makerName%
-                    </td>
-                    <td>
-                        <script>
-                            old = "%val:usr:o_makerName%";
-                            val = "%val:usr:makerName%";
-                            if(old === val)
-                            {
-                                document.write('<span class="uk-label uk-label-success">変更なし</span>');
-                            }
-                            else
-                            {
-                                document.write('<span class="uk-label uk-label-warning">変更あり</span>');
-                            }
-                        </script>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
                         カタログNo
                     </th>
                     <td>
@@ -293,6 +293,34 @@
                         <script>
                             old = "%val:usr:o_minPrice%";
                             val = "%val:usr:minPrice%";
+                            if(old === val)
+                            {
+                                document.write('<span class="uk-label uk-label-success">変更なし</span>');
+                            }
+                            else
+                            {
+                                document.write('<span class="uk-label uk-label-warning">変更あり</span>');
+                            }
+                        </script>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        ロット管理フラグ
+                    </th>
+                    <td>
+                        %val:usr:o_lotManagement:v%
+                    </td>
+                    <td>
+                        <span uk-icon="arrow-right"></span>
+                    </td>
+                    <td>
+                        %val:usr:lotManagement:v%
+                    </td>
+                    <td>
+                        <script>
+                            old = "%val:usr:o_lotManagement:v%";
+                            val = "%val:usr:lotManagement:v%";
                             if(old === val)
                             {
                                 document.write('<span class="uk-label uk-label-success">変更なし</span>');
@@ -433,34 +461,6 @@
                         <script>
                             old = "%val:usr:o_itemUnit%";
                             val = "%val:usr:itemUnit%";
-                            if(old === val)
-                            {
-                                document.write('<span class="uk-label uk-label-success">変更なし</span>');
-                            }
-                            else
-                            {
-                                document.write('<span class="uk-label uk-label-warning">変更あり</span>');
-                            }
-                        </script>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        ロット管理フラグ
-                    </th>
-                    <td>
-                        %val:usr:o_lotManagement:v%
-                    </td>
-                    <td>
-                        <span uk-icon="arrow-right"></span>
-                    </td>
-                    <td>
-                        %val:usr:lotManagement:v%
-                    </td>
-                    <td>
-                        <script>
-                            old = "%val:usr:o_lotManagement:v%";
-                            val = "%val:usr:lotManagement:v%";
                             if(old === val)
                             {
                                 document.write('<span class="uk-label uk-label-success">変更なし</span>');

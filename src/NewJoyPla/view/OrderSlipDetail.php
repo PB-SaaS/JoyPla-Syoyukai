@@ -62,46 +62,46 @@
 
                 <div class="" id="tablearea">
                     <div class="uk-overflow-auto">
-                        <table class="uk-table uk-table-hover uk-table-middle uk-table-divider uk-text-nowrap" id="tbl-Items">
+                        <table class="uk-table uk-table-hover uk-table-middle uk-table-divider" id="tbl-Items">
                             <thead>
                                 <tr>
-                                    <th>NO</th>
-                                    <th style="min-width:60px">メーカー</th>
-                                    <th style="min-width:150px">商品名</th>
-                                    <th>製品コード</th>
-                                    <th>規格</th>
-                                    <th>JANコード</th>
-                                    <th>価格</th>
-                                    <th>入数</th>
-                                    <th>発注数</th>
-                                    <th>入庫数</th>
-                                    <th>入庫可能数</th>
-                                    <th>今回入庫数</th>
-                                    <th>納期</th>
-                                    <th>金額</th>
+                                    <th class="uk-text-nowrap">NO</th>
+                                    <th class="uk-table-expand" style="min-width:60px">メーカー</th>
+                                    <th class="uk-table-expand" style="min-width:150px">商品名</th>
+                                    <th class="uk-table-expand">製品コード</th>
+                                    <th class="uk-table-expand">規格</th>
+                                    <th class="uk-table-expand">JANコード</th>
+                                    <th class="uk-text-nowrap">価格</th>
+                                    <th class="uk-text-nowrap">入数</th>
+                                    <th class="uk-text-nowrap">発注数</th>
+                                    <th class="uk-text-nowrap">入庫数</th>
+                                    <th class="uk-text-nowrap">入庫可能数</th>
+                                    <th class="uk-text-nowrap">今回入庫数</th>
+                                    <th class="uk-text-nowrap">納期</th>
+                                    <th class="uk-text-nowrap">金額</th>
                                     <?php if($user_info->isUser() || $user_info->isAdmin()): ?>
-                                    <th>入庫リストへ転記</th>
+                                    <th class="uk-text-nowrap">入庫リストへ転記</th>
                                     <?php endif ?>
                                 </tr>
                             </thead>
                             <tbody>
 						        <tr v-for="(item, key) in items" :id="'tr_' + key" v-bind:class="item.class">
-							        <td>{{key + 1 }}</td>
+							        <td class="uk-text-nowrap">{{key + 1 }}</td>
                                     <td>{{item.makerName}}</td>
                                     <td>{{item.itemName}}</td>
                                     <td>{{item.itemCode}}</td>
                                     <td>{{item.itemStandard}}</td>
                                     <td>{{item.itemJANCode}}</td>
-                                    <td>￥{{item.price | number_format}}</td>
-                                    <td>{{item.quantity}}{{item.quantityUnit}}</td>
-                                    <td>{{item.orderQuantity}}{{item.itemUnit}}</td>
-                                    <td>{{item.receivingNum}}{{item.itemUnit}}</td>
-                                    <td>{{item.possibleNumber}}{{item.itemUnit}}</td>
-                                    <td v-bind:class="item.nowCountClass">{{item.nowCount}}{{item.itemUnit}}</td>
-                                    <td>{{item.dueDate}}</td>
-                                    <td>￥{{item.orderPrice | number_format}}</td>
+                                    <td class="uk-text-nowrap">￥{{item.price | number_format}}</td>
+                                    <td class="uk-text-nowrap">{{item.quantity}}{{item.quantityUnit}}</td>
+                                    <td class="uk-text-nowrap">{{item.orderQuantity}}{{item.itemUnit}}</td>
+                                    <td class="uk-text-nowrap">{{item.receivingNum}}{{item.itemUnit}}</td>
+                                    <td class="uk-text-nowrap">{{item.possibleNumber}}{{item.itemUnit}}</td>
+                                    <td class="uk-text-nowrap" v-bind:class="item.nowCountClass">{{item.nowCount}}{{item.itemUnit}}</td>
+                                    <td class="uk-text-nowrap">{{item.dueDate}}</td>
+                                    <td class="uk-text-nowrap">￥{{item.orderPrice | number_format}}</td>
                                     <?php if($user_info->isUser() || $user_info->isAdmin()): ?>
-                                    <td><button type="button" class="uk-button uk-button-primary" v-on:click="add(item)">転記</button></td>
+                                    <td class="uk-text-nowrap"><button type="button" class="uk-button uk-button-primary" v-on:click="add(item)">転記</button></td>
                                     <?php endif ?>
                                 </tr>
                             </tbody>
@@ -120,49 +120,49 @@
                     </div>
                     
                     <div class="uk-overflow-auto">
-                        <table class="uk-table uk-table-hover uk-table-middle uk-table-divider uk-text-nowrap" id="tbl-Items">
+                        <table class="uk-table uk-table-hover uk-table-middle uk-table-divider" id="tbl-Items">
                             <thead>
                                 <tr>
-                                    <th>NO</th>
-                                    <th style="min-width:60px">メーカー</th>
-                                    <th style="min-width:150px">商品名</th>
-                                    <th>製品コード</th>
-                                    <th>規格</th>
-                                    <th>JANコード</th>
-                                    <th>価格</th>
-                                    <th>入数</th>
-                                    <th>入庫数</th>
-                                    <th>ロット管理</th>
-                                    <th>ロット番号</th>
-                                    <th>使用期限</th>
+                                    <th class="uk-text-nowrap">NO</th>
+                                    <th class="uk-table-expand" style="min-width:60px">メーカー</th>
+                                    <th class="uk-table-expand" style="min-width:150px">商品名</th>
+                                    <th class="uk-table-expand">製品コード</th>
+                                    <th class="uk-table-expand">規格</th>
+                                    <th class="uk-table-expand">JANコード</th>
+                                    <th class="uk-text-nowrap">価格</th>
+                                    <th class="uk-text-nowrap">入数</th>
+                                    <th class="uk-text-nowrap">入庫数</th>
+                                    <th class="uk-text-nowrap">ロット管理</th>
+                                    <th class="uk-table-expand">ロット番号</th>
+                                    <th class="uk-table-expand">使用期限</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
 						        <tr v-for="(list, key) in lists" :id="'tr_' + key" v-bind:class="list.class">
-							        <td>{{key + 1 }}</td>
+							        <td class="uk-text-nowrap">{{key + 1 }}</td>
                                     <td>{{list.makerName}}</td>
                                     <td>{{list.itemName}}</td>
                                     <td>{{list.itemCode}}</td>
                                     <td>{{list.itemStandard}}</td>
                                     <td>{{list.itemJANCode}}</td>
-                                    <td>￥{{list.price | number_format}}</td>
-                                    <td>{{list.quantity}}{{list.quantityUnit}}</td>
-        							<td>
+                                    <td class="uk-text-nowrap">￥{{list.price | number_format}}</td>
+                                    <td class="uk-text-nowrap">{{list.quantity}}{{list.quantityUnit}}</td>
+        							<td class="uk-text-nowrap">
         								<input type="number" step="1" class="uk-input" style="width: 96px;" v-bind:max="list.max" v-bind:min="list.min" v-bind:style="list.countStyle" v-model="list.countNum" v-bind:disabled="list.countNumDisabled" v-on:change="addCountStyle(key);changeCountNum(key)">
         								<span class="uk-text-bottom">{{list.itemUnit}}</span>
         							</td>
-        							<td>
+        							<td class="uk-text-nowrap">
         								<span v-if="list.lotManagement == 1" class="uk-text-danger">必須</span>
         								<span v-else >任意</span>
         							</td>
-        							<td>
+        							<td class="uk-text-nowrap">
         								<input type="text" maxlength="20" class="uk-input lot" style="width:180px" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
         							</td>
-							        <td>
+							        <td class="uk-text-nowrap">
                                         <input type="date" class="uk-input lotDate" v-model="list.lotDate" v-bind:style="list.lotDateStyle" v-on:change="addLotDateStyle(key)">
 							        </td>
-							        <td>
+							        <td class="uk-text-nowrap">
 								        <input type="button" class="uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)">
                                     </td>
                                 </tr>
@@ -206,43 +206,43 @@
 	            <h2 class="uk-modal-title">商品選択</h2>
 	        </div>
 	        <div class="uk-modal-body uk-width-expand uk-overflow-auto">
-	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-nowrap uk-table-divider">
+	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-table-divider">
 					<thead>
 						<tr>
-                            <th>NO</th>
-                            <th style="min-width:60px">メーカー</th>
-                            <th style="min-width:150px">商品名</th>
-                            <th>製品コード</th>
-                            <th>規格</th>
-                            <th>JANコード</th>
-                            <th>価格</th>
-                            <th>入数</th>
-                            <th>発注数</th>
-                            <th>入庫数</th>
-                            <th>入庫可能数</th>
-                            <th>今回入庫数</th>
-                            <th>納期</th>
-                            <th>金額</th>
-                            <th>入庫リストへ転記</th>
+                            <th class="uk-text-nowrap">NO</th>
+                            <th class="uk-table-expand" style="min-width:60px">メーカー</th>
+                            <th class="uk-table-expand" style="min-width:150px">商品名</th>
+                            <th class="uk-table-expand">製品コード</th>
+                            <th class="uk-table-expand">規格</th>
+                            <th class="uk-table-expand">JANコード</th>
+                            <th class="uk-text-nowrap">価格</th>
+                            <th class="uk-text-nowrap">入数</th>
+                            <th class="uk-text-nowrap">発注数</th>
+                            <th class="uk-text-nowrap">入庫数</th>
+                            <th class="uk-text-nowrap">入庫可能数</th>
+                            <th class="uk-text-nowrap">今回入庫数</th>
+                            <th class="uk-text-nowrap">納期</th>
+                            <th class="uk-text-nowrap">金額</th>
+                            <th class="uk-text-nowrap">入庫リストへ転記</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="(list , key) in select_items" >
-					        <td>{{key + 1 }}</td>
-                            <td>{{list.makerName}}</td>
-                            <td>{{list.itemName}}</td>
-                            <td>{{list.itemCode}}</td>
-                            <td>{{list.itemStandard}}</td>
-                            <td>{{list.itemJANCode}}</td>
-                            <td>￥{{list.price | number_format}}</td>
-                            <td>{{list.quantity}}{{list.quantityUnit}}</td>
-                            <td>{{list.orderQuantity}}{{list.itemUnit}}</td>
-                            <td>{{list.receivingNum}}{{list.itemUnit}}</td>
-                            <td>{{list.possibleNumber}}{{list.itemUnit}}</td>
-                            <td v-bind:class="list.nowCountClass">{{list.nowCount}}{{list.itemUnit}}</td>
-                            <td>{{list.dueDate}}</td>
-                            <td>￥{{list.orderPrice | number_format}}</td>
-                            <td><button type="button" class="uk-button uk-button-primary" v-on:click="addObject(key)">転記</button></td>
+					        <td class="uk-text-nowrap">{{key + 1 }}</td>
+                            <td class="uk-table-expand">{{list.makerName}}</td>
+                            <td class="uk-table-expand">{{list.itemName}}</td>
+                            <td class="uk-table-expand">{{list.itemCode}}</td>
+                            <td class="uk-table-expand">{{list.itemStandard}}</td>
+                            <td class="uk-table-expand">{{list.itemJANCode}}</td>
+                            <td class="uk-text-nowrap">￥{{list.price | number_format}}</td>
+                            <td class="uk-text-nowrap">{{list.quantity}}{{list.quantityUnit}}</td>
+                            <td class="uk-text-nowrap">{{list.orderQuantity}}{{list.itemUnit}}</td>
+                            <td class="uk-text-nowrap">{{list.receivingNum}}{{list.itemUnit}}</td>
+                            <td class="uk-text-nowrap">{{list.possibleNumber}}{{list.itemUnit}}</td>
+                            <td class="uk-text-nowrap" v-bind:class="list.nowCountClass">{{list.nowCount}}{{list.itemUnit}}</td>
+                            <td class="uk-text-nowrap">{{list.dueDate}}</td>
+                            <td class="uk-text-nowrap">￥{{list.orderPrice | number_format}}</td>
+                            <td class="uk-text-nowrap"><button type="button" class="uk-button uk-button-primary" v-on:click="addObject(key)">転記</button></td>
 						</tr>
 					</tbody>
 				</table>   
@@ -371,6 +371,13 @@ var app = new Vue({
                     ( ( changeObject.possibleNumber < 0 ) && ! (changeObject.possibleNumber <= changeObject.nowCount) )
                 )
                 {
+                    app.lists.forEach(function(list_elem, list_index) {
+                        if(changeObject.orderCNumber === list_elem.orderCNumber)
+                        {
+                            list_elem.countStyle.border = 'red 2px solid';
+				            app.$set(app.lists , list_index, list_elem);
+                        }
+        		    });
                     changeObject.nowCountClass = {'uk-text-danger' : true};
                     UIkit.modal.alert("今回入庫数が入庫可能数を上回っています。<br>ご確認ください。")
                 }
@@ -480,7 +487,7 @@ var app = new Vue({
 			}
 			
 			chkLot = true;
-			let regex = /^[0-9a-zA-Z]+$/;
+			let regex = /^[a-zA-Z0-9!-/:-@¥[-`{-~]+$/;
 			app.lists.forEach(function (elem, index) {
 				elem.lotNumberStyle.border = '';
 				if(app.lists[index].lotNumber) {
@@ -510,7 +517,7 @@ var app = new Vue({
 			
 			let checkflg = false;
 			app.items.forEach(function (elem, index) {
-			    if(elem.possibleNumber < elem.nowCount )
+			    if(Math.abs(elem.possibleNumber) < Math.abs(elem.nowCount) )
 			    {
 			        checkflg = true;
 			    }
@@ -701,18 +708,29 @@ var gs1_128 = new Vue({
 			
         	modal_sections.clear();
         	let check_count = 0;
+        	let isPossible = true;
         	let item = null ;
         	app.items.forEach(function(elem, index){
         	    if(elem.itemJANCode == searchJan && elem.possibleNumber != 0)
         	    {
         	        check_count++;
+        	        isPossible = true;
         	        elem.lotNumber = objLotNumber;
         	        elem.lotDate = objLotDate;
         		    modal_sections.addList(elem);
         	        item = elem;
         	    }
+        	    else if(elem.itemJANCode == searchJan && elem.possibleNumber == 0)
+        	    {
+        	        isPossible = false;
+        	    }
+        	    
         	});
-        	if(check_count == 0)
+        	if(!isPossible)
+        	{
+        	    UIkit.modal.alert("すでに入庫が完了しています");
+        	}
+        	else if(check_count == 0)
         	{
         	    UIkit.modal.alert("一致する商品が見つかりませんでした");
         	}

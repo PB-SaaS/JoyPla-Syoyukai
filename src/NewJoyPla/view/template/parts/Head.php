@@ -11,14 +11,15 @@
 
 <script src="https://i02.smp.ne.jp/u/joypla/new/js/jquery-3.5.1.js"></script>
 
-<link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/animsition.min.css">
-<script type="text/javascript" src="https://i02.smp.ne.jp/u/joypla/new/js/animsition.min.js"></script>
+<!-- <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/animsition.min.css"> -->
+<!-- <script type="text/javascript" src="https://i02.smp.ne.jp/u/joypla/new/js/animsition.min.js"></script> -->
 
 <script src="https://i02.smp.ne.jp/u/joypla/new/js/JsBarcode.all.min.js"></script>
 <script src="https://i02.smp.ne.jp/u/joypla/new/js/BarcodeParser.js"></script>
 
 
 <script src="https://i02.smp.ne.jp/u/joypla/new/js/vue.js"></script>
+<script src="https://i02.smp.ne.jp/u/joypla/new/js/encoding.min.js"></script>
 <?php
 
 if($new == '')

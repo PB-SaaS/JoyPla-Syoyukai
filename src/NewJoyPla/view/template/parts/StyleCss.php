@@ -97,4 +97,7 @@ table.uk-table td, table.uk-table th{
 .jp-min-width-150 {
   min-width : 150px;
 }
+.animsition {
+	opacity: 0;
+}
 </style>

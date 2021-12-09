@@ -34,7 +34,7 @@ function changeForInputNumber(elm){
 
 $(document).ready(function() {
 	//$(".animsition").show();
-
+	/*
 	$(".animsition").animsition({
 		inClass: 'fade-in', // ロード時のエフェクト
 		outClass: 'fade-out', // 離脱時のエフェクト
@@ -59,10 +59,19 @@ $(document).ready(function() {
 		//transition: function(url){ window.location.href = url; } // transition後にどこに遷移させるかを設定、urlは「linkElement」のhref
 		}
 	 );
+	 */
+	 loading();
+	 setTimeout(function(){loading_remove()},1000);
 });	
 
 
 function loading(){
+	if($("#loading").length == 0)
+	{
+		$(".animsition").before('<div style="z-index: 1;position: fixed;" id="loading" class="uk-position-cover uk-overlay uk-overlay-default uk-flex uk-flex-center uk-flex-middle"><span uk-spinner="ratio: 4.5" class="uk-icon uk-spinner"></span></div>');
+	
+	}
+	/*
 	$(".animsition").animsition({
 		inDuration: 500, // ロード時の演出時間
 		outDuration: 80, // 離脱時の演出時間
@@ -83,12 +92,19 @@ function loading(){
 		overlayClass : 'animsition-overlay-slide', // オーバーレイのクラス
 		overlayParentElement : 'body', // オーバーレイ要素のラッパー
 		//transition: function(url){ window.location.href = url; } // transition後にどこに遷移させるかを設定、urlは「linkElement」のhref
-	}
- );
+	});
+	*/
+ 
 }
 
 function loading_remove(){
-	$('.animsition-loading').remove();
+	if($("#loading").length != 0)
+	{
+		$('.animsition').css({  
+	        opacity: "1"  
+	    });  
+		$('#loading').remove();
+	}
 }
 
 function generateBarcode(idname,value){
@@ -204,6 +220,7 @@ function check_gs1128(code){
 function check_gs1128(code){
 	try {
 		let answer = parseBarcode(code);
+		gs1128_object = {'01':'','17':'','10':'','21':'','30':''};
 		
 		answer.parsedCodeItems.forEach((element) => {
 			if(element.ai == "17")
@@ -217,7 +234,7 @@ function check_gs1128(code){
 		})
 		console.log(gs1128_object);
 	} catch (error) {
-		console.error(error);
+		// console.error(error);
 		// expected output: ReferenceError: nonExistentFunction is not defined
 		// Note - error messages will vary depending on browser
 	}
@@ -225,30 +242,35 @@ function check_gs1128(code){
 }
 
     function price(num){
-		if(num === "") {
+		if(num == "") {
 			num = "0";
 		}
+		/*
 		let _num = num.replace( /^(-?\d+)(\d{3})/, "$1,$2" );
 		if(_num !== num) {
 			return price(_num);
 	    }
+	    */
+	    _num = parseFloat(num).toLocaleString('ja-JP', {maximumFractionDigits: 2});
 	    document.write(_num);
 	}
 	function price_text(num){
 		if(num == "") {
 			num = "0";
 		}
+		/*
 		let _num = num.replace( /^(-?\d+)(\d{3})/, "$1,$2" );
 		if(_num !== num) {
 			return price_text(_num);
 	    }
+	    */
+	    _num = parseFloat(num).toLocaleString('ja-JP', {maximumFractionDigits: 2});
 	    return _num;
 	}
 	function fixed(num){
-	
+		if(num == ""){ return 0 }
 		return parseFloat(num).toFixed(2);
 	}
-	
 	function objectValueToURIencode(object){
 		let result = {};
 		
@@ -264,4 +286,11 @@ function check_gs1128(code){
 		});
 		return result;
 	}
+	$(document).ajaxStart(function() {
+		loading();
+	});
+	
+	$(document).ajaxComplete(function() {
+		loading_remove();
+	});
 </script>

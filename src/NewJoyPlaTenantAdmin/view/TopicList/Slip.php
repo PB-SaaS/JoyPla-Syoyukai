@@ -1,5 +1,5 @@
 
-  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="app">
+  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove" id="app">
 	    <div class="uk-container uk-container-expand">
 	    	<div class="uk-margin-auto uk-width-2-3@m">
 	    		<article class="uk-article">

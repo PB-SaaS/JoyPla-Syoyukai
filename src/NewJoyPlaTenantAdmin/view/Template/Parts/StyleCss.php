@@ -38,7 +38,7 @@
     
     
     h1 {
-        margin: 0 !important;
+        /*margin: 0 !important;*/
     }
     .uk-input[type="number"]{
     	text-align: right;

@@ -9,7 +9,9 @@
 				</ul>
 				<div class="no_print uk-margin" uk-margin>
 					<input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
+					<?php if(!$user_info->isApprover()): ?>
 					<input class="print_hidden uk-button uk-button-danger" type="submit" value="返品伝票作成" onclick="location.href='<?php echo $api_url ?>&Action=returnSlipEntry'">
+					<?php endif ?>
 					<form action="%url/rel:@mpgt:ReceivingLabel%" target="_blank" method="post" class="print_hidden uk-inline">
 						<input class="print_hidden uk-button uk-button-primary" type="submit" value="ラベル発行">
 						<input type="hidden" value="<?php echo $receiving_history->receivingHId ?>" name="receivingId">
@@ -63,20 +65,20 @@
 		    	<div class="uk-margin" id="tablearea">
 		    		<form>
 			    		<div class="uk-overflow-auto">
-				    		<table class="uk-table uk-table-hover uk-table-middle uk-table-divider uk-text-nowrap" id="tbl-Items">
+				    		<table class="uk-table uk-table-hover uk-table-middle uk-table-divider" id="tbl-Items">
 				    			<thead>
 				    				<tr>
-										<th>NO</th>
-										<th style="min-width:150px">メーカー</th>
-										<th style="min-width:150px">商品名</th>
-										<th>製品コード</th>
-										<th>規格</th>
-										<th>ロット番号</th>
-										<th>使用期限</th>
-										<th>入数</th>
-										<th>発注数</th>
-										<th>入庫数</th>
-										<th>入荷状況</th>
+										<th class="uk-text-nowrap">NO</th>
+										<th class="uk-table-expand" style="min-width:150px">メーカー</th>
+										<th class="uk-table-expand" style="min-width:150px">商品名</th>
+										<th class="uk-table-expand">製品コード</th>
+										<th class="uk-table-expand">規格</th>
+										<th class="uk-table-expand">ロット番号</th>
+										<th class="uk-table-expand">使用期限</th>
+										<th class="uk-text-nowrap">入数</th>
+										<th class="uk-text-nowrap">発注数</th>
+										<th class="uk-text-nowrap">入庫数</th>
+										<th class="uk-text-nowrap">入荷状況</th>
 				    				</tr>
 				    			</thead>
 				    			<tbody>
@@ -91,9 +93,9 @@
 				    						echo "<td>".$record->itemStandard."</td>";
 				    						echo "<td>".$record->lotNumber."</td>";
 				    						echo "<td>".$record->lotDate."</td>";
-				    						echo "<td>".$record->quantity.$record->quantityUnit."</td>";
-				    						echo "<td>".$record->orderQuantity.$record->itemUnit."</td>";
-				    						echo "<td>".$record->receivingCount.$record->itemUnit."</td>";
+				    						echo "<td class='uk-text-nowrap'>".$record->quantity.$record->quantityUnit."</td>";
+				    						echo "<td class='uk-text-nowrap'>".$record->orderQuantity.$record->itemUnit."</td>";
+				    						echo "<td class='uk-text-nowrap'>".$record->receivingCount.$record->itemUnit."</td>";
 				    						$text = "入庫完了";
 				    						if(abs((int)$record->orderQuantity) > abs((int)$record->receivingCount)){
 				    							$text = "一部入庫(".$record->receivingCount." / ".$record->orderQuantity.")";
@@ -103,7 +105,7 @@
 				    						if((int)$record->totalReturnCount > 0){
 				    							$returnText = "<span class='uk-text-danger'>返品(".$record->totalReturnCount." / ".$record->receivingCount.")</span>";
 				    						}
-				    						echo "<td>".$text."<br>".$returnText."</td>";
+				    						echo "<td class='uk-text-nowrap'>".$text."<br>".$returnText."</td>";
 				    						echo "</tr>";
 				    						$num++;
 				    					}

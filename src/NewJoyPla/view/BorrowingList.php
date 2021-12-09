@@ -27,7 +27,7 @@
             </div>
             <hr>
             <div class="uk-margin" id="tablearea">
-                %sf:usr:search26%
+                %sf:usr:search26:mstfilter%
             </div>
         </div>
     </div>

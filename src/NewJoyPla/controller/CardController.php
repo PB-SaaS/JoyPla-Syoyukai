@@ -107,15 +107,16 @@ class CardController extends Controller
 	        $insert_data = [];
             foreach($card_items as $key =>  $item)
             {
-                $insert_data[] = [
-                    'cardId' => $this->makeId('90'), //18
-                    'inHospitalItemId' => $item['recordId'],
-                    'hospitalId' => $user_info->getHospitalId(),
-                    'quantity' => $item['countNum'],
-                    'lotNumber' => $item['lotNumber'],
-                    'lotDate' => $item['lotDate'],
-                    'divisionId' => $divisionId,
-                ];
+	            if((int)$item['countNum'] > 0)
+                {
+                    $insert_data[] = [
+                        'cardId' => $this->makeId('90'), //18
+                        'inHospitalItemId' => $item['recordId'],
+                        'hospitalId' => $user_info->getHospitalId(),
+                        'quantity' => $item['countNum'],
+                        'divisionId' => $divisionId,
+                    ];
+                }
             }
             
             $result = Card::insert($insert_data);

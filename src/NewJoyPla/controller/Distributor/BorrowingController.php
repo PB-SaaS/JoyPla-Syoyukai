@@ -80,13 +80,17 @@ class BorrowingController extends Controller
                 $borrowingAction = '';
             }
             
+            $hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+            $hospital = $hospital->data->get(0);
             
             $content = $this->view('NewJoyPla/view/BorrowingRegistration', [
                 'api_url' => $api_url,
+                'label_api_url' => '%url/rel:mpgt:labelBSOAPI%',
                 'user_info' => $user_info,
                 'divisionData'=> $divisionData,
                 'csrf_token' => Csrf::generate(16),
                 'borrowingAction' => $borrowingAction,
+                'useUnitPrice' => $hospital->billingUnitPrice,
                 ] , false);
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
@@ -412,7 +416,7 @@ class BorrowingController extends Controller
             {
                 if($update_item['usedSlipId'] === $history_data['usedSlipId'])
                 {
-                    $used_slip_price[] = (int)$update_item['price'] * (int)$update_item['borrowingNum'];
+                    $used_slip_price[] = (float)$update_item['price'] * (float)$update_item['borrowingNum'];
                     if(! in_array($update_item['inHospitalItemId'], $in_hospital_item_ids))
                     {
                         $in_hospital_item_ids[] = $update_item['inHospitalItemId'];
@@ -463,12 +467,12 @@ class BorrowingController extends Controller
         $in_hospital_item = $in_hospital_item->get();
         foreach($borrowing_items as $key =>  $item)
         {
-            foreach($in_hospital_item as $in_hp_item)
+            foreach($in_hospital_item->data->all() as $in_hp_item)
             {
                 $lot_flag = 0;
                 if($item['recordId'] == $in_hp_item->inHospitalItemId)
                 {
-                    $lot_flag = $in_hp_item->lotManagement;
+                    $lot_flag = (int)$in_hp_item->lotManagement;
                     break;
                 }
             }
@@ -478,11 +482,15 @@ class BorrowingController extends Controller
             }
             if( ($item['lotNumber'] != '' && $item['lotDate'] == '' ) || ($item['lotNumber'] == '' && $item['lotDate'] != ''))
             {
-                throw new Exception('invalid lotNumber',100);
+                throw new Exception('invalid lotNumber',101);
             }
-            if(strlen($payoutRecord['lotNumber']) > 20)
+            if (($item['lotNumber'] != '') && ($item['lotDate'] != '')) 
             {
-                throw new Exception('invalid lotNumber',100);
+            //if ((!ctype_alnum($item['lotNumber'])) || (strlen($item['lotNumber']) > 20))
+                if ((!preg_match('/^[a-zA-Z0-9!-\/:-@¥[-`{-~]+$/', $item['lotNumber'])) || (strlen($item['lotNumber']) > 20))
+                {
+                    throw new Exception('invalid lotNumber format',102);
+                }
             }
             $insert_data[$key] = [
                 'inHospitalItemId' => $item['recordId'],
@@ -590,7 +598,7 @@ class BorrowingController extends Controller
         $order_insert_data = [];
         foreach($used_report as $item)
         {
-            if(isset($order_insert_data[$item->inHospitalItemId]) || !$order_insert_data[$item->inHospitalItemId])
+            if(!$order_insert_data[$item->inHospitalItemId])
             {
                 $order_insert_data[$item->inHospitalItemId] = [
                     'registrationTime' => $item->usedDate,
@@ -612,9 +620,9 @@ class BorrowingController extends Controller
                     'distributorId' => $item->distributorId,
                 ];
             }
-            $order_insert_data[$item->inHospitalItemId]['orderQuantity'] = $order_insert_data[$item->inHospitalItemId]['orderQuantity'] + (int)$item->countNum;
-            $order_insert_data[$item->inHospitalItemId]['orderPrice'] = $order_insert_data[$item->inHospitalItemId]['orderPrice'] + ( (int)$item->price * (int)$item->countNum );
-            $order_insert_data[$item->inHospitalItemId]['receivingNum'] = $order_insert_data[$item->inHospitalItemId]['receivingNum'] + (int)$item->countNum;
+            $order_insert_data[$item->inHospitalItemId]['orderQuantity'] = ($order_insert_data[$item->inHospitalItemId]['orderQuantity'] + (float)$item->countNum);
+            $order_insert_data[$item->inHospitalItemId]['orderPrice'] = $order_insert_data[$item->inHospitalItemId]['orderPrice'] + ( (float)$item->price * (float)$item->countNum );
+            $order_insert_data[$item->inHospitalItemId]['receivingNum'] = $order_insert_data[$item->inHospitalItemId]['receivingNum'] + (float)$item->countNum;
         }
 
         $order_history_insert_data = [];
@@ -626,7 +634,7 @@ class BorrowingController extends Controller
             {
                 if($insert_record['orderNumber'] === $history_data['orderHistoryId'])
                 {
-                    $order_price[] = (int)$insert_record['orderPrice'];
+                    $order_price[] = (float)$insert_record['orderPrice'];
                     if(! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids))
                     {
                         $in_hospital_item_ids[] = $insert_record['inHospitalItemId'];
@@ -666,11 +674,11 @@ class BorrowingController extends Controller
             $receiving_insert_data[] = [
                 'registrationTime' => $item->usedDate,
                 'orderCNumber' => $orderCNumber,
-                'receivingCount' => (int)$item->countNum,
+                'receivingCount' => (float)$item->countNum,
                 'receivingHId' => $history_ids[$item->divisionId . $item->distributorId . $item->usedDate]['receivingHistoryId'],
                 'inHospitalItemId' => $item->inHospitalItemId,
-                'price' => (int)$item->price,
-                'receivingPrice' => (int)$item->price * (int)$item->countNum,
+                'price' => (float)$item->price,
+                'receivingPrice' => (float)$item->price * (float)$item->countNum,
                 'hospitalId' => $item->hospitalId,
                 'totalReturnCount' => 0,
                 'divisionId' => $item->divisionId,
@@ -691,7 +699,7 @@ class BorrowingController extends Controller
             {
                 if($insert_record['receivingHId'] === $history_data['receivingHistoryId'])
                 {
-                    //$receiving_price[] = (int)$insert_record['receivingPrice'];
+                    //$receiving_price[] = (float)$insert_record['receivingPrice'];
                     if(! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids))
                     {
                         $in_hospital_item_ids[] = $insert_record['inHospitalItemId'];
@@ -715,14 +723,18 @@ class BorrowingController extends Controller
         $billing_insert_data = [];
         foreach($used_report as $item)
         {
-            $unitPrice = ($hospital[0]->billingUnitPrice)? (int)$item->unitPrice : (int)$item->price / (int)$item->quantity;
+            $unitPrice = ($hospital[0]->billingUnitPrice)
+                ?(float)$item->unitPrice 
+                :((float)$item->price == 0 || (float)$item->quantity == 0)
+                    ? 0 
+                    : (float)$item->price / (float)$item->quantity ;
             $billing_insert_data[] = [
                 'registrationTime' => $item->usedDate,
                 'inHospitalItemId' => $item->inHospitalItemId,
                 'billingNumber' => $history_ids[$item->divisionId . $item->distributorId . $item->usedDate]['billingHistoryId'],
-                'price' => (int)$item->price,
-                'billingQuantity' => ((int)$item->quantity * (int)$item->countNum),
-                'billingAmount' => $unitPrice * ((int)$item->quantity * (int)$item->countNum),
+                'price' => (float)$item->price,
+                'billingQuantity' => ((float)$item->quantity * (float)$item->countNum),
+                'billingAmount' => $unitPrice * ((float)$item->quantity * (float)$item->countNum),
                 'hospitalId' => $item->hospitalId,
                 'divisionId' => $item->divisionId,
                 'quantity' => $item->quantity,
@@ -743,7 +755,7 @@ class BorrowingController extends Controller
             {
                 if($insert_record['billingNumber'] === $history_data['billingHistoryId'])
                 {
-                    $total_amount[] = (int)$insert_record['billingAmount'];
+                    $total_amount[] = (float)$insert_record['billingAmount'];
                     if(! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids))
                     {
                         $in_hospital_item_ids[] = $insert_record['inHospitalItemId'];

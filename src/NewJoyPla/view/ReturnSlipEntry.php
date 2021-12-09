@@ -57,21 +57,21 @@
 		    	<div class="uk-margin" id="tablearea">
 		    		<form>
 			    		<div class="uk-overflow-auto">
-				    		<table class="uk-table uk-table-hover uk-table-middle uk-table-divider uk-text-nowrap" id="tbl-Items">
+				    		<table class="uk-table uk-table-hover uk-table-middle uk-table-divider" id="tbl-Items">
 				    			<thead>
 				    				<tr>
-										<th>NO</th>
-										<th style="min-width:150px">メーカー</th>
-										<th style="min-width:150px">商品名</th>
-										<th>製品コード</th>
-										<th>規格</th>
-										<th>ロット番号</th>
-										<th>使用期限</th>
-										<th>入数</th>
-										<th>発注数</th>
-										<th>入庫数</th>
-										<th>返品数</th>
-										<th>今回返品数</th>
+										<th class="uk-text-nowrap">NO</th>
+										<th class="uk-table-expand" style="min-width:150px">メーカー</th>
+										<th class="uk-table-expand" style="min-width:150px">商品名</th>
+										<th class="uk-table-expand">製品コード</th>
+										<th class="uk-table-expand">規格</th>
+										<th class="uk-table-expand">ロット番号</th>
+										<th class="uk-table-expand">使用期限</th>
+										<th class="uk-text-nowrap">入数</th>
+										<th class="uk-text-nowrap">発注数</th>
+										<th class="uk-text-nowrap">入庫数</th>
+										<th class="uk-text-nowrap">返品数</th>
+										<th class="uk-text-nowrap">今回返品数</th>
 				    				</tr>
 				    			</thead>
 				    			<tbody>
@@ -89,18 +89,18 @@
 												$max = (int)$record->receivingCount - (int)$record->totalReturnCount;
 											}
 				    						echo "<tr>";
-				    						echo "<td>".$num."</td>";
+				    						echo "<td class='uk-text-nowrap'>".$num."</td>";
 				    						echo "<td>".$record->makerName."</td>";
 				    						echo "<td>".$record->itemName."</td>";
 				    						echo "<td>".$record->itemCode."</td>";
 				    						echo "<td>".$record->itemStandard."</td>";
 				    						echo "<td>".$record->lotNumber."</td>";
 				    						echo "<td>".$record->lotDate."</td>";
-				    						echo "<td>".$record->quantity.$record->quantityUnit."</td>";
-				    						echo "<td>".$record->orderQuantity.$record->itemUnit."</td>";
-				    						echo "<td>".$record->receivingCount.$record->itemUnit."</td>";
-				    						echo "<td>".$record->totalReturnCount.$record->itemUnit."</td>";
-				    						echo "<td><input type='number' step='1' class='uk-input' style='width:100px' min='0' max='".$max."' value='0' onchange='returnCount(this,\"".$record->receivingNumber."\")'><span class='uk-text-small uk-text-middle'>".$record->itemUnit."</span></td>";
+				    						echo "<td class='uk-text-nowrap'>".$record->quantity.$record->quantityUnit."</td>";
+				    						echo "<td class='uk-text-nowrap'>".$record->orderQuantity.$record->itemUnit."</td>";
+				    						echo "<td class='uk-text-nowrap'>".$record->receivingCount.$record->itemUnit."</td>";
+				    						echo "<td class='uk-text-nowrap'>".$record->totalReturnCount.$record->itemUnit."</td>";
+				    						echo "<td class='uk-text-nowrap'><input type='number' step='1' class='uk-input' style='width:100px' min='0' max='".$max."' value='0' onchange='returnCount(this,\"".$record->receivingNumber."\")'><span class='uk-text-small uk-text-middle'>".$record->itemUnit."</span></td>";
 				    						echo "</tr>";
 				    						$num++;
 				    					}

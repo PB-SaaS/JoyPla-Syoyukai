@@ -70,25 +70,30 @@
 		    	
 		    	<div class="uk-margin" id="tablearea">
 		    		<form>
+		    			<?php if($userInfo->isAdmin() || $userInfo->isUser()): ?>
 			    		<div class="no_print">
 			    			<input class="print_hidden uk-button uk-button-primary" type="button" value="更新" onclick="itemlistUpdate();return false;">
 			    			<input class="print_hidden uk-button uk-button-default" type="reset" value="リセット">
 			    			<input class="print_hidden uk-button uk-button-danger" type="button" value="削除" onclick="itemlistDelete();return false;">
 			    		</div>
+			    		<?php endif ?>
 			    		<div class="uk-overflow-auto">
-				    		<table class="uk-table uk-table-hover uk-table-middle uk-table-divider uk-text-nowrap" id="tbl-Items">
+				    		<table class="uk-table uk-table-hover uk-table-middle uk-table-divider" id="tbl-Items">
 				    			<thead>
 				    				<tr>
-										<th>NO</th>
-										<th class="no_print"><input type="checkbox" onclick="allItems(this.checked)" class="uk-checkbox"></th>
-										<th style="min-width:150px">メーカー</th>
-										<th style="min-width:150px">商品名</th>
-										<th>製品コード</th>
-										<th>規格</th>
-										<th>価格</th>
-										<th>入数</th>
-										<th style="min-width:150px;max-width: 180px;">数量</th>
-										<th>金額</th>
+										<th class="uk-text-nowrap">NO</th>
+		    							<?php if($userInfo->isAdmin() || $userInfo->isUser()): ?>
+										<th class="uk-text-nowrap"><input type="checkbox" onclick="allItems(this.checked)" class="uk-checkbox"></th>
+			    						<?php endif ?>
+										<th class="uk-table-expand">メーカー</th>
+										<th class="uk-table-expand">商品名</th>
+										<th class="uk-table-expand">製品コード</th>
+										<th class="uk-table-expand">規格</th>
+										<th class="uk-table-expand">JANコード</th>
+										<th class="uk-text-nowrap">価格</th>
+										<th class="uk-text-nowrap">入数</th>
+										<th class="uk-text-nowrap">数量</th>
+										<th class="uk-text-nowrap">金額</th>
 				    				</tr>
 				    			</thead>
 				    			<tbody>
@@ -97,14 +102,17 @@
 										foreach($order_data as $record){
 											$attr = [];
 				    						echo "<tr>";
-				    						echo "<td>".$num."</td>";
-				    						echo "<td class='no_print'><input type='checkbox' class='uk-checkbox itemsCheckBox' name='check".$num."'></td>";
+				    						echo "<td class='uk-text-nowrap'>".$num."</td>";
+				    						if($userInfo->isAdmin() || $userInfo->isUser()){
+				    							echo "<td class='uk-text-nowrap'><input type='checkbox' class='uk-checkbox itemsCheckBox' name='check".$num."'></td>";
+				    						}
 				    						echo "<td>".$record->makerName."</td>";
 				    						echo "<td>".$record->itemName."</td>";
 				    						echo "<td>".$record->itemCode."</td>";
 				    						echo "<td>".$record->itemStandard."</td>";
-				    						echo "<td>￥<script>price('".$record->price."')</script><span class='uk-text-small'> / 1".$record->itemUnit."</span></td>";
-				    						echo "<td>".$record->quantity."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
+				    						echo "<td>".$record->itemJANCode."</td>";
+				    						echo "<td class='uk-text-nowrap'>￥".number_format($record->price,2)."<span class='uk-text-small'> / 1".$record->itemUnit."</span></td>";
+				    						echo "<td class='uk-text-nowrap'>".$record->quantity."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
 				    						if( $record->orderQuantity > 0 )
 											{
 												$attr['min'] = 1;
@@ -113,11 +121,15 @@
 											{
 												$attr['max'] = -1;
 											}
-				    						echo "<td><input type='number' step='1' class='uk-input' style='color:#444444;width:100px;' onchange='active(this,".$num.")' ";
-											foreach($attr as $key => $val) echo " $key='$val' ";
-											echo "value='".$record->orderQuantity."'><span class='uk-text-small uk-text-middle'>".$record->itemUnit."</span></td>";
-
-				    						echo "<td>￥<script>price('".$record->orderPrice."')</script></td>";
+				    						if($userInfo->isAdmin() || $userInfo->isUser()){
+					    						echo "<td><input type='number' step='1' class='uk-input' style='color:#444444;width:100px;' onchange='active(this,".$num.")' ";
+												foreach($attr as $key => $val) echo " $key='$val' ";
+												echo "value='".$record->orderQuantity."'><span class='uk-text-small uk-text-middle'>".$record->itemUnit."</span></td>";
+				    						}
+				    						if($userInfo->isApprover()){
+				    							echo "<td class='uk-text-nowrap'>".$record->orderQuantity."<span class='uk-text-small'>".$record->itemUnit."</span></td>";
+				    						}
+				    						echo "<td>￥".number_format($record->orderPrice,2)."</td>";
 				    						echo "<td style='display:none'>".$record->orderCNumber."</td>";
 				    						echo "</tr>";
 				    						$num++;
@@ -143,8 +155,13 @@
 		    					    %val:usr:divisionName%	
 		    					</td>
 		    					<td class="uk-width-4-5">
+	    							<?php if($userInfo->isAdmin() || $userInfo->isUser()): ?>
 		    						<textarea class="uk-textarea uk-width-1-1" rows="5" name="ordercomment" placeholder="コメント...">%val:usr:ordercomment%</textarea>
 									<input class="print_hidden uk-button uk-button-primary uk-align-center" type="button" value="コメントを更新" onclick="commentUpdate();return false;">
+									<?php endif ?>
+	    							<?php if($userInfo->isApprover()): ?>
+		    						%val:usr:ordercomment:br%
+									<?php endif ?>
 								</td>
 							</tr>
 		    			</tbody>
@@ -186,8 +203,8 @@
 				let td = $(this).children();
 				if($(td[1]).children("input")[0].checked ){
 					upToData.push({
-						orderCNumber: $(td[10]).text(),
-						num: $(td[8]).children("input").val(),
+						orderCNumber: $(td[11]).text(),
+						num: $(td[9]).children("input").val(),
 					});
 				}
 			});
@@ -249,8 +266,8 @@
 				let td = $(this).children();
 				if($(td[1]).children("input")[0].checked){
 					upToData.push({
-						orderCNumber: $(td[10]).text(),
-						num: $(td[8]).children("input").val(),
+						orderCNumber: $(td[11]).text(),
+						num: $(td[9]).children("input").val(),
 					});
 				}
 			});

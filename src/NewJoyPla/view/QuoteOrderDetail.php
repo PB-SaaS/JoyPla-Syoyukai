@@ -43,19 +43,24 @@
                     </div>
                 </article>
             </div>
-        <?php if ($tenant_kind == "1" && $user_info->isAdmin()): ?>
+        <?php if ($tenant_kind == "1" && ( $user_info->isAdmin() || $user_info->isApprover() )): ?>
             <div class="uk-margin">
                 <p>見積商品一覧</p>
                 <div>%sf:usr:search39:mstfilter:table%</div>
+            </div>
+        <?php elseif ($tenant_kind == "1" && $user_info->isUser()): ?>
+            <div class="uk-margin">
+                <p>見積商品一覧</p>
+                <div>%sf:usr:_tantouMitsumori:mstfilter:table%</div>
             </div>
         <?php endif; ?>
 
             <hr>
             <div class="uk-margin">
+                <p>見積金額一覧</p>
                 <div class="no_print uk-margin" uk-margin>
                     <button class="uk-button uk-button-primary uk-margin-small-right" type="button" uk-toggle="target: #modal-RQItems">金額見積の対象商品を追加</button>
                 </div>
-                <p>見積金額一覧</p>
                 <hr>
                 <div class="" id="tablearea">
                     %sf:usr:search37:table:mstfilter%
@@ -103,7 +108,7 @@
                             <td>{{list.itemJANCode}}</td>
                             <td>{{list.lotFlag}}</td>
                             <td>
-                                <input type="number" step="1" class="uk-input" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.quantity" v-on:change="addCountStyle(key)">
+                                <input type="number" step="1" min="0" class="uk-input" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.quantity" v-on:change="addCountStyle(key)">
                                 <span class="uk-text-bottom">{{list.quantityUnit}}</span>
                             </td>
                             <td>
@@ -149,6 +154,7 @@ var app = new Vue({
     methods: {
         addList: function(object) {
             object.countStyle = {};
+            object.notice = "";
             app.lists.push(object);
             
         },
@@ -214,11 +220,14 @@ var app = new Vue({
             let checkflg = true;
             app.lists.forEach(function(elem, index) {
                 if (Math.floor(app.lists[index].quantity) <= 0) {
+                    let changeObject = app.lists[index];
+                    changeObject.countStyle.border = 'red 2px solid';
+                    app.$set(app.lists, index, changeObject);
                     checkflg = false;
                 }
             });
             if (!checkflg) {
-                UIkit.modal.alert('入数を0以上で入力してください').then(function() {
+                UIkit.modal.alert('入数を1以上で入力してください').then(function() {
                     UIkit.modal($('#modal-RQItems')).show();
                 });
                 return false;
@@ -226,8 +235,10 @@ var app = new Vue({
 
             checkflg = true;
             app.lists.forEach(function(elem, index) {
-                console.log(app.lists[index].itemUnit);
                 if (app.lists[index].itemUnit == '') {
+                    let changeObject = app.lists[index];
+                    changeObject.unitStyle.border = 'red 2px solid';
+                    app.$set(app.lists, index, changeObject);
                     checkflg = false;
                 }
             });
@@ -237,7 +248,43 @@ var app = new Vue({
                 });
                 return false;
             }
-
+            
+            checkflg = true;
+            app.lists.forEach(function(elem, index) {
+                if (app.lists[index].itemUnit.bytes() > 32)
+                {
+                    let changeObject = app.lists[index];
+                    changeObject.unitStyle.border = 'red 2px solid';
+                    app.$set(app.lists, index, changeObject);
+                    checkflg = false;
+                }
+            });
+            
+            if (!checkflg) {
+                UIkit.modal.alert('個数単位は半角32文字,全角16文字以内で入力してください').then(function() {
+                    UIkit.modal($('#modal-RQItems')).show();
+                });
+                return false;
+            }
+            
+            
+            checkflg = true;
+            app.lists.forEach(function(elem, index) {
+                if (app.lists[index].notice.bytes() > 512)
+                {
+                    let changeObject = app.lists[index];
+                    changeObject.noticeStyle.border = 'red 2px solid';
+                    app.$set(app.lists, index, changeObject);
+                    checkflg = false;
+                }
+            });
+            
+            if (!checkflg) {
+                UIkit.modal.alert('特記事項は半角512文字,全角256文字以内で入力してください').then(function() {
+                    UIkit.modal($('#modal-RQItems')).show();
+                });
+                return false;
+            }
             return true;
         },
         addCountStyle: function(index){

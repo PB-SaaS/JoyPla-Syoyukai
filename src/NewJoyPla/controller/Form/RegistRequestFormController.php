@@ -94,6 +94,7 @@ class RegistRequestFormController extends Controller
                     'distributorName' => $distributor_data->distributorName,
                     'csrf_token' => Csrf::generate(16),
                     'top_page_link' => $SPIRAL->getParam('topPageLink'),
+                    'quotePeriod' => \App\Lib\changeDateFormat('Y-m-d\TH:i',$SPIRAL->getParam('quotePeriod'),'Y年m月d日 h時i分'),
                     ] , false);
         
         } catch ( Exception $ex ) {
@@ -122,7 +123,20 @@ class RegistRequestFormController extends Controller
 			$requestTitle = $SPIRAL->getContextByFieldTitle("requestTitle");
 			$requestUName = $SPIRAL->getContextByFieldTitle("requestUName");
 			$distributorId = $SPIRAL->getContextByFieldTitle("distributorId");
-            
+			
+	        $requestUName_subject = $requestUName;
+	        $requestTitle_subject = $requestTitle;
+	        
+		    if(mb_strlen($requestUName_subject, 'euc') > 30)
+		    {
+		        $requestUName_subject = mb_strimwidth($requestUName_subject, 0, 30, "...", 'UTF-8');
+		    }
+		    if(mb_strlen($requestTitle_subject, 'euc') > 30)
+		    {
+		        $requestTitle_subject = mb_strimwidth($requestTitle_subject, 0, 30, "...", 'UTF-8');
+		    }
+		    
+	        $subject = "[JoyPla] ".$requestUName_subject."さんが見積依頼「".$requestTitle_subject."」を作成しました";
             $mail_body = $this->view('NewJoyPla/view/Mail/RegistRequestForm', [
                 'name' => '%val:usr:name%',
                 'request_title' => $requestTitle,
@@ -131,7 +145,6 @@ class RegistRequestFormController extends Controller
             ] , false)->render();
             
             $select_name = $this->makeId($distributorId);
-
             $test = DistributorAffiliationView::selectName($select_name)->rule([
                 'name'=>'distributorId',
                 'label'=>'name_'.$distributorId,
@@ -147,7 +160,7 @@ class RegistRequestFormController extends Controller
 
             $test = DistributorAffiliationView::selectRule($select_name)
                 ->body($mail_body)
-                ->subject("[JoyPla] ".$requestUName."さんが見積依頼「".$requestTitle."」を作成しました")
+                ->subject($subject)
                 ->from(FROM_ADDRESS,FROM_NAME)
                 ->send();
              
@@ -172,18 +185,10 @@ class RegistRequestFormController extends Controller
 
             $test = TenantMaster::selectRule($select_name)
                 ->body($mail_body)
-                ->subject("[JoyPla] ".$requestUName."さんが見積依頼「".$requestTitle."」を作成しました")
+                ->subject($subject)
                 ->from(FROM_ADDRESS,FROM_NAME)
                 ->send();
                     
-                
-            $breadcrumb = <<<EOM
-		    <li><a target="_parent" href="%url/rel:mpg:top%">TOP</a></li>
-		    <li><span>入力</span></li>
-		    <li><span>確認</span></li>
-		    <li><span>完了</span></li>
-EOM;
-                
             $form_content = <<<EOM
             <h1>見積依頼 - 完了</h1>
             <div class="smp_tmpl uk-text-left">

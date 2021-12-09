@@ -521,7 +521,7 @@ var app = new Vue({
 			}
 			
 			chkLot = true;
-			let regex = /^[0-9a-zA-Z]+$/;
+			let regex = /^[a-zA-Z0-9!-/:-@¥[-`{-~]+$/;
 			app.lists.forEach(function (elem, index) {
 				if(app.lists[index].lotNumber) {
 					if((!regex.test(app.lists[index].lotNumber)) ||

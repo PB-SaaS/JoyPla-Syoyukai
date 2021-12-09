@@ -1,4 +1,4 @@
-<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="app">
+<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove" id="app">
     <div class="uk-container uk-container-expand" uk-height-viewport="expand: true">
         <div class="uk-margin-auto uk-margin-remove-top uk-margin-bottom" id="mainPage">
             <!-- SMP_TEMPLATE_HEADER start -->
@@ -70,7 +70,7 @@ var app = new Vue({
             headers: [
                 "卸業者名",
                 "卸業者ID",
-                "共有ID",
+                "共通ID",
                 "郵便番号",
                 "都道府県",
                 "住所",

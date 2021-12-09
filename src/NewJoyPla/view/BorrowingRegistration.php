@@ -1,4 +1,3 @@
-
 <style>
     .id{
         min-width: 24px;
@@ -88,7 +87,7 @@
             <hr>
             <div class="uk-width-1-3@m">
                 <div class="uk-margin">
-                    <select class="uk-select" name="busyo" v-model="divisionId" v-bind:disabled="division_disabled">
+                    <select class="uk-select" name="busyo" v-model="divisionId" v-bind:disabled="lists.length > 0">
                         <option value="">----- 部署選択 -----</option>
                         <?php
                         foreach($divisionData->data as $data)
@@ -111,15 +110,13 @@
                 </div>
             </div>
             <div class="uk-margin-bottom">
-                <div>
-                    <div>
-                        <button class="uk-button uk-button-default"  v-on:click="sanshouClick">商品マスタを開く</button>
-                        <button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
-                        <button class="uk-button uk-button-primary " v-on:click="borrowingRegist">貸出リスト登録</button>
-                        <?php if(!$user_info->isDistributorUser()): ?>
-                        <button class="uk-button uk-button-primary "  v-on:click="usedReport">使用申請</button>
-                        <?php endif ?>
-                    </div>
+                <div uk-margin>
+                    <button class="uk-button uk-button-default"  v-on:click="sanshouClick">商品マスタを開く</button>
+                    <button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
+                    <button class="uk-button uk-button-primary " v-on:click="borrowingRegist">貸出リスト登録</button>
+                    <?php if(!$user_info->isDistributorUser()): ?>
+                    <button class="uk-button uk-button-primary "  v-on:click="usedReport">使用申請</button>
+                    <?php endif ?>
                 </div>
             </div>
             <div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky" class="uk-padding-top uk-background-muted uk-padding-small">
@@ -129,24 +126,24 @@
                 </form>	
             </div>
             <div class="shouhin-table uk-width-expand uk-overflow-auto">
-                <table class="uk-table uk-table-striped uk-table-striped uk-table-condensed uk-text-nowrap">
+                <table class="uk-table uk-table-striped uk-table-striped uk-table-condensed">
                     <thead>
                         <tr>
-                            <th class="uk-text-bottom">id</th>
-                            <th class="uk-text-bottom">メーカー</th>
-                            <th class="uk-text-bottom">商品名</th>
-                            <th class="uk-text-bottom">製品コード</th>
-                            <th class="uk-text-bottom">規格</th>
-                            <th class="uk-text-bottom">JANコード</th>
-                            <th class="uk-text-bottom">入数</th>
-                            <th class="uk-text-bottom">価格</th>
-                            <th class="uk-text-bottom">単価</th>
-                            <th class="uk-text-bottom">卸業者</th>
-                            <th class="uk-text-bottom">貸出数</th>
-	    					<th class="uk-text-bottom">ロット管理</th>
-                            <th class="uk-text-bottom">ロット番号</th>
-                            <th class="uk-text-bottom" style="width:146px">使用期限</th>
-                            <th>
+                            <th class="uk-text-bottom uk-text-nowrap">id</th>
+                            <th class="uk-text-bottom uk-table-expand">メーカー</th>
+                            <th class="uk-text-bottom uk-table-expand">商品名</th>
+                            <th class="uk-text-bottom uk-table-expand">製品コード</th>
+                            <th class="uk-text-bottom uk-table-expand">規格</th>
+                            <th class="uk-text-bottom uk-table-expand">JANコード</th>
+                            <th class="uk-text-bottom uk-text-nowrap">入数</th>
+                            <th class="uk-text-bottom uk-text-nowrap">価格</th>
+                            <th class="uk-text-bottom uk-text-nowrap">単価</th>
+                            <th class="uk-text-bottom uk-table-expand">卸業者</th>
+                            <th class="uk-text-bottom uk-text-nowrap">貸出数</th>
+	    					<th class="uk-text-bottom uk-table-expand">ロット管理</th>
+                            <th class="uk-text-bottom uk-table-expand">ロット番号</th>
+                            <th class="uk-text-bottom uk-table-expand">使用期限</th>
+                            <th class="uk-text-nowrap">
                                 使用日<br>
                                 <input type="date" class="uk-input uk-form-small" id="allUsedDate" style="width:184px" v-model="allUsedDate">
                                 <div class="uk-text-right" style="width:184px">
@@ -165,28 +162,31 @@
 							<td>{{list.code}}</td>
 							<td>{{list.kikaku}}</td>
 							<td>{{list.jan}}</td>
-							<td>{{list.irisu}}{{list.unit}}</td>
-							<td>{{list.kakaku}}{{list.itemUnit}}</td>
-							<td>{{list.unitPrice}}</td>
+							<td class="uk-text-nowrap">{{list.irisu}}{{list.unit}}</td>
+							<td class="uk-text-nowrap">{{list.kakaku}}{{list.itemUnit}}</td>
+							<td class="uk-text-nowrap">
+							    ￥<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
+							    <span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
+							</td>
 							<td>{{list.oroshi}}</td>
-							<td>1{{ list.itemUnit }}</td>
-							<td class="uk-text-center">
+							<td class="uk-text-nowrap">1{{ list.itemUnit }}</td>
+							<td class="uk-text-left">
 								<span v-if="list.lotFlagBool == 1" class="uk-text-danger">必須</span>
 								<span v-else >任意</span>
 							</td>
-							<td>
+							<td class="uk-text-nowrap">
 								<input type="text" maxlength="20" class="uk-input lot" style="width:180px" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
 							</td>
-							<td>
+							<td class="uk-text-nowrap">
 								<input type="date" class="uk-input lotDate" v-model="list.lotDate" v-bind:style="list.lotDateStyle" v-on:change="addLotDateStyle(key)">
 							</td>
-							<td>
+							<td class="uk-text-nowrap">
 								<input type="date" class="uk-input usedDate" v-model="list.usedDate" v-bind:style="list.usedDateStyle" v-on:change="addUsedDateStyle(key)">
 							</td>
-							<td uk-margin class="uk-text-center">
+							<td uk-margin class="uk-text-center uk-text-nowrap">
 								<input type="button" class="uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)">
 							</td>
-							<td uk-margin class="uk-text-center">
+							<td uk-margin class="uk-text-center uk-text-nowrap">
 								<input type="button" class="uk-button uk-button-default uk-button-small" value="追加" v-on:click="copyList(key)">
 							</td>
 						</tr>
@@ -261,39 +261,42 @@
             <h2 class="uk-modal-title">商品選択</h2>
         </div>
         <div class="uk-modal-body uk-width-expand uk-overflow-auto">
-         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-nowrap uk-table-divider">
+         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-table-divider">
 				<thead>
 					<tr>
-						<th class="uk-table-shrink">id</th>
-						<th class="uk-table-shrink"></th>
-						<th>メーカー</th>
-						<th>商品名</th>
-						<th>製品コード</th>
-						<th>規格</th>
-						<th>入数</th>
-						<th>価格</th>
-						<th>単価</th>
-						<th>JANコード</th>
-						<th>卸業者</th>
-						<th>ロット管理フラグ</th>
+						<th class="uk-text-nowrap">id</th>
+						<th class="uk-text-nowrap"></th>
+						<th class="uk-table-expand">メーカー</th>
+						<th class="uk-table-expand">商品名</th>
+						<th class="uk-table-expand">製品コード</th>
+						<th class="uk-table-expand">規格</th>
+						<th class="uk-text-nowrap">JANコード</th>
+						<th class="uk-text-nowrap">入数</th>
+						<th class="uk-text-nowrap">価格</th>
+						<th class="uk-text-nowrap">単価</th>
+						<th class="uk-table-expand">卸業者</th>
+						<th class="uk-table-expand">ロット管理フラグ</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="(list , key) in select_items">
-						<td></td>
-						<td><button type="button" v-on:click="addObject(key)" class="uk-button uk-button-primary uk-button-small">反映</button></td>
+					<tr v-for="(list , key) in select_items" >
+						<td class="uk-text-nowrap"></td>
+						<td><button type="button" v-on:click="addObject(key)" class="uk-text-nowrap uk-button uk-button-primary uk-button-small">反映</button></td>
 						<td class="uk-text-middle">{{list.maker}}</td>
 						<td class="uk-text-middle">{{list.shouhinName}}</td>
 						<td class="uk-text-middle">{{list.code}}</td>
-						<td class="uk-text-middle">{{list.kikaku}}</td>
-						<td class="uk-text-middle">
+						<td class="uk-text-middle uk-text-nowrap">{{list.kikaku}}</td>
+						<td class="uk-text-middle uk-text-nowrap">{{list.jan}}</td>
+						<td class="uk-text-middle uk-text-nowrap">
 						<span class="irisu">{{list.irisu}}</span><span class="unit uk-text-small">{{list.unit}}</span>
 						</td>
-						<td class="uk-text-middle">￥{{list.kakaku}}</td>
-						<td class="uk-text-middle">￥{{list.unitPrice}}</td>
-						<td class="uk-text-middle">{{list.jan}}</td>
+						<td class="uk-text-middle uk-text-nowrap">￥{{list.kakaku | number_format}}</td>
+						<td class="uk-text-nowrap">
+						    ￥<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
+						    <span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
+						</td>
 						<td class="uk-text-middle">{{list.oroshi}}</td>
-						<td class="uk-text-middle">{{list.lotFlag}}</td>
+						<td class="uk-text-middle uk-text-nowrap">{{list.lotFlag}}</td>
 					</tr>
 				</tbody>
 			</table>   
@@ -309,18 +312,16 @@ var app = new Vue({
 		lists: [],
 		divisionId: '',
 		allUsedDate: now_date,
-		division_disabled: false,
+		canAjax : true,
+        useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
 	},
     watch: {
-        lists: function() {
-            this.$nextTick(function() {
-                if (!app.lists.length) { 
-                    app.division_disabled = false;
-                } else {
-                    app.division_disabled = true;
-                }
-          })
-        }
+    },
+	filters: {
+        number_format: function(value) {
+            if (! value ) { return 0; }
+            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+        },
     },
 	methods: {
 		addList: function(object) {
@@ -330,6 +331,7 @@ var app = new Vue({
 			object.lotDate = ((object.lotDate == null)? '' : object.lotDate);
 			object.lotDateStyle = {};
 			object.lotNumberStyle = {};
+			object.usedDateStyle = {};
 			this.lists.push(object);
 		},
 		copyList: function(key) {
@@ -343,7 +345,10 @@ var app = new Vue({
 			
 			let copy = JSON.parse(JSON.stringify(original[key]));
 			copy.countNum = 0;
+			copy.lotNumber = ""; 
+			copy.lotDate = "";
 			copy.countStyle = {};
+			copy.usedDateStyle = {};
 			
 			this.addList(copy); //コピー
 			
@@ -387,6 +392,7 @@ var app = new Vue({
 			        elem.usedDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
     				app.addList(elem);
 				});
+            }, function () {
             });
 		},
 		addUsedDateStyle: function(index){
@@ -456,7 +462,7 @@ var app = new Vue({
 			}
 			
 			chkLot = true;
-			let regex = /^[0-9a-zA-Z]+$/;
+			let regex = /^[a-zA-Z0-9!-/:-@¥[-`{-~]+$/;
 			app.lists.forEach(function (elem, index) {
 				elem.lotNumberStyle.border = '';
 				if(app.lists[index].lotNumber) {
@@ -482,7 +488,11 @@ var app = new Vue({
             
 			app.lists.forEach(function (elem, index) {
 				if(app.lists[index].countNum > 0) {
+				    app.lists[index].usedDateStyle.border = "";
                     if(app.lists[index].usedDate == '' || ! app.lists[index].usedDate ) {
+						let changeObject = app.lists[index];
+						changeObject.usedDateStyle.border = 'red 2px solid';
+						app.$set(app.lists, index, changeObject);
                         usedDate = false;
                     }
 				}
@@ -492,9 +502,19 @@ var app = new Vue({
                 UIkit.modal.alert('使用日の入力を確認してください');
                 return false ;
             }
+            
+			app.lists.forEach(function (elem, index) {
+				if(app.lists[index].countNum > 0) {
+                    if(app.lists[index].usedDate == '' || ! app.lists[index].usedDate ) {
+						let changeObject = app.lists[index];
+						changeObject.usedDateStyle.border = 'red 2px solid';
+						app.$set(app.lists, index, changeObject);
+                        usedDate = false;
+                    }
+				}
+			});
 
             return true;
-            
         },
         borrowingRegist: function(){
             UIkit.modal.confirm('貸出商品登録を行いますか？').then(function () {
@@ -546,6 +566,7 @@ var app = new Vue({
         },
         
         usedReport: function(){
+            if(!app.canAjax){ return false }
             UIkit.modal.confirm('使用申請を行いますか？').then(function () {
                 
     			if(! app.divisionCheck()){
@@ -560,9 +581,10 @@ var app = new Vue({
     			if(! app.usedDateCheck()){
     			    return false;
     			}
+    			app.canAjax = false;
                 loading();
                 $.ajax({
-                    async: false,
+                    async: true,
                     url: "<?php echo $api_url ?>",
                     type:'POST',
                     data:{
@@ -592,6 +614,7 @@ var app = new Vue({
                 // Ajaxリクエストが成功・失敗どちらでも発動
                 .always( (data) => {
                     loading_remove();
+    			    app.canAjax = true;
                 });
             
             }, function () {
@@ -604,7 +627,7 @@ var app = new Vue({
 			}
 			$.ajax({
 				async: false,
-                url:'%url/rel:mpgt:labelBarcodeSAPI%',
+                url:'<?php echo $label_api_url ?>',
                 type:'POST',
                 data:{
                 	divisionId :app.divisionId,
@@ -637,7 +660,7 @@ var app = new Vue({
 					data.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
 					data.lotNumberStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
 					data.lotDateStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
-                	this.addList(data);
+                	app.addList(data);
 	                
 	                $('input[name="barcode"]').val('');
                 } else {
@@ -670,7 +693,14 @@ var modal_sections = new Vue({
 	el:	'#modal-sections',
 	data: {
 		select_items: [],
+        useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
 	},
+	filters: {
+        number_format: function(value) {
+            if (! value ) { return 0; }
+            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+        },
+    },
 	methods: {
 		clear: function(){
 			let original = JSON.parse(JSON.stringify(this.select_items));
@@ -725,7 +755,7 @@ var gs1_128 = new Vue({
 				return;
 			}
 			
-			let searchJan = removeCheckDigit(obj["01"]);
+			let searchJan = gs1_01_to_jan(obj["01"]);
 			let objkey = null;
 			let setObj = {};
 			
@@ -735,14 +765,15 @@ var gs1_128 = new Vue({
 			let changeObject = null;
 			
 			
-			existflg = app.search(searchJan,objLotNumber,objLotDate);
-			
+			existflg = app.barcodeSearch(searchJan,objLotNumber,objLotDate);
+			/*
 			if(!existflg){
 				app.barcodeSearch(searchJan,objLotNumber,objLotDate , false);
 				//UIkit.modal.alert("対象の発注商品が見つかりませんでした。").then(function(){
 				//	UIkit.modal($('#gs1-128')).show();
 				//});
 			}
+			*/
 		}
 	}
 });

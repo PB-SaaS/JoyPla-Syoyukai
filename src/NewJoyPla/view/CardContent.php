@@ -96,7 +96,7 @@
 		    	<div class="uk-child-width-1-3@m" uk-grid>
 		    		<div>
 		    			<div class="uk-form-controls">
-				            <select class="uk-width-3-4 uk-select uk-inline" id="divisionId" v-model="divisionId" v-bind:disabled="division_disabled">
+				            <select class="uk-width-3-4 uk-select uk-inline" id="divisionId" v-model="divisionId" v-bind:disabled="lists.length > 0">
 				                <option value="">----- 部署選択 -----</option>
 		                        <?php
 		                        foreach($division->data as $data)
@@ -134,18 +134,18 @@
 					</form>	
 				</div>
 		    	<div class="shouhin-table uk-width-expand uk-overflow-auto">
-		    		<table class="uk-table uk-table-striped uk-text-nowrap">
+		    		<table class="uk-table uk-table-striped">
 		    			<thead>
 		    				<tr>
-		    					<th class="uk-table-shrink">id</th>
-		    					<th>メーカー</th>
-		    					<th>商品名</th>
-		    					<th>製品コード</th>
-		    					<th>規格</th>
-		    					<th>JANコード</th>
-		    					<th>入数</th>
-		    					<th style="padding-right: 5px;">数量</th>
-		    					<th style="padding-left: 0px;">
+		    					<th class="uk-text-nowrap">id</th>
+		    					<th class="uk-table-expand">メーカー</th>
+		    					<th class="uk-table-expand">商品名</th>
+		    					<th class="uk-table-expand">製品コード</th>
+		    					<th class="uk-table-expand">規格</th>
+		    					<th class="uk-table-expand">JANコード</th>
+		    					<th class="uk-table-expand">入数</th>
+		    					<th class="uk-text-nowrap" style="padding-right: 5px;">数量</th>
+		    					<th class="uk-text-nowrap" style="padding-left: 0px;">
 		    					    <input type="button" class="uk-button uk-button-default uk-button-small" v-on:click="countToIrisu" value="入数を反映" >
 		    					</th>
 		    					<th style="width:100px"></th>
@@ -160,15 +160,15 @@
 								<td>{{list.code}}</td>
 								<td>{{list.kikaku}}</td>
 								<td>{{list.jan}}</td>
-								<td>{{list.irisu}}{{list.unit}}</td>
-								<td colspan="2">
+								<td class="uk-text-nowrap">{{list.irisu}}{{list.unit}}</td>
+								<td class="uk-text-nowrap" colspan="2">
 									<input type="number" step="1" class="uk-input" min="0" style="width: 100px;" v-bind:style="list.countStyle" v-model="list.countNum" v-on:change="addCountStyle(key)">
 									<span class="uk-text-bottom">{{list.unit}}</span>
 								</td>
-								<td uk-margin class="uk-text-center">
+								<td uk-margin class="uk-text-center uk-text-nowrap">
 									<input type="button" class="uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)">
 								</td>
-								<td uk-margin class="uk-text-center">
+								<td uk-margin class="uk-text-center uk-text-nowrap">
 									<input type="button" class="uk-button uk-button-default uk-button-small" value="追加" v-on:click="copyList(key)">
 								</td>
 							</tr>
@@ -228,35 +228,35 @@
 	            <h2 class="uk-modal-title">商品選択</h2>
 	        </div>
 	        <div class="uk-modal-body uk-width-expand uk-overflow-auto">
-	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-nowrap uk-table-divider">
+	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-table-divider">
 					<thead>
 						<tr>
-							<th class="uk-table-shrink">id</th>
-							<th class="uk-table-shrink"></th>
-							<th>メーカー</th>
-							<th>商品名</th>
-							<th>製品コード</th>
-							<th>規格</th>
-							<th>入数</th>
-							<th>価格</th>
-							<th>JANコード</th>
-							<th>卸業者</th>
-							<th>ロット管理フラグ</th>
+							<th class="uk-text-nowrap">id</th>
+							<th class="uk-text-nowrap"></th>
+							<th class="uk-table-expand">メーカー</th>
+							<th class="uk-table-expand">商品名</th>
+							<th class="uk-table-expand">製品コード</th>
+							<th class="uk-table-expand">規格</th>
+							<th class="uk-table-expand">JANコード</th>
+							<th class="uk-table-expand">入数</th>
+							<th class="uk-table-expand">価格</th>
+							<th class="uk-table-expand">卸業者</th>
+							<th class="uk-table-expand">ロット管理フラグ</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="(list , key) in select_items">
 							<td></td>
-							<td><button type="button" v-on:click="addObject(key)" class="uk-button uk-button-primary uk-button-small">反映</button></td>
+							<td><button type="button" v-on:click="addObject(key)" class="uk-text-nowrap uk-button uk-button-primary uk-button-small">反映</button></td>
 							<td class="uk-text-middle">{{list.maker}}</td>
 							<td class="uk-text-middle">{{list.shouhinName}}</td>
 							<td class="uk-text-middle">{{list.code}}</td>
 							<td class="uk-text-middle">{{list.kikaku}}</td>
+							<td class="uk-text-middle">{{list.jan}}</td>
 							<td class="uk-text-middle">
-							<span class="irisu">{{list.irisu}}</span><span class="unit uk-text-small">{{list.unit}}</span>
+							<span class="irisu uk-text-nowrap">{{list.irisu}}</span><span class="unit uk-text-small">{{list.unit}}</span>
 							</td>
 							<td class="uk-text-middle">￥{{list.kakaku}}</td>
-							<td class="uk-text-middle">{{list.jan}}</td>
 							<td class="uk-text-middle">{{list.oroshi}}</td>
 							<td class="uk-text-middle">{{list.lotFlag}}</td>
 						</tr>
@@ -279,7 +279,6 @@ var app = new Vue({
 	data: {
 		lists: [],
 		divisionId: '',
-		division_disabled: false,
 	},
 	filters: {
         number_format: function(value) {
@@ -340,48 +339,53 @@ var app = new Vue({
 			window.open('%url/rel:mpgt:page_175973%', '_blank','scrollbars=yes,width=1220,height=600');
 		},
 		regCard: function(){
-			if(! this.check()){
-				return false;
-			}
-			
-            loading();
-			canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
-			$.ajax({
-				async: false,
-                url: "<?php echo $api_url ?>",
-                type:'POST',
-                data:{
-                    _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-                	Action : 'cardRegistrationApi',
-                	cardItems : JSON.stringify( objectValueToURIencode(this.lists) ),
-                	divisionId : app.divisionId,
-                },
-                dataType: 'json'
-            })
-            // Ajaxリクエストが成功した時発動
-            .done( (data) => {
-                if(data.code != '0'){
-            		UIkit.modal.alert("カード登録に失敗しました").then(function(){
+			UIkit.modal.confirm("カード登録を行います。<br>よろしいですか").then(function()
+			{
+				if(! app.check()){
+					return false;
+				}
+				
+	            loading();
+				canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
+				$.ajax({
+					async: false,
+	                url: "<?php echo $api_url ?>",
+	                type:'POST',
+	                data:{
+	                    _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+	                	Action : 'cardRegistrationApi',
+	                	cardItems : JSON.stringify( objectValueToURIencode(app.lists) ),
+	                	divisionId : app.divisionId,
+	                },
+	                dataType: 'json'
+	            })
+	            // Ajaxリクエストが成功した時発動
+	            .done( (data) => {
+	                if(data.code != '0'){
+	            		UIkit.modal.alert("カード登録に失敗しました").then(function(){
+						});
+	            		return false;
+	                }
+	                UIkit.modal.alert("カード登録が完了しました").then(function(){
+						UIkit.modal.confirm("カードを印刷しますか。カード一覧からも可能です。").then(function () {
+							$('input[name=card_ids]').val(JSON.stringify( data.data ));
+							$('form#createLabelForm').submit();
+						});
+						app.lists.splice(0, app.lists.length);
 					});
-            		return false;
-                }
-                UIkit.modal.alert("カード登録が完了しました").then(function(){
-					UIkit.modal.confirm("カードを印刷しますか。カード一覧からも可能です。").then(function () {
-						$('input[name=card_ids]').val(JSON.stringify( data.data ));
-						$('form#createLabelForm').submit();
+	            })
+	            // Ajaxリクエストが失敗した時発動
+	            .fail( (data) => {
+	                UIkit.modal.alert("カード登録に失敗しました").then(function(){
 					});
-					app.lists.splice(0, app.lists.length);
-				});
-            })
-            // Ajaxリクエストが失敗した時発動
-            .fail( (data) => {
-                UIkit.modal.alert("カード登録に失敗しました").then(function(){
-				});
-            })
-            // Ajaxリクエストが成功・失敗どちらでも発動
-            .always( (data) => {
-				loading_remove();
-            });
+	            })
+	            // Ajaxリクエストが成功・失敗どちらでも発動
+	            .always( (data) => {
+					loading_remove();
+	            });
+			}).then(function(){
+				UIkit.alert("中止しました");
+			});
 		},
 		checkDivision: function(){
 			if(app.divisionId == ''){
@@ -412,6 +416,21 @@ var app = new Vue({
 			if(checkflg){
 			} else {
 				UIkit.modal.alert('数量を入力してください');
+				return false ;
+			}
+			
+			checkflg = true;
+			app.lists.forEach(function (elem, index) {
+			  if(app.lists[index].countNum < 0){
+				let changeObject = app.lists[index];
+				changeObject.countStyle.border = 'red 2px solid';
+				app.$set(app.lists, index, changeObject);
+			  	checkflg = false;
+			  }
+			});
+			
+			if(!checkflg){
+				UIkit.modal.alert('数量は1以上の数字を入力してください');
 				return false ;
 			}
 			
@@ -462,7 +481,6 @@ var app = new Vue({
             		UIkit.modal.alert("商品が見つかりませんでした");
             		return false;
                 }
-            	this.division_disabled = true;
                 if(data.count == 1)
                 {
                 	data = data.data;

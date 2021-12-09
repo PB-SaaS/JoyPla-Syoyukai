@@ -152,6 +152,20 @@ class StockController extends Controller
             $insert_data = [];
             $stock_instance = Stock::where('hospitalId',$user_info->getHospitalId());
             $items = [];
+            
+            if( $stock['stockCountNum'] && ( (int)$stock['stockCountNum'] > 2147483647 || (int)$stock['stockCountNum'] < -2147483647 ))
+            {
+                throw new Exception('stockCountNum: validate error',100); //ERRORはそのうちまとめて定義します・・・
+            }
+            if( $stock['constantByDiv'] && ( (int)$stock['constantByDiv'] > 2147483647 || (int)$stock['constantByDiv'] < -2147483647 ))
+            {
+                throw new Exception('constantByDiv: validate error',100);
+            }
+            
+            if( $stock['rackName'] && strlen($stock['rackName']) > 64 )
+            {
+                throw new Exception('rackName: validate error',100);
+            }
             foreach($stocks as $stock)
             {
                 $insert_data[] = [

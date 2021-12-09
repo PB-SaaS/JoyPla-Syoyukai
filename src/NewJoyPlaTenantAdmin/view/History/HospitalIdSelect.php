@@ -1,4 +1,4 @@
-<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top">
+<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove">
     <div class="uk-container uk-container-expand">
     	<h1>月次レポート【<?php echo $title ?>】</h1>
 		<div class="uk-margin spiral_table_area">

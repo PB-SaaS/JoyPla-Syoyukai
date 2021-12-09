@@ -43,7 +43,7 @@ class Controller
             if (is_array($value)) {
                 $result[$key] = $this->requestUrldecode($value);
             } else {
-                $result[$key] = (string)urldecode(preg_replace('/^%EF%BB%BF/', '', $value));
+                $result[$key] = (string)rawurldecode(preg_replace('/^%EF%BB%BF/', '', $value));
             }
         }
         return $result;

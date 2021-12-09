@@ -151,6 +151,7 @@ class PayoutMRController extends Controller
                 'itemName' => $row->itemName,
                 'itemCode' => $row->itemCode,
                 'itemStandard' => $row->itemStandard,
+                'itemJANCode' => $row->itemJANCode,
                 'price' => $getInformationByPrice['price'],
                 'unitPrice' => $getInformationByPrice['unitPrice'],
                 'quantity' => $getInformationByPrice['quantity'],

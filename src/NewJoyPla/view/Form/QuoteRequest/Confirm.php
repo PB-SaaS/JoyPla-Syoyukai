@@ -55,7 +55,7 @@
                             見積期限
                         </dt>
                         <dd class="data time">
-                            $quotePeriod$
+                            <?php echo $quotePeriod ?>
                             <br>
                         </dd>
                     </dl>

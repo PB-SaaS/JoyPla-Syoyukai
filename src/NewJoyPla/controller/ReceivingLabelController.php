@@ -75,7 +75,7 @@ class ReceivingLabelController extends Controller
                 
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla カード一覧',
+                'title'     => 'JoyPla 入庫ラベル',
                 'script' => $script,
                 'style' => $style,
                 'head' => $head->render(),

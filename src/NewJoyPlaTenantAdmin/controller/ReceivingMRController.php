@@ -155,6 +155,7 @@ class ReceivingMRController extends Controller
                 'itemName' => $row->itemName,
                 'itemCode' => $row->itemCode,
                 'itemStandard' => $row->itemStandard,
+                'itemJANCode' => $row->itemJANCode,
                 'distributorName' =>  $getInformationByPrice['distributorName'],
                 'quantity' => $getInformationByPrice['quantity'],
                 'price' => $getInformationByPrice['price'],

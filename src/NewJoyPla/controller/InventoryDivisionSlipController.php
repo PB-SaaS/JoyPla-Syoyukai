@@ -73,8 +73,15 @@ class InventoryDivisionSlipController extends Controller
                     }
                 }
                 
+                $update_time = $division_history_slip->updateTime;
+                if( $division_history_slip->totalAmount != $total_amount || $division_history_slip->itemsNumber != collect($in_hospital_item_ids)->count())
+                {
+                    $update_time = "now";
+                }
+                
                 InventoryHistory::where('hospitalId',$user_info->getHospitalId())->find($record_id)->update([
                     //"totalAmount" => collect($prices)->sum(),
+                    "updateTime" => $update_time,
                     "totalAmount" => $total_amount,
                     "itemsNumber" => collect($in_hospital_item_ids)->count(),
                 ]);
@@ -93,26 +100,27 @@ class InventoryDivisionSlipController extends Controller
                         $in_hospital_item_ids[] = $history_item->inHospitalItemId;
                     }
                 }
-                
                 InventoryEnd::where('hospitalId',$user_info->getHospitalId())->where('inventoryEndId',$division_history_slip->inventoryEndId)->update([
-                    //'totalAmount' => collect($prices)->sum(),
-                    'totalAmount' => $total_amount,
+                    'totalAmount' => (string)$total_amount,
                     "itemsNumber" => collect($in_hospital_item_ids)->count(),
                 ]);
             }
             
             $link = "%url/rel:mpgt:Inventory%&Action=inventoryEndList";
             
-            if($end_slip->inventoryStatus == 2 || 
-                ($user_info->isUser() && $end_slip->divisionId != $user_info->getDivisionId() ) ||
-                ($user_info->isApprover() )
-              )
+                
+            if($end_slip->inventoryStatus == 2 || $user_info->isApprover())
             {
                 $table = "%sf:usr:search25:mstfilter:table%";//修正不可能
             }
             else
             {
                 $table = "%sf:usr:search24:mstfilter:table%";//修正可能
+            }
+            
+            if($user_info->isUser() && $division_history_slip->divisionId != $user_info->getDivisionId())
+            {
+                $table = "%sf:usr:search25:mstfilter:table%";//修正不可能
             }
             
             $delete_button_view_flg = false;
@@ -156,8 +164,11 @@ class InventoryDivisionSlipController extends Controller
                 array_multisort(array_column($inventory_remake_items, 'inHospitalItemId'), SORT_ASC, $inventory_remake_items);
             }
             
+            $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+            $hospital_data = $hospital_data->data->get(0);
+            $useUnitPrice = $hospital_data->invUnitPrice;
             
-            
+    
             $api_url = "%url/card:page_263632%";
             $content = $this->view('NewJoyPla/view/InventorySlip', [
                 'api_url' => $api_url,

@@ -40,24 +40,24 @@
             <div class="uk-margin" id="tablearea">
                 <form>
                     <div class="uk-overflow-auto">
-                        <table class="uk-table uk-table-hover uk-table-middle uk-table-divider uk-text-nowrap" id="tbl-Items">
+                        <table class="uk-table uk-table-hover uk-table-middle uk-table-divider" id="tbl-Items">
                             <thead>
                                 <tr>
-                                    <th>NO</th>
-                                    <th style="min-width:150px">メーカー</th>
-                                    <th style="min-width:150px">商品名</th>
-                                    <th>製品コード</th>
-                                    <th>規格</th>
-                                    <th>ロット番号</th>
-                                    <th>使用期限</th>
-                                    <th>入数</th>
-                                    <th>価格</th>
-                                    <th>単価</th>
-                                    <th class="uk-table-shrink">数量</th>
-                                    <th class="uk-table-shrink"></th>
-                                    <th class="uk-table-shrink">個数（ラベル枚数）</th>
-                                    <th class="uk-table-shrink">合計払出数</th>
-                                    <th>払出金額</th>
+                                    <th class="uk-text-nowrap">NO</th>
+                                    <th class="uk-table-expand" style="min-width:150px">メーカー</th>
+                                    <th class="uk-table-expand" style="min-width:150px">商品名</th>
+                                    <th class="uk-table-expand">製品コード</th>
+                                    <th class="uk-table-expand">規格</th>
+                                    <th class="uk-table-expand">ロット番号</th>
+                                    <th class="uk-table-expand">使用期限</th>
+                                    <th class="uk-text-nowrap">入数</th>
+                                    <th class="uk-text-nowrap">価格</th>
+                                    <th class="uk-text-nowrap">単価</th>
+                                    <th class="uk-text-nowrap">数量</th>
+                                    <th></th>
+                                    <th class="uk-text-nowrap">個数（ラベル枚数）</th>
+                                    <th class="uk-text-nowrap">合計払出数</th>
+                                    <th class="uk-text-nowrap">払出金額</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -65,23 +65,23 @@
 				    					$num = 1;
 										foreach($payoutData as $record){
 				    						echo "<tr>";
-				    						echo "<td>".$num."</td>";
+				    						echo "<td class='uk-text-nowrap'>".$num."</td>";
 				    						echo "<td>".$record->makerName."</td>";
 				    						echo "<td>".$record->itemName."</td>";
 				    						echo "<td>".$record->itemCode."</td>";
 				    						echo "<td>".$record->itemStandard."</td>";
 				    						echo "<td>".$record->lotNumber."</td>";
 				    						echo "<td>".$record->lotDate."</td>";
-				    						echo "<td>".$record->quantity.$record->quantityUnit."</td>";
-				    						echo "<td><script>price(\"".($record->price / $record->quantity )."\")</script>円 / ".$record->quantityUnit."</td>";
-				    						echo "<td>￥<script>price(\"".$record->unitPrice."\")</script></td>";
-											echo "<td>".$record->payoutCount.$record->quantityUnit."</td>";
+				    						echo "<td class='uk-text-nowrap'>".$record->quantity.$record->quantityUnit."</td>";
+				    						echo "<td class='uk-text-nowrap'>￥".number_format($record->price,2)." / ".$record->quantityUnit."</td>";
+				    						echo "<td class='uk-text-nowrap'>￥".number_format($record->unitPrice,2)."</td>";
+											echo "<td class='uk-text-nowrap'>".$record->payoutCount.$record->quantityUnit."</td>";
 											
 											echo "<td>×</td>";
-											echo "<td>".$record->payoutLabelCount."枚</td>";
+											echo "<td class='uk-text-nowrap'>".$record->payoutLabelCount."枚</td>";
 
-				    						echo "<td>".$record->payoutQuantity.$record->quantityUnit."</td>";
-				    						echo "<td>￥<script>price(\"".$record->payoutAmount."\")</script></td>";
+				    						echo "<td class='uk-text-nowrap'>".$record->payoutQuantity.$record->quantityUnit."</td>";
+				    						echo "<td class='uk-text-nowrap'>￥".number_format($record->payoutAmount,2)."</td>";
 				    						echo "</tr>";
 				    						$num++;
 										}

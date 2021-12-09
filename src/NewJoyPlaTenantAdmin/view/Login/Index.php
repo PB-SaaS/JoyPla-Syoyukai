@@ -1,5 +1,5 @@
-<div class="uk-section uk-dark uk-background-muted uk-padding">
-    <div class="uk-container" uk-height-viewport="expand: true">
+<div class="uk-section uk-dark uk-background-muted" uk-height-viewport>
+    <div class="uk-container uk-padding">
         <div class="uk-width-1-3@m uk-margin-auto">
             <div class="uk-logo uk-margin uk-text-center">
                 <img src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png" /><br>

@@ -127,31 +127,35 @@ class InventoryController extends Controller
             }
             $in_hospital_item = $in_hospital_item->get();
             
-            foreach ($inventory as $item)
+            foreach ($inventory as $record)
             {
-                foreach($in_hospital_item as $in_hp_item)
+                foreach($in_hospital_item->data->all() as $in_hp_item)
                 {
                     $lot_flag = 0;
                     if($record['recordId'] == $in_hp_item->inHospitalItemId)
                     {
-                        $lot_flag = $in_hp_item->lotManagement;
+                        $lot_flag = (int)$in_hp_item->lotManagement;
                         break;
                     }
                 }
-                if($lot_flag && ($record['lotNumber'] == '' || $record['lotDate'] == '' ))
+                if($record['countNum'] > 0)
                 {
-                    throw new Exception('invalid lot',100);
-                }
-                
-                if (($record['lotNumber'] != '' && $record['lotDate'] == '' ) || ($record['lotNumber'] == '' && $record['lotDate'] != ''))
-                {
-                    throw new Exception('invalid lotNumber input',101);
-                }
-                if (($record['lotNumber'] != '') && ($record['lotDate'] != '')) 
-                {
-                    if ((!ctype_alnum($record['lotNumber'])) || (strlen($record['lotNumber']) > 20))
+                    if($lot_flag && ($record['lotNumber'] == '' || $record['lotDate'] == '' ))
                     {
-                        throw new Exception('invalid lotNumber format',102);
+                        throw new Exception('invalid lot',100);
+                    }
+                    
+                    if (($record['lotNumber'] != '' && $record['lotDate'] == '' ) || ($record['lotNumber'] == '' && $record['lotDate'] != ''))
+                    {
+                        throw new Exception('invalid lotNumber input',101);
+                    }
+                    if (($record['lotNumber'] != '') && ($record['lotDate'] != '')) 
+                    {
+                        //if ((!ctype_alnum($item['lotNumber'])) || (strlen($item['lotNumber']) > 20))
+                        if ((!preg_match('/^[a-zA-Z0-9!-\/:-@¥[-`{-~]+$/', $record['lotNumber'])) || (strlen($record['lotNumber']) > 20))
+                        {
+                            throw new Exception('invalid lotNumber format',102);
+                        }
                     }
                 }
             }
@@ -187,17 +191,30 @@ class InventoryController extends Controller
 
             $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
             $hospital_data = $hospital_data->data->get(0);
-            $useUnitPrice = $hospital_data->invUnitPrice;
-    
+            $useUnitPrice = (int)$hospital_data->invUnitPrice;
             $stock_taking_trdata = [];
             
-            $stock = StockView::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$divisionId)->get();
+            //在庫として存在するものを０で登録する
+            $stock = StockView::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$divisionId);
+            
+            foreach ($inventory as $data)
+            {
+                //棚卸対象以外
+                $stock->where('inHospitalItemId',$data['recordId'],"!=");
+            }
+            
+            $stock = $stock->get();
             
             foreach ($stock->data->all() as $data)
             {
+                
                 $unitPrice = $useUnitPrice
                     ? (str_replace(',', '', $data->unitPrice))
-                    : (str_replace(',', '', $data->price) / $data->quantity);
+                    : (
+                        ((float)$data->price == 0 || (float)$data->quantity == 0)
+                            ? 0 
+                            : (float)$data->price / (float)$data->quantity
+                        );
                 $stock_taking_trdata[] = [
                     'inventoryEndId' => $invEndId,
                     'inventoryHId' => $invHistId,
@@ -205,16 +222,16 @@ class InventoryController extends Controller
                     'hospitalId' => $user_info->getHospitalId(),
                     'divisionId' => $data->divisionId,
                     'price' => str_replace(',', '', $data->price),
-                    'inventryNum' => 0,
+                    'inventryNum' => 0, // 数は０で登録
                     'inventryAmount' => (float)$unitPrice * 0,
                     'quantity' => $data->quantity,
                     'quantityUnit' => $data->quantityUnit,
                     'itemUnit' => $data->itemUnit,
                     'unitPrice' => $unitPrice,
-                    'invUnitPrice' => (int)$useUnitPrice,
+                    'invUnitPrice' => (float)$useUnitPrice,
                     'lotNumber' => '',
                     'lotDate' => '',
-                    'lotUniqueKey' => $user_info->getHospitalId().$divisionId.$data->inHospitalItemId.''.''//ロット情報を入力していない場合は、
+                    'lotUniqueKey' => $user_info->getHospitalId().$divisionId.$data->inHospitalItemId.''.''
                 ];
             }
             
@@ -224,7 +241,11 @@ class InventoryController extends Controller
                 {
                     $unitPrice = $useUnitPrice
                         ? (str_replace(',', '', $data['unitPrice']))
-                        : (str_replace(',', '', $data['kakaku']) / $data['irisu']);
+                        : (
+                            ((float)str_replace(',', '', $data['kakaku']) == 0 || (float)$data['irisu'] == 0)
+                            ? 0 
+                            : ((float)str_replace(',', '', $data['kakaku']) / (float)$data['irisu']) 
+                        );
                     $stock_taking_trdata[] = [
                         'inventoryEndId' => $invEndId,
                         'inventoryHId' => $invHistId,
@@ -238,10 +259,10 @@ class InventoryController extends Controller
                         'quantityUnit' => $data['unit'],
                         'itemUnit' => $data['itemUnit'],
                         'unitPrice' => $unitPrice,
-                        'invUnitPrice' => (int)$useUnitPrice,
+                        'invUnitPrice' => (float)$useUnitPrice,
                         'lotNumber' => $data['lotNumber'],
                         'lotDate' => $data['lotDate'],
-                        'lotUniqueKey' => $user_info->getHospitalId().$divisionId.$data['recordId'].$data['lotNumber'].$data['lotDate']//ロット情報を入力していない場合は、
+                        'lotUniqueKey' => $user_info->getHospitalId().$divisionId.$data['recordId'].$data['lotNumber'].$data['lotDate']
                     ];
                 }
             }

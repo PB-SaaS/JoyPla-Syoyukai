@@ -99,13 +99,25 @@ class itemDB extends FieldTypeValidate
     
     public $dbFieldInfo =[ 
         [   
+            'key' => 'メーカー',
+            'fieldType' => 'TextField128bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
             'key' => '商品名',
             'fieldType' => 'TextField128bytes',
             'replaceKey' => 't',
             'notNullFlg' => 't',
         ],
         [   
-            'key' => '商品コード（製品コード）',
+            'key' => '分類',
+            'fieldType' => 'Select_',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '製品コード',
             'fieldType' => 'TextField128bytes',
             'replaceKey' => 't',
             'notNullFlg' => '',
@@ -123,13 +135,13 @@ class itemDB extends FieldTypeValidate
             'notNullFlg' => 't',
         ],
         [   
-            'key' => 'メーカー名',
+            'key' => 'カタログNo',
             'fieldType' => 'TextField128bytes',
             'replaceKey' => 't',
             'notNullFlg' => '',
         ],
         [   
-            'key' => 'カタログNo',
+            'key' => 'シリアルNo',
             'fieldType' => 'TextField128bytes',
             'replaceKey' => 't',
             'notNullFlg' => '',

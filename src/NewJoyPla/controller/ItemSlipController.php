@@ -88,7 +88,7 @@ class ItemSlipController extends Controller
             
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
-            <li><a href="%url/rel:mpgt:Product%&Action=Item&table_cache=true">商品マスタ</a></li>
+            <li><a href="%url/rel:mpgt:Product%&Action=Item&table_cache=true">商品一覧</a></li>
             <li><a href="%url/card:page_177122%">商品情報詳細</a></li>
             <li><span>商品情報変更</span></li>
 EOM;
@@ -157,7 +157,7 @@ EOM;
             
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
-            <li><a href="%url/rel:mpgt:Product%&Action=Item&table_cache=true">商品マスタ</a></li>
+            <li><a href="%url/rel:mpgt:Product%&Action=Item&table_cache=true">商品一覧</a></li>
             <li><a href="%url/card:page_177122%">商品情報詳細</a></li>
             <li><span>金額情報登録</span></li>
 EOM;
@@ -220,7 +220,7 @@ EOM;
             
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
-            <li><a href="%url/rel:mpgt:Product%&Action=Item&table_cache=true">商品マスタ</a></li>
+            <li><a href="%url/rel:mpgt:Product%&Action=Item&table_cache=true">商品一覧</a></li>
             <li><a href="%url/card:page_177122%">商品情報詳細</a></li>
             <li><span>院内商品情報登録</span></li>
 EOM;

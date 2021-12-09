@@ -90,7 +90,7 @@
                 <div class="uk-width-1-3@m">
     			    <label class="uk-form-label" > </label>
                     <div class="uk-form-controls">
-                        <select class="uk-select" name="busyo" v-model="divisionId" v-bind:disabled="division_disabled">
+                        <select class="uk-select" name="busyo" v-model="divisionId" v-bind:disabled="lists.length > 0">
                             <option value="">----- 部署選択 -----</option>
                         <?php
                             foreach($divisionData->data as $data)
@@ -137,28 +137,28 @@
                     <button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
                 </form>
             </div>
-
+			<span class="uk-text-small uk-text-danger">未発注伝票作成時はロット情報は不要です</span>
             <div class="shouhin-table uk-width-expand uk-overflow-auto">
-                <table class="uk-table uk-table-striped uk-table-striped uk-table-condensed uk-text-nowrap">
+                <table class="uk-table uk-table-striped uk-table-striped uk-table-condensed">
                     <thead>
                         <tr>
-                            <th>id</th>
-                            <th>メーカー</th>
-                            <th>商品名</th>
-                            <th>製品コード</th>
-                            <th>規格</th>
-                            <th>JANコード</th>
-                            <th>卸業者</th>
-                            <th>入数</th>
-                            <th>価格</th>
-                            <th>単価</th>
-                            <th style="padding-right: 5px;">数量</th>
-                            <th style="padding-left: 0px;">
+                            <th class="uk-text-nowrap">id</th>
+                            <th class="uk-table-expand">メーカー</th>
+                            <th class="uk-table-expand">商品名</th>
+                            <th class="uk-table-expand">製品コード</th>
+                            <th class="uk-table-expand">規格</th>
+                            <th class="uk-table-expand">JANコード</th>
+                            <th class="uk-table-expand">卸業者</th>
+                            <th class="uk-text-nowrap">入数</th>
+                            <th class="uk-text-nowrap">価格</th>
+                            <th class="uk-text-nowrap">単価</th>
+                            <th class="uk-text-nowrap" style="padding-right: 5px;">数量</th>
+                            <th class="uk-text-nowrap">
 	                            <input type="button" class="uk-button uk-button-default uk-button-small" v-on:click="countToIrisu" value="入数を反映" >
 		    				</th>
-                            <th>ロット管理</th>
-                            <th>ロット番号</th>
-                            <th>使用期限</th>
+                            <th class="uk-text-nowrap">ロット管理</th>
+                            <th class="uk-table-expand">ロット番号</th>
+                            <th class="uk-table-expand">使用期限</th>
                             <th></th>
                             <th></th>
                         </tr>
@@ -172,31 +172,32 @@
 							<td>{{list.kikaku}}</td>
 							<td>{{list.jan}}</td>
 							<td>{{list.oroshi}}</td>
-							<td>{{list.irisu}}{{list.unit}}</td>
-							<td>￥{{list.kakaku | number_format}}</td>
-							<td>
+							<td class="uk-text-nowrap">{{list.irisu}}{{list.unit}}</td>
+							<td class="uk-text-nowrap">￥{{list.kakaku | number_format}}</td>
+							<td class="uk-text-nowrap">
 							    ￥<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
 							    <span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
 							</td>
-							<td colspan="2">
-								<input type="number" step="1" min="0" class="uk-input" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.countNum" v-bind:disabled="list.countNumDisabled" v-on:change="addCountStyle(key)">
+							<td colspan="2" class="uk-text-nowrap">
+								<?php //マイナス発注ができるように、 min="0"は削除 ?>
+								<input type="number" step="1" class="uk-input" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.countNum" v-bind:disabled="list.countNumDisabled" v-on:change="addCountStyle(key)">
 								<span class="uk-text-bottom">{{list.unit}}</span>
 							</td>
-							<td>
+							<td class="uk-text-nowrap">
 								<span v-if="list.lotFlagBool == 1" class="uk-text-danger">必須</span>
 								<span v-else >任意</span>
 							</td>
-							<td>
+							<td class="uk-text-nowrap">
 								<input type="text" class="uk-input lot" style="width:180px" maxlength="20" v-model="list.lotNumber" v-bind:style="list.lotNumberStyle" v-on:change="addLotNumberStyle(key)">
 							</td>
 							<td>
 								<input type="date" class="uk-input lotDate" v-model="list.lotDate" v-bind:style="list.lotDateStyle" v-on:change="addLotDateStyle(key)">
 							</td>
 							<td>
-								<input type="button" class="uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)">
+								<input type="button" class="uk-text-nowrap uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)">
 							</td>
 							<td>
-								<input type="button" class="uk-button uk-button-default uk-button-small" value="追加" v-on:click="copyList(key)">
+								<input type="button" class="uk-text-nowrap uk-button uk-button-default uk-button-small" value="追加" v-on:click="copyList(key)">
 							</td>
 						</tr>
                     </tbody>
@@ -270,42 +271,42 @@
 	            <h2 class="uk-modal-title">商品選択</h2>
 	        </div>
 	        <div class="uk-modal-body uk-width-expand uk-overflow-auto">
-	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-nowrap uk-table-divider">
+	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-table-divider">
 					<thead>
 						<tr>
-							<th class="uk-table-shrink">id</th>
-							<th class="uk-table-shrink"></th>
-							<th>メーカー</th>
-							<th>商品名</th>
-							<th>製品コード</th>
-							<th>規格</th>
-							<th>入数</th>
-							<th>価格</th>
-							<th>単価</th>
-							<th>JANコード</th>
-							<th>卸業者</th>
-							<th>ロット管理フラグ</th>
+							<th class="uk-text-nowrap">id</th>
+							<th class="uk-text-nowrap"></th>
+							<th class="uk-table-expand">メーカー</th>
+							<th class="uk-table-expand">商品名</th>
+							<th class="uk-table-expand">製品コード</th>
+							<th class="uk-table-expand">規格</th>
+							<th class="uk-text-nowrap">JANコード</th>
+							<th class="uk-text-nowrap">入数</th>
+							<th class="uk-text-nowrap">価格</th>
+							<th class="uk-text-nowrap">単価</th>
+							<th class="uk-table-expand">卸業者</th>
+							<th class="uk-table-expand">ロット管理フラグ</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="(list , key) in select_items" >
-							<td></td>
-							<td><button type="button" v-on:click="addObject(key)" class="uk-button uk-button-primary uk-button-small">反映</button></td>
+							<td class="uk-text-nowrap"></td>
+							<td><button type="button" v-on:click="addObject(key)" class="uk-text-nowrap uk-button uk-button-primary uk-button-small">反映</button></td>
 							<td class="uk-text-middle">{{list.maker}}</td>
 							<td class="uk-text-middle">{{list.shouhinName}}</td>
 							<td class="uk-text-middle">{{list.code}}</td>
-							<td class="uk-text-middle">{{list.kikaku}}</td>
-							<td class="uk-text-middle">
+							<td class="uk-text-middle uk-text-nowrap">{{list.kikaku}}</td>
+							<td class="uk-text-middle uk-text-nowrap">{{list.jan}}</td>
+							<td class="uk-text-middle uk-text-nowrap">
 							<span class="irisu">{{list.irisu}}</span><span class="unit uk-text-small">{{list.unit}}</span>
 							</td>
-							<td class="uk-text-middle">￥{{list.kakaku}}</td>
-							<td>
+							<td class="uk-text-middle uk-text-nowrap">￥{{list.kakaku | number_format}}</td>
+							<td class="uk-text-nowrap">
 							    ￥<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
 							    <span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
 							</td>
-							<td class="uk-text-middle">{{list.jan}}</td>
 							<td class="uk-text-middle">{{list.oroshi}}</td>
-							<td class="uk-text-middle">{{list.lotFlag}}</td>
+							<td class="uk-text-middle uk-text-nowrap">{{list.lotFlag}}</td>
 						</tr>
 					</tbody>
 				</table>   
@@ -313,13 +314,13 @@
 	    </div>
 	</div>
 <script>
+
 var app = new Vue({
 	el: '#app',
 	data: {
 		lists: [],
 		divisionId: '',
 		consumeDate : '',
-		division_disabled: false,
         useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
 	},
 	filters: {
@@ -340,7 +341,6 @@ var app = new Vue({
     					app.$set(app.lists, index, changeObject);
         			});
                 }
-                if (!app.lists.length) { app.division_disabled = false; }
           })
         }
     },
@@ -392,7 +392,7 @@ var app = new Vue({
 		},
 		
 		divisionCheck : function(){
-			if(!this.divisionId){
+			if(!app.divisionId){
 				UIkit.modal.alert('部署を選択してください');
 				return false ;
 			}
@@ -442,6 +442,7 @@ var app = new Vue({
 			return exist;
 		},
 		barcodeSearch: function(barcode , lotNumber , lotDate , gs1_128_search_flg) {
+			
 			if(! this.divisionCheck()){
 				return false;
 			}
@@ -452,13 +453,12 @@ var app = new Vue({
 			       return false;
 			    }
 			}
-			
 			$.ajax({
 				async: false,
                 url:'%url/rel:mpgt:labelBarcodeSAPI%',
                 type:'POST',
                 data:{
-                	divisionId : $('select[name="sourceDivision"]').val(),
+                	divisionId : app.divisionId,
                 	barcode : barcode,
                 },
                 dataType: 'json'
@@ -475,12 +475,11 @@ var app = new Vue({
                 	}
             		return false;
                 }
-	            this.division_disabled = true;
                 if(data.count == 1)
                 {
                 	data = data.data;
                 	
-                	if(data.divisionId != "" && this.divisionId != data.divisionId )
+                	if(data.divisionId != "" && app.divisionId != data.divisionId )
                 	{
 	            		UIkit.modal.alert("読み込んだバーコードの部署が払出元の部署と一致しません");
 	            		if (!app.lists.length) { app.division_disabled = false; }
@@ -523,7 +522,6 @@ var app = new Vue({
             })
             // Ajaxリクエストが成功・失敗どちらでも発動
             .always( (data) => {
-				loading_remove();
             });
 		},
 		
@@ -611,7 +609,7 @@ var app = new Vue({
 			
           
 			chkLot = true;
-			let regex = /^[0-9a-zA-Z]+$/;
+			let regex = /^[a-zA-Z0-9!-/:-@¥[-`{-~]+$/;
 			app.lists.forEach(function (elem, index) {
 				elem.lotNumberStyle.border = '';
 				if(app.lists[index].lotNumber) {
@@ -644,9 +642,8 @@ var app = new Vue({
         
         sendGoodsBilling: function(){
             UIkit.modal.confirm('消費登録を行いますか？').then(function () {
-                loading();
+				
                 if (!app.goodsBillingValidationCheck()) {
-                    loading_remove();
                     return false;
                 }
                 $.ajax({
@@ -678,7 +675,6 @@ var app = new Vue({
                 })
                 // Ajaxリクエストが成功・失敗どちらでも発動
                 .always( (data) => {
-                    loading_remove();
                 });
           
             }, function () {
@@ -688,10 +684,8 @@ var app = new Vue({
         sendUnorderedSlip: function(goodsFlg){
             UIkit.modal.confirm('未発注伝票を作成しますか？').then(function () {
                 if (!app.listsCheck()) {
-                    loading_remove();
                     return false;
                 }
-                loading();
             
                 $.ajax({
                     async: false,
@@ -727,7 +721,6 @@ var app = new Vue({
                 })
                 // Ajaxリクエストが成功・失敗どちらでも発動
                 .always( (data) => {
-                    loading_remove();
                 });
           
             }, function () {

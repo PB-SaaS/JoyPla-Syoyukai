@@ -82,7 +82,7 @@ class ReceivingMRController extends Controller
 
             $result = $this->dataSelect($startMonth,$endMonth,$distributorId,$divisionId,$itemName,$itemCode,$itemStandard,$category_ids,$page,$limit);
 
-            if( ($user_info->isHospitalUser() && $user_info->getUserPermission() == '1'))
+            if( ($user_info->isHospitalUser() && ( $user_info->isAdmin() || $user_info->isApprover() )))
             {
                 $division = Division::where('hospitalId',$user_info->getHospitalId())->get();
             }
@@ -191,6 +191,7 @@ class ReceivingMRController extends Controller
                 'itemName' => $row->itemName,
                 'itemCode' => $row->itemCode,
                 'itemStandard' => $row->itemStandard,
+                'itemJANCode' => $row->itemJANCode,
                 'distributorName' =>  $getInformationByPrice['distributorName'],
                 'quantity' => $getInformationByPrice['quantity'],
                 'price' => $getInformationByPrice['price'],

@@ -80,7 +80,7 @@ class GoodsBillingMRController extends Controller
 
             $result = $this->dataSelect($startMonth,$endMonth,$divisionId,$itemName,$itemCode,$itemStandard,$category_ids,$page,$limit);
 
-            if( ($user_info->isHospitalUser() && $user_info->getUserPermission() == '1'))
+            if( ($user_info->isHospitalUser() &&  ( $user_info->isAdmin() || $user_info->isApprover() )))
             {
                 $division = Division::where('hospitalId',$user_info->getHospitalId())->get();
             }
@@ -188,6 +188,7 @@ class GoodsBillingMRController extends Controller
                 'itemName' => $row->itemName,
                 'itemCode' => $row->itemCode,
                 'itemStandard' => $row->itemStandard,
+                'itemJANCode' => $row->itemJANCode,
                 'price' => $getInformationByPrice['price'],
                 'unitPrice' => $getInformationByPrice['unitPrice'],
                 'quantity' => $getInformationByPrice['quantity'],

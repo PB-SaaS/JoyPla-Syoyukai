@@ -140,6 +140,11 @@ class Model
         $instance = self::getInstance();
         $instance->spiralDataBase->setDataBase($instance::$spiral_db_name);
         
+        foreach($instance->sort as $sort)
+        {
+            $instance->spiralDataBase->addSortField($sort['name'],$sort['order']);
+        }
+        
         $delete_field_flg = false;
         if($instance::DELETED_AT !== '')
         {
@@ -280,7 +285,7 @@ class Model
 
         foreach($update_data as $field => $val)
         {
-            $update_array[] = ['name' => $field , 'value' => $val];
+            $update_array[] = ['name' => $field , 'value' => (string)$val];
         }
 
         return $update_array;
@@ -323,16 +328,16 @@ class Model
             {
                 if(static::UPDATED_AT == $column){
                     if(! in_array($column, $update_fillable)) {
-                        $update_fillable[] = $column;
+                        $update_fillable[] = (string)$column;
                     }
                     $datas[] = 'now' ;
                 }
                 else if(array_key_exists($column, $data))
                 {
                     if(! in_array($column, $update_fillable)) {
-                        $update_fillable[] = $column;
+                        $update_fillable[] = (string)$column;
                     }
-                    $datas[] = $data[$column];
+                    $datas[] = (string)$data[$column];
                 }
             }
             $update_array[] = $datas;
@@ -365,12 +370,12 @@ class Model
 
         foreach($this::$attributes as $field => $val)
         {
-            $create_array[] = ['name' => $field , 'value' => $val];
+            $create_array[] = ['name' => $field , 'value' => (string)$val];
         }
 
         foreach($create_data as $field => $val)
         {
-            $create_array[] = ['name' => $field , 'value' => $val];
+            $create_array[] = ['name' => $field , 'value' => (string)$val];
         }
 
         return $create_array;
@@ -402,7 +407,7 @@ class Model
                 if(static::UPDATED_AT == $column){
                     $def = 'now';
                 }
-                $create_array[$index][] = (isset($data[$column]))? $data[$column] : ((isset($this::$attributes[$column]))? $attributes[$column]: $def) ;
+                $create_array[$index][] = (isset($data[$column]))? (string)$data[$column] : ((isset($this::$attributes[$column]))? (string)$attributes[$column]: (string)$def) ;
             }
         }
         return $create_array;
@@ -434,7 +439,7 @@ class Model
                 if(static::CREATED_AT == $column){
                     $def = 'now';
                 }
-                $create_array[$index][] = (isset($data[$column]))? $data[$column] : ((isset($this::$attributes[$column]))? $attributes[$column]: $def) ;
+                $create_array[$index][] = (isset($data[$column]))? (string)$data[$column] : ((isset($this::$attributes[$column]))? (string)$attributes[$column]: (string)$def) ;
             }
         }
         return $create_array;
@@ -468,7 +473,7 @@ class Model
             } 
             else 
             {
-                $save_array[] = ['name' => $field , 'value' => $this->{$field}];
+                $save_array[] = ['name' => $field , 'value' => (string)$this->{$field}];
             }
         }
 

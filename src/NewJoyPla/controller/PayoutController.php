@@ -122,7 +122,7 @@ class PayoutController extends Controller
     
             $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
             $hospital_data = $hospital_data->data->get(0);
-            $useUnitPrice = $hospital_data->payoutUnitPrice;
+            $useUnitPrice = (int)$hospital_data->payoutUnitPrice;
             
             $content = $this->view('NewJoyPla/view/PayoutContent2', [
                 'api_url' => $api_url,
@@ -290,7 +290,6 @@ class PayoutController extends Controller
                 $payout_items = $payout_items->data->all();
             }
             
-            
 	        Stock::where('hospitalId',$user_info->getHospitalId());
 	        
 	        foreach($payout_items as $item)
@@ -355,7 +354,6 @@ class PayoutController extends Controller
             {
                 $default_design = htmlspecialchars_decode($hospital_data->labelDesign1);
             }
-     
             $content = $this->view('NewJoyPla/view/PayoutLabel', [
                 'api_url' => $api_url,
                 'user_info' => $user_info,
@@ -441,6 +439,7 @@ EOM;
             }
             
             $payout = $SPIRAL->getParam('payout');
+            $payout = $this->requestUrldecode($payout);
             $payout_date = $SPIRAL->getParam('payoutDate');
             if($payout_date == '')
             {
@@ -475,10 +474,15 @@ EOM;
                 }
                 if (($record['lotNumber'] != '') && ($record['lotDate'] != '')) 
                 {
-                    if((!ctype_alnum($record['lotNumber'])) || strlen($record['lotNumber']) > 20)
+                    //if ((!ctype_alnum($item['lotNumber'])) || (strlen($item['lotNumber']) > 20))
+                    if ((!preg_match('/^[a-zA-Z0-9!-\/:-@¥[-`{-~]+$/', $record['lotNumber'])) || (strlen($record['lotNumber']) > 20))
                     {
                         throw new Exception('invalid lotNumber format',102);
                     }
+                }
+                if( (int)$payout['countNum'] < 0 ||(int)$record['countLabelNum'] < 0)
+                {
+                    throw new Exception('invalid payout count',200);
                 }
         		$payout[$key]['countNum'] = (int)$record['countNum'] * (int)$record['countLabelNum'] ;
         		$payout[$key]['payoutCount'] = $record['countNum'];
@@ -514,8 +518,10 @@ EOM;
 				        $in_hospital_item_ids[] = $data['recordId'];
 				    }
                     $unit_price = $use_unit_price
-                        ? (str_replace(',', '', $data['unitPrice']))
-                        : (str_replace(',', '', $data['kakaku']) / $data['irisu']);
+                        ?(float)(str_replace(',', '', $data['unitPrice']))
+                        :(((float)str_replace(',', '', $data['kakaku']) == 0 || (float)$data['irisu'] == 0)
+                            ? 0 
+                            : (float)(str_replace(',', '', $data['kakaku']) / (float)$data['irisu']));
 					$insert_data[] = [
 					    'registrationTime' => $payout_date,
 						'payoutHistoryId' => $payout_id,
@@ -610,6 +616,11 @@ EOM;
                         'hospitalId' => $user_info->getHospitalId(),
         		    ];   
     		    }
+    		}
+    		
+    		if( count($insert_data) === 0 )
+    		{
+                throw new Exception('not payout data',200);
     		}
     		
     		$result = PayoutHistory::insert($insert_history_data);

@@ -97,6 +97,7 @@ class LotController extends Controller
             }
             
             $lots = $SPIRAL->getParam('lots');
+            $lots = $this->requestUrldecode($lots);
             
             $insert_data = [];
             
@@ -106,7 +107,7 @@ class LotController extends Controller
                 {
                     throw new Exception('Invalid LotData',FactoryApiErrorCode::factory(100)->getCode());
                 }
-                if((!ctype_alnum($lot['lotNumber'])) || strlen($lot['lotNumber']) > 20)
+                if ((!preg_match('/^[a-zA-Z0-9!-\/:-@¥[-`{-~]+$/', $lot['lotNumber'])) || (strlen($lot['lotNumber']) > 20))
                 {
                     throw new Exception('Invalid LotData',FactoryApiErrorCode::factory(100)->getCode());
                 }
@@ -346,7 +347,7 @@ class LotController extends Controller
                 
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => 'ロット調整ログ',
-                    'table' => '%sf:usr:search34:table%',
+                    'table' => '%sf:usr:search34:table:mstfilter%',
                     'csrf_token' => Csrf::generate(16)
                     ] , false);
             

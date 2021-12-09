@@ -9,7 +9,7 @@
 			</ul>
 			<div class="no_print uk-margin">
 				<input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
-				<?php if($user_info->isAdmin() && $tenant->tenantKind == '1'): ?>
+				<?php if($user_info->isAdmin()): ?>
 				<input class="print_hidden uk-button uk-button-primary" type="submit" value="卸業者情報変更" onclick="document.distributorChang.submit()">
 				<form action="<?php echo $api_url ?>" method="post" name="distributorChang" class="uk-hidden">
 					<input type="hidden" name="Action" value="updateDistributor">

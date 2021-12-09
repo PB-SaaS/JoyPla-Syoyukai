@@ -99,6 +99,10 @@ class ReceiptSlipController extends Controller
             $receiving_history = ReceivingHistoryView::where('hospitalId', $user_info->getHospitalId())->find($record_id)->get();
             $receiving_history = $receiving_history->data->get(0);
             
+            if($user_info->isApprover())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
             if($user_info->isUser() && $receiving_history->divisionId != $user_info->getDivisionId())
             {
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());

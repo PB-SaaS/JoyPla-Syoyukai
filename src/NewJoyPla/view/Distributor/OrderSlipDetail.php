@@ -180,8 +180,9 @@ var app = new Vue({
                 })
                 // Ajaxリクエストが成功・失敗どちらでも発動
                 .always( (data) => {
-                    loading_remove();
                 });
+                
+            }, function () {
             });
 		},
 		orderFixing: function(){
@@ -213,8 +214,9 @@ var app = new Vue({
                 })
                 // Ajaxリクエストが成功・失敗どちらでも発動
                 .always( (data) => {
-                    loading_remove();
                 });
+                
+            }, function () {
             });
 		},
 		setUsedDate: function(){

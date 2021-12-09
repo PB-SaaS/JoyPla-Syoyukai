@@ -5,9 +5,6 @@
 			    <li><a href="%url/rel:mpg:top%">TOP</a></li>
 			    <li><span>契約情報確認</span></li>
 			</ul>
-			
-			
-			
 	    	<div class='uk-width-1-1' uk-grid>
 	    		<div class="uk-width-5-6@m uk-width-2-3">
 	    			<h2>契約情報確認</h2>

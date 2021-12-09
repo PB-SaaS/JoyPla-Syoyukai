@@ -36,7 +36,7 @@
 		    				</tr>
 		    				<tr>
 		    					<td class="uk-text-bold">合計金額</td>
-		    					<td class="uk-text-right">￥<script>price("%val:usr:totalAmount%")</script> - </td>
+		    					<td class="uk-text-right">￥<script>price(fixed("%val:usr:totalAmount%"))</script> - </td>
 		    				</tr>
 		    			</table>
 			    	</div>

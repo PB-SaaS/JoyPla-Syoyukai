@@ -120,8 +120,8 @@ html {
                     $design = str_replace('%JoyPla:constantByDiv%',		($item->constantByDiv)? $item->constantByDiv : 0, $design);//払い出し先部署定数
                     $design = str_replace('%JoyPla:officialFlag%',		$officialFlag,								$design);//償還フラグ
                     $design = str_replace('%JoyPla:officialFlag:id%',   $item->officialFlag,					    $design);//償還フラグ id
-                    $design = str_replace('%JoyPla:lotNumber%',			$item->lotNumber, 		                    $design);//個数単位
-                    $design = str_replace('%JoyPla:lotDate%',			$item->lotDate, 		                    $design);//個数単位
+                    $design = str_replace('%JoyPla:lotNumber%',			$item->lotNumber, 		                    $design);//ロット
+                    $design = str_replace('%JoyPla:lotDate%',			$item->lotDate, 		                    $design);//使用期限
     
                     echo $design;
     

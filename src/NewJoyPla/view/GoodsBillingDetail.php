@@ -42,22 +42,22 @@
 		    	<div class="uk-margin" id="tablearea">
 		    		<form>
 			    		<div class="uk-overflow-auto">
-				    		<table class="uk-table uk-table-hover uk-table-middle uk-table-divider uk-text-nowrap" id="tbl-Items">
+				    		<table class="uk-table uk-table-hover uk-table-middle uk-table-divider" id="tbl-Items">
 				    			<thead>
 				    				<tr>
-										<th>NO</th>
+										<th class="uk-text-nowrap">NO</th>
 										<th style="min-width:150px">メーカー</th>
 										<th style="min-width:150px">商品名</th>
-										<th>製品コード</th>
-										<th>規格</th>
-										<th>JANコード</th>
-										<th>ロット番号</th>
-										<th>使用期限</th>
-										<th>入数</th>
-										<th>価格</th>
-										<th>単価</th>
-										<th>消費数</th>
-										<th>金額</th>
+										<th class="uk-table-expand">製品コード</th>
+										<th class="uk-table-expand">規格</th>
+										<th class="uk-table-expand">JANコード</th>
+										<th class="uk-table-expand">ロット番号</th>
+										<th class="uk-table-expand">使用期限</th>
+										<th class="uk-text-nowrap">入数</th>
+										<th class="uk-text-nowrap">価格</th>
+										<th class="uk-text-nowrap">単価</th>
+										<th class="uk-text-nowrap">消費数</th>
+										<th class="uk-text-nowrap">金額</th>
 				    				</tr>
 				    			</thead>
 				    			<tbody>
@@ -71,14 +71,14 @@
 				    						echo '<td>'.$record->itemName.'</td>';
 				    						echo '<td>'.$record->itemCode.'</td>';
 				    						echo '<td>'.$record->itemStandard.'</td>';
-				    						echo '<td>'.$record->itemJANCode.'</td>';
+				    						echo '<td class="uk-text-nowrap">'.$record->itemJANCode.'</td>';
 				    						echo '<td>'.$record->lotNumber.'</td>';
 				    						echo '<td>'.$record->lotDate.'</td>';
-				    						echo '<td>'.$record->quantity.$record->quantityUnit.'</td>';
-				    						echo '<td>￥<script>price(fixed("'.$record->price.'"))</script> / '.$record->itemUnit.'</td>';
-				    						echo '<td>￥<script>price(fixed("'.$record->unitPrice.'"))</script></td>';
-				    						echo '<td>'.$record->billingQuantity.$record->quantityUnit.'</td>';
-				    						echo '<td>￥<script>price(fixed("'.$record->billingAmount.'"))</script></td>';
+				    						echo '<td class="uk-text-nowrap">'.$record->quantity.$record->quantityUnit.'</td>';
+				    						echo '<td class="uk-text-nowrap">￥'.number_format($record->price,2).' / '.$record->itemUnit.'</td>';
+				    						echo '<td class="uk-text-nowrap">￥'.number_format($record->unitPrice,2).'</td>';
+				    						echo '<td class="uk-text-nowrap">'.$record->billingQuantity.$record->quantityUnit.'</td>';
+				    						echo '<td class="uk-text-nowrap">￥'.number_format($record->billingAmount,2).'</td>';
 				    						echo '</tr>';
 				    						$num++;
 				    					}

@@ -95,11 +95,20 @@ class UsedSlipController extends Controller
             {
                 $base = "%url/rel:mpgt:BorrowingForD%";
             }
+    
 
             $association = [];
             if($used_slip_history->usedSlipStatus == '2')
             {
                 $link = $base."&Action=approvedUsedSlip";
+            
+                if($user_info->isUser())
+                {
+                    if (preg_match("/Action=approvedUsedSlipDivision/", $_SERVER['HTTP_REFERER'])) 
+                    {
+                	    $link = $_SERVER['HTTP_REFERER'];
+                    }
+                }
                 $link_name = "貸出伝票一覧";
                 $title = 'JoyPla 貸出伝票一覧';
 
@@ -112,6 +121,13 @@ class UsedSlipController extends Controller
             else 
             {
                 $link = $base."&Action=unapprovedUsedSlip";
+                if($user_info->isUser())
+                {
+                    if (preg_match("/Action=unapprovedUsedSlipDivision/", $_SERVER['HTTP_REFERER'])) 
+                    {
+                	    $link = $_SERVER['HTTP_REFERER'];
+                    }
+                }
                 $link_name = "使用申請一覧";
                 $title = 'JoyPla 使用申請一覧';
             }
@@ -329,7 +345,7 @@ class UsedSlipController extends Controller
         $order_insert_data = [];
         foreach($used_report as $item)
         {
-            if(isset($order_insert_data[$item->inHospitalItemId]) || !$order_insert_data[$item->inHospitalItemId])
+            if(!$order_insert_data[$item->inHospitalItemId])
             {
                 $order_insert_data[$item->inHospitalItemId] = [
                     'registrationTime' => $item->usedDate,
@@ -351,9 +367,9 @@ class UsedSlipController extends Controller
                     'distributorId' => $item->distributorId,
                 ];
             }
-            $order_insert_data[$item->inHospitalItemId]['orderQuantity'] = $order_insert_data[$item->inHospitalItemId]['orderQuantity'] + (int)$item->countNum;
-            $order_insert_data[$item->inHospitalItemId]['orderPrice'] = $order_insert_data[$item->inHospitalItemId]['orderPrice'] + ( (int)$item->price * (int)$item->countNum );
-            $order_insert_data[$item->inHospitalItemId]['receivingNum'] = $order_insert_data[$item->inHospitalItemId]['receivingNum'] + (int)$item->countNum;
+            $order_insert_data[$item->inHospitalItemId]['orderQuantity'] = $order_insert_data[$item->inHospitalItemId]['orderQuantity'] + (float)$item->countNum;
+            $order_insert_data[$item->inHospitalItemId]['orderPrice'] = $order_insert_data[$item->inHospitalItemId]['orderPrice'] + ( (float)$item->price * (float)$item->countNum );
+            $order_insert_data[$item->inHospitalItemId]['receivingNum'] = $order_insert_data[$item->inHospitalItemId]['receivingNum'] + (float)$item->countNum;
         }
 
         $order_history_insert_data = [];
@@ -365,7 +381,7 @@ class UsedSlipController extends Controller
             {
                 if($insert_record['orderNumber'] === $history_data['orderHistoryId'])
                 {
-                    $order_price[] = (int)$insert_record['orderPrice'];
+                    $order_price[] = (float)$insert_record['orderPrice'];
                     if(! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids))
                     {
                         $in_hospital_item_ids[] = $insert_record['inHospitalItemId'];
@@ -405,11 +421,11 @@ class UsedSlipController extends Controller
             $receiving_insert_data[] = [
                 'registrationTime' => $item->usedDate,
                 'orderCNumber' => $orderCNumber,
-                'receivingCount' => (int)$item->countNum,
+                'receivingCount' => (float)$item->countNum,
                 'receivingHId' => $history_ids[$item->divisionId . $item->distributorId . $item->usedDate]['receivingHistoryId'],
                 'inHospitalItemId' => $item->inHospitalItemId,
-                'price' => (int)$item->price,
-                'receivingPrice' => (int)$item->price * (int)$item->countNum,
+                'price' => (float)$item->price,
+                'receivingPrice' => (float)$item->price * (float)$item->countNum,
                 'hospitalId' => $item->hospitalId,
                 'totalReturnCount' => 0,
                 'divisionId' => $item->divisionId,
@@ -430,7 +446,7 @@ class UsedSlipController extends Controller
             {
                 if($insert_record['receivingHId'] === $history_data['receivingHistoryId'])
                 {
-                    $receiving_price[] = (int)$insert_record['receivingPrice'];
+                    $receiving_price[] = (float)$insert_record['receivingPrice'];
                     if(! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids))
                     {
                         $in_hospital_item_ids[] = $insert_record['inHospitalItemId'];
@@ -455,14 +471,18 @@ class UsedSlipController extends Controller
         $billing_insert_data = [];
         foreach($used_report as $item)
         {
-            $unitPrice = ($hospital[0]->billingUnitPrice)? (int)$item->unitPrice : (int)$item->price / (int)$item->quantity;
+            $unitPrice = ($hospital[0]->billingUnitPrice)
+                ?(float)$item->unitPrice 
+                :((float)$item->price == 0 || (float)$item->quantity == 0)
+                    ? 0 
+                    : (float)$item->price / (float)$item->quantity ;
             $billing_insert_data[] = [
                 'registrationTime' => $item->usedDate,
                 'inHospitalItemId' => $item->inHospitalItemId,
                 'billingNumber' => $history_ids[$item->divisionId . $item->distributorId . $item->usedDate]['billingHistoryId'],
-                'price' => (int)$item->price,
-                'billingQuantity' => ((int)$item->quantity * (int)$item->countNum),
-                'billingAmount' => $unitPrice * ((int)$item->quantity * (int)$item->countNum),
+                'price' => (float)$item->price,
+                'billingQuantity' => ((float)$item->quantity * (float)$item->countNum),
+                'billingAmount' => $unitPrice * ((float)$item->quantity * (float)$item->countNum),
                 'hospitalId' => $item->hospitalId,
                 'divisionId' => $item->divisionId,
                 'quantity' => $item->quantity,
@@ -483,7 +503,7 @@ class UsedSlipController extends Controller
             {
                 if($insert_record['billingNumber'] === $history_data['billingHistoryId'])
                 {
-                    $total_amount[] = (int)$insert_record['billingAmount'];
+                    $total_amount[] = (float)$insert_record['billingAmount'];
                     if(! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids))
                     {
                         $in_hospital_item_ids[] = $insert_record['inHospitalItemId'];

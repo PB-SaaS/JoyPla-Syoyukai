@@ -506,7 +506,7 @@ class ReturnItemView extends Model
     const UPDATED_AT = "";
     const DELETED_AT = "";
 
-    public static $spiral_db_name = "returnData";
+    public static $spiral_db_name = "returnDatav2";
     public static $guarded = ["id"];
     public static $primary_key = "returnID";
     public static $fillable = [
@@ -532,6 +532,8 @@ class ReturnItemView extends Model
         "quantityUnit",
         "itemUnit",
         "divisionId",
+        "lotNumber",
+        "lotDate",
     ];
 
     //デフォルト値
@@ -955,7 +957,12 @@ class Hospital extends Model
     //デフォルト値
     public static $attributes = [];
 
-    public static $select = [];
+    public static $select = [
+        'receivingTarget' => [
+            '1'=>'大倉庫',
+            '2'=>'発注部署'
+            ]
+        ];
 }
 
 

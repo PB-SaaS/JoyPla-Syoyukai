@@ -1,40 +1,28 @@
 <?php
-// APIÀÜÂ³ÍÑ¥Ñ¥é¥á¡¼¥¿
 define("API_URL", "https://www.pi-pe.co.jp/api/locator");
 define("MULTIPART_BOUNDARY", "SPIRAL_API_MULTIPART_BOUNDARY");
 
 $API_TOKEN = $argv[1];
 $API_SECRET = $argv[2];
 
-// [ ¥µ¥ó¥×¥ë¤Ç¹Ô¤¦»ö ] - API¤òÍøÍÑ¤¹¤ë¤¿¤á¤ÎURL¤ò¼èÆÀ¤¹¤ë
-// [¥µ¥ó¥×¥ë¤òÆ°¤«¤¹¤¿¤á¤Î½àÈ÷]
-// PHP¤Ëcurl¥é¥¤¥Ö¥é¥ê¤¬ÁÈ¤ß¹þ¤Þ¤ì¤Æ¤¤¤ëÉ¬Í×¤¬¤¢¤ê¤Þ¤¹¡£
-// »²¹Í¡§http://www.php.net/manual/ja/intro.curl.php
-// ¥í¥±¡¼¥¿¤ÎURL (ÊÑ¹¹¤ÎÉ¬Í×¤Ï¤¢¤ê¤Þ¤»¤ó)
 $locator = API_URL;
-// APIÍÑ¤ÎHTTP¥Ø¥Ã¥À
 $api_headers = array(
 "X-SPIRAL-API: locator/apiserver/request",
 "Content-Type: application/json; charset=UTF-8",
 );
-// ¥ê¥¯¥¨¥¹¥È¥Ç¡¼¥¿¤òºîÀ®
 $parameters = array();
-$parameters["spiral_api_token"] = $API_TOKEN; //¥È¡¼¥¯¥ó
-// JSON·Á¼°¤Ë¥¨¥ó¥³¡¼¥É¤·¤Þ¤¹¡£
+$parameters["spiral_api_token"] = $API_TOKEN;
 $json = json_encode($parameters);
-// curl¥é¥¤¥Ö¥é¥ê¤ò»È¤Ã¤ÆÁ÷¿®¤·¤Þ¤¹¡£
 $curl = curl_init($locator);
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($curl, CURLOPT_POST , true);
 curl_setopt($curl, CURLOPT_POSTFIELDS , $json);
 curl_setopt($curl, CURLOPT_HTTPHEADER , $api_headers);
 curl_exec($curl);
-// ¥¨¥é¡¼¤¬¤¢¤ì¤Ð¥¨¥é¡¼ÆâÍÆ¤òÉ½¼¨
 if (curl_errno($curl)) echo curl_error($curl);
 $response = curl_multi_getcontent($curl);
 curl_close($curl);
 $response = json_decode($response , true);
-// ²èÌÌ¤ËÉ½¼¨
 if($response['code'] != 0)
 {
     var_dump($response);
@@ -43,24 +31,20 @@ if($response['code'] != 0)
 
 $API_URL = $response['location'];
 
-//¥¢¥Ã¥×¥í¡¼¥É¤¹¤ë¥Õ¥¡¥¤¥ë
 $filename = $argv[3];
 $filedata = file_get_contents($filename);
-// APIÍÑ¤ÎHTTP¥Ø¥Ã¥À
+// APIï¿½Ñ¤ï¿½HTTPï¿½Ø¥Ã¥ï¿½
 $api_headers = array(
     "X-SPIRAL-API: custom_module/upload/request",
     "Content-Type: multipart/form-data; boundary=\"" . MULTIPART_BOUNDARY . "\"",
 );
-// Á÷¿®¤¹¤ëJSON¥Ç¡¼¥¿¤òºîÀ®
 $parameters = array();
-$parameters["spiral_api_token"] = $API_TOKEN; // ¥È¡¼¥¯¥ó
-$parameters["passkey"] = time(); // ¥¨¥Ý¥Ã¥¯ÉÃ
-$parameters["dir"] = ""; // ¥Ç¥£¥ì¥¯¥È¥ê
-$parameters["compress"] = "t"; // compress
-// ½ðÌ¾¤òÉÕ¤±¤Þ¤¹
+$parameters["spiral_api_token"] = $API_TOKEN; 
+$parameters["passkey"] = time();
+$parameters["dir"] = "";
+$parameters["compress"] = "t"; 
 $key = $parameters["spiral_api_token"] . "&" . $parameters["passkey"];
 $parameters["signature"] = hash_hmac('sha1', $key, $API_SECRET, false);
-// POST¥Ç¡¼¥¿¤òÀ¸À®¤·¤Þ¤¹
 
 $postdata = "--" . MULTIPART_BOUNDARY . "\r\n";
 $postdata .= "Content-Type: application/json; charset=\"UTF-8\";\r\n";
@@ -75,7 +59,7 @@ $postdata .= $filedata;
 $postdata .= "\r\n\r\n";
 $postdata .= "--" . MULTIPART_BOUNDARY . "--\r\n";
 $postdata .= "\r\n";
-// curl¥é¥¤¥Ö¥é¥ê¤ò»È¤Ã¤ÆÁ÷¿®¤·¤Þ¤¹¡£
+// curlï¿½é¥¤ï¿½Ö¥ï¿½ï¿½ï¿½È¤Ã¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ¤ï¿½ï¿½ï¿½
 $curl = curl_init($API_URL);
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($curl, CURLOPT_POST, true);

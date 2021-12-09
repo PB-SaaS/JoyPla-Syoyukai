@@ -176,11 +176,11 @@ var nav = new Vue({
             })
             // Ajaxリクエストが失敗した時発動
             .fail( (data) => {
-            	console.log(data);
+            	//console.log(data);
             })
             // Ajaxリクエストが成功・失敗どちらでも発動
             .always( (data) => {
-            	console.log(data);
+            	//console.log(data);
             });
 		}
 	}

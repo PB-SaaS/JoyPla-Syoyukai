@@ -25,7 +25,7 @@ class PayoutSlipController extends Controller
     {
     }
     
-    public function index(): View
+    public function index()
     {
         global $SPIRAL;
         // GETで呼ばれた
@@ -114,12 +114,12 @@ class PayoutSlipController extends Controller
             
             $payout_data = Payout::where('hospitalId',$user_info->getHospitalId())->where('payoutHistoryId',$card_data->payoutHistoryId)->get();
             $payout_data = $payout_data->data->all();
-            
+            $inventory_adjustment_trdata = [];
             foreach($payout_data as $record)
     		{
     		    if($record->lotNumber && $record->lotDate)
     		    {
-                    $lot_date = \App\Lib\changeDateFormat('Y年m月d日',$item->lotDate,'Y-m-d');
+                    $lot_date = \App\Lib\changeDateFormat('Y年m月d日',$record->lotDate,'Y-m-d');
         		    $inventory_adjustment_trdata[] = [
                         'divisionId' => $record->targetDivisionId,
                         'inHospitalItemId' => $record->inHospitalItemId,
@@ -162,8 +162,12 @@ class PayoutSlipController extends Controller
     		    }
     		}
     		
-            PayoutHistory::destroy($card_data->id);
-            $result = InventoryAdjustmentTransaction::insert($inventory_adjustment_trdata);
+    		if(count($inventory_adjustment_trdata) !== 0)
+    		{
+                $result = InventoryAdjustmentTransaction::insert($inventory_adjustment_trdata);
+    		}
+    		
+            $result = PayoutHistory::destroy($card_data->id);
             
             $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['delete']);
             $content = $content->toJson();
