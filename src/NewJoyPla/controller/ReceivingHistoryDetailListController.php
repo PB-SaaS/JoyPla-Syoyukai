@@ -67,7 +67,7 @@ class ReceivingHistListController extends Controller
                         'export' => true,
                         'table' => '%sf:usr:search41:mstfilter%',
                         'csrf_token' => Csrf::generate(16),
-                        'script' => $division_script->render().($this->view('NewJoyPla/view/Script/OrderHistoryDetailList', ['distributor' => $distributor,] , false)->render())
+                        'script' => $division_script->render().($this->view('NewJoyPla/view/Script/OrderHistoryDetailList', ['distributor' => $distributor] , false)->render())
                         ] , false);
             }
     
@@ -128,13 +128,18 @@ class ReceivingHistListController extends Controller
                     $val->distributorId
                 ];
             }
+            
+            
+            $script = $this->view('NewJoyPla/view/Script/SearchTableDivisionSelect', ['division' => $division->data->all()],false)->render();
+            $script .= $this->view('NewJoyPla/view/Script/OrderHistoryDetailList', ['distributor' => $distributor,] , false)->render();
+            
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '入荷履歴詳細一覧',
                     'print' => true,
                     'export' => true,
                     'table' => '%sf:usr:search41:mstfilter%',
                     'csrf_token' => Csrf::generate(16),
-                    'script' => $division_script->render().($this->view('NewJoyPla/view/Script/OrderHistoryDetailList', ['distributor' => $distributor,] , false)->render())
+                    'script' => $script
                     ] , false);
     
         } catch ( Exception $ex ) {

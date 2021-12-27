@@ -29,6 +29,10 @@ SECRET=f2bf4a8e7b3567fdba896429ea1c136e89320175
 #TOKEN=00051ch0wBaH42eef83b68d011985615a2ed3886c947f42d57e2
 #SECRET=94d8c9199dd27752c5ac9cd67ea5aceb124b9313
 
+#JoyPla_alpha
+#TOKEN=000736Ah3I7I6064ebd817a3b53cf127cefa2b0ddd4eea7816ac
+#SECRET=13d41fa9eafac33059fc727a1e6a0706331c9638
+
 log() {
     echo "[$(date +"%Y-%m-%d %H:%M:%S")][INFO] $@" | tee -a ${LOG_OUT}
 }

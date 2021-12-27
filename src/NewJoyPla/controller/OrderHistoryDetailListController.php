@@ -70,7 +70,7 @@ class OrderHistListController extends Controller
                     'userInfo' => $user_info,
                     'csrf_token' => Csrf::generate(16),
                     'distributor' => $distributor,
-                    'script' => $division_script->render().($this->view('NewJoyPla/view/Script/OrderHistoryDetailList', ['distributor' => $distributor,] , false)->render())
+                    'script' => $division_script->render().($this->view('NewJoyPla/view/Script/OrderHistoryDetailList', ['distributor' => $distributor] , false)->render())
                     ] , false);
             }
     
@@ -96,11 +96,10 @@ class OrderHistListController extends Controller
         }
     }
     
-    public function OrderHistListForDivision(): View
+    public function OrderHistListForDivision()
     {
         global $SPIRAL;
         try {
-
             $user_info = new UserInfo($SPIRAL);
             
             if ($user_info->isDistributorUser())
@@ -131,6 +130,13 @@ class OrderHistListController extends Controller
                 ];
             }
             
+            $division_script = $this->view('NewJoyPla/view/Script/SearchTableDivisionSelect', [
+                'division' => $division->data->all()
+            ],false);
+            
+            $script = $division_script->render();
+            $script .= $this->view('NewJoyPla/view/Script/OrderHistoryDetailList', ['distributor' => $distributor] , false)->render();
+            
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '発注履歴詳細一覧',
                     'print' => true,
@@ -138,7 +144,7 @@ class OrderHistListController extends Controller
                     'table' => '%sf:usr:search17:mstfilter%',
                     'csrf_token' => Csrf::generate(16),
                     'distributor' => $distributor,
-                    'script' => $division_script->render().($this->view('NewJoyPla/view/Script/OrderHistoryDetailList', ['distributor' => $distributor,] , false)->render())
+                    'script' => $script
                     ] , false);
     
         } catch ( Exception $ex ) {
@@ -152,7 +158,6 @@ class OrderHistListController extends Controller
                 'SPIRAL' => $SPIRAL
             ], false);
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 発注履歴詳細一覧',
                 'content'   => $content->render(),
