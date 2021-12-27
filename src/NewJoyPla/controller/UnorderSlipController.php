@@ -68,12 +68,19 @@ class UnorderSlipController extends Controller
             else
             {
                 $total_price = 0;
+                $in_hospital_item_ids = [];
                 foreach($order_data as $order_item)
                 {
                     $total_price = $total_price + (float)$order_item->orderPrice;
+                    if (array_search($order_item->inHospitalItemId, $in_hospital_item_ids) === false) {
+                        $in_hospital_item_ids[] = $inHPItemid;
+                    }
                 }
                 
-                OrderHistory::where('hospitalId',$user_info->getHospitalId())->find($record_id)->update(['totalAmount'=>$total_price]);
+                OrderHistory::where('hospitalId',$user_info->getHospitalId())->find($record_id)->update([
+                    'totalAmount'=>$total_price,
+                    'itemsNumber' => count($in_hospital_item_ids),//院内商品マスタID数
+                    ]);
                 
                 foreach($order_data as $record){
                 	$ItemsToJs[$record->inHospitalItemId] = [
@@ -139,9 +146,11 @@ class UnorderSlipController extends Controller
             {
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             }
+            
             $id = (int)$SPIRAL->getCardId();
-            $comment = $SPIRAL->getParam('ordercomment');
-            $comment = urldecode($comment);
+            $comment = ($SPIRAL->getParam('ordercomment')) ? urldecode($SPIRAL->getParam('ordercomment')) : '';
+            if ($comment) { $comment = $this->html($comment); }
+            
             if(strlen($comment) > 512)
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
@@ -304,8 +313,8 @@ class UnorderSlipController extends Controller
             Csrf::validate($token,true);
 
             $id = (int)$SPIRAL->getCardId();
-            $comment = $SPIRAL->getParam('ordercomment');
-            $comment = urldecode($comment);
+            $comment = ($SPIRAL->getParam('ordercomment')) ? urldecode($SPIRAL->getParam('ordercomment')) : '';
+            if ($comment) { $comment = $this->html($comment); }
             
             if(strlen($comment) > 512)
             {
@@ -393,6 +402,10 @@ class UnorderSlipController extends Controller
         }
     }
     
+    private function html($string = '')
+    {
+        return htmlspecialchars($string, REPLACE_FLAGS, CHARSET);
+    }
 }
 /***
  * 実行

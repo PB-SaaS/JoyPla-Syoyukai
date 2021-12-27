@@ -96,6 +96,7 @@ html {
             <div id="createLabel">
             <?php 
             $num = 1 ;
+            $nowTime = date('Y年m月d日 H時i分s秒');
             foreach($receiving_items as $item){
                 $barcodeId = '';
                 $quantity = '';
@@ -142,15 +143,15 @@ html {
                     $design = str_replace('%JoyPla:quantity%',			(int)$quantity, 		                    $design);//入り数
                     $design = str_replace('%JoyPla:catalogNo%',			$item->catalogNo, 		                    $design);//カタログ名
                     $design = str_replace('%JoyPla:labelId%',			$item->labelId, 		                    $design);//ラベルID
-                    $design = str_replace('%JoyPla:printCount%',		$item->printCount,					    	$design);//印刷数
+                    //$design = str_replace('%JoyPla:printCount%',		$item->printCount,					    	$design);//印刷数
                     $design = str_replace('%JoyPla:distributorName%',	$item->distributorName,				       	$design);//卸業者名
                     $design = str_replace('%JoyPla:itemMaker%',			$item->makerName, 		                    $design);//メーカー名
                     $design = str_replace('%JoyPla:quantityUnit%',		$item->quantityUnit,	                    $design);//入数単位
-                    $design = str_replace('%JoyPla:sourceDivisionName%',$item->sourceDivisionName,				    $design);//払い出し元部署
-                    $design = str_replace('%JoyPla:sourceRackName%',	$item->sourceRackName, 					    $design);//払い出し元部署棚
+                    //$design = str_replace('%JoyPla:sourceDivisionName%',$item->sourceDivisionName,				    $design);//払い出し元部署
+                    //$design = str_replace('%JoyPla:sourceRackName%',	$item->sourceRackName, 					    $design);//払い出し元部署棚
                     $design = str_replace('%JoyPla:divisionName%',		$item->divisionName,						$design);//払い出し先部署 
-                    $design = str_replace('%JoyPla:rackName%',			$item->rackName, 							$design);//払い出し先部署棚
-                    $design = str_replace('%JoyPla:constantByDiv%',		$item->constantByDiv, 					    $design);//払い出し先部署定数
+                    //$design = str_replace('%JoyPla:rackName%',			$item->rackName, 							$design);//払い出し先部署棚
+                    //$design = str_replace('%JoyPla:constantByDiv%',		$item->constantByDiv, 					    $design);//払い出し先部署定数
                     $design = str_replace('%JoyPla:officialFlag%',		$officialFlag,								$design);//償還フラグ
                     $design = str_replace('%JoyPla:officialFlag:id%',   $item->officialFlag,					    $design);//償還フラグ id
                     $design = str_replace('%JoyPla:lotNumber%',			$item->lotNumber, 		                    $design);//ロット

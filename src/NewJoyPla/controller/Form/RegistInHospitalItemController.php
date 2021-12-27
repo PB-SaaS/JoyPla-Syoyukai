@@ -115,7 +115,8 @@ class RegistInHospitalItemController extends Controller
         }
     }
     
-    public function thank(): View
+    public function thank()
     {
+        
     }
 }

@@ -75,7 +75,6 @@ EOM;
                     		"category" => "%val:usr:category%",
                     		"catalogNo" => "%val:usr:catalogNo%",
                     		"serialNo" => "%val:usr:serialNo%",
-                    		"SMPFORM" => "%smpform:310_ORQItemC%",
                     		"priceId" => "%val:usr:priceId%",
                     		"authKey" => "%val:usr:authKey%",
                     		"itemId" => "%val:usr:itemId%",

@@ -201,7 +201,7 @@ EOM;
             $content = $this->view('NewJoyPla/view/template/FormDesign', [
                     'form_content' =>$form_content,
                     'csrf_token' => Csrf::generate(16),
-                    'breadcrumb' => $breadcrumb,
+                    /*'breadcrumb' => $breadcrumb,*/
                     ] , false);
         
         } catch ( Exception $ex ) {

@@ -7,7 +7,8 @@ use Exception;
 
 class Auth extends TenantMaster
 {
-
+	public $id;
+	public $authority;
     public function __construct(){
         global $SPIRAL;
         

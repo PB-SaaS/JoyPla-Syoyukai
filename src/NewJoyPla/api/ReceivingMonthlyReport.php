@@ -164,8 +164,6 @@ class ReceivingMonthlyReport{
         }
         return $ReturnCount;
     }
-*/
-    
     private function getInformationByPrice(string $inHospitalItemId){
         $disAndPriceArray = array();
         $receivingDataByPrice = array("price" => array(), "quantity" => array(), "receivingCount" => array(), "returnCount" => array(), "totalAmount" => array(), "adjAmount" => array(), "itemUnit" => array(), "distributorName" => array());
@@ -224,3 +222,4 @@ class ReceivingMonthlyReport{
         return $this->spiralDataBase->doSelect();
     }
 }
+*/

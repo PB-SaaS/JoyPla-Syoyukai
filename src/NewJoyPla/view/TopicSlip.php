@@ -155,6 +155,7 @@ var app = new Vue({
 		        .always( (data) => {
 		        	loading_remove();
 		        });
+			}, function () {
 			});
 		},
 		commentDelete: function(commentId)
@@ -199,6 +200,7 @@ var app = new Vue({
 					vm.canAjax = true;
 		        	loading_remove();
 		        });
+			}, function () {
 			});
 		},
 		getComment: function()

@@ -22,3 +22,4 @@ if($result['code'] != '0'){
 }
 //結果を返却
 echo json_encode(array('result'=>true,'data'=>$result['data']));
+*/

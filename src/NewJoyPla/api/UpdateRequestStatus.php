@@ -71,6 +71,7 @@ class UpdateRequestStatus{
          *  6	却下
          *  7	採用
          */
+        /**
         $recordCount = count($reqItemData);
         $rec = 0;
         $not = 0;
@@ -122,6 +123,7 @@ class UpdateRequestStatus{
          * 1	採用
          * 2	不採用
          */
+         /**
         $this->spiralDatabase->setDataBase($this->childDatabase);
         $this->spiralDatabase->addSelectFields('id','requestFlg');
         $this->spiralDatabase->addSearchCondition('requestId',$requestId);
@@ -133,6 +135,7 @@ class UpdateRequestStatus{
          * 1	採用
          * 2	不採用
          */
+         /**
         $this->spiralDatabase->setDataBase($this->childDatabase2);
         $this->spiralDatabase->addSelectFields('id','requestFlg');
         $this->spiralDatabase->addSearchCondition('requestId',$requestId);
@@ -163,3 +166,5 @@ class UpdateRequestStatus{
         return $this->spiralDatabase->doSelect();
     }
 }
+
+*/

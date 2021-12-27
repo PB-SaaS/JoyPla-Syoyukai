@@ -9,6 +9,7 @@ use Csrf;
 
 use App\Lib\UserInfo;
 use App\Model\Distributor;
+use App\Model\Division;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -43,6 +44,13 @@ class OrderHistListController extends Controller
             }
             else
             {
+                
+                $division = Division::where('hospitalId',$user_info->getHospitalId())->get();
+                
+                $division_script = $this->view('NewJoyPla/view/Script/SearchTableDivisionSelect', [
+                    'division' => $division->data->all()
+                ],false);
+                
                 $distributor_data = Distributor::where('hospitalId',$user_info->getHospitalId())->get();
                 $distributor_data = $distributor_data->data->all();
                 $distributor = [];
@@ -62,7 +70,7 @@ class OrderHistListController extends Controller
                     'userInfo' => $user_info,
                     'csrf_token' => Csrf::generate(16),
                     'distributor' => $distributor,
-                    'script' => $this->view('NewJoyPla/view/Script/OrderHistoryDetailList', ['distributor' => $distributor,] , false)->render()
+                    'script' => $division_script->render().($this->view('NewJoyPla/view/Script/OrderHistoryDetailList', ['distributor' => $distributor,] , false)->render())
                     ] , false);
             }
     
@@ -110,6 +118,8 @@ class OrderHistListController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             }
     
+            $division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
+            
             $distributor_data = Distributor::where('hospitalId',$user_info->getHospitalId())->get();
             $distributor_data = $distributor_data->data->all();
             $distributor = [];
@@ -120,7 +130,7 @@ class OrderHistListController extends Controller
                     $val->distributorId
                 ];
             }
-
+            
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '発注履歴詳細一覧',
                     'print' => true,
@@ -128,7 +138,7 @@ class OrderHistListController extends Controller
                     'table' => '%sf:usr:search17:mstfilter%',
                     'csrf_token' => Csrf::generate(16),
                     'distributor' => $distributor,
-                    'script' => $this->view('NewJoyPla/view/Script/OrderHistoryDetailList', ['distributor' => $distributor,] , false)->render()
+                    'script' => $division_script->render().($this->view('NewJoyPla/view/Script/OrderHistoryDetailList', ['distributor' => $distributor,] , false)->render())
                     ] , false);
     
         } catch ( Exception $ex ) {

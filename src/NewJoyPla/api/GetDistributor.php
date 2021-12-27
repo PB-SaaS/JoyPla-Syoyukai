@@ -99,4 +99,4 @@ class GetDistributor{
     $this->spiralDataBase->addSearchCondition('hospitalId',$this->userInfo->getHospitalId());
     return $this->spiralDataBase->doSelect();
   }
-}
+}*/

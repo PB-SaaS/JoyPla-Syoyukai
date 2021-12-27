@@ -170,7 +170,7 @@
 	}
 
 	function makeDivitionSelect(){
-   		let selectval = $('#divisionName').val();
+   		let selectval = $('#divisionId').val();
 		//html = '<input type="number" class="uk-input" style="width:72px" step="10">';
 	    html = document.createElement("div");
 	    select = document.createElement("select");
@@ -189,12 +189,12 @@
 		Object.keys(divisitonData).forEach(function (key) {
 		    
 		    option = document.createElement("option");
-		    option.value = divisitonData[key].divisionName;
+		    option.value = divisitonData[key].divisionId;
 		    option.text = divisitonData[key].divisionName;
 		    //input.step = listObject[object.recordId].irisu;
 		    //<span class="uk-text-bottom">個</span>
 		    
-		    if(divisitonData[key].divisionName == selectval){
+		    if(divisitonData[key].divisionId == selectval){
 		    	option.selected = 'selected';
 		    }
 			select.appendChild(option);
@@ -202,11 +202,11 @@
 	
 		html.appendChild(select);
 		
-		$('#divisionNameDiv').append(html);
+		$('#divisionIdDiv').append(html);
 	}
    
 	function onchangeSelect(val){
-		$('#divisionName').val(val);
+		$('#divisionId').val(val);
 	}
 
 	let itemsToJs = {};

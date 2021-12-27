@@ -117,7 +117,7 @@ class RegistTopicController extends Controller
                     'login_url' => TENANT_ADMIN_LOGIN_URL,
                 ] , false)->render();
                 
-                $select_name = $this->makeId($topic->tenantId);
+                $select_name = $this->makeId($tenantId);
     
                 $test = TenantMaster::selectName($select_name)->rule([
                     'name'=>'tenantId',

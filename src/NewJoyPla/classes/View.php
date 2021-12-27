@@ -2,6 +2,7 @@
 class View {
 
     protected $file = null;
+    public $data = [];
     public function __construct(string $file = null , array $data = array() , bool $filter = true )
     {
         $this->file = $file;

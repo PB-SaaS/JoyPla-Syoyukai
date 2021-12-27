@@ -33,6 +33,7 @@ class RegItemsBlukIns{
         /**
          * ここに処理を書く
          */
+        /*
         $columns = array("itemName","itemCode","itemStandard","itemJANCode","makerName","officialFlag","officialpriceOld","officialprice","quantity","quantityUnit","itemUnit","minPrice","tenantId");
         
         $this->spiralDataBase->setDataBase($this->database);
@@ -54,4 +55,4 @@ class RegItemsBlukIns{
 		return $result;
 	}
 }
- 
+ */

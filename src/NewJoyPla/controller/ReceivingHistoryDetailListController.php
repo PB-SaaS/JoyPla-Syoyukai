@@ -8,6 +8,8 @@ use ApiResponse;
 use Csrf;
 
 use App\Lib\UserInfo;
+use App\Model\Distributor;
+use App\Model\Division;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -42,12 +44,30 @@ class ReceivingHistListController extends Controller
             }
             else
             {
+                    
+                $division = Division::where('hospitalId',$user_info->getHospitalId())->get();
+                
+                $division_script = $this->view('NewJoyPla/view/Script/SearchTableDivisionSelect', [
+                    'division' => $division->data->all()
+                ],false);
+                
+                $distributor_data = Distributor::where('hospitalId',$user_info->getHospitalId())->get();
+                $distributor_data = $distributor_data->data->all();
+                $distributor = [];
+                foreach ($distributor_data as $val)
+                {
+                    $distributor[] = [
+                        $val->distributorName,
+                        $val->distributorId
+                    ];
+                }
                 $content = $this->view('NewJoyPla/view/template/List', [
                         'title' => '入荷履歴詳細一覧',
                         'print' => true,
                         'export' => true,
                         'table' => '%sf:usr:search41:mstfilter%',
                         'csrf_token' => Csrf::generate(16),
+                        'script' => $division_script->render().($this->view('NewJoyPla/view/Script/OrderHistoryDetailList', ['distributor' => $distributor,] , false)->render())
                         ] , false);
             }
     
@@ -95,13 +115,26 @@ class ReceivingHistListController extends Controller
             {
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             }
-    
+            
+            $division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
+            
+            $distributor_data = Distributor::where('hospitalId',$user_info->getHospitalId())->get();
+            $distributor_data = $distributor_data->data->all();
+            $distributor = [];
+            foreach ($distributor_data as $val)
+            {
+                $distributor[] = [
+                    $val->distributorName,
+                    $val->distributorId
+                ];
+            }
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '入荷履歴詳細一覧',
                     'print' => true,
                     'export' => true,
                     'table' => '%sf:usr:search41:mstfilter%',
                     'csrf_token' => Csrf::generate(16),
+                    'script' => $division_script->render().($this->view('NewJoyPla/view/Script/OrderHistoryDetailList', ['distributor' => $distributor,] , false)->render())
                     ] , false);
     
         } catch ( Exception $ex ) {

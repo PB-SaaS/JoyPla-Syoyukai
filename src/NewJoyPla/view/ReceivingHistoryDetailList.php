@@ -1,4 +1,5 @@
 <?php
+/*
 include_once "NewJoyPla/lib/UserInfo.php";
 include_once "NewJoyPla/lib/Func.php";
 $userInfo = new App\Lib\UserInfo($SPIRAL);
@@ -42,3 +43,4 @@ if($userInfo->isUser() && $myPageID != ''){
 	</div>
 </body>
 </html>
+*/

@@ -121,7 +121,7 @@ class RegistUserInfoController extends Controller
         }
     }
     
-    public function thank(): View
+    public function thank()
     {
     }
     

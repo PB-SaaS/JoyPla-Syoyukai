@@ -39,7 +39,7 @@ class StocksController extends Controller
                 $select_distributor[] = ['text'=> $d->distributorName ,'value'=> $d->distributorName ];
             }
             $content = $this->view('NewJoyPlaTenantAdmin/view/Stocks/Index', [
-                'error' => $error,
+                //'error' => $error,
                 ] , false)->render();
             
         } catch ( Exception $ex ) {
@@ -88,7 +88,7 @@ class StocksController extends Controller
                 $select_hospital[] = ['text'=> $h->hospitalName ,'value'=> $h->hospitalName ];
             }
             $content = $this->view('NewJoyPlaTenantAdmin/view/Stocks/Lots', [
-                'error' => $error,
+                //'error' => $error,
                 ] , false)->render();
             
         } catch ( Exception $ex ) {

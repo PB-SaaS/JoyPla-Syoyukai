@@ -15,3 +15,4 @@ $spiralDataBase = new App\Lib\SpiralDataBase($SPIRAL,$spiralApiCommunicator,$spi
 
 $updateRequestStatus = new \App\Api\UpdateRequestStatus($spiralDataBase);
 $updateRequestStatus->hospitalCheck($SPIRAL->getContextByFieldTitle("requestId"));
+*/

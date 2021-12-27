@@ -121,8 +121,8 @@ namespace field {
                     return TextArea512Bytes::of($value);
                 case TextArea1024Bytes::FIELD_NAME:
                     return TextArea1024Bytes::of($value);
-                case TextArea4096bytes::FIELD_NAME:
-                    return TextArea4096bytes::of($value);
+                case TextArea4096Bytes::FIELD_NAME:
+                    return TextArea4096Bytes::of($value);
                 case Select::FIELD_NAME:
                     return Select::of($value);
                 case Currency::FIELD_NAME:

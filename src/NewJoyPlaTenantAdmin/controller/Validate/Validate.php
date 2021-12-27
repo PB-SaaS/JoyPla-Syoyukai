@@ -15,6 +15,10 @@ use function validate\isValueEmpty;
 abstract class FieldTypeValidate
 {
     protected $tryDbFieldList;
+    
+    public $dbFieldInfo = [];
+    public $startRowNumber = 0;
+    public $rowData = [];
 
     public function __construct() {
         $this->tryDbFieldList = new TryList();

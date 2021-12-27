@@ -1,4 +1,5 @@
 <?php
+/*
 include_once 'NewJoyPla/lib/ApiSpiral.php';
 include_once "NewJoyPla/lib/Define.php";
 include_once "NewJoyPla/lib/SpiralDataBase.php";
@@ -98,3 +99,4 @@ if($userInfo->isUser() && $myPageID != ''){
 	</script>
 </body>
 </html>
+*/

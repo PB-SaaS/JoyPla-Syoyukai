@@ -560,9 +560,9 @@ class BorrowingController extends Controller
 
             $used_slip_create_data = $this->usedSlipHisotoyRegist($borrowing_regist_result->insert_data , 1);
 
-            $all_create_data = $this->usedReportApi($borrowing_regist_result->insert_data);
+            //$all_create_data = $this->usedReportApi($borrowing_regist_result->insert_data);
 
-            $result = $this->association($used_slip_create_data['ids'],$all_create_data['ids']);
+            //$result = $this->association($used_slip_create_data['ids'],$all_create_data['ids']);
         
             $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
             $content = $content->toJson();
@@ -619,7 +619,7 @@ class BorrowingController extends Controller
             $quantityUnit = '';
             $itemUnit = '';
             $distributorId = '';
-            foreach($this->in_hospital_items->data as $in_hp_item)
+            foreach($this->in_hospital_items->data->all() as $in_hp_item)
             {
                 if($item->inHospitalItemId == $in_hp_item->inHospitalItemId)
                 {
@@ -820,7 +820,7 @@ class BorrowingController extends Controller
         foreach($borrowing_data as $borrowing_key => $data)
         {
             $used_report[$borrowing_key] = new StdClass;
-            foreach($this->in_hospital_items->data as $key => $val)
+            foreach($this->in_hospital_items->data->all() as $key => $val)
             {
                 if($val->inHospitalItemId == $data->inHospitalItemId)
                 {
@@ -1077,6 +1077,7 @@ class BorrowingController extends Controller
             Csrf::validate($token,true);
 
             $user_info = new UserInfo($SPIRAL);
+            $all_create_data = [];
 
             $used_ids = $SPIRAL->getParam('used_ids');
             $used_date = $SPIRAL->getParam('used_date');

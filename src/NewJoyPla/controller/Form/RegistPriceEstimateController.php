@@ -62,7 +62,7 @@ class RegistPriceEstimateController extends Controller
         global $SPIRAL;
         try {
             $content = $this->view('NewJoyPla/view/Form/RegistPriceEstimate/Confirm', [
-                    'distributorName' => $distributor_data->distributorName,
+                    /*'distributorName' => $distributor_data->distributorName,*/
                     'csrf_token' => Csrf::generate(16),
                     'top_page_link' => $SPIRAL->getParam('topPageLink'),
                     'list_link' => $SPIRAL->getParam('list_link'),

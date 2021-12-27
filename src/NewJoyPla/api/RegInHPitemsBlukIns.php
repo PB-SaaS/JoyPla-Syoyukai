@@ -105,6 +105,7 @@ class RegInHPitemsBlukIns{
         /**
          * ここに処理を書く
          */
+        /**
         $columns = array("itemId","distributorId","catalogNo","serialNo","quantity","itemUnit","medicineCategory","homeCategory","notUsedFlag","notice","labelId","hospitalId");
         
         $this->spiralDataBase->setDataBase($this->database);
@@ -127,3 +128,5 @@ class RegInHPitemsBlukIns{
 	}
 }
  
+
+*/

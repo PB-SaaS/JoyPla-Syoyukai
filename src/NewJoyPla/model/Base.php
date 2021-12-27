@@ -371,7 +371,11 @@ class ReceivingView extends Model
         "unitPrice",
         "orderQuantity",
         "orderPrice",
-        "category"
+        "category",
+        "minPrice",
+        "officialFlag",
+        "labelId",
+        "catalogNo",
     ];
 
     //デフォルト値
@@ -708,7 +712,7 @@ class PayoutHistory extends Model
 class Item extends Model
 {
     const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
+    const UPDATED_AT = "updateTime";
     const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_itemDB";
@@ -739,7 +743,8 @@ class Item extends Model
         "catalogNo",
         "serialNo",
         "lotManagement",
-        "category"
+        "category",
+        "updateTime"
     ];
 
     //デフォルト値
@@ -890,8 +895,9 @@ class InHospitalItemView extends Model
         "unitPrice",
         "measuringInst",
         "lotManagement",
-        "category"
-
+        "category",
+        "tenantId"
+   
     ];
 
     //デフォルト値
@@ -992,7 +998,8 @@ class HospitalUser extends Model
         "termsAgreement",
         "tenantId",
         "agreementDate",
-        "hospitalAuthKey"
+        "hospitalAuthKey",
+        "userCheck"
     ];
 
     //デフォルト値
@@ -1063,6 +1070,7 @@ class DistributorUser extends Model
         "termsAgreement",
         "agreementDate",
         "affiliationId",
+        "userCheck"
     ];
 
     //デフォルト値
@@ -1425,7 +1433,8 @@ class OrderedItemView extends Model
         "minPrice",
         "orderStatus",
         "itemId",
-        "lotManagement"
+        "lotManagement",
+        "category"
     ];
 
     //デフォルト値
@@ -1498,7 +1507,8 @@ class Inventory extends Model
         "lotDate",
         "lotUniqueKey",
         "unitPrice",
-        "invUnitPrice"
+        "invUnitPrice",
+        "inventoryStatus"
     ];
 
     //デフォルト値
@@ -1808,6 +1818,8 @@ class PriceView extends Model
         "catalogNo",
         "serialNo",
         "category",
+        "lotManagement",
+        "tenantId"
     ];
 
     //デフォルト値
@@ -1855,7 +1867,8 @@ class QuoteItem extends Model
         "officialpriceOld",
         "catalogNo",
         "serialNo",
-        "category"
+        "category",
+        "lotManagement"
     ];
 
     //デフォルト値
@@ -2088,6 +2101,8 @@ class PriceUpsertTrDB extends Model
         "itemCode",
         "itemStandard",
         "itemJANCode",
+        "requestFlg",
+        "requestId"
     ];
 
     //デフォルト値

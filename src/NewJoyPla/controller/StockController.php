@@ -153,21 +153,21 @@ class StockController extends Controller
             $stock_instance = Stock::where('hospitalId',$user_info->getHospitalId());
             $items = [];
             
-            if( $stock['stockCountNum'] && ( (int)$stock['stockCountNum'] > 2147483647 || (int)$stock['stockCountNum'] < -2147483647 ))
-            {
-                throw new Exception('stockCountNum: validate error',100); //ERRORはそのうちまとめて定義します・・・
-            }
-            if( $stock['constantByDiv'] && ( (int)$stock['constantByDiv'] > 2147483647 || (int)$stock['constantByDiv'] < -2147483647 ))
-            {
-                throw new Exception('constantByDiv: validate error',100);
-            }
-            
-            if( $stock['rackName'] && strlen($stock['rackName']) > 64 )
-            {
-                throw new Exception('rackName: validate error',100);
-            }
             foreach($stocks as $stock)
             {
+                if( $stock['stockCountNum'] && ( (int)$stock['stockCountNum'] > 2147483647 || (int)$stock['stockCountNum'] < -2147483647 ))
+                {
+                    throw new Exception('stockCountNum: validate error',100); //ERRORはそのうちまとめて定義します・・・
+                }
+                if( $stock['constantByDiv'] && ( (int)$stock['constantByDiv'] > 2147483647 || (int)$stock['constantByDiv'] < -2147483647 ))
+                {
+                    throw new Exception('constantByDiv: validate error',100);
+                }
+                
+                if( $stock['rackName'] && strlen($stock['rackName']) > 64 )
+                {
+                    throw new Exception('rackName: validate error',100);
+                }
                 $insert_data[] = [
                     'divisionId'=>$division_id,
                     'inHospitalItemId'=>$stock['recordId'],

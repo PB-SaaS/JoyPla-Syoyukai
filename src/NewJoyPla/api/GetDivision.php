@@ -57,4 +57,4 @@ class GetDivision{
         $this->spiralDataBase->addSearchCondition('divisionType','1');
         return $this->spiralDataBase->doSelectLoop();
     }
-}
+}*/

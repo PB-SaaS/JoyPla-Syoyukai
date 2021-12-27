@@ -78,6 +78,7 @@ html {
             <div id="createLabel">
             <?php 
             $num = 1 ;
+            $nowTime = date('Y年m月d日 H時i分s秒');
             foreach($payout_items as $item){
 				$max = (int)$item->payoutLabelCount;
 				
@@ -108,8 +109,8 @@ html {
                     $design = str_replace('%JoyPla:itemUnit%',			$item->itemUnit, 		                    $design);//個数単位
                     $design = str_replace('%JoyPla:quantity%',			$item->payoutCount, 		                $design);//入り数
                     $design = str_replace('%JoyPla:catalogNo%',			$item->catalogNo, 		                    $design);//カタログ名
-                    //$design = str_replace('%JoyPla:labelId%',			$item->labelId, 		                    $design);//ラベルID
-                    //$design = str_replace('%JoyPla:printCount%',		$item->printCount,					    	$design);//印刷数
+                    $design = str_replace('%JoyPla:labelId%',			$item->labelId, 		                    $design);//ラベルID
+                    $design = str_replace('%JoyPla:printCount%',		$item->payoutLabelCount,					$design);//印刷数
                     $design = str_replace('%JoyPla:distributorName%',	$item->distributorName,				       	$design);//卸業者名
                     $design = str_replace('%JoyPla:itemMaker%',			$item->makerName, 		                    $design);//メーカー名
                     $design = str_replace('%JoyPla:quantityUnit%',		$item->quantityUnit,	                    $design);//入数単位

@@ -128,8 +128,7 @@ class RegistItemPriceController extends Controller
         }
     }
     
-    public function thank(): View
+    public function thank()
     {
-        global $SPIRAL;
     }
 }

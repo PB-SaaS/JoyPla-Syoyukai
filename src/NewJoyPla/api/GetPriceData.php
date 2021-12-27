@@ -33,4 +33,4 @@ class GetPriceData{
         return $this->spiralDataBase->arrayToNameArray($result['data'],$this->column);
     }
 
-}
+}*/

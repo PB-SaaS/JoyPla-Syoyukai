@@ -45,7 +45,7 @@ class BlukUpsertItemsSlipController extends Controller
             }
             
             $content = $this->view('NewJoyPlaTenantAdmin/view/BlukUpsertItemsLogs/Slip', [
-                'api_url' => $api_url,
+                //'api_url' => $api_url,
                 'csrf_token' => Csrf::generate(16)
                 ] , false)->render();
             

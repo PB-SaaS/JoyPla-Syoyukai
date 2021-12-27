@@ -108,7 +108,7 @@ class UpdateInHospitalItemController extends Controller
             $content = $this->view('NewJoyPla/view/Form/UpdateInHospitalItem/Confirm', [
                     'csrf_token' => Csrf::generate(16),
                     'price' => $price,
-                    'ticket' => $ticket,
+                    //'ticket' => $ticket,
                     'oldPrice' => $SPIRAL->getParam('oldPrice') ,
                     'oldUnitPrice' => $SPIRAL->getParam('oldUnitPrice'),
                     ] , false);
@@ -236,7 +236,7 @@ class UpdateInHospitalItemController extends Controller
             $content = $this->view('NewJoyPla/view/Form/UpdateInHospitalItem/Thank', [
                     'csrf_token' => Csrf::generate(16),
                     'price' => $price,
-                    'ticket' => $ticket,
+                    //'ticket' => $ticket,
                     'oldPrice' => $SPIRAL->getParam('oldPrice') ,
                     'oldUnitPrice' => $SPIRAL->getParam('oldUnitPrice'),
                     ] , false);

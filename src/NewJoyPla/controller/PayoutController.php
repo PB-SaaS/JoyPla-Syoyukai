@@ -279,7 +279,7 @@ class PayoutController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
             
-            if($user_info->isAdmin())
+            if($user_info->isAdmin() || $user_info->isApprover())
             {
                 $payout_items = PayoutView::where('payoutHistoryId', $payout_history_id)->where('hospitalId',$user_info->getHospitalId())->get();
                 $payout_items = $payout_items->data->all();
@@ -352,10 +352,10 @@ class PayoutController extends Controller
         
             if($hospital_data->labelDesign2 != '')
             {
-                $default_design = htmlspecialchars_decode($hospital_data->labelDesign1);
+                $default_design = htmlspecialchars_decode($hospital_data->labelDesign2);
             }
             $content = $this->view('NewJoyPla/view/PayoutLabel', [
-                'api_url' => $api_url,
+                //'api_url' => $api_url,
                 'user_info' => $user_info,
                 'payout_items' => $payout_items,
                 'default_design' => $default_design

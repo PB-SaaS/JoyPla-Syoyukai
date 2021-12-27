@@ -37,4 +37,4 @@ class GetStock{
 		return $this->spiralDataBase->doSelectLoop();
 	}
 
-}
+}*/

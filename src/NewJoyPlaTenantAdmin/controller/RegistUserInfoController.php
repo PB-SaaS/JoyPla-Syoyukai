@@ -61,7 +61,7 @@ class RegistUserInfoController extends Controller
             $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [] , false)->render();
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            return $this->view('NewJoyPla/view/template/Template', [
+            return $this->view('NewJoyPlaTenantAdmin/view/Template/FormBase', [
                 'title'     => 'JoyPla 病院ユーザー情報登録 - 入力',
                 'content'   => $content,
                 'head' => $head,
@@ -96,7 +96,7 @@ class RegistUserInfoController extends Controller
             $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [] , false)->render();
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            return $this->view('NewJoyPla/view/Template/FormBase', [
+            return $this->view('NewJoyPlaTenantAdmin/view/Template/FormBase', [
                 'title'     => 'JoyPla 病院ユーザー情報登録 - 確認',
                 'content'   => $content,
                 'head' => $head,
@@ -105,7 +105,7 @@ class RegistUserInfoController extends Controller
         }
     }
     
-    public function thank(): View
+    public function thank()
     {
     }
     

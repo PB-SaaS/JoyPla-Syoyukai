@@ -18,3 +18,4 @@ $card = $cardInfo->select("NJ_QRequestDB",$SPIRAL->getCardId(),"requestId","requ
 
 $updateRequestStatus = new \App\Api\UpdateRequestStatus($spiralDataBase);
 $updateRequestStatus->hospitalCheck($card["data"][0][0]);
+*/

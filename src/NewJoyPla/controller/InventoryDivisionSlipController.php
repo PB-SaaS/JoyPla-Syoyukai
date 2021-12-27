@@ -213,12 +213,12 @@ class InventoryDivisionSlipController extends Controller
             Csrf::validate($token,true);
 
             $user_info = new UserInfo($SPIRAL);
-            
+            /*
             if($user_info->isUser())
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
-            
+            */
             $record_id = (int)$SPIRAL->getCardId();
             
             $inventory_history = InventoryHistory::where('hospitalId',$user_info->getHospitalId())->find($record_id)->get();
@@ -227,7 +227,7 @@ class InventoryDivisionSlipController extends Controller
             $end_slip = InventoryEnd::where('hospitalId',$user_info->getHospitalId())->where('inventoryEndId',$inventory_history->inventoryEndId)->get();
             $end_slip = $end_slip->data->get(0);
             
-            if($end_slip->inventoryStatus == 2)
+            if($end_slip->inventoryStatus == 2 && ( $user_info->isUser() && $user_info->getDivisionId() !== $inventory_history->divisionId ))
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }

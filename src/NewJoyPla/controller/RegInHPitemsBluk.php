@@ -22,3 +22,4 @@ if($blukinsertData['code'] != "0"){
 }
 //結果を返却
 echo json_encode(array('result'=>$result,'response'=>$blukinsertData));
+*/

@@ -39,6 +39,7 @@ EOM;
         		"authkey" => "%val:usr:authkey%",
                 "user_id" => "%val:@sys:id%",
                 "user_auth_key" => "%val:@usr:authKey%",
+			    "hospitalId" => "%val:usr:hospitalId%",
                 ];
                 
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [

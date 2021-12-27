@@ -44,7 +44,7 @@ class TopicSlipController extends Controller
             $content = $this->view('NewJoyPla/view/TopicSlip', [
                 'title' => 'トピック',
                 'link' => $link,
-                'return_items' => $return_items,
+                //'return_items' => $return_items,
                 'csrf_token' => Csrf::generate(16)
                 ] , false);
     

@@ -195,6 +195,7 @@ class InventoryController extends Controller
             $stock_taking_trdata = [];
             
             //在庫として存在するものを０で登録する
+            /*
             $stock = StockView::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$divisionId);
             
             foreach ($inventory as $data)
@@ -234,7 +235,7 @@ class InventoryController extends Controller
                     'lotUniqueKey' => $user_info->getHospitalId().$divisionId.$data->inHospitalItemId.''.''
                 ];
             }
-            
+            */
             foreach ($inventory as $data)
             {
                 if( (int)$data['countNum']  >= 0 )
@@ -429,7 +430,7 @@ class InventoryController extends Controller
                 }
             }
 
-            $content = new ApiResponse($data , count($data) , 0 , $result->message, ['getLotAndStockApi']);
+            $content = new ApiResponse($data , count($data) , 0 , "OK", ['getLotAndStockApi']);
             $content = $content->toJson();
             
         } catch ( Exception $ex ) {
@@ -464,7 +465,7 @@ class InventoryController extends Controller
             }
             
             $content = $this->view('NewJoyPla/view/InventoryHistoryList', [
-                'api_url' => $api_url,
+                //'api_url' => $api_url,
                 'user_info' => $user_info,
                 'csrf_token' => Csrf::generate(16)
                 ] , false);

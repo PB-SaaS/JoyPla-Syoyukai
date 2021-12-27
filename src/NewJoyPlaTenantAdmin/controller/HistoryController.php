@@ -201,7 +201,7 @@ class HistoryController extends Controller
         } finally {
             $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [
                 'select_hospital'=>$select_hospital,
-                'select_distributor'=>$select_distributor,
+                //'select_distributor'=>$select_distributor,
                 ] , false)->render();
             $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [] , false)->render();
             $sidemenu = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/SideMenu', [

@@ -11,7 +11,7 @@ use App\Model\Distributor;
 use App\Model\AllNewItemInsert;
 use App\Model\Item;
 
-use validate\AllNewItemInsertDB;
+use Validate\AllNewItemInsertDB;
 use stdClass;
 use Exception;
 

@@ -33,7 +33,7 @@ class ReceivingLabelController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
             
-            if($user_info->isAdmin())
+            if($user_info->isAdmin() || $user_info->isApprover())
             {
                 $receiving_items = ReceivingView::where('receivingHId', $receiving_id)->where('hospitalId',$user_info->getHospitalId())->get();
                 $receiving_items = $receiving_items->data->all();
@@ -47,7 +47,7 @@ class ReceivingLabelController extends Controller
             $hospital_data = $hospital_data->data->get(0);
         
             $content = $this->view('NewJoyPla/view/ReceivingLabel', [
-                'api_url' => $api_url,
+                //'api_url' => $api_url,
                 'user_info' => $user_info,
                 'receiving_items' => $receiving_items,
                 'hospital_data' => $hospital_data

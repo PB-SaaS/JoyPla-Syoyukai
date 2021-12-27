@@ -224,7 +224,7 @@ class ReceiptSlipController extends Controller
                 $divisionId = $division->divisionId;
             }
             if($hospital->receivingTarget == '2'){ //発注部署
-                $divisionId = $card->divisionId;
+                $divisionId = $receiving_history->divisionId;
             }
         	
         	$return_insert = [];

@@ -24,7 +24,10 @@ use App\Lib\SpiralTable;
 
 class BarcodeSearchController extends Controller
 {
-
+      public $card_title = [];
+      public $jsessonId = '';
+      public $my_area_title = '';
+      public $spiral_table = '';
       public function __construct()
       {
             global $SPIRAL;

@@ -377,6 +377,7 @@
 	                type:"POST",
 	                data:{
 	                	_csrf : '<?php echo $csrf_token ?>',
+	                	ordercomment : encodeURI($("textarea[name='ordercomment']").val()),
 	                	Action : 'orderFix',
 	                },
 	                dataType: "json"

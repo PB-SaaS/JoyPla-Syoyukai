@@ -76,10 +76,10 @@ class OrderSlipDetailController extends Controller
                 'orderResetButton' => (int)( $card->orderStatus == 3 || $card->orderStatus == 4 ),
                 'orderFixingButton' => (int)( $card->orderStatus == 2 ),
                 'orderItems' => $order_items,
-                'pattern' => $pattern,
+                /*'pattern' => $pattern,*/
                 'link_title' => $link_title,
                 'link' => $link,
-                'cardId' => $cardId
+                /*'cardId' => $cardId*/
             ] , false);
 
         } catch ( Exception $ex ) {

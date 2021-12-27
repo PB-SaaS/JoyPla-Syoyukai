@@ -8,6 +8,7 @@ use ApiResponse;
 use Csrf;
 
 use App\Lib\UserInfo;
+use App\Model\Division;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -42,12 +43,20 @@ class ConsumeHistListController extends Controller
             }
             else
             {
+                
+                $division = Division::where('hospitalId',$user_info->getHospitalId())->get();
+                
+                $division_script = $this->view('NewJoyPla/view/Script/SearchTableDivisionSelect', [
+                    'division' => $division->data->all()
+                ],false);
+                
                 $content = $this->view('NewJoyPla/view/template/List', [
                         'title' => '消費履歴詳細一覧',
                         'print' => true,
                         'export' => true,
                         'table' => '%sf:usr:search15:mstfilter%',
                         'csrf_token' => Csrf::generate(16),
+                        'script' => $division_script->render(),
                         ] , false);
             }
     
@@ -95,6 +104,13 @@ class ConsumeHistListController extends Controller
             {
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             }
+            
+            
+            $division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
+            
+            $division_script = $this->view('NewJoyPla/view/Script/SearchTableDivisionSelect', [
+                'division' => $division->data->all()
+            ],false);
     
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '消費履歴詳細一覧',
@@ -102,6 +118,7 @@ class ConsumeHistListController extends Controller
                     'export' => true,
                     'table' => '%sf:usr:search15:mstfilter%',
                     'csrf_token' => Csrf::generate(16),
+                    'script' => $division_script->render(),
                     ] , false);
     
         } catch ( Exception $ex ) {

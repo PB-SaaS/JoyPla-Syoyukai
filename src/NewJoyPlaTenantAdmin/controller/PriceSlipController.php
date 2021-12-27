@@ -59,11 +59,11 @@ class PriceSlipController extends Controller
             
             $base_url = $base_url ."&BACK=".$back_key;
             $content = $this->view('NewJoyPlaTenantAdmin/view/PriceList/Slip', [
-                'error' => $error,
+                //'error' => $error,
                 'back_key' => $back_key,
                 'switch_1' => $switch_1,
                 'switch_2' => $switch_2,	
-                'back_key' => $back_key, 
+                //'back_key' => $back_key, 
                 'form_url' => '%url/card:page_178889%&BACK='.$back_key,
                 'base_url' => $base_url
                 ] , false)->render();
@@ -108,6 +108,7 @@ class PriceSlipController extends Controller
             $back_url = "";
             $back_text = "";
             $sidemenu = [];
+            $base_url = "%url/card:page_178889%";
             
             $session = $SPIRAL->getSession();
             $back_key = $SPIRAL->getParam('BACK');

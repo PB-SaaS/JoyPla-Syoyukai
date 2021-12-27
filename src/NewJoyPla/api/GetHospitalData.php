@@ -40,4 +40,4 @@ class GetHospitalData{
         $this->spiralDataBase->addSearchCondition('hospitalId',$hospitalId);
         return $this->spiralDataBase->doSelectLoop();
     }
-}
+}*/

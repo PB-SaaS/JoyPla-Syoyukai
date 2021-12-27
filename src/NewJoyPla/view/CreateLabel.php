@@ -79,6 +79,7 @@ html {
 			<div id="createLabel">
 			<?php 
 			$num = 1 ;
+            $nowTime = date('Y年m月d日 H時i分s秒');
 			foreach($itemsData as $inHPId => $item){
 				$barcodeId = '';
 				$quantity = '';
@@ -147,6 +148,9 @@ html {
 					$design = str_replace('%JoyPla:constantByDiv%',		$item['constantByDiv'], 					$design);//払い出し先部署定数
 					$design = str_replace('%JoyPla:officialFlag%',		$officialFlag,								$design);//償還フラグ
 					$design = str_replace('%JoyPla:officialFlag:id%',	$inHpItemMaster[$inHPId]['officialFlag'],	$design);//償還フラグ
+                    $design = str_replace('%JoyPla:lotNumber%',			"", 		                    $design);//ロット
+                    $design = str_replace('%JoyPla:lotDate%',			"", 		                    $design);//使用期限
+    
 
 					echo $design;
 

@@ -148,7 +148,7 @@ class BorrowingController extends Controller
         } finally {
         // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 貸出登録',
+                'title'     => 'JoyPla 貸出リスト',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),
@@ -723,11 +723,11 @@ class BorrowingController extends Controller
         $billing_insert_data = [];
         foreach($used_report as $item)
         {
-            $unitPrice = ($hospital[0]->billingUnitPrice)
+            $unitPrice = ($hospital->billingUnitPrice)
                 ?(float)$item->unitPrice 
-                :((float)$item->price == 0 || (float)$item->quantity == 0)
+                :(((float)$item->price == 0 || (float)$item->quantity == 0)
                     ? 0 
-                    : (float)$item->price / (float)$item->quantity ;
+                    : (float)$item->price / (float)$item->quantity);
             $billing_insert_data[] = [
                 'registrationTime' => $item->usedDate,
                 'inHospitalItemId' => $item->inHospitalItemId,
@@ -797,6 +797,7 @@ class BorrowingController extends Controller
             Csrf::validate($token,true);
 
             $user_info = new UserInfo($SPIRAL);
+            $all_create_data = [];
 
             $used_ids = $SPIRAL->getParam('used_ids');
             $used_date = $SPIRAL->getParam('used_date');

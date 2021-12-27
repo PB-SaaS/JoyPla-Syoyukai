@@ -113,7 +113,6 @@ EOM;
                         'quantityUnit' => '%val:usr:quantityUnit%',
                         'itemUnit' => '%val:usr:itemUnit%',
                         'tenantId' => '%val:usr:tenantId%',
-                        'itemsAuthKey' => '%val:usr:itemsAuthKey%',
                         'makerName' => '%val:usr:makerName%',
                         'itemsAuthKey' => '%val:usr:itemsAuthKey%',
                         'catalogNo' => '%val:usr:catalogNo%',

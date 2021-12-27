@@ -78,6 +78,7 @@ html {
             <div id="createLabel">
             <?php 
             $num = 1 ;
+            $nowTime = date('Y年m月d日 H時i分s秒');
             foreach($card_items as $item){
                 $barcodeId = '';
                 

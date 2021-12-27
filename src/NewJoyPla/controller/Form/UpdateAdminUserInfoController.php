@@ -117,8 +117,8 @@ class UpdateAdminUserInfoController extends Controller
             
             $content = $this->view('NewJoyPla/view/Form/UpdateInHospitalItem/Thank', [
                     'csrf_token' => Csrf::generate(16),
-                    'price' => $price,
-                    'ticket' => $ticket,
+                    //'price' => $price,
+                    //'ticket' => $ticket,
                     'oldPrice' => $SPIRAL->getParam('oldPrice') ,
                     'oldUnitPrice' => $SPIRAL->getParam('oldUnitPrice'),
                     ] , false);

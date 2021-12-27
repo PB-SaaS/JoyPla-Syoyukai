@@ -33,6 +33,8 @@ use Exception;
 
 class UsedSlipController extends Controller
 {
+    public $in_hospital_items = [];
+    
     public function __construct()
     {
     }
@@ -274,7 +276,7 @@ class UsedSlipController extends Controller
         $user_info = new UserInfo($SPIRAL);
         
         $hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
-        $hospital = $hospital->data->all();
+        $hospital = $hospital->data->get(0);
         if($this->in_hospital_items == null)
         {
             $in_hospital_items_instance = InHospitalItem::getInstance();
@@ -288,7 +290,7 @@ class UsedSlipController extends Controller
         foreach($borrowing_data as $borrowing_key => $data)
         {
             $used_report[$borrowing_key] = new StdClass;
-            foreach($this->in_hospital_items->data as $key => $val)
+            foreach($this->in_hospital_items->data->all() as $key => $val)
             {
                 if($val->inHospitalItemId == $data->inHospitalItemId)
                 {
@@ -471,11 +473,11 @@ class UsedSlipController extends Controller
         $billing_insert_data = [];
         foreach($used_report as $item)
         {
-            $unitPrice = ($hospital[0]->billingUnitPrice)
+            $unitPrice = ($hospital->billingUnitPrice)
                 ?(float)$item->unitPrice 
-                :((float)$item->price == 0 || (float)$item->quantity == 0)
+                :(((float)$item->price == 0 || (float)$item->quantity == 0)
                     ? 0 
-                    : (float)$item->price / (float)$item->quantity ;
+                    : (float)$item->price / (float)$item->quantity);
             $billing_insert_data[] = [
                 'registrationTime' => $item->usedDate,
                 'inHospitalItemId' => $item->inHospitalItemId,

@@ -83,8 +83,8 @@ class ListResponse {
         {
             $urlparams['page'.$this->tablel_id] = 1;
             $items[] = sprintf('<li><span%s>%s</span></li>'
-                , ($intCurrentPage == $i) ? ' class="uk-active"' : ''
-                , ($intCurrentPage == $i) ? '1' : '<a href="?' .http_build_query($urlparams). '">1</a>' 
+                , ($intCurrentPage == 1) ? ' class="uk-active"' : ''
+                , ($intCurrentPage == 1) ? '1' : '<a href="?' .http_build_query($urlparams). '">1</a>' 
             );
         }
 

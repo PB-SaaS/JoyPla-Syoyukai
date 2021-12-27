@@ -87,7 +87,6 @@ class InventoryEndSlipController extends Controller
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
-            
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 棚卸結果報告',
@@ -109,7 +108,6 @@ class InventoryEndSlipController extends Controller
             Csrf::validate($token,true);
 
             $user_info = new UserInfo($SPIRAL);
-            
             if($user_info->isUser())
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
@@ -126,7 +124,7 @@ class InventoryEndSlipController extends Controller
             }
             
             $result = InventoryEnd::where('hospitalId',$user_info->getHospitalId())->find($record_id)->delete();
-        
+            
             $content = new ApiResponse($result->ids , $result->count , $result->code, $result->message, ['slipDeleteApi']);
             $content = $content->toJson();
             

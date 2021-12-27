@@ -96,7 +96,7 @@ class UpdateUserInfoController extends Controller
         }
     }
     
-    public function thank(): View
+    public function thank()
     {
     }
 }

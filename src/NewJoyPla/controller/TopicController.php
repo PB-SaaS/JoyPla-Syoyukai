@@ -119,7 +119,7 @@ EOM;
             
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla トピック一覧',
+                'title'     => 'JoyPla トピック作成',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),

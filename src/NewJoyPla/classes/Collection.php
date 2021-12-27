@@ -153,14 +153,30 @@ class Collection
 
     public function first()
     {
-        $first = array_key_first($this->all());
+        $first = $this->array_key_first_org($this->all());
         return $this->get($first);
     }
+    
+    private function array_key_first_org($array) {
+        foreach($array as $key => $unused) {
+            return $key;
+        }
+        return NULL;
+    }
+
 
     public function last()
     {
-        $last = array_key_last($this->all());
+        $last = $this->array_key_last_org($this->all());
         return $this->get($last);
+    }
+    
+    private function array_key_last_org($array) {
+        if (!is_array($array) || empty($array)) {
+            return NULL;
+        }
+       
+        return array_keys($array)[count($array)-1];
     }
 
     public function get($index)

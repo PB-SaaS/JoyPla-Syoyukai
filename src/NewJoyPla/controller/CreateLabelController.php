@@ -53,45 +53,55 @@ class CreateLabelController extends Controller
             
             $defaultDesign = $hospital->labelDesign2;
             $defaultDesign = $this->design();
-            if($defaultDesign === "")
+            if($hospital->labelDesign2 != '')
             {
+                $defaultDesign = htmlspecialchars_decode($hospital->labelDesign2);
             }
             
-            $inHospitalItem = InHospitalItem::where('hospitalId',$user_info->getHospitalId());   
-            if($sourceDivision !== "")
-            {
-                $sourceStock = StockView::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$sourceDivision);
-            }
-            $targetStock = StockView::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$targetDivision);
+            $inHospitalItem = InHospitalItem::where('hospitalId',$user_info->getHospitalId());
             
             foreach($itemsData as $inHPId => $item){
                 $inHospitalItem->orWhere('inHospitalItemId',$inHPId);
-                if($sourceDivision !== "")
-                {
-                    $sourceStock->orWhere('inHospitalItemId',$inHPId);
-                }
-                
-                $targetStock->orWhere('inHospitalItemId',$inHPId);
             }
             
             $inHospitalItem = $inHospitalItem->get();
             $inHospitalItem = $inHospitalItem->data->all();
             
             $inHpItemMaster = [];
-            foreach($inHpItemMaster as $item)
+            foreach($inHospitalItem as $item)
             {
                 $inHpItemMaster[$item->inHospitalItemId] = (array)$item;
             }
             
             if($sourceDivision !== "")
             {
-               
+                $sourceStock = StockView::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$sourceDivision);
+                foreach($itemsData as $inHPId => $item){
+                    $sourceStock->orWhere('inHospitalItemId',$inHPId);
+                }
                 $sourceStock = $sourceStock->get();
                 
-            	foreach($sourceStock->data->all() as $stock){
-            		$itemsData[ $stock->inHospitalItemId ]['sourceDivisionName'] = $stock->divisionName;
-            		$itemsData[ $stock->inHospitalItemId ]['sourceRackName'] = $stock->rackName;
-            	}
+                if($sourceStock->count === "0")
+                {
+                    foreach($itemsData as $inHPId => $item){
+                        $division = Division::where('divisionId',$sourceDivision)->get();
+                        $division = $division->data->get(0);
+                		$itemsData[ $inHPId ]['sourceDivisionName'] = $division->divisionName;
+                    }
+                }
+                else
+                {
+                	foreach($sourceStock->data->all() as $stock){
+                		$itemsData[ $stock->inHospitalItemId ]['sourceDivisionName'] = $stock->divisionName;
+                		$itemsData[ $stock->inHospitalItemId ]['sourceRackName'] = $stock->rackName;
+                	}
+                }
+            	
+            }
+            
+            $targetStock = StockView::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$targetDivision);
+            foreach($itemsData as $inHPId => $item){
+                $targetStock->orWhere('inHospitalItemId',$inHPId);
             }
             
             $targetStock = $targetStock->get();

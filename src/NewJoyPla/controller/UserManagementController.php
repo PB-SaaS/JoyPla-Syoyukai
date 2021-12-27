@@ -169,7 +169,7 @@ EOM;
 EOM;
             $hidden = [
 						"SMPFORM" => "%smpform:divisionReg%",
-						"hospitalId" => "%val:usr:hospitalId%",
+					    "hospitalId" => "%val:usr:hospitalId%", 
 						"divisionType" => "2",
                 ];
                 

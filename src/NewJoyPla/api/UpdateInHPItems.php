@@ -24,3 +24,4 @@ class UpdateInHPItems{
         return $this->spiralDataBase->doUpdate(array(array("name" => "updateTime","value" => "now")));
     }
 }
+*/

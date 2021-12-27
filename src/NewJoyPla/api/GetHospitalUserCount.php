@@ -28,4 +28,4 @@ class GetHospitalUserCount{
         return $this->spiralDataBase->doSelect();
     }
 
-}
+}*/

@@ -128,7 +128,7 @@ class OrderSlipDetailController extends Controller
                 'pattern' => $pattern,
                 'link_title' => $link_title,
                 'link' => $link,
-                'cardId' => $cardId
+                //'cardId' => $cardId
             ] , false);
 
         } catch ( Exception $ex ) {

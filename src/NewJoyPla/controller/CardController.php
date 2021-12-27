@@ -47,7 +47,7 @@ class CardController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
             
-            if( ($user_info->isHospitalUser() && $user_info->getUserPermission() == '1')) 
+            if( ($user_info->isHospitalUser() && !$user_info->isUser())) 
             {
                 $division = Division::where('hospitalId',$user_info->getHospitalId())->get();
             } 

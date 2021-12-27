@@ -111,7 +111,7 @@
             <div class="uk-margin">
                 <?php if(count($association) > 0): ?>
                 <p class="uk-text-bold">紐づく伝票情報</p>
-                <div>
+                <div class="uk-overflow-auto">
                     <table class="uk-table uk-table-hover uk-table-middle uk-table-divider uk-text-nowrap" id="tbl-Items">
                         <thead>
                             <tr>

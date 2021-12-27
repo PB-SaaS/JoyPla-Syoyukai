@@ -35,4 +35,4 @@ class GetTenantData{
         $this->spiralDataBase->addSearchCondition('tenantId',$tenantId);
         return $this->spiralDataBase->doSelectLoop();
     }
-}
+}*/

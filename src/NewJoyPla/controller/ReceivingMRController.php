@@ -26,6 +26,8 @@ class ReceivingMRController extends Controller
         '4' => ['label' => '日用品', 'checked' => ''],
         '99' => ['label' => 'その他', 'checked' => '']
     ];
+    
+    public $receiving_data = [];
 
     public function __construct()
     {

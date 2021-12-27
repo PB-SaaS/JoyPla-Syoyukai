@@ -104,7 +104,6 @@ EOM;
                     "itemCode" => "%val:usr:itemCode%",
                     "itemStandard" => "%val:usr:itemStandard%",
                     "itemJANCode" => "%val:usr:itemJANCode%",
-                    "price" => "%val:usr:price%",
                     "inHospitalItemId" => "%val:usr:inHospitalItemId%",
                     "authKey" => "%val:usr:authKey%",
                     "notUsedFlag" => "%val:usr:notUsedFlag%",
@@ -187,10 +186,10 @@ EOM;
         	$hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
             $hospital = $hospital->data->get(0);
             
-        	$design = $hospital->labelDesign1;
-        	
-            if($design == ""){
-        	    $design = $this->design();
+            $defaultDesign = $this->design();
+            if($hospital->labelDesign1 != '')
+            {
+                $defaultDesign = htmlspecialchars_decode($hospital->labelDesign1);
             }
             
             $content = $this->view('NewJoyPla/view/InHospitalItemCreateLabel', [
@@ -198,7 +197,7 @@ EOM;
                 'api_url' => $api_url,
                 'cardItems' => $card,
                 'quantity' => $quantity,
-                'original_design' => $design,
+                'original_design' => $defaultDesign,
                 'printCount' => $printCount,
                 'csrf_token' => Csrf::generate(16),
                 'link' => $link,

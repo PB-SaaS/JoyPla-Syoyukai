@@ -42,7 +42,7 @@ class RequestSlipController extends Controller
             $auth = new Auth();
             
             $content = $this->view('NewJoyPlaTenantAdmin/view/RequestList/Slip', [
-                'error' => $error,
+                //'error' => $error,
                 'switch_1' => $switch_1,
                 'switch_2' => $switch_2,	
                 'form_url' => '%url/card:page_179154%',
