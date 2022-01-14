@@ -168,6 +168,11 @@ class StockController extends Controller
                 {
                     throw new Exception('rackName: validate error',100);
                 }
+
+                if( $stock['changeReason'] && strlen($stock['changeReason']) > 1026 )
+                {
+                    throw new Exception('changeReason: validate error',100);
+                }
                 $insert_data[] = [
                     'divisionId'=>$division_id,
                     'inHospitalItemId'=>$stock['recordId'],
@@ -183,6 +188,7 @@ class StockController extends Controller
                     'constantByDiv'=>$stock['constantByDiv'],
                     'loginId'=>$user_info->getLoginId(),
                     'previousStock' => $stock['stock'],
+                    'changeReason' => $stock['changeReason'],
                 ];
                 if(array_search($stock['recordId'], $items) === false)
                 {

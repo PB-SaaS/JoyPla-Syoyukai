@@ -955,6 +955,54 @@
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
+				                                <span class="title">払出予定商品登録</span><br>
+				                                <span class="text">Payout Scheduled</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:Payout%&Action=payoutScheduled" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-6-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">払出予定商品一覧</span><br>
+				                                <span class="text">Payout Scheduled Item List</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:Payout%&Action=payoutScheduledItemList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-6-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">ピッキングリスト</span><br>
+				                                <span class="text">Picking List</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:Payout%&Action=pickingList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-6-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
 				                                <span class="title">払出</span><br>
 				                                <span class="text">Payout</span>
 			                                </p>

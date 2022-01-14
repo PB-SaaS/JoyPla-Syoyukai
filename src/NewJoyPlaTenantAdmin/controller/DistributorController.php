@@ -139,6 +139,7 @@ class DistributorController extends Controller
             $auth = new Auth();
             
             $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
+            //$rowData = $SPIRAL->getParam('rowData');
             $insert_data = [];
             foreach($rowData as $rows)
             {
@@ -194,6 +195,7 @@ class DistributorController extends Controller
         Csrf::validate($token,true);
         
         $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
+        //$rowData = $SPIRAL->getParam('rowData');
         $messages = [];
         
         $distributor = Distributor::where('hospitalId',$_POST['hospitalId']);

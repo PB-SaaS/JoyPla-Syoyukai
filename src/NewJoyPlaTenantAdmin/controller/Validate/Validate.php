@@ -339,12 +339,14 @@ class InHospitalNewInsertDb extends FieldTypeValidate
             'replaceKey' => 't',
             'notNullFlg' => '',
         ],
+        /*
         [   
             'key' => '定価',
             'fieldType' => 'RealNumber',
             'replaceKey' => 't',
             'notNullFlg' => '',
         ],
+        */
         [   
             'key' => '単価',
             'fieldType' => 'RealNumber',

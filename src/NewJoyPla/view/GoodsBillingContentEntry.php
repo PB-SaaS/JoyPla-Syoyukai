@@ -123,11 +123,25 @@
             </div>
             <div class="uk-margin-bottom">
                 <div>
-                    <div>
+                    <div uk-margin>
                         <button class="uk-button uk-button-default" v-on:click="sanshouClick">商品マスタを開く</button>
                         <button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
                         <button class="uk-button uk-button-primary goodsBillingButton" v-on:click="sendGoodsBilling">消費登録</button>
                         <button class="uk-button uk-button-primary unorderedSlipButton" v-on:click="sendUnorderedSlip(false)">未発注伝票作成</button>
+						<div class="uk-inline uk-margin-small-left">
+							<div uk-grid class="uk-margin-remove">
+								<div class="uk-padding-remove">
+									<label class="uk-switch" for="default-1">
+										<input type="checkbox" id="default-1" v-model="integrate" />
+										<div class="uk-switch-slider uk-switch-big"></div>
+									</label>
+								</div>
+								<div style="padding: 7px 0px 7px 8px;">
+									<small v-if="integrate">既存の未発注伝票に追加する</small>
+									<small v-else>新規で未発注伝票を発行する</small>
+								</div>
+							</div>
+						</div>
                     </div>
                 </div>
             </div>
@@ -314,14 +328,19 @@
 	    </div>
 	</div>
 <script>
-
 var app = new Vue({
 	el: '#app',
 	data: {
 		lists: [],
 		divisionId: '',
 		consumeDate : '',
+		integrate: false,
         useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
+	},
+	mounted() {
+		if (localStorage.joypla_unorder_slip_integrate) {
+			this.integrate = (localStorage.joypla_unorder_slip_integrate === 'true');
+		}
 	},
 	filters: {
         number_format: function(value) {
@@ -330,6 +349,9 @@ var app = new Vue({
         },
     },
     watch: {
+		integrate(bool) {
+			localStorage.joypla_unorder_slip_integrate = bool;
+		},
         lists: function() {
             this.$nextTick(function() {
                 if($('.target').length > 0){
@@ -458,6 +480,7 @@ var app = new Vue({
                 url:'%url/rel:mpgt:labelBarcodeSAPI%',
                 type:'POST',
                 data:{
+					_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
                 	divisionId : app.divisionId,
                 	barcode : barcode,
                 },
@@ -682,7 +705,16 @@ var app = new Vue({
         },
         
         sendUnorderedSlip: function(goodsFlg){
-            UIkit.modal.confirm('未発注伝票を作成しますか？').then(function () {
+			let confirmtext = "新規で未発注伝票を発行します。<br>よろしいですか";
+			let errortext = "未発注伝票の発行に失敗しました";
+			let successtext = "未発注伝票を発行しました";
+			if(this.integrate)
+			{
+				confirmtext = "既存の未発注伝票に追加します。<br>よろしいですか";
+				errortext = "既存の未発注伝票への追加に失敗しました";
+				successtext = "未発注伝票へ追加しました";
+			}
+            UIkit.modal.confirm(confirmtext).then(function () {
                 if (!app.listsCheck()) {
                     return false;
                 }
@@ -694,6 +726,7 @@ var app = new Vue({
                     data:{
                         _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
                         Action : "regUnorderedAPI",
+						integrate : app.integrate,
                         ordered : JSON.stringify( objectValueToURIencode(app.lists) ),
                         divisionId : app.divisionId
                     },
@@ -702,22 +735,26 @@ var app = new Vue({
                 // Ajaxリクエストが成功した時発動
                 .done( (data) => {
                     if (data.code != 0) {
-                        UIkit.modal.alert('未発注伝票の作成に失敗しました');
+                        UIkit.modal.alert(errortext);
                         return false;
                     }
                     if (data.count == 0) {
-                        UIkit.modal.alert('登録するデータがありませんでした');
+                        UIkit.modal.alert("登録する情報がありませんでした");
                         return false;
                     }
-              
-                    UIkit.modal.alert('未発注伝票を作成しました').then(function(){
+					let	his_text = "追加・発行した伝票番号<br>";
+                	for(let num = 0 ; num < data.data.length ; num++)
+                	{
+						his_text += data.data[num].orderNumber+"<br>";
+					}
+                    UIkit.modal.alert(successtext+'<br>'+his_text).then(function(){
                         $('.goodsBillingButton').prop('disabled', false);
 						app.lists.splice(0, app.lists.length);
                     });
                 })  
                 // Ajaxリクエストが失敗した時発動
                 .fail( (data) => {
-                    UIkit.modal.alert('未発注伝票の作成に失敗しました');
+                    UIkit.modal.alert(errortext);
                 })
                 // Ajaxリクエストが成功・失敗どちらでも発動
                 .always( (data) => {

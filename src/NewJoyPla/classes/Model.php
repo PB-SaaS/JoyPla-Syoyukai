@@ -13,6 +13,7 @@ class Model
     private static $instances = [];
     public static $guarded = [];
     public static $fillable = [];
+    public static $select = [];
     public static $attributes = [];
     public static $primary_key = null;
     public static $page = 1;
@@ -166,6 +167,9 @@ class Model
         $column = array_merge($instance::$fillable,$instance::$guarded);
         $instance->spiralDataBase->addSelectFieldsToArray($column);
         $result = $instance->spiralDataBase->doSelectLoop();
+        if($result['label']){
+            $result['label'] = $instance->spiralDataBase->labelToNameArray($result['label'],$column);
+        }
         if($result['count'] > 0){
             $result['data'] = $instance->spiralDataBase->arrayToNameArray($result['data'],$column);
             $result['data'] = $instance->getDataToInstance($result['data']);
@@ -182,9 +186,18 @@ class Model
     public static function sort(string $fieldTitle , string $order = 'asc')
     {
         $instance = self::getInstance();
+        $column = array_merge($instance::$fillable,$instance::$guarded);
+        if(array_search($fieldTitle, $column , true) === false){ $fieldTitle = 'id'; $order = 'asc';}
         if($order == 'asc' || $order == 'desc'){
             $instance->sort[] = array( 'name' => $fieldTitle , 'order' => $order );
         }
+        return $instance;
+    }
+
+    public static function groupby(string $fieldTitle)
+    {
+        $instance = self::getInstance();
+        $instance->spiralDataBase->setGroupByField($fieldTitle);
         return $instance;
     }
     
@@ -224,6 +237,9 @@ class Model
         $instance->spiralDataBase->addSelectFieldsToArray($column);
         $instance->spiralDataBase->setLinesPerPage($lines_per_page);
         $result = $instance->spiralDataBase->doSelect();
+        if($result['label']){
+            $result['label'] = $instance->spiralDataBase->labelToNameArray($result['label'],$column);
+        }
         if($result['count'] > 0){
             $result['data'] = $instance->spiralDataBase->arrayToNameArray($result['data'],$column);
             $result['data'] = $instance->getDataToInstance($result['data']);
@@ -387,7 +403,7 @@ class Model
         $instance = self::getInstance();
         $instance->spiralDataBase->setDataBase($instance::$spiral_db_name);
         $upsert_data = $instance->makeUpsertArray($upsert_data);
-        $result = $instance->spiralDataBase->doBulkUpdate($key , $instance::$fillable, $upsert_data);
+        $result = $instance->spiralDataBase->doBulkUpsert($key , $instance::$fillable, $upsert_data);
         if($result['code'] != 0)
         {
             throw new Exception(FactoryApiErrorCode::factory((int)$result['code'])->getMessage(),FactoryApiErrorCode::factory((int)$result['code'])->getCode());

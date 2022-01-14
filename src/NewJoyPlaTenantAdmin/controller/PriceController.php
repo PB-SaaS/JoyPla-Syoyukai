@@ -164,6 +164,7 @@ class PriceController extends Controller
         $price = Price::where('hospitalId',$_POST['hospitalId']);
         
         $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
+        //$rowData = $SPIRAL->getParam('rowData');
         $messages = [];
         
         foreach ( $rowData as $row )
@@ -250,13 +251,26 @@ class PriceController extends Controller
             $auth = new Auth();
             
             $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
-            
+            //$rowData = $SPIRAL->getParam('rowData');
+             
             $insert_data = [];
+            $price = Price::where('hospitalId',$_POST['hospitalId']);
+            
             foreach($rowData as $rows)
             {
+                $price->orWhere('priceId',$rows['data'][0]);
+            }
+
+            $price = $price->get();
+            $price = $price->data->all();
+
+            foreach($rowData as $rows)
+            {
+                $price_info = $this->array_obj_find($price,'priceId',$rows['data'][0]);
                 $insert_data[] = 
                     [
                         "priceId" => $rows['data'][0],
+                        "itemsAuthKey" => $price_info->authKey,
                         "distributorId" => $rows['data'][1],
                         "itemId" => $rows['data'][2],
                         "hospitalId" => $_POST['hospitalId'],
@@ -267,6 +281,7 @@ class PriceController extends Controller
                         "notice" => $rows['data'][7],
                     ];
             }
+            
             $result = PriceUpsertTrDB::insert($insert_data);
             $content = new ApiResponse($result->ids , count($insert_data) , $result->code, $result->message, ['insert']);
             $content = $content->toJson();
@@ -279,6 +294,36 @@ class PriceController extends Controller
                 'content'   => $content,
             ],false);
         }
+    }
+    
+    private function array_obj_find($arr,string $key ,string $findVal)
+    {
+        foreach($arr as $a)
+        {
+            if(is_object($a))
+            {  
+                if($a->{$key} === $findVal)
+                {
+                    return $a;
+                }
+            }
+            else if(is_array($a))
+            {  
+                if($a[$key] === $findVal)
+                {
+                    return $a;
+                }
+            }
+            else if(is_string($a))
+            {
+                if($a === $findVal)
+                {
+                    return $a;
+                }
+            }
+        }
+    
+        return "";
     }
 }
 

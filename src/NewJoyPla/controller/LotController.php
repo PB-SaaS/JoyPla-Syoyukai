@@ -111,6 +111,10 @@ class LotController extends Controller
                 {
                     throw new Exception('Invalid LotData',FactoryApiErrorCode::factory(100)->getCode());
                 }
+                if( $lot['changeReason'] && strlen($lot['changeReason']) > 1026 )
+                {
+                    throw new Exception('changeReason: validate error',100);
+                }
                 $insert_data[] = [
                     'divisionId'=>$division_id,
                     'inHospitalItemId'=>$lot['recordId'],
@@ -125,6 +129,7 @@ class LotController extends Controller
                     'rackName'=>'',
                     'constantByDiv'=>'',
                     'loginId'=>$user_info->getLoginId(),
+                    'changeReason'=>$lot['changeReason'],
                 ];
             }
             $result = InventoryAdjustmentTransaction::insert($insert_data);

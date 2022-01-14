@@ -158,7 +158,7 @@
 						            </select>	
 						        </div>
 					            <form action='#' method="post" onsubmit="app.cardSearch($('input[name=barcode2]').val()); $('input[name=barcode2]').val('') ; $('input[name=barcode2]').focus(); return false;">
-			    					<input type="text" class="uk-input uk-width-4-5" placeholder="カードのバーコード入力..." autofocus="true" name="barcode2" autocomplete="off">  
+			    					<input type="text" class="uk-input uk-width-4-5" placeholder="カードまたは払出ラベルのバーコード入力..." autofocus="true" name="barcode2" autocomplete="off">  
 					    			<button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
 								</form>
 								<span class="uk-text-danger uk-text-small">カードを紐づける場合は払出数を0、枚数を1にしてください</span>
@@ -499,7 +499,7 @@ var app = new Vue({
 			
 			
 			if(app.sourceDivision == app.targetDivision ){
-				UIkit.modal.alert('払出元部署と払出先部署は同一のものを選択しないでください');
+				UIkit.modal.alert('払出元部署と払出先部署は別のものを選択してください');
 				return false ;
 			}	
 			return true;
@@ -683,31 +683,45 @@ var app = new Vue({
 		},
 		cardSearch: function(barcode)
 		{
+			let is_card = false;
+			let is_payout_label = false;
 			if(! this.divisionCheck()){
 				return false;
 			}
-			if(barcode.length != 18)
+			if(barcode.indexOf("90") === 0 && barcode.lengt == 18)
 			{
-				UIkit.modal.alert("カードのバーコードではありません");
+				is_card = true;
+			}
+			else if(barcode.indexOf("30") === 0 && barcode.length == 12)
+			{
+				is_payout_label = true;
+			}
+			else
+			{
+				UIkit.modal.alert("カードまたは払出ラベルのバーコードではありません");
 				return false;
 			}
-        	let exist = false;
-        	app.lists.forEach(function(elem, index) {
-        		if(app.lists[index].cardNum == barcode)
-        		{
-        			exist = true;
-        		}
-        	});
-        	if(exist)
-        	{
-            	UIkit.modal.alert("すでに紐づいているカード情報です");
-            	return false;
-        	}
+			if(is_card)
+			{
+				let exist = false;
+				app.lists.forEach(function(elem, index) {
+					if(app.lists[index].cardNum == barcode)
+					{
+						exist = true;
+					}
+				});
+				if(exist)
+				{
+					UIkit.modal.alert("読み込み済みのカード情報です");
+					return false;
+				}
+			}
 			$.ajax({
 				async: false,
                 url:'%url/rel:mpgt:labelBarcodeSAPI%',
                 type:'POST',
                 data:{
+					_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
                 	divisionId : app.targetDivision,
                 	barcode : barcode,
                 },
@@ -722,32 +736,48 @@ var app = new Vue({
 	                	UIkit.modal.alert("払出先のカードではありません");
 	                	return false;
             		}
-	            	let checked = false;
-	            	app.lists.forEach(function(elem, index) {
-	            		if(
-	            			data.data.recordId == app.lists[index].recordId && 
-	            			app.lists[index].countNum == 0 && app.lists[index].countLabelNum == 1 && !app.lists[index].cardNum &&
-	            			!checked
-	            		)
-	            		{
-							let changeObject = null;
-							changeObject = app.lists[index];
-							changeObject.countNum = data.data.count;
-							changeObject.cardNum = barcode;
-							changeObject.countNumDisabled = true;
-							changeObject.countLabelNumDisabled = true;
-							changeObject.countStyle = {};
-							changeObject.labelCountStyle= {};
-							app.$set(app.lists, index, changeObject);
-		            		checked = true;
-	            		}
-	            	});
-	            	if(!checked)
-	            	{
-	                	UIkit.modal.alert("紐づける対象の商品がリストにありませんでした");
-	            	}
+					if(is_card)
+					{
+						let checked = false;
+						app.lists.forEach(function(elem, index) {
+							if(
+								data.data.recordId == app.lists[index].recordId && 
+								app.lists[index].countNum == 0 && app.lists[index].countLabelNum == 1 && !app.lists[index].cardNum &&
+								!checked
+							)
+							{
+								let changeObject = null;
+								changeObject = app.lists[index];
+								changeObject.countNum = data.data.count;
+								changeObject.cardNum = barcode;
+								changeObject.countNumDisabled = true;
+								changeObject.countLabelNumDisabled = true;
+								changeObject.countStyle = {};
+								changeObject.labelCountStyle= {};
+								app.$set(app.lists, index, changeObject);
+								checked = true;
+							}
+						});
+						if(!checked)
+						{
+							UIkit.modal.alert("紐づける対象の商品がリストにありませんでした");
+						}
+					}
+					if(is_payout_label)
+					{
+						data = data.data;
+						if(data.divisionId != "" && app.targetDivision != data.divisionId )
+						{
+							UIkit.modal.alert("読み込んだバーコードの部署が払出先の部署と一致しません");
+							return false;
+						}
+						data.countNum = data.count;
+						data.lotDate = '';
+						data.lotNumber = '';
+						app.addList(data);
+					}
             	} else {
-                	UIkit.modal.alert("カード情報が取得できませんでした。カード情報と払出先部署が一致しているか確認してください。");
+                	UIkit.modal.alert("情報が取得できませんでした。払出先部署が一致しているか確認してください。");
                 	return false;
             	}
             })
@@ -770,6 +800,7 @@ var app = new Vue({
                 url:'%url/rel:mpgt:labelBarcodeSAPI%',
                 type:'POST',
                 data:{
+					_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
                 	divisionId : app.sourceDivision,
                 	barcode : barcode,
                 },

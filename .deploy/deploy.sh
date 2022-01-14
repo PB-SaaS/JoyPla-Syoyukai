@@ -101,6 +101,7 @@ else
     errorlog "zip directory ${TARGET}"
 fi
 
+rm -rf tmp/${TARGET}
 if rm -rf tmp/${TARGET} ;then
     log "rm directory ${TARGET}"
 else

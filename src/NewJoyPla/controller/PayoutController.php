@@ -13,6 +13,8 @@ use App\Model\InHospitalItemView;
 use App\Model\PayoutHistory;
 use App\Model\Payout;
 use App\Model\PayoutView;
+use App\Model\PayScheduleItems;
+use App\Model\PayScheduleItemsView;
 use App\Model\Card;
 use App\Model\Stock;
 use App\Model\Distributor;
@@ -88,6 +90,74 @@ class PayoutController extends Controller
         }
     }
     */
+
+    public function payoutScheduled(): View
+    {
+        global $SPIRAL;
+        // GETで呼ばれた
+        //$mytable = new mytable();
+        // テンプレートにパラメータを渡し、HTMLを生成し返却
+        $param = array();
+        try {
+
+            $user_info = new UserInfo($SPIRAL);
+            
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            
+            if($user_info->isDistributorUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            
+            $target_division = Division::where('hospitalId',$user_info->getHospitalId())->get();
+            if( ($user_info->isHospitalUser() && !$user_info->isUser())) 
+            {
+                $source_division = $target_division;
+            } 
+            else 
+            {
+                $source_division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
+            }
+    
+            $api_url = "%url/rel:mpgt:Payout%";
+    
+            $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+            $hospital_data = $hospital_data->data->get(0);
+            $useUnitPrice = (int)$hospital_data->payoutUnitPrice;
+            
+            $content = $this->view('NewJoyPla/view/PayoutScheduled', [
+                'api_url' => $api_url,
+                'user_info' => $user_info,
+                'source_division'=> $source_division,
+                'target_division'=> $target_division,
+                'useUnitPrice'=> $useUnitPrice,
+                'csrf_token' => Csrf::generate(16)
+                ] , false);
+            
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                'csrf_token' => Csrf::generate(16)
+                ] , false);
+        } finally {
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla 払出予定商品登録',
+                'script' => '',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
+    }
+
+
+
     public function newPayout(): View
     {
         global $SPIRAL;
@@ -664,7 +734,203 @@ EOM;
         }
     }
 
+    
+    public function regPayoutScheduledApi()
+    {
+        global $SPIRAL;
+        try{
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+
+            $user_info = new UserInfo($SPIRAL);
+
+            $items = $SPIRAL->getParam('items');
+            $items = $this->requestUrldecode($items);
+
+            $insert = [];
+
+            foreach($items as $item)
+            {
+                $insert[] = [
+                    "payoutPlanTime" => $item['payout_schedule'],
+                    "payoutPlanId" => $this->makeId('psi'),//payout schedule item
+                    "pickingId" => '',
+                    "inHospitalItemId" => $item['recordId'],
+                    "itemId" => $item['itemId'],
+                    "hospitalId" => $user_info->getHospitalId(),
+                    "cardId" => $item['cardNum'],
+                    "sourceDivisionId" => $item['source_division'],
+                    "targetDivisionId" => $item['target_division'],
+                    "payoutQuantity" => $item['payoutCount'],
+                ];
+            }
+
+            $result = PayScheduleItems::insert($insert);
+
+            $content = new ApiResponse($result->ids, $result->count , $result->code, $result->message, ['insert']);
+            $content = $content->toJson();
+            
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['payoutRegistApi']);
+            $content = $content->toJson();
+        }finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+    }
+
+    public function payoutScheduledItemList()
+    {
+        global $SPIRAL;
+        try {
+            //フルスクラッチでやってみる
+            $user_info = new UserInfo($SPIRAL);
+            
+            if ($user_info->isDistributorUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+            $sort_title = ( $SPIRAL->getParam('sortTitle'))? $SPIRAL->getParam('sortTitle') : 'id'; // 初期ソート id asc
+            $sort_asc = ( $SPIRAL->getParam('sort') === 'asc' || $SPIRAL->getParam('sort') === 'desc' )? $SPIRAL->getParam('sort') : 'asc';
+            /** 取得条件 */
+            $limit = ( is_null($SPIRAL->getParam('limit')) )? 0 : $SPIRAL->getParam('limit') ;
+            $limit = ( $limit >= 1 && $limit <= 1000 )? $limit : 10 ; //デフォルト値 10
+            
+            $page = ( is_null($SPIRAL->getParam('page')) )? 0 : $SPIRAL->getParam('page') ;
+            $page = ( $page >= 1 )? $page : 1 ; //デフォルト値 1
+
+            /** 値の取得 */
+            /** 払出予定商品 */
+            $pay_schedule_items = PayScheduleItemsView::where('pickingId','','ISNULL')
+                                                        ->where('hospitalId',$user_info->getHospitalId())
+                                                        ->orWhere('outOfStockStatus','2','!=')
+                                                        ->sort($sort_title,$sort_asc)
+                                                        ->page($page);
+
+            /** 検索 */
+            $registration_time_start = ( $SPIRAL->getParam('registration_time_start') )? $SPIRAL->getParam('registration_time_start') : '';
+            $registration_time_end = ( $SPIRAL->getParam('registration_time_end') )? $SPIRAL->getParam('registration_time_end') : '';
+            $payout_plan_time_start = ( $SPIRAL->getParam('payout_plan_time_start') )? $SPIRAL->getParam('payout_plan_time_start') : '';
+            $payout_plan_time_end = ( $SPIRAL->getParam('payout_plan_time_end') )? $SPIRAL->getParam('payout_plan_time_end') : '';
+            $source_division = ( $SPIRAL->getParam('source_division') )? $SPIRAL->getParam('source_division') : '';
+            $target_division = ( $SPIRAL->getParam('target_division') )? $SPIRAL->getParam('target_division') : '';
+            $category = ( $SPIRAL->getParams('category') )? $SPIRAL->getParams('category') : '';
+            $out_of_stock_status = ( $SPIRAL->getParams('out_of_stock_status') )? $SPIRAL->getParams('out_of_stock_status') : '';
+            
+            if ($registration_time_start !== '') { 
+                $pay_schedule_items->where('registrationTime', $registration_time_start, '>='); 
+            }
+
+            if ($registration_time_end !== '') { 
+                $pay_schedule_items->where('registrationTime', (date('Y-m-d', strtotime($registration_time_end . '+1 day'))), '<');
+            }
+
+            if ($payout_plan_time_start !== '') { 
+                $pay_schedule_items->where('payoutPlanTime', $payout_plan_time_start, '>='); 
+            }
+
+            if ($payout_plan_time_end !== '') { 
+                $pay_schedule_items->where('payoutPlanTime', (date('Y-m-d', strtotime($payout_plan_time_end . '+1 day'))), '<');
+            }
+
+            if ($source_division !== '') { 
+                $pay_schedule_items->where('sourceDivisionId', $source_division); 
+            }
+
+            if ($target_division !== '') { 
+                $pay_schedule_items->where('targetDivisionId', $target_division); 
+            }
+
+            if ($category !== '') {
+                foreach($category as $c)
+                {
+                    $pay_schedule_items->orWhere('category', $c ); 
+                }
+            }
+
+            if ($out_of_stock_status !== '') {
+                foreach($out_of_stock_status as $c)
+                {
+                    if($c == 2){ continue; } //払出可能は検索できなくする
+                    $pay_schedule_items->orWhere('outOfStockStatus', $c ); 
+                }
+            }
+
+            $pay_schedule_items = $pay_schedule_items->paginate($limit);
+
+            $count = $pay_schedule_items->count;
+            $pay_schedule_items_label = $pay_schedule_items->label->all();
+            $pay_schedule_items = $pay_schedule_items->data->all();
+
+            /** 部署情報 */
+            $division = [];
+            $division = Division::where('hospitalId',$user_info->getHospitalId())->get();
+            $division = $division->data->all();
+            /** 実体参照を行い、必要な情報をセット */
+            foreach($pay_schedule_items as &$item)
+            {
+                $item->checked = false;
+                $item->outOfStockStatus_id = $item->outOfStockStatus;
+                $item->outOfStockStatus = $pay_schedule_items_label['outOfStockStatus']->all()[$item->outOfStockStatus];
+                $item->category = $pay_schedule_items_label['category']->all()[$item->category];
+
+                $sourceDivision = \App\Lib\array_obj_find($division,'divisionId',$item->sourceDivisionId);
+                $targetDivision = \App\Lib\array_obj_find($division,'divisionId',$item->targetDivisionId);
+                $item->sourceDivision = $sourceDivision->divisionName;
+                $item->targetDivision = $targetDivision->divisionName;
+            }
+
+            $form_url = "%url/rel:mpgt:Payout%";
+            
+            $content = $this->view('NewJoyPla/view/PayoutScheduledItemList', [
+                    'title' => '払出予定商品一覧',
+                    'action' => 'payoutScheduledItemList',
+                    'form_url' => $form_url,
+                    'sort_title' => $sort_title,
+                    'sort_asc' => $sort_asc,
+                    'limit' => $limit,
+                    'page' => $page,
+                    'count' => $count,
+                    'category' => $category,
+                    'category_label' => $pay_schedule_items_label['category']->all(),
+                    'out_of_stock_status' => $out_of_stock_status,
+                    'out_of_stock_status_label' => $pay_schedule_items_label['outOfStockStatus']->all(),
+                    'registration_time_start' => \App\Lib\html($registration_time_start),
+                    'registration_time_end' => \App\Lib\html($registration_time_end),
+                    'payout_plan_time_start' => \App\Lib\html($payout_plan_time_start),
+                    'payout_plan_time_end' => \App\Lib\html($payout_plan_time_end),
+                    'source_division' => \App\Lib\html($source_division),
+                    'target_division' => \App\Lib\html($target_division),
+                    'division_info' => $division,
+                    'pay_schedule_items' => $pay_schedule_items,
+                    'csrf_token' => Csrf::generate(16)
+                    ] , false);
+    
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla 払出予定商品一覧',
+                'script' => '',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
+    }
 }
+
+
 
 /***
  * 実行
@@ -693,6 +959,18 @@ $action = $SPIRAL->getParam('Action');
     else if($action === 'payoutListForDivision')
     {
         echo $PayoutController->payoutListForDivision()->render();
+    }
+    else if($action === 'payoutScheduled')
+    {
+        echo $PayoutController->payoutScheduled()->render();
+    }
+    else if($action === 'regPayoutScheduledApi')
+    {
+        echo $PayoutController->regPayoutScheduledApi()->render();
+    }
+    else if($action === 'payoutScheduledItemList')
+    {
+        echo $PayoutController->payoutScheduledItemList()->render();
     }
     else 
     {

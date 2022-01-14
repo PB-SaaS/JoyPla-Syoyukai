@@ -22,7 +22,6 @@ require_once "NewJoyPla/lib/SpiralDBFilter.php";
 require_once "NewJoyPla/lib/Define.php";
 require_once "NewJoyPla/lib/Func.php";
 
-
 require_once "NewJoyPla/model/Base.php";
 
 

@@ -10,6 +10,7 @@ use Csrf;
 use App\Lib\UserInfo;
 use App\Model\Division;
 use App\Model\Hospital;
+use App\Model\InHospitalItem;
 use App\Model\StockView;
 use App\Model\Stock;
 use App\Model\Card;
@@ -17,6 +18,9 @@ use App\Model\InventoryAdjustmentTransaction;
 use App\Model\Distributor;
 use App\Model\Order;
 use App\Model\OrderHistory;
+use App\Model\OrderedItemView;
+
+
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -51,13 +55,90 @@ class OrderController extends Controller
             $order_data = $SPIRAL->getParam('ordered');
             $order_data = $this->requestUrldecode($order_data);
             $divisionId = $SPIRAL->getParam('divisionId');
-            $order[$divisionId] = $order_data;
-            $content = $this->unordered($order);
+
+			$in_hospital_item = InHospitalItem::where('notUsedFlag','0')->where('hospitalId', $user_info->getHospitalId());	
+
+            $puls = [];
+            $minus = [];
+            foreach($order_data as $key => $order_items)
+            {
+                if($order_items['countNum'] == 0){continue;}
+                $in_hospital_item->orWhere('inHospitalItemId',$order_items['recordId']);
+                
+                if($order_items['countNum'] > 0)
+                {
+                    if (array_key_exists($order_items['recordId'], $puls) === false) {
+                        $puls[$order_items['recordId']] = $order_items;
+                        $puls[$order_items['recordId']]['countNum'] = 0;
+                    }
+                    
+                    $puls[$order_items['recordId']]['countNum'] += (int)$order_items['countNum'];
+                }
+                if($order_items['countNum'] < 0)
+                {
+                    if (array_key_exists($order_items['recordId'], $minus) === false) {
+                        $minus[$order_items['recordId']] = $order_items;
+                        $minus[$order_items['recordId']]['countNum'] = 0;
+                    }
+                    
+                    $minus[$order_items['recordId']]['countNum'] += (int)$order_items['countNum'];
+                }
+            }
+
+            $order_data = [];
+            foreach($puls as $p)
+            {
+                $order_data[] = $p;
+            }
+            foreach($minus as $m)
+            {
+                $order_data[] = $m;
+            }
+
+            $in_hospital_item = $in_hospital_item->get();
+
+            $order_array = [];
+            foreach($order_data as $order_items)
+            {
+                if($order_items['countNum'] == 0){continue;}
+                foreach($in_hospital_item->data->all() as $item){
+                    if($order_items['recordId'] == $item->inHospitalItemId)
+                    {
+                        if (array_key_exists($divisionId, $order_array) === false) {
+                            $order_array[$divisionId] = [];
+                        }
+                        $order_array[$divisionId][] = [
+            				"makerName" => $item->makerName,
+            				"itemName" => $item->itemName,
+            				"itemCode" => $item->itemCode,
+            				"itemStandard" => $item->itemStandard,
+            				"quantity" => $item->quantity,
+            				"price" => $item->price,
+            				"itemJANCode" => $item->itemJANCode,
+            				"distributorName" => $item->distributorName,
+            				"inHospitalItemId" => $item->inHospitalItemId,
+            				"quantityUnit" => $item->quantityUnit,
+            				"itemUnit" => $item->itemUnit,
+            				"distributorId" => $item->distributorId,
+            				"catalogNo" => $item->catalogNo,
+            				"labelId" => $item->labelId,
+            				"unitPrice" => $item->unitPrice,
+            				"lotFlag" => ($item->lotManagement == 1 )? "はい": "",
+            				"lotManagement" => $item->lotManagement,
+            				"itemId" => $item->itemId,
+            				"orderQuantity" => ((int)$order_items['countNum'] > 0)? floor( (int)$order_items['countNum'] / (int)$item->quantity ) : '-'.floor( abs((int)$order_items['countNum']) / (int)$item->quantity )  
+            			];
+                    }
+                }
+            }
+            $integrate = ( $SPIRAL->getParam('integrate') == 'true');
+            $content = $this->unordered($order_array , $integrate);
 
         } catch ( Exception $ex ) {
             $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
             $content = $content->toJson();
         } finally {
+
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
             ],false);
@@ -104,30 +185,31 @@ class OrderController extends Controller
                             $order_array[$item->divisionId] = [];
                         } 
                         $order_array[$item->divisionId][] = [
-            				"maker" => $item->makerName,
-            				"shouhinName" => $item->itemName,
-            				"code" => $item->itemCode,
-            				"kikaku" => $item->itemStandard,
-            				"irisu" => $item->quantity,
-            				"kakaku" => $item->price,
-            				"jan" => $item->itemJANCode,
-            				"oroshi" => $item->distributorName,
-            				"recordId" => $item->inHospitalItemId,
-            				"unit" => $item->quantityUnit,
+            				"makerName" => $item->makerName,
+            				"itemName" => $item->itemName,
+            				"itemCode" => $item->itemCode,
+            				"itemStandard" => $item->itemStandard,
+            				"quantity" => $item->quantity,
+            				"price" => $item->price,
+            				"itemJANCode" => $item->itemJANCode,
+            				"distributorName" => $item->distributorName,
+            				"inHospitalItemId" => $item->inHospitalItemId,
+            				"quantityUnit" => $item->quantityUnit,
             				"itemUnit" => $item->itemUnit,
             				"distributorId" => $item->distributorId,
             				"catalogNo" => $item->catalogNo,
             				"labelId" => $item->labelId,
             				"unitPrice" => $item->unitPrice,
             				"lotFlag" => ($item->lotManagement == 1 )? "はい": "",
-            				"lotFlagBool" => $item->lotManagement,
+            				"lotManagement" => $item->lotManagement,
             				"itemId" => $item->itemId,
-            				"countNum" => ((int)$order_items['orderQuantity'] * (int)$item->quantity)
+            				"orderQuantity" => (int)$order_items['orderQuantity'] //定数発注の場合は個数単位
             			];
                     }
                 }
             }
-            $content = $this->unordered($order_array);
+            $integrate = ( $SPIRAL->getParam('integrate') == 'true');
+            $content = $this->unordered($order_array , $integrate);
 
         } catch ( Exception $ex ) {
             $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
@@ -139,144 +221,197 @@ class OrderController extends Controller
         }
     }
     
-    private function unordered( $order_data )
+    private function unordered( $order_data , bool $integrate)
     {
         global $SPIRAL;
         $user_info = new UserInfo($SPIRAL);
-        $insert_data = [];
-        $history_data = [];
-        $distributorDB = Distributor::where('hospitalId',$user_info->getHospitalId());
-        foreach( $order_data as $divisionId => $ordered )
+        $unorder_historys = [];
+        if($integrate)
         {
-            foreach( $ordered as $key => $order)
-            {
-                $distributorDB->orWhere('distributorId',$order['distributorId']);
-            }
+            $unorder_historys = OrderHistory::where('hospitalId',$user_info->getHospitalId())->where('orderStatus','1')->sort('id','desc')->get();
+            $unorder_historys = $unorder_historys->data->all(); //未発注履歴
         }
-        $distributorDB = $distributorDB->get();
-        $distributorDB = $distributorDB->data->all();
-            
-        //個数を合算する
-        foreach( $order_data as $divisionId => $ordered )
+        
+        /** 対応する履歴IDを取得 */
+        $history_ids = [];
+        foreach($order_data as $divisionId => $items)
         {
-            $remaked = [];
-            $remaked_mainasu = [];
-            $arrayEachDistributor = [];
-            foreach( $ordered as $key => $order)
+            foreach($items as $key => $item)
             {
-                if((int)$order['countNum'] > 0)
+                if($item['orderQuantity'] == 0){ continue; }
+                $exist = false;
+                $divisionId; //search1
+                $distributorId = $item['distributorId']; //search2
+                $puls = ($item['orderQuantity'] > 0); //search3
+                //既存の履歴の確認
+                foreach($unorder_historys as $history)
                 {
-                    if (array_key_exists($order['recordId'], $remaked) === false) {
-                        $remaked[$order['recordId']] = $order;
-                    } 
-                    else 
+                    if($exist){ break; }
+                    if(
+                        $history->divisionId === $divisionId &&
+                        $history->distributorId === $distributorId &&
+                        ($history->totalAmount >= 0) === $puls
+                    )
                     {
-                        $remaked[$order['recordId']]['countNum'] = (int)$remaked[$order['recordId']]['countNum'] + (int)$order['countNum'];
-                    }
-                }
-                else if((int)$order['countNum'] < 0)
-                {
-                    if (array_key_exists($order['recordId'], $remaked_mainasu) === false) {
-                        $remaked_mainasu[$order['recordId']] = $order;
-                    } 
-                    else 
-                    {
-                        $remaked_mainasu[$order['recordId']]['countNum'] = (int)$remaked_mainasu[$order['recordId']]['countNum'] + (int)$order['countNum'];
-                    }
-                }
-                
-            }
-            
-            $ordered = $remaked;
-            $ordered_mainasu = $remaked_mainasu;
-            
-            foreach ($distributorDB as $distributor)
-            {
-                $distributorId = $distributor->distributorId;
-                if (array_search($distributorId, $arrayEachDistributor) === false) {
-                    $arrayEachDistributor[$distributorId] = [];
-                    $arrayEachDistributor["-".$distributorId] = [];
-                }
-                
-                foreach ($ordered as $order)
-                {
-                    if ($order['distributorId'] == $distributorId) { $arrayEachDistributor[$distributorId][] = $order; }
-                }
-                
-                foreach ($ordered_mainasu as $order)
-                {
-                    if ($order['distributorId'] == $distributorId) { $arrayEachDistributor["-".$distributorId][] = $order; }
-                }
-            }
-            foreach ($arrayEachDistributor as $key => $order_data)
-            {
-                $in_hospital_item_ids = [];
-                $total_amount = 0;
-                $ordered_id = $this->makeId('03');
-                $distributorId = '';
-                $history_create_flag = false;
-                foreach($order_data as $data)
-                {
-                    $distributorId = $data['distributorId'];
-                    $sign = '';
-                    $inHPItemid = $data['recordId'];
-                    if ((int)$data['countNum'] < 0) { 
-                        $sign = '-'; 
-                    }
-                    $count = (abs((int)$data['countNum']) == 0 || (int)$data['irisu'] == 0)
-                        ? 0
-                        : floor(abs((int)$data['countNum']) / (int)$data['irisu']);
-                    if ($count > 0)
-                    {
-                        $insert_data[] = [
-                            'hospitalId' => $user_info->getHospitalId(),
-                            'inHospitalItemId' => $inHPItemid,
-                            'orderNumber' => $ordered_id,
-                            'price' => str_replace(',', '', $data['kakaku']),
-                            'orderQuantity' => $sign.floor(abs((int)$data['countNum']) / (int)$data['irisu']),
-                            'orderPrice' => $sign.str_replace(',', '', $data['kakaku']) * floor(abs((int)$data['countNum']) / (int)$data['irisu']),
-                            'receivingFlag' => '0',
-                            'quantity' => $data['irisu'],
-                            'quantityUnit' => $data['unit'],
-                            'itemUnit' => $data['itemUnit'],
-                            'divisionId' => $divisionId,
-                            'distributorId' => $data['distributorId'],
-                            'itemId' => $data['itemId']
+                        $history_ids[] = [
+                            'divisionId' => $history->divisionId,
+                            'distributorId' => $history->distributorId,
+                            'puls' => ($history->totalAmount >= 0),
+                            'orderNumber' => $history->orderNumber,
                         ];
-                        $total_amount = $total_amount + (float)($sign.str_replace(',', '', $data['kakaku']) * floor(abs((int)$data['countNum']) / (int)$data['irisu']));
-                        $history_create_flag = true;
-                        
-                        if (array_search($inHPItemid, $in_hospital_item_ids) === false) {
-                            $in_hospital_item_ids[] = $inHPItemid;
-                        }
+                        $order_data[$divisionId][$key]['orderNumber'] = $history->orderNumber;
+                        $exist = true;
                     }
                 }
-                if (count($insert_data) == 0) {
-                   continue;
-                }
-                if($history_create_flag)
+                //履歴IDから再検索
+                foreach($history_ids as $history)
                 {
-                    $history_data[] = [
-                        'orderNumber' => $ordered_id,
-                        'hospitalId' => $user_info->getHospitalId(),
+                    if($exist){ break; }
+                    if(
+                        $history['divisionId'] === $divisionId &&
+                        $history['distributorId'] === $distributorId &&
+                        $history['puls'] === $puls
+                    )
+                    {
+                        $order_data[$divisionId][$key]['orderNumber'] = $history['orderNumber'];
+                        $exist = true;
+                    }
+                }
+
+                //履歴IDを作成
+                if(!$exist)
+                {
+                    $id = $this->makeId('03');
+                    $history_ids[] = [
                         'divisionId' => $divisionId,
-                        'itemsNumber' => count($in_hospital_item_ids),//院内商品マスタID数
-                        'totalAmount' => $total_amount,
-                        'orderStatus' => '1',
-                        'hachuRarrival' => '未入庫',
-                        'distributorId' => $distributorId,
-                        'ordererUserName' => $user_info->getName()
+                        'distributorId' => $item['distributorId'],
+                        'puls' => ($item['orderQuantity'] > 0),
+                        'orderNumber' => $id,
                     ];
+                    $order_data[$divisionId][$key]['orderNumber'] = $id;
                 }
             }
         }
-        if(count($history_data) == 0 ){
-            $content = new ApiResponse([] , 0 , 0, '登録するデータがありませんでした', ['insert']);
+
+        $ordered_items = [];
+        if(count($history_ids) > 0)
+        {
+            $ordered_items = OrderedItemView::where('hospitalId',$user_info->getHospitalId());
+            foreach($history_ids as $h)
+            {
+                $ordered_items->orWhere('orderNumber',$h['orderNumber']);
+            }
+            $ordered_items = $ordered_items->get();
+            $ordered_items = $ordered_items->data->all();
+        }
+
+        $upsert = [];
+        foreach($ordered_items as $item)
+        {
+            $order_quantity = $item->orderQuantity;
+            if($order_quantity  == 0){ continue; }
+            $price = $item->price;
+            if (array_key_exists($item->divisionId, $order_data) === true) {
+                foreach($order_data[$item->divisionId] as $key => $i)
+                {
+                    if(
+                        $i['inHospitalItemId'] === $item->inHospitalItemId &&
+                        $i['orderNumber'] === $item->orderNumber &&
+                        ($i['orderQuantity'] > 0) === ($item->orderQuantity > 0) &&
+                        $i['distributorId'] === $item->distributorId
+                    )
+                    {
+                        $order_quantity = (int)$order_quantity + (int)$i['orderQuantity'];
+                        $price = $i['price'];
+                        unset($order_data[$item->divisionId][$key]); //未発注商品と一致した場合、配列から削除
+                        break;
+                    }
+                }
+            }
+            $upsert[] = [
+                'hospitalId' => $item->hospitalId,
+                'inHospitalItemId' => $item->inHospitalItemId,
+                'orderNumber' => $item->orderNumber,
+                'orderCNumber' => $item->orderCNumber,
+                'price' => $price,
+                'orderQuantity' => $order_quantity,
+                'orderPrice' => ($order_quantity * $price),
+                'receivingFlag' => $item->receivingFlag,
+                'quantity' => $item->quantity,
+                'quantityUnit' => $item->quantityUnit,
+                'itemUnit' => $item->itemUnit,
+                'divisionId' => $item->divisionId,
+                'distributorId' => $item->distributorId,
+                'itemId' => $item->itemId,
+            ];
+        }
+        //一致しなかったものを新規登録として作成
+        foreach($order_data as $divisionId => $order_items)
+        {
+            foreach($order_items as $item)
+            {
+                if($item['orderQuantity']  == 0){ continue; }
+                $upsert[] = [
+                    'hospitalId' => $user_info->getHospitalId(),
+                    'inHospitalItemId' => $item['inHospitalItemId'],
+                    'orderNumber' => $item['orderNumber'],
+                    'orderCNumber' => '',
+                    'price' => $item['price'],
+                    'orderQuantity' => $item['orderQuantity'],
+                    'orderPrice' => ($item['orderQuantity'] * $item['price']),
+                    'receivingFlag' => '0',
+                    'quantity' => $item['quantity'],
+                    'quantityUnit' => $item['quantityUnit'],
+                    'itemUnit' => $item['itemUnit'],
+                    'divisionId' => $divisionId,
+                    'distributorId' => $item['distributorId'],
+                    'itemId' => $item['itemId'],
+                ];
+            }
+        }
+
+        $history = [];
+        foreach($upsert as $item)
+        {
+            if (array_key_exists($item['orderNumber'], $history) === false)
+            {
+                $history[$item['orderNumber']] = 
+                [
+                    'orderNumber' => $item['orderNumber'],
+                    'hospitalId' => $user_info->getHospitalId(),
+                    'divisionId' => $item['divisionId'],
+                    'orderStatus' => '1',
+                    'itemsNumber' => [],
+                    'totalAmount' => 0,
+                    'hachuRarrival' => '未入庫',
+                    'distributorId' => $item['distributorId'],
+                    'ordererUserName' => $user_info->getName()
+                ];
+            }
+            if(array_search($item['inHospitalItemId'], $history[$item['orderNumber']]['itemsNumber']) === false)
+            {
+                $history[$item['orderNumber']]['itemsNumber'][] = $item['inHospitalItemId'];
+            }
+            $history[$item['orderNumber']]['totalAmount'] += (float)$item['orderPrice'];
+        }
+
+        foreach($history as $k => $h)
+        {
+            $history[$k]['itemsNumber'] = count($history[$k]['itemsNumber']);
+        }
+
+        $history = array_values($history);
+        $upsert = array_values($upsert);
+        if(count($history) !== 0 && count($upsert) !== 0){
+            $result = OrderHistory::upsert('orderNumber',$history);
+            $result = Order::upsert('orderCNumber',$upsert);
+        }
+        if(count($history) === 0 && count($upsert) === 0){
+            $content = new ApiResponse([], 0 , 0, "is not data", ['insert']);
             return $content->toJson();
         }
-        $result = OrderHistory::insert($history_data);
-        $result = Order::insert($insert_data);
-        $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+        
+        $content = new ApiResponse($history , $result->count , $result->code, $result->message, ['insert']);
         return $content->toJson();
     }
     

@@ -791,7 +791,8 @@ class InventoryAdjustmentTransaction extends Model
         "rackName",
         "constantByDiv",
         "loginId",
-        "previousStock"
+        "previousStock",
+        "changeReason"
     ];
 
     //デフォルト値
@@ -2304,4 +2305,110 @@ class AllNewItemInsert extends Model
 
     public static $select = [];
     
+}
+
+
+
+class PayScheduleItems extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "NJ_PayScheduleDB";
+    public static $guarded = ["id"];
+    public static $primary_key = "payoutPlanId";
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "payoutPlanTime",
+        "payoutPlanId",
+        "pickingId",
+        "inHospitalItemId",
+        "itemId",
+        "hospitalId",
+        "cardId",
+        "sourceDivisionId",
+        "targetDivisionId",
+        "payoutQuantity",
+        "outOfStockStatus",
+        "sourceDivision",
+        "targetDivision",
+    ];
+
+    //デフォルト値
+    public static $attributes = [
+        'outOfStockStatus' => '1',
+    ];
+
+    public static $select = [
+        'outOfStockStatus' => [
+            '1'=>"未チェック",
+            '2'=>"払出可能",
+            '3'=>"欠品",
+        ]
+    ];
+}
+
+class PayScheduleItemsView extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "payoutSchedule";
+    public static $guarded = ["id"];
+    public static $primary_key = "payoutPlanId";
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "payoutPlanTime",
+        "payoutPlanId",
+        "pickingId",
+        "inHospitalItemId",
+        "itemId",
+        "hospitalId",
+        "cardId",
+        "sourceDivisionId",
+        "targetDivisionId",
+        "payoutQuantity",
+        "outOfStockStatus",
+        "catalogNo",
+        "serialNo",
+        "quantity",
+        "quantityUnit",
+        "itemUnit",
+        "medicineCategory",
+        "homeCategory",
+        "notUsedFlag",
+        "itemName",
+        "itemCode",
+        "itemStandard",
+        "itemJANCode",
+        "notice",
+        "HPstock",
+        "makerName",
+        "price",
+        "minPrice",
+        "officialFlag",
+        "priceId",
+        "unitPrice",
+        "measuringInst",
+        "distributorName",
+        "lotManagement",
+        "category",
+    ];
+
+    //デフォルト値
+    public static $attributes = [
+        'outOfStockStatus' => '1',
+    ];
+
+    public static $select = [
+        'outOfStockStatus' => [
+            '1'=>"未チェック",
+            '2'=>"払出可能",
+            '3'=>"欠品",
+        ]
+    ];
 }

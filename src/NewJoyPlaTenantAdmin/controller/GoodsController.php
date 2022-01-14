@@ -163,6 +163,7 @@ class GoodsController extends Controller
             $auth = new Auth();
             
             $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
+            //$rowData = $SPIRAL->getParam('rowData');
             
             $insert_data = [];
             foreach($rowData as $row)
@@ -235,6 +236,7 @@ class GoodsController extends Controller
         
         
         $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
+        //$rowData = $SPIRAL->getParam('rowData');
         $messages = [];
         
         $distributor = Distributor::where('hospitalId',$_POST['hospitalId']);

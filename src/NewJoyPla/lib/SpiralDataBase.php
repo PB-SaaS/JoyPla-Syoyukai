@@ -50,6 +50,10 @@ class SpiralDataBase {
 		$this->groupBy = $fields;
 	}
 
+    public function setGroupByField(string $field){
+		$this->groupBy[] = $field;
+	}
+
 	public function setDataBase(string $databaseTitle){
 		$this->database = $databaseTitle;
 	}
@@ -190,7 +194,7 @@ class SpiralDataBase {
 			$resdata = array_merge($resdata, $response['data']);
 		}
 		$this->clearData();
-		return array( 'data' => $resdata , 'count' => $response['count'] , 'code' => '0' ,'message' => $response['message']);
+		return array( 'data' => $resdata , 'count' => $response['count'] , 'code' => '0' ,'message' => $response['message'] , 'label' => $response['label']);
 	}
 
 	private function clearData(){
@@ -204,6 +208,14 @@ class SpiralDataBase {
 		$this->linesPerPage = 1000;
 	}
 
+	public function labelToNameArray(array $label , array $selectColumns){
+		$result = array();
+		foreach($selectColumns as $key => $data){
+			if($data == 'id'){ continue; }
+			$result[$data] = $label[$key];
+		}
+		return $result;
+	}
 	
 	public function arrayToNameArray(array $selectData , array $selectColumns){
 		$result = array();

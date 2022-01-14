@@ -147,6 +147,9 @@
                             <th class="uk-text-nowrap">
                                 調整数
                             </th>
+                            <th class="uk-text-nowrap">
+                                変更理由
+                            </th>
                             <th>
                             </th>
                         </tr>
@@ -169,6 +172,9 @@
                             <td class="uk-text-nowrap">
                                 <input type="number" step="1" class="uk-input" style="width: 96px;" v-bind:style="list.countStyle" v-model="list.lotCountNum" v-on:change="addCountStyle(key)">
                                 <span class="uk-text-bottom">{{list.unit}}</span>
+                            </td>
+                            <td class="uk-text-nowrap">
+                                <textarea class="uk-textarea uk-width-small" v-model="list.changeReason" v-bind:style="list.changeReasonStyle"  v-on:change="addChangeReasonStyle(key)"></textarea>
                             </td>
                             <td uk-margin class="uk-text-center uk-text-nowrap">
                                 <input type="button" class="uk-button uk-button-danger uk-button-small" value="削除" v-on:click="deleteList(key)">
@@ -301,6 +307,8 @@ var app = new Vue({
         	object.lotDateStyle = {};
         	object.lotNumberStyle = {};
         	object.countStyle = {};
+			object.changeReason = "";
+			object.changeReason = "";
 			app.lists.push(object);
 			
 		},
@@ -430,6 +438,27 @@ var app = new Vue({
 				UIkit.modal.alert('調整数を確認してください');
 				return false ;
 			}
+
+
+			let checkflg = true;
+			let errormsg = new Object();
+			errormsg.changeReason = "";
+			app.lists.forEach(function(elem, index) {
+				let checkObject = app.lists[index];
+			    if(checkObject.changeReason.bytes() > 1024 || checkObject.changeReason.bytes() == 0) {
+    				errormsg.changeReason = "<br>変更理由：半角1024文字全角512文字以内で入力してください";
+			        checkObject.changeReasonStyle = { 'border' : "2px solid red"};
+    			    checkflg = false;
+			    }
+				app.$set(app.lists, index, checkObject);
+			});
+			
+			if(!checkflg)
+			{
+				UIkit.modal.alert('値が正しく入力されていません'+ errormsg.changeReason );
+			    return false;
+			}
+
 			return true;
 		},
 		addLotNumberStyle: function(index){
@@ -447,6 +476,11 @@ var app = new Vue({
 			changeObject.countStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
 			app.$set(app.lists, index, changeObject);
 		},
+		addChangeReasonStyle: function(index){
+			let changeObject = app.lists[index];
+			changeObject.changeReasonStyle = { 'backgroundColor' : "rgb(255, 204, 153)" , 'color' : "rgb(68, 68, 68)"};
+			app.$set(app.lists, index, changeObject);
+		},
 		
 		barcodeSearch: function(barcode , lotNumber , lotDate , gs1_128_search_flg) {
 			if(! this.checkDivision()){
@@ -457,6 +491,7 @@ var app = new Vue({
                 url:'%url/rel:mpgt:labelBarcodeSAPI%',
                 type:'POST',
                 data:{
+					_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
                 	divisionId : app.divisionId,
                 	barcode : barcode,
                 },

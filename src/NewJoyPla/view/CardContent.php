@@ -470,6 +470,7 @@ var app = new Vue({
                 url:'%url/rel:mpgt:labelBarcodeSAPI%',
                 type:'POST',
                 data:{
+					_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
                 	barcode : barcode,
                 },
                 dataType: 'json'

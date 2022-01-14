@@ -31,6 +31,9 @@ class LabelBarcodeSearchController extends Controller
 		global $SPIRAL;
 
         try {
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+
 			$user_info = new UserInfo($SPIRAL);
 	
             //$token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
@@ -79,6 +82,7 @@ class LabelBarcodeSearchController extends Controller
 				}
 				$data = [
 					"divisionId" => $divisionId,
+					"itemId" => $in_hospital_item->itemId,
 					"maker" => $in_hospital_item->makerName,
 					"shouhinName" => $in_hospital_item->itemName,
 					"code" => $in_hospital_item->itemCode,
@@ -128,6 +132,7 @@ class LabelBarcodeSearchController extends Controller
 				}
 				$data = [
 					"divisionId" => $record->targetDivisionId,
+					"itemId" => $in_hospital_item->itemId,
 					"maker" => $in_hospital_item->makerName,
 					"shouhinName" => $in_hospital_item->itemName,
 					"code" => $in_hospital_item->itemCode,
@@ -175,6 +180,7 @@ class LabelBarcodeSearchController extends Controller
 				$in_hospital_item = $in_hospital_item->data->get(0);
 				$data = [
 					"divisionId" => $record->divisionId,
+					"itemId" => $in_hospital_item->itemId,
 					"maker" => $in_hospital_item->makerName,
 					"shouhinName" => $in_hospital_item->itemName,
 					"code" => $in_hospital_item->itemCode,
@@ -217,6 +223,7 @@ class LabelBarcodeSearchController extends Controller
 					$record = $result->data->get(0);
 					$data = [
 						"divisionId" => '',
+						"itemId" => $record->itemId,
 						"maker" => $record->makerName,
 						"shouhinName" => $record->itemName,
 						"code" => $record->itemCode,
@@ -239,6 +246,7 @@ class LabelBarcodeSearchController extends Controller
 					foreach($result->data->all() as $record){
 						$data[] = [
 							"divisionId" => '',
+							"itemId" => $record->itemId,
 							"maker" => $record->makerName,
 							"shouhinName" => $record->itemName,
 							"code" => $record->itemCode,
@@ -290,6 +298,7 @@ class LabelBarcodeSearchController extends Controller
 				
 				$data = [
 					"divisionId" => '',
+					"itemId" => $record->itemId,
 					"maker" => $record->makerName,
 					"shouhinName" => $record->itemName,
 					"code" => $record->itemCode,

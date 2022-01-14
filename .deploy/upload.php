@@ -19,7 +19,10 @@ curl_setopt($curl, CURLOPT_POST , true);
 curl_setopt($curl, CURLOPT_POSTFIELDS , $json);
 curl_setopt($curl, CURLOPT_HTTPHEADER , $api_headers);
 curl_exec($curl);
-if (curl_errno($curl)) echo curl_error($curl);
+if (curl_errno($curl)){
+    echo curl_error($curl);
+    exit(1);
+}
 $response = curl_multi_getcontent($curl);
 curl_close($curl);
 $response = json_decode($response , true);

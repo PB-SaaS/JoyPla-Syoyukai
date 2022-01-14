@@ -109,4 +109,34 @@ function pager($c, $t, $limit) {
     </div>
     <?php
 }
+
+function array_obj_find($arr,string $key ,string $findVal)
+{
+    foreach($arr as $a)
+    {
+        if(is_object($a))
+        {  
+            if($a->{$key} === $findVal)
+            {
+                return $a;
+            }
+        }
+        else if(is_array($a))
+        {  
+            if($a[$key] === $findVal)
+            {
+                return $a;
+            }
+        }
+        else if(is_string($a))
+        {
+            if($a === $findVal)
+            {
+                return $a;
+            }
+        }
+    }
+
+    return "";
+}
 ?>

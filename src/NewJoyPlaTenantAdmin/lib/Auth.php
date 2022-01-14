@@ -43,11 +43,12 @@ class Auth extends TenantMaster
 				return true;
 			}
 		}
-		else if( $this->authority === "2" )
+		else if( is_numeric($this->authority) )
 		{
-			if(isset(GateSetting['custom1'][$page]))
+			$key = "custom" . ((int)($this->authority) - 1);
+			if(isset(GateSetting[$key][$page]))
 			{
-				return GateSetting['custom1'][$page];
+				return GateSetting[$key][$page];
 			}
 			else
 			{

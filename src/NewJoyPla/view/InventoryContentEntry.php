@@ -443,6 +443,7 @@ var app = new Vue({
                 url:'%url/rel:mpgt:labelBarcodeSAPI%',
                 type:'POST',
                 data:{
+					_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
                 	divisionId : app.divisionId,
                 	barcode : barcode,
                 },

@@ -153,10 +153,11 @@ class InHospitalItemController extends Controller
         Csrf::validate($token,true);
         
         $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
+        //$rowData = $SPIRAL->getParam('rowData');
         $messages = [];
         
         $item = Item::where('tenantId',$auth->tenantId);
-        $distributor = Distributor::where('hospitalId',$_POST['hospitalId']);
+        $distributor = Distributor::where('hospitalId',$SPIRAL->getParam('hospitalId'));
         
         foreach($rowData as $row)
         {
@@ -214,24 +215,24 @@ class InHospitalItemController extends Controller
             $auth = new Auth();
             
             $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
+            //$rowData =  $SPIRAL->getParam('rowData');
             
             $insert_data = [];
             foreach($rowData as $rows)
             {
                 $insert_data[] = 
                     [
-                        "hospitalId" => $_POST['hospitalId'],
+                        "hospitalId" => $SPIRAL->getParam('hospitalId'),
                         "itemId" => $rows['data'][0],
                         "distributorId" => $rows['data'][1],
                         "notUsedFlag" => $rows['data'][2],
-                        "minPrice" => $rows['data'][3],
-                        "unitPrice" => $rows['data'][4],
-                        "measuringInst" => $rows['data'][5],
-                        "quantity" => $rows['data'][6],
-                        "quantityUnit" => $rows['data'][7],
-                        "itemUnit" => $rows['data'][8],
-                        "price" => $rows['data'][9],
-                        "notice" => $rows['data'][10],
+                        "unitPrice" => $rows['data'][3],
+                        "measuringInst" => $rows['data'][4],
+                        "quantity" => $rows['data'][5],
+                        "quantityUnit" => $rows['data'][6],
+                        "itemUnit" => $rows['data'][7],
+                        "price" => $rows['data'][8],
+                        "notice" => $rows['data'][9],
                     ];
             }
             $result = InHospitalTrDb::insert($insert_data);
