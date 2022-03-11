@@ -50,12 +50,47 @@ html {
                 入庫ラベル発行
             </h1>
             <div class="no_print">
-            <form class="uk-form-stacked uk-child-width-1-2 uk-width-1-2@m" uk-grid>
+            <form class="uk-form-stacked uk-child-width-1-2 uk-width-1-2@m" uk-grid :action="form_action" method="post" name="setting_form" id="app">
+                <input type="hidden" :value="receiving_id" name="receivingId">
+                <input type="hidden" value="" name="print_counts">
+                <div class="uk-width-1-1">
+                    <div class="uk-margin">
+                        <table class="uk-table uk-table-divider"> 
+                            <tr>
+                                <th>id</th>
+                                <th>検収番号</th>
+                                <th>商品情報</th>
+                                <th>印刷枚数</th>
+                            </tr>
+                            <tr v-for="( elm , index ) in print_counts">
+                                <td>{{ index + 1 }}</td>
+                                <td>{{ elm.receivingHId }}</td>
+                                <td>
+                                    <div uk-grid margin="0">
+                                        <div class="uk-width-1-4 uk-text-muted">メーカー</div>
+                                        <div class="uk-width-3-4">{{ get_item_object(elm.receivingNumber).makerName }}</div>
+                                        <div class="uk-width-1-4 uk-text-muted">商品名</div>
+                                        <div class="uk-width-3-4">{{ get_item_object(elm.receivingNumber).itemName }}</div>
+                                        <div class="uk-width-1-4 uk-text-muted">製品コード</div>
+                                        <div class="uk-width-3-4">{{ get_item_object(elm.receivingNumber).itemCode }}</div>
+                                        <div class="uk-width-1-4 uk-text-muted">規格</div>
+                                        <div class="uk-width-3-4">{{ get_item_object(elm.receivingNumber).itemStandard }}</div>
+                                        <div class="uk-width-1-4 uk-text-muted">JANコード</div>
+                                        <div class="uk-width-3-4">{{ get_item_object(elm.receivingNumber).itemJANCode }}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="number" v-model="elm.count" class="uk-input">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
                 <div>
                     <div class="uk-margin">
                         <label class="uk-form-label">印刷タイプ</label>
                         <div class="uk-form-controls">
-                            <select name="printType" class="uk-select">
+                            <select name="printType" class="uk-select" v-model="label_setting.printType">
                                 <option value="1">ラベルプリンター</option>
                                 <option value="2">A4印刷</option>
                             </select>
@@ -64,7 +99,7 @@ html {
                     <div class="uk-margin">
                         <label class="uk-form-label">バーコードの高さ</label>
                         <div class="uk-form-controls">
-                            <input type="number" name="barcodeHeight" value="" class="uk-input uk-width-2-3"><span class="uk-text-bottom">px</span>
+                            <input type="number" name="barcodeHeight" v-model="label_setting.barcodeHeight" class="uk-input uk-width-2-3"><span class="uk-text-bottom">px</span>
                         </div>
                     </div>
                 </div>
@@ -72,18 +107,18 @@ html {
                     <div class="uk-margin">
                         <label class="uk-form-label">ラベルの幅</label>
                         <div class="uk-form-controls">
-                            <input type="number" name="labelwidth" value="" class="uk-input uk-width-2-3"><span class="uk-text-bottom">mm</span>
+                            <input type="number" name="labelwidth" v-model="label_setting.labelwidth" class="uk-input uk-width-2-3"><span class="uk-text-bottom">mm</span>
                         </div>
                     </div>
                     <div class="uk-margin">
                         <label class="uk-form-label">ラベルの最小高さ</label>
                         <div class="uk-form-controls">
-                            <input type="number" name="labelmheight" value="" class="uk-input uk-width-2-3"><span class="uk-text-bottom">mm</span>
+                            <input type="number" name="labelmheight" v-model="label_setting.labelmheight" class="uk-input uk-width-2-3"><span class="uk-text-bottom">mm</span>
                         </div>
                     </div>
                 </div>
                 <div class="uk-width-1-1 uk-text-center">
-                    <button onclick="receiving_label.setting()" type="button" class="uk-button uk-button-small ">反映</button>
+                    <button v-on:click="setting" type="button" class="uk-button uk-button-small ">反映</button>
                 </div>
 
             </form>
@@ -115,8 +150,7 @@ html {
                 }
                 
                 $max = 0;
-                $max = (int)$item->receivingCount - (int)$item->totalReturnCount;
-                
+                $max = $item->print_count;
                 for($rnum = 1 ; $rnum <= $max; $rnum++){
                     $receiving_num = str_replace('rec_', '', $item->receivingNumber);
                     $barcodeId = "20".$receiving_num; // 検収書から生成できるバーコードは20にする。
@@ -163,6 +197,7 @@ html {
                         echo "</div>";
                     }
                     $num ++ ;
+                    
                 }
             }
             ?>
@@ -171,38 +206,49 @@ html {
     </div>
 </div>
 <script>
-    class ReceivingLabel
-    {
-        constructor()
-        {
-            this.label_setting = JSON.parse(localStorage.getItem("joypla_LabelCreate"));
-            if(!this.label_setting){
-                this.label_setting = {
-                "barcodeHeight": 50,
-                "labelwidth": 85,
-                "labelmheight": 50,
-                "printType": 1,
-                };
+
+    let register_data = {
+        print_counts : <?php echo json_encode($print_counts) ?>,
+        receiving_items : <?php echo json_encode($receiving_items) ?>,
+        form_action: "<?php echo $form_action ?>",
+        receiving_id: "<?php echo $receiving_id ?>",
+        count : "<?php echo  $num ?>",
+    };
+    var app = new Vue({
+        el: '#app',
+        data: {
+            print_counts: register_data.print_counts,
+            receiving_items: register_data.receiving_items,
+            form_action: register_data.form_action,
+            receiving_id: register_data.receiving_id,
+            count: register_data.count,
+            label_setting: {
+                    "barcodeHeight": 50,
+                    "labelwidth": 85,
+                    "labelmheight": 50,
+                    "printType": 1,
+                }
+        },
+        created(){
+            document.querySelector('input[name=print_counts]').value = JSON.stringify(this.print_counts);
+            let storage_item = localStorage.getItem("joypla_LabelCreate");
+            if(storage_item){
+                this.label_setting = JSON.parse(localStorage.getItem("joypla_LabelCreate"));
             }
-
-            document.getElementsByName('barcodeHeight')[0].value = this.label_setting["barcodeHeight"];
-            document.getElementsByName('labelwidth')[0].value = this.label_setting["labelwidth"];
-            document.getElementsByName('labelmheight')[0].value = this.label_setting["labelmheight"];
-            document.getElementsByName('printType')[0].value = this.label_setting["printType"];
-
+            
             const style = document.createElement('style');
             style.innerHTML = `
             .printarea {
-                width:`+this.label_setting["labelwidth"]+`mm;
-                min-height:`+this.label_setting["labelmheight"]+`mm;
+                width:`+this.label_setting.labelwidth+`mm;
+                min-height:`+this.label_setting.labelmheight+`mm;
             }
             `;
 
-            if(this.label_setting["printType"] == '2'){
+            if(this.label_setting.printType == '2'){
                 style.innerHTML = `
                 .printarea {
-                    width:`+this.label_setting["labelwidth"]+`mm;
-                    min-height:`+this.label_setting["labelmheight"]+`mm;
+                    width:`+this.label_setting.labelwidth+`mm;
+                    min-height:`+this.label_setting.labelmheight+`mm;
                     display: inline-block;
 					page-break-after: auto !important;
                 }
@@ -210,15 +256,15 @@ html {
             }
             document.body.appendChild(style);
 
-            
             //let count = $('#createLabel').children().length;
-            let count = "<?= $num ?>";
-            let num ;
-            for(let i = 1 ; i < count ; i++){
-                num = $('#barcode_' + i).text();
-                $('#barcode_' + i).html('<svg id="barcode_area_'+i+'"></svg>');
-                this.generateBarcodeForLabel('barcode_area_' + i,num);
-                //$('td#barcode_' + i +' div').barcode(num, "ean13",{barWidth: 2 ,barHeight: 40 , output: 'css'});
+            let num;
+            for(let i = 1 ; i < this.count ; i++){
+                if($('#barcode_' + i).length > 0){
+                    num = $('#barcode_' + i).text();
+                    $('#barcode_' + i).html('<svg id="barcode_area_'+i+'"></svg>');
+                    this.generate_barcode('barcode_area_' + i,num);
+                    //$('td#barcode_' + i +' div').barcode(num, "ean13",{barWidth: 2 ,barHeight: 40 , output: 'css'});
+                }
             }
             
             if(document.getElementsByName('printType')[0].value == 2){
@@ -233,25 +279,25 @@ html {
                     pointHeight = 0;
                 });
             }
+        },
+        methods: {
+            generate_barcode(idname,value)
+            {
+                let height = this.label_setting.barcodeHeight;
+                
+                JsBarcode("#"+idname,value,{format: "ITF", width: 1.8, height: height,fontSize: 14});
+            },
+            get_item_object : function(receiving_number)
+            {
+                if(!receiving_number){ return {} }
+                return this.receiving_items.find(s => s.receivingNumber === receiving_number);
+            },
+            setting: function()
+            {
+                document.querySelector('input[name=print_counts]').value = JSON.stringify(this.print_counts);
+                localStorage.setItem("joypla_LabelCreate", JSON.stringify(this.label_setting));
+                document.setting_form.submit();
+            }
         }
-        setting()
-        {
-            this.label_setting = {
-                "barcodeHeight":document.getElementsByName('barcodeHeight')[0].value,
-                "labelwidth":document.getElementsByName('labelwidth')[0].value,
-                "labelmheight":document.getElementsByName('labelmheight')[0].value,
-                "printType":document.getElementsByName('printType')[0].value,
-                };
-            localStorage.setItem("joypla_LabelCreate", JSON.stringify(this.label_setting));
-            location.reload();
-        }
-        generateBarcodeForLabel(idname,value)
-        {
-            let height = document.getElementsByName('barcodeHeight')[0].value;
-            JsBarcode("#"+idname,value,{format: "ITF", width: 1.8, height: height,fontSize: 14});
-        }
-    }
-
-    let receiving_label = new ReceivingLabel();
-    
+    });
 </script>

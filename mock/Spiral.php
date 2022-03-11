@@ -37,6 +37,7 @@ class Spiral{
     }
 
     public function getParam(string $_name = null){
+        return [];
     }
     
     public function getParams(string $_name = null){

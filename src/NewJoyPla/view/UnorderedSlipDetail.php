@@ -160,7 +160,8 @@
 									<input class="print_hidden uk-button uk-button-primary uk-align-center" type="button" value="コメントを更新" onclick="commentUpdate();return false;">
 									<?php endif ?>
 	    							<?php if($userInfo->isApprover()): ?>
-		    						%val:usr:ordercomment:br%
+									<textarea class="uk-textarea uk-width-1-1 uk-hidden" rows="5" name="ordercomment" placeholder="コメント...">%val:usr:ordercomment%</textarea>
+									%val:usr:ordercomment:br%
 									<?php endif ?>
 								</td>
 							</tr>

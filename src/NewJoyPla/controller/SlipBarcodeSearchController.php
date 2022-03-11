@@ -15,6 +15,7 @@ use App\Model\ReturnHistory;
 use App\Model\PayoutHistory;
 use App\Model\InventoryHistory;
 use App\Model\InventoryEnd;
+use App\Model\PickingHistory;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use StdClass;
@@ -69,6 +70,7 @@ class SlipBarcodeSearchController extends Controller
                   $search_value = $SPIRAL->getParam('searchValue');
                   $card_title = '';
                   $record = '';
+                  $content = '';
                   
                   if(preg_match('/^02/', $search_value) && strlen($search_value) == 18)
                   {
@@ -95,13 +97,12 @@ class SlipBarcodeSearchController extends Controller
                         }
 
                         $record = $result->data->get(0);
-
+                        if($record->orderStatus == '1'){
+                              $card_title = $this->card_title['03_unorder'];
+                        }
+                        else
                         if(isset($this->card_title['03_order'])){
                               $card_title = $this->card_title['03_order'];
-                        }
-
-                        if($record->orderStatus == '1' && isset($card_title['03_unorder'])){
-                              $card_title = $card_title['03_unorder'];
                         }
 
                   } 
@@ -180,20 +181,35 @@ class SlipBarcodeSearchController extends Controller
                               $card_title = $this->card_title['09'];
                         }
                   }
+                  else if(preg_match('/^12/', $search_value) && strlen($search_value) == 18)
+                  {
+                        //ピッキングリスト
+                        $search = PickingHistory::where('hospitalId',$user_info->getHospitalId())->where('pickingId',$search_value)->get();
+                        if($search->count == 0)
+                        {
+                              throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+                        }
+                        $search = $search->data->get(0);
+                        $content = json_encode( [ 'code' => 0 , 'message' => 'OK' , 'urls' => [ '%url/rel:mpgt:Payout%&Action=pickingListSlip&id=' . $search->id ]],JSON_UNESCAPED_SLASHES);
+                  }
+                  
+                  if($content == ''){
+                        
+                        if($card_title != '' && $record != '' )
+                        {
+                              $this->spiral_table->setJsessionid($this->jsessonId);
+                              $this->spiral_table->setMyAreaTitle($this->my_area_title);
+                              $this->spiral_table->setCardTitle($card_title);
+                              $this->spiral_table->addIds($record->id);
+                              $content = $this->spiral_table->getCardUrls();
+                              $content = json_encode($content,JSON_UNESCAPED_SLASHES);
+                        }
+                        else 
+                        {
+                              throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+                        }
+                  }
 
-                  if($card_title != '' && $record != '')
-                  {
-                        $this->spiral_table->setJsessionid($this->jsessonId);
-                        $this->spiral_table->setMyAreaTitle($this->my_area_title);
-                        $this->spiral_table->setCardTitle($card_title);
-                        $this->spiral_table->addIds($record->id);
-                        $content = $this->spiral_table->getCardUrls();
-                        $content = json_encode($content);
-                  }
-                  else 
-                  {
-                        throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
-                  }
 
             } catch ( Exception $ex ) {
                   $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['SlipBarcodeSearch']);

@@ -88,8 +88,7 @@ class ProductQuotationController extends Controller
                 'table' => '<div class="uk-margin-auto uk-width-4-5@m">%sf:usr:search92%</div>',
                 'csrf_token' => Csrf::generate(16)
                 ] , false);
-    
-    
+
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
@@ -112,6 +111,44 @@ class ProductQuotationController extends Controller
             ],false);
         }
     }
+    
+    public function priceList(): View
+    {
+        global $SPIRAL;
+        try {
+        
+            $user_info = new UserInfo($SPIRAL);
+
+            $content = $this->view('NewJoyPla/view/template/List', [
+                    'title' => '金額情報一覧',
+                    'print' => true,
+                    'export' => true,
+                    'table' => '%sf:usr:search58%',
+                    'userInfo' => $user_info,
+                    'csrf_token' => Csrf::generate(16),
+                    'distributor' => $distributor,
+                    ] , false);
+        
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+               'SPIRAL' => $SPIRAL
+            ], false);
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla 金額情報一覧',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
+    }
 }
 
 /***
@@ -125,6 +162,10 @@ $action = $SPIRAL->getParam('Action');
     if($action === 'Quotation')
     {
         echo $ProductQuotationController->quotation()->render();
+    }
+    else if($action === 'PriceList')
+    {
+        echo $ProductQuotationController->priceList()->render();
     }
     else 
     {

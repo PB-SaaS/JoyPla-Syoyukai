@@ -17,6 +17,7 @@ class PayoutHistListController extends Controller
 {
     public function __construct()
     {
+        
     }
     
     

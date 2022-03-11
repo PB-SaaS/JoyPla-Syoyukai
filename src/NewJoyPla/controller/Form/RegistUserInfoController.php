@@ -100,8 +100,8 @@ class RegistUserInfoController extends Controller
             $division = $division->data->get(0);
             
             $content = $this->view('NewJoyPla/view/Form/RegistUserInfo/Confirm', [
-                    'divisionName' => $division->divisionName,
-                    ] , true);
+                    'divisionName' => \App\Lib\html($division->divisionName),
+                    ] , false);
         
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [

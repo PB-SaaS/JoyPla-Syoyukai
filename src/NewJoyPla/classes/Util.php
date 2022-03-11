@@ -18,7 +18,8 @@ namespace validate
 
     function isValueEmpty ($value): bool
     {
-        return $value == null || strlen(trim($value, " \t")) === 0;
+        return $value == null || $value == '';
+        //return $value == null || strlen(trim($value, " \t")) === 0;
     }
 
     function isOnlyKana ($value): bool

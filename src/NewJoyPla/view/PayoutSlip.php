@@ -51,7 +51,6 @@
                                     <th class="uk-table-expand">ロット番号</th>
                                     <th class="uk-table-expand">使用期限</th>
                                     <th class="uk-text-nowrap">入数</th>
-                                    <th class="uk-text-nowrap">価格</th>
                                     <th class="uk-text-nowrap">単価</th>
                                     <th class="uk-text-nowrap">数量</th>
                                     <th></th>
@@ -73,7 +72,6 @@
 				    						echo "<td>".$record->lotNumber."</td>";
 				    						echo "<td>".$record->lotDate."</td>";
 				    						echo "<td class='uk-text-nowrap'>".$record->quantity.$record->quantityUnit."</td>";
-				    						echo "<td class='uk-text-nowrap'>￥".number_format($record->price,2)." / ".$record->quantityUnit."</td>";
 				    						echo "<td class='uk-text-nowrap'>￥".number_format($record->unitPrice,2)."</td>";
 											echo "<td class='uk-text-nowrap'>".$record->payoutCount.$record->quantityUnit."</td>";
 											

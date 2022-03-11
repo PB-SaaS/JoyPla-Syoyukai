@@ -41,7 +41,7 @@ class SystemNotificationSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => "%url/rel:mpgt:TopPage%&Action=systemNotification&table_cache=true",
                 'back_text' => 'システム通知',
-                'title'     => 'JoyPla-Tenant-Master システム通知詳細',
+                'title'     => 'JoyPla システム通知詳細',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

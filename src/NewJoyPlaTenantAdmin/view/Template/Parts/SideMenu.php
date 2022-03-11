@@ -57,6 +57,8 @@ $auth = new App\Lib\Auth();
             <ul class="uk-nav-sub">
     		    <li class=" <?php echo $n5_1 ?>"><a href="%url/rel:mpgt:Stocks%">在庫管理</a></li>
     		    <li class=" <?php echo $n5_2 ?>"><a href="%url/rel:mpgt:Stocks%&Action=Lots">ロット管理</a></li>
+    		    <li class=" <?php echo $n5_3 ?>"><a href="%url/rel:mpgt:Stocks%&Action=Cards">カード情報管理</a></li>
+    		    <li class=" <?php echo $n5_4 ?>"><a href="%url/rel:mpgt:Stocks%&Action=CardsBulkInsert">カード情報一括登録</a></li>
 		    </ul>
 		</li>
 		<li class="uk-parent <?php echo $n6 ?>">

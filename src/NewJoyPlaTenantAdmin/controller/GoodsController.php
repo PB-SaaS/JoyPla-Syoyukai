@@ -49,7 +49,7 @@ class GoodsController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 商品管理',
+                'title'     => 'JoyPla 商品管理',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -94,7 +94,7 @@ class GoodsController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 商品情報登録',
+                'title'     => 'JoyPla 商品情報登録',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -142,7 +142,7 @@ class GoodsController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 新規導入用一括登録',
+                'title'     => 'JoyPla 新規導入用一括登録',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

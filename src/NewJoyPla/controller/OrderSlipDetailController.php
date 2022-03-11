@@ -277,7 +277,7 @@ class OrderSlipDetailController extends Controller
             $in_hospital_item_ids = [];
             $total_price = [];
             
-            foreach ($receiving_items as $item)
+            foreach ($receiving_items as $item) 
             {
                 if ($item['countNum'] != 0)
                 {
@@ -293,7 +293,7 @@ class OrderSlipDetailController extends Controller
                         'receivingPrice' => (float)$item['countNum'] * (float)$item['price'],
                         'hospitalId' => $user_info->getHospitalId(),
                         'distributorId' => $card->distributorId,
-                        'divisionId' => $card->divisionId,
+                        'divisionId' => $divisionId,
                         'lotNumber' => $item['lotNumber'],
                         'lotDate' => $item['lotDate']
                     ];

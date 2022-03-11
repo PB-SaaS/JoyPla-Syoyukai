@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/uikit.min.css" />
 <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/normalize.css" />
 
-<!-- UIkit JS -->
+<!-- UIkit JS --> 
 <script src="https://i02.smp.ne.jp/u/joypla/new/js/uikit.min.js"></script>
 <script src="https://i02.smp.ne.jp/u/joypla/new/js/uikit-icons.min.js"></script>
 

@@ -56,7 +56,7 @@ class TopicSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => "%url/rel:mpgt:TopPage%&Action=topics&table_cache=true",
                 'back_text' => 'トピック一覧',
-                'title'     => 'JoyPla-Tenant-Master トピック',
+                'title'     => 'JoyPla トピック',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

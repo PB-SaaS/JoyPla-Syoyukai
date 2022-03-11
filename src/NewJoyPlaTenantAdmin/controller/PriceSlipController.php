@@ -83,7 +83,7 @@ class PriceSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => $back_text,
-                'title'     => 'JoyPla-Tenant-Master 金額管理',
+                'title'     => 'JoyPla 金額管理',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -220,7 +220,7 @@ class PriceSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => $back_text,
-                'title'     => 'JoyPla-Tenant-Master 金額情報変更',
+                'title'     => 'JoyPla 金額情報変更',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -282,7 +282,7 @@ class PriceSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => '%url/card:page_178572%',
                 'back_text' => '金額情報詳細',
-                'title'     => 'JoyPla-Tenant-Master 院内商品登録',
+                'title'     => 'JoyPla 院内商品登録',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

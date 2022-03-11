@@ -65,7 +65,7 @@ class UserSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => '施設情報詳細',
-                'title'     => 'JoyPla-Tenant-Master ユーザー情報変更',
+                'title'     => 'JoyPla ユーザー情報変更',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -121,7 +121,7 @@ class UserSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => '施設情報詳細',
-                'title'     => 'JoyPla-Tenant-Master ユーザー情報削除',
+                'title'     => 'JoyPla ユーザー情報削除',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

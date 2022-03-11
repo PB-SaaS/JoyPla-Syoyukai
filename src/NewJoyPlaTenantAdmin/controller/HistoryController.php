@@ -54,7 +54,7 @@ class HistoryController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 消費履歴詳細一覧',
+                'title'     => 'JoyPla 消費履歴詳細一覧',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -108,7 +108,7 @@ class HistoryController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 注文履歴詳細一覧',
+                'title'     => 'JoyPla 注文履歴詳細一覧',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -163,7 +163,7 @@ class HistoryController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 入荷履歴詳細一覧',
+                'title'     => 'JoyPla 入荷履歴詳細一覧',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -212,7 +212,7 @@ class HistoryController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 入荷履歴詳細一覧',
+                'title'     => 'JoyPla 入荷履歴詳細一覧',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -266,7 +266,7 @@ class HistoryController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 入庫履歴詳細一覧',
+                'title'     => 'JoyPla 入庫履歴詳細一覧',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -321,7 +321,7 @@ class HistoryController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 返品履歴詳細一覧',
+                'title'     => 'JoyPla 返品履歴詳細一覧',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

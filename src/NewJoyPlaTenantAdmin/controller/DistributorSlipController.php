@@ -73,7 +73,7 @@ class DistributorSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => $back_text,
-                'title'     => 'JoyPla-Tenant-Master 卸業者情報詳細',
+                'title'     => 'JoyPla 卸業者情報詳細',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -141,7 +141,7 @@ class DistributorSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => $back_text,
-                'title'     => 'JoyPla-Tenant-Master 卸業者情報詳細',
+                'title'     => 'JoyPla 卸業者情報詳細',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

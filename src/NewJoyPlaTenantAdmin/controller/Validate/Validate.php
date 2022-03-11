@@ -683,3 +683,59 @@ class AllNewItemInsertDB extends FieldTypeValidate
         return $field;
     }
 }
+
+class CardDB extends FieldTypeValidate
+{
+    const TARGET_NAME = "CardDB";
+    
+    const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
+    
+    public $dbFieldInfo =[ 
+        [   
+            'key' => '部署ID',
+            'fieldType' => 'NumberSymbolAlphabet32bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => '院内商品ID',
+            'fieldType' => 'NumberSymbolAlphabet32bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [   
+            'key' => '入数',
+            'fieldType' => 'Integer_',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+    ];
+    
+    public $rowData = [
+        //"商品名\t商品コード（製品コード）\t商品規格\t1235\tメーカー名\tカタログNo\tあ000\t1\t100\t10\t枚\t個",
+        ];
+
+    public function __construct()
+    {
+        $this->rowData = $_POST['rowData'];
+        
+        $this->startRowNumber = $_POST['startRowNumber'];
+        parent::__construct();
+        $this->validate();
+    }
+
+    public function personalValidate(Try_ $field): Try_
+    {
+        if ($field->isFailed()) {
+            return $field;
+        }
+
+        $columnObj = $field->getValue();
+        if ($columnObj->isNotNullFlg() && isValueEmpty($columnObj->getValue())) {
+            return new Failed(new FormatError(CardDB::SENTENCE_INPUT_REQUIRED));
+        }
+
+        return $field;
+    }
+}
+

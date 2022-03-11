@@ -160,7 +160,7 @@ class MonthlyReportController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 月次レポート',
+                'title'     => 'JoyPla 月次レポート',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

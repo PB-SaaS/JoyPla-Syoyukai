@@ -39,7 +39,7 @@ class AchievementController extends Controller
             
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => $title,
-                    'table' => '%sf:usr:search17%',
+                    'table' => '%sf:usr:search57%',
                     'print' => true,
                     'export' => true,
                     'csrf_token' => Csrf::generate(16)
@@ -61,7 +61,7 @@ class AchievementController extends Controller
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla '.$title,
                 'script' => '',
-                'before_script' => '<script>$("#search_distributorId").remove();</script>',
+                'before_script' => '',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),

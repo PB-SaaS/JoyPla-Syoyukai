@@ -7,12 +7,15 @@
             </ul>
             <div class="no_print uk-margin">
                 <input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
+                <input class="print_hidden uk-button uk-button-primary" type="button" value="ピッキングリスト作成" v-on:click="regist_picking">
             </div>
             <h2 class="page_title uk-margin-remove">払出予定商品一覧</h2>
             <hr>
-            <div class="uk-width-1-1 uk-margin-auto">
-                <form class="uk-form-stacked" name="searchForm" method="POST" action="<?php echo $form_url; ?>">
-                    <input type="hidden" name="Action" value="<?php echo $action ?>">
+            <div class="uk-width-1-1 uk-margin-auto ">
+                <form class="uk-form-stacked" name="searchForm" method="POST" :action="form_url">
+                    <input type="hidden" name="Action" :value="search_action">
+                    <input type="hidden" name="sortTitle" :value="sort_title">
+                    <input type="hidden" name="sort" :value="( sort_asc === 'true' )? 'asc' : 'desc' ">
                     <div class="uk-width-3-4@m uk-margin-auto">
                         <h3>検索</h3>
                         <div class="uk-form-controls uk-margin">
@@ -20,13 +23,13 @@
                             <div class="uk-child-width-1-2@m" uk-grid>
                                 <div>
                                     <div>
-                                        <input type="date" class="uk-input uk-width-4-5" name="registration_time_start" value="<?php echo $registration_time_start ?>">
+                                        <input type="date" class="uk-input uk-width-4-5" name="registration_time_start" v-model="registration_time_start">
                                         <span class="uk-width-1-5'">から</span>
                                     </div>
                                 </div>
                                 <div>
                                     <div>
-                                        <input type="date" class="uk-input uk-width-4-5" name="registration_time_end" value="<?php echo $registration_time_end ?>">
+                                        <input type="date" class="uk-input uk-width-4-5" name="registration_time_end" v-model="registration_time_end">
                                         <span class="uk-width-1-5'">まで</span>
                                     </div>
                                 </div>
@@ -37,13 +40,13 @@
                             <div class="uk-child-width-1-2@m" uk-grid>
                                 <div>
                                     <div>
-                                        <input type="date" class="uk-input uk-width-4-5" name="payout_plan_time_start" value="<?php echo $payout_plan_time_start ?>">
+                                        <input type="date" class="uk-input uk-width-4-5" name="payout_plan_time_start" v-model="payout_plan_time_start">
                                         <span class="uk-width-1-5'">から</span>
                                     </div>
                                 </div>
                                 <div>
                                     <div>
-                                        <input type="date" class="uk-input uk-width-4-5" name="payout_plan_time_end" value="<?php echo $payout_plan_time_end ?>">
+                                        <input type="date" class="uk-input uk-width-4-5" name="payout_plan_time_end" v-model="payout_plan_time_end">
                                         <span class="uk-width-1-5'">まで</span>
                                     </div>
                                 </div>
@@ -63,7 +66,7 @@
                                 <div>
                                     <select name="source_division" class="uk-select" v-model="source_division">
                                         <option value="">----- 選択してください -----</option>
-                                        <option v-for="(di , index) in division_info" :value="di.divisionId">{{ di.divisionName }}</option>
+                                        <option v-for="(di , index) in source_division_info" :value="di.divisionId">{{ di.divisionName }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -74,7 +77,7 @@
                                 <div>
                                     <select name="target_division" class="uk-select" v-model="target_division">
                                         <option value="">----- 選択してください -----</option>
-                                        <option v-for="(di , index) in division_info" :value="di.divisionId">{{ di.divisionName }}</option>
+                                        <option v-for="(di , index) in target_division_info" :value="di.divisionId">{{ di.divisionName }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -91,81 +94,81 @@
                             <input class="uk-margin-top uk-button uk-button-default" type="submit" value="検索">
                         </div>
                     </div>
+                    <div class="no_print uk-margin">
+                        <input id="smp-table-delete-button" class=" uk-button uk-button-danger uk-margin-small-right" type="button" name="smp-table-submit-button" value="削除" @click="delete_items">
+                    </div>
                     <div>
-                        <table-offset :current_page="<?php echo $page ?>" :total_rec="<?php echo $count ?>" :limit="<?php echo $limit ?>" ></table-offset>
-                        <limit-select :attr="{'uk-width-1-3@m':true}" :select="[10,50,100]" :limit="<?php echo $limit ?>"></limit-select>
-                        <pagination :current_page="<?php echo $page ?>" :total_rec="<?php echo $count ?>" :limit="<?php echo $limit ?>" :show_nav="5"></pagination>
+                        <table-offset :current_page="current_page" :total_rec="total_rec" :limit="limit" ></table-offset>
+                        <limit-select :attr="{'uk-width-1-3@m':true}" :select="[10,50,100]" :limit="limit"></limit-select>
+                        <pagination :current_page="current_page" :total_rec="total_rec" :limit="limit" :show_nav="5"></pagination>
                         <div class="uk-overflow-auto">
                             <table class="uk-table uk-table-hover uk-table-middle uk-table-divider">
                                 <thead>
                                     <tr>
-                                        <th class="uk-text-nowrap">
+                                        <th class="uk-text-nowrap no_print">
                                             <input type="checkbox" class="uk-checkbox" v-on:click="allchecked">
                                         </th>
                                         <th class="uk-text-nowrap">
-                                            <sort-link title="id" asc="<?php echo ( $sort_asc === 'asc' )?'true':'false' ?>" current_title="<?php echo $sort_title ?>">id</sort-link>
+                                            <sort-link title="id" :asc="sort_asc" :current_title="sort_title">id</sort-link>
                                         </th>
-                                        <th class="uk-table-expand">
-                                            <sort-link title="registrationTime" asc="<?php echo ( $sort_asc === 'asc' )?'true':'false' ?>" current_title="<?php echo $sort_title ?>">登録日時</sort-link>
+                                        <th>
+                                            <sort-link title="registrationTime" :asc="sort_asc" :current_title="sort_title">登録日時</sort-link>
                                         </th>
-                                        <th class="uk-table-expand">
-                                            <sort-link title="payoutPlanTime" asc="<?php echo ( $sort_asc === 'asc' )?'true':'false' ?>" current_title="<?php echo $sort_title ?>">払出予定日</sort-link>
+                                        <th>
+                                            <sort-link title="payoutPlanTime" :asc="sort_asc" :current_title="sort_title">払出予定日</sort-link>
                                         </th>
-                                        <th class="uk-table-expand">
-                                            <sort-link title="outOfStockStatus" asc="<?php echo ( $sort_asc === 'asc' )?'true':'false' ?>" current_title="<?php echo $sort_title ?>">ステータス</sort-link>
+                                        <th class="uk-width-1-3">
+                                         商品情報
                                         </th>
-                                        <th class="uk-table-expand">
-                                            <sort-link title="inHospitalItemId" asc="<?php echo ( $sort_asc === 'asc' )?'true':'false' ?>" current_title="<?php echo $sort_title ?>">院内商品ID</sort-link>
+                                        <th class="uk-table-expand">払出元<br><span uk-icon="icon: arrow-right"></span>払出先</th>
+                                        <th>
+                                            <sort-link title="payoutQuantity" :asc="sort_asc" :current_title="sort_title">払出予定数</sort-link>
                                         </th>
-                                        <th class="uk-table-expand">
-                                            <sort-link title="category" asc="<?php echo ( $sort_asc === 'asc' )?'true':'false' ?>" current_title="<?php echo $sort_title ?>">分類</sort-link>
-                                        </th>
-                                        <th class="uk-table-expand">
-                                            <sort-link title="itemName" asc="<?php echo ( $sort_asc === 'asc' )?'true':'false' ?>" current_title="<?php echo $sort_title ?>">商品名</sort-link>
-                                        </th>
-                                        <th class="uk-table-expand">
-                                            <sort-link title="itemCode" asc="<?php echo ( $sort_asc === 'asc' )?'true':'false' ?>" current_title="<?php echo $sort_title ?>">製品コード</sort-link>
-                                        </th>
-                                        <th class="uk-table-expand">
-                                            <sort-link title="itemStandard" asc="<?php echo ( $sort_asc === 'asc' )?'true':'false' ?>" current_title="<?php echo $sort_title ?>">規格</sort-link>
-                                        </th>
-                                        <th class="uk-table-expand">
-                                            <sort-link title="itemJANCode" asc="<?php echo ( $sort_asc === 'asc' )?'true':'false' ?>" current_title="<?php echo $sort_title ?>">JANコード</sort-link>
-                                        </th>
-                                        <th class="uk-table-expand">払出元</th>
-                                        <th class="uk-table-expand">払出先</th>
-                                        <th class="uk-table-expand">
-                                            <sort-link title="payoutQuantity" asc="<?php echo ( $sort_asc === 'asc' )?'true':'false' ?>" current_title="<?php echo $sort_title ?>">払出予定数</sort-link>
+                                        <th>
+                                            <sort-link title="outOfStockStatus" :asc="sort_asc" :current_title="sort_title">ステータス</sort-link>
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="(li, index)  in lists" class="uk-text-break" :key="index" @click="tr_click(index,li)">
-                                        <th class="uk-text-middle">
+                                        <th class="uk-text-middle no_print">
                                             <input type="checkbox" class="uk-checkbox" v-model="li.check">
                                         </th>
                                         <td>{{ li.id }}</td>
                                         <td>{{ li.registrationTime }}</td>
-                                        <td>{{ li.payoutPlanTime | date_format }}</td>
                                         <td>
-                                            <span class="uk-label" :class="{ 'uk-label-warning' : (li.outOfStockStatus_id = '1'),'uk-label-danger' : (li.outOfStockStatus_id = '3'), }">
+                                            <span class="uk-text-bold" :class="{'uk-text-danger' : ( li.payoutPlanTimeStatus == 2 ),'uk-text-warning' : ( li.payoutPlanTimeStatus == 1 ), }">{{ li.payoutPlanTime | date_format }}</span>
+                                        </td>
+                                        <td>
+                                            <div uk-grid margin="0">
+                                                <div class="uk-width-1-4 uk-text-muted">院内商品ID</div>
+                                                <div class="uk-width-3-4">{{ li.inHospitalItemId }}</div>
+                                                <div class="uk-width-1-4 uk-text-muted">分類</div>
+                                                <div class="uk-width-3-4">{{ li.category }}</div>
+                                                <div class="uk-width-1-4 uk-text-muted">メーカー</div>
+                                                <div class="uk-width-3-4">{{ li.makerName }}</div>
+                                                <div class="uk-width-1-4 uk-text-muted">商品名</div>
+                                                <div class="uk-width-3-4">{{ li.itemName }}</div>
+                                                <div class="uk-width-1-4 uk-text-muted">製品コード</div>
+                                                <div class="uk-width-3-4">{{ li.itemCode }}</div>
+                                                <div class="uk-width-1-4 uk-text-muted">規格</div>
+                                                <div class="uk-width-3-4">{{ li.itemStandard }}</div>
+                                                <div class="uk-width-1-4 uk-text-muted">JANコード</div>
+                                                <div class="uk-width-3-4">{{ li.itemJANCode }}</div>
+                                            </div>
+                                        </td>
+                                        <td>{{ li.sourceDivision }}<br><span uk-icon="icon: arrow-right"></span>{{ li.targetDivision }}</td>
+                                        <td>{{ li.payoutQuantity }}{{ li.quantityUnit }}</td>
+                                        <td>
+                                            <span class="uk-label" :class="{ 'uk-label-warning' : (li.outOfStockStatus_id == '1'),'uk-label-danger' : (li.outOfStockStatus_id == '3'), }">
                                             {{ li.outOfStockStatus }}
                                             </span>
                                         </td>
-                                        <td>{{ li.inHospitalItemId }}</td>
-                                        <td>{{ li.category }}</td>
-                                        <td>{{ li.itemName }}</td>
-                                        <td>{{ li.itemCode }}</td>
-                                        <td>{{ li.itemStandard }}</td>
-                                        <td>{{ li.itemJANCode }}</td>
-                                        <td>{{ li.sourceDivision }}</td>
-                                        <td>{{ li.targetDivision }}</td>
-                                        <td>{{ li.payoutQuantity }}{{ li.quantityUnit }}</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <pagination :current_page="<?php echo $page ?>" :total_rec="<?php echo $count ?>" :limit="<?php echo $limit ?>" :show_nav="5"></pagination>
+                        <pagination :current_page="current_page" :total_rec="total_rec" :limit="limit" :show_nav="5"></pagination>
                     </div>
                 </form>
             </div>
@@ -177,27 +180,60 @@
 <script src="https://i02.smp.ne.jp/u/joypla/new/components/limit-select.js"></script>
 <script src="https://i02.smp.ne.jp/u/joypla/new/components/sort-link.js"></script>
 <script>
-let payout_schedule_items = <?php echo json_encode($pay_schedule_items) ?>;
-let division_info = <?php echo json_encode($division_info) ?>;
-let start = "<?php echo ($limit * ($page - 1) + 1) ?>";
-let source_division = "<?php echo $source_division ?>";
-let target_division = "<?php echo $target_division ?>";
-let category_label = <?php echo json_encode($category_label) ?>;
-let category = <?php echo json_encode($category) ?>;
-let out_of_stock_status_label = <?php echo json_encode($out_of_stock_status_label) ?>;
-let out_of_stock_status = <?php echo json_encode($out_of_stock_status) ?>;
+
+
+let register_data = {
+     payout_schedule_items :<?php echo json_encode($payout_schedule_items) ?>,
+     source_division_info :<?php echo json_encode($source_division_info) ?>,
+     target_division_info :<?php echo json_encode($target_division_info) ?>,
+     start :parseInt("<?php echo ($search->limit * ($search->page - 1) + 1) ?>"),
+     registration_time_start :"<?php echo $search->registration_time_start ?>",
+     registration_time_end :"<?php echo $search->registration_time_end ?>",
+     payout_plan_time_start :"<?php echo $search->payout_plan_time_start ?>",
+     payout_plan_time_end :"<?php echo $search->payout_plan_time_end ?>",
+     source_division : "<?php echo $search->source_division ?>",
+     target_division : "<?php echo $search->target_division ?>",
+     category_label :<?php echo json_encode($category_label) ?>,
+     category : "<?php echo $search->category ?>",
+     out_of_stock_status_label :<?php echo json_encode($out_of_stock_status_label) ?>,
+     out_of_stock_status : "<?php echo $search->out_of_stock_status ?>",
+     form_url :"<?php echo $form_url ?>",
+     search_action :"<?php echo $search_action ?>",
+     total_rec :parseInt("<?php echo $count ?>"),
+     sort_asc :"<?php echo ( $search->sort_asc ==='asc' )?'true':'false' ?>",
+     sort_title :"<?php echo $search->sort_title ?>",
+     current_page :parseInt("<?php echo $search->page ?>"),
+     limit :parseInt("<?php echo $search->limit ?>"),
+     csrf_token: "<?php echo $csrf_token ?>",
+};
+
+
 var app = new Vue({
 	el: '#app',
 	data: {
-        start: start,
-        lists : payout_schedule_items,
-        division_info: division_info,
-        source_division: source_division,
-        target_division: target_division,
-        category_label: category_label, 
-        category: category,
-        out_of_stock_status_label: out_of_stock_status_label, 
-        out_of_stock_status: out_of_stock_status,
+        csrf_token: register_data.csrf_token,
+        start: register_data.start,
+        registration_time_start :register_data.registration_time_start,
+        registration_time_end :register_data.registration_time_end,
+        payout_plan_time_start :register_data.payout_plan_time_start,
+        payout_plan_time_end :register_data.payout_plan_time_end,
+        lists : register_data.payout_schedule_items,
+        source_division_info: register_data.source_division_info,
+        target_division_info: register_data.target_division_info,
+        source_division: register_data.source_division,
+        target_division: register_data.target_division,
+        category_label: register_data.category_label, 
+        category: register_data.category,
+        out_of_stock_status_label: register_data.out_of_stock_status_label, 
+        out_of_stock_status: register_data.out_of_stock_status,
+        form_url :register_data.form_url,
+        search_action :register_data.search_action,
+        sort_asc :register_data.sort_asc,
+        sort_title :register_data.sort_title,
+        current_page :register_data.current_page,
+        total_rec :register_data.total_rec,
+        limit :register_data.limit,
+        start :register_data.start,
     },
 	filters: {
         number_format: function(value) {
@@ -232,6 +268,109 @@ var app = new Vue({
             li.check = !li.check;
             app.$set(app.lists, index, li);
         },
+        delete_items()
+        {
+            let ids = this.get_checked_ids();
+
+            if(ids.length === 0)
+            {
+				UIkit.modal.alert('削除したい払出予定商品を選択してください');
+                return false;
+            }
+
+            
+			UIkit.modal.confirm('払出予定商品を削除します<br>よろしいですか').then(function(){
+                
+				$.ajax({
+	                url: "<?php echo $api_url ?>",
+					type:'POST',
+					data:{
+	                	Action : 'pickingItemsDeleteApi',
+						_csrf: app.csrf_token,  // CSRFトークンを送信
+	                	ids : JSON.stringify( objectValueToURIencode(ids) ),
+					},
+					dataType: 'json'
+				})
+				// Ajaxリクエストが成功した時発動
+				.done( (data) => {
+	                if(data.code != '0'){
+	            		UIkit.modal.alert("払出予定商品の削除に失敗しました");
+	            		return false;
+	                }
+	                UIkit.modal.alert("払出予定商品の削除が完了しました").then(function(){
+						location.reload();
+					});
+				})
+				// Ajaxリクエストが失敗した時発動
+				.fail( (data) => {
+	                UIkit.modal.alert("払出予定商品の削除に失敗しました");
+				})
+				// Ajaxリクエストが成功・失敗どちらでも発動
+				.always( (data) => {
+				});
+				
+			},function(){
+				UIkit.modal.alert("中止しました");
+			});
+
+        },
+        regist_picking()
+        {
+            let ids = this.get_checked_ids();
+
+            if(ids.length === 0)
+            {
+				UIkit.modal.alert('ピッキングしたい払出予定商品を選択してください');
+                return false;
+            }
+
+            
+			UIkit.modal.confirm('ピッキングリストを作成します<br>よろしいですか').then(function(){
+                
+				$.ajax({
+	                url: "<?php echo $api_url ?>",
+					type:'POST',
+					data:{
+	                	Action : 'pickingItemsRegistApi',
+						_csrf: app.csrf_token,  // CSRFトークンを送信
+	                	ids : JSON.stringify( objectValueToURIencode(ids) ),
+					},
+					dataType: 'json'
+				})
+				// Ajaxリクエストが成功した時発動
+				.done( (data) => {
+	                if(data.code != '0'){
+	            		UIkit.modal.alert("ピッキングリストの作成に失敗しました");
+	            		return false;
+	                }
+	                UIkit.modal.alert("ピッキングリストの作成が完了しました").then(function(){
+						location.reload();
+					});
+				})
+				// Ajaxリクエストが失敗した時発動
+				.fail( (data) => {
+	                UIkit.modal.alert("ピッキングリストの作成に失敗しました");
+				})
+				// Ajaxリクエストが成功・失敗どちらでも発動
+				.always( (data) => {
+				});
+				
+			},function(){
+				UIkit.modal.alert("中止しました");
+			});
+
+        },
+        get_checked_ids()
+        {
+            let ids = [];
+            app.lists.forEach(function (elem, index) {
+                if(elem.check)
+                {
+                    ids.push(elem.id);
+                }
+            });
+            return ids;
+        }
     }
 });
 </script>

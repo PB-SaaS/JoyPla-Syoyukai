@@ -1,4 +1,5 @@
 <?php
+require_once "NewJoyPla/classes/Monad.php";
 require_once "NewJoyPla/classes/Collection.php";
 require_once "NewJoyPla/classes/Model.php";
 require_once "NewJoyPla/classes/View.php";

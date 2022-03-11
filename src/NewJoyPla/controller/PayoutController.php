@@ -13,16 +13,20 @@ use App\Model\InHospitalItemView;
 use App\Model\PayoutHistory;
 use App\Model\Payout;
 use App\Model\PayoutView;
+use App\Model\PickingHistory;
 use App\Model\PayScheduleItems;
 use App\Model\PayScheduleItemsView;
 use App\Model\Card;
 use App\Model\Stock;
 use App\Model\Distributor;
 use App\Model\InventoryAdjustmentTransaction;
+use App\Model\StockView;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
+use validate\FieldSet;
 use Exception;
+use DateTime;
 
 class PayoutController extends Controller
 {
@@ -791,121 +795,212 @@ EOM;
             {
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             }
-            $sort_title = ( $SPIRAL->getParam('sortTitle'))? $SPIRAL->getParam('sortTitle') : 'id'; // 初期ソート id asc
-            $sort_asc = ( $SPIRAL->getParam('sort') === 'asc' || $SPIRAL->getParam('sort') === 'desc' )? $SPIRAL->getParam('sort') : 'asc';
-            /** 取得条件 */
-            $limit = ( is_null($SPIRAL->getParam('limit')) )? 0 : $SPIRAL->getParam('limit') ;
-            $limit = ( $limit >= 1 && $limit <= 1000 )? $limit : 10 ; //デフォルト値 10
+
+            /** キャッシュから取得 */
+            $table_cache = ($SPIRAL->getParam('table_cache') === 'true');
             
-            $page = ( is_null($SPIRAL->getParam('page')) )? 0 : $SPIRAL->getParam('page') ;
-            $page = ( $page >= 1 )? $page : 1 ; //デフォルト値 1
+            $search = new StdClass;
+            /** デフォルト */
+            $search->sort_title = 'id';
+            $search->limit = 10;
+            $search->page = 1;
+            $search->sort_asc = 'asc';
+            $search->registration_time_start = '';
+            $search->registration_time_end = '';
+            $search->payout_plan_time_start = '';
+            $search->payout_plan_time_end = '';
+            $search->source_division = '';
+            $search->target_division = '';
+            $search->category = [];
+            $search->out_of_stock_status = [];
+
+            if($table_cache && $cache->exists('joypla_payoutScheduledItemList')){
+                $search = $cache->get('joypla_payoutScheduledItemList');
+            }
+
+            $search->sort_title = ( $SPIRAL->getParam('sortTitle'))? $SPIRAL->getParam('sortTitle') : $search->sort_title; // 初期ソート id asc
+            $search->sort_asc = ( $SPIRAL->getParam('sort') === 'asc' || $SPIRAL->getParam('sort') === 'desc' )? $SPIRAL->getParam('sort') : $search->sort_asc;
+            /** 取得条件 */
+            $search->limit = ( ! is_null($SPIRAL->getParam('limit')) && ( $SPIRAL->getParam('limit') >= 1 && $SPIRAL->getParam('limit') <= 1000 ) )? $SPIRAL->getParam('limit') : $search->limit ;
+            $search->page = ( ! is_null($SPIRAL->getParam('page')) && ( $SPIRAL->getParam('page') >= 1 ) )?  $SPIRAL->getParam('page')  : $search->page;
+
 
             /** 値の取得 */
             /** 払出予定商品 */
             $pay_schedule_items = PayScheduleItemsView::where('pickingId','','ISNULL')
                                                         ->where('hospitalId',$user_info->getHospitalId())
                                                         ->orWhere('outOfStockStatus','2','!=')
-                                                        ->sort($sort_title,$sort_asc)
-                                                        ->page($page);
+                                                        ->sort($search->sort_title,$search->sort_asc)
+                                                        ->page($search->page);
 
             /** 検索 */
-            $registration_time_start = ( $SPIRAL->getParam('registration_time_start') )? $SPIRAL->getParam('registration_time_start') : '';
-            $registration_time_end = ( $SPIRAL->getParam('registration_time_end') )? $SPIRAL->getParam('registration_time_end') : '';
-            $payout_plan_time_start = ( $SPIRAL->getParam('payout_plan_time_start') )? $SPIRAL->getParam('payout_plan_time_start') : '';
-            $payout_plan_time_end = ( $SPIRAL->getParam('payout_plan_time_end') )? $SPIRAL->getParam('payout_plan_time_end') : '';
-            $source_division = ( $SPIRAL->getParam('source_division') )? $SPIRAL->getParam('source_division') : '';
-            $target_division = ( $SPIRAL->getParam('target_division') )? $SPIRAL->getParam('target_division') : '';
-            $category = ( $SPIRAL->getParams('category') )? $SPIRAL->getParams('category') : '';
-            $out_of_stock_status = ( $SPIRAL->getParams('out_of_stock_status') )? $SPIRAL->getParams('out_of_stock_status') : '';
+            $search->registration_time_start =  ($SPIRAL->getParam('registration_time_start'))? $SPIRAL->getParam('registration_time_start') : $search->registration_time_start;
+            $search->registration_time_start = ( 
+                FieldSet::validate(\field\DateYearMonthDay::FIELD_NAME , $search->registration_time_start)->isSuccess()
+            )? $search->registration_time_start : '';
             
-            if ($registration_time_start !== '') { 
-                $pay_schedule_items->where('registrationTime', $registration_time_start, '>='); 
+            $search->registration_time_end =  ($SPIRAL->getParam('registration_time_end'))? $SPIRAL->getParam('registration_time_start') : $search->registration_time_end;
+            $search->registration_time_end = (
+                FieldSet::validate(\field\DateYearMonthDay::FIELD_NAME, $search->registration_time_end)->isSuccess()
+            )? $search->registration_time_end : '';
+
+
+            $search->payout_plan_time_start =  ($SPIRAL->getParam('payout_plan_time_start'))? $SPIRAL->getParam('payout_plan_time_start') : $search->payout_plan_time_start;
+            $search->payout_plan_time_start = ( 
+                FieldSet::validate(\field\DateYearMonthDay::FIELD_NAME , $search->payout_plan_time_start)->isSuccess()
+            )? $search->payout_plan_time_start : '';
+            
+            $search->payout_plan_time_end =  ($SPIRAL->getParam('payout_plan_time_end'))? $SPIRAL->getParam('payout_plan_time_end') : $search->payout_plan_time_end;
+            $search->payout_plan_time_end = (
+                FieldSet::validate(\field\DateYearMonthDay::FIELD_NAME, $search->payout_plan_time_end)->isSuccess()
+            )? $search->payout_plan_time_end : '';
+
+            if( $user_info->isUser())
+            {
+                $search->source_division = $user_info->getDivisionId();
+            }
+            else
+            {
+                $search->source_division = ( $SPIRAL->getParam('source_division') )? $SPIRAL->getParam('source_division') : $search->source_division;
+                $search->source_division = (
+                    FieldSet::validate(\field\NumberSymbolAlphabet32Bytes::FIELD_NAME, $search->source_division)->isSuccess()
+                )? $search->source_division : '';
+            }
+            
+
+            $search->target_division = ( $SPIRAL->getParam('target_division') )? $SPIRAL->getParam('target_division') : $search->target_division;
+            $search->target_division = (
+                FieldSet::validate(\field\NumberSymbolAlphabet32Bytes::FIELD_NAME, $search->target_division)->isSuccess()
+            )? $search->target_division : '';
+            
+
+            $search->category = ( $SPIRAL->getParams('category') )? $SPIRAL->getParams('category') : $search->category;
+            foreach($search->category as &$c)
+            {
+                $c = (
+                    FieldSet::validate(\field\Select::FIELD_NAME, $c)->isSuccess()
+                )? $c : '';
             }
 
-            if ($registration_time_end !== '') { 
-                $pay_schedule_items->where('registrationTime', (date('Y-m-d', strtotime($registration_time_end . '+1 day'))), '<');
+            $search->out_of_stock_status = ( $SPIRAL->getParams('out_of_stock_status') )? $SPIRAL->getParams('out_of_stock_status') : $search->out_of_stock_status;
+
+            foreach($search->out_of_stock_status as &$s)
+            {
+                $s = (
+                    FieldSet::validate(\field\Select::FIELD_NAME, $s)->isSuccess()
+                )? $s : '';
+            }
+            
+
+            
+            if ($search->registration_time_start !== '') { 
+                $pay_schedule_items->where('registrationTime', $search->registration_time_start, '>='); 
             }
 
-            if ($payout_plan_time_start !== '') { 
-                $pay_schedule_items->where('payoutPlanTime', $payout_plan_time_start, '>='); 
+            if ($search->registration_time_end !== '') { 
+                $pay_schedule_items->where('registrationTime', (date('Y-m-d', strtotime($search->registration_time_end . '+1 day'))), '<');
             }
 
-            if ($payout_plan_time_end !== '') { 
-                $pay_schedule_items->where('payoutPlanTime', (date('Y-m-d', strtotime($payout_plan_time_end . '+1 day'))), '<');
+            if ($search->payout_plan_time_start !== '') { 
+                $pay_schedule_items->where('payoutPlanTime', $search->payout_plan_time_start, '>='); 
             }
 
-            if ($source_division !== '') { 
-                $pay_schedule_items->where('sourceDivisionId', $source_division); 
+            if ($search->payout_plan_time_end !== '') { 
+                $pay_schedule_items->where('payoutPlanTime', (date('Y-m-d', strtotime($search->payout_plan_time_end . '+1 day'))), '<');
             }
 
-            if ($target_division !== '') { 
-                $pay_schedule_items->where('targetDivisionId', $target_division); 
+            if ($search->source_division !== '') { 
+                $pay_schedule_items->where('sourceDivisionId', $search->source_division); 
             }
 
-            if ($category !== '') {
-                foreach($category as $c)
+            if ($search->target_division !== '') { 
+                $pay_schedule_items->where('targetDivisionId', $search->target_division); 
+            }
+
+            if ($search->category !== '') {
+                foreach($search->category as $c)
                 {
                     $pay_schedule_items->orWhere('category', $c ); 
                 }
             }
 
-            if ($out_of_stock_status !== '') {
-                foreach($out_of_stock_status as $c)
+            if ($search->out_of_stock_status !== '') {
+                foreach($search->out_of_stock_status as $c)
                 {
                     if($c == 2){ continue; } //払出可能は検索できなくする
                     $pay_schedule_items->orWhere('outOfStockStatus', $c ); 
                 }
             }
 
-            $pay_schedule_items = $pay_schedule_items->paginate($limit);
+            $pay_schedule_items = $pay_schedule_items->paginate($search->limit);
 
             $count = $pay_schedule_items->count;
             $pay_schedule_items_label = $pay_schedule_items->label->all();
             $pay_schedule_items = $pay_schedule_items->data->all();
-
             /** 部署情報 */
-            $division = [];
-            $division = Division::where('hospitalId',$user_info->getHospitalId())->get();
-            $division = $division->data->all();
+            $division_info = [];
+            $division_info = Division::where('hospitalId',$user_info->getHospitalId())->whereDeleted()->get();
+            $division_info = $division_info->data->all();
             /** 実体参照を行い、必要な情報をセット */
+            $source_division_info = [];
+            $target_division_info = $division_info;
+
+            if($user_info->isUser())
+            {
+                $source_division_info[] = \App\Lib\array_obj_find($division_info,'divisionId',$user_info->getDivisionId());
+            }
+            else
+            {
+                $source_division_info = $division_info;
+            }
             foreach($pay_schedule_items as &$item)
             {
+                
+                $payout_plan_time = \App\lib\changeDateFormat('Y年m月d日 H時i分s秒',$item->payoutPlanTime,'Y-m-d');
+                $payout_plan_time = new DateTime($payout_plan_time);
+                $today = new DateTime(date('Y-m-d'));
+                $week_plus_2 = new DateTime(date('Y-m-d'));
+                $week_plus_2 = $week_plus_2->modify('+2 week');
+                $item->payoutPlanTimeStatus = 0;
+                //あと2週間を切っている
+                if( $today < $payout_plan_time && $week_plus_2 >= $payout_plan_time)
+                {
+                    $item->payoutPlanTimeStatus = 1;
+                }
+                //当日を過ぎている
+                else if( $today >= $payout_plan_time )
+                {
+                    $item->payoutPlanTimeStatus = 2;
+                }
+
                 $item->checked = false;
                 $item->outOfStockStatus_id = $item->outOfStockStatus;
                 $item->outOfStockStatus = $pay_schedule_items_label['outOfStockStatus']->all()[$item->outOfStockStatus];
                 $item->category = $pay_schedule_items_label['category']->all()[$item->category];
 
-                $sourceDivision = \App\Lib\array_obj_find($division,'divisionId',$item->sourceDivisionId);
-                $targetDivision = \App\Lib\array_obj_find($division,'divisionId',$item->targetDivisionId);
+                $sourceDivision = \App\Lib\array_obj_find($division_info,'divisionId',$item->sourceDivisionId);
+                $targetDivision = \App\Lib\array_obj_find($division_info,'divisionId',$item->targetDivisionId);
                 $item->sourceDivision = $sourceDivision->divisionName;
                 $item->targetDivision = $targetDivision->divisionName;
             }
 
             $form_url = "%url/rel:mpgt:Payout%";
+            $api_url = "%url/rel:mpgt:Payout%";
             
             $content = $this->view('NewJoyPla/view/PayoutScheduledItemList', [
                     'title' => '払出予定商品一覧',
-                    'action' => 'payoutScheduledItemList',
+                    'search_action' => 'payoutScheduledItemList',
                     'form_url' => $form_url,
-                    'sort_title' => $sort_title,
-                    'sort_asc' => $sort_asc,
-                    'limit' => $limit,
-                    'page' => $page,
+                    'api_url' => $api_url,
                     'count' => $count,
-                    'category' => $category,
+                    'search' => $search,
+                    'source_division_info' => $source_division_info,
+                    'target_division_info' => $target_division_info,
+                    'payout_schedule_items' => $pay_schedule_items,
+                    'csrf_token' => Csrf::generate(16),
                     'category_label' => $pay_schedule_items_label['category']->all(),
-                    'out_of_stock_status' => $out_of_stock_status,
                     'out_of_stock_status_label' => $pay_schedule_items_label['outOfStockStatus']->all(),
-                    'registration_time_start' => \App\Lib\html($registration_time_start),
-                    'registration_time_end' => \App\Lib\html($registration_time_end),
-                    'payout_plan_time_start' => \App\Lib\html($payout_plan_time_start),
-                    'payout_plan_time_end' => \App\Lib\html($payout_plan_time_end),
-                    'source_division' => \App\Lib\html($source_division),
-                    'target_division' => \App\Lib\html($target_division),
-                    'division_info' => $division,
-                    'pay_schedule_items' => $pay_schedule_items,
-                    'csrf_token' => Csrf::generate(16)
-                    ] , false);
+                    ] , true);
     
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
@@ -913,18 +1008,599 @@ EOM;
                 'message'=> $ex->getMessage(),
                 ] , false);
         } finally {
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [
+                'new' => true
+            ] , false);
+            $style   = $this->view('NewJoyPla/view/template/parts/FormPrintCss', [] , false)->render();
+                
+            $style   .= $this->view('NewJoyPla/view/template/parts/StyleCss', [] , false)->render();
+                
+            $script   = $this->view('NewJoyPla/view/template/parts/Script', [] , false)->render();
+                
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 払出予定商品一覧',
-                'script' => '',
+                'script' => $script,
+                'style' => $style,
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
+            ],false);
+        }
+    }
+    
+    public function pickingItemsRegistApi()
+    {
+        global $SPIRAL;
+        try{
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+
+            $user_info = new UserInfo($SPIRAL);
+
+            $item_ids = $SPIRAL->getParam('ids');
+            $item_ids = $this->requestUrldecode($item_ids);
+
+            if(is_null($item_ids) || count($item_ids) === 0)
+            {
+                throw new Exception('not payout data',200);
+            }
+
+            $payschedule_items_view = PayScheduleItemsView::where('hospitalId',$user_info->getHospitalId());
+            
+            foreach($item_ids as $id)
+            {
+                $payschedule_items_view->orWhere('id',$id);
+            }
+
+            $payschedule_items_view = $payschedule_items_view->get();
+            $payschedule_items_view = $payschedule_items_view->data->all();
+            $source_division_ids = [];
+            foreach($payschedule_items_view as $p)
+            {
+                $source_division_ids[] = $p->sourceDivisionId;
+            }
+
+            $source_division_ids = array_unique($source_division_ids);
+
+            $picking_item_update = [];
+            $picking_insert = [];
+            foreach($source_division_ids as $division_id)
+            {
+                $picking_id = $this->makeId('12');// picking
+                foreach($payschedule_items_view as $p)
+                {
+                    if($division_id !== $p->sourceDivisionId){
+                        continue;
+                    }
+                    $picking_item_update[] = [
+                        'payoutPlanId' => $p->payoutPlanId,
+                        'pickingId' => $picking_id,
+                    ];
+                }
+
+                $picking_insert[] = [
+                    'pickingId' => $picking_id,
+                    'hospitalId' => $user_info->getHospitalId(),
+                    'divisionId' => $division_id,
+                ];
+            }
+
+            $result = PickingHistory::insert($picking_insert);
+            $result = PayScheduleItems::bulkUpdate('payoutPlanId',$picking_item_update);
+
+            $content = new ApiResponse($result->ids, $result->count , $result->code, $result->message, ['insert']);
+            $content = $content->toJson();
+            
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['payoutRegistApi']);
+            $content = $content->toJson();
+        }finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+    }
+    
+    
+    public function pickingItemsDeleteApi()
+    {
+        global $SPIRAL;
+        try{
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+
+            $user_info = new UserInfo($SPIRAL);
+
+            $item_ids = $SPIRAL->getParam('ids');
+            $item_ids = $this->requestUrldecode($item_ids);
+
+            if(is_null($item_ids) || count($item_ids) === 0)
+            {
+                throw new Exception('not delete data',200);
+            }
+
+            $payschedule_items = PayScheduleItems::where('hospitalId',$user_info->getHospitalId());
+            
+            foreach($item_ids as $id)
+            {
+                $payschedule_items->orWhere('id',$id);
+            }
+
+            $payschedule_items = $payschedule_items->get();
+            
+            if($payschedule_items->count != count($item_ids))
+            {
+                throw new Exception('datas error',200);
+            }
+
+            $payschedule_items = PayScheduleItems::where('hospitalId',$user_info->getHospitalId());
+            
+            foreach($item_ids as $id)
+            {
+                $payschedule_items->orWhere('id',$id);
+            }
+
+            $result = $payschedule_items->delete();
+
+            $content = new ApiResponse($result->ids, $result->count , $result->code, $result->message, ['insert']);
+            $content = $content->toJson();
+            
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['payoutRegistApi']);
+            $content = $content->toJson();
+        }finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+    }
+    
+
+    public function pickingList()
+    {
+        global $SPIRAL;
+        try {
+            //フルスクラッチでやってみる
+            $user_info = new UserInfo($SPIRAL);
+            $cache = $SPIRAL->getCache();
+            
+            if ($user_info->isDistributorUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+
+            /** キャッシュから取得 */
+            $table_cache = ($SPIRAL->getParam('table_cache') === 'true');
+            
+            $search = new StdClass;
+            /** デフォルト */
+            $search->sort_title = 'id';
+            $search->sort_asc = 'desc';
+            $search->limit = 10;
+            $search->page = 1;
+            $search->registration_time_start = '';
+            $search->registration_time_end = '';
+            $search->division_id = '';
+            $search->picking_status = [];
+
+            if($table_cache && $cache->exists('joypla_pickingList')){
+                $search = $cache->get('joypla_pickingList');
+                $search = json_decode($search);
+            }
+
+            $search->sort_title = ( $SPIRAL->getParam('sortTitle'))? $SPIRAL->getParam('sortTitle') : $search->sort_title; // 初期ソート id asc
+            $search->sort_asc = ( $SPIRAL->getParam('sort') === 'asc' || $SPIRAL->getParam('sort') === 'desc' )? $SPIRAL->getParam('sort') : $search->sort_asc;
+            /** 取得条件 */
+            $search->limit = ( ! is_null($SPIRAL->getParam('limit')) && ( $SPIRAL->getParam('limit') >= 1 && $SPIRAL->getParam('limit') <= 1000 ) )? $SPIRAL->getParam('limit') : $search->limit ;
+            $search->page = ( ! is_null($SPIRAL->getParam('page')) && ( $SPIRAL->getParam('page') >= 1 ) )?  $SPIRAL->getParam('page')  : $search->page;
+
+            /** 値の取得 */
+            /** ピッキングリストの取得 */
+            $picking_history = PickingHistory::where('hospitalId',$user_info->getHospitalId())
+                                                ->sort($search->sort_title,$search->sort_asc)
+                                                ->page((int)$search->page);
+
+            /** 検索 */
+            $search->registration_time_start =  ($SPIRAL->getParam('registration_time_start'))? $SPIRAL->getParam('registration_time_start') : $search->registration_time_start;
+            $search->registration_time_start = ( 
+                FieldSet::validate(\field\DateYearMonthDay::FIELD_NAME , $search->registration_time_start)->isSuccess()
+            )? $search->registration_time_start : '';
+            
+            $search->registration_time_end =  ($SPIRAL->getParam('registration_time_end'))? $SPIRAL->getParam('registration_time_end') : $search->registration_time_end;
+            $search->registration_time_end = (
+                FieldSet::validate(\field\DateYearMonthDay::FIELD_NAME, $search->registration_time_end)->isSuccess()
+            )? $search->registration_time_end : '';
+
+            if($user_info->isUser())
+            {
+                $search->division_id = $user_info->getDivisionId();
+            } 
+            else 
+            {
+                $search->division_id = ( $SPIRAL->getParam('division_id') )? $SPIRAL->getParam('division_id') : $search->division_id;
+                $search->division_id = (
+                    FieldSet::validate(\field\NumberSymbolAlphabet32Bytes::FIELD_NAME, $search->division_id)->isSuccess()
+                )? $search->division_id : '';
+            }
+
+
+            $search->picking_status = ( $SPIRAL->getParams('picking_status') )? $SPIRAL->getParams('picking_status') : $search->picking_status;
+            foreach($search->picking_status as &$s)
+            {
+                $s = (
+                    FieldSet::validate(\field\Select::FIELD_NAME, $s)->isSuccess()
+                )? $s : '';
+            }
+            
+
+            
+            if ($search->registration_time_start !== '') { 
+                $picking_history->where('registrationTime', $search->registration_time_start, '>='); 
+            }
+
+            if ($search->registration_time_end !== '') { 
+                $picking_history->where('registrationTime', (date('Y-m-d', strtotime($search->registration_time_end . '+1 day'))), '<');
+            }
+
+            if ($search->division_id !== '') { 
+                $picking_history->where('divisionId', $search->division_id); 
+            }
+
+            if ($search->picking_status !== '') {
+                foreach($search->picking_status as $c)
+                {
+                    $picking_history->orWhere('pickingStatus', $c ); 
+                }
+            }
+
+            $picking_history = $picking_history->paginate((int)$search->limit);
+            $cache->set('joypla_pickingList', json_encode($search));
+
+            $count = $picking_history->count;
+            $picking_history_label = $picking_history->label->all();
+            $picking_history = $picking_history->data->all();
+            
+            /** 部署情報 */
+            $division_info = [];
+            $division_info = Division::where('hospitalId',$user_info->getHospitalId())->whereDeleted();
+            if($user_info->isUser())
+            {
+                $division_info->where('divisionId',$user_info->getDivisionId());
+            }
+            $division_info = $division_info->get();
+            $division_info = $division_info->data->all();
+            /** 実体参照を行い、必要な情報をセット */
+            foreach($picking_history as &$item)
+            {
+                $item->checked = false;
+                $item->pickingStatus_id = $item->pickingStatus;
+                $item->pickingStatus = $picking_history_label['pickingStatus']->all()[$item->pickingStatus];
+
+                $division = \App\Lib\array_obj_find($division_info,'divisionId',$item->divisionId);
+                $item->divisionName = $division->divisionName;
+            }
+
+            $form_url = "%url/rel:mpgt:Payout%";
+            $api_url = "%url/rel:mpgt:Payout%";
+
+            $content = $this->view('NewJoyPla/view/PickingList', [
+                    'title' => 'ピッキングリスト',
+                    'search_action' => 'pickingList',
+                    'slip_link_action' => 'pickingListSlip',
+                    'form_url' => $form_url,
+                    'api_url' => $api_url,
+                    'search' => $search,
+                    'count' => $count,
+                    'division_info' => $division_info,
+                    'picking_history' => $picking_history,
+                    'picking_status_label' => $picking_history_label['pickingStatus']->all(),
+                    'csrf_token' => Csrf::generate(16)
+                    ] , true);
+    
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [
+                'new' => true
+            ] , false);
+            $style   = $this->view('NewJoyPla/view/template/parts/FormPrintCss', [] , false)->render();
+                
+            $style   .= $this->view('NewJoyPla/view/template/parts/StyleCss', [] , false)->render();
+                
+            $script   = $this->view('NewJoyPla/view/template/parts/Script', [] , false)->render();
+                
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla ピッキングリスト',
+                'script' => $script,
+                'style' => $style,
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
+    }
+
+    
+    public function pickingListSlip()
+    {
+        global $SPIRAL;
+        try {
+            //フルスクラッチでやってみる
+            $user_info = new UserInfo($SPIRAL);
+            $cache = $SPIRAL->getCache();
+            
+            if ($user_info->isDistributorUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+
+            $id = $SPIRAL->getParam('id');
+            $picking_history = PickingHistory::where('hospitalId',$user_info->getHospitalId())->find($id)->get();
+            
+            if($picking_history->count ==  0)
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+
+            $picking_history = $picking_history->data->get(0);
+            $picking_id = $picking_history->pickingId;
+            $picking_status = $picking_history->pickingStatus;
+            $pay_schedule_items = PayScheduleItems::where('pickingId',$picking_history->pickingId)->where('hospitalId',$user_info->getHospitalId())->get();
+            
+            if($pay_schedule_items->count == 0 && $picking_history->pickingStatus == '1')
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+
+            $stock = [];
+            $in_item_ids = [];
+            $count = $pay_schedule_items->count;
+            $stocks_count = 0;
+            $pay_schedule_items = $pay_schedule_items->data->all();
+            if($count > 0){
+                $stock = StockView::where('hospitalId',$user_info->getHospitalId())->where('divisionId', $picking_history->divisionId);
+                foreach($pay_schedule_items as $item)
+                {
+                    $stock->orWhere('inHospitalItemId', $item->inHospitalItemId);
+                }
+                
+                $stock = $stock->get();
+                $stocks_count = $stock->count;
+                $stock = $stock->data->all();
+            }
+
+            foreach($pay_schedule_items as $item)
+            {
+                if(array_search($item->inHospitalItemId, $in_item_ids) === false) {
+                    $in_item_ids[] = $item->inHospitalItemId;
+                }
+            }
+            
+            foreach($stock as $s)
+            {
+                if(($key = array_search($s->inHospitalItemId, $in_item_ids)) !== false) {
+                    unset($in_item_ids[$key]);
+                }
+            }
+
+            $in_hospital_item_tmp = [];
+            if(count($in_item_ids) > 0)
+            {
+                $in_hospital_items = InHospitalItemView::where('hospitalId',$user_info->getHospitalId());
+                foreach($in_item_ids as $id)
+                {
+                    $in_hospital_items->orWhere('inHospitalItemId',$id);
+                }
+                $in_hospital_items = $in_hospital_items->get();
+                $in_hospital_items = $in_hospital_items->data->all();
+
+                //StockView と同じ形に成形
+                foreach($in_hospital_items as $t)
+                {
+                    $tmp = new stdClass;
+                    foreach(StockView::$fillable as $f )
+                    {
+                        if( ! isset($t->{$f}) )
+                        {
+                            $tmp->{$f} = '';
+                            if($f === 'stockQuantity')
+                            {
+                                $tmp->{$f} = 0;
+                            }
+                        }
+                        else if( isset($t->{$f}) )
+                        {
+                            $tmp->{$f} = $t->{$f};
+                        }
+                    }
+                    $in_hospital_item_tmp[] = $tmp;
+                }
+            }
+            $stock_view_model = array_merge($stock , $in_hospital_item_tmp);
+
+            /** 部署情報 */
+            $division_info = [];
+            $division_info = Division::where('hospitalId',$user_info->getHospitalId())->whereDeleted()->get();
+            $division_info = $division_info->data->all();
+            $division = \App\Lib\array_obj_find($division_info,'divisionId',$picking_history->divisionId);
+            $division_name = $division->divisionName;
+
+            /** 実体参照を行い、必要な情報をセット */
+            foreach($pay_schedule_items as &$item)
+            {
+                $division = \App\Lib\array_obj_find($division_info,'divisionId',$item->sourceDivisionId);
+                $item->sourceDivision = $division->divisionName;
+                $division = \App\Lib\array_obj_find($division_info,'divisionId',$item->targetDivisionId);
+                $item->targetDivision = $division->divisionName;
+            }
+
+            $form_url = "%url/rel:mpgt:Payout%";
+            $api_url = "%url/rel:mpgt:Payout%";
+
+            $content = $this->view('NewJoyPla/view/PickingListSlip', [
+                    'title' => 'ピッキングリスト伝票',
+                    'form_url' => $form_url,
+                    'picking_id' => $picking_id,
+                    'api_url' => $api_url,
+                    'picking_list_url' => '%url/rel:mpgt:Payout%',
+                    'stock' => $stock_view_model,
+                    'picking_status' => $picking_status,
+                    'division_name' => $division_name,
+                    'picking_history' => $picking_history,
+                    'pay_schedule_items' => $pay_schedule_items,
+                    'csrf_token' => Csrf::generate(16)
+                    ] , true);
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [
+                'new' => true
+            ] , false);
+            $style   = $this->view('NewJoyPla/view/template/parts/FormPrintCss', [] , false)->render();
+                
+            $style   .= $this->view('NewJoyPla/view/template/parts/StyleCss', [] , false)->render();
+                
+            $script   = $this->view('NewJoyPla/view/template/parts/Script', [] , false)->render();
+                
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla ピッキングリスト伝票',
+                'script' => $script,
+                'style' => $style,
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
+    }
+
+    public function pickingSlipDelete()
+    {
+        global $SPIRAL;
+        try{
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+
+            $user_info = new UserInfo($SPIRAL);
+
+            $pickingId = $SPIRAL->getParam('picking_id');
+
+            $picking_history = PickingHistory::where('hospitalId',$user_info->getHospitalId())->where('pickingId',$pickingId)->where('pickingStatus','1')->get();
+
+            if($picking_history->count == 0)
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+
+            $picking_history = $picking_history->data->get(0);
+
+            $result = PayScheduleItems::where('hospitalId',$user_info->getHospitalId())->where('pickingId',$pickingId)->update(['pickingId'=>'']);
+            PickingHistory::where('hospitalId',$user_info->getHospitalId())->where('pickingId',$pickingId)->where('pickingStatus','1')->delete();
+            $content = new ApiResponse($result->ids, $result->count , $result->code, $result->message, ['insert']);
+            $content = $content->toJson();
+            
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['payoutRegistApi']);
+            $content = $content->toJson();
+        }finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+    }
+
+    public function pickingSlipCommit()
+    {
+        global $SPIRAL;
+        try{
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+
+            $user_info = new UserInfo($SPIRAL);
+
+            $picking_id = $SPIRAL->getParam('picking_id');
+            $picking_history = PickingHistory::where('hospitalId',$user_info->getHospitalId())->where('pickingId',$picking_id)->where('pickingStatus','1')->get();
+
+            if($picking_history->count == 0)
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+
+            $picking_history = $picking_history->data->get(0);
+
+            $post_items = $SPIRAL->getParam('pay_schedule_items');
+
+            if(! is_array($post_items))
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+
+            $pay_schedule_items = PayScheduleItems::where('pickingId',$picking_id)->where('hospitalId',$user_info->getHospitalId());
+            
+            foreach($post_items as $item)
+            {
+                $pay_schedule_items->orWhere('payoutPlanId',$item['payoutPlanId']);
+            }
+            $pay_schedule_items = $pay_schedule_items->get();
+
+            if(count($post_items) != $pay_schedule_items->count)
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+
+            $update = [];
+            foreach($post_items as $item)
+            {
+                if($item['outOfStockStatus'] == '2')
+                {
+                    $update[] = [
+                        'payoutPlanId' => $item['payoutPlanId'],
+                        'pickingId' => $item['pickingId'],
+                        'outOfStockStatus' => $item['outOfStockStatus'],
+                    ];
+                }
+                else 
+                {
+                    $update[] = [
+                        'payoutPlanId' => $item['payoutPlanId'],
+                        'pickingId' => '',
+                        'outOfStockStatus' => $item['outOfStockStatus'],
+                    ];
+                }
+            }
+
+            $result = PayScheduleItems::bulkUpdate('payoutPlanId',$update);
+            $result = PickingHistory::where('hospitalId',$user_info->getHospitalId())->where('pickingId',$picking_id)->update(['pickingStatus' => '2']);
+
+            $content = new ApiResponse($result->ids, $result->count , $result->code, $result->message, ['insert']);
+            $content = $content->toJson();
+            
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['payoutRegistApi']);
+            $content = $content->toJson();
+        }finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
             ],false);
         }
     }
@@ -971,6 +1647,30 @@ $action = $SPIRAL->getParam('Action');
     else if($action === 'payoutScheduledItemList')
     {
         echo $PayoutController->payoutScheduledItemList()->render();
+    }
+    else if($action === 'pickingItemsDeleteApi')
+    {
+        echo $PayoutController->pickingItemsDeleteApi()->render();
+    }
+    else if($action === 'pickingItemsRegistApi')
+    {
+        echo $PayoutController->pickingItemsRegistApi()->render();
+    }
+    else if($action === 'pickingList')
+    {
+        echo $PayoutController->pickingList()->render();
+    }
+    else if($action === 'pickingListSlip')
+    {
+       echo $PayoutController->pickingListSlip()->render();
+    }
+    else if($action === 'pickingSlipDelete')
+    {
+        echo $PayoutController->pickingSlipDelete()->render();
+    }
+    else if($action === 'pickingSlipCommit')
+    {
+        echo $PayoutController->pickingSlipCommit()->render();
     }
     else 
     {

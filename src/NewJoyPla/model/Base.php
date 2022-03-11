@@ -241,7 +241,8 @@ class Order extends Model
         "divisionId",
         "distributorId",
         "lotManagement",
-        "itemId"
+        "itemId",
+        "priceId"
     ];
 
     //デフォルト値
@@ -2346,6 +2347,38 @@ class PayScheduleItems extends Model
             '1'=>"未チェック",
             '2'=>"払出可能",
             '3'=>"欠品",
+        ]
+    ];
+}
+
+
+class PickingHistory extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "NJ_PickingSlip";
+    public static $guarded = ["id"];
+    public static $primary_key = "pickingId";
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "pickingId",
+        "hospitalId",
+        "divisionId",
+        "pickingStatus",
+    ];
+
+    //デフォルト値
+    public static $attributes = [
+        'pickingStatus' => '1',
+    ];
+
+    public static $select = [
+        'pickingStatus' => [
+            '1'=>"未確認",
+            '2'=>"完了",
         ]
     ];
 }

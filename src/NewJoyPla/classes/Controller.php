@@ -21,14 +21,20 @@ class Controller
     }
     
     protected function makeId($id = '00')
-    {
+    { 
         /*
         '02' => HP_BILLING_PAGE,
         '03_unorder' => HP_UNORDER_PAGE,
         '03_order' => HP_ORDER_PAGE,
         '04' => HP_RECEIVING_PAGE,
-        '06' => HP_RETERN_PAGE,
         '05' => HP_PAYOUT_PAGE,
+        '06' => HP_RETERN_PAGE,
+        '07' => HP_BORROWING_PAGE,
+        '08' => HP_INVENTORY_END,
+        '09' => HP_INVENTORY_HIST,
+        '10' => NONE,
+        '11' => NONE,
+        '12' => NONE,
         */
         $id .= date("ymdHis");
         $id .= str_pad(substr(rand(),0,3) , 4, "0"); 

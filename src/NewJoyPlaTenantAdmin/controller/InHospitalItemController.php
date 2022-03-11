@@ -69,7 +69,7 @@ class InHospitalItemController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 院内商品管理',
+                'title'     => 'JoyPla 院内商品管理',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -118,7 +118,7 @@ class InHospitalItemController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 金額・院内商品一括登録',
+                'title'     => 'JoyPla 金額・院内商品一括登録',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

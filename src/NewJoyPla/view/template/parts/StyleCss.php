@@ -57,6 +57,9 @@ table.uk-table td, table.uk-table th{
   color: #fff;
   border: 1px solid transparent;
 }
+.uk-text-primary {
+  color: #7AAE36 !important;
+}
 /* Hover + Focus */
 .uk-button-primary:hover,
 .uk-button-primary:focus {
@@ -92,6 +95,7 @@ table.uk-table td, table.uk-table th{
 
 .title_spacing {
 	letter-spacing : 1em;
+	text-indent: 1em;
 }
 
 .jp-min-width-150 {
@@ -174,5 +178,10 @@ input:checked + .uk-switch-slider.uk-switch-big:before {
 /* Inverse Modifier - affects only default */
 .uk-light .uk-switch-slider:not(.uk-switch-on-off) {
   background-color: rgba(255,255,255,0.22);
+}
+
+.change {
+  background-color: rgb(255, 204, 153);
+  color: rgb(68, 68, 68)
 }
 </style>

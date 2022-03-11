@@ -32,7 +32,7 @@ class LoginController extends Controller
             $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [] , false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master ログイン',
+                'title'     => 'JoyPla ログイン',
                 'content'   => $content,
                 'head' => $head,
                 'style' => $style,

@@ -13,6 +13,9 @@
       color: #fff;
       border: 1px solid transparent;
     }
+    .uk-text-primary {
+      color: #7AAE36 !important;
+    }
     /* Hover + Focus */
     .uk-button-primary:hover,
     .uk-button-primary:focus {

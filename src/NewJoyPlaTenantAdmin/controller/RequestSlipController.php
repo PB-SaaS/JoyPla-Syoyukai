@@ -71,7 +71,7 @@ class RequestSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => $back_text,
-                'title'     => 'JoyPla-Tenant-Master 見積依頼詳細',
+                'title'     => 'JoyPla 見積依頼詳細',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

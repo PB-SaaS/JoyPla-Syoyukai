@@ -71,7 +71,7 @@ class DistributorController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 卸業者管理',
+                'title'     => 'JoyPla 卸業者管理',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -119,7 +119,7 @@ class DistributorController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 卸業者一括登録・更新',
+                'title'     => 'JoyPla 卸業者一括登録・更新',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

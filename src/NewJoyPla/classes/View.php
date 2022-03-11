@@ -1,4 +1,5 @@
 <?php
+
 class View {
 
     protected $file = null;
@@ -8,7 +9,7 @@ class View {
         $this->file = $file;
         foreach($data as $key => $d){
             if($filter){
-                $d = htmlspecialchars($d, ENT_QUOTES, 'UTF-8');
+                $d = $this->filter($d);
             }
             $this->data[$key] = $d;
         }
@@ -36,7 +37,7 @@ class View {
     public function set(string $key , string $value = null , bool $filter = true): void
     {
         if($filter){
-            $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+            $value = $this->filter($value);
         }
         $this->data[$key] = $value;
     }
@@ -45,10 +46,42 @@ class View {
     {
         foreach($data as $key => $d){
             if($filter){
-                $d = htmlspecialchars($d, ENT_QUOTES, 'UTF-8');
+                $d = $this->filter($d);
             }
             $this->data[$key] = $d;
         }
+    }
+
+    public function filter($value)
+    {
+        if ( ! is_object($value) && ! is_array($value)  ) return htmlspecialchars($value, ENT_QUOTES, "UTF-8");//PHPサーバーはUTF-8
+        
+        if( is_object($value)){
+            unset($value->spiralDataBase);
+            unset($value->spiralSendMail);
+            unset($value->spiralDBFilter);
+            $tmp = new StdClass;
+            foreach((array)$value as $k => $t)
+            {
+                $t = $this->filter($t);
+                $tmp->{$k} = $t;
+            }
+            
+            return $tmp;
+        }
+
+        
+        if( is_array($value)){
+            $tmp = [];
+            foreach($value as $k => $t)
+            {
+                $t = $this->filter($t);
+                $tmp[$k] = $t;
+            }
+            return $tmp;
+        }
+
+        return $value;
     }
 
     public function render( string $file = null ): string

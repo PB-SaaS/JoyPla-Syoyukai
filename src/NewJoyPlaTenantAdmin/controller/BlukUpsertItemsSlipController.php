@@ -66,7 +66,7 @@ class BlukUpsertItemsSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => $back_text,
-                'title'     => 'JoyPla-Tenant-Master 商品登録更新詳細',
+                'title'     => 'JoyPla 商品登録更新詳細',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

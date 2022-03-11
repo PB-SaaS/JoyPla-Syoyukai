@@ -605,6 +605,22 @@
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
+				                                <span class="title">金額一覧</span><br>
+				                                <span class="text">Price List</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:ProductQuotation%&Action=PriceList" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-7-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
 				                                <span class="title">院内商品一覧</span><br>
 				                                <span class="text">In Hospital Items List</span>
 			                                </p>

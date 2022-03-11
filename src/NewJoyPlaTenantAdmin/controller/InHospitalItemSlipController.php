@@ -79,7 +79,7 @@ class InHospitalItemSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => $back_text,
-                'title'     => 'JoyPla-Tenant-Master 院内商品詳細',
+                'title'     => 'JoyPla 院内商品詳細',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -226,7 +226,7 @@ class InHospitalItemSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => $back_text,
-                'title'     => 'JoyPla-Tenant-Master 院内商品情報変更',
+                'title'     => 'JoyPla 院内商品情報変更',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

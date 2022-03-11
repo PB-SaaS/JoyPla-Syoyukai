@@ -63,7 +63,7 @@ class FacilitySlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => '%url/rel:mpgt:Facility%&table_cache=true',
                 'back_text' => '病院情報管理',
-                'title'     => 'JoyPla-Tenant-Master 病院情報詳細',
+                'title'     => 'JoyPla 病院情報詳細',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -115,7 +115,7 @@ class FacilitySlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => '病院情報詳細',
-                'title'     => 'JoyPla-Tenant-Master 部署情報登録',
+                'title'     => 'JoyPla 部署情報登録',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -183,7 +183,7 @@ class FacilitySlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => '病院情報詳細',
-                'title'     => 'JoyPla-Tenant-Master 病院ユーザー登録',
+                'title'     => 'JoyPla 病院ユーザー登録',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -236,7 +236,7 @@ class FacilitySlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => '病院情報詳細',
-                'title'     => 'JoyPla-Tenant-Master 卸業者情報登録',
+                'title'     => 'JoyPla 卸業者情報登録',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -312,7 +312,7 @@ class FacilitySlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => '病院情報詳細',
-                'title'     => 'JoyPla-Tenant-Master 病院情報更新',
+                'title'     => 'JoyPla 病院情報更新',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

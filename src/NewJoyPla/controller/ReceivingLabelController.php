@@ -27,29 +27,65 @@ class ReceivingLabelController extends Controller
         try{
             $user_info = new UserInfo($SPIRAL);
             
-            $receiving_id = $SPIRAL->getParam('receivingId');
-            if($receiving_id == "" || $receiving_id == null)
+            $receiving_id_row = $SPIRAL->getParam('receivingId');
+            $receiving_ids = explode(",", $receiving_id_row);
+            
+            $print_counts = ($SPIRAL->getParam('print_counts'))? $SPIRAL->getParam('print_counts') : [];
+
+            if(count($receiving_ids) === 0)
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
             
-            if($user_info->isAdmin() || $user_info->isApprover())
+            $receiving_items = ReceivingView::where('hospitalId',$user_info->getHospitalId());
+            foreach($receiving_ids as $id)
             {
-                $receiving_items = ReceivingView::where('receivingHId', $receiving_id)->where('hospitalId',$user_info->getHospitalId())->get();
-                $receiving_items = $receiving_items->data->all();
+                $receiving_items->orWhere('receivingHId', $id);
             }
-            else
+            if($user_info->isUser())
             {
-                $receiving_items = ReceivingView::where('receivingHId', $receiving_id)->where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
-                $receiving_items = $receiving_items->data->all();
+                $receiving_items->where('divisionId',$user_info->getDivisionId());
             }
+            $receiving_items = $receiving_items->get();
+            $receiving_items = $receiving_items->data->all();
+
+            $first_flg = (count($print_counts) == 0);
+            foreach($receiving_items as &$i)
+            {
+                $i->print_count = 1;
+                if(!$first_flg)
+                {
+                    foreach($print_counts as $p)
+                    {
+                        if($p['receivingNumber'] == $i->receivingNumber && $p['count'] > 0)
+                        {
+                            $i->print_count = $p['count'];
+                            $exist = true;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    $i->print_count = ( (int)$i->receivingCount - (int)$i->totalReturnCount > 0)? (int)$i->receivingCount - (int)$i->totalReturnCount : 0;
+                    $print_counts[] = [
+                        'receivingHId' => $i->receivingHId,
+                        'receivingNumber' => $i->receivingNumber,
+                        'count' => $i->print_count ,
+                    ];
+                }
+            }
+
             $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
             $hospital_data = $hospital_data->data->get(0);
         
             $content = $this->view('NewJoyPla/view/ReceivingLabel', [
                 //'api_url' => $api_url,
                 'user_info' => $user_info,
+                'receiving_id' => $receiving_id_row,
+                'form_action' => '%url/rel:mpgt:ReceivingLabel%',
                 'receiving_items' => $receiving_items,
+                'print_counts' => $print_counts,
                 'hospital_data' => $hospital_data
                 ] , false);
         } catch ( Exception $ex ) {

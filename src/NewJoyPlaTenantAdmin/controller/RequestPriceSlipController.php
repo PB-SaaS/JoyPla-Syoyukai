@@ -146,7 +146,7 @@ class RequestPriceSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => $back_text,
-                'title'     => 'JoyPla-Tenant-Master 見積金額登録',
+                'title'     => 'JoyPla 見積金額登録',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

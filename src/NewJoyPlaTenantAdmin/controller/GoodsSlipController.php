@@ -67,7 +67,7 @@ class GoodsSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => '%url/rel:mpgt:Goods%&table_cache=true',
                 'back_text' => '商品情報一覧',
-                'title'     => 'JoyPla-Tenant-Master 商品管理',
+                'title'     => 'JoyPla 商品管理',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -132,7 +132,7 @@ class GoodsSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => '%url/card:page_178572%',
                 'back_text' => '商品情報詳細',
-                'title'     => 'JoyPla-Tenant-Master 商品情報変更',
+                'title'     => 'JoyPla 商品情報変更',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -280,7 +280,7 @@ class GoodsSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => '%url/card:page_178572%',
                 'back_text' => '商品情報詳細',
-                'title'     => 'JoyPla-Tenant-Master 金額情報登録',
+                'title'     => 'JoyPla 金額情報登録',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -369,7 +369,7 @@ class GoodsSlipController extends Controller
             if($step_check == 2){
                 $hospitalId = $SPIRAL->getParam('hospitalId');
                 $hospital = Hospital::where('hospitalId',$hospitalId)->get();
-                $priceInfoView = PriceInfoView::where('tenantId',$auth->tenantId)->where('hospitalId',$iteminfo->hospitalId)->where('itemId',$iteminfo->itemId)->where('notUsedFlag','1','!=')->get();
+                $priceInfoView = PriceInfoView::where('tenantId',$auth->tenantId)->where('hospitalId',$hospitalId)->where('itemId',$iteminfo->itemId)->where('notUsedFlag','1','!=')->get();
                 $content = $this->view('NewJoyPlaTenantAdmin/view/InHospitalItemReg/Step2', [
                     'hospital' => $hospital->data->get(0),
                     'priceinfo' => $priceInfoView->data->all(),
@@ -426,7 +426,7 @@ class GoodsSlipController extends Controller
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => '%url/card:page_178572%',
                 'back_text' => '商品情報詳細',
-                'title'     => 'JoyPla-Tenant-Master 院内商品登録',
+                'title'     => 'JoyPla 院内商品登録',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

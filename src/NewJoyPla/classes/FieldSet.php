@@ -1,42 +1,32 @@
 <?php
 
+namespace validate;
+
+use DbFieldTypeError\FormatError;
 use field\DbField;
+use monad\Failed;
+use monad\Try_;
+use monad\TryList;
+
+use Exception;
+use function Sanitize\htmlSanitize;
+use function validate\isValueEmpty;
 
 class FieldSet {
 
     public $name;
-    public $validate_type;
-    public $not_null_Flg;
-    public $method;
-    public $label;
-    public $attr;
-    public $option;
-    public $current_value = ' ';
-    public $message;
+    public $value;
 
-    public function __construct($name , $validate_type , $not_null_Flg = 'f', $method = 'text', $label = '', $attr = array(), $option = array()){
-        $this->name = $name;
-        $this->validate_type = $validate_type;
-        $this->not_null_Flg = $not_null_Flg;
-        $this->method = $method;
-        $this->label = $label;
-        $this->attr = $attr;
-        $this->option = $option;
-        $this->getCurrentValue();
-    }
-
-    public function getCurrentValue()
+    public static function validate($fieldType , $value , $info = ['key' => 'sample','replaceKey' => 'sample'])
     {
-        global $SPIRAL ;
-        $this->current_value = $SPIRAL->getParam($this->name);
-    }
+        $signingColumn = (isValueEmpty($value))? "": htmlSanitize($value);
+        $signingColumn = urldecode($signingColumn);
+        $signingColumn = (is_string($signingColumn))? preg_replace('/\A[\p{Cc}\p{Cf}\p{Z}]++|[\p{Cc}\p{Cf}\p{Z}]++\z/u', '', $signingColumn): $signingColumn;
 
-    public function validate()
-    {
-        $DbField = DbField::of($this->name , $this->validate_type,' ',$this->current_value , ['not_null_Flg'=>$this->not_null_Flg]);
-        if($DbField->isFailed()){
-            $this->message = $DbField->getValue()->message;
-        }
-        return $this;
+        $info['key'] = (is_null($info['key']))? 'sample' : $info['key'];
+        $info['replaceKey'] = (is_null($info['replaceKey']))? 'sample' : $info['replaceKey'];
+
+        $dbField = DbField::of($info["key"], $fieldType, $info["replaceKey"], $signingColumn, $info);
+        return $dbField;
     }
 }

@@ -538,6 +538,9 @@ function check_gs1128(code){
   color: #fff;
   border: 1px solid transparent;
 }
+.uk-text-primary {
+	color: #7AAE36 !important;
+}
 /* Hover + Focus */
 .uk-button-primary:hover,
 .uk-button-primary:focus {
@@ -573,6 +576,7 @@ function check_gs1128(code){
 
 .title_spacing {
 	letter-spacing : 1em;
+	text-indent: 1em;
 }
 
 .animsition {

@@ -571,7 +571,7 @@ var gs1_128 = new Vue({
 	},
 	methods: {
 		changeDate: function (text){
-			if(text == null){
+			if(!text){
 				return "";
 			}
 			if(text.length == "6"){

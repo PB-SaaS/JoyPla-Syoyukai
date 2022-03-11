@@ -52,7 +52,7 @@ class BlukUpsertItemsController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 一括商品登録更新',
+                'title'     => 'JoyPla 一括商品登録更新',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -159,7 +159,7 @@ class BlukUpsertItemsController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla-Tenant-Master 商品登録更新履歴',
+                'title'     => 'JoyPla 商品登録更新履歴',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,

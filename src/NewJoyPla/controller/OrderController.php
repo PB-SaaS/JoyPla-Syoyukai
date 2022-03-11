@@ -20,6 +20,9 @@ use App\Model\Order;
 use App\Model\OrderHistory;
 use App\Model\OrderedItemView;
 
+use App\Model\Receiving;
+use App\Model\ReceivingHistory;
+
 
 
 use ApiErrorCode\FactoryApiErrorCode;
@@ -329,6 +332,7 @@ class OrderController extends Controller
                 }
             }
             $upsert[] = [
+                'registrationTime' => $item->registrationTime,
                 'hospitalId' => $item->hospitalId,
                 'inHospitalItemId' => $item->inHospitalItemId,
                 'orderNumber' => $item->orderNumber,
@@ -352,6 +356,7 @@ class OrderController extends Controller
             {
                 if($item['orderQuantity']  == 0){ continue; }
                 $upsert[] = [
+                    'registrationTime' => 'now',
                     'hospitalId' => $user_info->getHospitalId(),
                     'inHospitalItemId' => $item['inHospitalItemId'],
                     'orderNumber' => $item['orderNumber'],
@@ -377,6 +382,7 @@ class OrderController extends Controller
             {
                 $history[$item['orderNumber']] = 
                 [
+                    'registrationTime' => $item['registrationTime'],
                     'orderNumber' => $item['orderNumber'],
                     'hospitalId' => $user_info->getHospitalId(),
                     'divisionId' => $item['divisionId'],
@@ -765,6 +771,497 @@ class OrderController extends Controller
             ],false);
         }
     }
+    
+    
+    public function individualEntry()
+    {
+        global $SPIRAL;
+        try {
+
+            $user_info = new UserInfo($SPIRAL);
+            
+            if ($user_info->isDistributorUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+            
+            $division = Division::where('hospitalId',$user_info->getHospitalId());
+            
+            $hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+            $hospital = $hospital->data->get(0);
+
+            if($hospital->receivingTarget == '1')
+            {
+                $division->where('divisionType','1');
+            }
+            
+            if($hospital->receivingTarget == '2' && $user_info->isUser())
+            {
+                $division->where('divisionId',$user_info->getDivisionId());
+            }
+
+            $division = $division->get();
+            $division = $division->data->all();
+            
+            $api_url = "%url/rel:mpgt:Order%";
+            $content = $this->view('NewJoyPla/view/IndividualEntry', [
+                    'csrf_token' => Csrf::generate(16),
+                    'division' => $division,
+                    'api_url' => $api_url 
+                    ] , false);
+    
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla 個別入荷',
+                'script' => '',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
+    }
+
+    
+    public function individualRegistApi()
+    {   
+        global $SPIRAL;
+        $content = '';
+        try{
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+
+            $user_info = new UserInfo($SPIRAL);
+
+            if($user_info->isDistributorUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            
+            if($user_info->isApprover())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+
+            $receiving_items = $SPIRAL->getParam('items');
+            $receiving_items = $this->requestUrldecode($receiving_items);
+
+            $re_items = [];
+            foreach($receiving_items as &$i)
+            {
+                $i['lotNumber'] = (is_null($i['lotNumber']))? "" : $i['lotNumber'];
+                $i['lotDate'] = (is_null($i['lotDate']))? "" : $i['lotDate'];
+                $re_items = $this->uniqLotMerge($re_items , $i['lotNumber'] , $i['lotDate'] , $i['recordId'] , (int)$i['count']);
+            }
+
+            $receiving_items = $this->getInHospitalItems($re_items);
+
+            $division_id = $SPIRAL->getParam('divisionId');
+            //倉庫納品
+            //    -　倉庫を選択していること
+            //担当者の場合、発注書は自身の部署の発注書のみ
+            //その他の場合、発注書はどれでも
+            //部署納品
+            //    -　部署を選択していること
+            //発注書部署 = 納品先部署（ = 倉庫納品の担当者ロジック）
+            
+            $hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+            $hospital = $hospital->data->get(0);
+            
+            $order_item = OrderedItemView::where('hospitalId',$user_info->getHospitalId())->orWhere('receivingFlag','0')->orWhere('receivingFlag','0','ISNULL')->where('orderStatus','1','!=')->sort('id','asc');
+            if( $user_info->isUser())
+            {
+                $order_item->where('divisionId',$user_info->getDivisionId());
+            }
+            else if($hospital->receivingTarget == '2')
+            {
+                $order_item->where('divisionId',$division_id);
+            }
+
+            foreach($receiving_items as $i)
+            {
+                $order_item->orWhere('inHospitalItemId',$i->inHospitalItemId);
+            }
+            
+            $order_item = $order_item->get();
+            $order_count = $order_item->count;
+            $order_item = $order_item->data->all();//対象の発注商品
+            
+            //発注履歴ID 1..1 入庫履歴ID
+            $recept_ids = $this->createReceiveIds($order_item);
+            $result = $this->createReceiveData($order_item , $receiving_items, $recept_ids );
+
+            $receivingTargetDivision = $division_id;
+            if($hospital->receivingTarget == '1')
+            {
+                $division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionType','1')->get();
+                $division = $division->data->get(0);
+                $receivingTargetDivision = $division->divisionId;
+            }
+
+            Order::bulkUpdate('orderCNumber',$this->makeOrderUpdateArray($result['order_update_items']));
+            OrderHistory::bulkUpdate('orderNumber',$this->makeOrderHistoryUpdateArray($result['order_update_items']));
+            
+            $tmp = $this->makeReceptionHistoryInsertArray($result['receiving_insert_items'] , $receivingTargetDivision );
+            ReceivingHistory::insert($tmp);
+
+            Receiving::insert($this->makeReceptionInsertArray($result['receiving_insert_items'] , $receivingTargetDivision ));
+
+            InventoryAdjustmentTransaction::insert($this->makeInventoryAdjustmentTransaction($result['receiving_insert_items'] , $receivingTargetDivision));
+
+            $message = implode('<br>',array_keys($tmp));
+
+            $content = new ApiResponse($tmp,0,0,'登録が完了しました<br>生成された検収番号<br>'.$message,['insert']);
+            $content = $content->toJson();
+
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+            $content = $content->toJson();
+        } finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+    }
+
+    private function makeInventoryAdjustmentTransaction($receiving_items  , $target_division_id)
+    {
+        $inventory_adjustment_trdata = [];
+        
+        foreach($receiving_items as $i)
+        {
+            if($i['lotNumber'] && $i['lotDate']){
+                $inventory_adjustment_trdata[] = [
+                    'divisionId' => $target_division_id,
+                    'pattern' => 3,
+                    'inHospitalItemId' => $i['inHospitalItemId'],
+                    'count' => (int)$i['quantity'] * (int)$i['receivingCount'],
+                    'orderWithinCount' => ((int)$i['receivingCount'] < 0) ? 0 : -((int)$i['quantity'] * (int)$i['receivingCount']),
+                    'hospitalId' => $i['hospitalId'],
+                    'lotUniqueKey' => $i['hospitalId'].$target_division_id.$i['inHospitalItemId'].$i['lotNumber'].$i['lotDate'],
+                    'lotNumber' => $i['lotNumber'],
+                    'lotDate' => $i['lotDate'],
+                ];
+            }
+            else
+            {
+                $inventory_adjustment_trdata[] = [
+                    'divisionId' => $target_division_id,
+                    'pattern' => 3,
+                    'inHospitalItemId' => $i['inHospitalItemId'],
+                    'count' => (int)$i['quantity'] * (int)$i['receivingCount'],
+                    'orderWithinCount' => ((int)$i['receivingCount'] < 0) ? 0 : -((int)$i['quantity'] * (int)$i['receivingCount']),
+                    'hospitalId' => $i['hospitalId'],
+                ];
+            }
+        }
+
+        return $inventory_adjustment_trdata;
+    }
+
+    private function getInHospitalItems($items)
+    {
+        global $SPIRAL;
+        $user_info = new UserInfo($SPIRAL);
+        $instance = InHospitalItem::where('hospitalId',$user_info->getHospitalId());
+        foreach($items as $i)
+        {
+            $instance->orWhere('inHospitalItemId',$i->inHospitalItemId);
+        }
+        $instance = $instance->get();
+        $instance = $instance->data->all();
+
+        foreach($items as &$i)
+        {
+            foreach($instance as $ins)
+            {
+                if($i->inHospitalItemId === $ins->inHospitalItemId )
+                {
+                    $i->distributorId = $ins->distributorId;
+                }
+            }
+        }
+
+        return $items;
+    }
+    
+    //ロット＋期限＋院内商品IDでユニーク化
+    private function uniqLotMerge(array $items ,string $lotNumber = "",string $lotDate  = "" , string $inHospitalItemId ,int $count)
+    {
+        $exist = false;
+        foreach($items as $i)
+        {
+            if($i->lotNumber == $lotNumber &&
+                $i->lotDate == $lotDate &&
+                $i->inHospitalItemId == $inHospitalItemId &&
+                $i->count > 0
+            )
+            {
+                $i->count += $count;
+                $exist = true;
+                break;
+            }
+            if($i->lotNumber == $lotNumber &&
+                $i->lotDate == $lotDate &&
+                $i->inHospitalItemId == $inHospitalItemId &&
+                $i->count < 0
+            )
+            {
+                $i->count += $count;
+                $exist = true;
+                break;
+            }
+        }
+        if(!$exist)
+        {
+            $new = new stdClass;
+            $new->lotNumber = $lotNumber;
+            $new->lotDate = $lotDate;
+            $new->inHospitalItemId = $inHospitalItemId;
+            $new->count = $count;
+            $items[] = $new;
+        }
+        
+        return $items;
+    }
+
+
+    private function createReceiveIds($order_items)
+    {
+        $ids = [];
+        foreach($order_items as $o)
+        {
+            if(! array_key_exists($o->orderNumber , $ids))
+            {
+                $temp = new stdClass;
+                $temp->id = $this->makeId('04');
+                $temp->create_flg = false;
+                $ids[$o->orderNumber] = $temp;
+            }
+        }
+        return $ids;
+    } 
+
+    private function createReceiveData($order_items , $receptive_items , $ids)
+    {
+        global $SPIRAL;
+        $user_info = new UserInfo($SPIRAL);
+        //Divisionid　は取得の時に抽出済み
+        $receiving_insert_items = [];
+        $order_update_items = [];
+        foreach($receptive_items as $r)
+        {
+            foreach($order_items as &$o)
+            {
+                if($r->count === 0){ break; }
+                if(
+                    $o->inHospitalItemId == $r->inHospitalItemId &&
+                    $o->distributorId == $r->distributorId &&
+                    (
+                        ( $o->orderQuantity < 0 && $r->count < 0 ) ||
+                        ( $o->orderQuantity > 0 && $r->count > 0 )
+                    )
+                )
+                {
+                    $difference = (int)$o->orderQuantity - (int)$o->receivingNum;
+                    if(
+                        ($o->orderQuantity > 0 && $difference <= (int)$r->count ) ||
+                        ($o->orderQuantity < 0 && $difference >= (int)$r->count ) 
+                    )
+                    {
+                        $r->count = $r->count - $difference;//その後の入庫可能数
+                        
+                        //$o->receivingNum = (int)$receiving_num + (int)$o->receivingNum;
+                        $o->receivingNum = (int)$difference + (int)$o->receivingNum;//入庫数
+
+                        $o->receivingFlag = '1';
+                        $order_update_items[] = [
+                            'orderCNumber' => $o->orderCNumber,
+                            'receivingTime' => 'now',
+                            'orderNumber' => $o->orderNumber,
+                            'orderQuantity' => $o->orderQuantity,
+                            'receivingNum' => $o->receivingNum,
+                            'receivingFlag' => $o->receivingFlag,
+                        ];
+
+                        $receiving_insert_items[] = [
+                            'orderCNumber' => $o->orderCNumber,
+                            'receivingCount' => (int)$difference,
+                            'orderHistoryId' => $o->orderNumber,
+                            'receivingHId' => $ids[$o->orderNumber]->id,
+                            'inHospitalItemId' => $o->inHospitalItemId,
+                            'quantity' => $o->quantity,
+                            'price' => $o->price,
+                            'receivingPrice' => $o->price * (int)$difference,
+                            'hospitalId' => $user_info->getHospitalId(),
+                            'divisionId' => $o->divisionId,
+                            'distributorId' => $o->distributorId,
+                            'lotNumber' => $r->lotNumber,
+                            'lotDate' => $r->lotDate,
+                            'itemId' => $o->itemId,
+                        ];
+                        $ids[$o->orderNumber]->create_flg = true;
+
+                    }
+                    else 
+                    {
+                        $o->receivingNum = (int)$o->receivingNum + (int)$r->count;//入庫数
+                        $order_update_items[] = [
+                            'orderCNumber' => $o->orderCNumber,
+                            'receivingTime' => 'now',
+                            'orderNumber' => $o->orderNumber,
+                            'orderQuantity' => $o->orderQuantity,
+                            'receivingNum' => $o->receivingNum,
+                            'receivingFlag' => $o->receivingFlag,
+                        ];
+                        $receiving_insert_items[] = [
+                            'orderCNumber' => $o->orderCNumber,
+                            'receivingCount' => $r->count,
+                            'orderHistoryId' => $o->orderNumber,
+                            'receivingHId' => $ids[$o->orderNumber]->id,
+                            'inHospitalItemId' => $o->inHospitalItemId,
+                            'quantity' => $o->quantity,
+                            'price' => $o->price,
+                            'receivingPrice' => $o->price * $r->count,
+                            'hospitalId' => $user_info->getHospitalId(),
+                            'divisionId' => $o->divisionId,
+                            'distributorId' => $o->distributorId,
+                            'lotNumber' => $r->lotNumber,
+                            'lotDate' => $r->lotDate,
+                            'itemId' => $o->itemId,
+                        ];
+                        $ids[$o->orderNumber]->create_flg = true;
+                        $r->count = 0;
+                    }
+                }
+            }
+            if($r->count !== 0)
+            {
+                throw new Exception('発注商品に対して入庫量が多いため、入庫できませんでした', 1 );
+            }
+        }
+        //var_dump(['receiving_insert_items' => $receiving_insert_items , 'order_update_items' => $order_update_items , 'ids' => $ids]);
+        return ['receiving_insert_items' => $receiving_insert_items , 'order_update_items' => $order_update_items , 'ids' => $ids];
+    } 
+
+    private function makeOrderUpdateArray($order_items)
+    {
+        $result = [];
+        foreach($order_items as $o)
+        {
+            $result[] = $o;
+        }
+        return $result ;
+    }
+
+    private function makeOrderHistoryUpdateArray($order_items)
+    {
+        global $SPIRAL;
+        $user_info = new UserInfo($SPIRAL);
+        $result = [];
+        $instance = OrderedItemView::where('hospitalId',$user_info->getHospitalId());
+        foreach($order_items as $i)
+        {
+            $instance->orWhere('orderNumber', $i['orderNumber']);
+        }
+        $instance = $instance->get();
+        $instance = $instance->data->all();
+
+        
+        foreach($instance as &$i)
+        {
+            $i->orderfixflg = ($i->orderQuantity == $i->receivingNum)? "OK" : "NG";
+            if(! array_key_exists($i->orderNumber, $result))
+            {
+                $result[$i->orderNumber] = [
+                    'orderNumber' => $i->orderNumber,
+                    'receivingTime' => 'now',
+                    'orderStatus' => '',
+                    'hachuRarrival' => '',
+                    'orderItemsStatus' => [],
+                ];
+            }
+            $result[$i->orderNumber]['orderItemsStatus'][] = $i->orderfixflg;
+        }
+
+        foreach($result as &$r)
+        {
+            $r['orderStatus'] = $this->checkOrderStatus($r['orderItemsStatus']);
+        }
+
+        return $result ;
+    }
+
+    private function checkOrderStatus($s)
+    {
+        return (array_search( "NG" , $s ) === false )? 6 : 5;
+    }
+
+    private function makeReceptionInsertArray($receiving_items , $target_division_id)
+    {
+        $result = [];
+        foreach($receiving_items as $r)
+        {
+            $result[] = [
+                'orderCNumber' => $r['orderCNumber'],
+                'receivingCount' => $r['receivingCount'],
+                'receivingHId' => $r['receivingHId'],
+                'inHospitalItemId' => $r['inHospitalItemId'],
+                'price' => $r['price'],
+                'receivingPrice' => $r['receivingPrice'],
+                'hospitalId' => $r['hospitalId'],
+                'divisionId' => $target_division_id,
+                'distributorId' => $r['distributorId'],
+                'lotNumber' => $r['lotNumber'],
+                'lotDate' => $r['lotDate'],
+                'itemId' => $r['itemId'],
+            ];
+        }
+        return $result ;
+    }
+    
+    private function makeReceptionHistoryInsertArray($receiving_items , $target_division_id)
+    {
+        $result = [];
+        foreach($receiving_items as $r)
+        {
+            if(! array_key_exists($r['receivingHId'] , $result))
+            {
+                $result[$r['receivingHId']] = [
+                    'receivingHId' => $r['receivingHId'],
+                    'distributorId' => $r['distributorId'],
+                    'orderHistoryId' => $r['orderHistoryId'],
+                    'hospitalId' => $r['hospitalId'],
+                    'divisionId' => $target_division_id,
+                    'recevingStatus' => 1,
+                    'itemsNumber' => [],
+                    'totalAmount' => 0,
+                ];
+            }
+            $result[$r['receivingHId']]['totalAmount'] += (int)$r['receivingPrice'];
+            if( array_search( $r['inHospitalItemId'] ,$result[$r['receivingHId']]['itemsNumber']) === false)
+            {
+                $result[$r['receivingHId']]['itemsNumber'][] = $r['inHospitalItemId'];
+            }
+        }
+        foreach($result as &$r)
+        {
+            $r['itemsNumber'] = count($r['itemsNumber']);
+        }
+
+        return $result ;
+    }
 }
 /***
  * 実行
@@ -813,6 +1310,14 @@ $action = $SPIRAL->getParam('Action');
     else if($action === 'arrivalVerificationForDivision')
     {
         echo $OrderController->orderedListForDivision(true)->render();
+    }
+    else if($action === 'individualEntry')
+    {
+        echo $OrderController->individualEntry()->render();
+    }
+    else if($action === 'individualRegistApi')
+    {
+        echo $OrderController->individualRegistApi()->render();
     }
     else 
     {

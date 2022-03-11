@@ -723,8 +723,8 @@
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
-				                                <span class="title">発注書一覧</span><br>
-				                                <span class="text">Ordered List</span>
+				                                <span class="title">発注書一覧 / 入荷照合</span><br>
+				                                <span class="text">Ordered List / Arrival Check</span>
 			                                </p>
 			                            </div>
 			                            <div class="menu-foot">
@@ -762,22 +762,24 @@
 				    		<p class="uk-width-1-1 content-1-2 category-title">入庫</p>
 			    		</div>
 				    	<div class="uk-child-width-1-2@m uk-text-center" uk-grid>
+						    <?php if($user_info->isAdmin() || $user_info->isUser()) : ?>
 						    <div>
 						        <div class="nj_card content-1-2">
 			                        <div class="menu-content">
 			                            <div class="menu-body">
 			                                <p>
-				                                <span class="title">入荷照合</span><br>
-				                                <span class="text">Arrival Check</span>
+				                                <span class="title">個別入荷</span><br>
+				                                <span class="text">Individual Entry</span>
 			                                </p>
 			                            </div>
 			                            <div class="menu-foot">
 			                                <span>More Info</span>
 			                            </div>
-			                            <a href="%url/rel:mpgt:Order%&Action=arrivalVerification" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                            <a href="%url/rel:mpgt:Order%&Action=individualEntry" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>
+						    <?php endif; ?>
 						    <?php if($user_info->isAdmin()) : ?>
 						    
 						    <div>

@@ -206,7 +206,7 @@ EOM;
             
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 見積依頼',
+                'title'     => 'JoyPla ユーザー情報変更',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),

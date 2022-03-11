@@ -688,7 +688,7 @@ var app = new Vue({
 			if(! this.divisionCheck()){
 				return false;
 			}
-			if(barcode.indexOf("90") === 0 && barcode.lengt == 18)
+			if(barcode.indexOf("90") === 0 && barcode.length == 18)
 			{
 				is_card = true;
 			}
@@ -898,7 +898,7 @@ var gs1_128 = new Vue({
 	},
 	methods: {
 		changeDate: function (text){
-			if(text == null || text == ""){
+			if(!text){
 				return "";
 			}
 			if(text.length == "6"){
