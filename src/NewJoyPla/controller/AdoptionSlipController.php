@@ -41,7 +41,7 @@ class AdoptionSlipController extends Controller
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
             <li><a href="%url/rel:mpgt:Price%&Action=QuoteList&table_cache=true">見積依頼一覧</a></li>
-            <li><a href="{$_SERVER['HTTP_REFERER']}">見積依頼詳細</a></li>
+            <li><a href="javascript:history.back()">見積依頼詳細</a></li>
             <li><span>見積商品採用</span></li>
 EOM;
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
@@ -121,7 +121,7 @@ EOM;
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
             <li><a href="%url/rel:mpgt:Price%&Action=QuoteList&table_cache=true">見積依頼一覧</a></li>
-            <li><a href="{$_SERVER['HTTP_REFERER']}">見積依頼詳細</a></li>
+            <li><a href="javascript:history.back()">見積依頼詳細</a></li>
             <li><span>見積商品不採用</span></li>
 EOM;
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [

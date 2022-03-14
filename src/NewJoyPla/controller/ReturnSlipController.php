@@ -37,7 +37,8 @@ class ReturnSlipController extends Controller
         	$link = '%url/rel:mpgt:Return%&Action=returnList';
             if($user_info->isUser()){
                 if (preg_match("/Action=returnListForDivision/", $_SERVER['HTTP_REFERER'])) {
-            	    $link = $_SERVER['HTTP_REFERER'];
+                    $box = parse_url($_SERVER['HTTP_REFERER']);
+            	    $link = $box['path']."?".$box['query'];
                 }
             }
             

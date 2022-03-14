@@ -1,18 +1,18 @@
 <?php
-require_once "NewJoyPla/classes/Monad.php";
-require_once "NewJoyPla/classes/Collection.php";
-require_once "NewJoyPla/classes/Model.php";
-require_once "NewJoyPla/classes/View.php";
-require_once "NewJoyPla/classes/Controller.php";
-require_once "NewJoyPla/classes/ApiController.php";
-require_once "NewJoyPla/classes/Response.php";
-require_once "NewJoyPla/classes/ApiResponse.php";
-require_once "NewJoyPla/classes/ListResponse.php";
-require_once "NewJoyPla/classes/Form.php";
-require_once "NewJoyPla/classes/Field.php";
-require_once "NewJoyPla/classes/FieldSet.php";
-require_once "NewJoyPla/classes/Util.php";
-require_once "NewJoyPla/classes/Csrf.php";
+require_once "NewJoyPla/core/Monad.php";
+require_once "NewJoyPla/core/Collection.php";
+require_once "NewJoyPla/core/Model.php";
+require_once "NewJoyPla/core/View.php";
+require_once "NewJoyPla/core/Controller.php";
+require_once "NewJoyPla/core/ApiController.php";
+require_once "NewJoyPla/core/Response.php";
+require_once "NewJoyPla/core/ApiResponse.php";
+require_once "NewJoyPla/core/ListResponse.php";
+require_once "NewJoyPla/core/Form.php";
+require_once "NewJoyPla/core/Field.php";
+require_once "NewJoyPla/core/FieldSet.php";
+require_once "NewJoyPla/core/Util.php";
+require_once "NewJoyPla/core/Csrf.php";
 
 require_once "NewJoyPla/lib/ApiSpiral.php";
 require_once 'NewJoyPla/lib/UserInfo.php';

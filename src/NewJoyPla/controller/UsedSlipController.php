@@ -108,7 +108,8 @@ class UsedSlipController extends Controller
                 {
                     if (preg_match("/Action=approvedUsedSlipDivision/", $_SERVER['HTTP_REFERER'])) 
                     {
-                	    $link = $_SERVER['HTTP_REFERER'];
+                        $box = parse_url($_SERVER['HTTP_REFERER']);
+                        $link = $box['path']."?".$box['query'];
                     }
                 }
                 $link_name = "貸出伝票一覧";
@@ -127,7 +128,8 @@ class UsedSlipController extends Controller
                 {
                     if (preg_match("/Action=unapprovedUsedSlipDivision/", $_SERVER['HTTP_REFERER'])) 
                     {
-                	    $link = $_SERVER['HTTP_REFERER'];
+                        $box = parse_url($_SERVER['HTTP_REFERER']);
+                        $link = $box['path']."?".$box['query'];
                     }
                 }
                 $link_name = "使用申請一覧";

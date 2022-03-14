@@ -50,7 +50,8 @@ class ConsumeSlipController extends Controller
         	$link = '%url/rel:mpgt:Consume%&Action=consumeList';
             if($user_info->isUser()){
                 if (preg_match("/Action=consumeListForDivision/", $_SERVER['HTTP_REFERER'])) {
-            	    $link = $_SERVER['HTTP_REFERER'];
+                    $box = parse_url($_SERVER['HTTP_REFERER']);
+            	    $link = $box['path']."?".$box['query'];
                 }
             }
     

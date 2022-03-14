@@ -90,7 +90,8 @@ class DistributorSlipController extends Controller
         global $SPIRAL;
         try {
             $base_url = "%url/card:page_178749%";
-            $back_url = $_SERVER['HTTP_REFERER'];
+            $box = parse_url($_SERVER['HTTP_REFERER']);
+            $back_url = $box['path']."?".$box['query'];
             
             $back_text = "卸業者情報詳細";
             

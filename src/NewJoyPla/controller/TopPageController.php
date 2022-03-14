@@ -37,6 +37,8 @@ class TopPageController extends Controller
                 'hospital' => $hospital,
                 'tenant' => $tenant,
                 'user_info' => $user_info,
+                'MyPageID' => $this->sanitize($SPIRAL->getParam('MyPageID')),
+                'page' => $this->sanitize($SPIRAL->getParam('page')),
                 'url' => '%url/rel:mpgt:page_262241%'
                 ] , false);
             

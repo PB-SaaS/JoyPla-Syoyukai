@@ -385,16 +385,16 @@
 					loading_remove();
 				});
 			}
-
+ 
 		}
 
 		let phpData = {
-			'MyPageID': '<?php echo $_POST["MyPageID"] ?>'
+			'MyPageID': '<?php echo $MyPageID ?>'
 		};
 		let hospitalTop = new HospitalTop(phpData);
 
 		$(document).ready(function() {
-			hospitalTop.pageShow('<?php echo $_POST["page"] ?>');
+			hospitalTop.pageShow('<?php echo $page ?>');
 		});
     	
     </script>
@@ -614,7 +614,7 @@
 					    			</p>	
 				    			</div>
 				    		</div>
-				    		<div class="uk-padding-small">
+				    		<div class="uk-padding-small" style="overflow-y: scroll;height: 84%;">
 				    				%sf:usr:search91:table%
 				    		</div>
 			    		</div>
@@ -628,10 +628,10 @@
 					    			</p>
 					    			<p class="uk-width-1-2 uk-text-right">
 					    				<a href="%url/rel:mpgt:Topic%" class="uk-link" style="color:#ffffff">More Info</a>
-					    			</p>	
+					    			</p>
 				    			</div>
 				    		</div>
-				    		<div class="uk-padding-small">
+				    		<div class="uk-padding-small" style="overflow-y: scroll;height: 84%;">
 				    				%sf:usr:search88:table%
 				    		</div>
 			    		</div>
@@ -662,7 +662,7 @@
                 </div>
 		    	<div class="uk-child-width-1-2@m uk-text-left@m uk-margin-small-top"  style="color: #ffffff" uk-grid>
 		    		<div>
-			    		<div>	
+			    		<div>
 				    		<p class="uk-width-1-1 content-1-1 category-title">注文</p>
 			    		</div>
 				    	<div class="uk-child-width-1-2@m uk-text-center" uk-grid>
@@ -673,7 +673,7 @@
 			                            <div class="menu-body">
 			                                <p>
 				                                <span class="title">消費登録 / 個別発注</span><br>
-				                                <span class="text">consume / Orders</span>
+				                                <span class="text">Consume / Orders</span>
 			                                </p>
 			                            </div>
 			                            <div class="menu-foot">
@@ -690,7 +690,7 @@
 			                            <div class="menu-body">
 			                                <p>
 				                                <span class="title">消費一覧</span><br>
-				                                <span class="text">consume List</span>
+				                                <span class="text">Consume List</span>
 			                                </p>
 			                            </div>
 			                            <div class="menu-foot">
@@ -834,12 +834,8 @@
 			                        </div>
 						        </div>
 						    </div>
-						    
-						    
 						</div>
 					</div>
-					
-					
 		    	</div>
 		    </div>
 		</div>

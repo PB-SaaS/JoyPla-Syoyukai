@@ -54,7 +54,8 @@ class ReceiptSlipByItemController extends Controller
         	$link = '%url/rel:mpgt:Receipt%&Action=acceptanceList';
             if($user_info->isUser()){
                 if (preg_match("/Action=acceptanceListForDivision/", $_SERVER['HTTP_REFERER'])) {
-            	    $link = $_SERVER['HTTP_REFERER'];
+                    $box = parse_url($_SERVER['HTTP_REFERER']);
+            	    $link = $box['path']."?".$box['query'];
                 }
             }
             
@@ -142,7 +143,8 @@ class ReceiptSlipByItemController extends Controller
         	$link = '%url/rel:mpgt:Receipt%&Action=acceptanceList';
             if($user_info->isUser()){
                 if (preg_match("/Action=acceptanceListForDivision/", $_SERVER['HTTP_REFERER'])) {
-            	    $link = $_SERVER['HTTP_REFERER'];
+                    $box = parse_url($_SERVER['HTTP_REFERER']);
+            	    $link = $box['path']."?".$box['query'];
                 }
             }
             

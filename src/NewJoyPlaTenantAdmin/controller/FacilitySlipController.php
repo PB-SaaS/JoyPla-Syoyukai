@@ -85,7 +85,8 @@ class FacilitySlipController extends Controller
 					"divisionType" => "2",
                 ];
                 
-            $back_url = $_SERVER['HTTP_REFERER'];
+            $box = parse_url($_SERVER['HTTP_REFERER']);
+            $back_url = $box['path']."?".$box['query'];
             
             $content = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/IframeContent', [
                 'title' => '部署情報登録',
@@ -133,7 +134,8 @@ class FacilitySlipController extends Controller
             
             $base_url = "%url/card:page_178577%";
             
-            $back_url = $_SERVER['HTTP_REFERER'];
+            $box = parse_url($_SERVER['HTTP_REFERER']);
+            $back_url = $box['path']."?".$box['query'];
             
             $card_id = $SPIRAL->getCardId();
             $hospital = Hospital::find($card_id)->get();
@@ -201,7 +203,8 @@ class FacilitySlipController extends Controller
             
             $base_url = "%url/card:page_178577%";
             
-            $back_url = $_SERVER['HTTP_REFERER'];
+            $box = parse_url($_SERVER['HTTP_REFERER']);
+            $back_url = $box['path']."?".$box['query'];
             
             $hidden = [
  					"SMPFORM" => "%smpform:T_distributorReg%",
@@ -258,7 +261,8 @@ class FacilitySlipController extends Controller
                 
             $base_url = "%url/card:page_178577%";
             
-            $back_url = $_SERVER['HTTP_REFERER'];
+            $box = parse_url($_SERVER['HTTP_REFERER']);
+            $back_url = $box['path']."?".$box['query'];
             
             $hidden = [
  					"SMPFORM" => "%smpform:T_FacilityUpd%",

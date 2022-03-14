@@ -17,7 +17,7 @@ namespace Composer\Autoload;
  *
  *     $loader = new \Composer\Autoload\ClassLoader();
  *
- *     // register classes with namespaces
+ *     // register core with namespaces
  *     $loader->add('Symfony\Component', __DIR__.'/component');
  *     $loader->add('Symfony',           __DIR__.'/framework');
  *
@@ -90,7 +90,7 @@ class ClassLoader
      * @var bool[]
      * @psalm-var array<string, bool>
      */
-    private $missingClasses = array();
+    private $missingcore = array();
 
     /** @var ?string */
     private $apcuPrefix;
@@ -325,7 +325,7 @@ class ClassLoader
 
     /**
      * Can be used to check if the autoloader uses the include path to check
-     * for classes.
+     * for core.
      *
      * @return bool
      */
@@ -335,7 +335,7 @@ class ClassLoader
     }
 
     /**
-     * Turns off searching the prefix and fallback directories for classes
+     * Turns off searching the prefix and fallback directories for core
      * that have not been registered with the class map.
      *
      * @param bool $classMapAuthoritative
@@ -358,7 +358,7 @@ class ClassLoader
     }
 
     /**
-     * APCu prefix to use to cache found/not-found classes, if the extension is enabled.
+     * APCu prefix to use to cache found/not-found core, if the extension is enabled.
      *
      * @param string|null $apcuPrefix
      *
@@ -446,7 +446,7 @@ class ClassLoader
         if (isset($this->classMap[$class])) {
             return $this->classMap[$class];
         }
-        if ($this->classMapAuthoritative || isset($this->missingClasses[$class])) {
+        if ($this->classMapAuthoritative || isset($this->missingcore[$class])) {
             return false;
         }
         if (null !== $this->apcuPrefix) {
@@ -469,7 +469,7 @@ class ClassLoader
 
         if (false === $file) {
             // Remember that this class does not exist.
-            $this->missingClasses[$class] = true;
+            $this->missingcore[$class] = true;
         }
 
         return $file;

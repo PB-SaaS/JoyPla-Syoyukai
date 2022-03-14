@@ -50,7 +50,7 @@
 	/* Single Widths
 	 ========================================================================== */
 	/*
-	 * 1. `max-width` is needed for the pixel-based classes
+	 * 1. `max-width` is needed for the pixel-based core
 	 */
 	[class*='uk-width'] {
 	  box-sizing: border-box;

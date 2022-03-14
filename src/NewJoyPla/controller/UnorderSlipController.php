@@ -73,10 +73,9 @@ class UnorderSlipController extends Controller
                 {
                     $total_price = $total_price + (float)$order_item->orderPrice;
                     if (array_search($order_item->inHospitalItemId, $in_hospital_item_ids) === false) {
-                        $in_hospital_item_ids[] = $inHPItemid;
+                        $in_hospital_item_ids[] = $order_item->inHospitalItemId;
                     }
                 }
-                
                 OrderHistory::where('hospitalId',$user_info->getHospitalId())->find($record_id)->update([
                     'totalAmount'=>$total_price,
                     'itemsNumber' => count($in_hospital_item_ids),//院内商品マスタID数
@@ -94,7 +93,8 @@ class UnorderSlipController extends Controller
         	$link = '%url/rel:mpgt:Order%&Action=unorderedList';
             if($user_info->isUser()){
                 if (preg_match("/Action=unorderedListForDivision/", $_SERVER['HTTP_REFERER'])) {
-            	    $link = $_SERVER['HTTP_REFERER'];
+                    $box = parse_url($_SERVER['HTTP_REFERER']);
+            	    $link = $box['path']."?".$box['query'];
                 }
             }
             $api_url = "%url/card:page_262926%";

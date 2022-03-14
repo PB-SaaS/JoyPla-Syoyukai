@@ -37,7 +37,7 @@ class PriceEstimateRequestSlipController extends Controller
             $breadcrumb = <<<EOM
     		    <li><a target="_parent" href="%url/rel:mpg:top%">TOP</a></li>
     		    <li><a target="_parent" href="%url/rel:mpgt:ProductQuotation%&Action=Quotation&table_cache=true">見積依頼一覧</a></li>
-    		    <li><a target="_parent" href="{$_SERVER['HTTP_REFERER']}">見積依頼詳細</a></li>
+    		    <li><a target="_parent" href="javascript:history.back()">見積依頼詳細</a></li>
     		    <li><span>見積金額登録</span></li>
 EOM;
             if($price_data->requestFlg == 1)

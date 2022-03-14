@@ -45522,3 +45522,115 @@
 [2022-02-27 11:07:26][INFO] zip directory NewJoyPla
 [2022-02-27 11:07:26][INFO] rm directory NewJoyPla
 [2022-02-27 11:07:29][INFO] upload NewJoyPla
+[2022-03-11 14:01:38][INFO] directory logs
+[2022-03-11 14:01:38][INFO] directory tmp
+[2022-03-11 14:01:38][INFO] rm zip file
+[2022-03-11 14:01:39][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-03-11 14:01:39][INFO] zip directory NewJoyPla
+[2022-03-11 14:01:40][INFO] rm directory NewJoyPla
+[2022-03-11 14:01:41][INFO] upload NewJoyPla
+[2022-03-11 14:04:13][INFO] directory logs
+[2022-03-11 14:04:13][INFO] directory tmp
+[2022-03-11 14:04:13][INFO] rm zip file
+[2022-03-11 14:04:15][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-03-11 14:04:15][INFO] zip directory NewJoyPla
+[2022-03-11 14:04:15][INFO] rm directory NewJoyPla
+[2022-03-11 14:04:16][INFO] upload NewJoyPla
+[2022-03-11 14:37:17][INFO] directory logs
+[2022-03-11 14:37:17][INFO] directory tmp
+[2022-03-11 14:37:17][INFO] rm zip file
+[2022-03-11 14:37:18][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-03-11 14:37:19][INFO] zip directory NewJoyPla
+[2022-03-11 14:37:19][INFO] rm directory NewJoyPla
+[2022-03-11 14:37:21][INFO] upload NewJoyPla
+[2022-03-11 14:46:39][INFO] directory logs
+[2022-03-11 14:46:39][INFO] directory tmp
+[2022-03-11 14:46:39][INFO] rm zip file
+[2022-03-11 14:46:42][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-03-11 14:46:42][INFO] zip directory NewJoyPla
+[2022-03-11 14:46:42][INFO] rm directory NewJoyPla
+[2022-03-11 14:46:43][INFO] upload NewJoyPla
+[2022-03-11 14:52:47][INFO] directory logs
+[2022-03-11 14:52:47][INFO] directory tmp
+[2022-03-11 14:52:47][INFO] rm zip file
+[2022-03-11 14:52:49][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-03-11 14:52:49][INFO] zip directory NewJoyPla
+[2022-03-11 14:52:49][INFO] rm directory NewJoyPla
+[2022-03-11 14:52:53][INFO] upload NewJoyPla
+[2022-03-11 14:53:14][INFO] directory logs
+[2022-03-11 14:53:14][INFO] directory tmp
+[2022-03-11 14:53:14][INFO] rm zip file
+[2022-03-11 14:53:16][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-03-11 14:53:17][INFO] zip directory NewJoyPla
+[2022-03-11 14:53:17][INFO] rm directory NewJoyPla
+[2022-03-11 14:53:18][INFO] upload NewJoyPla
+[2022-03-11 14:57:29][INFO] directory logs
+[2022-03-11 14:57:29][INFO] directory tmp
+[2022-03-11 14:57:29][INFO] rm zip file
+[2022-03-11 14:57:32][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-03-11 14:57:32][INFO] zip directory NewJoyPla
+[2022-03-11 14:57:32][INFO] rm directory NewJoyPla
+[2022-03-11 14:57:34][INFO] upload NewJoyPla
+[2022-03-14 14:58:45][INFO] directory logs
+[2022-03-14 14:58:45][INFO] directory tmp
+[2022-03-14 14:58:45][INFO] rm zip file
+[2022-03-14 14:58:47][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-03-14 14:58:47][INFO] zip directory NewJoyPla
+[2022-03-14 14:58:47][INFO] rm directory NewJoyPla
+[2022-03-14 14:58:50][INFO] upload NewJoyPla
+[2022-03-14 14:59:03][INFO] directory logs
+[2022-03-14 14:59:03][INFO] directory tmp
+[2022-03-14 14:59:03][INFO] rm zip file
+[2022-03-14 14:59:05][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-03-14 14:59:05][INFO] zip directory NewJoyPla
+[2022-03-14 14:59:05][INFO] rm directory NewJoyPla
+[2022-03-14 14:59:07][INFO] upload NewJoyPla
+[2022-03-14 15:00:19][INFO] directory logs
+[2022-03-14 15:00:19][INFO] directory tmp
+[2022-03-14 15:00:19][INFO] rm zip file
+[2022-03-14 15:00:21][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-03-14 15:00:21][INFO] zip directory NewJoyPla
+[2022-03-14 15:00:21][INFO] rm directory NewJoyPla
+[2022-03-14 15:00:22][INFO] upload NewJoyPla
+[2022-03-14 15:00:53][INFO] directory logs
+[2022-03-14 15:00:53][INFO] directory tmp
+[2022-03-14 15:00:53][INFO] rm zip file
+[2022-03-14 15:00:55][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-03-14 15:00:55][INFO] zip directory NewJoyPla
+[2022-03-14 15:00:55][INFO] rm directory NewJoyPla
+[2022-03-14 15:00:57][INFO] upload NewJoyPla
+[2022-03-14 15:01:30][INFO] directory logs
+[2022-03-14 15:01:30][INFO] directory tmp
+[2022-03-14 15:01:30][INFO] rm zip file
+[2022-03-14 15:01:32][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-03-14 15:01:32][INFO] zip directory NewJoyPla
+[2022-03-14 15:01:32][INFO] rm directory NewJoyPla
+[2022-03-14 15:01:34][INFO] upload NewJoyPla
+[2022-03-14 16:18:54][INFO] directory logs
+[2022-03-14 16:18:54][INFO] directory tmp
+[2022-03-14 16:18:54][INFO] rm zip file
+[2022-03-14 16:18:56][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-03-14 16:18:56][INFO] zip directory NewJoyPla
+[2022-03-14 16:18:57][INFO] rm directory NewJoyPla
+[2022-03-14 16:18:58][INFO] upload NewJoyPla
+[2022-03-14 16:20:01][INFO] directory logs
+[2022-03-14 16:20:01][INFO] directory tmp
+[2022-03-14 16:20:01][INFO] rm zip file
+[2022-03-14 16:20:03][INFO] cp directory NewJoyPla
+[2022-03-14 16:20:05][INFO] zip directory NewJoyPla
+[2022-03-14 16:20:05][INFO] rm directory NewJoyPla
+[2022-03-14 16:20:25][INFO] upload NewJoyPla
+[2022-03-14 16:20:58][INFO] directory logs
+[2022-03-14 16:20:58][INFO] directory tmp
+[2022-03-14 16:20:58][INFO] rm zip file
+[2022-03-14 16:21:00][INFO] cp directory NewJoyPla
+[2022-03-14 16:21:02][INFO] zip directory NewJoyPla
+[2022-03-14 16:21:03][INFO] rm directory NewJoyPla
+[2022-03-14 16:21:19][INFO] upload NewJoyPla
+[2022-03-14 16:30:20][INFO] directory logs
+[2022-03-14 16:30:20][INFO] directory tmp
+[2022-03-14 16:30:20][INFO] rm zip file
+[2022-03-14 16:30:21][INFO] cp directory NewJoyPlaTenantAdmin
+[2022-03-14 16:30:22][INFO] zip directory NewJoyPlaTenantAdmin
+[2022-03-14 16:30:22][INFO] rm directory NewJoyPlaTenantAdmin
+[2022-03-14 16:30:30][INFO] upload NewJoyPlaTenantAdmin

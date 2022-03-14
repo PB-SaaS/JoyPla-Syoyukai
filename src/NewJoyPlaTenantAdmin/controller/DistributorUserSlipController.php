@@ -24,7 +24,8 @@ class DistributorUserSlipController extends Controller
         global $SPIRAL;
         try {
             
-            $back_url = $_SERVER['HTTP_REFERER'];
+            $box = parse_url($_SERVER['HTTP_REFERER']);
+            $back_url = $box['path']."?".$box['query'];
             
             $back_key = $SPIRAL->getParam('BACK');
             
@@ -90,7 +91,8 @@ class DistributorUserSlipController extends Controller
     {
         global $SPIRAL;
         try {
-            $back_url = $_SERVER['HTTP_REFERER'];
+            $box = parse_url($_SERVER['HTTP_REFERER']);
+            $back_url = $box['path']."?".$box['query'];
             
             $back_key = $SPIRAL->getParam('BACK');
             

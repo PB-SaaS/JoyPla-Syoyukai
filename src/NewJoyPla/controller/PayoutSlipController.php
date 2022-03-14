@@ -50,7 +50,8 @@ class PayoutSlipController extends Controller
         	$link = '%url/rel:mpgt:Payout%&Action=payoutList';
             if($user_info->isUser()){
                 if (preg_match("/&Action=payoutListForDivision/", $_SERVER['HTTP_REFERER'])) {
-            	    $link = $_SERVER['HTTP_REFERER'];
+                    $box = parse_url($_SERVER['HTTP_REFERER']);
+            	    $link = $box['path']."?".$box['query'];
                 }
             }
     

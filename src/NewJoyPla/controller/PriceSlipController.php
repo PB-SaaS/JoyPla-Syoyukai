@@ -44,7 +44,7 @@ EOM;
                     $breadcrumb = <<<EOM
                     <li><a href="%url/rel:mpg:top%">TOP</a></li>
                     <li><a href="%url/rel:mpgt:Product%&Action=Item&table_cache=true">商品マスタ</a></li>
-                    <li><a href="{$_SERVER['HTTP_REFERER']}">商品情報詳細</a></li>
+                    <li><a href="javascript:history.back()">商品情報詳細</a></li>
                     <li><span>金額情報変更</span></li>
 EOM;
                     

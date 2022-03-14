@@ -90,20 +90,21 @@ if [ -e tmp/${ZIP_FILE}.zip ] ;then
     fi
 fi
 
-#if cp -r ../${TARGET_DIR}/${TARGET} tmp ;then
-#   log "cp directory ${TARGET}"
-#else
-#    errorlog "cp directory ${TARGET}"
-#fi
-cd ../src/
-
-if git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/ ;then
-    cd -
-    log "git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/"
+if cp -r ../${TARGET_DIR}/${TARGET} tmp ;then
+   log "cp directory ${TARGET}"
 else
-    cd -
-    errorlog "git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/"
+    errorlog "cp directory ${TARGET}"
 fi
+
+#cd ../src/
+#
+#if git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/ ;then
+#    cd -
+#    log "git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/"
+#else
+#    cd -
+#    errorlog "git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/"
+#fi
 
 cd tmp
 if zip -r ${ZIP_FILE} ${TARGET} ;then

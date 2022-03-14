@@ -24,7 +24,8 @@ class UserSlipController extends Controller
         global $SPIRAL;
         try {
             
-            $back_url = $_SERVER['HTTP_REFERER'];
+            $box = parse_url($_SERVER['HTTP_REFERER']);
+            $back_url = $box['path']."?".$box['query'];
             $hidden = [
 				"hospitalId" => "%val:usr:hospitalId%",
         		"divisionId" => "%val:usr:divisionId%",
@@ -81,7 +82,8 @@ class UserSlipController extends Controller
     {
         global $SPIRAL;
         try {
-            $back_url = $_SERVER['HTTP_REFERER'];
+            $box = parse_url($_SERVER['HTTP_REFERER']);
+            $back_url = $box['path']."?".$box['query'];
             $hidden = [
 				"hospitalId" => "%val:usr:hospitalId%",
         		"divisionId" => "%val:usr:divisionId%",

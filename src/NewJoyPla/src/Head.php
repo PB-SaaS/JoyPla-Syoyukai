@@ -421,7 +421,7 @@ function check_gs1128(code){
 			/* Single Widths
 			 ========================================================================== */
 			/*
-			 * 1. `max-width` is needed for the pixel-based classes
+			 * 1. `max-width` is needed for the pixel-based core
 			 */
 			[class*='uk-width'] {
 			  box-sizing: border-box;

@@ -99,7 +99,8 @@ class OrderSlipDetailController extends Controller
             	$link = '%url/rel:mpgt:Order%&Action=arrivalVerification';
                 if($user_info->isUser()){
                     if (preg_match("/Action=arrivalVerificationForDivision/", $_SERVER['HTTP_REFERER'])) {
-                	    $link = $_SERVER['HTTP_REFERER'];
+                        $box = parse_url($_SERVER['HTTP_REFERER']);
+                        $link = $box['path']."?".$box['query'];
                     }
                 }
             } else {
@@ -107,7 +108,8 @@ class OrderSlipDetailController extends Controller
             	$link = '%url/rel:mpgt:Order%&Action=orderedList';
                 if($user_info->isUser()){
                     if (preg_match("/Action=orderedListForDivision/", $_SERVER['HTTP_REFERER'])) {
-                	    $link = $_SERVER['HTTP_REFERER'];
+                        $box = parse_url($_SERVER['HTTP_REFERER']);
+                        $link = $box['path']."?".$box['query'];
                     }
                 }
             }
