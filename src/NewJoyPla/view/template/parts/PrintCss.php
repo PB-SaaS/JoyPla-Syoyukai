@@ -1,5 +1,5 @@
 <style>
-@media print{
+@media print{ 
 	.print-width-1-1{
 		width:100% !important;
 	}

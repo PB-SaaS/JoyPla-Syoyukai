@@ -1387,6 +1387,54 @@ class OrderDataView extends Model
 
 }
 
+class OrderedItemInfoView extends Model
+{
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "333_hacchu";
+    public static $guarded = ["id"];
+    public static $primary_key = "orderCNumber";
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "receivingTime",
+        "dueDate",
+        "orderCNumber",
+        "hospitalId",
+        "inHospitalItemId",
+        "orderNumber",
+        "price",
+        "orderQuantity",
+        "orderPrice",
+        "receivingFlag",
+        "receivingNum",
+        "quantity",
+        "quantityUnit",
+        "itemUnit",
+        "divisionId",
+        "distributorId",
+        "lotManagement",
+        "itemId",
+        "priceId",
+        "distributorMCode",
+        "itemName",
+        "itemCode",
+        "itemStandard",
+        "itemJANCode",
+        "makerName",
+        "divisionName",
+        "orderStatus",
+        "category",
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+
+}
 
 class OrderedItemView extends Model
 {
@@ -1624,6 +1672,38 @@ class InventoryHistory extends Model
         "itemsNumber",
         "totalAmount",
         "invHAuthKey"
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+    
+}
+
+class InventoryHistoryDivisionView extends Model
+{
+    
+    const CREATED_AT = "registrationTime";
+    const UPDATED_AT = "updateTime";
+    const DELETED_AT = "";
+
+    public static $spiral_db_name = "333_divisionInv";
+    public static $guarded = ["id"];
+    public static $primary_key = "inventoryHId";
+    public static $fillable = [
+        "registrationTime",
+        "updateTime",
+        "inventoryHId",
+        "inventoryEndId",
+        "hospitalId",
+        "divisionId",
+        "itemsNumber",
+        "totalAmount",
+        "invHAuthKey",
+        "divisionName",
+        "inventoryTime",
+        "inventoryStatus"
     ];
 
     //デフォルト値

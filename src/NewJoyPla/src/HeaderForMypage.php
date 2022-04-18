@@ -11,12 +11,12 @@ $nav->user_info = new UserInfo($SPIRAL);
 
 if($nav->user_info->isHospitalUser())
 {
-	$nav->hospital = Hospital::where('hospitalId',$nav->user_info->getHospitalId())->get();
+	$nav->hospital = Hospital::where('hospitalId',$nav->user_info->getHospitalId())->plain()->get();
 	$nav->hospital = $nav->hospital->data->get(0);
 }
 if($nav->user_info->isDistributorUser())
 {
-	$nav->distributor = Distributor::where('distributorId',$nav->user_info->getDistributorId())->get();
+	$nav->distributor = Distributor::where('distributorId',$nav->user_info->getDistributorId())->plain()->get();
 	$nav->distributor = $nav->distributor->data->get(0);
 	$nav->hospital = Hospital::where('hospitalId',$nav->distributor->hospitalId)->get();
 	$nav->hospital = $nav->hospital->data->get(0);

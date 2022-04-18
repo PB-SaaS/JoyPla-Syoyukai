@@ -354,6 +354,7 @@
                 url:'%url/rel:mpgt:ObarcodeSAPI%',
                 type:'POST',
                 data:{
+					Action: 'search',
                 	searchValue :searchValue
                 },
                 dataType: 'json'

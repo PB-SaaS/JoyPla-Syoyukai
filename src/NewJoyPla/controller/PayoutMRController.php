@@ -285,10 +285,10 @@ class PayoutMRController extends Controller
 /***
  * 実行
  */
-$PayoutMRController = new PayoutMRController();
 
 $action = $SPIRAL->getParam('Action');
 
 {
+    $PayoutMRController = new PayoutMRController();
     echo $PayoutMRController->index()->render();
 }

@@ -1215,7 +1215,7 @@
 		    	<div class="uk-child-width-1-1@m uk-text-left@m uk-margin-small-top"  style="color: #ffffff" uk-grid>
 		    		<div>
 			    		<div>	
-				    		<p class="uk-width-1-1 content-3-1 category-title">実績</p>
+				    		<p class="uk-width-1-1 content-3-1 category-title">月次レポート</p>
 			    		</div>
 				    	<div class="uk-child-width-1-4@m uk-text-center" uk-grid>
 						    <div>
@@ -1282,6 +1282,15 @@
 			                        </div>
 						        </div>
 						    </div>
+						</div>
+					</div>
+				</div>
+				<div class="uk-child-width-1-1@m uk-text-left@m uk-margin-large-top"  style="color: #ffffff" uk-grid>
+					<div>
+						<div>	
+							<p class="uk-width-1-1 content-3-1 category-title">実績</p>
+						</div>
+				    	<div class="uk-child-width-1-4@m uk-text-center" uk-grid>
 						    <div>
 						        <div class="nj_card content-3-1">
 			                        <div class="menu-content">
@@ -1343,6 +1352,22 @@
 			                                <span>More Info</span>
 			                            </div>
 			                            <a href="%url/rel:mpgt:PayoutHistList%" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
+			                        </div>
+						        </div>
+						    </div>
+						    <div>
+						        <div class="nj_card content-3-1">
+			                        <div class="menu-content">
+			                            <div class="menu-body">
+			                                <p>
+				                                <span class="title">棚卸実績</span><br>
+				                                <span class="text">Inventory Movement</span>
+			                                </p>
+			                            </div>
+			                            <div class="menu-foot">
+			                                <span>More Info</span>
+			                            </div>
+			                            <a href="%url/rel:mpgt:Inventory%&Action=inventoryMovement" class="slide1 animsition-link"  data-animsition-out-class="fade-out"></a>
 			                        </div>
 						        </div>
 						    </div>

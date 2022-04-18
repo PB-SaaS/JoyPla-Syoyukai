@@ -1,7 +1,7 @@
 <?php 
 $auth = new App\Lib\Auth();
 ?>
-<div class="uk-background-muted uk-padding uk-padding-remove-top"  uk-height-viewport="offset-top: true" style="border-right:#98CB00 1px solid">
+<div class="uk-background-muted uk-padding uk-padding-remove-top no_print"  uk-height-viewport="offset-top: true" style="border-right:#98CB00 1px solid">
     <a href="%url/rel:mpg:top%" class="uk-navbar-item uk-logo">
         <img src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png" />
     </a>
@@ -93,6 +93,9 @@ $auth = new App\Lib\Auth();
                 <?php endif ?>
                 <?php if($auth->Gate('PayoutMR')): ?>
                 <li class=" <?php echo $n4_9 ?>"><a href="%url/rel:mpgt:MonthlyReport%&Action=Payout&table_cache=true">払出実績</a></li>
+                <?php endif ?>
+                <?php if($auth->Gate('InventoryMovement')): ?>
+                <li class=" <?php echo $n4_12 ?>"><a href="%url/rel:mpgt:MonthlyReport%&Action=InventoryMovement&table_cache=true">棚卸実績</a></li>
                 <?php endif ?>
                 <?php if($auth->Gate('ReceiveHistoryMCH')): ?>
                 <li class=" <?php echo $n4_10 ?>"><a href="%url/rel:mpgt:History%&Action=ReceivingHistoryMCH&table_cache=true">入庫実績(MCH様)</a></li>

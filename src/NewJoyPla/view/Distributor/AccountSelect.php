@@ -65,7 +65,7 @@
                     UIkit.modal.alert('更新に失敗しました');
                     return false;
                 }
-                location.href = "<?php echo $api_url ?>";
+                location.href = "%url/rel:mpgt:oroshiTopPage%";
             })
             // Ajaxリクエストが失敗した時発動
             .fail( (data) => {

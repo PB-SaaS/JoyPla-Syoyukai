@@ -61,7 +61,7 @@ class ConsumeSlipController extends Controller
                 'api_url' => $api_url,
                 'userInfo' => $user_info,
                 'billingData' => $billing_data,
-                'link'=> $link,
+                'link'=> $this->sanitize($link),
                 'csrf_token' => Csrf::generate(16)
                 ] , false);
             

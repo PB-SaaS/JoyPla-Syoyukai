@@ -36,11 +36,13 @@ class Spiral{
     public function getJsonParam(){
     }
 
-    public function getParam(string $_name = null){
+    public function getParam($_name = null){
+        return "";
         return [];
     }
     
-    public function getParams(string $_name = null){
+    public function getParams($_name = null){
+        return [];
     }
     
     public function getPdfReport(){

@@ -114,7 +114,7 @@ class FacilitySlipController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'back_url' => $back_url,
+                'back_url' => $this->sanitize($back_url),
                 'back_text' => '病院情報詳細',
                 'title'     => 'JoyPla 部署情報登録',
                 'sidemenu'  => $sidemenu,
@@ -183,7 +183,7 @@ class FacilitySlipController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'back_url' => $back_url,
+                'back_url' => $this->sanitize($back_url),
                 'back_text' => '病院情報詳細',
                 'title'     => 'JoyPla 病院ユーザー登録',
                 'sidemenu'  => $sidemenu,
@@ -237,7 +237,7 @@ class FacilitySlipController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'back_url' => $back_url,
+                'back_url' => $this->sanitize($back_url),
                 'back_text' => '病院情報詳細',
                 'title'     => 'JoyPla 卸業者情報登録',
                 'sidemenu'  => $sidemenu,
@@ -314,7 +314,7 @@ class FacilitySlipController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'back_url' => $back_url,
+                'back_url' => $this->sanitize($back_url),
                 'back_text' => '病院情報詳細',
                 'title'     => 'JoyPla 病院情報更新',
                 'sidemenu'  => $sidemenu,

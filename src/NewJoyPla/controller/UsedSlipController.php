@@ -142,7 +142,7 @@ class UsedSlipController extends Controller
                 'csrf_token' => Csrf::generate(16),
                 'used_slip_history' => $used_slip_history,
                 'borrowing' => $borrowing,
-                'link' => $link ,
+                'link' => $this->sanitize($link),
                 'link_name' => $link_name,
                 'association' => $association,
                 'current_name' => '貸出伝票',

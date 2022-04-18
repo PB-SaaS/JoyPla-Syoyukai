@@ -19,11 +19,13 @@ require_once 'NewJoyPla/lib/UserInfo.php';
 require_once "NewJoyPla/lib/SpiralDataBase.php";
 require_once "NewJoyPla/lib/SpiralSendMail.php";
 require_once "NewJoyPla/lib/SpiralTable.php";
+require_once "NewJoyPla/lib/SpiralArea.php";
 require_once "NewJoyPla/lib/SpiralDBFilter.php";
 require_once "NewJoyPla/lib/Define.php";
 require_once "NewJoyPla/lib/Func.php";
 
 require_once "NewJoyPla/model/Base.php";
+
 
 
 /** 初期実行しなければならない処理 */

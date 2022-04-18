@@ -15,7 +15,7 @@
 <!-- <script type="text/javascript" src="https://i02.smp.ne.jp/u/joypla/new/js/animsition.min.js"></script> -->
 
 <script src="https://i02.smp.ne.jp/u/joypla/new/js/JsBarcode.all.min.js"></script>
-<script src="https://i02.smp.ne.jp/u/joypla/new/js/BarcodeParser.js"></script>
+<script src="https://i02.smp.ne.jp/u/joypla/new/js/BarcodeParser_20220331.js"></script>
 
 
 <script src="https://i02.smp.ne.jp/u/joypla/new/js/vue.js"></script>

@@ -1,4 +1,5 @@
 <?php
+
 define("API_URL", "https://www.pi-pe.co.jp/api/locator");
 define("MULTIPART_BOUNDARY", "SPIRAL_API_MULTIPART_BOUNDARY");
 
@@ -18,6 +19,8 @@ curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($curl, CURLOPT_POST , true);
 curl_setopt($curl, CURLOPT_POSTFIELDS , $json);
 curl_setopt($curl, CURLOPT_HTTPHEADER , $api_headers);
+
+
 curl_exec($curl);
 if (curl_errno($curl)){
     echo curl_error($curl);
@@ -29,11 +32,13 @@ $response = json_decode($response , true);
 if($response['code'] != 0)
 {
     var_dump($response);
+    
     exit(1);
 }
 
 $API_URL = $response['location'];
 
+echo $API_URL;
 $filename = $argv[3];
 $filedata = file_get_contents($filename);
 // API�Ѥ�HTTP�إå�
@@ -68,6 +73,7 @@ curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($curl, CURLOPT_POST, true);
 curl_setopt($curl, CURLOPT_POSTFIELDS, $postdata);
 curl_setopt($curl, CURLOPT_HTTPHEADER, $api_headers);
+
 curl_exec($curl);
 $response = curl_multi_getcontent($curl);
 curl_close($curl);

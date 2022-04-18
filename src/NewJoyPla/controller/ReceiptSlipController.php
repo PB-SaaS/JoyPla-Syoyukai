@@ -63,7 +63,7 @@ class ReceiptSlipController extends Controller
                 'link_title' => '検収書一覧',
                 'receiving_history' => $receiving_history,
                 'receiving_item' => $receiving_item,
-                'link'=> $link,
+                'link'=> $this->sanitize($link),
                 'csrf_token' => Csrf::generate(16)
                 ] , false);
     

@@ -9,7 +9,7 @@ use Csrf;
 
 use App\Lib\UserInfo;
 use App\Model\Division;
-use App\Model\DistributorUser;
+use App\Model\HospitalUser;
 use App\Model\Hospital;
 use App\Model\OrderedItemView;
 use App\Model\OrderDataView;
@@ -20,6 +20,7 @@ use App\Model\DistributorAffiliationView;
 
 
 use ApiErrorCode\FactoryApiErrorCode;
+use App\Model\Distributor;
 use stdClass;
 use Exception;
 
@@ -104,7 +105,7 @@ class UnorderSlipController extends Controller
                 'is_deleted' => $is_deleted,
                 'order_data' => $order_data,
                 'ItemsToJs' => $ItemsToJs,
-                'link'=> $link,
+                'link'=> $this->sanitize($link),
                 'csrf_token' => Csrf::generate(16)
                 ] , false);
             
@@ -302,7 +303,6 @@ class UnorderSlipController extends Controller
     
     public function orderFix()
     {
-        
         global $SPIRAL;
 
         $content = '';
@@ -343,9 +343,10 @@ class UnorderSlipController extends Controller
             }
             
             $order_items = OrderedItemView::where('hospitalId',$user_info->getHospitalId())->where('orderNumber',$order_history->orderNumber)->get();
-
+            $inventory_adjustment_trdata = [];
             foreach($order_items->data->all() as $item)
     		{
+                if($item->orderQuantity <= 0){ continue; }
         		$inventory_adjustment_trdata[] = [
                     'divisionId' => $divisionId,
                     'pattern' => 2,
@@ -357,7 +358,7 @@ class UnorderSlipController extends Controller
     		}
             
             {
-                $mail_body = $this->view('NewJoyPla/view/Mail/OrderFix', [
+                $mail_body = $this->view('NewJoyPla/view/Mail/OrderFixForDistributor', [
                     'name' => '%val:usr:name%',
                     'hospital_name' => $hospital->hospitalName,
                     'postal_code' => $hospital->postalCode,
@@ -368,17 +369,15 @@ class UnorderSlipController extends Controller
                     'order_number' => $order_history->orderNumber,
                     'item_num' => $order_history->itemsNumber,
                     'total_price' => '￥'.number_format((float)$order_history->totalAmount),
+                    'slip_url' => OROSHI_OrderDetailAccess."?searchValue=".$order_history->orderNumber,
                     'login_url' => OROSHI_LOGIN_URL,
                 ] , false)->render();
                 $select_name = $this->makeId($order_history->distributorId);
 
                 $test = DistributorAffiliationView::selectName($select_name)
-                    ->rule(
-                        ['name'=>'distributorId','label'=>'name_'.$order_history->distributorId,'value1'=>$order_history->distributorId,'condition'=>'matches']
-                    )
-                    ->rule(
-                        ['name'=>'invitingAgree','label'=>'invitingAgree','value1'=>'t','condition'=>'is_boolean']
-                    )->filterCreate();
+                    ->rule(['name'=>'distributorId','label'=>'name_'.$order_history->distributorId,'value1'=>$order_history->distributorId,'condition'=>'matches'])
+                    ->rule(['name'=>'invitingAgree','label'=>'invitingAgree','value1'=>'t','condition'=>'is_boolean'])
+                    ->filterCreate();
 
                 $test = DistributorAffiliationView::selectRule($select_name)
                     ->body($mail_body)
@@ -386,6 +385,62 @@ class UnorderSlipController extends Controller
                     ->from(FROM_ADDRESS,FROM_NAME)
                     ->send();
             }
+
+            
+            {
+                $distributor = Distributor::where('distributorId',$order_history->distributorId)->plain()
+                ->value('distributorName')
+                ->value('postalCode')
+                ->value('prefectures')
+                ->value('address')
+                ->get();
+                $distributor = $distributor->data->get(0);
+                
+                $mail_body = $this->view('NewJoyPla/view/Mail/OrderFix', [
+                    'name' => '%val:usr:name%',
+                    'distributor_name' => $distributor->distributorName,
+                    'distributor_postal_code' => $distributor->postalCode,
+                    'distributor_prefectures' => $distributor->prefectures,
+                    'distributor_address' => $distributor->address,
+                    'hospital_name' => $hospital->hospitalName,
+                    'postal_code' => $hospital->postalCode,
+                    'prefectures' => $hospital->prefectures,
+                    'address' => $hospital->address,
+                    'division_name' => $order_history->divisionName,
+                    'order_date' => $order_history->orderTime,
+                    'order_number' => $order_history->orderNumber,
+                    'item_num' => $order_history->itemsNumber,
+                    'total_price' => '￥'.number_format((float)$order_history->totalAmount),
+                    'login_url' => LOGIN_URL,
+                ] , false)->render();
+                
+                $hospital_user = HospitalUser::getNewInstance();
+                $select_name = $this->makeId($hospital->hospitalId);
+                $test = $hospital_user::selectName($select_name)
+                    ->rule(['name'=>'hospitalId','label'=>'name_'.$hospital->hospitalId,'value1'=>$hospital->hospitalId,'condition'=>'matches'])
+                    ->rule(['name'=>'userPermission','label'=>'permission_admin2','value1'=>'1,3','condition'=>'contains'])
+                    ->filterCreate();
+                    
+                $test = $hospital_user::selectRule($select_name)
+                    ->body($mail_body)
+                    ->subject("[JoyPla] 発注が行われました")
+                    ->from(FROM_ADDRESS,FROM_NAME)
+                    ->send();
+                    
+                $hospital_user = HospitalUser::getNewInstance();
+                $select_name = $this->makeId($hospital->hospitalId);
+                $test = $hospital_user::selectName($select_name)
+                    ->rule(['name'=>'hospitalId','label'=>'name_'.$hospital->hospitalId,'value1'=>$hospital->hospitalId,'condition'=>'matches'])
+                    ->rule(['name'=>'userPermission','label'=>'permission_admin2','value1'=>'2','condition'=>'contains'])
+                    ->rule(['name'=>'divisionId','label'=>'permission_division','value1'=>$order_history->divisionId,'condition'=>'matches'])
+                    ->filterCreate();
+                $test = $hospital_user::selectRule($select_name)
+                    ->body($mail_body)
+                    ->subject("[JoyPla] 発注が行われました")
+                    ->from(FROM_ADDRESS,FROM_NAME)
+                    ->send();
+            }
+
             $result = InventoryAdjustmentTransaction::insert($inventory_adjustment_trdata);
             $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
             $content = $content->toJson();

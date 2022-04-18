@@ -12,6 +12,7 @@ use App\Model\Tenant;
 use App\Model\DistributorAffiliationView;
 use App\Model\DistributorUser;
 
+
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
 use Exception;
@@ -26,7 +27,7 @@ class TopPageController extends Controller
     {
         global $SPIRAL;
         try {
-            
+
             $user_info = new UserInfo($SPIRAL);
             
             $hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
@@ -216,14 +217,14 @@ EOM;
             $user_info = new UserInfo($SPIRAL);
             
             $affiliationId = $SPIRAL->getParam('affiliationId');
-            
+
             $result = DistributorUser::where('loginId',$user_info->getLoginId())->update(['affiliationId'=> $affiliationId ]);
             
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['update']);
             $content = $content->toJson();
 
         } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['consumeRegistApi']);
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['update']);
             $content = $content->toJson();
         } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [

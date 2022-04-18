@@ -15,7 +15,6 @@ JoyPla からお知らせです。
 
 使用品目 <?php echo $used_item_num ?> (品目) 
 
-
 合計金額 <?php echo $total_price ?> 
  
 下記URLよりログインしてご確認ください 

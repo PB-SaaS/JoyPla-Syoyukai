@@ -17,14 +17,13 @@
 
 	
     <script src="https://i02.smp.ne.jp/u/joypla/new/js/JsBarcode.all.min.js"></script>
-    <script src="https://i02.smp.ne.jp/u/joypla/new/js/BarcodeParser.js"></script>
+    <script src="https://i02.smp.ne.jp/u/joypla/new/js/BarcodeParser_20220331.js"></script>
 	<script src="https://i02.smp.ne.jp/u/joypla/new/js/vue.js"></script>
 <script src="https://i02.smp.ne.jp/u/joypla/new/js/encoding.min.js"></script>
-    
     <script>
 $(function(){
 	
-  $('input[type="number"]').on('change', function(e){
+  $('input[type="number"]').not('.joypla-333').on('change', function(e){
 	changeForInputNumber(this);
   });
 });
@@ -189,42 +188,35 @@ function gs1_01_to_jan(gs1_01)
 	gs1_01 = gs1_01.slice( 0, -1 );
 	return gs1_01 + eanCheckDigit(gs1_01);
 }
-/*
-function check_gs1128(code){
+var date = '';
+function gs1128_date_chack(code){
 	let allcheck = false;
+	
 	if(code.indexOf("01") === 0){
-		code = code.slice( 2 );
-		gs1128_object['01'] = code.slice( 0, 14 );
 		code = code.slice( 14 );
 	}else if(code.indexOf("17") === 0){
 		code = code.slice( 2 );
-		gs1128_object['17'] = code.slice( 0, 6 );
+		date = code.slice( 0, 6 ); // insert
 		code = code.slice( 6 );
 	}else if(code.indexOf("10") === 0){
 		code = code.slice( 2 );
 		if(code.indexOf(" ") == -1){
-			gs1128_object['10'] = code;
 			code = '';
 		} else {
-			gs1128_object['10'] = code.slice( 0, code.indexOf(" "));
 			code = code.slice( code.indexOf(" ") + 1 );
 		}
 	}else if(code.indexOf("21") === 0){
 		code = code.slice( 2 );
 		if(code.indexOf(" ") == -1){
-			gs1128_object['21'] = code;
 			code = '';
 		} else {
-			gs1128_object['21'] = code.slice( 0, code.indexOf(" "));
 			code = code.slice( code.indexOf(" ") + 1 );
 		}
 	}else if(code.indexOf("30") === 0){
 		code = code.slice( 2 );
 		if(code.indexOf(" ") == -1){
-			gs1128_object['30'] = code;
 			code = '';
 		} else {
-			gs1128_object['30'] = code.slice( 0, code.indexOf(" "));
 			code = code.slice( code.indexOf(" ") + 1 );
 		}
 	}else{
@@ -234,13 +226,15 @@ function check_gs1128(code){
 	if(code.length != 0 && !allcheck){
 		return check_gs1128(code);
 	}
-	return gs1128_object;
+
+	return date;
 }
-*/
 
 
 function check_gs1128(code){
 	try {
+		gs1128_date_chack(code);
+		console.log(date);
 		let answer = parseBarcode(code);
 		gs1128_object = {'01':'','17':'','10':'','21':'','30':''};
 		answer.parsedCodeItems.forEach((element) => {
@@ -308,18 +302,22 @@ function check_gs1128(code){
 	}
 			
 	let isPosting = false;
+	let custom_loading = false;
 	$("#content").ajaxStart(function() {
-		isPosting  = true;
-		loading();
+		if(custom_loading !== true){
+			isPosting  = true;
+			loading();
+		}
 	});
 	
 	$("#content").ajaxComplete(function() {
-		isPosting  = false;
-		loading_remove();
+		if(custom_loading !== true){
+			isPosting  = false;
+			loading_remove();
+		}
 	});
 	</script>
     <style>
-   
     	.uk-button-link {
     		color: #1e87f0;
     	}

@@ -13,7 +13,7 @@
             <?php echo $sidemenu; ?>
         </div>
         <div id="content" class="uk-width-expand uk-padding-remove uk-panel-scrollable uk-inline" uk-height-viewport>
-            <div class="joy-pla-progressbar uk-position-cover uk-position-fixed uk-overlay uk-overlay-default uk-flex uk-flex-center uk-flex-middle" style="z-index: 1;" uk-height-viewport>
+            <div class="joy-pla-progressbar uk-position-cover uk-position-fixed uk-overlay uk-overlay-default uk-flex uk-flex-center uk-flex-middle" style="z-index: 1;">
                 <div class="uk-width-1-3 uk-margin-auto">
                     <progress id="js-progressbar" class="uk-progress" value="0" max="100"></progress>
                     <p class="uk-text-mute uk-text-center" id="progress-message"></p>

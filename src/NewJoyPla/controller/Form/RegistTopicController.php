@@ -88,9 +88,8 @@ class RegistTopicController extends Controller
                 $select_name = $this->makeId($distributor);
 
                 $distributor_user = DistributorAffiliationView::getNewInstance();
-                $test = $distributor_user::selectName($select_name)->rule(
-                    ['name'=>'distributorId','label'=>'name_'.$distributor,'value1'=>$distributor,'condition'=>'matches']
-                    )
+                $test = $distributor_user::selectName($select_name)
+                    ->rule(['name'=>'distributorId','label'=>'name_'.$distributor,'value1'=>$distributor,'condition'=>'matches'])
                     ->rule([
                         'name'=>'invitingAgree',
                         'label'=>'invitingAgree',

@@ -180,12 +180,13 @@ class InHospitalItemSlipController extends Controller
                 $priceinfo = $priceinfo->data->get(0);
                 
                 $content = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/IframeContent', [
-                    'title' => '院内商品情報変更',
+                    'title' => '院内商品情報更新',
                     'width' => '100%',
                     'height'=> '100%',
                     'url' => '/regist/is',
                     'hiddens' => [
                             'SMPFORM'=> '%smpform:T_InhpItemUpdate%',
+                            'notUsedFlag' => '%val:usr:notUsedFlag%',
                             'hospitalId' => $priceinfo->hospitalId,
                             'hospitalName' => $priceinfo->hospitalName,
                             'distributorId' => $priceinfo->distributorId,

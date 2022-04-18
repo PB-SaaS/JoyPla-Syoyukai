@@ -19,6 +19,11 @@ use App\Model\Lot;
 
 
 use ApiErrorCode\FactoryApiErrorCode;
+use App\Model\Billing;
+use App\Model\Distributor;
+use App\Model\InventoryHistoryDivisionView;
+use App\Model\ReceivingView;
+use App\Model\Stock;
 use stdClass;
 use Exception;
 
@@ -488,6 +493,499 @@ class InventoryController extends Controller
         }
     }
 
+
+    public function inventoryMovement($SPIRAL)
+    {
+        //$stock = Distributor::value('distributorId')->plain()->get();
+
+        $user_info = new UserInfo($SPIRAL);
+
+        
+        $hospital = Hospital::where('hospitalId', $user_info->getHospitalId())
+        ->value('hospitalName')
+        ->plain()
+        ->get();
+        $hospital = $hospital->data->get(0);
+
+        if($user_info->isUser())
+        {
+            $division = Division::where('hospitalId',$user_info->getHospitalId())
+            ->where('divisionId',$user_info->getDivisionId())
+            ->value('divisionId')
+            ->value('divisionName')
+            ->plain()->get();
+            $division = $division->data->all();
+        } else 
+        {
+            
+            $division = Division::where('hospitalId',$user_info->getHospitalId())
+            ->value('divisionId')
+            ->value('divisionName')
+            ->plain()->get();
+            $division = $division->data->all();
+        }
+
+
+        $content = $this->view('NewJoyPla/view/InventoryMovement', [
+            'csrf_token' => Csrf::generate(16),
+            'division' => $division,
+            'hospitalName' => $hospital->hospitalName
+        ] , false);
+
+        $style   = $this->view('NewJoyPla/view/template/parts/DetailPrintCss', [] , false)->render();
+        $style   .= $this->view('NewJoyPla/view/template/parts/StyleCss', [] , false)->render();
+
+        $script   = $this->view('NewJoyPla/view/template/parts/Script', [] , false)->render();
+        $head = $this->view('NewJoyPla/view/template/parts/Head', ['new'=> true] , false);
+        $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+            'SPIRAL' => $SPIRAL
+        ], false);
+
+        return $this->view('NewJoyPla/view/template/Template', [
+            'title'     => 'JoyPla 棚卸実績',
+            'content'   => $content->render(),
+            'style' => $style,
+            'script' => $script,
+            'head' => $head->render(),
+            'header' => $header->render(),
+            'baseUrl' => '',
+        ],false);
+    }
+
+    
+    public function divisonInventorySelectApi($SPIRAL)
+    {
+        try{
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+            //$stock = Distributor::value('distributorId')->plain()->get();
+
+            $user_info = new UserInfo($SPIRAL);
+            $divisionId = $SPIRAL->getParam('divisionId');
+            if($divisionId === '')
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+                
+            if($user_info->isUser() && $user_info->getDivisionId() != $divisionId)
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            
+            $content = InventoryHistoryDivisionView::where('divisionId',$divisionId)
+            ->where('hospitalId',$user_info->getHospitalId())
+            ->sort('id','desc')
+            ->value('inventoryTime')
+            ->value('inventoryStatus')
+            ->value('inventoryHId')
+            ->plain()
+            ->get();
+
+            $data = [];
+
+            foreach($content->data->all() as $key => $c)
+            {
+                $date = $c->inventoryTime;
+                if($c->inventoryTime === ''){
+                    $date = date("Y年m月d日 H時i分s秒");
+                }
+                $data[] = [
+                    'inventoryTime' => $c->inventoryTime,
+                    'inventoryStatus' => $c->inventoryStatus,
+                    'inventoryHId' => $c->inventoryHId,
+                    'searchStartDate' => '',
+                    'searchEndDate' => $date,
+                ];
+            }
+
+            foreach($data as $key => &$d)
+            {
+                if(array_key_exists( ($key+1) , $data))
+                {
+                    $data[$key]['searchStartDate'] = $data[$key+1]['searchEndDate'];
+                }
+            }
+
+            $content = new ApiResponse($data ,$content->count , 0 , "OK", ['']);
+            $content = $content->toJson();
+            
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['']);
+            $content = $content->toJson();
+        } finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+    }
+
+
+    public function divisonItemsSelectApi($SPIRAL)
+    {
+        try{
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+            //$stock = Distributor::value('distributorId')->plain()->get();
+
+            $user_info = new UserInfo($SPIRAL);
+            $divisionId = $SPIRAL->getParam('divisionId');
+            if($divisionId === '')
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            if($user_info->isUser() && $user_info->getDivisionId() != $divisionId)
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+
+            $hospital = Hospital::where('hospitalId', $user_info->getHospitalId())->value('invUnitPrice')->plain()->get();
+            $hospital = $hospital->data->get(0);
+            
+            $content = StockView::where('divisionId',$divisionId)
+                ->where('hospitalId',$user_info->getHospitalId())
+                ->sort('id','desc')
+                ->value('inHospitalItemId')
+                ->value('rackName')
+                ->value('distributorName')
+                ->value('itemName')
+                ->value('itemCode')
+                ->value('itemStandard')
+                ->value('itemJANCode')
+                ->value('makerName')
+                ->value('price')
+                ->value('unitPrice')
+                ->value('quantity')
+                ->value('quantityUnit')
+                ->plain()
+                ->get();
+
+            $data = $content->data->all();
+
+            foreach($data as &$d)
+            {
+                $d->price = (int) $d->price ;
+                $d->unitPrice = (float) $d->unitPrice ;
+                if($hospital->invUnitPrice != '1')
+                {
+                    $d->unitPrice = 0;
+                    if((int)$d->quantity !== 0 && (int)$d->price !== 0)
+                    {
+                        $d->unitPrice = ((int)$d->price / (int)$d->quantity);
+                    }
+                }
+            }
+
+            $content = new ApiResponse( $data ,$content->count , 0 , "OK", ['divisonItemsSelectApi']);
+            $content = $content->toJson();
+            
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['divisonItemsSelectApi']);
+            $content = $content->toJson();
+        } finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+    }
+
+    
+    public function getInventoryItemNumsApi($SPIRAL)
+    {
+        try{
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+            //$stock = Distributor::value('distributorId')->plain()->get();
+
+            $user_info = new UserInfo($SPIRAL);
+            $inventoryHId = $SPIRAL->getParam('inventoryHId');
+            if($inventoryHId === '')
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+
+            $hospital = Hospital::where('hospitalId', $user_info->getHospitalId())
+            ->value('invUnitPrice')
+            ->plain()
+            ->get();
+            $hospital = $hospital->data->get(0);
+            
+            $content = Inventory::where('inventoryHId',$inventoryHId)
+                ->where('hospitalId',$user_info->getHospitalId())
+                ->sort('id','desc')
+                ->value('inHospitalItemId')
+                ->value('inventryNum')
+                ->value('divisionId')
+                ->plain()
+                ->get();
+
+            $data = [];
+            $data['record'] = [];
+            foreach($content->data->all() as $d)
+            {
+                if($user_info->isUser() && $user_info->getDivisionId() != $d->divisionId)
+                {
+                    throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+                }
+                
+                $check = array_column($data['record'], 'inHospitalItemId');
+                $key = array_search($d->inHospitalItemId, $check);
+                if ($key === FALSE)
+                {
+                    $data['record'][] = [
+                        'inHospitalItemId' => $d->inHospitalItemId,
+                        'count' => (int)$d->inventryNum
+                    ];
+                } else {
+                    $data['record'][$key]['count'] = $data['record'][$key]['count']  + (int)$d->inventryNum;
+                }
+            }
+
+            $content = new ApiResponse( $data ,$content->count , 0 , "OK", ['getInventoryItemNumsApi']);
+            $content = $content->toJson();
+            
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['getInventoryItemNumsApi']);
+            $content = $content->toJson();
+        } finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+    }
+
+    
+    public function getBeforeInventoryItemNumsApi($SPIRAL)
+    {
+        try{
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+            //$stock = Distributor::value('distributorId')->plain()->get();
+
+            $user_info = new UserInfo($SPIRAL);
+            $inventoryHId = $SPIRAL->getParam('inventoryHId');
+            $divisionId= $SPIRAL->getParam('divisionId');
+            if($inventoryHId === '' || $divisionId === '')
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            if($user_info->isUser() && $user_info->getDivisionId() != $divisionId)
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+
+            $content = InventoryHistoryDivisionView::where('divisionId',$divisionId)
+                ->where('hospitalId',$user_info->getHospitalId())
+                ->where('inventoryHId',$inventoryHId ,'<')
+                ->sort('id','desc')
+                ->value('inventoryTime')
+                ->value('inventoryStatus')
+                ->value('inventoryHId')
+                ->plain()
+                ->get();
+
+            $data = [];
+            $data['record'] = [];
+            $data['date'] = '';
+            if($content->count > 0){
+
+                $before = $content->data->get(0);
+                $beforeInventoryHId = $before->inventoryHId;
+                $data['date'] = $before->inventoryTime;
+
+                $hospital = Hospital::where('hospitalId', $user_info->getHospitalId())->value('invUnitPrice')->plain()->get();
+                $hospital = $hospital->data->get(0);
+                
+                $content = Inventory::where('inventoryHId',$beforeInventoryHId)
+                    ->where('hospitalId',$user_info->getHospitalId())
+                    ->sort('id','desc')
+                    ->value('inHospitalItemId')
+                    ->value('inventryNum')
+                    ->plain()
+                    ->get();
+
+
+                foreach($content->data->all() as $d)
+                {
+                    $check = array_column($data['record'], 'inHospitalItemId');
+                    $key = array_search($d->inHospitalItemId, $check);
+                    if ($key === FALSE)
+                    {
+                        $data['record'][] = [
+                            'inHospitalItemId' => $d->inHospitalItemId,
+                            'count' => (int)$d->inventryNum,
+                        ];
+                    } else {
+                        $data['record'][$key]['count'] = $data['record'][$key]['count'] + (int)$d->inventryNum;
+                    }
+                }
+            }
+
+            $content = new ApiResponse( $data ,$content->count , 0 , "OK", ['getBeforeInventoryItemNumsApi']);
+            $content = $content->toJson();
+            
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['getBeforeInventoryItemNumsApi']);
+            $content = $content->toJson();
+        } finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+    }
+    
+    public function getReceivingItemNumsApi($SPIRAL)
+    {
+        try{
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+            //$stock = Distributor::value('distributorId')->plain()->get();
+
+            $user_info = new UserInfo($SPIRAL);
+            $divisionId= $SPIRAL->getParam('divisionId');
+            
+            $startDate = $SPIRAL->getParam('startDate');
+            $endDate= $SPIRAL->getParam('endDate');
+
+            if($divisionId === '')
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            if($user_info->isUser() && $user_info->getDivisionId() != $divisionId)
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+
+            $content = ReceivingView::where('divisionId',$divisionId)
+                ->where('hospitalId',$user_info->getHospitalId())
+                ->sort('id','desc')
+                ->value('inHospitalItemId')
+                ->value('receivingCount')
+                ->value('priceAfterAdj')
+                ->value('quantity')
+                ->plain();
+                
+            if($startDate)
+            {
+                $content = $content->where('registrationTime',urldecode($startDate) ,'>=');
+            }
+            if($endDate)
+            {
+                $content = $content->where('registrationTime',urldecode($endDate) ,'<=');
+            }
+
+            $content = $content->get();
+            $data = [];
+            $data['record'] = [];
+
+            if($content->count > 0){
+
+                foreach($content->data->all() as $d)
+                {
+                    $check = array_column($data['record'], 'inHospitalItemId');
+                    $key = array_search($d->inHospitalItemId, $check);
+                    if ($key === FALSE)
+                    {
+                        $data['record'][] = [
+                            'inHospitalItemId' => $d->inHospitalItemId,
+                            'count' => (int)$d->receivingCount * (int)$d->quantity,
+                            'price' => (float)$d->priceAfterAdj,
+                        ];
+                    } else {
+                        $data['record'][$key]['count'] = $data['record'][$key]['count'] + ((int)$d->receivingCount * (int)$d->quantity);
+                        $data['record'][$key]['price'] = $data['record'][$key]['price'] + (float)$d->priceAfterAdj;
+                    }
+                }
+            }
+
+            $content = new ApiResponse( $data ,$content->count , 0 , "OK", ['getReceivingItemNumsApi']);
+            $content = $content->toJson();
+            
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['getReceivingItemNumsApi']);
+            $content = $content->toJson();
+        } finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+    }
+
+    
+    public function getConsumedItemNumsApi($SPIRAL)
+    {
+        try{
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+            //$stock = Distributor::value('distributorId')->plain()->get();
+
+            $user_info = new UserInfo($SPIRAL);
+            $divisionId= $SPIRAL->getParam('divisionId');
+            
+            $startDate = $SPIRAL->getParam('startDate');
+            $endDate= $SPIRAL->getParam('endDate');
+
+            if($divisionId === '')
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            if($user_info->isUser() && $user_info->getDivisionId() != $divisionId)
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+
+            $content = Billing::where('divisionId',$divisionId)
+                ->where('hospitalId',$user_info->getHospitalId())
+                ->sort('id','desc')
+                ->value('inHospitalItemId')
+                ->value('billingQuantity')
+                ->value('billingAmount')
+                ->value('quantity')
+                ->plain();
+                
+            if($startDate)
+            {
+                $content = $content->where('registrationTime',urldecode($startDate) ,'>=');
+            }
+            if($endDate)
+            {
+                $content = $content->where('registrationTime',urldecode($endDate) ,'<=');
+            }
+
+            $content = $content->get();
+            $data = [];
+            $data['record'] = [];
+            if($content->count > 0){
+
+                foreach($content->data->all() as $d)
+                {
+                    $check = array_column($data['record'], 'inHospitalItemId');
+                    $key = array_search($d->inHospitalItemId, $check);
+                    if ($key === FALSE)
+                    {
+                        $data['record'][] = [
+                            'inHospitalItemId' => $d->inHospitalItemId,
+                            'count' => (int)$d->billingQuantity,
+                            'price' => (float)$d->billingAmount,
+                        ];
+                    } else {
+                        $data['record'][$key]['count'] = $data['record'][$key]['count'] + (int)$d->billingQuantity;
+                        $data['record'][$key]['price'] = $data['record'][$key]['price'] + (float)$d->billingAmount;
+                    }
+                }
+            }
+
+            $content = new ApiResponse( $data ,$content->count , 0 , "OK", ['getConsumedItemNumsApi']);
+            $content = $content->toJson();
+            
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['getConsumedItemNumsApi']);
+            $content = $content->toJson();
+        } finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+    }
 }
 
 /***
@@ -509,6 +1007,34 @@ $action = $SPIRAL->getParam('Action');
     else if($action === 'inventoryEndList')
     {
         echo $InventoryController->inventoryEndList()->render();
+    }
+    else if($action === 'inventoryMovement')
+    {
+        echo $InventoryController->inventoryMovement($SPIRAL)->render();
+    }
+    else if($action === 'divisonInventorySelectApi')
+    {
+        echo $InventoryController->divisonInventorySelectApi($SPIRAL)->render();
+    }
+    else if($action === 'divisonItemsSelectApi')
+    {
+        echo $InventoryController->divisonItemsSelectApi($SPIRAL)->render();
+    }
+    else if($action === 'getInventoryItemNumsApi')
+    {
+        echo $InventoryController->getInventoryItemNumsApi($SPIRAL)->render();
+    }
+    else if($action === 'getBeforeInventoryItemNumsApi')
+    {
+        echo $InventoryController->getBeforeInventoryItemNumsApi($SPIRAL)->render();
+    }
+    else if($action === 'getReceivingItemNumsApi')
+    {
+        echo $InventoryController->getReceivingItemNumsApi($SPIRAL)->render();
+    }
+    else if($action === 'getConsumedItemNumsApi')
+    {
+        echo $InventoryController->getConsumedItemNumsApi($SPIRAL)->render();
     }
     else
     {

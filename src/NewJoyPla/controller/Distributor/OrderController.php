@@ -19,6 +19,7 @@ use App\Model\Order;
 use App\Model\OrderHistory;
 
 use ApiErrorCode\FactoryApiErrorCode;
+use App\Model\DistributorAffiliationView;
 use stdClass;
 use Exception;
 
@@ -40,12 +41,21 @@ class OrderController extends Controller
             {
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             }
-            
+        
             $api_url = "%url/rel:mpgt:OrderD%";
+
+            //account select 実装
     
-            $content = $this->view('NewJoyPla/view/template/List', [
+            $user_info = new UserInfo($SPIRAL);
+            
+            $distributorAffiliation = DistributorAffiliationView::where('loginId',$user_info->getLoginId())->where('invitingAgree','1')->get();
+            $distributorAffiliation = $distributorAffiliation->data->all();
+
+            $content = $this->view('NewJoyPla/view/Distributor/OrderList', [
                 'title' => '発注書一覧',
                 'table' => '%sf:usr:search83%',
+                'affiliation' => $distributorAffiliation,
+                'current_affiliation' => $SPIRAL->getContextByFieldTitle('affiliationId'),
                 'csrf_token' => Csrf::generate(16)
                 ] , false);
     
@@ -86,9 +96,16 @@ class OrderController extends Controller
             
             $api_url = "%url/rel:mpgt:OrderD%";
     
-            $content = $this->view('NewJoyPla/view/template/List', [
+            $user_info = new UserInfo($SPIRAL);
+            
+            $distributorAffiliation = DistributorAffiliationView::where('loginId',$user_info->getLoginId())->where('invitingAgree','1')->get();
+            $distributorAffiliation = $distributorAffiliation->data->all();
+
+            $content = $this->view('NewJoyPla/view/Distributor/AcceptanceFormList', [
                 'title' => '検収書一覧',
                 'table' => '%sf:usr:search101%',
+                'affiliation' => $distributorAffiliation,
+                'current_affiliation' => $SPIRAL->getContextByFieldTitle('affiliationId'),
                 'csrf_token' => Csrf::generate(16)
                 ] , false);
     

@@ -68,7 +68,20 @@ class OrderSlipDetailController extends Controller
 
             $link_title = "発注書一覧";
         	$link = '%url/rel:mpgt:OrderD%';
+
+            $hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+            $hospital = $hospital->data->get(0);
+            $receipt_division = '';
             
+            if($hospital->receivingTarget == '1'){ //大倉庫
+                $division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionType','1')->get();
+                $division = $division->data->get(0);
+                $receipt_division = $division->divisionName;
+            }
+            if($hospital->receivingTarget == '2'){ //発注部署
+                $receipt_division = '%val:usr:divisionName%';
+            }
+
             $content = $this->view('NewJoyPla/view/Distributor/OrderSlipDetail', [
                 'user_info' => $user_info,
                 'api_url' => $api_url,
@@ -79,6 +92,7 @@ class OrderSlipDetailController extends Controller
                 /*'pattern' => $pattern,*/
                 'link_title' => $link_title,
                 'link' => $link,
+                'receipt_division' => $receipt_division
                 /*'cardId' => $cardId*/
             ] , false);
 
@@ -90,7 +104,12 @@ class OrderSlipDetailController extends Controller
 
         } finally {
 
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $style   = $this->view('NewJoyPla/view/template/parts/DetailPrintCss', [] , false)->render();
+            $style   .= $this->view('NewJoyPla/view/template/parts/StyleCss', [] , false)->render();
+
+            $script   = $this->view('NewJoyPla/view/template/parts/Script', [] , false)->render();
+            $head = $this->view('NewJoyPla/view/template/parts/Head', ['new'=> true] , false);
+
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
@@ -98,6 +117,8 @@ class OrderSlipDetailController extends Controller
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => $title,
                 'content'   => $content->render(),
+                'style' => $style,
+                'script' => $script,
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
@@ -201,8 +222,8 @@ class OrderSlipDetailController extends Controller
                 'distributorName' => $distributor->distributorName,
                 'staffName' => $user_info->getName(),
                 'orderTime' => $order_history->orderTime,
-                'itemsNumber' => $order_history->orderNumber,
-                'orderNumber' => $order_history->itemsNumber,
+                'itemsNumber' => $order_history->itemsNumber,
+                'orderNumber' => $order_history->orderNumber,
                 'totalAmount' => "￥".number_format((float)$order_history->totalAmount,2),
                 'url' => LOGIN_URL,
             ] , false)->render();
@@ -212,7 +233,7 @@ class OrderSlipDetailController extends Controller
             $select_name = $this->makeId($order_history->hospitalId);
             $test = $hospital_user::selectName($select_name)
                 ->rule(['name'=>'hospitalId','label'=>'name_'.$order_history->hospitalId,'value1'=>$order_history->hospitalId,'condition'=>'matches'])
-                ->rule(['name'=>'userPermission','label'=>'permission_admin','value1'=>'1,2','condition'=>'contains'])
+                ->rule(['name'=>'userPermission','label'=>'permission_admin2','value1'=>'1,3','condition'=>'contains'])
                 ->filterCreate();
                 
             $test = $hospital_user::selectRule($select_name)
@@ -223,11 +244,11 @@ class OrderSlipDetailController extends Controller
                 
             $hospital_user = HospitalUser::getNewInstance();
             $select_name = $this->makeId($order_history->hospitalId);
-            $test = $hospital_user::selectName($select_name)->rule(
-                ['name'=>'hospitalId','label'=>'name_'.$order_history->hospitalId,'value1'=>$order_history->hospitalId,'condition'=>'matches'],
-                ['name'=>'userPermission','label'=>'permission_admin','value1'=>'2','condition'=>'contains'],
-                ['name'=>'divisionId','label'=>'permission_division','value1'=>$order_history->divisionId,'condition'=>'matches']
-                )->filterCreate();
+            $test = $hospital_user::selectName($select_name)
+                ->rule(['name'=>'hospitalId','label'=>'name_'.$order_history->hospitalId,'value1'=>$order_history->hospitalId,'condition'=>'matches'])
+                ->rule(['name'=>'userPermission','label'=>'permission_admin2','value1'=>'2','condition'=>'contains'])
+                ->rule(['name'=>'divisionId','label'=>'permission_division','value1'=>$order_history->divisionId,'condition'=>'matches'])
+                ->filterCreate();
             $test = $hospital_user::selectRule($select_name)
                 ->body($mail_body)
                 ->subject($subject)

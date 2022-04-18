@@ -156,11 +156,11 @@
 		    					</td>
 		    					<td class="uk-width-4-5">
 	    							<?php if($userInfo->isAdmin() || $userInfo->isUser()): ?>
-		    						<textarea class="uk-textarea uk-width-1-1" rows="5" name="ordercomment" placeholder="コメント...">%val:usr:ordercomment%</textarea>
-									<input class="print_hidden uk-button uk-button-primary uk-align-center" type="button" value="コメントを更新" onclick="commentUpdate();return false;">
+		    						<textarea class="uk-textarea uk-width-1-1" rows="5" name="ordercomment" placeholder="備考を記入...">%val:usr:ordercomment%</textarea>
+									<input class="print_hidden uk-button uk-button-primary uk-align-center" type="button" value="備考を更新" onclick="commentUpdate();return false;">
 									<?php endif ?>
 	    							<?php if($userInfo->isApprover()): ?>
-									<textarea class="uk-textarea uk-width-1-1 uk-hidden" rows="5" name="ordercomment" placeholder="コメント...">%val:usr:ordercomment%</textarea>
+									<textarea class="uk-textarea uk-width-1-1 uk-hidden" rows="5" name="ordercomment" placeholder="備考を記入...">%val:usr:ordercomment%</textarea>
 									%val:usr:ordercomment:br%
 									<?php endif ?>
 								</td>
@@ -323,7 +323,13 @@
 				console.log('通信中');
 				return;
 			}
-			UIkit.modal.confirm("コメントを更新します。<br>よろしいですか").then(function () {
+			
+			if ($("textarea[name='ordercomment']").val().bytes() > 512)
+			{
+				UIkit.modal.alert('備考は全角256文字以内、半角512文字以内で入力してください');
+				return false;
+			}
+			UIkit.modal.confirm("備考を更新します。<br>よろしいですか").then(function () {
             	loading();
 				canAjax = false; // これからAjaxを使うので、新たなAjax処理が発生しないようにする
 				$.ajax({
@@ -340,17 +346,17 @@
 	            // Ajaxリクエストが成功した時発動
 	            .done( (data) => {
 					if(! data.result){
-						UIkit.modal.alert("コメントに失敗しました").then(function(){
+						UIkit.modal.alert("備考の更新に失敗しました").then(function(){
 							canAjax = true; // 再びAjaxできるようにする
 						});
 						return false;
 					}
-	        		UIkit.modal.alert("コメントを更新しました").then(function(){
+	        		UIkit.modal.alert("備考を更新しました").then(function(){
 						location.reload();
 					});
 	            })
 	            .fail( (data) => {
-	        		UIkit.modal.alert("コメントの更新に失敗しました").then(function(){
+	        		UIkit.modal.alert("備考の更新に失敗しました").then(function(){
 						canAjax = true; // 再びAjaxできるようにする
 					});
 	        		return false;

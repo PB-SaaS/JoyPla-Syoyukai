@@ -73,7 +73,7 @@ class DistributorUserSlipController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'back_url' => $back_url,
+                'back_url' => $this->sanitize($back_url),
                 'back_text' => '卸業者情報詳細',
                 'title'     => 'JoyPla ユーザー招待情報変更',
                 'sidemenu'  => $sidemenu,

@@ -50,7 +50,7 @@ html {
                 入庫ラベル発行
             </h1>
             <div class="no_print">
-            <form class="uk-form-stacked uk-child-width-1-2 uk-width-1-2@m" uk-grid :action="form_action" method="post" name="setting_form" id="app">
+            <form class="uk-form-stacked uk-child-width-1-2 uk-width-1-1 uk-width-1-2@l" uk-grid :action="form_action" method="post" name="setting_form" id="app">
                 <input type="hidden" :value="receiving_id" name="receivingId">
                 <input type="hidden" value="" name="print_counts">
                 <div class="uk-width-1-1">

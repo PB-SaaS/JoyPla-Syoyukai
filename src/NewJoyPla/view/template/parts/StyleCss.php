@@ -1,5 +1,8 @@
- <style>
+ <style> 
  
+ .error {
+			border : red 2px solid;
+		}
 	.uk-button-link {
 		color: #1e87f0;
 	}

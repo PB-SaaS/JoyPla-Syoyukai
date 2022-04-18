@@ -17,7 +17,7 @@ if(isset($argv[1]))
 {
     $ModelName = $argv[1];
 }
-foreach(get_declared_core() as $className)
+foreach(get_declared_classes() as $className)
 {
     if (preg_match("/^App\\\Model/", $className)) {
         if($ModelName === "" || "App\Model\\".$ModelName === $className)

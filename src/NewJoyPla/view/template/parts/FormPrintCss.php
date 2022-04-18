@@ -1,5 +1,5 @@
 <style>
-@media print{
+@media print{ 
 	.no_print{
         display: none !important;
     }

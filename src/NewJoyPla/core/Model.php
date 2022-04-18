@@ -14,6 +14,8 @@ class Model
     public static $guarded = [];
     public static $fillable = [];
     public static $select = [];
+    public static $select_fields = [];
+    public static $plain = false;
     public static $attributes = [];
     public static $primary_key = null;
     public static $page = 1;
@@ -136,6 +138,21 @@ class Model
         return $instance;
     }
 
+    public static function value($fieldTitle)
+    {
+        $instance = self::getInstance();
+        $instance->select_fields[] = $fieldTitle;
+        return $instance;
+    }
+
+    
+    public static function plain()
+    {
+        $instance = self::getInstance();
+        $instance->plain = true;
+        return $instance;
+    }
+
     public static function get()
     {
         $instance = self::getInstance();
@@ -165,14 +182,23 @@ class Model
         }
         
         $column = array_merge($instance::$fillable,$instance::$guarded);
+        
+        if($instance->select_fields !== null )
+        {
+            $column = $instance->select_fields;
+        }
+
         $instance->spiralDataBase->addSelectFieldsToArray($column);
+
         $result = $instance->spiralDataBase->doSelectLoop();
         if($result['label']){
             $result['label'] = $instance->spiralDataBase->labelToNameArray($result['label'],$column);
         }
         if($result['count'] > 0){
             $result['data'] = $instance->spiralDataBase->arrayToNameArray($result['data'],$column);
-            $result['data'] = $instance->getDataToInstance($result['data']);
+            if( $instance->select_fields === null && $instance->plain === null){
+                $result['data'] = $instance->getDataToInstance($result['data']);
+            }
         }
         
         if($result['code'] != 0)
@@ -234,6 +260,13 @@ class Model
         }
         $instance->spiralDataBase->setDataBase($instance::$spiral_db_name);
         $column = array_merge($instance::$fillable,$instance::$guarded);
+
+        if($instance->select_fields !== null )
+        {
+            $column = $instance->select_fields;
+        }
+
+
         $instance->spiralDataBase->addSelectFieldsToArray($column);
         $instance->spiralDataBase->setLinesPerPage($lines_per_page);
         $result = $instance->spiralDataBase->doSelect();
@@ -242,7 +275,9 @@ class Model
         }
         if($result['count'] > 0){
             $result['data'] = $instance->spiralDataBase->arrayToNameArray($result['data'],$column);
-            $result['data'] = $instance->getDataToInstance($result['data']);
+            if( $instance->select_fields === null && $instance->plain === null){
+                $result['data'] = $instance->getDataToInstance($result['data']);
+            }
         }
         
         if($result['code'] != 0)

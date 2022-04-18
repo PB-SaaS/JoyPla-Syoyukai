@@ -1,5 +1,6 @@
-<div id="app" class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
-    <div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
+<div id="app">
+<div class="animsition uk-margin-bottom no_print" uk-height-viewport="expand: true">
+    <div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top no_print" id="page_top">
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
@@ -11,6 +12,11 @@
                         <input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
                         <?php if($user_info->isUser() || $user_info->isAdmin()): ?>
                         <input class="print_hidden uk-button uk-button-danger" type="button" value="発注書取消" v-on:click="slipDelete" v-bind:disabled="delete_disabled">
+                        <?php endif ?>
+                        <?php if($user_info->isApprover() || $user_info->isAdmin()): ?>
+                        <input class="print_hidden uk-button uk-button-default" type="button" value="発注書訂正" v-on:click="correction">
+                        <?php endif ?>
+                        <?php if($user_info->isUser() || $user_info->isAdmin()): ?>
                         <input class="print_hidden uk-button uk-button-primary" type="button" value="納品照合" v-on:click="receiving">
                         <?php endif ?>
                     </div>
@@ -65,12 +71,15 @@
                         <table class="uk-table uk-table-hover uk-table-middle uk-table-divider" id="tbl-Items">
                             <thead>
                                 <tr>
-                                    <th class="uk-text-nowrap">NO</th>
+                                    <th class="uk-text-nowrap">No</th>
+                                    <th class="uk-width-1-2">商品情報</th>
+                                    <?php /*
                                     <th class="uk-table-expand" style="min-width:60px">メーカー</th>
                                     <th class="uk-table-expand" style="min-width:150px">商品名</th>
                                     <th class="uk-table-expand">製品コード</th>
                                     <th class="uk-table-expand">規格</th>
                                     <th class="uk-table-expand">JANコード</th>
+                                    */ ?>
                                     <th class="uk-text-nowrap">価格</th>
                                     <th class="uk-text-nowrap">入数</th>
                                     <th class="uk-text-nowrap">発注数</th>
@@ -87,11 +96,27 @@
                             <tbody>
 						        <tr v-for="(item, key) in items" :id="'tr_' + key" v-bind:class="item.class">
 							        <td class="uk-text-nowrap">{{key + 1 }}</td>
+                                    <?php /*
                                     <td>{{item.makerName}}</td>
                                     <td>{{item.itemName}}</td>
                                     <td>{{item.itemCode}}</td>
                                     <td>{{item.itemStandard}}</td>
                                     <td>{{item.itemJANCode}}</td>
+                                    */ ?>
+                                    <td>
+                                        <div uk-grid margin="0">
+                                            <div class="uk-width-1-4 uk-text-muted">メーカー</div>
+                                            <div class="uk-width-3-4">{{ item.makerName }}</div>
+                                            <div class="uk-width-1-4 uk-text-muted">商品名</div>
+                                            <div class="uk-width-3-4">{{ item.itemName }}</div>
+                                            <div class="uk-width-1-4 uk-text-muted">製品コード</div>
+                                            <div class="uk-width-3-4">{{ item.itemCode }}</div>
+                                            <div class="uk-width-1-4 uk-text-muted">規格</div>
+                                            <div class="uk-width-3-4">{{ item.itemStandard }}</div>
+                                            <div class="uk-width-1-4 uk-text-muted">JANコード</div>
+                                            <div class="uk-width-3-4">{{ item.itemJANCode }}</div>
+                                        </div>
+                                    </td>
                                     <td class="uk-text-nowrap">￥{{item.price | number_format}}</td>
                                     <td class="uk-text-nowrap">{{item.quantity}}{{item.quantityUnit}}</td>
                                     <td class="uk-text-nowrap">{{item.orderQuantity}}{{item.itemUnit}}</td>
@@ -124,11 +149,14 @@
                             <thead>
                                 <tr>
                                     <th class="uk-text-nowrap">NO</th>
+                                    <?php /*
                                     <th class="uk-table-expand" style="min-width:60px">メーカー</th>
                                     <th class="uk-table-expand" style="min-width:150px">商品名</th>
                                     <th class="uk-table-expand">製品コード</th>
                                     <th class="uk-table-expand">規格</th>
                                     <th class="uk-table-expand">JANコード</th>
+                                    */ ?>
+                                    <th class="uk-width-1-2">商品情報</th>
                                     <th class="uk-text-nowrap">価格</th>
                                     <th class="uk-text-nowrap">入数</th>
                                     <th class="uk-text-nowrap">入庫数</th>
@@ -141,11 +169,27 @@
                             <tbody>
 						        <tr v-for="(list, key) in lists" :id="'tr_' + key" v-bind:class="list.class">
 							        <td class="uk-text-nowrap">{{key + 1 }}</td>
+                                    <?php /*
                                     <td>{{list.makerName}}</td>
                                     <td>{{list.itemName}}</td>
                                     <td>{{list.itemCode}}</td>
                                     <td>{{list.itemStandard}}</td>
                                     <td>{{list.itemJANCode}}</td>
+                                    */ ?>
+                                    <td>
+                                        <div uk-grid margin="0">
+                                            <div class="uk-width-1-4 uk-text-muted">メーカー</div>
+                                            <div class="uk-width-3-4">{{ list.makerName }}</div>
+                                            <div class="uk-width-1-4 uk-text-muted">商品名</div>
+                                            <div class="uk-width-3-4">{{ list.itemName }}</div>
+                                            <div class="uk-width-1-4 uk-text-muted">製品コード</div>
+                                            <div class="uk-width-3-4">{{ list.itemCode }}</div>
+                                            <div class="uk-width-1-4 uk-text-muted">規格</div>
+                                            <div class="uk-width-3-4">{{ list.itemStandard }}</div>
+                                            <div class="uk-width-1-4 uk-text-muted">JANコード</div>
+                                            <div class="uk-width-3-4">{{ list.itemJANCode }}</div>
+                                        </div>
+                                    </td>
                                     <td class="uk-text-nowrap">￥{{list.price | number_format}}</td>
                                     <td class="uk-text-nowrap">{{list.quantity}}{{list.quantityUnit}}</td>
         							<td class="uk-text-nowrap">
@@ -183,72 +227,151 @@
                                 <td class="uk-width-1-5">
                                     %val:usr:divisionName%
                                 </td>
-                                <td class="uk-width-4-5">
+                                <td class="uk-width-4-5 uk-text-break">
                                     %val:usr:ordercomment:br%
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+            </div>
         </div>
     </div>
+    <!-- print Only -->
+    <div id="detail-sheet">
+        <section class="sheet">
+            <p class="uk-text-center print-text-xlarge title_spacing">発注書</p>
+            <div>
+                <div uk-grid>
+                    <div class="uk-width-1-2">
+                        <p class="uk-text-bold print-text-large">%val:usr:distributorName% 御中</p>
+                        <p class="uk-text-bold print-text-large">合計金額 &yen; {{ totalAmount | number_format }} - </p>
+                        <div>
+                            <span>備考</span><br>
+                            <div class="print-text-small uk-text-break" style="border: gray 1.2px solid; min-height: 90pt;line-height: normal; padding: 2pt">
+                            %val:usr:ordercomment:br%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="uk-width-1-2">
+                        <div class="print-text-default">
+                            発注日時 %val:usr:orderTime%<br>
+                            発注番号 %val:usr:orderNumber%
+                        </div>
+                        <div id="order_barcode_print" class="uk-text-center uk-padding-remove">
+                        </div>
+                        <table class="print-text-small uk-text-left" style="line-height: normal;">
+                            <tr><td colspan="2">%val:usr:hospitalName%</td></tr>
+                            <tr><td style="width: 45pt">〒%val:usr:postalCode%</td><td>%val:usr:prefectures% %val:usr:address%</td></tr>
+                            <tr><td>電話番号</td><td>%val:usr:phoneNumber%</td></tr>
+                            <tr><td>発注担当者</td><td>%val:usr:ordererUserName%</td></tr>
+                            <tr><td>発注部署</td><td>%val:usr:divisionName%</td></tr>
+                            <tr><td>納品部署</td><td><?php echo $receipt_division ?></td></tr>
+                        </table>
+                    </div>
+                </div>
+                <table class="print-table" style="line-height: normal;">
+                    <thead>
+                        <tr class="print-text-default">
+                            <th class="uk-table-shrink">No</th>
+                            <th class="uk-text-left" style="width:200pt">商品情報</th>
+                            <th style="min-width:100pt">JANコード</th>
+                            <th style="min-width:80pt">卸業者管理コード</th>
+                            <th>価格</th>
+                            <th>入数</th>
+                            <th>発注数</th>
+                            <th>金額</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item, key) in items" :id="'tr_' + key" v-bind:class="item.class" class="uk-text-center" style="word-break: break-all;">
+                            <td class="uk-text-nowrap">{{key + 1 }}</td>
+                            <td  class="uk-text-left">
+                                <div uk-grid>
+                                    <div class="uk-width-1-3">メーカー</div>
+                                    <div class="uk-width-2-3 uk-padding-remove">{{ item.makerName }}</div>
+                                    <div class="uk-width-1-3">商品名</div>
+                                    <div class="uk-width-2-3 uk-padding-remove">{{ item.itemName }}</div>
+                                    <div class="uk-width-1-3">製品コード</div>
+                                    <div class="uk-width-2-3 uk-padding-remove">{{ item.itemCode }}</div>
+                                    <div class="uk-width-1-3">規格</div>
+                                    <div class="uk-width-2-3 uk-padding-remove">{{ item.itemStandard }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <svg :id="'print_jan_'+(key+1)"></svg>
+                            </td>
+                            <td>{{ item.distributorMCode }}</td>
+                            <td>&yen;{{item.price | number_format}}</td>
+                            <td>{{item.quantity}}{{item.quantityUnit}}</td>
+                            <td>{{item.orderQuantity}}{{item.itemUnit}}</td>
+                            <td>&yen;{{item.orderPrice | number_format}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
 </div>
-<form action="%url/rel:mpgt:ReceivingLabel%" target="_blank" method="post" class="print_hidden uk-inline" id="createLabelForm">
+
+
+
+<form action="%url/rel:mpgt:ReceivingLabel%" target="_blank" method="post" class="no_print uk-inline" id="createLabelForm">
     <!-- <input type="hidden" value="" name="itemsData" id="itemsData"> -->
     <input type="hidden" id="receivingId" name="receivingId">
     <input type="hidden" value="%val:usr:distributorName%" name="distributorName">
 </form>
 
-	<div id="modal-sections" class="uk-modal-container" uk-modal>
-	    <div class="uk-modal-dialog">
-	        <button class="uk-modal-close-default" type="button" uk-close></button>
-	        <div class="uk-modal-header">
-	            <h2 class="uk-modal-title">商品選択</h2>
-	        </div>
-	        <div class="uk-modal-body uk-width-expand uk-overflow-auto">
-	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-table-divider">
-					<thead>
-						<tr>
-                            <th class="uk-text-nowrap">NO</th>
-                            <th class="uk-table-expand" style="min-width:60px">メーカー</th>
-                            <th class="uk-table-expand" style="min-width:150px">商品名</th>
-                            <th class="uk-table-expand">製品コード</th>
-                            <th class="uk-table-expand">規格</th>
-                            <th class="uk-table-expand">JANコード</th>
-                            <th class="uk-text-nowrap">価格</th>
-                            <th class="uk-text-nowrap">入数</th>
-                            <th class="uk-text-nowrap">発注数</th>
-                            <th class="uk-text-nowrap">入庫数</th>
-                            <th class="uk-text-nowrap">入庫可能数</th>
-                            <th class="uk-text-nowrap">今回入庫数</th>
-                            <th class="uk-text-nowrap">納期</th>
-                            <th class="uk-text-nowrap">金額</th>
-                            <th class="uk-text-nowrap">入庫リストへ転記</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="(list , key) in select_items" >
-					        <td class="uk-text-nowrap">{{key + 1 }}</td>
-                            <td class="uk-table-expand">{{list.makerName}}</td>
-                            <td class="uk-table-expand">{{list.itemName}}</td>
-                            <td class="uk-table-expand">{{list.itemCode}}</td>
-                            <td class="uk-table-expand">{{list.itemStandard}}</td>
-                            <td class="uk-table-expand">{{list.itemJANCode}}</td>
-                            <td class="uk-text-nowrap">￥{{list.price | number_format}}</td>
-                            <td class="uk-text-nowrap">{{list.quantity}}{{list.quantityUnit}}</td>
-                            <td class="uk-text-nowrap">{{list.orderQuantity}}{{list.itemUnit}}</td>
-                            <td class="uk-text-nowrap">{{list.receivingNum}}{{list.itemUnit}}</td>
-                            <td class="uk-text-nowrap">{{list.possibleNumber}}{{list.itemUnit}}</td>
-                            <td class="uk-text-nowrap" v-bind:class="list.nowCountClass">{{list.nowCount}}{{list.itemUnit}}</td>
-                            <td class="uk-text-nowrap">{{list.dueDate}}</td>
-                            <td class="uk-text-nowrap">￥{{list.orderPrice | number_format}}</td>
-                            <td class="uk-text-nowrap"><button type="button" class="uk-button uk-button-primary" v-on:click="addObject(key)">転記</button></td>
-						</tr>
-					</tbody>
-				</table>   
-	        </div>
-	    </div>
-	</div>
+<div id="modal-sections" class="uk-modal-container no_print" uk-modal>
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <div class="uk-modal-header">
+            <h2 class="uk-modal-title">商品選択</h2>
+        </div>
+        <div class="uk-modal-body uk-width-expand uk-overflow-auto">
+            <table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-table-divider">
+                <thead>
+                    <tr>
+                        <th class="uk-text-nowrap">NO</th>
+                        <th class="uk-table-expand" style="min-width:60px">メーカー</th>
+                        <th class="uk-table-expand" style="min-width:150px">商品名</th>
+                        <th class="uk-table-expand">製品コード</th>
+                        <th class="uk-table-expand">規格</th>
+                        <th class="uk-table-expand">JANコード</th>
+                        <th class="uk-text-nowrap">価格</th>
+                        <th class="uk-text-nowrap">入数</th>
+                        <th class="uk-text-nowrap">発注数</th>
+                        <th class="uk-text-nowrap">入庫数</th>
+                        <th class="uk-text-nowrap">入庫可能数</th>
+                        <th class="uk-text-nowrap">今回入庫数</th>
+                        <th class="uk-text-nowrap">納期</th>
+                        <th class="uk-text-nowrap">金額</th>
+                        <th class="uk-text-nowrap">入庫リストへ転記</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(list , key) in select_items" >
+                        <td class="uk-text-nowrap">{{key + 1 }}</td>
+                        <td class="uk-table-expand">{{list.makerName}}</td>
+                        <td class="uk-table-expand">{{list.itemName}}</td>
+                        <td class="uk-table-expand">{{list.itemCode}}</td>
+                        <td class="uk-table-expand">{{list.itemStandard}}</td>
+                        <td class="uk-table-expand">{{list.itemJANCode}}</td>
+                        <td class="uk-text-nowrap">￥{{list.price | number_format}}</td>
+                        <td class="uk-text-nowrap">{{list.quantity}}{{list.quantityUnit}}</td>
+                        <td class="uk-text-nowrap">{{list.orderQuantity}}{{list.itemUnit}}</td>
+                        <td class="uk-text-nowrap">{{list.receivingNum}}{{list.itemUnit}}</td>
+                        <td class="uk-text-nowrap">{{list.possibleNumber}}{{list.itemUnit}}</td>
+                        <td class="uk-text-nowrap" v-bind:class="list.nowCountClass">{{list.nowCount}}{{list.itemUnit}}</td>
+                        <td class="uk-text-nowrap">{{list.dueDate}}</td>
+                        <td class="uk-text-nowrap">￥{{list.orderPrice | number_format}}</td>
+                        <td class="uk-text-nowrap"><button type="button" class="uk-button uk-button-primary" v-on:click="addObject(key)">転記</button></td>
+                    </tr>
+                </tbody>
+            </table>   
+        </div>
+    </div>
+</div>
 
 <script>
     
@@ -283,6 +406,21 @@ var app = new Vue({
                 }
             })
         }
+    },
+    mounted: function()
+    {
+        this.items.forEach(function(elem, index) {
+            if(isJanCheckDigit(elem.itemJANCode))
+            {
+                JsBarcode("#print_jan_"+(index+1),elem.itemJANCode,{format: "EAN13", width: 1, height: 25,fontSize: 20});
+            }
+            else
+            {
+                //$("#print_jan_"+(index+1)).before('<span>'+elem.itemJANCode+'</span>');
+                //$("#print_jan_"+(index+1)).remove();
+                JsBarcode("#print_jan_"+(index+1),elem.itemJANCode,{format: "codabar", width: 1, height: 30,fontSize: 12});
+            }
+        });
     },
 	methods: {
 	    add: function(item){
@@ -440,6 +578,11 @@ var app = new Vue({
                 UIkit.modal.alert("中止します");
             });
 		},
+        correction: function(){
+            UIkit.modal.confirm("発注書を訂正しますか").then(function(){
+                location.href = "%url/card:page_263320%&Action=correction";
+            });
+        },
 		lotCheck: function(){
 			
 			let chkLot = true;
@@ -611,7 +754,7 @@ var app = new Vue({
                 }, function () {
                     UIkit.modal.alert("中止します");
             });
-		}
+		},
 	},
 }); 
 
@@ -753,9 +896,11 @@ var gs1_128 = new Vue({
 	}
 });
 
-
  let order_num = $('#hacchu_num').text();
  //$('#hacchu_num').remove();
  $('#order_barcode').html('<svg id="barcode_hacchu"></svg>');
+ $('#order_barcode_print').html('<svg id="barcode_hacchu_print"></svg>');
  generateBarcode('barcode_hacchu',order_num);
+ JsBarcode("#barcode_hacchu_print",order_num,{format: "ITF", width: 1.4, height: 30,fontSize: 12});
+
 </script>

@@ -52,7 +52,7 @@ class ReturnSlipController extends Controller
             
             $content = $this->view('NewJoyPla/view/ReturnSlip', [
                 'title' => '返品伝票',
-                'link' => $link,
+                'link' => $this->sanitize($link),
                 'return_items' => $return_items,
                 'csrf_token' => Csrf::generate(16)
                 ] , false);

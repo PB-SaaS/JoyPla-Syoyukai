@@ -1,8 +1,8 @@
 
-<script>
+<script> 
 $(function(){
 	
-  $('input[type="number"]').on('change', function(e){
+  $('input[type="number"]').not('.joypla-333').on('change', function(e){
 	changeForInputNumber(this);
   });
 });
@@ -113,6 +113,23 @@ function generateBarcode(idname,value){
 	//JsBarcode("#"+idname,value,{ width: 1.8, height: 50,fontSize: 14});
 //$(elm).barcode(value.replace(/\r?\n/g,"").trim(), btype, settings);
 }
+
+function isJanCheckDigit(barcodeStr) {
+	// 短縮用処理
+	barcodeStr = ('00000' + barcodeStr).slice(-13);
+	let evenNum = 0, oddNum = 0;
+	for (var i = 0; i < barcodeStr.length - 1; i++) {
+		if (i % 2 == 0) { // 「奇数」かどうか（0から始まるため、iの偶数と奇数が逆）
+			oddNum += parseInt(barcodeStr[i]);
+		} else {
+			evenNum += parseInt(barcodeStr[i]);
+		}
+	}
+	// 結果
+	let m = 10 - parseInt((evenNum * 3 + oddNum).toString().slice(-1));
+	if(m === 10 ){ m = 0}
+	return m === parseInt(barcodeStr.slice(-1));
+}
     
 gs1128_object = {'01':'','17':'','10':'','21':'','30':''};
 
@@ -216,9 +233,52 @@ function check_gs1128(code){
 }
 */
 
+var date = '';
+function gs1128_date_chack(code){
+	let allcheck = false;
+	
+	if(code.indexOf("01") === 0){
+		code = code.slice( 2 );
+		code = code.slice( 14 );
+	}else if(code.indexOf("17") === 0){
+		code = code.slice( 2 );
+		date = code.slice( 0, 6 ); // insert
+		code = code.slice( 6 );
+	}else if(code.indexOf("10") === 0){
+		code = code.slice( 2 );
+		if(code.indexOf(" ") == -1){
+			code = '';
+		} else {
+			code = code.slice( code.indexOf(" ") + 1 );
+		}
+	}else if(code.indexOf("21") === 0){
+		code = code.slice( 2 );
+		if(code.indexOf(" ") == -1){
+			code = '';
+		} else {
+			code = code.slice( code.indexOf(" ") + 1 );
+		}
+	}else if(code.indexOf("30") === 0){
+		code = code.slice( 2 );
+		if(code.indexOf(" ") == -1){
+			code = '';
+		} else {
+			code = code.slice( code.indexOf(" ") + 1 );
+		}
+	}else{
+		allcheck = true;
+	}
+	
+	if(code.length != 0 && !allcheck){
+		return check_gs1128(code);
+	}
+
+	return date;
+}
 
 function check_gs1128(code){
 	try {
+		console.log(parseBarcode(code));
 		let answer = parseBarcode(code);
 		gs1128_object = {'01':'','17':'','10':'','21':'','30':''};
 		
@@ -286,11 +346,17 @@ function check_gs1128(code){
 		});
 		return result;
 	}
-	$(document).ajaxStart(function() {
-		loading();
+	
+	let custom_loading = false;
+	$("#content").ajaxStart(function() {
+		if(custom_loading !== true){
+			loading();
+		}
 	});
 	
-	$(document).ajaxComplete(function() {
-		loading_remove();
+	$("#content").ajaxComplete(function() {
+		if(custom_loading !== true){
+			loading_remove();
+		}
 	});
 </script>

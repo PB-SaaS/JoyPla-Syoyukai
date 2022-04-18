@@ -12,14 +12,14 @@ use App\Model\Hospital;
 use App\Model\Division;
 use App\Model\Order;
 use App\Model\OrderDataView;
-use App\Model\OrderedItemView;
+use App\Model\OrderedItemInfoView;
 use App\Model\OrderHistory;
 use App\Model\Receiving;
 use App\Model\ReceivingHistory;
 use App\Model\InventoryAdjustmentTransaction;
 
 use ApiErrorCode\FactoryApiErrorCode;
-
+use App\Model\DistributorAffiliationView;
 use stdClass;
 use Exception;
 
@@ -62,7 +62,7 @@ class OrderSlipDetailController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             }
             
-            $order_items = OrderedItemView::where('hospitalId',$user_info->getHospitalId())->sort('id','asc')->where('orderNumber',$card->orderNumber)->get();
+            $order_items = OrderedItemInfoView::where('hospitalId',$user_info->getHospitalId())->sort('id','asc')->where('orderNumber',$card->orderNumber)->get();
             $order_items = $order_items->data->all();
 
             if ($card->orderStatus != 8) // 貸出品以外
@@ -122,6 +122,17 @@ class OrderSlipDetailController extends Controller
                 $order_items[$key]->min = ((int)$item->orderQuantity > 0)? 0 : $item->orderQuantity;
             }
             
+            $hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+            $hospital = $hospital->data->get(0);
+            $receipt_division = '';
+            if($hospital->receivingTarget == '1'){ //大倉庫
+                $division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionType','1')->get();
+                $division = $division->data->get(0);
+                $receipt_division = $division->divisionName;
+            }
+            if($hospital->receivingTarget == '2'){ //発注部署
+                $receipt_division = '%val:usr:divisionName%';
+            }
             $content = $this->view('NewJoyPla/view/OrderSlipDetail', [
                 'user_info' => $user_info,
                 'api_url' => $api_url,
@@ -129,7 +140,8 @@ class OrderSlipDetailController extends Controller
                 'orderItems' => $order_items,
                 'pattern' => $pattern,
                 'link_title' => $link_title,
-                'link' => $link,
+                'link' => $this->sanitize($link),
+                'receipt_division' => $receipt_division
                 //'cardId' => $cardId
             ] , false);
 
@@ -140,8 +152,12 @@ class OrderSlipDetailController extends Controller
             ] , false);
 
         } finally {
+            
+            $style   = $this->view('NewJoyPla/view/template/parts/DetailPrintCss', [] , false)->render();
+            $style   .= $this->view('NewJoyPla/view/template/parts/StyleCss', [] , false)->render();
 
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $script   = $this->view('NewJoyPla/view/template/parts/Script', [] , false)->render();
+            $head = $this->view('NewJoyPla/view/template/parts/Head', ['new'=> true] , false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
@@ -149,6 +165,8 @@ class OrderSlipDetailController extends Controller
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => $title,
                 'content'   => $content->render(),
+                'style' => $style,
+                'script' => $script,
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
@@ -464,11 +482,327 @@ class OrderSlipDetailController extends Controller
             ],false);
         }
     }
+
+    public function correction()
+    {
+        
+        global $SPIRAL;
+
+        $title = 'JoyPla 発注書';
+
+        try {
+            
+            $user_info = new UserInfo($SPIRAL);
+
+            if ($user_info->isDistributorUser() || $user_info->isUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+            
+            $card_Id = $SPIRAL->getCardId();
+            if($card_Id == null)
+            {   
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+
+            $card = OrderHistory::where('hospitalId',$user_info->getHospitalId())->find($card_Id)->get();
+            $card = $card->data->get(0);
+            
+            if($user_info->isUser() && $card->divisionId != $user_info->getDivisionId())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+            
+            $order_items = OrderedItemInfoView::where('hospitalId',$user_info->getHospitalId())->sort('id','asc')->where('orderNumber',$card->orderNumber)->get();
+            $order_items = $order_items->data->all();
+
+            foreach($order_items as &$item)
+            {
+                $item->orderQuantityCorrection = $item->orderQuantity;
+                if($item->orderQuantity > 0){
+                    $item->max = (int)$item->orderQuantity;
+                    $item->min = (int)$item->receivingNum;
+                } else 
+                {
+                    $item->max = (int)$item->receivingNum;
+                    $item->min = (int)$item->orderQuantity;
+                }
+            }
+
+            $content = $this->view('NewJoyPla/view/OrderCorrectionSlipDetail', [
+                'user_info' => $user_info,
+                'order_items' => $order_items,
+                'csrf_token' => Csrf::generate(16),
+                'link_title' => "発注書一覧",
+            	'link' => '%url/rel:mpgt:Order%&Action=orderedList',
+            ] , false);
+
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message' => $ex->getMessage(),
+            ] , false);
+
+        } finally {
+            
+            $style   = $this->view('NewJoyPla/view/template/parts/DetailPrintCss', [] , false)->render();
+            $style   .= $this->view('NewJoyPla/view/template/parts/StyleCss', [] , false)->render();
+
+            $script   = $this->view('NewJoyPla/view/template/parts/Script', [] , false)->render();
+            $head = $this->view('NewJoyPla/view/template/parts/Head', ['new'=> true] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => $title,
+                'content'   => $content->render(),
+                'style' => $style,
+                'script' => $script,
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
+    }
+
+    public function orderItemUpdate($SPIRAL) : View
+    {
+
+        try{
+            
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+
+            $user_info = new UserInfo($SPIRAL);
+
+            if ($user_info->isDistributorUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+            
+            $card_Id = $SPIRAL->getCardId();
+            if($card_Id == null)
+            {   
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+
+            $card = OrderHistory::where('hospitalId',$user_info->getHospitalId())->find($card_Id)->plain()->get();
+            $card = $card->data->get(0);
+            
+            $items = $SPIRAL->getParam('items');
+
+            $request = new stdClass;
+            $request->items = [];
+            $request->orderNumber = $card->orderNumber;
+            $request->hospitalId = $card->hospitalId;
+            $request->orderStatus = $card->orderStatus;
+            $request->ordercomment = urldecode($SPIRAL->getParam('comment'));
+
+            foreach($items as $i)
+            {
+                $r = new stdClass ;
+                $r->orderCNumber = $i['orderCNumber'];
+                $r->orderQuantityCorrection = $i['orderQuantityCorrection'];   
+                $request->items[] = $r;
+            }
+
+            $order_items = OrderedItemInfoView::where('hospitalId',$request->hospitalId)->sort('id','asc')->where('orderNumber',$request->orderNumber)->plain();
+
+            if(count($request->items) === 0){
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+
+            foreach($request->items as $r)
+            {
+                $order_items->orWhere('orderCNumber',$r->orderCNumber);
+            }
+            $order_items = $order_items->get();
+            $order_items = $order_items->data->all();
+
+            $search_values = array_column($request->items,'orderCNumber');
+            $validation_msg = [];
+            $exist = false;
+            $update = [];
+
+            if($request->ordercomment !== $card->ordercomment)
+            {
+                $exist = true;
+                if(strlen($request->ordercomment) > 512)
+                {
+                    $validation_msg['comment'] ='半角256文字以内,全角512文字以内で入力してください';
+                }
+            }
+
+
+            foreach($order_items as $key => &$o_item)
+            {  
+                $key = array_search($o_item->orderCNumber , $search_values);
+                if($key === false)
+                {
+                    throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+                }
+
+                if((int)$o_item->orderQuantity === (int)$request->items[$key]->orderQuantityCorrection)
+                {
+                    continue;
+                }
+                else
+                {
+                    $exist = true;
+                }
+
+                if($o_item->orderQuantity > 0){
+                    
+                    if($request->items[$key]->orderQuantityCorrection > $o_item->orderQuantity )
+                    {
+                        $validation_msg[$key] = '発注数量を上回る変更はできません';
+                        continue;
+                    }
+    
+                    if($o_item->receivingNum > 0 && $request->items[$key]->orderQuantityCorrection < $o_item->receivingNum )
+                    {
+                        $validation_msg[$key] = '入庫数量を下回る変更はできません';
+                        continue;
+                    }
+
+                    if( $request->items[$key]->orderQuantityCorrection < 0 || $request->items[$key]->orderQuantityCorrection == '')
+                    {
+                        $validation_msg[$key] = '0を下回る変更はできません';
+                        continue;
+                    }
+                }
+                else
+                {
+                    /* 
+                    $validation_msg[$key] = 'マイナス発注の商品は数量を変更できません';
+                    continue;
+                    */
+                    if($request->items[$key]->orderQuantityCorrection < $o_item->orderQuantity )
+                    {
+                        $validation_msg[$key] = '発注数量を下回る変更はできません';
+                        continue;
+                    }
+    
+                    if($o_item->receivingNum > 0 && $request->items[$key]->orderQuantityCorrection > $o_item->receivingNum )
+                    {
+                        $validation_msg[$key] = '入庫数量を上回る変更はできません';
+                        continue;
+                    }
+
+                    if( $request->items[$key]->orderQuantityCorrection > 0  || $request->items[$key]->orderQuantityCorrection == '')
+                    {
+                        $validation_msg[$key] = '0を上回る変更はできません';
+                        continue;
+                    }
+                }
+                $o_item->orderQuantity = $request->items[$key]->orderQuantityCorrection;
+                $o_item->orderPrice = ($o_item->price * $request->items[$key]->orderQuantityCorrection);
+                $o_item->receivingFlag = (int)($o_item->orderQuantity == $o_item->receivingNum);
+                $update[$key]['orderCNumber'] = $o_item->orderCNumber;
+                $update[$key]['orderQuantity'] = $request->items[$key]->orderQuantityCorrection;
+                $update[$key]['orderPrice'] = ($o_item->price * $request->items[$key]->orderQuantityCorrection);
+                $update[$key]['receivingFlag'] = (int)($o_item->orderQuantity == $o_item->receivingNum);
+            }
+
+            if( count($validation_msg) > 0 )
+            {
+                $message = '';
+                foreach($validation_msg as $key => $msg)
+                {
+                    if($key === 'comment'){
+                        $message .=  "備考: ".$msg."<br>";
+                    }
+                    else{
+                        $message .=  ( $key + 1 )."行目: ".$msg."<br>";
+                    }
+                }
+
+                $content = new ApiResponse($validation_msg, 0, 102, $message, ['update']);
+                $content = $content->toJson();
+                return $content;
+            }
+
+            if( $exist === false )
+            {
+                throw new Exception("更新対象がありません",FactoryApiErrorCode::factory(191)->getCode());
+            }
+
+            
+            $response = OrderHistory::where('orderNumber',$request->orderNumber)->update([
+                'totalAmount' => collect(array_column($order_items,'orderPrice'))->sum(),
+                'orderStatus' => $this->checkPattern($order_items, $request->orderStatus),
+                'ordercomment' => $request->ordercomment
+            ]);
+
+            $result = Order::bulkUpdate('orderCNumber',$update);
+
+            //ここからメール送信
+            $hospital = Hospital::where('hospitalId',$user_info->getHospitalId())
+                ->plain()
+                ->value('hospitalName')
+                ->value('postalCode')
+                ->value('prefectures')
+                ->value('address')
+                ->get();
+            $hospital = $hospital->data->get(0);
+
+            $divison = Division::where('divisionId',$card->divisionId)
+            ->plain()
+            ->value('divisionName')
+            ->get();
+            $divison = $divison->data->get(0);
+
+            $mail_body = $this->view('NewJoyPla/view/Mail/OrderItemUpdate', [
+                'name' => '%val:usr:name%',
+                'hospital_name' => $hospital->hospitalName,
+                'postal_code' => $hospital->postalCode,
+                'prefectures' => $hospital->prefectures,
+                'address' => $hospital->address,
+                'division_name' => $divison->divisionName,
+                'order_date'=> $card->orderTime,
+                'order_number'=> $card->orderNumber,
+                'item_num'=> $card->itemsNumber,
+                'total_price'=>"￥".number_format(collect(array_column($order_items,'orderPrice'))->sum(),2),
+                'comment' => $request->ordercomment,
+                'slip_url' => OROSHI_OrderDetailAccess."?searchValue=".$card->orderNumber,
+                'login_url' => OROSHI_LOGIN_URL,
+            ] , false)->render();
+            
+            $select_name = $this->makeId($card->distributorId);
+
+            $test = DistributorAffiliationView::selectName($select_name)
+                ->rule(
+                    ['name'=>'distributorId','label'=>'name_'.$card->distributorId,'value1'=>$card->distributorId,'condition'=>'matches']
+                )
+                ->rule(
+                    ['name'=>'invitingAgree','label'=>'invitingAgree','value1'=>'t','condition'=>'is_boolean']
+                )->filterCreate();
+
+            $test = DistributorAffiliationView::selectRule($select_name)
+                ->body($mail_body)
+                ->subject("[JoyPla] 発注書に変更がありました")
+                ->from(FROM_ADDRESS,FROM_NAME)
+                ->send();
+
+            $content = new ApiResponse($result->data, $result->count, 0, '更新が完了しました', ['update']);
+            $content = $content->toJson();
+
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['update']);
+            $content = $content->toJson();
+        } finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+    }
 }
 
 /***
  * 実行
  */
+
 $OrderSlipDetailControllerController = new OrderSlipDetailController();
 
 $action = $SPIRAL->getParam('Action');
@@ -485,6 +819,13 @@ $action = $SPIRAL->getParam('Action');
     else if($action === 'receipt')
     {
         echo $OrderSlipDetailControllerController->index(true)->render();
+    }
+    else if($action === 'correction')
+    {
+        echo $OrderSlipDetailControllerController->correction()->render();
+    }
+    else if($action === 'orderItemUpdate'){
+        echo $OrderSlipDetailControllerController->orderItemUpdate($SPIRAL)->render();
     }
     else
     {

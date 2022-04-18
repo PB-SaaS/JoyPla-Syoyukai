@@ -26,6 +26,7 @@ use App\Model\ReceivingHistory;
 
 
 use ApiErrorCode\FactoryApiErrorCode;
+use App\Model\HospitalUser;
 use stdClass;
 use Exception;
 
@@ -110,6 +111,12 @@ class OrderController extends Controller
                         if (array_key_exists($divisionId, $order_array) === false) {
                             $order_array[$divisionId] = [];
                         }
+                        $calc_order_quantity = 0;
+                        if((int)$item->quantity > 0 && (int)$order_items['countNum'] !== 0 )
+                        {
+                            $calc_order_quantity = ((int)$order_items['countNum'] > 0)? floor( (int)$order_items['countNum'] / (int)$item->quantity ) : '-'.floor( abs((int)$order_items['countNum']) / (int)$item->quantity );
+                        }
+
                         $order_array[$divisionId][] = [
             				"makerName" => $item->makerName,
             				"itemName" => $item->itemName,
@@ -129,13 +136,15 @@ class OrderController extends Controller
             				"lotFlag" => ($item->lotManagement == 1 )? "はい": "",
             				"lotManagement" => $item->lotManagement,
             				"itemId" => $item->itemId,
-            				"orderQuantity" => ((int)$order_items['countNum'] > 0)? floor( (int)$order_items['countNum'] / (int)$item->quantity ) : '-'.floor( abs((int)$order_items['countNum']) / (int)$item->quantity )  
+            				"orderQuantity" => $calc_order_quantity, 
             			];
                     }
                 }
             }
             $integrate = ( $SPIRAL->getParam('integrate') == 'true');
             $content = $this->unordered($order_array , $integrate);
+
+
 
         } catch ( Exception $ex ) {
             $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
@@ -206,7 +215,7 @@ class OrderController extends Controller
             				"lotFlag" => ($item->lotManagement == 1 )? "はい": "",
             				"lotManagement" => $item->lotManagement,
             				"itemId" => $item->itemId,
-            				"orderQuantity" => (int)$order_items['orderQuantity'] //定数発注の場合は個数単位
+            				"orderQuantity" => $order_items['orderQuantity'] //定数発注の場合は個数単位
             			];
                     }
                 }
@@ -231,7 +240,7 @@ class OrderController extends Controller
         $unorder_historys = [];
         if($integrate)
         {
-            $unorder_historys = OrderHistory::where('hospitalId',$user_info->getHospitalId())->where('orderStatus','1')->sort('id','desc')->get();
+            $unorder_historys = OrderHistory::where('hospitalId',$user_info->getHospitalId())->where('orderStatus','1')->sort('id','desc')->plain()->get();
             $unorder_historys = $unorder_historys->data->all(); //未発注履歴
         }
         
@@ -243,7 +252,6 @@ class OrderController extends Controller
             {
                 if($item['orderQuantity'] == 0){ continue; }
                 $exist = false;
-                $divisionId; //search1
                 $distributorId = $item['distributorId']; //search2
                 $puls = ($item['orderQuantity'] > 0); //search3
                 //既存の履歴の確認
@@ -251,9 +259,9 @@ class OrderController extends Controller
                 {
                     if($exist){ break; }
                     if(
-                        $history->divisionId === $divisionId &&
-                        $history->distributorId === $distributorId &&
-                        ($history->totalAmount >= 0) === $puls
+                        $history->divisionId == $divisionId &&
+                        $history->distributorId == $distributorId &&
+                        ($history->totalAmount >= 0) == $puls
                     )
                     {
                         $history_ids[] = [
@@ -271,9 +279,9 @@ class OrderController extends Controller
                 {
                     if($exist){ break; }
                     if(
-                        $history['divisionId'] === $divisionId &&
-                        $history['distributorId'] === $distributorId &&
-                        $history['puls'] === $puls
+                        $history['divisionId'] == $divisionId &&
+                        $history['distributorId'] == $distributorId &&
+                        $history['puls'] == $puls
                     )
                     {
                         $order_data[$divisionId][$key]['orderNumber'] = $history['orderNumber'];
@@ -417,6 +425,31 @@ class OrderController extends Controller
             return $content->toJson();
         }
         
+        /**
+         * メール送信をする
+         * 管理者と承認者あて
+         */
+        $mail_body = $this->view('NewJoyPla/view/Mail/RegistUnOrderSlip', [
+            'name' => '%val:usr:name%',
+            'history' => $history,
+            'url' => LOGIN_URL,
+        ] , false)->render();
+        
+        $hospital_user = HospitalUser::getNewInstance();
+        
+        $select_name = $this->makeId($user_info->getHospitalId());
+        $test = $hospital_user::selectName($select_name)
+            ->rule(['name'=>'hospitalId','label'=>'name_'.$user_info->getHospitalId(),'value1'=>$user_info->getHospitalId(),'condition'=>'matches'])
+            ->rule(['name'=>'userPermission','label'=>'permission_admin2','value1'=>'1,3','condition'=>'contains'])
+            ->filterCreate();
+            
+        $test = $hospital_user::selectRule($select_name)
+            ->body($mail_body)
+            ->subject('[JoyPla] 未発注書が作成されました')
+            ->from(FROM_ADDRESS,FROM_NAME)
+            ->send();
+
+
         $content = new ApiResponse($history , $result->count , $result->code, $result->message, ['insert']);
         return $content->toJson();
     }
