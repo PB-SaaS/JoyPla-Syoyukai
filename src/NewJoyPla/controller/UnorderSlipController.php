@@ -315,6 +315,7 @@ class UnorderSlipController extends Controller
             $id = (int)$SPIRAL->getCardId();
             $comment = ($SPIRAL->getParam('ordercomment')) ? urldecode($SPIRAL->getParam('ordercomment')) : '';
             if ($comment) { $comment = $this->html($comment); }
+            $adjustment = ($SPIRAL->getParam('adjustment') === '1' || $SPIRAL->getParam('adjustment') === '2') ? $SPIRAL->getParam('adjustment') : "";
             
             if(strlen($comment) > 512)
             {
@@ -325,6 +326,7 @@ class UnorderSlipController extends Controller
                 'ordercomment'=> $comment,
                 'orderStatus' => 2,
                 'orderTime' => 'now',
+                'adjustment' => $adjustment,
             ]);
             
             $order_history = OrderDataView::where('hospitalId',$user_info->getHospitalId())->find($id)->get();

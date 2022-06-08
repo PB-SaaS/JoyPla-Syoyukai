@@ -242,13 +242,19 @@ class Order extends Model
         "distributorId",
         "lotManagement",
         "itemId",
-        "priceId"
+        "priceId",
+        "adjustment",
     ];
 
     //デフォルト値
     public static $attributes = [];
 
-    public static $select = [];
+    public static $select = [
+        "adjustment" => [
+            1 => "定数発注",
+            2 => "個別発注",
+        ],
+    ];
 }
 
 class OrderHistory extends Model
@@ -277,6 +283,7 @@ class OrderHistory extends Model
         "ordercomment",
         "orderAuthKey",
         "staffName",
+        "adjustment",
     ];
 
     //デフォルト値
@@ -292,7 +299,11 @@ class OrderHistory extends Model
             6 =>"入庫完了",
             7 =>"納品取消",
             8 =>"貸出品",
-        ]
+        ],
+        "adjustment" => [
+            1 => "定数発注",
+            2 => "個別発注",
+        ],
     ];
 }
 
@@ -1484,14 +1495,19 @@ class OrderedItemView extends Model
         "orderStatus",
         "itemId",
         "lotManagement",
-        "category"
+        "category",
+        "adjustment",
     ];
 
     //デフォルト値
     public static $attributes = [];
 
-    public static $select = [];
-
+    public static $select = [
+        "adjustment" => [
+            1 => "定数発注",
+            2 => "個別発注",
+        ],
+    ];
 }
 
 class Lot extends Model

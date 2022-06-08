@@ -36,9 +36,8 @@ class Controller
         '11' => NONE,
         '12' => NONE,
         */
-        $id .= date("ymdHis");
+        $id .= time();
         $id .= str_pad(substr(rand(),0,3) , 4, "0"); 
-        
         return $id;
     }
 

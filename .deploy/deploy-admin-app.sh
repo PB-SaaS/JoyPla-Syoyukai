@@ -9,11 +9,12 @@ DATE=`date '+%y%m%d%H%M%S'`
 LOG_OUT="logs/deploy.log"
 ZIP_FILE="upload_file"
 
-#TOKEN=00011KB9HzJA6571fc2a62048af337abb32cbab1e0dfa3c8aadb
-#SECRET=f2bf4a8e7b3567fdba896429ea1c136e89320175
+TOKEN=00011KB9HzJA6571fc2a62048af337abb32cbab1e0dfa3c8aadb
+SECRET=f2bf4a8e7b3567fdba896429ea1c136e89320175
 
-TOKEN=00011Bki9kGk5abfd3697509e0f98372a184110aedfbd6d3163e
-SECRET=53b7ebda4372d64ff56a1f1c60bcf303744a4d62
+#TOKEN=00011Bki9kGk5abfd3697509e0f98372a184110aedfbd6d3163e
+#SECRET=53b7ebda4372d64ff56a1f1c60bcf303744a4d62
+
 log() {
     echo "[$(date +"%Y-%m-%d %H:%M:%S")][INFO] $@" | tee -a ${LOG_OUT}
 }
@@ -66,22 +67,29 @@ if [ -e tmp/${ZIP_FILE}.zip ] ;then
         errorlog "rm zip file"
     fi
 fi
+<< COMMENTOUT
 
-#cd ../src/
-#
-#if git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/ ;then
-#    cd -
-#    log "git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/"
-#else
-#    cd -
-#    errorlog "git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/"
-#fi
-
-
-if cp -r ${TARGET_DIR}/${TARGET} tmp ;then
-    log "cp directory ${TARGET}"
+if cp -r ../${TARGET_DIR}/${TARGET} tmp ;then
+   log "cp directory ${TARGET}"
 else
     errorlog "cp directory ${TARGET}"
+fi
+COMMENTOUT
+
+if php makeAutoloadAdmin.php "../src/${TARGET}/require.php" ;then
+    log "makeAutoload ${TARGET}"
+else 
+    errorlog "makeAutoload ${TARGET}"
+fi
+
+cd ../src/
+
+if git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/ ;then
+    cd -
+    log "git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/"
+else
+    cd -
+    errorlog "git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/"
 fi
 
 cd tmp
@@ -106,6 +114,24 @@ if php ../upload.php ${TOKEN} ${SECRET} ${ZIP_FILE}.zip ;then
 else 
     cd -
     errorlog "upload ${TARGET}"
+fi
+
+if [ -e tmp/${TARGET} ] ;then
+    if rm -rf tmp/${TARGET} ;then
+        log "rm directory ${TARGET}"
+    else
+        errorlog "rm directory ${TARGET}"
+    fi
+fi
+
+cd ../
+
+if git add . ;then
+    cd -
+    log "git add ."
+else
+    cd -
+    errorlog "git add ."
 fi
 
 #if java -jar custom_module.jar -t $TOKEN -s $SECRET tmp/upload_data.zip ;then

@@ -49,6 +49,10 @@
                                     <td>発注番号</td>
                                     <td>%val:usr:orderNumber%</td>
                                 </tr>
+                                <tr>
+                                    <td><!-- 発注種別 -->&nbsp;</td>
+                                    <td>%val:usr:adjustment%</td>
+                                </tr>
                             </table>
                             <div id="order_barcode" class="uk-text-center">
                                 <span id="hacchu_num">%val:usr:orderNumber%</span>
@@ -243,9 +247,10 @@
             <p class="uk-text-center print-text-xlarge title_spacing">発注書</p>
             <div>
                 <div uk-grid>
-                    <div class="uk-width-1-2">
-                        <p class="uk-text-bold print-text-large">%val:usr:distributorName% 御中</p>
-                        <p class="uk-text-bold print-text-large">合計金額 &yen; {{ totalAmount | number_format }} - </p>
+                    <div class="uk-width-1-2" >
+                        <span class="uk-text-bold print-text-large">%val:usr:adjustment%</span><br>
+                        <span class="uk-text-bold print-text-large">%val:usr:distributorName% 御中</span><br>
+                        <span class="uk-text-bold print-text-large">合計金額 &yen; {{ totalAmount | number_format }} - </span>
                         <div>
                             <span>備考</span><br>
                             <div class="print-text-small uk-text-break" style="border: gray 1.2px solid; min-height: 90pt;line-height: normal; padding: 2pt">
@@ -256,7 +261,7 @@
                     <div class="uk-width-1-2">
                         <div class="print-text-default">
                             発注日時 %val:usr:orderTime%<br>
-                            発注番号 %val:usr:orderNumber%
+                            発注番号 %val:usr:orderNumber%<br>
                         </div>
                         <div id="order_barcode_print" class="uk-text-center uk-padding-remove">
                         </div>

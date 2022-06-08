@@ -18,3 +18,5 @@ cd .deploy
 joypla2_dev に反映
 
 sh deploy.sh
+
+npx tailwindcss -i ./src/JoyPla/resources/parts/input.css.php -o ./src/JoyPla/resources/parts/output.css.php --watch

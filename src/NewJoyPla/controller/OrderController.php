@@ -142,7 +142,7 @@ class OrderController extends Controller
                 }
             }
             $integrate = ( $SPIRAL->getParam('integrate') == 'true');
-            $content = $this->unordered($order_array , $integrate);
+            $content = $this->unordered($order_array , $integrate, "2");
 
 
 
@@ -221,7 +221,7 @@ class OrderController extends Controller
                 }
             }
             $integrate = ( $SPIRAL->getParam('integrate') == 'true');
-            $content = $this->unordered($order_array , $integrate);
+            $content = $this->unordered($order_array , $integrate, "1");
 
         } catch ( Exception $ex ) {
             $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
@@ -233,7 +233,7 @@ class OrderController extends Controller
         }
     }
     
-    private function unordered( $order_data , bool $integrate)
+    private function unordered( $order_data , bool $integrate, $adjustment)
     {
         global $SPIRAL;
         $user_info = new UserInfo($SPIRAL);
@@ -355,6 +355,7 @@ class OrderController extends Controller
                 'divisionId' => $item->divisionId,
                 'distributorId' => $item->distributorId,
                 'itemId' => $item->itemId,
+                'adjustment' => $adjustment,
             ];
         }
         //一致しなかったものを新規登録として作成
@@ -379,6 +380,7 @@ class OrderController extends Controller
                     'divisionId' => $divisionId,
                     'distributorId' => $item['distributorId'],
                     'itemId' => $item['itemId'],
+                    'adjustment' => $adjustment,
                 ];
             }
         }
@@ -399,7 +401,8 @@ class OrderController extends Controller
                     'totalAmount' => 0,
                     'hachuRarrival' => '未入庫',
                     'distributorId' => $item['distributorId'],
-                    'ordererUserName' => $user_info->getName()
+                    'ordererUserName' => $user_info->getName(),
+                    'adjustment' => $adjustment,
                 ];
             }
             if(array_search($item['inHospitalItemId'], $history[$item['orderNumber']]['itemsNumber']) === false)
@@ -1302,7 +1305,6 @@ class OrderController extends Controller
 $OrderController = new OrderController();
 
 $action = $SPIRAL->getParam('Action');
-
 {
     if($action === 'regUnorderedAPI')
     {

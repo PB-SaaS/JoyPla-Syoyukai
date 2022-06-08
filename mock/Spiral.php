@@ -72,5 +72,7 @@ class Spiral{
     
     public function urlEncode(string $_string = null){
     }
+
+    public function getSession(){}
     
 }

@@ -239,7 +239,7 @@ class GoodBillingMR
         let k = 0;
         remakeArray[k] = records[0];
         for (let i = 1; i < records.length; i++) {
-            for (let j = 0; j < records[i][7].length; j++) {
+            for (let j = 0; j < records[i][8].length; j++) {
                 k = k + 1;
                 remakeArray[k] = new Array();
                 remakeArray[k][0] = records[i][0];
@@ -249,12 +249,13 @@ class GoodBillingMR
                 remakeArray[k][4] = records[i][4];
                 remakeArray[k][5] = records[i][5];
                 remakeArray[k][6] = records[i][6];
-                remakeArray[k][7] = records[i][7][j];
+                remakeArray[k][7] = records[i][7];
                 remakeArray[k][8] = records[i][8][j];
                 remakeArray[k][9] = records[i][9][j];
                 remakeArray[k][10] = records[i][10][j];
                 remakeArray[k][11] = records[i][11][j];
                 remakeArray[k][12] = records[i][12][j];
+                remakeArray[k][13] = records[i][13][j];
             }
         }
         let data = remakeArray.map((record) => record.join('\t')).join('\r\n');

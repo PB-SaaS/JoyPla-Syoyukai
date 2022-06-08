@@ -33,7 +33,7 @@ require_once "NewJoyPla/model/Base.php";
 
 use App\Lib\UserInfo;
 
-class AutoLoad {
+class AutoLoad { 
     
     public function __construct()
     {

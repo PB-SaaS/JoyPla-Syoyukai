@@ -51,6 +51,15 @@
 			    					<td>発注番号</td>
 			    					<td>%val:usr:orderNumber%</td>
 			    				</tr>
+                                <tr>
+                                    <td><!-- 発注種別 -->&nbsp;</td>
+                                    <td>
+                                        <select name="adjustment" id="adjustmentSelect" class="uk-select">
+                                            <option value="1" %val:usr:adjustment:1%>定数発注</option>
+                                            <option value="2" %val:usr:adjustment:2%>個別発注</option>
+                                        </select>
+                                    </td>
+                                </tr>
 			    			</table>
 		    				<div id="order_barcode" class="uk-text-center">
 	    						<span id="hacchu_num">%val:usr:orderNumber%</span>
@@ -386,6 +395,7 @@
 	                	_csrf : '<?php echo $csrf_token ?>',
 	                	ordercomment : encodeURI($("textarea[name='ordercomment']").val()),
 	                	Action : 'orderFix',
+                        adjustment : $("#adjustmentSelect").val(),
 	                },
 	                dataType: "json"
 		        })

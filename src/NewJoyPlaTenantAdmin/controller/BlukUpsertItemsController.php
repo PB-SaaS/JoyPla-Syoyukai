@@ -5,6 +5,7 @@ use Controller;
 use Csrf;
 use ApiResponse;
 use App\Lib\Auth;
+use App\Model\Item;
 use App\Model\Tenant;
 use App\Model\ItemBulkUpsertTrDB;
 
@@ -70,12 +71,31 @@ class BlukUpsertItemsController extends Controller
             $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
             Csrf::validate($token,true);
             
-            
             $auth = new Auth();
             
             $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
             //$rowData = $SPIRAL->getParam('rowData');
             
+            $items = Item::where('tenantId',$auth->tenantId)->plain()
+            ->value('itemId')
+            ->value("makerName")
+            ->value("itemName")
+            ->value("category")
+            ->value("itemCode")
+            ->value("itemStandard")
+            ->value("itemJANCode")
+            ->value("catalogNo")
+            ->value("serialNo")
+            ->value("minPrice")
+            ->value("officialFlag")
+            ->value("officialprice")
+            ->value("quantity")
+            ->value("quantityUnit")
+            ->value("itemUnit")
+            ->value("lotManagement")
+            ->value("tenantId")
+            ->value("itemsAuthKey");
+
             $insert_data = [];
             foreach($rowData as $rows)
             {
@@ -98,10 +118,63 @@ class BlukUpsertItemsController extends Controller
                         "lotManagement" => $rows['data'][14],
                         "tenantId" => $auth->tenantId,
                     ];
+                $items->orWhere('itemJANCode',$rows['data'][5]);
             }
+
+            $items = ($items->get())->data->all();
+
+            $insert_data = array_map(
+                function(array $i) use ($items)
+                {
+                    foreach($items as $item)
+                    {
+                        if( $item->itemJANCode == $i['itemJANCode'] )
+                        {
+                            $i['o_makerName'] = $item->makerName;
+                            $i['o_itemName'] = $item->itemName;
+                            $i['o_category'] = $item->category;
+                            $i['o_itemCode'] = $item->itemCode;
+                            $i['o_itemStandard'] = $item->itemStandard;
+                            $i['o_itemJANCode'] = $item->itemJANCode;
+                            $i['o_catalogNo'] = $item->catalogNo;
+                            $i['o_serialNo'] = $item->serialNo;
+                            $i['o_minPrice'] = $item->minPrice;
+                            $i['o_officialFlag'] = $item->officialFlag;
+                            $i['o_officialprice'] = $item->officialprice;
+                            $i['o_quantity'] = $item->quantity;
+                            $i['o_quantityUnit'] = $item->quantityUnit;
+                            $i['o_itemUnit'] = $item->itemUnit;
+                            $i['o_lotManagement'] = $item->lotManagement;
+                            $i['itemId'] = $item->itemId;
+                            $i['itemsAuthKey'] = $item->itemsAuthKey;
+                            return $i;
+                        }
+                    }
+
+                    $i['o_makerName'] = "";
+                    $i['o_itemName'] = "";
+                    $i['o_category'] = "";
+                    $i['o_itemCode'] = "";
+                    $i['o_itemStandard'] = "";
+                    $i['o_itemJANCode'] = "";
+                    $i['o_catalogNo'] = "";
+                    $i['o_serialNo'] = "";
+                    $i['o_minPrice'] = "";
+                    $i['o_officialFlag'] = "";
+                    $i['o_officialprice'] = "";
+                    $i['o_quantity'] = "";
+                    $i['o_quantityUnit'] = "";
+                    $i['o_itemUnit'] = "";
+                    $i['o_lotManagement'] = "";
+                    $i['itemId'] = "";
+                    $i['itemsAuthKey'] = "";
+                    return $i;
+                },$insert_data
+            );
             
             $result = ItemBulkUpsertTrDB::insert($insert_data);
         
+            //$content = new ApiResponse([] , count($insert_data) , 0, '', ['insert']);
             $content = new ApiResponse($result->ids , count($insert_data) , $result->code, $result->message, ['insert']);
             $content = $content->toJson();
             
