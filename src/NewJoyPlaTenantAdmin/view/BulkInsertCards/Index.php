@@ -323,7 +323,7 @@ var app = new Vue({
                 {
                     vm.lists[index]['index'] = index; 
                 });
-                let chunk = vm.arrayChunk(vm.lists,1000);
+                let chunk = vm.arrayChunk(vm.lists,5000);
                 let i = 0 ;
                 let ajaxCount = 0 ;
                 for(i ; i < chunk.length ; i++ )

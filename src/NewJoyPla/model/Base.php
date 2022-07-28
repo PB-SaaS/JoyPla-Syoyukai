@@ -202,6 +202,7 @@ class BillingHistory extends Model
         "totalAmount",
         "billingAuthKey",
         "billingStatus",
+        "billingDate",
     ];
 
     //デフォルト値
@@ -1878,7 +1879,6 @@ class Price extends Model
             4 => "業者記入済"
         ]
     ];
-    
 }
 
 

@@ -6,10 +6,10 @@ require_once ('../mock/Spiral.php');
 require_once ('../mock/SpiralApiRequest.php');
 require_once ('../mock/PbSpiralApiCommunicator.php');
 
-require_once "../src/NewJoyPla/core/Collection.php";
-require_once "../src/NewJoyPla/core/Model.php";
+require_once "../src/framework/Core/Collection.php";
+require_once "../src/framework/Core/Model.php";
 
-require_once "../src/NewJoyPla/model/Base.php";
+require_once "../src/JoyPla/Enterprise/SpiralDb/Base.php";
 
 $SPIRAL = new \Spiral();
 $ModelName = "";
@@ -19,8 +19,8 @@ if(isset($argv[1]))
 }
 foreach(get_declared_classes() as $className)
 {
-    if (preg_match("/^App\\\Model/", $className)) {
-        if($ModelName === "" || "App\Model\\".$ModelName === $className)
+    if (preg_match("/^App\\\SpiralDb/", $className)) {
+        if($ModelName === "" || "App\SpiralDb\\".$ModelName === $className)
         {
             $debug = new Debug($className) ;
             $debug->checkField();

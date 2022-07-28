@@ -1,38 +1,29 @@
 <?php
 $outputtext = "<?php".PHP_EOL; 
-foreach(scanDirctory('../src/framework/Domain/Traits') as $file){
+foreach(scanDirctory('../src/framework/Exception') as $file){
+    $file = str_replace("../src/", "", $file);
+    $outputtext .= "require_once('$file');".PHP_EOL; 
+}
+foreach(scanDirctory('../src/framework/Http') as $file){
+    $file = str_replace("../src/", "", $file);
+    $outputtext .= "require_once('$file');".PHP_EOL; 
+}
+foreach(scanDirctory('../src/framework/Routing') as $file){
+    $file = str_replace("../src/", "", $file);
+    $outputtext .= "require_once('$file');".PHP_EOL; 
+}
+foreach(scanDirctory('../src/framework/Routing') as $file){
+    $file = str_replace("../src/", "", $file);
+    $outputtext .= "require_once('$file');".PHP_EOL; 
+}
+foreach(scanDirctory('../src/framework/Core') as $file){
     $file = str_replace("../src/", "", $file);
     $outputtext .= "require_once('$file');".PHP_EOL; 
 }
 
-foreach(scanDirctory('../src/framework/Domain/Entity') as $file){
-    $file = str_replace("../src/", "", $file);
-    $outputtext .= "require_once('$file');".PHP_EOL; 
-}
 
-foreach(scanDirctory('../src/framework/Domain/ValueObject') as $file){
-    $file = str_replace("../src/", "", $file);
-    $outputtext .= "require_once('$file');".PHP_EOL; 
-}
-foreach(scanDirctory('../src/framework/Application') as $file){
-    $file = str_replace("../src/", "", $file);
-    $outputtext .= "require_once('$file');".PHP_EOL; 
-}
+$outputtext .= "require_once('framework/Application.php');".PHP_EOL;
 
-foreach(scanDirctory('../src/framework/lib') as $file){
-    $file = str_replace("../src/", "", $file);
-    $outputtext .= "require_once('$file');".PHP_EOL; 
-}
-
-foreach(scanDirctory('../src/framework/core') as $file){
-    $file = str_replace("../src/", "", $file);
-    $outputtext .= "require_once('$file');".PHP_EOL; 
-}
-
-foreach(scanDirctory('../src/framework/model') as $file){
-    $file = str_replace("../src/", "", $file);
-    $outputtext .= "require_once('$file');".PHP_EOL; 
-}
 
 //file_put_contents("../src/framework/require.php", $outputtext);
 file_put_contents($argv[1], $outputtext);

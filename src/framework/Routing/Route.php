@@ -43,7 +43,7 @@ class Route
 
     final public function processable(Request $request): bool
     {
-        if ($request->getMethod() !== $this->method) {
+        if ($request->getMethod() !== $this->method) { 
             return false;
         }
 
@@ -84,9 +84,10 @@ class Route
         $handler = $this->handler;
 
         if(! is_string($handler)){
-            return $handler(...$service);
+            if($service == null){ return $handler($vars); }
+            return $handler($vars , ...$service);
         }
-        
+         
         if(! is_string($this->action)){
             throw new NotFoundException('not found');
         }
@@ -95,6 +96,7 @@ class Route
         //__constract Method実行
         $instance = new $handler($request);
         
+        if($service == null){ return $instance->$action($vars); }
         return $instance->$action($vars ,...$service);
     }
 

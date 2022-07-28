@@ -29,7 +29,32 @@ class BlukUpsertItemsController extends Controller
                 
             $api_url = "%url/rel:mpgt:BulkItem%";
             $error = $SPIRAL->getParam('errorMsg');
-            
+            /*
+            $insert_data = [];
+            for($num = 1 ; $num >= 100000 ; $num++){
+
+                $insert_data[] = 
+                [
+                    "makerName" => 'testメーカー',
+                    "itemName" => 'テストアイテム'.$num,
+                    "category" => '1',
+                    "itemCode" => $num,
+                    "itemStandard" => $num,
+                    "itemJANCode" => '9'.str_pad($num , 12, "0", STR_PAD_LEFT),
+                    "catalogNo" => $num,
+                    "serialNo" => $num,
+                    "minPrice" => '100',
+                    "officialFlag" => '0',
+                    "officialprice" => '0',
+                    "quantity" => '10',
+                    "quantityUnit" => '枚',
+                    "itemUnit" => '箱',
+                    "lotManagement" => '1',
+                    "tenantId" => $auth->tenantId,
+                ];
+            }
+            $result = ItemBulkUpsertTrDB::insert($insert_data);
+            */
             $content = $this->view('NewJoyPlaTenantAdmin/view/BlukUpsertItems/Index', [
                 'api_url' => $api_url,
                 'csrf_token' => Csrf::generate(16)
@@ -67,6 +92,8 @@ class BlukUpsertItemsController extends Controller
     public function regist()
     {
         global $SPIRAL;
+        $time_start = microtime(true);
+
         try {
             $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
             Csrf::validate($token,true);
@@ -75,25 +102,9 @@ class BlukUpsertItemsController extends Controller
             
             $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
             //$rowData = $SPIRAL->getParam('rowData');
-            
             $items = Item::where('tenantId',$auth->tenantId)->plain()
             ->value('itemId')
-            ->value("makerName")
-            ->value("itemName")
-            ->value("category")
-            ->value("itemCode")
-            ->value("itemStandard")
-            ->value("itemJANCode")
-            ->value("catalogNo")
-            ->value("serialNo")
-            ->value("minPrice")
-            ->value("officialFlag")
-            ->value("officialprice")
-            ->value("quantity")
-            ->value("quantityUnit")
-            ->value("itemUnit")
-            ->value("lotManagement")
-            ->value("tenantId")
+            ->value('itemJANCode')
             ->value("itemsAuthKey");
 
             $insert_data = [];
@@ -120,9 +131,7 @@ class BlukUpsertItemsController extends Controller
                     ];
                 $items->orWhere('itemJANCode',$rows['data'][5]);
             }
-
             $items = ($items->get())->data->all();
-
             $insert_data = array_map(
                 function(array $i) use ($items)
                 {
@@ -130,56 +139,26 @@ class BlukUpsertItemsController extends Controller
                     {
                         if( $item->itemJANCode == $i['itemJANCode'] )
                         {
-                            $i['o_makerName'] = $item->makerName;
-                            $i['o_itemName'] = $item->itemName;
-                            $i['o_category'] = $item->category;
-                            $i['o_itemCode'] = $item->itemCode;
-                            $i['o_itemStandard'] = $item->itemStandard;
-                            $i['o_itemJANCode'] = $item->itemJANCode;
-                            $i['o_catalogNo'] = $item->catalogNo;
-                            $i['o_serialNo'] = $item->serialNo;
-                            $i['o_minPrice'] = $item->minPrice;
-                            $i['o_officialFlag'] = $item->officialFlag;
-                            $i['o_officialprice'] = $item->officialprice;
-                            $i['o_quantity'] = $item->quantity;
-                            $i['o_quantityUnit'] = $item->quantityUnit;
-                            $i['o_itemUnit'] = $item->itemUnit;
-                            $i['o_lotManagement'] = $item->lotManagement;
                             $i['itemId'] = $item->itemId;
                             $i['itemsAuthKey'] = $item->itemsAuthKey;
                             return $i;
                         }
                     }
-
-                    $i['o_makerName'] = "";
-                    $i['o_itemName'] = "";
-                    $i['o_category'] = "";
-                    $i['o_itemCode'] = "";
-                    $i['o_itemStandard'] = "";
-                    $i['o_itemJANCode'] = "";
-                    $i['o_catalogNo'] = "";
-                    $i['o_serialNo'] = "";
-                    $i['o_minPrice'] = "";
-                    $i['o_officialFlag'] = "";
-                    $i['o_officialprice'] = "";
-                    $i['o_quantity'] = "";
-                    $i['o_quantityUnit'] = "";
-                    $i['o_itemUnit'] = "";
-                    $i['o_lotManagement'] = "";
                     $i['itemId'] = "";
                     $i['itemsAuthKey'] = "";
                     return $i;
                 },$insert_data
             );
-            
             $result = ItemBulkUpsertTrDB::insert($insert_data);
         
             //$content = new ApiResponse([] , count($insert_data) , 0, '', ['insert']);
-            $content = new ApiResponse($result->ids , count($insert_data) , $result->code, $result->message, ['insert']);
+            $time = microtime(true) - $time_start;
+            $content = new ApiResponse($result->ids , count($insert_data) , $result->code, $result->message, [$time."秒"]);
             $content = $content->toJson();
             
         } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+            $time = microtime(true) - $time_start;
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), [$time."秒"]);
             $content = $content->toJson();
         }finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [

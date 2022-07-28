@@ -15,7 +15,7 @@ if($userInfo->isUser() && $myPageID != ''){
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
     <title>JoyPla 入荷履歴詳細一覧</title>
 	<?php include_once "NewJoyPla/src/Head.php"; ?>

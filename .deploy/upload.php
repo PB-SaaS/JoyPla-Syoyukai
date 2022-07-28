@@ -1,10 +1,11 @@
 <?php
+require_once('env.php');
 
 define("API_URL", "https://www.pi-pe.co.jp/api/locator");
 define("MULTIPART_BOUNDARY", "SPIRAL_API_MULTIPART_BOUNDARY");
 
-$API_TOKEN = $argv[1];
-$API_SECRET = $argv[2];
+$API_TOKEN = TOKEN;
+$API_SECRET = SECRET;
 
 $locator = API_URL;
 $api_headers = array(
@@ -39,7 +40,7 @@ if($response['code'] != 0)
 $API_URL = $response['location'];
 
 echo $API_URL;
-$filename = $argv[3];
+$filename = $argv[1];
 $filedata = file_get_contents($filename);
 // API�Ѥ�HTTP�إå�
 $api_headers = array(

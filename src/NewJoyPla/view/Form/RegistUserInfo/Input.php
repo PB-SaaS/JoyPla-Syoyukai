@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
     <head>
         <title>JoyPla 病院ユーザー登録 - 入力</title>
         <?php include_once "NewJoyPla/src/Head.php"; ?>

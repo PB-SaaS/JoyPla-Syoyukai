@@ -9,25 +9,39 @@ namespace framework\Http;
  */
 class Request
 {
+    private array $post = [] ;
+    private array $server = [] ;
+
+    public function __construct()
+    {
+        $this->post = $_POST;
+        $this->server = $_SERVER;
+    }
+
     public function isSsl(): bool
     {
-        return isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+        return isset($this->server['HTTPS']) && $this->server['HTTPS'] === 'on';
     }
 
     public function getHost(): string
     {
-        return $_SERVER['SERVER_NAME'];
+        return $this->server['SERVER_NAME'];
     }
     
     public function getRequestUri(): string
-    {
-        //SPIRALはREQUEST_URLを任意設定ができないので POST値でとる
+    { 
+        //SPIRALはREQUEST_URIを任意設定ができないので POST値でとる
         //return $_SERVER['REQUEST_URI'];
-        if(!isset($_POST['path']))
+        if(!isset($this->post['path']))
         {
-            return "";
+            return ""; 
         }
-        return $_POST['path'];
+        return $this->post['path'];
+    }
+
+    public function setRequestUri(string $path)
+    { 
+        $this->set('path' , $path);
     }
 
     public function getQueryParams(): array
@@ -37,11 +51,35 @@ class Request
 
     public function getRequestBody(): array
     {
-        return $_POST;
+        return self::requestUrldecode($this->post);
+    }
+
+    private static function requestUrldecode($v){
+        if(is_array($v))
+        {
+            $result = array();
+            foreach($v as $key => $value){
+                $result[$key] = self::requestUrldecode($value);
+            }
+            return $result;
+        }
+        return urldecode($v);
     }
 
     public function getMethod(): string
     {
-        return $_SERVER['REQUEST_METHOD'];
+        return $this->server['REQUEST_METHOD'];
+    }
+
+    public function get($key)
+    {
+        global $SPIRAL;
+        if($SPIRAL === null || ( $SPIRAL->getParam($key) == null )){ return self::requestUrldecode($this->post[$key]); }
+        return self::requestUrldecode($SPIRAL->getParam($key));
+    }
+
+    public function set($key , $val)
+    {
+        $this->post[$key] = $val;
     }
 }

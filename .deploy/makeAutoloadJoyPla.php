@@ -1,5 +1,7 @@
 <?php
 $outputtext = "<?php".PHP_EOL; 
+$outputtext .= "require_once('JoyPla/config.php');".PHP_EOL; 
+
 foreach(scanDirctory('../src/JoyPla/Domain/Traits') as $file){
     $file = str_replace("../src/", "", $file);
     $outputtext .= "require_once('$file');".PHP_EOL; 
@@ -18,7 +20,16 @@ foreach(scanDirctory('../src/JoyPla/Application') as $file){
     $file = str_replace("../src/", "", $file);
     $outputtext .= "require_once('$file');".PHP_EOL; 
 }
-foreach(scanDirctory('../src/JoyPla/Enterprise') as $file){
+foreach(scanDirctory('../src/JoyPla/Enterprise/Traits') as $file){
+    $file = str_replace("../src/", "", $file);
+    $outputtext .= "require_once('$file');".PHP_EOL; 
+}
+
+foreach(scanDirctory('../src/JoyPla/Enterprise/Models') as $file){
+    $file = str_replace("../src/", "", $file);
+    $outputtext .= "require_once('$file');".PHP_EOL; 
+}
+foreach(scanDirctory('../src/JoyPla/Enterprise/ValueObject') as $file){
     $file = str_replace("../src/", "", $file);
     $outputtext .= "require_once('$file');".PHP_EOL; 
 }
@@ -38,10 +49,11 @@ foreach(scanDirctory('../src/JoyPla/core') as $file){
     $outputtext .= "require_once('$file');".PHP_EOL; 
 }
 
-foreach(scanDirctory('../src/JoyPla/model') as $file){
+foreach(scanDirctory('../src/JoyPla/Enterprise/SpiralDb') as $file){
     $file = str_replace("../src/", "", $file);
     $outputtext .= "require_once('$file');".PHP_EOL; 
 }
+
 
 //file_put_contents("../src/NewJoyPla/require.php", $outputtext);
 file_put_contents($argv[1], $outputtext);

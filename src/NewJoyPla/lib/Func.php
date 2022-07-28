@@ -40,7 +40,7 @@ function isMypage(){
 function viewNotPossible(){
     ?>
     <!DOCTYPE html>
-    <html>
+    <html lang="ja">
         <head>
             <title>閲覧不可</title>
         </head>

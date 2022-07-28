@@ -86,14 +86,14 @@ class ReceivingMRController extends Controller
 
             if( ($user_info->isHospitalUser() && ( $user_info->isAdmin() || $user_info->isApprover() )))
             {
-                $division = Division::where('hospitalId',$user_info->getHospitalId())->get();
+                $division = Division::where('hospitalId',$user_info->getHospitalId())->plain()->get();
             }
             else
             {
-                $division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
+                $division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->plain()->get();
             }
 
-            $distributor_data = Distributor::where('hospitalId',$user_info->getHospitalId())->get();
+            $distributor_data = Distributor::where('hospitalId',$user_info->getHospitalId())->plain()->get();
             $distributor_data = $distributor_data->data->all();
 
             $api_url = '%url/rel:mpgt:ReceivingMR%';
@@ -148,7 +148,7 @@ class ReceivingMRController extends Controller
         $report = [];
         $total_amount = 0;
     
-        ReceivingView::where('hospitalId',$user_info->getHospitalId());
+        ReceivingView::where('hospitalId',$user_info->getHospitalId())->plain();
         if ($startMonth) { ReceivingView::where('registrationTime', $startMonth, '>='); }
         if ($endMonth) { ReceivingView::where('registrationTime', (date('Y-m-d', strtotime($endMonth . '+1 day'))), '<='); }
         if ($divisionId) { ReceivingView::where('divisionId', $divisionId); }
@@ -160,8 +160,7 @@ class ReceivingMRController extends Controller
         }
 
         $this->receiving_data = $receivingDB->data->all();
-
-        InHospitalItemView::where('hospitalId',$user_info->getHospitalId());
+        InHospitalItemView::where('hospitalId',$user_info->getHospitalId())->plain();
         foreach ($this->receiving_data as $receiving)
         {
             InHospitalItemView::orWhere('inHospitalItemId',$receiving->inHospitalItemId);

@@ -6,11 +6,11 @@ use framework\Http\Request;
 
 class Controller
 {
-    private Request $request;
+    public Request $request;
 
     public function __construct(Request $request)
     {
-        $this->request = $request;
+        $this->request = $request; 
     }
     // ログの出力
     public function logging($message, string $file_name = 'app.log')

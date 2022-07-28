@@ -119,7 +119,7 @@ var app = new Vue({
 					}
 					
 					UIkit.modal.alert("未発注伝票を作成しました").then(function(){
-						UIkit.modal.alert("未発注伝票一覧へ移動します").then(function(){
+						UIkit.modal.alert("未発注書一覧へ移動します").then(function(){
 							location.href="%url/rel:mpgt:Order%&Action=unorderedList";
 						});
 					});

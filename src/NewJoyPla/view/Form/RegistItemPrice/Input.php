@@ -3,7 +3,7 @@
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="ja">
     <head>
         <title>JoyPla 金額情報登録 - 入力</title>
         <?php include_once "NewJoyPla/src/Head.php"; ?>

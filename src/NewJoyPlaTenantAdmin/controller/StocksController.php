@@ -309,17 +309,22 @@ class StocksController extends Controller
             //$rowData =  $SPIRAL->getParam('rowData');
             
             $insert_data = [];
-            foreach($rowData as $rows)
+            $ids = [];
+            foreach($rowData as $key => $rows)
             {
+                $id = $this->makeIds('90' , $key );
+                if(in_array($id , $ids, true) === true){ var_dump($id); }
+                $ids[] = $id;
                 $insert_data[] = 
                     [
-                        "cardId" => $this->makeId('90'),
+                        "cardId" => $id,
                         "hospitalId" => $SPIRAL->getParam('hospitalId'),
                         "divisionId" => $rows['data'][0],
                         "inHospitalItemId" => $rows['data'][1],
                         "quantity" => $rows['data'][2]
                     ];
             }
+            exit;
             $result = Card::insert($insert_data);
             $content = new ApiResponse($result->ids , count($insert_data) , $result->code, $result->message, ['insert']);
             $content = $content->toJson();
@@ -332,6 +337,14 @@ class StocksController extends Controller
                 'content'   => $content,
             ],false);
         }
+    }
+
+    function makeIds($id = '00' ,  $key)
+    { 
+        $id .= date("ymdHis");
+        $id .= str_pad($key , 4, "0", STR_PAD_LEFT); 
+        //if(in_array($id , $ids, true)){ $this->makeId('90' , $ids); }
+        return $id;
     }
     
 }

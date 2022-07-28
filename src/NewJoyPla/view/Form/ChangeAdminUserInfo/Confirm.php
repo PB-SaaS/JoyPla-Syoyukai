@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
     <head>
         <?php include_once "NewJoyPla/src/Head.php"; ?>
         <title>JoyPla 病院ユーザ―情報変更 - 確認</title>

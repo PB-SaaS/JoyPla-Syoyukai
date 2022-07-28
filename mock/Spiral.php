@@ -9,6 +9,10 @@ class Spiral{
 
     public function getArgs(){
     }
+
+    public function getAccountId(){
+        return "";
+    }
     
     public function getCache(int $_timeout = 900){
     }
@@ -73,6 +77,11 @@ class Spiral{
     public function urlEncode(string $_string = null){
     }
 
-    public function getSession(){}
+    public function getSession(){ return new Session(); }
     
+}
+
+class Session {
+    public function get(){}
+    public function put(){}
 }

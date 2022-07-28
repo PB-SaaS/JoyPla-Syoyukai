@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
     <head>
         <?php include_once "NewJoyPla/src/Head.php"; ?>
         <title>JoyPla 院内商品情報追加 - 確認</title>

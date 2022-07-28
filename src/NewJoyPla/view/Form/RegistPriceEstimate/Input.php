@@ -3,7 +3,7 @@
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="ja">
     <head>
         <title>JoyPla 見積情報登録 - 入力</title>
         <style>

@@ -23,7 +23,7 @@ class Kernel
     {
         // add global middleware.
         // $this->router->middleware($this->middlewares);
-
+        
         return $this->router->dispatch($request);
     }
 }

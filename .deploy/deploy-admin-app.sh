@@ -3,17 +3,11 @@
 #
 #java -jar custom_module.jar -t $TOKEN -s $SECRET $*
 
-TARGET_DIR='../src'
+TARGET_DIR='src'
 TARGET='NewJoyPlaTenantAdmin'
 DATE=`date '+%y%m%d%H%M%S'`
 LOG_OUT="logs/deploy.log"
 ZIP_FILE="upload_file"
-
-TOKEN=00011KB9HzJA6571fc2a62048af337abb32cbab1e0dfa3c8aadb
-SECRET=f2bf4a8e7b3567fdba896429ea1c136e89320175
-
-#TOKEN=00011Bki9kGk5abfd3697509e0f98372a184110aedfbd6d3163e
-#SECRET=53b7ebda4372d64ff56a1f1c60bcf303744a4d62
 
 log() {
     echo "[$(date +"%Y-%m-%d %H:%M:%S")][INFO] $@" | tee -a ${LOG_OUT}
@@ -108,7 +102,7 @@ else
 fi
 
 cd tmp
-if php ../upload.php ${TOKEN} ${SECRET} ${ZIP_FILE}.zip ;then
+if php ../upload.php ${ZIP_FILE}.zip ;then
     cd -
     log "upload ${TARGET}"
 else 
@@ -126,12 +120,13 @@ fi
 
 cd ../
 
-if git add . ;then
+
+if git add ${TARGET_DIR}/${TARGET}/. ;then
     cd -
-    log "git add ."
+    log "git add ${TARGET_DIR}/${TARGET}/."
 else
     cd -
-    errorlog "git add ."
+    errorlog "git add ${TARGET_DIR}/${TARGET}/."
 fi
 
 #if java -jar custom_module.jar -t $TOKEN -s $SECRET tmp/upload_data.zip ;then

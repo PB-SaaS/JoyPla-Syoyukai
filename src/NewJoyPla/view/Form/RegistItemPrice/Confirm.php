@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
     <head>
         <title>JoyPla 金額情報登録 - 確認</title>
         <style>

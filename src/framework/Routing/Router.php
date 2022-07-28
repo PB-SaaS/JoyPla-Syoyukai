@@ -52,6 +52,12 @@ class Router
             }
         }
 
-        throw new NotFoundException('404 Not Found.');
+        throw new NotFoundException('Not Found.',404);
+    }
+
+    public static function redirect($uri , Request $request){
+        $request->setRequestUri($uri);
+        $router = new Router();
+        return $router->dispatch($request);
     }
 }

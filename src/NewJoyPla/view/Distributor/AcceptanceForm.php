@@ -25,7 +25,7 @@
 		    	</div>
 		    	<div class="uk-width-1-2@m">
 		    		<div class="uk-float-right uk-width-2-3@m">
-		    			<table class="uk-table uk-width-1-1 uk-table-divider">
+		    			<table class="uk-table uk-width-1-1 uk-table-divider"> 
 		    				<tr>
 		    					<td>検収日時</td>
 		    					<td>%val:usr:registrationTime%</td>

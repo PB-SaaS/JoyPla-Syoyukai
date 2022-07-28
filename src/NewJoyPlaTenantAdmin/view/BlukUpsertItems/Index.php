@@ -270,7 +270,7 @@ var app = new Vue({
                 {
                     vm.lists[index]['index'] = index; 
                 });
-                let chunk = vm.arrayChunk(vm.lists,1000);
+                let chunk = vm.arrayChunk(vm.lists,200);
                 let i = 0 ;
                 let ajaxCount = 0 ;
                 for(i ; i < chunk.length ; i++ )
@@ -323,6 +323,14 @@ var app = new Vue({
                     }
                 });
             });
+        },
+        sleep: function(a){
+            var dt1 = new Date().getTime();
+            var dt2 = new Date().getTime();
+            while (dt2 < dt1 + a){
+                dt2 = new Date().getTime();
+            }
+            return;
         },
         objectValueToURIencode: function(object){
 			let result = {};

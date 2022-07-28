@@ -21,7 +21,7 @@ if(isset($_POST['MyPageID']) && $_POST['MyPageID'] != '' ){
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
     <title>JoyPla 金額情報一覧</title>
 	<?php include_once "NewJoyPla/src/Head.php"; ?>
