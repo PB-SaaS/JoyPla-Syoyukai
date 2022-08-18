@@ -1463,6 +1463,7 @@ EOM;
                     'stock' => $stock_view_model,
                     'picking_status' => $picking_status,
                     'division_name' => $division_name,
+                    'registrationTime' => $picking_history->registrationTime,
                     'picking_history' => $picking_history,
                     'pay_schedule_items' => $pay_schedule_items,
                     'csrf_token' => Csrf::generate(16)

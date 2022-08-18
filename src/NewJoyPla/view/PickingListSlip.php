@@ -20,7 +20,7 @@
                     <table class="uk-table uk-width-1-1 uk-table-divider">
                         <tr>
                             <td class="uk-text-bold">登録日時</td>
-                            <td class="uk-text-right">%val:usr:registrationTime%</td>
+                            <td class="uk-text-right">{{ registrationTime }}</td>
                         </tr>
                         <tr>
                             <td class="uk-text-bold">払出元部署</td>
@@ -163,6 +163,7 @@ let register_data = {
      picking_list_url: "<?php echo $picking_list_url ?>&Action=pickingList&table_cache=true",
      division_name: "<?php echo $division_name ?>",
      picking_id: "<?php echo $picking_id ?>",
+     registrationTime: "<?php echo $registrationTime ?>",
      picking_status : "<?php echo $picking_status ?>",
 };
 var app = new Vue({
@@ -175,6 +176,7 @@ var app = new Vue({
         picking_id : register_data.picking_id,
         pay_schedule_items : register_data.pay_schedule_items,
         picking_status : register_data.picking_status,
+        registrationTime : register_data.registrationTime
     },
     created(){
         JsBarcode("#barcode",this.picking_id,{width: 1.8, height: 40,fontSize: 14});
