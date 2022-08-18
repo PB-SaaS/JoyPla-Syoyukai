@@ -57,6 +57,7 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
+                                        <th>棚名</th>
                                         <th class="uk-width-1-6">商品情報</th>
                                         <th>卸業者</th>
                                         <th>価格</th>
@@ -75,6 +76,7 @@
                                 <tbody>
                                     <tr v-for="( i , key) in items">
                                         <td>{{ key + 1 }}</td>
+                                        <td>{{ i.rackName }}</td>
                                         <td>
                                             <div margin="0">
                                                 <div>{{ i.makerName }}</div>
@@ -99,7 +101,7 @@
                                     </tr>
                                 </tbody>
                                 <tfoot>
-                                    <td colspan=6>合計</td>
+                                    <td colspan='7'>合計</td>
                                     <td></td>
                                     <td>&yen;{{ get_before_inventory_total_price() | number_format }}</td>
                                     <td></td>
@@ -191,7 +193,7 @@
                         </tr>
                     </tbody>
                     <tfoot>
-                        <td colspan=6>合計</td>
+                        <td colspan='7'>合計</td>
                         <td></td>
                         <td>&yen;{{ get_before_inventory_total_price() | number_format }}</td>
                         <td></td> 
@@ -551,6 +553,7 @@ var app = new Vue({
             for (let i = 0; i < app.items.length; i++) {
                 result[i] = [
                     i+1,
+                    app.items[i].rackName,
                     app.items[i].itemName,
                     app.items[i].itemCode,
                     app.items[i].itemStandard,
@@ -576,7 +579,7 @@ var app = new Vue({
 
             console.log(result);
             
-            result.unshift(['id','商品名','製品コード','規格','メーカー名','JANコード','卸業者名','購買価格','単価','入数','入数単位','前回数量','前回金額','入荷数量','入荷金額','消費数量','消費金額','棚卸数量','棚卸金額','病院名','部署名']);
+            result.unshift(['id','棚名','商品名','製品コード','規格','メーカー名','JANコード','卸業者名','購買価格','単価','入数','入数単位','前回数量','前回金額','入荷数量','入荷金額','消費数量','消費金額','棚卸数量','棚卸金額','病院名','部署名']);
         
             this.exportCSV(result);
         }
