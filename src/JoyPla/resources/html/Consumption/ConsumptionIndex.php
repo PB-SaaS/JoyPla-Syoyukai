@@ -7,6 +7,16 @@
       <div class="index container mx-auto mb-96">
         <h1 class="text-2xl mb-2">消費伝票の詳細</h1>
         <hr>
+        <div class="p-4 text-base bg-gray-100 border border-gray-400 flex flex-col md:flex-row md:gap-6 gap-4 mb-6">
+          <v-button-default type="button" class="md:w-1/6 w-full" @click.native="openPrint( consumption.consumptionId )">
+            消費伝票を印刷
+          </v-button-default>
+          <?php if( gate('cancellation_of_consumption_slips')->can() ): ?>
+          <v-button-danger type="button" class="md:w-1/6 w-full" @click.native="deleteSlip( consumption.consumptionId )" >
+            消費伝票を削除
+          </v-button-danger>
+          <?php endif ?>
+        </div>
         <div class="p-4 text-base bg-gray-100 border border-gray-400">
           <div class="flex w-full gap-6">
             <div class="flex-initial lg:w-1/6 w-1/3">消費日</div>
@@ -78,7 +88,9 @@ var JoyPlaApp = Vue.createApp({
       'v-loading' : vLoading,
       'header-navi' : headerNavi,
       'v-breadcrumbs': vBreadcrumbs,
-      'item-view' : itemView
+      'item-view' : itemView,
+      'v-button-default' : vButtonDefault,
+      'v-button-danger' : vButtonDanger
     },
     setup(){
       const {ref , onCreated , onMounted} = Vue;
@@ -105,12 +117,12 @@ var JoyPlaApp = Vue.createApp({
           {
             text: '消費メニュー',
             disabled: false,
-            href: '%url/rel:mpgt:Root%&path=/consumption',
+            href: _ROOT+'&path=/consumption',
           },
           {
             text: '消費一覧',
             disabled: false,
-            href: '%url/rel:mpgt:Root%&path=/consumption/show&isCache=true',
+            href: _ROOT+'&path=/consumption/show&isCache=true',
           },
           {
             text: '消費伝票の詳細',
@@ -122,9 +134,58 @@ var JoyPlaApp = Vue.createApp({
 
       const numberFormat = (value) => {
           if (! value ) { return 0; }
-          return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+          return new Intl.NumberFormat('ja-JP').format(value);
       };
+
+
+      const deleteSlip = ( consumptionId ) => 
+      {
+          Swal.fire({
+            title: '消費伝票を削除',
+            text: "削除後は元に戻せません。\r\nよろしいですか？",
+            icon: 'warning',
+            confirmButtonText: '削除します',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+          }).then( async (result) => {
+            if(result.isConfirmed){
+              start();
+              
+              let params = new URLSearchParams();
+              params.append("path", "/api/consumption/"+consumptionId+"/delete");
+              params.append("_csrf", _CSRF);
+
+              const res = await axios.post(_APIURL,params);
+              
+              complete();
+              if(res.data.code != 200) {
+                throw new Error(res.data.message)
+              }
+              Swal.fire({
+                  icon: 'success',
+                  title: '消費伝票の削除が完了しました。',
+              }).then((result) => {
+                location.href = _ROOT+'&path=/consumption/show&isCache=true';
+              });
+              return true ;
+            }
+          }).catch((error) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'システムエラー',
+              text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+            });
+          });
+      }
+      const openPrint = ( url ) => {
+        location.href = _ROOT + "&path=/consumption/" + url + "/print";    
+      }
+
       return {
+        openPrint,
+        deleteSlip,
         numberFormat,
         consumption,
         breadcrumbs,

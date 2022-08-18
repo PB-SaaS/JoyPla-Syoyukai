@@ -2,7 +2,9 @@
 
 namespace framework\Routing;
 
+use App\Http\Middleware\MiddlewareTrait;
 use Closure;
+use Exception;
 use framework\Exception\NotFoundException;
 use framework\Http\Request;
 use framework\Service\ServiceProvider;
@@ -10,6 +12,8 @@ use Response;
 
 class Router
 {
+    use MiddlewareTrait;
+
     public static array $routes = [];
 
     /**
@@ -33,7 +37,7 @@ class Router
 
         self::$routes[] = $route;
 
-        return $route;
+        return $route->middleware(self::$groupMiddlewares);
     }
 
     /**
@@ -45,9 +49,7 @@ class Router
     {
         foreach (self::$routes as $route) {
             if ($route->processable($request)) {
-                // Merge root middleware and global middleware.
-                // $route->middleware($this->middlewares);
-
+                $route->middleware($this->middlewares);
                 return $route->process($request , $route->service);
             }
         }
@@ -60,4 +62,21 @@ class Router
         $router = new Router();
         return $router->dispatch($request);
     }
+
+    public static function abort(int $code , string $message = "")
+    {
+        if($message == ""){
+            switch ($code) {
+                case 404:
+                    $message = "Not Found";
+                    break;
+                case 403:
+                    $message = "Forbidden";
+                    break;
+            }
+        }
+
+        throw new Exception($message , $code);
+    }
+    
 }

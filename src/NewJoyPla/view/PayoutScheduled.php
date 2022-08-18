@@ -99,6 +99,7 @@
 		    <div class="uk-container uk-container-expand">
 		    	<ul class="uk-breadcrumb">
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&path=payout">払出メニュー</a></li>
 				    <li><span>払出予定商品入力</span></li>
 				</ul>
 		    	<h2 class="page_title">払出予定商品入力</h2>
@@ -297,7 +298,7 @@ var app = new Vue({
 		lists: [],
 		change_class: {'payout_count':false,'target_division':false},
 		error_class: {'payout_count':false,'target_division':false},
-		source_division: '',
+		source_division: "<?php echo ($user_info->isUser())? $user_info->getDivisionId() : "" ; ?>",
 		payout_schedule : '',
 		payout_schedule_class : {'error': false},
         useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
@@ -305,7 +306,7 @@ var app = new Vue({
 	filters: {
         number_format: function(value) {
             if (! value ) { return 0; }
-            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+            return new Intl.NumberFormat('ja-JP').format(value);
         },
     },
     watch: {
@@ -572,7 +573,7 @@ var modal_sections = new Vue({
 	filters: {
         number_format: function(value) {
             if (! value ) { return 0; }
-            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+            return new Intl.NumberFormat('ja-JP').format(value);
         },
     },
 	methods: {

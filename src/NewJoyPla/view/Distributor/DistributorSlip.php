@@ -4,6 +4,7 @@
 	    <div class="uk-container uk-container-expand">
 	    	<ul class="uk-breadcrumb no_print">
 			    <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&page=page8">ユーザー管理</a></li>
 			    <li><a href="%url/rel:mpgt:DistributorInfo%&table_cache=true">卸業者一覧</a></li>
 			    <li><span>卸業者情報詳細</span></li>
 			</ul>

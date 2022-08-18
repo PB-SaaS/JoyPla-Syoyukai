@@ -248,6 +248,11 @@ class InventoryEndSlipController extends Controller
                 'inventoryTime' => 'now',
                 'inventoryStatus' => 2
                 ]);
+
+            $result = InventoryHistory::where('hospitalId',$user_info->getHospitalId())->where('inventoryEndId', $end_slip->inventoryEndId)->update([
+                'inventoryHStatus' => 2
+            ]);
+            
             $content = new ApiResponse($result->ids , $result->count , $result->code, $result->message, ['slipDeleteApi']);
             $content = $content->toJson();
             

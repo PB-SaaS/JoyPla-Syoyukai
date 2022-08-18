@@ -108,14 +108,13 @@ class BarcodeSearchController extends Controller
                   $card_title = '';
                   $record = '';
                   
-                  if(preg_match('/^03/', $search_value) && strlen($search_value) == 18)
+                  if(preg_match('/^03/', $search_value) && ( strlen($search_value) == 18 || strlen($search_value) == 15 ))
                   {
                         //注文書
                         //$result = OrderHistory::where('orderNumber',$search_value)->where('hospitalId',$user_info->getHospitalId())->where('distributorId',$user_info->getDistributorId())->get();
-                        $result = OrderHistory::where('orderNumber',$search_value)->get();
+                        $result = OrderHistory::getNewInstance()->where('orderNumber',$search_value)->get();
                         
                         $record = $result->data->get(0);
-
                         if($result->count == '0' || $record->orderStatus == '1'){
                               throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
                         }

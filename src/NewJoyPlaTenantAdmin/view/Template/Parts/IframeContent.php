@@ -2,7 +2,7 @@
     <iframe id="iframeForm" name="iframeForm" frameborder="0" style="overflow: hidden;
             width: 100%; position: absolute;"></iframe>
 </div>
-<form action="<?php echo $url ?>" target="iframeForm" id="iframe_form">
+<form action="<?php echo $url ?>" method="post" target="iframeForm" id="iframe_form">
     %SMPAREA%
     <input type="hidden" value="%url/rel:mpg:top%" name="topPageLink">
     <?php 

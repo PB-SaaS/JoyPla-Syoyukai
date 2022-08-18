@@ -127,7 +127,7 @@
                             <tbody>
                                 <tr class="uk-text-large">
                                     <td>合計金額</td>
-                                    <td class="uk-text-right">￥<?php echo number_format($report['totalAmount'],2); ?> -</td>
+                                    <td class="uk-text-right">￥<?php echo number_format_jp($report['totalAmount']); ?> -</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -193,17 +193,17 @@
                                             echo "<td>".$record['itemJANCode']."</td>";
                                             echo "<td>";
                                             foreach ($record['price'] as $price) {
-                                                echo "￥".number_format($price,2)."<br>";
+                                                echo "￥".number_format_jp($price)."<br>";
                                             }
                                             echo "</td>";
                                             echo "<td>";
                                             foreach ($record['orderQuantity'] as $key => $orderQuantity) {
-                                                echo $orderQuantity." ".$record['itemUnit'][$key]."<br>";
+                                                echo number_format_jp($orderQuantity)." ".$record['itemUnit'][$key]."<br>";
                                             }
                                             echo "</td>";
                                             echo "<td>";
                                             foreach ($record['totalAmount'] as $totalAmount) {
-                                                echo "￥".number_format($totalAmount,2)."<br>";
+                                                echo "￥".number_format_jp($totalAmount)."<br>";
                                             }
                                             echo "</td>";
                                             echo "</tr>";

@@ -77,6 +77,7 @@ namespace JoyPla\Application\InputPorts\Api\InHospitalItem {
             $this->search->distributorIds= $search['distributorIds'];
             $this->search->perPage= $search['perPage'];
             $this->search->currentPage= $search['currentPage'];
+            $this->search->isNotUse = '0';
         }
     }
 

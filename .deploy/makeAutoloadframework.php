@@ -4,6 +4,12 @@ foreach(scanDirctory('../src/framework/Exception') as $file){
     $file = str_replace("../src/", "", $file);
     $outputtext .= "require_once('$file');".PHP_EOL; 
 }
+
+foreach(scanDirctory('../src/framework/Facades') as $file){
+    $file = str_replace("../src/", "", $file);
+    $outputtext .= "require_once('$file');".PHP_EOL; 
+}
+
 foreach(scanDirctory('../src/framework/Http') as $file){
     $file = str_replace("../src/", "", $file);
     $outputtext .= "require_once('$file');".PHP_EOL; 

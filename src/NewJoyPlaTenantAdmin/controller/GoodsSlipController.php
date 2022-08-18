@@ -410,7 +410,7 @@ class GoodsSlipController extends Controller
                             'hospitalName' => $priceinfo->hospitalName,
                             'distributorId' => $priceinfo->distributorId,
                             'distributorName' => $priceinfo->distributorName,
-                            'priceMText' => $priceinfo->distributorName."：￥".number_format($priceinfo->price,2)."/".$priceinfo->quantity.$priceinfo->quantityUnit."(".$priceinfo->itemUnit.")",
+                            'priceMText' => $priceinfo->distributorName."：￥".number_format_jp($priceinfo->price)."/".number_format_jp($priceinfo->quantity).$priceinfo->quantityUnit."(".$priceinfo->itemUnit.")",
                             'makerName' => '%val:usr:makerName%',
                             'itemId' => '%val:usr:itemId%',
                             'itemName' => '%val:usr:itemName%',

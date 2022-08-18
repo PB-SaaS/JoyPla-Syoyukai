@@ -54,6 +54,8 @@ class ConsumeHistListController extends Controller
                         'title' => '消費履歴詳細一覧',
                         'print' => true,
                         'export' => true,
+                        'submenulink' => "%url/rel:mpg:top%&path=trackrecord",
+                        'submenu' => '実績メニュー',
                         'table' => '%sf:usr:search15:mstfilter%',
                         'csrf_token' => Csrf::generate(16),
                         'script' => $division_script->render(),
@@ -114,8 +116,10 @@ class ConsumeHistListController extends Controller
     
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '消費履歴詳細一覧',
-                    'print' => true,
-                    'export' => true,
+                    'print' => false,
+                    'export' => false,
+                    'submenulink' => "%url/rel:mpg:top%&path=trackrecord",
+                    'submenu' => '実績メニュー',
                     'table' => '%sf:usr:search15:mstfilter%',
                     'csrf_token' => Csrf::generate(16),
                     'script' => $division_script->render(),
@@ -133,6 +137,8 @@ class ConsumeHistListController extends Controller
             ], false);
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             
+            $script = $this->view('NewJoyPla/view/template/parts/TableScript', [], false);
+
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 消費履歴詳細一覧',
                 'script' => '',

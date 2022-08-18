@@ -5,6 +5,9 @@
     <div id="content" class="flex h-full px-1">
         <div class="flex-auto">
             <div class="index container mx-auto flex flex-col md:gap-10">
+                <div class="md:grid md:grid-cols-2 md:gap-10">
+                    <v-barcode-slip-search></v-barcode-slip-search>
+                </div>
                 <div class="md:grid md:grid-cols-4 md:gap-10">
                     <card-button
                         main-color="bg-cornflower-blue-500"
@@ -49,7 +52,8 @@
                         text-color="text-pine-green-50"
                         sub-color="bg-pine-green-600"
                         label-text="棚卸"
-                        label-sub-text="Inventory">
+                        label-sub-text="Stocktaking"
+                        path="stocktaking">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -61,13 +65,14 @@
                                 stroke-linejoin="round"
                                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                         </svg>
-                    </card-button>
+                    </card-button> 
                     <card-button
                         main-color="bg-chelsea-cucumber-500"
                         text-color="text-chelsea-cucumber-50"
                         sub-color="bg-chelsea-cucumber-600"
                         label-text="払出"
-                        label-sub-text="Paypout">
+                        label-sub-text="Paypout"
+                        path="payout">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -87,7 +92,8 @@
                         text-color="text-buttercup-50"
                         sub-color="bg-buttercup-600"
                         label-text="在庫"
-                        label-sub-text="Paypout">
+                        label-sub-text="stock"
+                        path="stock">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -105,7 +111,8 @@
                         text-color="text-carrot-orange-50"
                         sub-color="bg-carrot-orange-600"
                         label-text="カード"
-                        label-sub-text="Paypout">
+                        label-sub-text="card"
+                        path="card"> 
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -123,7 +130,8 @@
                         text-color="text-outrageous-orange-50"
                         sub-color="bg-outrageous-orange-600"
                         label-text="実績"
-                        label-sub-text="Achievement">
+                        label-sub-text="TrackRecord"
+                        path="trackrecord">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -141,7 +149,8 @@
                         text-color="text-pomegranate-50"
                         sub-color="bg-pomegranate-600"
                         label-text="月次レポート"
-                        label-sub-text="Achievement">
+                        label-sub-text="MonthlyReport"
+                        path="monthlyreport">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -180,8 +189,8 @@
                         text-color="text-amethyst-50"
                         sub-color="bg-amethyst-600"
                         label-text="見積"
-                        label-sub-text="Product"
-                        path="/product">
+                        label-sub-text="Estimate"
+                        path="/estimate">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -199,7 +208,8 @@
                         text-color="text-flush-orange-50"
                         sub-color="bg-flush-orange-600"
                         label-text="貸出"
-                        label-sub-text="Borrowing">
+                        label-sub-text="Borrowing"
+                        path="/lending">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -217,7 +227,8 @@
                         text-color="text-san-juan-50"
                         sub-color="bg-san-juan-600"
                         label-text="ユーザー"
-                        label-sub-text="User">
+                        label-sub-text="User"
+                        path="/user">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -237,7 +248,8 @@
                         text-color="text-stack-50"
                         sub-color="bg-stack-600"
                         label-text="オプション"
-                        label-sub-text="Option">
+                        label-sub-text="Option"
+                        path="/option">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -340,9 +352,12 @@
                   sleepComplate()
                 });
 
-                return {loading, start, complete}
+                const searchValue = ref("");
+
+                return {loading, start, complete , searchValue }
             },
             components: {
+                'v-barcode-slip-search': vBarcodeSlipSearch,
                 'v-loading' : vLoading,
                 'v-breadcrumbs': vBreadcrumbs,
                 'card-button': cardButton,

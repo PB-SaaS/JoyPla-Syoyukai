@@ -2,6 +2,8 @@
 
 namespace framework\Http;
 
+use Auth;
+
 /**
  * Class Request
  *
@@ -11,6 +13,8 @@ class Request
 {
     private array $post = [] ;
     private array $server = [] ;
+    private $user;
+
 
     public function __construct()
     {
@@ -26,6 +30,16 @@ class Request
     public function getHost(): string
     {
         return $this->server['SERVER_NAME'];
+    }
+
+    public function setUserModel($model)
+    {
+        $this->user = new Auth($model);
+    }
+
+    public function user()
+    {
+        return $this->user;
     }
     
     public function getRequestUri(): string

@@ -42,7 +42,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
         public function handle(OrderShowInputData $inputData)
         {
             [ $orders , $count ] = $this->orderRepository->search(
-                (new HospitalId($inputData->hospitalId)),
+                (new HospitalId($inputData->user->hospitalId)),
                 $inputData->search
             );
             $this->outputPort->output(new OrderShowOutputData($orders , $count));
@@ -56,6 +56,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
  */
 namespace JoyPla\Application\InputPorts\Api\Order {
 
+    use Auth;
     use stdClass;
 
     /**
@@ -67,9 +68,9 @@ namespace JoyPla\Application\InputPorts\Api\Order {
         /**
          * OrderShowInputData constructor.
          */
-        public function __construct(string $hospitalId , array $search)
+        public function __construct(Auth $user , array $search)
         {
-            $this->hospitalId = $hospitalId;
+            $this->user = $user;
             $this->search = new stdClass();
             $this->search->itemName = $search['itemName'];
             $this->search->makerName = $search['makerName'];

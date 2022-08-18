@@ -17,7 +17,7 @@ class DistributorController extends Controller
         $token = $this->request->get('_csrf');
         Csrf::validate($token,true);
 
-        $inputData = new DistributorShowInputData((new Auth(HospitalUser::class))->hospitalId);
+        $inputData = new DistributorShowInputData($this->request->user()->hospitalId);
         $inputPort->handle($inputData);
     }
 }

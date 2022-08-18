@@ -18,6 +18,7 @@
 			?>
 			<ul class="uk-breadcrumb no_print uk-margin-top">
 				<li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&page=page1">消費・発注</a></li>
 				<li><span>定数発注</span></li>
 			</ul>
 			<div class="no_print" uk-margin id="app">
@@ -69,7 +70,7 @@ var app = new Vue({
 	filters: {
         number_format: function(value) {
             if (! value ) { return 0; }
-            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+            return new Intl.NumberFormat('ja-JP').format(value);
         },
     },
     watch: {

@@ -16,13 +16,13 @@ class SpiralDataBase {
 	protected $dataformat = [] ;
 
 	public function __construct(\Spiral $SPIRAL,\PbSpiralApiCommunicator $PbSpiralApiCommunicator ,\SpiralApiRequest $SpiralApiRequest){
-		$this->spiral = $SPIRAL;
 		$this->setApiSpiral($PbSpiralApiCommunicator,$SpiralApiRequest);
 	}
 	
 	private function setApiSpiral(\PbSpiralApiCommunicator $PbSpiralApiCommunicator ,\SpiralApiRequest $SpiralApiRequest){
 		//$this->spiral->setApiTokenTitle(APITITLE); //APIタイトル
-		$this->apiSpiral = new \App\Lib\ApiSpiral($this->spiral);
+		global $SPIRAL;
+		$this->apiSpiral = new \App\Lib\ApiSpiral($SPIRAL);
 		$this->apiSpiral->setApiCommunicator($PbSpiralApiCommunicator);
 		$this->apiSpiral->setSpiralApiRequest($SpiralApiRequest);
 	}
@@ -204,7 +204,7 @@ class SpiralDataBase {
 		return array( 'data' => $resdata , 'count' => $response['count'] , 'code' => '0' ,'message' => $response['message'] , 'label' => $response['label']);
 	}
 
-	private function clearData(){
+	public function clearData(){
 		$this->database = "";
 		$this->selectColumns = array();
 		$this->searchCondition = array();

@@ -268,6 +268,8 @@ EOM;
                 $content = $this->view('NewJoyPla/view/template/List', [
                         'title' => 'カード一覧',
                         'table' => '%sf:usr:search32:mstfilter%',
+                        'submenulink' => "%url/rel:mpg:top%&path=card",
+                        'submenu' => 'カードメニュー',
                         'csrf_token' => Csrf::generate(16),
                         'add_button' => $add_button,
                         'print' => true,
@@ -341,6 +343,8 @@ EOM;
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => 'カード一覧',
                     'table' => '%sf:usr:search32:mstfilter%',
+                    'submenulink' => "%url/rel:mpg:top%&path=card",
+                    'submenu' => 'カードメニュー',
                     'csrf_token' => Csrf::generate(16),
                     'add_button' => $add_button,
                     'print' => true,

@@ -1626,7 +1626,9 @@ class InventoryItemView extends Model
         "makerName",
         "oldPrice",
         "unitPrice",
-
+        "lotNumber",
+        "lotDate",
+        "labelId"
     ];
 
     //デフォルト値
@@ -1688,7 +1690,8 @@ class InventoryHistory extends Model
         "divisionId",
         "itemsNumber",
         "totalAmount",
-        "invHAuthKey"
+        "invHAuthKey",
+        "inventoryHStatus"
     ];
 
     //デフォルト値

@@ -238,8 +238,8 @@ $(function(){
 });
 function generateBarcodeForLabel(idname,value){
 	let height = document.getElementsByName('barcodeHeight')[0].value;
-	JsBarcode("#"+idname,value,{format: "ITF", width: 1.8, height: height,fontSize: 14});
-	//JsBarcode("#"+idname,value,{format: "CODE128", width: 1.8, height: 50,fontSize: 14});
+	JsBarcode("#"+idname,value,{width: 1.8, height: height,fontSize: 14});
+	//JsBarcode("#"+idname,value,{width: 1.8, height: 50,fontSize: 14});
 	//JsBarcode("#"+idname,value,{ width: 1.8, height: 50,fontSize: 14});
 	//$(elm).barcode(value.replace(/\r?\n/g,"").trim(), btype, settings);
 }

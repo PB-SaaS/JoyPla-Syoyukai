@@ -108,8 +108,7 @@ class InventoryDivisionSlipController extends Controller
             
             $link = "%url/rel:mpgt:Inventory%&Action=inventoryEndList";
             
-                
-            if($end_slip->inventoryStatus == 2 || $user_info->isApprover())
+            if($end_slip->inventoryStatus == 2 || $user_info->isApprover() || $division_history_slip->inventoryHStatus != "1")
             {
                 $table = "%sf:usr:search25:mstfilter:table%";//修正不可能
             }
@@ -124,14 +123,38 @@ class InventoryDivisionSlipController extends Controller
             }
             
             $delete_button_view_flg = false;
-            if($end_slip->inventoryStatus == 1) {
-                if( $user_info->isAdmin() || $user_info->isApprover() )
+            if($end_slip->inventoryStatus == 1 && $division_history_slip->inventoryHStatus == 1) {
+                if( $user_info->isAdmin() || $user_info->isApprover())
                 {
                     $delete_button_view_flg = true;
                 } 
                 else if( $user_info->isUser() && $user_info->getDivisionId() == $division_history_slip->divisionId )  
                 {
                     $delete_button_view_flg = true;
+                }
+            }
+            
+            $updateSaving = false;
+            if($end_slip->inventoryStatus == 1 && $division_history_slip->inventoryHStatus == 1) {
+                if( $user_info->isAdmin() )
+                {
+                    $updateSaving = true;
+                } 
+                else if( $user_info->isUser() && $user_info->getDivisionId() == $division_history_slip->divisionId )  
+                {
+                    $updateSaving = true;
+                }
+            }
+            
+            $updateTemporarySaving = false;
+            if($end_slip->inventoryStatus == 1 && $division_history_slip->inventoryHStatus != 1) {
+                if( $user_info->isAdmin() )
+                {
+                    $updateTemporarySaving = true;
+                } 
+                else if( $user_info->isUser() && $user_info->getDivisionId() == $division_history_slip->divisionId )  
+                {
+                    $updateTemporarySaving = true;
                 }
             }
             
@@ -174,6 +197,8 @@ class InventoryDivisionSlipController extends Controller
                 'api_url' => $api_url,
                 'user_info' => $user_info,
                 'link' => $link,
+                'updateSaving' => ( $updateSaving ),
+                'updateTemporarySaving' => ( $updateTemporarySaving ),
                 'delete_button_view_flg' => $delete_button_view_flg,
                 'end_flg' => ( $end_slip->inventoryStatus == 2 ),
                 'useUnitPrice'=> $useUnitPrice,
@@ -204,6 +229,94 @@ class InventoryDivisionSlipController extends Controller
             ],false);
         }
     }
+    public function updateTemporarySaving(): View
+    {
+        global $SPIRAL;
+        try {
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+
+            $user_info = new UserInfo($SPIRAL);
+
+            $record_id = (int)$SPIRAL->getCardId();
+            
+            $inventory_history = InventoryHistory::where('hospitalId',$user_info->getHospitalId())->find($record_id)->get();
+            $inventory_history = $inventory_history->data->get(0);
+
+            if($inventory_history->inventoryHStatus === '1')
+            {
+                throw new Exception('完了のステータスではないため、更新できませんでした。',1);
+            }
+            
+            $end_slip = InventoryEnd::where('hospitalId',$user_info->getHospitalId())->where('inventoryEndId',$inventory_history->inventoryEndId)->get();
+            $end_slip = $end_slip->data->get(0);
+            
+            if($end_slip->inventoryStatus == 2 && ( $user_info->isUser() && $user_info->getDivisionId() !== $inventory_history->divisionId ) && $user_info->isApprover())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            
+            $result = InventoryHistory::where('hospitalId',$user_info->getHospitalId())->find($record_id)->update(
+                [
+                    'inventoryHStatus' => "1"
+                ]);
+        
+            $content = new ApiResponse($result->ids , $result->count , $result->code, $result->message, ['']);
+            $content = $content->toJson();
+            
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['']);
+            $content = $content->toJson();
+        } finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+    }
+    public function updateSaving(): View
+    {
+        global $SPIRAL;
+        try {
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+
+            $user_info = new UserInfo($SPIRAL);
+
+            $record_id = (int)$SPIRAL->getCardId();
+            
+            $inventory_history = InventoryHistory::where('hospitalId',$user_info->getHospitalId())->find($record_id)->get();
+            $inventory_history = $inventory_history->data->get(0);
+
+            if($inventory_history->inventoryHStatus !== '1')
+            {
+                throw new Exception('一時保存のステータスではないため、更新できませんでした。',1);
+            }
+             
+            $end_slip = InventoryEnd::where('hospitalId',$user_info->getHospitalId())->where('inventoryEndId',$inventory_history->inventoryEndId)->get();
+            $end_slip = $end_slip->data->get(0);
+            
+            if($end_slip->inventoryStatus == 2 && ( $user_info->isUser() && $user_info->getDivisionId() !== $inventory_history->divisionId ) && $user_info->isApprover())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+            
+            $result = InventoryHistory::where('hospitalId',$user_info->getHospitalId())->find($record_id)->update(
+                [
+                    'inventoryHStatus' => "2"
+                ]);
+        
+            $content = new ApiResponse($result->ids , $result->count , $result->code, $result->message, ['']);
+            $content = $content->toJson();
+            
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['']);
+            $content = $content->toJson();
+        } finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+    }
     
     public function deleteSlipApi(): View
     {
@@ -223,6 +336,11 @@ class InventoryDivisionSlipController extends Controller
             
             $inventory_history = InventoryHistory::where('hospitalId',$user_info->getHospitalId())->find($record_id)->get();
             $inventory_history = $inventory_history->data->get(0);
+
+            if($inventory_history->inventoryHStatus !== '1')
+            {
+                throw new Exception('一時保存のステータスではないため、削除できませんでした。',1);
+            }
             
             $end_slip = InventoryEnd::where('hospitalId',$user_info->getHospitalId())->where('inventoryEndId',$inventory_history->inventoryEndId)->get();
             $end_slip = $end_slip->data->get(0);
@@ -256,7 +374,15 @@ $InventoryDivisionSlipController = new InventoryDivisionSlipController();
 $action = $SPIRAL->getParam('Action');
 
 {
-    if($action === 'deleteSlipApi')
+    if($action === 'updateSaving')
+    {
+        echo $InventoryDivisionSlipController->updateSaving()->render();
+    }
+    else if($action === 'updateTemporarySaving')
+    {
+        echo $InventoryDivisionSlipController->updateTemporarySaving()->render();
+    }
+    else if($action === 'deleteSlipApi')
     {
         echo $InventoryDivisionSlipController->deleteSlipApi()->render();
     }

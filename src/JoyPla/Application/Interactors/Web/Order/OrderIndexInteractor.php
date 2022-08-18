@@ -15,6 +15,8 @@ namespace JoyPla\Application\Interactors\Web\Order {
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\Enterprise\Models\Order;
     use JoyPla\Enterprise\Models\OrderStatus;
+    use JoyPla\InterfaceAdapters\GateWays\Repository\DivisionRepositoryInterface;
+    use JoyPla\InterfaceAdapters\GateWays\Repository\HospitalRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\orderRepositoryInterface;
 
     /**
@@ -33,10 +35,15 @@ namespace JoyPla\Application\Interactors\Web\Order {
          * OrderIndexInteractor constructor.
          * @param OrderIndexOutputPortInterface $outputPort
          */
-        public function __construct(OrderIndexOutputPortInterface $outputPort , OrderRepositoryInterface $orderRepository)
+        public function __construct(
+            OrderIndexOutputPortInterface $outputPort , 
+            OrderRepositoryInterface $orderRepository , 
+            DivisionRepositoryInterface $divisionRepository
+            )
         {
             $this->outputPort = $outputPort;
             $this->orderRepository = $orderRepository;
+            $this->divisionRepository = $divisionRepository;
         }
 
         /**
@@ -45,7 +52,7 @@ namespace JoyPla\Application\Interactors\Web\Order {
         public function handle(OrderIndexInputData $inputData)
         {
 
-            $hospitalId = new HospitalId($inputData->hospitalId);
+            $hospitalId = new HospitalId($inputData->user->hospitalId);
             $orderId = new OrderId($inputData->orderId);
 
             $orderstatus = [];
@@ -79,6 +86,23 @@ namespace JoyPla\Application\Interactors\Web\Order {
                 throw new NotFoundException("Not Found.",404);
             }
 
+            if($inputData->isOnlyMyDivision && ! $order->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
+            {
+                throw new NotFoundException("Not Found.",404);
+            }
+
+            $order = $order->toArray();
+            
+            if($order['receivedTarget'] == '2')
+            {
+                $order['receivedDivisionName'] = $order['division']['divisionName'];
+            }
+            if($order['receivedTarget'] == '1')
+            {
+                $receivedDivision = $this->divisionRepository->getStorehouse($hospitalId);
+                $order['receivedDivisionName'] = $receivedDivision->getDivisionName()->value();
+            }
+
             $this->outputPort->output(new OrderIndexOutputData($order));
         }
     }
@@ -90,6 +114,7 @@ namespace JoyPla\Application\Interactors\Web\Order {
  */
 namespace JoyPla\Application\InputPorts\Web\Order {
 
+    use Auth;
     use stdClass;
 
     /**
@@ -101,11 +126,12 @@ namespace JoyPla\Application\InputPorts\Web\Order {
         /**
          * OrderIndexInputData constructor.
          */
-        public function __construct(string $hospitalId , string $orderId , bool $isUnapproved)
+        public function __construct(Auth $user , string $orderId , bool $isUnapproved , bool $isOnlyMyDivision)
         {
-            $this->hospitalId = $hospitalId;
+            $this->user = $user;
             $this->orderId= $orderId;
             $this->isUnapproved = $isUnapproved;
+            $this->isOnlyMyDivision = $isOnlyMyDivision;
         }
     }
 
@@ -140,9 +166,9 @@ namespace JoyPla\Application\OutputPorts\Web\Order {
         /**
          * OrderIndexOutputData constructor.
          */
-        public function __construct(Order $order)
+        public function __construct(array $order)
         {
-            $this->order = $order->toArray();
+            $this->order = $order;
         }
     }
 

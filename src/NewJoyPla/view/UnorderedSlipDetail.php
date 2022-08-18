@@ -11,6 +11,7 @@
 		    <div class="uk-container uk-container-expand">
 		    	<ul class="uk-breadcrumb no_print">
 					<li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&page=page1">消費・発注</a></li>
 				    <li><a href="<?php echo $link ?>&table_cache=true"><span>未発注書一覧</span></a></li>
 				    <li><span>未発注書</span></li>
 				</ul>
@@ -120,8 +121,8 @@
 				    						echo "<td>".$record->itemCode."</td>";
 				    						echo "<td>".$record->itemStandard."</td>";
 				    						echo "<td>".$record->itemJANCode."</td>";
-				    						echo "<td class='uk-text-nowrap'>￥".number_format($record->price,2)."<span class='uk-text-small'> / 1".$record->itemUnit."</span></td>";
-				    						echo "<td class='uk-text-nowrap'>".$record->quantity."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
+				    						echo "<td class='uk-text-nowrap'>￥".number_format_jp($record->price)."<span class='uk-text-small'> / 1".$record->itemUnit."</span></td>";
+				    						echo "<td class='uk-text-nowrap'>".number_format_jp($record->quantity)."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
 				    						if( $record->orderQuantity > 0 )
 											{
 												$attr['min'] = 1;
@@ -136,9 +137,9 @@
 												echo "value='".$record->orderQuantity."'><span class='uk-text-small uk-text-middle'>".$record->itemUnit."</span></td>";
 				    						}
 				    						if($userInfo->isApprover()){
-				    							echo "<td class='uk-text-nowrap'>".$record->orderQuantity."<span class='uk-text-small'>".$record->itemUnit."</span></td>";
+				    							echo "<td class='uk-text-nowrap'>".number_format_jp($record->orderQuantity)."<span class='uk-text-small'>".$record->itemUnit."</span></td>";
 				    						}
-				    						echo "<td>￥".number_format($record->orderPrice,2)."</td>";
+				    						echo "<td>￥".number_format_jp($record->orderPrice)."</td>";
 				    						echo "<td style='display:none'>".$record->orderCNumber."</td>";
 				    						echo "</tr>";
 				    						$num++;

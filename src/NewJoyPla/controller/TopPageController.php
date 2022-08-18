@@ -159,6 +159,7 @@ class TopPageController extends Controller
             
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
+            <li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
             <li><span>ユーザー情報変更</span></li>
 EOM;
 
@@ -226,6 +227,7 @@ EOM;
             
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
+            <li><a href="%url/rel:mpg:top%&path=estimate">見積メニュー</a></li>
             <li><span>見積依頼</span></li>
 EOM;
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
@@ -325,6 +327,7 @@ EOM;
             
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
+            <li><a href="%url/rel:mpg:top%&path=product">商品メニュー</a></li>
             <li><span>商品登録</span></li>
 EOM;
             $hidden = [

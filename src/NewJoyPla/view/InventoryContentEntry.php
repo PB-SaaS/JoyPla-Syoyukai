@@ -72,6 +72,12 @@
     table.uk-table > tbody > tr > td:first-child::before {
       content: counter(rowCount);
     }
+	.asc::after {
+		content: "▲";
+	}
+	.desc::after {
+		content: "▼";
+	}
     
 </style>
 <div id="app" class="animsition" uk-height-viewport="expand: true">
@@ -79,12 +85,13 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&path=stocktaking">棚卸メニュー</a></li>
                 <li><span>棚卸内容入力</span></li>
             </ul>
             <h2 class="page_title">棚卸内容入力</h2>
             <hr>
-            <div class="uk-width-1-3@m">
-                <div class="uk-margin">
+            <div class="uk-width-1-2@m">
+                <div class="uk-margin uk-flex">
                     <select class="uk-select" name="busyo" v-model="divisionId" v-bind:disabled="lists.length > 0">
                         <option value="">----- 部署選択 -----</option>
                     <?php
@@ -105,13 +112,15 @@
                         }
                     ?>
                     </select>
+                    <button class="uk-button uk-button-default" style="white-space: nowrap;" v-on:click="getTemporaryData" v-bind:disabled="divisionId == '' || lists.length > 0">一時保存情報取得</button>
                 </div>
             </div>
             <div class="uk-margin-bottom">
                 <div class="" uk-margin>
                         <button class="uk-button uk-button-default" v-on:click="sanshouClick">商品マスタを開く</button>
                     <button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
-                    <button class="uk-button uk-button-primary" v-on:click="sendInventory">棚卸一時保存</button>
+                    <button class="uk-button uk-button-primary" v-on:click="sendInventory" :disabled="isTemporaryData" v-if="!isTemporaryData">一時保存</button>
+                    <button class="uk-button uk-button-primary" v-on:click="sendInventory" :disabled="!isTemporaryData" v-if="isTemporaryData">上書き保存</button>
                     <button class="uk-button uk-button-primary" v-on:click="getLotAndStock" v-bind:disabled="lists.length > 0">理論在庫から表を作成</button>
                 </div>
             </div>
@@ -127,36 +136,63 @@
                     <thead>
                         <tr>
                             <th class="uk-text-nowrap">id</th>
-                            <th class="uk-table-expand">メーカー</th>
-                            <th class="uk-table-expand">商品名</th>
-                            <th class="uk-table-expand">製品コード</th>
-                            <th class="uk-table-expand">規格</th>
-                            <th class="uk-table-expand">JANコード</th>
-                            <th class="uk-table-expand">卸業者</th>
-                            <th class="uk-text-nowrap">入数</th>
-                            <th class="uk-text-nowrap">価格</th>
-                            <th class="uk-text-nowrap">単価</th>
-                            <th class="uk-text-nowrap" style="padding-right: 5px;">棚卸数量</th>
+                            <th class="uk-table-expand">
+								<a href="#" @click="sortBy('rackName')" :class="addClass('rackName')">棚名</a>
+							</th>
+                            <th class="uk-table-expand">
+								<a href="#" @click="sortBy('maker')" :class="addClass('maker')">メーカー</a>
+							</th>
+                            <th class="uk-table-expand">
+								<a href="#" @click="sortBy('shouhinName')" :class="addClass('shouhinName')">商品名</a>
+							</th>
+                            <th class="uk-table-expand">
+								<a href="#" @click="sortBy('code')" :class="addClass('code')">製品コード</a>
+							</th>
+                            <th class="uk-table-expand">
+								<a href="#" @click="sortBy('kikaku')" :class="addClass('kikaku')">規格</a>
+							</th>
+                            <th class="uk-table-expand">
+								<a href="#" @click="sortBy('jan')" :class="addClass('jan')">JANコード</a>
+							</th>
+                            <th class="uk-table-expand">
+								<a href="#" @click="sortBy('oroshi')" :class="addClass('oroshi')">卸業者</a>
+							</th>
+                            <th class="uk-text-nowrap">
+								<a href="#" @click="sortBy('irisu')" :class="addClass('irisu')">入数</a>
+							</th>
+                            <th class="uk-text-nowrap">
+								<a href="#" @click="sortBy('kakaku')" :class="addClass('kakaku')">価格</a>
+							</th>
+                            <th class="uk-text-nowrap">
+								<a href="#" @click="sortBy('unitPrice')" :class="addClass('unitPrice')">単価</a>
+							</th>
+                            <th class="uk-text-nowrap" style="padding-right: 5px;">棚卸数量
+							</th>
                             <th class="uk-text-nowrap" style="padding-left: 0px;">
                                 <input type="button" class="uk-button uk-button-default uk-button-small" v-on:click="countToIrisu" value="入数を反映" >
 		    				</th>
-                            <th class="uk-text-nowrap">ロット管理</th>
-                            <th class="uk-table-expand">ロット番号</th>
-                            <th class="uk-table-expand">使用期限</th>
+                            <th class="uk-text-nowrap">
+								<a href="#" @click="sortBy('lotFlagBool')" :class="addClass('lotFlagBool')">ロット管理</a>
+							</th>
+                            <th class="uk-table-expand">ロット番号
+							</th>
+                            <th class="uk-table-expand">使用期限
+							</th>
                             <th></th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
-						<tr v-for="(list, key) in lists" :id="'tr_' + key" v-bind:class="list.class">
+						<tr v-for="(list, key) in sort_lists" :id="'tr_' + key" v-bind:class="list.class">
 							<td></td>
+							<td>{{list.rackName}}</td>
 							<td>{{list.maker}}</td>
 							<td>{{list.shouhinName}}</td>
 							<td>{{list.code}}</td>
 							<td>{{list.kikaku}}</td>
 							<td>{{list.jan}}</td>
 							<td>{{list.oroshi}}</td>
-							<td class="uk-text-nowrap">{{list.irisu}}{{list.unit}}</td>
+							<td class="uk-text-nowrap">{{list.irisu | number_format}}{{list.unit}}</td>
 							<td class="uk-text-nowrap">￥{{list.kakaku | number_format}}</td>
 							<td class="uk-text-nowrap">
 							    ￥<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
@@ -283,7 +319,7 @@
 							<td class="uk-text-middle">{{list.kikaku}}</td>
 							<td class="uk-text-middle">{{list.jan}}</td>
 							<td class="uk-text-middle">
-							<span class="irisu">{{list.irisu}}</span><span class="unit uk-text-small">{{list.unit}}</span>
+							<span class="irisu">{{list.irisu | number_format}}</span><span class="unit uk-text-small">{{list.unit}}</span>
 							</td>
 							<td class="uk-text-nowrap uk-text-middle">￥{{list.kakaku}}</td>
 							<td class="uk-text-nowrap uk-text-middle">
@@ -304,16 +340,40 @@ var app = new Vue({
 	el: '#app',
 	data: {
 		lists: [],
-		divisionId: '',
+		isTemporaryData: false,
+		divisionId: "<?php echo ($user_info->isUser())? $user_info->getDivisionId() : "" ; ?>",
+		rackNames: [],
+  		sort_key: "",
+  		sort_asc: true,
         useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
+	},
+	computed: {
+		sort_lists() {
+			if (this.sort_key != "") {
+			let set = 1;
+			this.sort_asc ? (set = 1) : (set = -1);
+			this.lists.sort((a, b) => {
+				if (a[this.sort_key] < b[this.sort_key]) return -1 * set;
+				if (a[this.sort_key] > b[this.sort_key]) return 1 * set;
+				return 0;
+			});
+			return this.lists;
+			} else {
+			return this.lists;
+			}
+		},
 	},
 	filters: {
         number_format: function(value) {
             if (! value ) { return 0; }
-            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+            return new Intl.NumberFormat('ja-JP').format(value);
         },
     },
     watch: {
+		divisionId: function()
+		{
+			this.getRackNames(this.divisionId);
+		},
         lists: function() {
             this.$nextTick(function() {
                 if($('.target').length > 0){
@@ -329,6 +389,18 @@ var app = new Vue({
         }
     },
 	methods: {
+		addClass(key) {
+			return {
+				asc: this.sort_key === key && this.sort_asc,
+				desc: this.sort_key === key && !this.sort_asc,
+			};
+		},
+		sortBy(key) {
+			this.sort_key === key
+			? (this.sort_asc = !this.sort_asc)
+			: (this.sort_asc = true);
+			this.sort_key = key;
+		},
 		addList: function(object) {
 			object.class = ((object.class == null)? {'target' : true} : object.class);
 			object.countNum = ((object.countNum == null)? 0 : object.countNum);
@@ -337,6 +409,8 @@ var app = new Vue({
 			object.countStyle =  ((object.countStyle == null)? {} : object.countStyle);
 			object.lotDateStyle =  ((object.lotDateStyle == null)? {} : object.lotDateStyle);
 			object.lotNumberStyle =  ((object.lotNumberStyle == null)? {} : object.lotNumberStyle);
+			let rackName = this.rackNames.find((x) => (x.inHospitalItemId === object.recordId));
+			object.rackName = rackName.rackName;
 			this.lists.push(object);
 		},
 		copyList: function(key) {
@@ -602,7 +676,9 @@ var app = new Vue({
           
         },
         sendInventory: function(){
-            UIkit.modal.confirm('棚卸の一時保存を行います').then(function(){
+			let keywd =(app.isTemporaryData)?"上書き保存" : "一時保存";
+
+            UIkit.modal.confirm('棚卸の'+keywd+'を行います').then(function(){
     			if(! app.validationCheck()){
     				return false;
     			}
@@ -613,6 +689,7 @@ var app = new Vue({
                     data: {
                         _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
                         Action : "inventoryRegistApi",
+						isTemporaryData: app.isTemporaryData,
                         inventory : JSON.stringify( objectValueToURIencode(app.lists) ),
                         divisionId : app.divisionId,
                     },
@@ -620,17 +697,22 @@ var app = new Vue({
                 })
                 // Ajaxリクエストが成功した時発動
                 .done( (data) => {
+	                if(data.code == '1'){
+	            		UIkit.modal.alert(data.message);
+	            		return false;
+	                }
                     if (!data.result) {
-                        UIkit.modal.alert("棚卸一時登録に失敗しました");
+                        UIkit.modal.alert("棚卸"+keywd+"に失敗しました");
                         return false;
                     }
-                    UIkit.modal.alert("棚卸一時登録が完了しました").then(function(){
+                    UIkit.modal.alert("棚卸"+keywd+"が完了しました").then(function(){
 						app.lists.splice(0, app.lists.length);
+						app.isTemporaryData = false;
                     });
                 })
                 // Ajaxリクエストが失敗した時発動
                 .fail( (data) => {
-                    UIkit.modal.alert("棚卸一時登録に失敗しました");
+                    UIkit.modal.alert("棚卸"+keywd+"に失敗しました");
                 })
                 // Ajaxリクエストが成功・失敗どちらでも発動
                 .always( (data) => {
@@ -639,7 +721,55 @@ var app = new Vue({
             
             });
         },
-        
+
+		getTemporaryData: function(){
+            UIkit.modal.confirm('一時保存されている情報を取得します').then(function(){
+                if(!app.divisionCheck()){
+                    return false;
+                }
+                $.ajax({
+                    async: false,
+                    url: "<?php echo $api_url ?>",
+                    type:'POST',
+                    data: {
+                        _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+                        Action : "getTemporaryData",
+                        divisionId : app.divisionId,
+                    },
+                    dataType: 'json'
+                })
+                // Ajaxリクエストが成功した時発動
+                .done( (data) => {
+                    if (data.code == '1') {
+                        UIkit.modal.alert(data.message);
+                        return false;
+                    }
+                    if (!data.result) {
+                        UIkit.modal.alert("取得に失敗しました");
+                        return false;
+                    }
+                    if(data.count > 0)
+                    {
+						app.isTemporaryData = true;
+                        data.data.forEach(function(elem,index){
+                            app.addList(elem);
+                        });
+                    } else 
+                    {
+                        UIkit.modal.alert("データがありませんでした");
+                    }
+                })
+                // Ajaxリクエストが失敗した時発動
+                .fail( (data) => {
+                    UIkit.modal.alert("取得に失敗しました");
+                })
+                // Ajaxリクエストが成功・失敗どちらでも発動
+                .always( (data) => {
+                    loading_remove();
+                });
+            
+            });
+        },
         getLotAndStock: function(){
             UIkit.modal.confirm('在庫表とロット一覧から理論在庫を取得します').then(function(){
                 if(!app.divisionCheck()){
@@ -658,6 +788,10 @@ var app = new Vue({
                 })
                 // Ajaxリクエストが成功した時発動
                 .done( (data) => {
+                    if (data.code == '1') {
+                        UIkit.modal.alert(data.message);
+                        return false;
+                    }
                     if (!data.result) {
                         UIkit.modal.alert("取得に失敗しました");
                         return false;
@@ -680,9 +814,35 @@ var app = new Vue({
                 .always( (data) => {
                     loading_remove();
                 });
-            
             });
         },
+
+		getRackNames: function(divisionId)
+		{
+			$.ajax({
+				async: false,
+				url: "<?php echo $api_url ?>",
+				type:'POST',
+				data: {
+					_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+					Action : "getRackNames",
+					divisionId : divisionId,
+				},
+				dataType: 'json'
+			})
+			// Ajaxリクエストが成功した時発動
+			.done( (data) => {
+				app.rackNames = data.data;
+			})
+			// Ajaxリクエストが失敗した時発動
+			.fail( (data) => {
+				UIkit.modal.alert("取得に失敗しました");
+			})
+			// Ajaxリクエストが成功・失敗どちらでも発動
+			.always( (data) => {
+				loading_remove();
+			});
+		}
 	}
 });
 
@@ -695,7 +855,7 @@ var modal_sections = new Vue({
 	filters: {
         number_format: function(value) {
             if (! value ) { return 0; }
-            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+            return new Intl.NumberFormat('ja-JP').format(value);
         },
     },
 	methods: {

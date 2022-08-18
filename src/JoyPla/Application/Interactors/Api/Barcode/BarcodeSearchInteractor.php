@@ -5,12 +5,19 @@
  */
 namespace JoyPla\Application\Interactors\Api\Barcode {
 
-    use App\Model\Division;
+    use App\SpiralDb\CardView;
+    use App\SpiralDb\Division;
+    use App\SpiralDb\Hospital;
+    use App\SpiralDb\HospitalUser;
+    use App\SpiralDb\InHospitalItemView;
+    use App\SpiralDb\PayoutItem;
+    use App\SpiralDb\ReceivedItemView;
     use Exception;
     use JoyPla\Application\InputPorts\Api\Barcode\BarcodeSearchInputPortInterface;
     use JoyPla\Application\InputPorts\Api\Barcode\BarcodeSearchInputData;
     use JoyPla\Application\OutputPorts\Api\Barcode\BarcodeSearchOutputData;
     use JoyPla\Application\OutputPorts\Api\Barcode\BarcodeSearchOutputPortInterface;
+    use JoyPla\Enterprise\Models\DateYearMonthDay;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\BarcodeRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\InHospitalItemRepositoryInterface;
@@ -40,22 +47,178 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
          */
         public function handle(BarcodeSearchInputData $inputData)
         {
+            $type = '';
+            $inHospitalItems = [];
+            $count = 0;
             if($inputData->barcode === "" )
             {
                 throw new Exception("Barcode is Null",422);
             }
+            if(preg_match('/^20/', $inputData->barcode) && ( strlen($inputData->barcode) == 12 || strlen($inputData->barcode) == 15) ){ //received
 
-            if(preg_match('/^20/', $inputData->barcode) && strlen($inputData->barcode) == 12){
+                $type = 'received';
+                //TODO Repository化は後でやる
+				//検収書から発行されたラベル
+				$receivedItemId = substr($inputData->barcode, 2);
+				if(HospitalUser::isAdmin($inputData->user))
+				{
+					$result = ReceivedItemView::where('receivingNumber', 'rec_'.$receivedItemId)->where('hospitalId',$inputData->user->hospitalId)->get();
+				}
+				else
+				{
+					$result = ReceivedItemView::where('receivingNumber', 'rec_'.$receivedItemId)->where('hospitalId',$inputData->user->hospitalId)->where('divisionId',$inputData->user->divisionId)->get();
+				}
+                if($result->count == 0)
+                {
+                    throw new Exception('Not Received Label');
+                }
+                $record = $result->data->get(0);
+				
+				$hospital = Hospital::where('hospitalId',$inputData->user->hospitalId)->get();
+				$hospital = $hospital->data->get(0);
+				
+				$divisionId = $record->divisionId;
+				
+				if($hospital->receivingTarget == "1"){
+					$division = Division::where('hospitalId',$inputData->user->hospitalId)->where('divisionType','1')->get();
+					$division = $division->data->get(0);
+					$divisionId = $division->divisionId;
+				}
+
+				$inHospitalItems = InHospitalItemView::where('notUsedFlag','1','!=')->where('inHospitalItemId',$record->inHospitalItemId)->where('hospitalId', $inputData->user->hospitalId)->get();	
+                $count = $inHospitalItems->count;
+				$inHospitalItems = $inHospitalItems->data->all();
+                foreach($inHospitalItems as $key => $v)
+                {
+                    if($record->lotDate != ""){ 
+                        $record->lotDate =(new DateYearMonthDay($record->lotDate))->format('Y-m-d');
+                    } 
+                    $inHospitalItems[$key]->set('lotNumber' , $record->lotNumber);
+                    $inHospitalItems[$key]->set('lotDate' , $record->lotDate );
+                    $inHospitalItems[$key]->set('divisionId' , $divisionId);
+                }
+
+            } else if(preg_match('/^30/', $inputData->barcode) && strlen($inputData->barcode) == 12){ //payout
             
-            } else if(preg_match('/^30/', $inputData->barcode) && strlen($inputData->barcode) == 12){
+                //TODO Repository化は後でやる
+                $type = 'payout';
+				//払出から発行されたラベル
+				$payout_num = substr($inputData->barcode, 2);
+				if(HospitalUser::isAdmin($inputData->user))
+				{
+					$result = PayoutItem::where('payoutId', 'payout_'.$payout_num)->where('hospitalId',$inputData->user->hospitalId)->get();
+				}
+				else
+				{
+					$result = PayoutItem::where('payoutId', 'payout_'.$payout_num)->where('hospitalId',$inputData->user->hospitalId)->where('sourceDivisionId',$inputData->user->divisionId)->get();
+				}
+
+                if($result->count == 0)
+                {
+                    throw new Exception('Not Payout Label');
+                }
+
+                $record = $result->data->get(0);
+				$inHospitalItems = InHospitalItemView::where('notUsedFlag','1','!=')->where('inHospitalItemId',$record->inHospitalItemId)->where('hospitalId', $inputData->user->hospitalId)->get();	
+				
+                if($inHospitalItems->count === 0)
+                {
+                    throw new Exception('Not Payout Label');
+                }
+
+                $inHospitalItems = $inHospitalItems->data->all();
+
+                foreach($inHospitalItems as $key => $v)
+                {
+                    if($record->lotDate != ""){ 
+                        $record->lotDate =(new DateYearMonthDay($record->lotDate))->format('Y-m-d');
+                    } 
+                    $inHospitalItems[$key]->set('lotNumber' , $record->lotNumber);
+                    $inHospitalItems[$key]->set('lotDate' , $record->lotDate );
+                    $inHospitalItems[$key]->set('payoutQuantity' , $record->payoutQuantity);
+                    $inHospitalItems[$key]->set('divisionId' , $record->targetDivisionId);
+                }
+
+
+            } else if(preg_match('/^90/', $inputData->barcode) && strlen($inputData->barcode) == 18){ //card
             
-            } else if(preg_match('/^90/', $inputData->barcode) && strlen($inputData->barcode) == 18){
-            
-            } else if(strlen($inputData->barcode) == 13) {
-            
-            } else if((preg_match('/^1/', $inputData->barcode) && strlen($inputData->barcode) == 14 ) || (preg_match('/^01/', $inputData->barcode) && strlen($inputData->barcode) == 14)){
-            
+                $type = 'card';
+
+				if(HospitalUser::isAdmin($inputData->user))
+				{
+					$result = CardView::where('cardId', $inputData->barcode)->where('hospitalId',$inputData->user->hospitalId)->get();
+					$record = $result->data->get(0);
+				}
+				else
+				{
+					$result = CardView::where('cardId', $inputData->barcode)->where('hospitalId',$inputData->user->hospitalId)->where('divisionId',$inputData->user->divisionId)->get();
+					$record = $result->data->get(0);
+				}
+
+				if($result->count == '0'){
+                    throw new Exception('Card Label');
+				}
+				$inHospitalItems = InHospitalItemView::where('hospitalId',$inputData->user->hospitalId)->where('inHospitalItemId',$record->inHospitalItemId)->get();
+
+                if($inHospitalItems->count === 0)
+                {
+                    throw new Exception('Not Payout Label');
+                }
+
+                $inHospitalItems = $inHospitalItems->data->all();
+
+                foreach($inHospitalItems as $key => $v)
+                {
+                    if($record->lotDate != ""){ 
+                        $record->lotDate =(new DateYearMonthDay($record->lotDate))->format('Y-m-d');
+                    } 
+                    $inHospitalItems[$key]->set('lotNumber' , $record->lotNumber);
+                    $inHospitalItems[$key]->set('lotDate' , $record->lotDate );
+                    $inHospitalItems[$key]->set('cardQuantity' , $record->quantity);
+                    $inHospitalItems[$key]->set('divisionId' , $record->divisionId);
+                }
+
+
+            } else if(strlen($inputData->barcode) == 13) { //JanCode
+
+                $type = 'jancode';
+    
+                [ $inHospitalItems , $count ] = $this->barcodeRepository->searchByJanCode((new HospitalId($inputData->user->hospitalId)) , (string)$inputData->barcode);
+                
+
+            } else if((preg_match('/^1/', $inputData->barcode) && strlen($inputData->barcode) == 14 ) || (preg_match('/^01/', $inputData->barcode) && strlen($inputData->barcode) == 14)){ //院内商品マスタ
+                
+                $type = 'customlabel';
+
+                //在庫表等で発行されたラベル
+				if(preg_match('/^1/', $inputData->barcode) && strlen($inputData->barcode) == 14){
+					$label_id = substr($inputData->barcode, 1 , 5);
+					$label_id = str_pad($label_id, 8, 0, STR_PAD_LEFT);
+					$custom_quantity = substr($inputData->barcode, 10 , 4);
+				}
+				else if(preg_match('/^01/', $inputData->barcode) && strlen($inputData->barcode) == 14){
+					$label_id = substr($inputData->barcode, 2 , 8);
+					$custom_quantity = substr($inputData->barcode, 10 , 4);
+				}
+				$InHospitalItemView = InHospitalItemView::where('notUsedFlag','1','!=')->where('labelId',$label_id)->where('hospitalId', $inputData->user->hospitalId);
+				
+				$result = $InHospitalItemView->get();
+				$count = $result->count;
+                if($result->count == '0'){
+                    throw new Exception('Not Received Label'); 
+				}
+                
+				$inHospitalItems = $result->data->all();
+                foreach($inHospitalItems as $key => $v)
+                {
+                    $inHospitalItems[$key]->set('lotNumber' , '');
+                    $inHospitalItems[$key]->set('lotDate' , '');
+                    $inHospitalItems[$key]->set('customQuantity' , (int)$custom_quantity);
+                }
+
             } else {
+                $type = 'gs1-128';
+
                 $decoder = new Decoder($delimiter = ' ');
                 $barcode = $decoder->decode($inputData->barcode);
                 $gs1128Data = $barcode->toArray();
@@ -73,9 +236,8 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                     
                     $inHospitalItems[$key]->set('lotDate',$lotDate);
                 }
-                
             }
-            $this->outputPort->output(new BarcodeSearchOutputData($inHospitalItems , $count));
+            $this->outputPort->output(new BarcodeSearchOutputData($inHospitalItems , $count , $type));
         }
 
         private static function gtin14ToGtin13Convert($code)
@@ -163,10 +325,11 @@ namespace JoyPla\Application\OutputPorts\Api\Barcode {
         /**
          * BarcodeSearchOutputData constructor.
          */
-        public function __construct(array $inHospitalItems , int $count)
+        public function __construct(array $inHospitalItems , int $count ,string $type)
         {
             $this->inHospitalItems = $inHospitalItems;
             $this->count = $count;
+            $this->type = $type;
         }
     }
 

@@ -3,6 +3,7 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&path=payout">払出メニュー</a></li>
                 <li><a href="<?php echo $link ?>&table_cache=true"><span>払出履歴一覧</span></a></li>
                 <li><span>払出伝票</span></li>
             </ul>
@@ -71,15 +72,15 @@
 				    						echo "<td>".$record->itemStandard."</td>";
 				    						echo "<td>".$record->lotNumber."</td>";
 				    						echo "<td>".$record->lotDate."</td>";
-				    						echo "<td class='uk-text-nowrap'>".$record->quantity.$record->quantityUnit."</td>";
-				    						echo "<td class='uk-text-nowrap'>￥".number_format($record->unitPrice,2)."</td>";
-											echo "<td class='uk-text-nowrap'>".$record->payoutCount.$record->quantityUnit."</td>";
+				    						echo "<td class='uk-text-nowrap'>".number_format_jp($record->quantity).$record->quantityUnit."</td>";
+				    						echo "<td class='uk-text-nowrap'>￥".number_format_jp($record->unitPrice)."</td>";
+											echo "<td class='uk-text-nowrap'>".number_format_jp($record->payoutCount).$record->quantityUnit."</td>";
 											
 											echo "<td>×</td>";
-											echo "<td class='uk-text-nowrap'>".$record->payoutLabelCount."枚</td>";
+											echo "<td class='uk-text-nowrap'>".number_format_jp($record->payoutLabelCount)."枚</td>";
 
-				    						echo "<td class='uk-text-nowrap'>".$record->payoutQuantity.$record->quantityUnit."</td>";
-				    						echo "<td class='uk-text-nowrap'>￥".number_format($record->payoutAmount,2)."</td>";
+				    						echo "<td class='uk-text-nowrap'>".number_format_jp($record->payoutQuantity).$record->quantityUnit."</td>";
+				    						echo "<td class='uk-text-nowrap'>￥".number_format_jp($record->payoutAmount)."</td>";
 				    						echo "</tr>";
 				    						$num++;
 										}

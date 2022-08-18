@@ -8,6 +8,11 @@
         <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/normalize.css" />
         <script src="https://unpkg.com/vue@3.2.36"></script>
         <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.1.0/dist/bwip-js.min.js"></script>
+        <script>
+        const _CSRF = "<?php echo Csrf::generate(16) ?>";
+        const _APIURL = "%url/rel:mpgt:ApiRoot%";
+        const _ROOT = "%url/rel:mpgt:Root%";
+        </script>
         <style>
             @page {
                 size: A4;

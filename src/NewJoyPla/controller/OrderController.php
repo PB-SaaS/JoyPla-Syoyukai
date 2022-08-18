@@ -477,7 +477,9 @@ class OrderController extends Controller
                 $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '未発注書一覧',
                     'table' => '%sf:usr:unorderedSlip:mstfilter%',
-                    'csrf_token' => Csrf::generate(16)
+                    'csrf_token' => Csrf::generate(16),
+                    'submenulink' => "%url/rel:mpg:top%&page=page1",
+                    'submenu' => '消費・発注',
                     ] , false);
             } else {
                 $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
@@ -539,7 +541,9 @@ class OrderController extends Controller
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '未発注書一覧',
                     'table' => '%sf:usr:unorderedSlip:mstfilter%',
-                    'csrf_token' => Csrf::generate(16)
+                    'csrf_token' => Csrf::generate(16),
+                    'submenulink' => "%url/rel:mpg:top%&page=page1",
+                    'submenu' => '消費・発注',
                     ] , false);
     
         } catch ( Exception $ex ) {
@@ -596,7 +600,10 @@ class OrderController extends Controller
                         'title' => $title,
                         'table' => '%sf:usr:orederList:mstfilter%',
                         'param' => $param,
-                        'csrf_token' => Csrf::generate(16)
+                        'csrf_token' => Csrf::generate(16),
+                        'submenulink' => "%url/rel:mpg:top%&page=page1",
+                        'submenu' => '消費・発注',
+                        
                         ] , false);
             } else {
                 $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
@@ -666,7 +673,9 @@ class OrderController extends Controller
                     'title' => $title,
                     'table' => '%sf:usr:orederList:mstfilter%',
                     'param' => $param,
-                    'csrf_token' => Csrf::generate(16)
+                    'csrf_token' => Csrf::generate(16),
+                    'submenulink' => "%url/rel:mpg:top%&page=page1",
+                    'submenu' => '消費・発注',
                     ] , false);
                     
         } catch ( Exception $ex ) {

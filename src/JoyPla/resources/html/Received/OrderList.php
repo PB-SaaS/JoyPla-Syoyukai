@@ -29,7 +29,7 @@
         </div>
         <div class="pt-2 hover:bg-sushi-50" v-for="(order) in orders">
           <div class="border-b-2 border-solid border-gray-100 w-full">
-            <div class="lg:flex lg:divide-x my-4">
+            <div class="lg:flex lg:divide-x ">
               <div class="lg:w-1/5 p-2">
                 <p class="text-md font-bold">登録日時<br>{{ order.registDate }}</p>
                 <p class="text-md font-bold">発注日時<br>{{ order.orderDate }}</p>
@@ -79,7 +79,7 @@
                         <p class="text-md text-gray-500">{{ orderItem.item.itemStandard }}</p>
                         <p class="text-md text-gray-500">{{ orderItem.item.itemJANCode }}</p>
                         <p class="text-base text-gray-900">
-                        {{ numberFormat(orderItem.orderQuantity) }}枚
+                        {{ numberFormat(orderItem.orderQuantity) }}{{ orderItem.quantity.quantityUnit }}
                         </p>
                         <p>
                           <span class="bg-red-100 text-red-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="orderItem.orderItemReceivedStatus == 1">
@@ -96,10 +96,6 @@
                           <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(orderItem.orderPrice) }}</span>
                           <span class="text-sm text-gray-900">( &yen; {{ numberFormat(orderItem.price) }} / {{ orderItem.quantity.itemUnit }} )</span>
                         </p>
-                      </div>
-                      <div class="flex-auto lg:w-1/5 w-full">
-                        <v-button-default type="button" class="w-full my-2 ">商品情報詳細</v-button-default>
-                        <v-button-default type="button" class="w-full my-2">在庫状況の確認</v-button-default>
                       </div>
                     </div>
                   </div>
@@ -133,7 +129,7 @@
             <div class="my-4">
               <v-input
                 name="orderDate"
-                type="orderMonth"
+                type="month"
                 label="発注年月"
                 title="発注年月"
                 ></v-input>
@@ -178,13 +174,14 @@
                 title="JANコード"
                 ></v-input>
             </div>
-
+            <?php if(! gate('list_of_order_slips' )->isOnlyMyDivision ): ?>
             <div class="my-4">
               <v-multiple-select-division
                 name="divisionIds"
                 title="発注書元部署名"
                 ></v-multiple-select-division>
             </div>
+            <?php endif ?>
             <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
               <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
               <v-button-primary type="button" @click.native="searchExec">絞り込み</v-button-primary>
@@ -294,7 +291,7 @@ var JoyPlaApp = Vue.createApp({
           {
             text: '発注メニュー',
             disabled: false,
-            href: '%url/rel:mpgt:Root%&path=/order',
+            href: _ROOT + '&path=/order',
           },
           {
             text: '入荷照合',
@@ -306,7 +303,7 @@ var JoyPlaApp = Vue.createApp({
 
       const numberFormat = (value) => {
           if (! value ) { return 0; }
-          return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+          return new Intl.NumberFormat('ja-JP').format(value);
       };
 
       const onOpenModal = () => {

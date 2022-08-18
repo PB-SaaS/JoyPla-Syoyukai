@@ -8,6 +8,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
     use ApiErrorCode\AccessFrequencyLimitExceededScopeIs;
     use App\Model\Division;
     use Exception;
+    use framework\Exception\NotFoundException;
     use JoyPla\Application\InputPorts\Api\Order\OrderUnapprovedItemDeleteInputData;
     use JoyPla\Application\InputPorts\Api\Order\OrderUnapprovedItemDeleteInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\Order\OrderUnapprovedItemDeleteOutputData;
@@ -54,9 +55,15 @@ namespace JoyPla\Application\Interactors\Api\Order {
                 ]
             );
 
+        
             if( $order === null )
             {
                 throw new Exception("Invalid value.",422);
+            }
+
+            if($inputData->isOnlyMyDivision && ! $order->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
+            {
+                throw new NotFoundException("Not Found.",404);
             }
 
             if( ! $order->isExistOrderItemId((new OrderItemId($inputData->orderItemId))))
@@ -65,11 +72,12 @@ namespace JoyPla\Application\Interactors\Api\Order {
             }
 
             $order = $order->deleteItem((new OrderItemId($inputData->orderItemId)));
-            $orders = $this->orderRepository->saveToArray((new HospitalId($inputData->hospitalId)),[$order]);
+            $orders = $this->orderRepository->saveToArray((new HospitalId($inputData->user->hospitalId)),[$order]);
 
             $isOrderDeleted = true;
             foreach($orders as $o)
             {
+
                 if($o->getOrderId()->equal($order->getOrderId()->value()))
                 {
                     $isOrderDeleted = false;
@@ -87,6 +95,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
  */
 namespace JoyPla\Application\InputPorts\Api\Order {
 
+    use Auth;
     use stdClass;
 
     /**
@@ -98,11 +107,12 @@ namespace JoyPla\Application\InputPorts\Api\Order {
         /**
          * OrderUnapprovedItemDeleteInputData constructor.
          */
-        public function __construct(string $hospitalId , string $orderId , string $orderItemId )
+        public function __construct(Auth $user , string $orderId , string $orderItemId , bool $isOnlyMyDivision)
         {
-            $this->hospitalId = $hospitalId;
+            $this->user = $user;
             $this->orderId = $orderId;
             $this->orderItemId = $orderItemId;
+            $this->isOnlyMyDivision = $isOnlyMyDivision;
         }
     }
 

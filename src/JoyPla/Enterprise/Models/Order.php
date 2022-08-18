@@ -16,7 +16,9 @@ class Order
     private Distributor $distributor;
     private OrderStatus $orderStatus;
     private OrderAdjustment $adjustment;
+    private TextArea512Bytes $orderComment;
     private string $orderUserName;
+    private int $receivedTarget;
 
     public function __construct(
         OrderId $orderId,
@@ -28,7 +30,9 @@ class Order
         Distributor $distributor,
         OrderStatus $orderStatus,
         OrderAdjustment $adjustment,
-        string $orderUserName
+        TextArea512Bytes $orderComment,
+        string $orderUserName = "",
+        int $receivedTarget = 1 
         )
     {
         
@@ -43,7 +47,9 @@ class Order
         $this->distributor = $distributor;
         $this->orderStatus = $orderStatus;
         $this->adjustment = $adjustment;
+        $this->orderComment = $orderComment;
         $this->orderUserName = $orderUserName;
+        $this->receivedTarget = $receivedTarget;
     }
 
     public static function create( Collection $input)
@@ -58,8 +64,15 @@ class Order
             (Distributor::create($input) ),
             (new OrderStatus($input->orderStatus) ),
             (new OrderAdjustment($input->adjustment)),
-            $input->ordererUserName
+            (new TextArea512Bytes($input->ordercomment)),
+            $input->ordererUserName,
+            ( $input->receivingTarget != '2' )? 1 : 2, //1	大倉庫  2	発注部署
         );
+    }
+
+    public function getHospital()
+    {
+        return $this->hospital;
     }
 
     public function isMinus()
@@ -90,6 +103,18 @@ class Order
         return $this->orderId;
     }
 
+    public function searchOrderItem(OrderItemId $orderItemId)
+    {
+        foreach($this->orderItems as $item){
+            if($item->getOrderItemId()->equal($orderItemId->value()))
+            {
+                return $item;
+            }
+        }
+
+        return null;
+    }
+
     public function getOrderItems()
     {
         return $this->orderItems;
@@ -118,14 +143,16 @@ class Order
         return new Order(
             $this->orderId,
             $this->registDate,
-            (new DateYearMonthDayHourMinutesSecond('now')),
+            (new DateYearMonthDayHourMinutesSecond(date('Y-m-d H:i:s'))),
             $this->orderItems,
             $this->hospital,
             $this->division,
             $this->distributor,
             (new OrderStatus(OrderStatus::OrderCompletion)),
             $this->adjustment,
-            $this->orderUserName
+            $this->orderComment,
+            $this->orderUserName,
+            $this->receivedTarget
         );
     }
 
@@ -141,7 +168,9 @@ class Order
             $this->distributor,
             $orderStatus,
             $this->adjustment,
-            $this->orderUserName
+            $this->orderComment,
+            $this->orderUserName,
+            $this->receivedTarget
         );
     }
 
@@ -163,6 +192,7 @@ class Order
                 OrderStatus::UnOrdered,
                 OrderStatus::OrderCompletion,
                 OrderStatus::OrderFinished,
+                OrderStatus::DeliveryDateReported
             ];
             $fkey = array_search( $this->orderStatus->value() , $status , true);
 
@@ -256,12 +286,40 @@ class Order
         return $this->setOrderItems($tmp);
     }
 
+    public function getReceivedTarget()
+    {
+        return $this->receivedTarget;
+    }
+
+    public function getOrderDate()
+    {
+        return $this->orderDate;
+    }
+
+    public function setOrderComment( TextArea512Bytes $comment )
+    {
+        return new Order(
+            $this->orderId,
+            $this->registDate,
+            $this->orderDate,
+            $this->orderItems,
+            $this->hospital,
+            $this->division,
+            $this->distributor,
+            $this->orderStatus,
+            $this->adjustment,
+            $comment,
+            $this->orderUserName,
+            $this->receivedTarget
+        );
+    }
+
     public function setOrderItems(array $orderItems)
     {
         $orderId = $this->orderId;
         $orderItems = array_map(function(OrderItem $v) use ($orderId){
             $tmp = $v;
-            $tmp->setOrderId($orderId);
+            $tmp = $tmp->setOrderId($orderId);
             return $tmp;
         },$orderItems);
 
@@ -275,7 +333,9 @@ class Order
             $this->distributor,
             $this->orderStatus,
             $this->adjustment,
-            $this->orderUserName
+            $this->orderComment,
+            $this->orderUserName,
+            $this->receivedTarget
         );
     }
 
@@ -291,7 +351,9 @@ class Order
             $this->distributor,
             $this->orderStatus,
             $adjustment,
-            $this->orderUserName
+            $this->orderComment,
+            $this->orderUserName,
+            $this->receivedTarget
         );
     }
 
@@ -313,7 +375,9 @@ class Order
             'itemCount' => $this->itemCount(),
             'adjustment' => $this->adjustment->value(),
             'adjustmentToString' => $this->adjustment->toString(),
-            'orderUserName' => $this->orderUserName
+            'orderComment' => $this->orderComment->value(),
+            'orderUserName' => $this->orderUserName,
+            'receivedTarget' => $this->receivedTarget
         ];
     } 
 }

@@ -93,6 +93,11 @@
                                             </div>
                                             <div class="flex-auto lg:w-2/5 w-full">
                                                 <div class="md:flex gap-6 ">
+                                                    <div class="font-bold w-32">入数</div>
+                                                    <div>{{ numberFormat(item.value.quantity.quantityNum) }}
+                                                        {{ item.value.quantity.quantityUnit }}</div>
+                                                </div>
+                                                <div class="md:flex gap-6 ">
                                                     <div class="font-bold w-32">発注数</div>
                                                     <div>{{ numberFormat(item.value.orderQuantity) }}
                                                         {{ item.value.quantity.itemUnit }}</div>
@@ -141,7 +146,7 @@
                                         <v-input
                                             :name="`orderItems[${idx}].sumReceivedQuantity`"
                                             label="合計入荷数"
-                                            :rules="{ between: ( (item.value.orderQuantity > 0)? [ item.value.receivedQuantity , item.value.orderQuantity - item.value.receivedQuantity ] : [ item.value.orderQuantity - item.value.receivedQuantity , item.value.receivedQuantity ] ) }"
+                                            :rules="{ between: ( (item.value.orderQuantity > 0)? [ 0 , item.value.orderQuantity - item.value.receivedQuantity ] : [ item.value.orderQuantity - item.value.receivedQuantity , 0 ] ) }"
                                             type="hidden"
                                             title=""></v-input>
                                     </fieldset>
@@ -174,7 +179,7 @@
                                                 label="入荷数"
                                                 :unit="item.value.quantity.itemUnit"
                                                 :step="1"
-                                                @change="isChange = true ; receivedQuantitySum(idx)"
+                                                @change="receivedQuantitySum(idx)"
                                                 title="入荷数"></v-input-number>
                                         </div>
                                         <div class="lg:mt-0 mt-2">
@@ -251,7 +256,6 @@
             </div>
         </div>
     </div>
-</div>
 </v-open-modal>
 </div>
 </div>
@@ -339,11 +343,11 @@ setup() {
         {
             text: '発注メニュー',
             disabled: false,
-            href: '%url/rel:mpgt:Root%&path=/order'
+            href: _ROOT + '&path=/order'
         }, {
             text: '入荷照合',
             disabled: false,
-            href: '%url/rel:mpgt:Root%&path=/received/order/list&isCache=true'
+            href: _ROOT + '&path=/received/order/list&isCache=true'
         }, {
             text: '入荷登録',
             disabled: true
@@ -391,7 +395,7 @@ setup() {
                         if (result.isConfirmed) {
                             const registerModel = createRegisterModel();
                             let params = new URLSearchParams();
-                            params.append("path", "/api/received/" + values.orderId + "/register");
+                            params.append("path", "/api/" + values.orderId + "/received/register");
                             params.append("_csrf", _CSRF);
                             params.append("registerModel", JSON.stringify(encodeURIToObject(registerModel)));
 
@@ -444,6 +448,7 @@ setup() {
     };
 
     const addItem = (idx, item) => {
+        isChange.value = true ; 
         if (!fields.value[idx].value.receiveds) {
             fields
                 .value[idx]
@@ -488,6 +493,7 @@ setup() {
 
     };
     const addReceived = (idx) => {
+        isChange.value = true ; 
         if (fields.value[idx].value.orderItemReceivedStatus == "3") {
             return null;
         }

@@ -25,7 +25,7 @@
                                 {
                                     $selected = 'selected';
                                 }
-                                echo "<option value='".$p->priceId."' ".$selected.">".$p->distributorName."：&yen;".number_format($p->price,2)."/".$p->quantity.$p->quantityUnit."(".$p->itemUnit.")</option>";
+                                echo "<option value='".$p->priceId."' ".$selected.">".$p->distributorName."：&yen;".number_format_jp($p->price)."/".$p->quantity.$p->quantityUnit."(".$p->itemUnit.")</option>";
                             }
                             ?>
                         </select>

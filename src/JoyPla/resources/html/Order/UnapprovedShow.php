@@ -29,7 +29,7 @@
         </div>
         <div class="pt-2 hover:bg-sushi-50" v-for="(order) in orders">
           <div class="border-b-2 border-solid border-gray-100 w-full">
-            <div class="lg:flex lg:divide-x my-4">
+            <div class="lg:flex lg:divide-x ">
               <div class="lg:w-1/5 p-2">
                 <p class="text-md font-bold">登録日時<br>{{ order.registDate }}</p>
                 <p class="text-md">
@@ -40,21 +40,25 @@
                   </span>
                   <br>
                   発注元部署：{{ order.division.divisionName }}<br>
+                  卸業者：{{ order.distributor.distributorName }}<br>
                   合計金額：&yen; {{ numberFormat( order.totalAmount) }}
                 </p>
                 <div class="flex flex-col gap-3">
+                  <?php if( gate('list_of_unordered_slips')->can() ): ?>
                   <v-button-default type="button" class="w-full" @click.native="openSlip( order.orderId )">
                     発注書を表示
                   </v-button-default>
-                  <v-button-default type="button" class="w-full" @click.native="openPrint( order.orderId )">
-                    発注書を印刷
-                  </v-button-default>
+                  <?php endif ?>
+                  <?php if( gate('decision_of_order_slips')->can() ): ?>
                   <v-button-primary type="button" class="w-full" @click.native="approvalSlip( order.orderId )">
                     発注書を承認
                   </v-button-primary>
+                  <?php endif ?>
+                  <?php if( gate('deletion_of_unordered_slips')->can() ): ?>
                   <v-button-danger type="button" class="w-full" @click.native="deleteSlip( order.orderId )">
                     発注書を削除
                   </v-button-danger>
+                  <?php endif ?>
                 </div>
               </div>
               <div class="lg:w-4/5 p-2">
@@ -69,16 +73,12 @@
                         <p class="text-md text-gray-500">{{ orderItem.item.itemStandard }}</p>
                         <p class="text-md text-gray-500">{{ orderItem.item.itemJANCode }}</p>
                         <p class="text-base text-gray-900">
-                        {{ numberFormat(orderItem.orderQuantity) }}枚
+                        {{ numberFormat(orderItem.orderQuantity) }}{{ orderItem.quantity.quantityUnit }}
                         </p>
                         <p>
                           <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(orderItem.orderPrice) }}</span>
                           <span class="text-sm text-gray-900">( &yen; {{ numberFormat(orderItem.price) }} / {{ orderItem.quantity.itemUnit }} )</span>
                         </p>
-                      </div>
-                      <div class="flex-auto lg:w-1/5 w-full">
-                        <v-button-default type="button" class="w-full my-2 ">商品情報詳細</v-button-default>
-                        <v-button-default type="button" class="w-full my-2">在庫状況の確認</v-button-default>
                       </div>
                     </div>
                   </div>
@@ -150,12 +150,14 @@
                 ></v-input>
             </div>
 
+            <?php if( gate('list_of_unordered_slips')->isOnlyMyDivision() ): ?>
             <div class="my-4">
               <v-multiple-select-division
                 name="divisionIds"
                 title="発注書元部署名"
                 ></v-multiple-select-division>
             </div>
+            <?php endif ?>
             <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
               <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
               <v-button-primary type="button" @click.native="searchExec">絞り込み</v-button-primary>
@@ -272,7 +274,7 @@ var JoyPlaApp = Vue.createApp({
           {
             text: '発注メニュー',
             disabled: false,
-            href: '%url/rel:mpgt:Root%&path=/order',
+            href: _ROOT + '&path=/order',
           },
           {
             text: '未発注書一覧',
@@ -284,7 +286,7 @@ var JoyPlaApp = Vue.createApp({
 
       const numberFormat = (value) => {
           if (! value ) { return 0; }
-          return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+          return new Intl.NumberFormat('ja-JP').format(value);
       };
 
       const onOpenModal = () => {
@@ -399,90 +401,86 @@ var JoyPlaApp = Vue.createApp({
 
       const approvalSlip = ( orderId ) => 
       {
-        try {
-            Swal.fire({
-              title: '発注書を承認',
-              text: "発注書の承認をします。\r\nよろしいですか？",
-              icon: 'warning',
-              showCancelButton: true,
-              reverseButtons: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'OK'
-            }).then( async (result) => {
-              if(result.isConfirmed){
-                
-                let params = new URLSearchParams();
-                params.append("path", "/api/order/unapproved/"+orderId+"/approval");
-                params.append("_csrf", _CSRF);
+        Swal.fire({
+          title: '発注書を承認',
+          text: "発注書の承認をします。\r\nよろしいですか？",
+          icon: 'warning',
+          showCancelButton: true,
+          reverseButtons: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'OK'
+        }).then( async (result) => {
+          if(result.isConfirmed){
+            start();
+            let params = new URLSearchParams();
+            params.append("path", "/api/order/unapproved/"+orderId+"/approval");
+            params.append("_csrf", _CSRF);
 
-                const res = await axios.post(_APIURL,params);
-                
-                if(res.data.code != 200) {
-                  throw new Error(res.data.message)
-                }
-                
-                Swal.fire({
-                    icon: 'success',
-                    title: '発注書を承認が完了しました。',
-                }).then((result) => {
-                  location.reload();
-                });
-                return true ;
-              }
-            })
-          } catch (error) {
+            const res = await axios.post(_APIURL,params);
+            complete();
+            if(res.data.code != 200) {
+              throw new Error(res.data.message);
+            }
+            
+            Swal.fire({
+                icon: 'success',
+                title: '発注書を承認が完了しました。',
+            }).then((result) => {
+              location.reload();
+            });
+            return true ;
+          }
+        }).catch((error) => {
             Swal.fire({
               icon: 'error',
               title: 'システムエラー',
               text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
             });
-          }
-
+        });
       }
 
       const deleteSlip = ( orderId ) => 
       {
-        try {
-            Swal.fire({
-              title: '発注書を削除',
-              text: "削除後は元に戻せません。\r\nよろしいですか？",
-              icon: 'warning',
-              confirmButtonText: '削除します',
-              showCancelButton: true,
-              reverseButtons: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-            }).then( async (result) => {
-              if(result.isConfirmed){
-                
-                let params = new URLSearchParams();
-                params.append("path", "/api/order/unapproved/"+orderId+"/delete");
-                params.append("_csrf", _CSRF);
+        Swal.fire({
+          title: '発注書を削除',
+          text: "削除後は元に戻せません。\r\nよろしいですか？",
+          icon: 'warning',
+          confirmButtonText: '削除します',
+          showCancelButton: true,
+          reverseButtons: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+        }).then( async (result) => {
+          if(result.isConfirmed){
+            start();
+            
+            let params = new URLSearchParams();
+            params.append("path", "/api/order/unapproved/"+orderId+"/delete");
+            params.append("_csrf", _CSRF);
 
-                const res = await axios.post(_APIURL,params);
-                
-                if(res.data.code != 200) {
-                  throw new Error(res.data.message)
-                }
-                
-                Swal.fire({
-                    icon: 'success',
-                    title: '発注書の削除が完了しました。',
-                }).then((result) => {
-                  location.reload();
-                });
-                return true ;
-              }
-            })
-          } catch (error) {
+            const res = await axios.post(_APIURL,params);
+
+            complete();
+            if(res.data.code != 200) {
+              throw new Error(res.data.message)
+            }
+            
+            Swal.fire({
+                icon: 'success',
+                title: '発注書の削除が完了しました。',
+            }).then((result) => {
+              location.reload();
+            });
+            return true ;
+          }
+        }).catch((error) => {
             Swal.fire({
               icon: 'error',
               title: 'システムエラー',
               text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
             });
-          }
-
+        });
       }
 
       return {

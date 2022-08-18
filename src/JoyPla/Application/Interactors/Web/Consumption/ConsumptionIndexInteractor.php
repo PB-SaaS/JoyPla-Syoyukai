@@ -6,6 +6,7 @@
 namespace JoyPla\Application\Interactors\Web\Consumption {
 
     use App\Model\Division;
+    use Exception;
     use JoyPla\Application\InputPorts\Web\Consumption\ConsumptionIndexInputData;
     use JoyPla\Application\InputPorts\Web\Consumption\ConsumptionIndexInputPortInterface;
     use JoyPla\Application\OutputPorts\Web\Consumption\ConsumptionIndexOutputData;
@@ -42,10 +43,16 @@ namespace JoyPla\Application\Interactors\Web\Consumption {
         public function handle(ConsumptionIndexInputData $inputData)
         {
 
-            $hospitalId = new HospitalId($inputData->hospitalId);
+            $hospitalId = new HospitalId($inputData->user->hospitalId);
             $consumptionId = new ConsumptionId($inputData->consumptionId);
 
             $consumption = $this->consumptionRepository->index($hospitalId,$consumptionId);
+
+            if($inputData->isMyOnlyDivision && !$consumption->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
+            {
+
+                throw new Exception('Illegal request',403);
+            }
 
             $this->outputPort->output(new ConsumptionIndexOutputData($consumption));
         }
@@ -58,6 +65,7 @@ namespace JoyPla\Application\Interactors\Web\Consumption {
  */
 namespace JoyPla\Application\InputPorts\Web\Consumption {
 
+    use Auth;
     use stdClass;
 
     /**
@@ -69,10 +77,11 @@ namespace JoyPla\Application\InputPorts\Web\Consumption {
         /**
          * ConsumptionIndexInputData constructor.
          */
-        public function __construct(string $hospitalId , string $consumptionId)
+        public function __construct(Auth $user , string $consumptionId , bool $isMyOnlyDivision)
         {
-            $this->hospitalId = $hospitalId;
-            $this->consumptionId= $consumptionId;
+            $this->user = $user;
+            $this->consumptionId = $consumptionId;
+            $this->isMyOnlyDivision = $isMyOnlyDivision;
         }
     }
 

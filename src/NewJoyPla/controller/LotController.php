@@ -183,6 +183,8 @@ class LotController extends Controller
                         'title' => $title,
                         'table' => '%sf:usr:search38:mstfilter%',
                         'csrf_token' => Csrf::generate(16),
+                        'submenulink' => "%url/rel:mpg:top%&path=stock",
+                        'submenu' => '在庫メニュー',
                         'print' => true,
                         'export' => true,
                         'script' => $this->view('NewJoyPla/view/Script/LotManagement', [
@@ -244,6 +246,8 @@ class LotController extends Controller
                     'title' => $title,
                     'table' => '%sf:usr:search38:mstfilter%',
                     'csrf_token' => Csrf::generate(16),
+                    'submenulink' => "%url/rel:mpg:top%&path=stock",
+                    'submenu' => '在庫メニュー',
                     'print' => true,
                     'export' => true,
                     'script' => $this->view('NewJoyPla/view/Script/LotManagement', [
@@ -304,6 +308,8 @@ class LotController extends Controller
                 $content = $this->view('NewJoyPla/view/template/List', [
                         'title' => 'ロット調整ログ',
                         'table' => '%sf:usr:search34:table%',
+                        'submenulink' => "%url/rel:mpg:top%&path=stock",
+                        'submenu' => '在庫メニュー',
                         'csrf_token' => Csrf::generate(16)
                         ] , false);
             }
@@ -353,7 +359,9 @@ class LotController extends Controller
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => 'ロット調整ログ',
                     'table' => '%sf:usr:search34:table:mstfilter%',
-                    'csrf_token' => Csrf::generate(16)
+                    'csrf_token' => Csrf::generate(16),
+                    'submenulink' => "%url/rel:mpg:top%&path=stock",
+                    'submenu' => '在庫メニュー',
                     ] , false);
             
         } catch ( Exception $ex ) {

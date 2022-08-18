@@ -70,6 +70,11 @@ class ConsumptionItem
         return $this->division;
     }
 
+    public function getHospitalId()
+    {
+        return $this->hospitalId;
+    }
+
     public function equalDivision(Division $division)
     {
         return $this->division === $division;
@@ -78,9 +83,19 @@ class ConsumptionItem
     public function price(){
         return $this->unitPrice->value() * $this->consumptionQuantity;
     }
+
+    public function getConsumptionQuantity()
+    {
+        return $this->consumptionQuantity;
+    }
     
     public function getInHospitalItemId(){
         return $this->inHospitalItemId;
+    }
+
+    public function getLot()
+    {
+        return $this->lot;
     }
 
     public function toArray()

@@ -32,7 +32,7 @@
                                     </div>
                                     <div class="flex-auto w-1/2">
                                         <div>
-                                            <img class="ml-auto" src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png"/>
+                                            <img class="ml-auto h-6" src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png"/>
                                         </div>
                                         <div class="productsLabel mt-6">
                                             <img :src="barcode_src" alt="" class="w-2/3 ml-auto pb-4"/>
@@ -103,7 +103,7 @@ var JoyPlaApp = Vue.createApp({
     setup(){
       const numberFormat = (value) => {
           if (! value ) { return 0; }
-          return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+          return new Intl.NumberFormat('ja-JP').format(value);
       };
       return {
         numberFormat,
@@ -136,7 +136,7 @@ var JoyPlaApp = Vue.createApp({
 
                 bwipjs.toCanvas(canvas, {
                         bcid:        'qrcode',
-                        text:        'https://'+ location.host +'%url/rel:mpgt:Root%&path=/consumption/' + this.consumption.consumptionId ,    // Text to encode
+                        text:        'https://'+ location.host +_ROOT + '&path=/consumption/' + this.consumption.consumptionId ,    // Text to encode
                     }); 
 
                 this.qr_src = canvas.toDataURL();
@@ -146,5 +146,5 @@ var JoyPlaApp = Vue.createApp({
             }
         },
     }
-}).mount('#top');
+}).mount('#top'); 
 </script>

@@ -313,7 +313,8 @@ class StocksController extends Controller
             foreach($rowData as $key => $rows)
             {
                 $id = $this->makeIds('90' , $key );
-                if(in_array($id , $ids, true) === true){ var_dump($id); }
+                if(in_array($id , $ids, true) === true){ //var_dump($id); 
+                }
                 $ids[] = $id;
                 $insert_data[] = 
                     [
@@ -324,7 +325,6 @@ class StocksController extends Controller
                         "quantity" => $rows['data'][2]
                     ];
             }
-            exit;
             $result = Card::insert($insert_data);
             $content = new ApiResponse($result->ids , count($insert_data) , $result->code, $result->message, ['insert']);
             $content = $content->toJson();

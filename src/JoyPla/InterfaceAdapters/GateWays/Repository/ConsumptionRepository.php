@@ -7,6 +7,7 @@ use App\SpiralDb\ConsumptionItem as SpiralDbConsumptionItem;
 use App\SpiralDb\ConsumptionItemView;
 use App\SpiralDb\ConsumptionView;
 use App\SpiralDb\Division as SpiralDbDivision;
+use App\SpiralDb\Hospital;
 use App\SpiralDb\InHospitalItemView;
 use JoyPla\Enterprise\Models\Consumption;
 use JoyPla\Enterprise\Models\ConsumptionId;
@@ -34,6 +35,8 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface{
 
     public function findByInHospitalItem( HospitalId $hospitalId , array $consumptionItems ){
 
+        $consumptionUnitPriceUseFlag = (Hospital::where('hospitalId', $hospitalId->value())->value('billingUnitPrice')->get())->data->get(0);
+
         $division = SpiralDbDivision::where('hospitalId',$hospitalId->value());
         foreach($consumptionItems as $item){
             $division = $division->orWhere('divisionId',$item->divisionId);
@@ -51,6 +54,21 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface{
         foreach($consumptionItems as $item){
             $division_find_key = array_search($item->divisionId, collect_column($division, 'divisionId'));
             $inHospitalItem_find_key = array_search($item->inHospitalItemId, collect_column($inHospitalItem, 'inHospitalItemId'));
+
+            $unitprice = $inHospitalItem[$inHospitalItem_find_key]->unitPrice;
+            if($consumptionUnitPriceUseFlag->billingUnitPrice !== '1')
+            {
+                if($inHospitalItem[$inHospitalItem_find_key]->quantity != 0 && $inHospitalItem[$inHospitalItem_find_key]->price != 0)
+                {
+                    $unitprice = ($inHospitalItem[$inHospitalItem_find_key]->price / $inHospitalItem[$inHospitalItem_find_key]->quantity) ;
+                }
+                else 
+                {
+                    $unitprice = 0;
+                }
+            }
+            
+
             $result[] = new ConsumptionItem(
                 (new ConsumptionId('') ),
                 (new InHospitalItemId($inHospitalItem[$inHospitalItem_find_key]->inHospitalItemId) ),
@@ -225,6 +243,11 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface{
 
         return $consumption;
     }
+
+    public function delete( HospitalId $hospitalId , ConsumptionId $consumptionId)
+    {
+        ConsumptionView::where('hospitalId',$hospitalId->value())->where('billingNumber',$consumptionId->value())->delete();
+    }
 }
 
 interface ConsumptionRepositoryInterface 
@@ -236,5 +259,7 @@ interface ConsumptionRepositoryInterface
     public function search( HospitalId $hospitalId , object $search);
 
     public function index( HospitalId $hospitalId , ConsumptionId $consumptionId);
+
+    public function delete( HospitalId $hospitalId , ConsumptionId $consumptionId);
     
 }

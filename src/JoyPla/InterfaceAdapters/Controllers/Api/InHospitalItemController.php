@@ -18,7 +18,7 @@ class InHospitalItemController extends Controller
         Csrf::validate($token,true);
  
         $inputData = new InHospitalItemShowInputData(
-            (new Auth(HospitalUser::class))->hospitalId,
+            $this->request->user()->hospitalId,
             $this->request->get('search')
         );
         $inputPort->handle($inputData);

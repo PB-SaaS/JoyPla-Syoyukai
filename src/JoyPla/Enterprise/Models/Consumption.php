@@ -47,6 +47,11 @@ class Consumption
     {
         return $this->consumptionId;
     }
+    
+    public function getConsumptionItems()
+    {
+        return $this->consumptionItems;
+    }
 
     public function getDivision()
     {

@@ -9,6 +9,7 @@ namespace JoyPla\Application\Interactors\Api\Division {
     use JoyPla\Application\InputPorts\Api\Division\DivisionShowInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\Division\DivisionShowOutputData;
     use JoyPla\Application\OutputPorts\Api\Division\DivisionShowOutputPortInterface;
+    use JoyPla\Enterprise\Models\DivisionId;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\DivisionRepositoryInterface;
 
@@ -39,8 +40,21 @@ namespace JoyPla\Application\Interactors\Api\Division {
          */
         public function handle(DivisionShowInputData $inputData)
         {
-            $division = $this->divisionRepository->findByHospitalId((new HospitalId($inputData->hospitalId)));
-            $this->outputPort->output(new DivisionShowOutputData($division));
+            $divisions = [];
+            if($inputData->isOnlyMyDivision)
+            {
+                $divisions[] = $this->divisionRepository->find(
+                    (new HospitalId($inputData->user->hospitalId)),
+                    (new DivisionId($inputData->user->divisionId))
+                );
+            } else 
+            {
+                $divisions = $this->divisionRepository->findByHospitalId(
+                    (new HospitalId($inputData->user->hospitalId)),
+                );
+            }
+            
+            $this->outputPort->output(new DivisionShowOutputData($divisions));
         }
     }
 }
@@ -50,6 +64,9 @@ namespace JoyPla\Application\Interactors\Api\Division {
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Division {
+
+    use Auth;
+
     /**
      * Class DivisionShowInputData
      * @package JoyPla\Application\InputPorts\Division\Api
@@ -59,9 +76,10 @@ namespace JoyPla\Application\InputPorts\Api\Division {
         /**
          * DivisionShowInputData constructor.
          */
-        public function __construct(string $hospitalId)
+        public function __construct(Auth $user , bool $isOnlyMyDivision)
         {
-            $this->hospitalId = $hospitalId;
+            $this->user = $user;
+            $this->isOnlyMyDivision = $isOnlyMyDivision;
         }
     }
 

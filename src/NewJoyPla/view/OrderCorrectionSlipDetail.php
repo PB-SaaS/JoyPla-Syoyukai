@@ -4,6 +4,7 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&page=page1">消費・発注</a></li>
                 <li><a href="<?php echo $link ?>&table_cache=true"><span><?php echo $link_title ?></span></a></li>
                 <li><a href="%url/card:page_263320%&table_cache=true"><span>発注書</span></a></li>
                 <li><span>発注書訂正</span></li>
@@ -98,7 +99,7 @@ var app = new Vue({
 	filters: {
         number_format: function(value) {
             if (! value ) { return 0; }
-            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+            return new Intl.NumberFormat('ja-JP').format(value);
         },
     },
     watch: {

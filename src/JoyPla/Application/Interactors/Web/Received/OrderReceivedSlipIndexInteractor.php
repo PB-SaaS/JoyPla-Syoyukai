@@ -45,7 +45,7 @@ namespace JoyPla\Application\Interactors\Web\Received {
         public function handle(OrderReceivedSlipIndexInputData $inputData)
         {
 
-            $hospitalId = new HospitalId($inputData->hospitalId);
+            $hospitalId = new HospitalId($inputData->user->hospitalId);
             $orderId = new OrderId($inputData->orderId);
 
             $order = $this->orderRepository->index($hospitalId,
@@ -65,6 +65,11 @@ namespace JoyPla\Application\Interactors\Web\Received {
                 throw new NotFoundException("Not Found.",404);
             }
 
+            if($inputData->isOnlyMyDivision && ! $order->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
+            {
+                throw new NotFoundException("Not Found.",404);
+            }
+
             $this->outputPort->output(new OrderReceivedSlipIndexOutputData($order));
         }
     }
@@ -76,6 +81,7 @@ namespace JoyPla\Application\Interactors\Web\Received {
  */
 namespace JoyPla\Application\InputPorts\Web\Received {
 
+    use Auth;
     use stdClass;
 
     /**
@@ -87,10 +93,11 @@ namespace JoyPla\Application\InputPorts\Web\Received {
         /**
          * OrderReceivedSlipIndexInputData constructor.
          */
-        public function __construct(string $hospitalId , string $orderId)
+        public function __construct(Auth $user , string $orderId , bool $isOnlyMyDivision)
         {
-            $this->hospitalId = $hospitalId;
+            $this->user = $user;
             $this->orderId= $orderId;
+            $this->isOnlyMyDivision= $isOnlyMyDivision;
         }
     }
 

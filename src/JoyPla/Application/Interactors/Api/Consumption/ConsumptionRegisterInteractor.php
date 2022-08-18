@@ -6,6 +6,7 @@
 namespace JoyPla\Application\Interactors\Api\Consumption {
 
     use App\Model\Division;
+    use Exception;
     use JoyPla\Application\InputPorts\Api\Consumption\ConsumptionRegisterInputPortInterface;
     use JoyPla\Application\InputPorts\Api\Consumption\ConsumptionRegisterInputData;
     use JoyPla\Application\OutputPorts\Api\Consumption\ConsumptionRegisterOutputData;
@@ -18,7 +19,10 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
     use JoyPla\Enterprise\Models\Hospital;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\Enterprise\Models\HospitalName;
+    use JoyPla\Enterprise\Models\InventoryCalculation;
+    use JoyPla\Enterprise\Models\Pref;
     use JoyPla\InterfaceAdapters\GateWays\Repository\consumptionRepositoryInterface;
+    use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepositoryInterface;
 
     /**
      * Class ConsumptionRegisterInteractor
@@ -36,10 +40,11 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
          * ConsumptionRegisterInteractor constructor.
          * @param ConsumptionRegisterOutputPortInterface $outputPort
          */
-        public function __construct(ConsumptionRegisterOutputPortInterface $outputPort , ConsumptionRepositoryInterface $consumptionRepository)
+        public function __construct(ConsumptionRegisterOutputPortInterface $outputPort , ConsumptionRepositoryInterface $consumptionRepository , InventoryCalculationRepositoryInterface $inventoryCalculationRepository)
         {
             $this->outputPort = $outputPort;
             $this->consumptionRepository = $consumptionRepository;
+            $this->inventoryCalculationRepository = $inventoryCalculationRepository;
         }
 
         /**
@@ -48,7 +53,16 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
         public function handle(ConsumptionRegisterInputData $inputData)
         {
 
-            $hospitalId = new HospitalId($inputData->hospitalId);
+            $hospitalId = new HospitalId($inputData->user->hospitalId);
+
+            $inputData->consumptionItems = array_map(function($v) use ($inputData){
+                if($inputData->isOnlyMyDivision && $inputData->user->divisionId !== $v->divisionId)
+                {
+                    throw new Exception('Illegal request',403);
+                }
+                return $v;
+            },$inputData->consumptionItems);
+
             $consumptionItems = $this->consumptionRepository->findByInHospitalItem( $hospitalId , $inputData->consumptionItems );
 
             $ids = [];
@@ -68,10 +82,42 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
                 $id = ConsumptionId::generate();
                 $ids[] = $id->value();
                 //登録時には病院名は必要ないので、いったんhogeでいい
-                $result[] = new Consumption( $id , ( new DateYearMonthDay($inputData->consumeDate) ), [$i] , new Hospital($hospitalId, ( new HospitalName('hoge') ) ) , $i->getDivision() , ( new ConsumptionStatus(ConsumptionStatus::Consumption) ) );
+                $result[] = new Consumption( 
+                    $id , 
+                    ( new DateYearMonthDay($inputData->consumeDate) ), 
+                    [$i] , 
+                    new Hospital(
+                        $hospitalId, 
+                        ( new HospitalName('hoge') ) ,
+                        "",
+                        "",
+                        new Pref(""),
+                        ""
+                    ) , 
+                    $i->getDivision() , 
+                    ( new ConsumptionStatus(ConsumptionStatus::Consumption) ) );
             }
 
             $this->consumptionRepository->saveToArray($result);
+
+            $inventoryCalculations = [];
+            foreach($result as $r)
+            {
+                foreach($r->getConsumptionItems() as $item)
+                {
+                    $inventoryCalculations[] = new InventoryCalculation(
+                        $item->getHospitalId(),
+                        $item->getDivision()->getDivisionId(),
+                        $item->getInHospitalItemId(),
+                        0,
+                        1,
+                        $item->getLot(),
+                        $item->getConsumptionQuantity() * -1,
+                    );
+                }
+            }
+
+            $this->inventoryCalculationRepository->saveToArray($inventoryCalculations);
 
             $this->outputPort->output(new ConsumptionRegisterOutputData($ids));
         }
@@ -84,6 +130,7 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
  */
 namespace JoyPla\Application\InputPorts\Api\Consumption {
 
+    use Auth;
     use stdClass;
 
     /**
@@ -95,11 +142,11 @@ namespace JoyPla\Application\InputPorts\Api\Consumption {
         /**
          * ConsumptionRegisterInputData constructor.
          */
-        public function __construct(string $hospitalId , string $consumeDate, array $consumptionItems)
+        public function __construct(Auth $user , string $consumeDate, array $consumptionItems , bool $isOnlyMyDivision)
         {
-            $this->hospitalId = $hospitalId;
+            $this->user = $user;
             $this->consumeDate= $consumeDate;
-            $this->consumptionItems = array_map(function($v){
+            $this->consumptionItems = array_map(function($v) use ($isOnlyMyDivision , $user){
                 $object = new stdClass();
                 $object->inHospitalItemId = $v['inHospitalItemId'];
                 $object->consumeLotDate = $v['consumeLotDate'];
@@ -109,6 +156,8 @@ namespace JoyPla\Application\InputPorts\Api\Consumption {
                 $object->divisionId= $v['divisionId'];
                 return $object;
             },$consumptionItems);
+
+            $this->isOnlyMyDivision = $isOnlyMyDivision;
         }
     }
 

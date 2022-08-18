@@ -81,6 +81,7 @@
         <div class="uk-container uk-container-expand uk-margin-top">
             <ul class="uk-breadcrumb">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                <li><a href="%url/rel:mpg:top%&path=lending">貸出メニュー</a></li>
                 <li><span>貸出内容入力</span></li>
             </ul>
             <h2 class="page_title">貸出内容入力</h2>
@@ -163,9 +164,9 @@
 							<td>{{list.kikaku}}</td>
 							<td>{{list.jan}}</td>
 							<td class="uk-text-nowrap">{{list.irisu}}{{list.unit}}</td>
-							<td class="uk-text-nowrap">{{list.kakaku}}{{list.itemUnit}}</td>
+							<td class="uk-text-nowrap">&yen;{{list.kakaku| number_format}}</td>
 							<td class="uk-text-nowrap">
-							    ￥<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
+								&yen;<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
 							    <span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
 							</td>
 							<td>{{list.oroshi}}</td>
@@ -310,7 +311,7 @@ var app = new Vue({
 	el: '#app',
 	data: {
 		lists: [],
-		divisionId: '',
+		divisionId: "<?php echo ($user_info->isUser())? $user_info->getDivisionId() : "" ; ?>",
 		allUsedDate: now_date,
 		canAjax : true,
         useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
@@ -320,7 +321,7 @@ var app = new Vue({
 	filters: {
         number_format: function(value) {
             if (! value ) { return 0; }
-            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+            return new Intl.NumberFormat('ja-JP').format(value);
         },
     },
 	methods: {
@@ -630,6 +631,7 @@ var app = new Vue({
                 url:'<?php echo $label_api_url ?>',
                 type:'POST',
                 data:{
+					_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
                 	divisionId :app.divisionId,
                 	barcode : barcode,
                 },
@@ -698,7 +700,7 @@ var modal_sections = new Vue({
 	filters: {
         number_format: function(value) {
             if (! value ) { return 0; }
-            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+            return new Intl.NumberFormat('ja-JP').format(value);
         },
     },
 	methods: {

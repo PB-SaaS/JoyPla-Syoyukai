@@ -4,6 +4,7 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&page=page1">消費・発注</a></li>
                 <li><a href="<?php echo $link ?>&table_cache=true"><span><?php echo $link_title ?></span></a></li>
                 <li><span>発注書</span></li>
             </ul>
@@ -394,7 +395,7 @@ var app = new Vue({
 	filters: {
         number_format: function(value) {
             if (! value ) { return 0; }
-            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+            return new Intl.NumberFormat('ja-JP').format(value);
         },
     },
     watch: {
@@ -773,7 +774,7 @@ var modal_sections = new Vue({
 	filters: {
         number_format: function(value) {
             if (! value ) { return 0; }
-            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+            return new Intl.NumberFormat('ja-JP').format(value);
         },
     },
 	methods: {
@@ -906,6 +907,6 @@ var gs1_128 = new Vue({
  $('#order_barcode').html('<svg id="barcode_hacchu"></svg>');
  $('#order_barcode_print').html('<svg id="barcode_hacchu_print"></svg>');
  generateBarcode('barcode_hacchu',order_num);
- JsBarcode("#barcode_hacchu_print",order_num,{format: "ITF", width: 1.4, height: 30,fontSize: 12});
+ JsBarcode("#barcode_hacchu_print",order_num,{width: 1.4, height: 30,fontSize: 12});
 
 </script>

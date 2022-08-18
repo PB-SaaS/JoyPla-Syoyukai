@@ -8,7 +8,7 @@ JoyPla からお知らせです。
 foreach($history as $h)
 {
     echo "[発注番号]: " . $h["orderNumber"] ." \n";
-    echo "[金額]: ￥" . number_format($h["totalAmount"]) ." \n";
+    echo "[金額]: ￥" . number_format_jp($h["totalAmount"]) ." \n";
     echo "[担当者]: " . $h["ordererUserName"] ." \n";
     echo " \n";
 }

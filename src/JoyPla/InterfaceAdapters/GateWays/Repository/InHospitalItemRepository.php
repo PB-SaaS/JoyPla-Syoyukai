@@ -79,6 +79,15 @@ class InHospitalItemRepository implements InHospitalItemRepositoryInterface{
                 $instance->orWhere('distributorId',$distributorId);
             }
         }
+
+        if($search->isNotUse == '1')
+        {
+            $instance->where('notUsedFlag','1');
+        } else if($search->isNotUse == '0')
+        {
+            $instance->where('notUsedFlag','1','!=');
+        }
+
         $result = $instance->page($search->currentPage)->paginate($search->perPage);
 
         $inHospitalItems = $result->data->all();

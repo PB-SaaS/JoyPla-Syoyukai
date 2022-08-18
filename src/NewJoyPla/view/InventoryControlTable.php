@@ -3,6 +3,7 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print uk-margin-top">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&path=stock">在庫メニュー</a></li>
                 <li><span>在庫管理表</span></li>
             </ul>
             <div class="no_print uk-margin" uk-margin>

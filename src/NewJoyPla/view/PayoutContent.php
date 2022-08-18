@@ -89,6 +89,7 @@
 		    <div class="uk-container uk-container-expand">
 		    	<ul class="uk-breadcrumb">
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&path=payout">払出メニュー</a></li>
 				    <li><span>払出内容入力</span></li>
 				</ul>
 		    	<h2 class="page_title">払出内容入力</h2>
@@ -100,11 +101,12 @@
 				            <select class="uk-width-3-4 uk-select uk-inline" name="sourceDivision">
 				                <option value="">----- 部署選択 -----</option>
 		                        <?php
+								$selected = ($user_info->isUser())? $user_info->getDivisionId() : "" ;
 		                        foreach($source_division->data as $data)
 		                        {
 		                            if($data->divisionType === '1')
 		                            {
-		                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
+		                                echo '<option value="'.$data->divisionId.'" '. ($data->divisionId === $selected)? "selected" : "" .'>'.$data->divisionName.'(大倉庫)</option>';
 		                                echo '<option value="" disabled>--------------------</option>';
 		                            }
 		                        }
@@ -112,7 +114,7 @@
 		                        {
 		                            if($data->divisionType === '2')
 		                            {
-		                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
+		                                echo '<option value="'.$data->divisionId.'" '. ($data->divisionId === $selected)? "selected" : "" .'>'.$data->divisionName.'</option>';
 		                            }
 		                        }
 		                        ?>

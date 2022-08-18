@@ -4,6 +4,7 @@
             <div class="uk-container uk-container-expand">
                 <ul class="uk-breadcrumb no_print">
                     <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&path=stocktaking">棚卸メニュー</a></li>
                     <li><span>棚卸実績</span></li>
                 </ul>
                 <h2 class="page_title uk-margin-remove">棚卸実績</h2>
@@ -86,14 +87,14 @@
                                         <td>{{ i.distributorName }}</td>
                                         <td>&yen;{{ i.price | number_format }}</td>
                                         <td>&yen;{{ i.unitPrice  | number_format }}</td>
-                                        <td>{{ i.quantity }}{{ i.quantityUnit }}</td>
-                                        <td>{{ get_before_inventory_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
+                                        <td>{{ i.quantity | number_format }}{{ i.quantityUnit }}</td>
+                                        <td>{{ get_before_inventory_nums(i.inHospitalItemId).count | number_format }}{{ i.quantityUnit }}</td>
                                         <td>&yen;{{ Math.round( get_before_inventory_nums(i.inHospitalItemId).count * i.unitPrice * 100 ) / 100 | number_format }}</td>
-                                        <td>{{ get_receiving_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
+                                        <td>{{ get_receiving_nums(i.inHospitalItemId).count | number_format }}{{ i.quantityUnit }}</td>
                                         <td>&yen;{{ get_receiving_nums(i.inHospitalItemId).price  | number_format }}</td>
-                                        <td>{{ get_consumed_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
+                                        <td>{{ get_consumed_nums(i.inHospitalItemId).count | number_format }}{{ i.quantityUnit }}</td>
                                         <td>&yen;{{ get_consumed_nums(i.inHospitalItemId).price  | number_format }}</td>
-                                        <td>{{ get_inventory_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
+                                        <td>{{ get_inventory_nums(i.inHospitalItemId).count | number_format }}{{ i.quantityUnit }}</td>
                                         <td>&yen;{{ Math.round( get_inventory_nums(i.inHospitalItemId).count * i.unitPrice * 100 ) / 100  | number_format }}</td>
                                     </tr>
                                 </tbody>
@@ -146,6 +147,7 @@
                     <thead>
                         <tr>
                             <th>No</th>
+                            <th>棚名</th>
                             <th class="uk-width-1-6">商品情報</th>
                             <th>卸業者</th>
                             <th>価格</th>
@@ -164,6 +166,7 @@
                     <tbody>
                         <tr v-for="( i , key) in items">
                             <td>{{ key + 1 }}</td>
+                            <td>{{ i.rackName }}</td>
                             <td>
                                 <div margin="0">
                                     <div>{{ i.makerName }}</div>
@@ -176,14 +179,14 @@
                             <td>{{ i.distributorName }}</td>
                             <td>&yen;{{ i.price | number_format }}</td>
                             <td>&yen;{{ i.unitPrice  | number_format }}</td>
-                            <td>{{ i.quantity }}{{ i.quantityUnit }}</td>
-                            <td>{{ get_before_inventory_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
+                            <td>{{ i.quantity | number_format }}{{ i.quantityUnit }}</td>
+                            <td>{{ get_before_inventory_nums(i.inHospitalItemId).count | number_format }}{{ i.quantityUnit }}</td>
                             <td>&yen;{{ Math.round( get_before_inventory_nums(i.inHospitalItemId).count * i.unitPrice * 100 ) / 100 | number_format }}</td>
-                            <td>{{ get_receiving_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
+                            <td>{{ get_receiving_nums(i.inHospitalItemId).count | number_format }}{{ i.quantityUnit }}</td>
                             <td>&yen;{{ get_receiving_nums(i.inHospitalItemId).price  | number_format }}</td>
-                            <td>{{ get_consumed_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
+                            <td>{{ get_consumed_nums(i.inHospitalItemId).count | number_format }}{{ i.quantityUnit }}</td>
                             <td>&yen;{{ get_consumed_nums(i.inHospitalItemId).price  | number_format }}</td>
-                            <td>{{ get_inventory_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
+                            <td>{{ get_inventory_nums(i.inHospitalItemId).count | number_format }}{{ i.quantityUnit }}</td>
                             <td>&yen;{{ Math.round( get_inventory_nums(i.inHospitalItemId).count * i.unitPrice * 100 ) / 100  | number_format }}</td>
                         </tr>
                     </tbody>
@@ -191,7 +194,7 @@
                         <td colspan=6>合計</td>
                         <td></td>
                         <td>&yen;{{ get_before_inventory_total_price() | number_format }}</td>
-                        <td></td>
+                        <td></td> 
                         <td>&yen;{{ get_receivig_total_price() | number_format }}</td>
                         <td></td>
                         <td>&yen;{{ get_consumed_total_price() | number_format }}</td>
@@ -232,7 +235,7 @@ var app = new Vue({
 	filters: {
         number_format: function(value) {
             if (! value ) { return 0; }
-            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+            return new Intl.NumberFormat('ja-JP').format(value);
         },
     },
     watch: {

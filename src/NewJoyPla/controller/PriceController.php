@@ -52,6 +52,8 @@ class PriceController extends Controller
                     'export' => true,
                     'table' => '%sf:usr:search36%',
                     'userInfo' => $user_info,
+                    'submenulink' => "%url/rel:mpg:top%&path=product",
+                    'submenu' => '商品メニュー',
                     'csrf_token' => Csrf::generate(16),
                     'distributor' => $distributor,
                     'script' => $this->view('NewJoyPla/view/Script/PriceList', ['distributor' => $distributor,] , false)->render()
@@ -99,6 +101,8 @@ class PriceController extends Controller
                     'title' => '見積依頼一覧',
                     'table' => '<div class="uk-margin-auto uk-width-4-5@m">%sf:usr:search10%</div>',
                     'userInfo' => $user_info,
+                    'submenulink' => "%url/rel:mpg:top%&path=estimate",
+                    'submenu' => '見積メニュー',
                     'csrf_token' => Csrf::generate(16)
                     ] , false);
         

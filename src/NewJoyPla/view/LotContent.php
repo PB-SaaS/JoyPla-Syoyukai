@@ -89,6 +89,7 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&path=stock">在庫メニュー</a></li>
                 <li><span>ロット調整</span></li>
             </ul>
             <h2 class="page_title">ロット調整</h2>
@@ -297,7 +298,7 @@ var app = new Vue({
 	el: '#app',
 	data: {
 		lists: [],
-		divisionId: '',
+		divisionId: "<?php echo ($user_info->isUser())? $user_info->getDivisionId() : "" ; ?>",
 	},
     watch: {
     },

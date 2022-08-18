@@ -7,15 +7,14 @@ require_once ('../mock/SpiralApiRequest.php');
 require_once ('../mock/PbSpiralApiCommunicator.php');
 
 require_once "../src/framework/Core/Collection.php";
-require_once "../src/framework/Core/Model.php";
-
-require_once "../src/JoyPla/Enterprise/SpiralDb/Base.php";
+require_once "../src/framework/Core/SpiralORM.php";
 
 $SPIRAL = new \Spiral();
 $ModelName = "";
 if(isset($argv[1]))
 {
     $ModelName = $argv[1];
+    require_once "../src/JoyPla/Enterprise/SpiralDb/".$argv[1].".php";
 }
 foreach(get_declared_classes() as $className)
 {

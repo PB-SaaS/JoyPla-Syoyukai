@@ -4,6 +4,7 @@
 		    <div class="uk-container uk-container-expand">
 		    	<ul class="uk-breadcrumb no_print">
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&path=stocktaking">棚卸メニュー</a></li>
 				    <li><a href="<?php echo $link ?>&table_cache=true"><span>棚卸履歴一覧</span></a></li>
 				    <li><span>棚卸結果報告</span></li>
 				</ul>
@@ -26,10 +27,12 @@
 		    	<div uk-grid>
 			    	<div class="uk-width-1-2@m">
 		    			<table class="uk-table uk-width-1-1 uk-width-2-3@m uk-table-divider">
+							<?php if($end_flg ): ?>
 		    				<tr>
 		    					<td class="uk-text-bold">棚卸完了日時</td>
 		    					<td class="uk-text-right">%val:usr:inventoryTime%</td>
 		    				</tr>
+							<?php endif ?>
 		    				<tr>
 		    					<td class="uk-text-bold">品目数</td>
 		    					<td class="uk-text-right">%val:usr:itemsNumber%</td>
@@ -100,7 +103,7 @@
 	}
 	
 	function inventoryFinish(){
-		UIkit.modal.confirm("棚卸を確定します。<br>よろしいですか").then(function () {
+		UIkit.modal.confirm("棚卸を確定します。<br>よろしいですか<br>※一時保存の情報は完了に変更します").then(function () {
 			if(!canAjax) { 
 				console.log('通信中');
 				return;

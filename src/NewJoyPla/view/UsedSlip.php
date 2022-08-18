@@ -3,6 +3,7 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&page=page1">消費・発注</a></li>
                 <li><a href="<?php echo $link ?>&table_cache=true"><span><?php echo $link_name ?></span></a></li>
                 <li><span><?php echo $current_name ?></span></li>
             </ul>

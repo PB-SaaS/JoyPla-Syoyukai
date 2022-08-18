@@ -116,9 +116,7 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
          */
         public function __construct(array $stocks , int $count)
         {
-            $this->stocks = array_map(function(Stock $stock){
-                return $stock->toArray();
-            },$stocks);
+            $this->stocks = $stocks;
             $this->count = $count;
         }
     }

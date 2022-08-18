@@ -2,6 +2,10 @@
 
 namespace App\Lib ;
 
+use App\Lib\LoggingSpiralv2;
+use LogConfig;
+use Logger;
+
 /**
  * SPIRAL API をラッピングしたアクセスクラスです。
  *
@@ -51,6 +55,8 @@ namespace App\Lib ;
 			$this->request->put($param_name, $param_value);
 		}
 		$response = $this->apiCommunicator->request($apiHeader[0], $apiHeader[1], $this->request);
+		
+		$this->logging($response);
 
 		$responseArray = array();
 		foreach($response->entrySet() as $key => $val){
@@ -59,6 +65,26 @@ namespace App\Lib ;
 		
 		return $responseArray;
 	}
+
+	public function logging($response)
+	{
+        if(! LogConfig::EXPORT_TO_SPIRALV2){ return ""; }
+        $spiralv2 = new LoggingSpiralv2(LogConfig::SPIRALV2_API_KEY , 'https://api.spiral-platform.com/v1/');
+        $spiralv2->setAppId(LogConfig::LOGGING_APP_TITLE);
+        $spiralv2->setDbId(LogConfig::SPIRAL_API_LOGGING_DB_TITLE);
+
+        $logger = new Logger($spiralv2);
+
+		$body = [
+			'execTime' => Logger::getTime(),
+			'AccountId' => $this->spiral->getAccountId(),
+			'code' => $response->getResultCode(),
+			'message' =>  $response->getMessage(),
+		];
+
+		$logger->out($body);
+	}
+	
 	
 	/**
 	 *  Public Object->Array 

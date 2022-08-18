@@ -19,6 +19,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
     use JoyPla\Enterprise\Models\OrderId;
     use JoyPla\Enterprise\Models\OrderItemId;
     use JoyPla\Enterprise\Models\OrderQuantity;
+    use JoyPla\Enterprise\Models\OrderStatus;
     use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
 
     /**
@@ -48,9 +49,20 @@ namespace JoyPla\Application\Interactors\Api\Order {
          */
         public function handle(OrderUnapprovedDeleteInputData $inputData)
         {
-            $hospitalId = new HospitalId($inputData->hospitalId);
+            $hospitalId = new HospitalId($inputData->user->hospitalId);
             $orderId = new OrderId($inputData->orderId);
             
+            $order = $this->orderRepository->index($hospitalId , $orderId , [ OrderStatus::UnOrdered ]);
+
+            if( $order === null ){
+                throw new NotFoundException("Not Found.",404);
+            }
+
+            if($inputData->isOnlyMyDivision && ! $order->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
+            {
+                throw new NotFoundException("Not Found.",404);
+            }
+
             $deleteCount = $this->orderRepository->delete($hospitalId , $orderId);
             
             $this->outputPort->output(new OrderUnapprovedDeleteOutputData($deleteCount));
@@ -65,6 +77,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
  */
 namespace JoyPla\Application\InputPorts\Api\Order {
 
+    use Auth;
     use stdClass;
 
     /**
@@ -76,10 +89,11 @@ namespace JoyPla\Application\InputPorts\Api\Order {
         /**
          * OrderUnapprovedDeleteInputData constructor.
          */
-        public function __construct(string $hospitalId , string $orderId )
+        public function __construct(Auth $user , string $orderId , bool $isOnlyMyDivision)
         {
-            $this->hospitalId = $hospitalId;
+            $this->user = $user;
             $this->orderId = $orderId;
+            $this->isOnlyMyDivision = $isOnlyMyDivision;
         }
     }
 

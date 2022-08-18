@@ -3,6 +3,7 @@
 	    <div class="uk-container uk-container-expand">
 	    	<ul class="uk-breadcrumb no_print">
 			    <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                <li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
 			    <li><span>部署一覧</span></li>
 			</ul>
 	    	<h2 class="page_title uk-margin-remove">部署一覧</h2>

@@ -7,35 +7,26 @@
       <div class="index container mx-auto mb-96">
         <h1 class="text-2xl mb-2">個別発注</h1>
         <hr>
-        <form>
+        <div>
           <div class="mb-2 lg:w-1/3">
             <v-select-division 
             name="divisionId" 
             label="発注部署" 
             :rules="{ required : true }"
-            title="発注部署指定" />
+            title="発注部署指定" 
+            :is-only-my-division="<?php var_export(gate('register_of_unordered_slips')->isOnlyMyDivision()) ?>"
+            />
           </div>
           <div class="my-4 grid grid-cols-3 gap-4 lg:w-1/3 items-center">
             <v-button-default type="button" data-micromodal-trigger="inHospitalItemModal">商品検索</v-button-default>
-            <v-inhospitalitem-modal v-on:additem="additem">
-            </v-inhospitalitem-modal>
+            <v-in-hospital-item-modal v-on:additem="additem">
+            </v-in-hospital-item-modal>
             <div class="col-span-2">
               <v-switch id="integrate" v-model="integrate" :message="(integrate)? '既存の未発注伝票に追加します' : '新規発行します'"></v-switch>
             </div>
           </div>
           <div class="p-2 bg-gray-300">
-            <fieldset class="relative">
-              <v-input 
-                type="text" 
-                name="barcode" 
-                class=" pl-12" 
-                ></v-input>
-              <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-2 text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div> 
-            </fieldset>
+            <v-barcode-search @additem="addItemByBarcode"></v-barcode-search>
           </div>
           <div class="my-2" v-if="fields.length == 0">
             <div class="max-h-full h-full grid place-content-center w-full lg:flex border border-sushi-600 bg-white mt-3">
@@ -91,13 +82,63 @@
               </div> 
             </div>
           </transition-group>
-        </form>
+        </div>
       </div>
     </div>
   </div>
-  <v-confirm id="modal-confirm" ref="confirm" :headtext="confirmSetting.headtext.value" :message="confirmSetting.message.value" @ok="confirmSetting.okMethod.value" @cancel="confirmSetting.cancelMethod.value" ></v-confirm>
-  <v-alert id="modal-alert" ref="alert" :headtext="alertSetting.headtext.value" :message="alertSetting.message.value" @ok="alertSetting.okMethod.value" ></v-alert>
-  
+  <v-open-modal ref="openModal" headtext="商品選択" id="openModal">
+      <div class="flex flex-col" style="max-height: 68vh;">
+          <div class="overflow-y-scroll my-6">
+              <div class="w-full mb-8 xl:mb-0">
+                  <div class="hidden lg:flex w-full sticky top-0 bg-white py-4 flex-wrap">
+                      <div class="w-full lg:w-5/6">
+                          <h4 class="font-bold font-heading text-gray-500 text-center">商品情報</h4>
+                      </div>
+                      <div class="w-full lg:w-1/6">
+                          <h4 class="font-bold font-heading text-gray-500 text-center">反映</h4>
+                      </div>
+                  </div>
+                  <div class="lg:pt-0 pt-4">
+                      <div
+                          class="flex flex-wrap items-center mb-3"
+                          v-for="(elem, index) in selectInHospitalItems">
+                          <div class="w-full lg:w-5/6 lg:px-4 px-0 mb-6 lg:mb-0">
+                              <div class="flex flex-wrap items-center gap-4">
+                                  <div class="flex-none">
+                                      <item-view class="md:h-44 md:w-44 h-32 w-32" :base64=""></item-view>
+                                  </div>
+                                  <div class="break-words flex-1 box-border w-44">
+                                      <h3 class="text-xl font-bold font-heading">{{ elem.makerName }}</h3>
+                                      <p class="text-md font-bold font-heading">{{ elem.itemName }}</p>
+                                      <p class="text-gray-500">{{ elem.itemCode }}<br>{{ elem.itemStandard }}</p>
+                                      <p class="text-gray-500">{{ elem.quantity }}{{ elem.quantityUnit }}
+                                          入り</p>
+                                      <p>
+                                          <span class="text-xl text-orange-600 font-bold font-heading">&yen;
+                                              {{ numberFormat(elem.price) }}</span>
+                                          <span class="text-gray-400">
+                                              ( &yen;
+                                              {{ numberFormat(elem.unitPrice) }}/{{ elem.quantityUnit }}
+                                              )</span>
+                                      </p>
+                                      <p class="text-gray-800">ロット番号：{{ elem.lotNumber }}</p>
+                                      <p class="text-gray-800">使用期限：{{ elem.lotDate }}</p>
+                                      <p class="text-gray-800">{{ elem.distributorName }}</p>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="w-full lg:block lg:w-1/6 px-4 py-4">
+                              <v-button-default type="button" class="w-full" v-on:click.native="additem(elem)">反映</v-button-default>
+                          </div>
+                          <div class="py-2 px-4 w-full">
+                              <div class="border-t border-gray-200"></div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </v-open-modal>
 </div>
 
 <script> 
@@ -163,7 +204,7 @@ var JoyPlaApp = Vue.createApp({
           {
             text: '発注メニュー',
             disabled: false,
-            href: '%url/rel:mpgt:Root%&path=/order',
+            href: _ROOT + '&path=/order',
           },
           {
             text: '個別発注',
@@ -205,7 +246,7 @@ var JoyPlaApp = Vue.createApp({
 
       const numberFormat = (value) => {
           if (! value ) { return 0; }
-          return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+          return new Intl.NumberFormat('ja-JP').format(value);
       }
 
       const alertSetting = toRefs(alertModel);
@@ -298,7 +339,7 @@ var JoyPlaApp = Vue.createApp({
       const additem = (item) =>
       {
         item = JSON.parse(JSON.stringify(item));
-        item.orderUnitQuantity = 1;
+        item.orderUnitQuantity = (item.orderUnitQuantity)? item.orderUnitQuantity : 1;
         let checked = false;
         if(Array.isArray(values.orderItems))
         {
@@ -316,8 +357,67 @@ var JoyPlaApp = Vue.createApp({
         }
       };
     
+      const openModal = ref();
+      const selectInHospitalItems = ref([]);
+      const addItemByBarcode = (items) => 
+      {
+        selectInHospitalItems.value = [];
+        if (items.item.length === 0) {
+            return false;
+        }
+
+        if(items.type == "received")
+        {
+          items.item.forEach((x , id)=>{
+            items.item[id].orderUnitQuantity = 1;
+          });
+        }
+        
+        if(items.type == "payout")
+        {
+          items.item.forEach((x , id)=>{
+            items.item[id].orderUnitQuantity = Math.ceil(items.item[id].payoutQuantity / items.item[id].quantity);
+          });
+        }
+        if(items.type == "card")
+        {
+          items.item.forEach((x , id)=>{
+            items.item[id].orderUnitQuantity = Math.ceil(items.item[id].cardQuantity / items.item[id].quantity);
+          });
+        }
+        if(items.type == "customlabel")
+        {
+          items.item.forEach((x , id)=>{
+            items.item[id].orderUnitQuantity = Math.ceil(items.item[id].customQuantity / items.item[id].quantity);
+          });
+        }
+
+        if (items.item.length === 1) {
+          if(items.item[0].divisionId)
+          {
+            if(values.divisionId !== items.item[0].divisionId)
+            {
+              Swal.fire({
+                icon: 'error',
+                title: 'エラー',
+                text: '読み込んだ値と選択している部署が一致しませんでした',
+              });
+              return false;
+            }
+          }
+          additem(items.item[0]);
+        } else {
+            selectInHospitalItems.value = items.item;
+            openModal
+                .value
+                .open();
+        }
+      }
 
       return {
+        openModal,
+        selectInHospitalItems ,
+        addItemByBarcode,
         integrate,
         loading, 
         start, 
@@ -356,6 +456,8 @@ var JoyPlaApp = Vue.createApp({
       },
     },
     components: {
+      'v-open-modal': vOpenModal,
+      'v-barcode-search' : vBarcodeSearch,
       'v-switch' : vSwitch,
       'v-loading' : vLoading,
       'item-view': itemView,
@@ -372,7 +474,7 @@ var JoyPlaApp = Vue.createApp({
       'v-button-primary': vButtonPrimary,
       'v-button-danger': vButtonDanger,
       'v-input-number': vInputNumber,
-      'v-inhospitalitem-modal': vInHospitalItemModal,
+      'v-in-hospital-item-modal': vInHospitalItemModal,
       'header-navi' : headerNavi,
       'blowing' : blowing
     },

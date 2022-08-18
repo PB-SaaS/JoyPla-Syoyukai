@@ -42,9 +42,15 @@
                         <p class="text-md font-bold font-heading">{{ stock.value.item.itemName }}</p>
                         <p class="text-md text-gray-500">{{ stock.value.item.itemCode }}</p>
                         <p class="text-md text-gray-500">{{ stock.value.item.itemStandard }}</p>
-                        <p class="text-md text-gray-500">{{ stock.value.item.itemJANCode }}</p>
+                        <p class="text-md text-gray-500">
+                          {{ stock.value.item.itemJANCode }}
+                        </p>
+                        <div class="w-full text-lg font-bold font-heading flex gap-6">
+                          <span class="text-xl text-orange-600 font-bold font-heading">&yen; {{ numberFormat(stock.value.price) }}/{{ stock.value.quantity.itemUnit }}</span>
+                          <blowing :message="stock.value.priceNotice" title="金額管理備考" v-if="stock.value.priceNotice != ''"></blowing>
+                        </div>
                         <p class="text-base text-gray-900">
-                        {{ numberFormat(stock.value.quantity.quantityNum) }}枚
+                        {{ numberFormat(stock.value.quantity.quantityNum) }}{{ stock.value.quantity.quantityUnit }}
                         </p>
                         <p class="text-base text-gray-900">
                         {{ stock.value.distributor.distributorName }}
@@ -138,13 +144,14 @@
                 title="JANコード"
                 ></v-input>
             </div>
-
+            <?php if(! gate('fixed_quantity_order_slips' )->isOnlyMyDivision ): ?>
             <div class="my-4">
               <v-multiple-select-division
                 name="divisionIds"
                 title="発注書元部署名"
                 ></v-multiple-select-division>
             </div>
+            <?php endif ?>
             <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
               <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
               <v-button-primary type="button" @click.native="searchExec">絞り込み</v-button-primary>
@@ -180,7 +187,8 @@ var JoyPlaApp = Vue.createApp({
       'v-select' : vSelect,
       'v-text' : vText,
       'v-input-number': vInputNumber,
-      'v-multiple-select-division' : vMultipleSelectDivision
+      'v-multiple-select-division' : vMultipleSelectDivision,
+      'blowing' : blowing
     },
     setup(){
         
@@ -281,7 +289,7 @@ var JoyPlaApp = Vue.createApp({
           {
             text: '発注メニュー',
             disabled: false,
-            href: '%url/rel:mpgt:Root%&path=/order',
+            href: _ROOT + '&path=/order',
           },
           {
             text: '定数発注',
@@ -293,7 +301,7 @@ var JoyPlaApp = Vue.createApp({
 
       const numberFormat = (value) => {
           if (! value ) { return 0; }
-          return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+          return new Intl.NumberFormat('ja-JP').format(value);
       };
 
       const onOpenModal = () => {
@@ -461,45 +469,43 @@ var JoyPlaApp = Vue.createApp({
 
       const orderRegister = handleSubmit(async (values) => {
         try {
-            const orderModels = createOrderModel(values);
-            if( orderModels.length === 0)
-            {
-              Swal.fire({
-                icon: 'error',
-                title: '登録する商品がありませんでした。',
-                text: '内容を確認の上、再送信をしてください。',
-              })
-              return false;
-            }
-            
-            let params = new URLSearchParams();
-            params.append("path", "/api/fixedQuantityOrder/register");
-            params.append("_csrf", _CSRF);
-            params.append("orderItems", JSON.stringify(encodeURIToObject(orderModels)));
+              start();
+              const orderModels = createOrderModel(values);
+              if( orderModels.length === 0)
+              {
+                Swal.fire({
+                  icon: 'error',
+                  title: '登録する商品がありませんでした。',
+                  text: '内容を確認の上、再送信をしてください。',
+                })
+                return false;
+              }
+              
+              let params = new URLSearchParams();
+              params.append("path", "/api/fixedQuantityOrder/register");
+              params.append("_csrf", _CSRF);
+              params.append("orderItems", JSON.stringify(encodeURIToObject(orderModels)));
 
-            const res = await axios.post(_APIURL,params);
-            
-            if(res.data.code != 200) {
-              throw new Error(res.data.message)
-            }
-            
-            Swal.fire({
-                icon: 'success',
-                title: '登録が完了しました。',
-                text: 'メールに登録した発注番号を記載しています',
-            }).then((result) => {
-              let tmp = [];
-              replace(tmp);
-            });
-            return true ;
+              const res = await axios.post(_APIURL,params);
+              complete();
+              if(res.data.code != 200) {
+                throw new Error(res.data.message)
+              }
+              Swal.fire({
+                  icon: 'success',
+                  title: '登録が完了しました。',
+                  text: 'メールに登録した発注番号を記載しています',
+              }).then((result) => {
+                location.href = _ROOT + "&path=/order/unapproved/show";
+              });
+              return true ;
           } catch (error) {
             Swal.fire({
               icon: 'error',
               title: 'システムエラー',
               text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
-            });
-          }
-          
+          });
+        }
       });
 
       const orderPrice = (idx) => {

@@ -16,8 +16,10 @@ class DivisionController extends Controller
         global $SPIRAL;     
         $token = $this->request->get('_csrf');
         Csrf::validate($token,true);
+        
+        $isOnlyMyDivision = ( $this->request->get('isOnlyMyDivision') === 'true' || $this->request->get('isOnlyMyDivision') === '1');
 
-        $inputData = new DivisionShowInputData((new Auth(HospitalUser::class))->hospitalId);
+        $inputData = new DivisionShowInputData($this->request->user() , $isOnlyMyDivision);
         $inputPort->handle($inputData);
     }
 }

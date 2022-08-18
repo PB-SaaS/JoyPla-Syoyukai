@@ -4,6 +4,7 @@ namespace JoyPla\InterfaceAdapters\GateWays\Repository;
 
 use App\Model\InHospitalItem;
 use App\SpiralDb\InHospitalItemView;
+use App\SpiralDb\Price;
 use App\SpiralDb\StockView;
 use Auth;
 use Collection;
@@ -74,6 +75,21 @@ class StockRepository implements StockRepositoryInterface
 
         $inHospitalItem = ($inHospitalItem->get())->data->all();
 
+        $price = Price::where('hospitalId' , $auth->hospitalId)->value('priceId')->value('notice');
+
+        foreach($inHospitalItem as $item)
+        {
+            $price->orWhere('priceId',$item->priceId);
+        }
+
+        $price = ($price->get())->data->all();
+
+        foreach($inHospitalItem as $key => $item)
+        {
+            $price_fkey = array_search($item->priceId, collect_column($price, 'priceId'));
+            $inHospitalItem[$key]->set('priceNotice',$price[$price_fkey]->notice);
+        }
+
         $result = [];
         $maxcount = $stocks->count;
         
@@ -81,8 +97,11 @@ class StockRepository implements StockRepositoryInterface
         {
             $fkey = array_search($i->inHospitalItemId , collect_column($inHospitalItem , 'inHospitalItemId'));
             $merge = array_merge($i->all() , $inHospitalItem[$fkey]->all());
-            $result[] = ( Stock::create(new Collection($merge)) );
+            $r = ( Stock::create(new Collection($merge)) )->toArray();
+            $r['priceNotice'] = $inHospitalItem[$fkey]->priceNotice;
+            $result[] = $r;
         }
+        
 
         return [$result , $maxcount];
     }

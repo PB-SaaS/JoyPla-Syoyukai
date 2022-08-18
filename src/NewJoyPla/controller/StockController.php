@@ -371,6 +371,8 @@ class StockController extends Controller
     
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => $title,
+                    'submenulink' => "%url/rel:mpg:top%&path=stock",
+                    'submenu' => '在庫メニュー',
                     'table' => '%sf:usr:search33:table%',
                     'csrf_token' => Csrf::generate(16)
                     ] , false);

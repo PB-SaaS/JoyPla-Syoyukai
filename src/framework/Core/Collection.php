@@ -194,22 +194,3 @@ class Collection
         return null; 
     }
 }
-
-/**
- * helper
- * Todo いつか別ファイルにする
- */
-
-function collect(array $ary){
-    return new Collection($ary);
-}
-
-function collect_column($array, $key)
-{
-    $result = []; 
-    foreach($array as $a )
-    {
-        $result[] = $a->{$key};
-    }
-    return $result;
-}

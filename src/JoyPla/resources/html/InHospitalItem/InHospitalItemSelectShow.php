@@ -124,7 +124,7 @@ var JoyPlaApp = Vue.createApp({
       'v-button-default': vButtonDefault,
       'v-button-primary': vButtonPrimary,
       'v-input-number': vInputNumber,
-      'v-inhospitalitem-modal': vInHospitalItemModal,
+      'v-in-hospital-item-modal': vInHospitalItemModal,
       'header-navi' : headerNavi
     },
     data(){
@@ -140,7 +140,7 @@ var JoyPlaApp = Vue.createApp({
           {
             text: '消費メニュー',
             disabled: false,
-            href: '%url/rel:mpgt:Root%&path=/consumption',
+            href: _ROOT + '&path=/consumption',
           },
           {
             text: '個別消費',

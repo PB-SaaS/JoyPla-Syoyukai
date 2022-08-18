@@ -35,6 +35,7 @@ class PriceSlipController extends Controller
                 {
                     $breadcrumb = <<<EOM
                     <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                    <li><a href="%url/rel:mpg:top%&path=product">商品メニュー</a></li>
                     <li><a href="%url/rel:mpgt:Price%&Action=Price&table_cache=true">金額情報一覧</a></li>
                     <li><span>金額情報変更</span></li>
 EOM;
@@ -43,6 +44,7 @@ EOM;
                 {
                     $breadcrumb = <<<EOM
                     <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                    <li><a href="%url/rel:mpg:top%&path=product">商品メニュー</a></li>
                     <li><a href="%url/rel:mpgt:Product%&Action=Item&table_cache=true">商品マスタ</a></li>
                     <li><a href="javascript:history.back()">商品情報詳細</a></li>
                     <li><span>金額情報変更</span></li>

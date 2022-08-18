@@ -6,6 +6,7 @@
 namespace JoyPla\Application\Interactors\Api\Order {
 
     use App\Model\Division;
+    use Exception;
     use JoyPla\Application\InputPorts\Api\Order\OrderRegisterInputData;
     use JoyPla\Application\InputPorts\Api\Order\OrderRegisterInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\Order\OrderRegisterOutputData;
@@ -21,6 +22,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\Enterprise\Models\HospitalName;
     use JoyPla\Enterprise\Models\OrderAdjustment;
+    use JoyPla\Enterprise\Models\TextArea512Bytes;
     use JoyPla\InterfaceAdapters\GateWays\Repository\HospitalRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
 
@@ -53,8 +55,16 @@ namespace JoyPla\Application\Interactors\Api\Order {
         public function handle(OrderRegisterInputData $inputData , $adjustment)
         {
 
-            $hospitalId = new HospitalId($inputData->hospitalId);
+            $hospitalId = new HospitalId($inputData->user->hospitalId);
             $hospital = $this->hospitalRepository->find($hospitalId);
+
+            $inputData->orderItems = array_map(function($v) use ($inputData){
+                if($inputData->isOnlyMyDivision && $inputData->user->divisionId !== $v->divisionId)
+                {
+                    throw new Exception('Illegal request',403);
+                }
+                return $v;
+            },$inputData->orderItems);
 
             $orderItems = $this->orderRepository->findByInHospitalItem( $hospitalId , $inputData->orderItems );
             $historyOrders = [];
@@ -108,7 +118,9 @@ namespace JoyPla\Application\Interactors\Api\Order {
                     $i->getDistributor(), 
                     ( new OrderStatus(OrderStatus::UnOrdered) ) , 
                     ( new OrderAdjustment($adjustment)) ,
-                    $inputData->user->name
+                    ( new TextArea512Bytes("")),
+                    $inputData->user->name,
+                    1
                 );
             }
 
@@ -164,9 +176,10 @@ namespace JoyPla\Application\InputPorts\Api\Order {
         /**
          * OrderRegisterInputData constructor.
          */
-        public function __construct(Auth $user , string $hospitalId , array $orderItems , bool $integrate)
+        public function __construct(Auth $user , array $orderItems , bool $integrate , bool $isOnlyMyDivision)
         {
-            $this->hospitalId = $hospitalId;
+            $this->user = $user;
+
             $this->orderItems = array_map(function($v){
                 $object = new stdClass();
                 $object->inHospitalItemId = $v['inHospitalItemId'];
@@ -177,7 +190,7 @@ namespace JoyPla\Application\InputPorts\Api\Order {
 
             $this->integrate = $integrate;
 
-            $this->user = $user;
+            $this->isOnlyMyDivision = $isOnlyMyDivision;
         }
     }
  

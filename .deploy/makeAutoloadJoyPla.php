@@ -1,6 +1,7 @@
 <?php
 $outputtext = "<?php".PHP_EOL; 
 $outputtext .= "require_once('JoyPla/config.php');".PHP_EOL; 
+$outputtext .= "require_once('JoyPla/JoyPlaApplication.php');".PHP_EOL; 
 
 foreach(scanDirctory('../src/JoyPla/Domain/Traits') as $file){
     $file = str_replace("../src/", "", $file);
@@ -26,6 +27,10 @@ foreach(scanDirctory('../src/JoyPla/Enterprise/Traits') as $file){
 }
 
 foreach(scanDirctory('../src/JoyPla/Enterprise/Models') as $file){
+    $file = str_replace("../src/", "", $file);
+    $outputtext .= "require_once('$file');".PHP_EOL; 
+}
+foreach(scanDirctory('../src/JoyPla/Enterprise/CommonModels') as $file){
     $file = str_replace("../src/", "", $file);
     $outputtext .= "require_once('$file');".PHP_EOL; 
 }

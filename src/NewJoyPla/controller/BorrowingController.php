@@ -235,6 +235,8 @@ class BorrowingController extends Controller
             {
                 $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '使用申請一覧',
+                    'submenulink' => "%url/rel:mpg:top%&path=lending",
+                    'submenu' => '貸出メニュー',
                     'table' => '%sf:usr:search27:mstfilter%',
                     'csrf_token' => Csrf::generate(16),
                     'print' => true
@@ -298,6 +300,8 @@ class BorrowingController extends Controller
             
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '使用申請一覧',
+                    'submenulink' => "%url/rel:mpg:top%&path=lending",
+                    'submenu' => '貸出メニュー',
                     'table' => '%sf:usr:search27:mstfilter%',
                     'csrf_token' => Csrf::generate(16),
                     'print' => true
@@ -348,6 +352,8 @@ class BorrowingController extends Controller
                 $content = $this->view('NewJoyPla/view/template/List', [
                         'title' => '貸出伝票一覧',
                         'table' => '%sf:usr:search28:mstfilter%',
+                        'submenulink' => "%url/rel:mpg:top%&path=lending",
+                        'submenu' => '貸出メニュー',
                         'csrf_token' => Csrf::generate(16),
                         'print' => true
                         ] , false);
@@ -415,6 +421,8 @@ class BorrowingController extends Controller
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '貸出伝票一覧',
                     'table' => '%sf:usr:search28:mstfilter%',
+                    'submenulink' => "%url/rel:mpg:top%&path=lending",
+                    'submenu' => '貸出メニュー',
                     'csrf_token' => Csrf::generate(16),
                     'print' => true
                     ] , false);

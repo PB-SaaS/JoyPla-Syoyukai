@@ -26,5 +26,10 @@ require_once "NewJoyPla/model/Base.php";
 require_once 'NewJoyPlaTenantAdmin/lib/Auth.php';
 require_once "NewJoyPlaTenantAdmin/lib/Define.php";
 
-
 require_once "NewJoyPlaTenantAdmin/controller/Validate/Validate.php";
+
+function number_format_jp($num)
+{
+    if(empty($num)) { return 0; }
+    return preg_replace("/\.?0+$/","",number_format($num,2));
+}

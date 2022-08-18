@@ -13,9 +13,14 @@ namespace JoyPla\Application\Interactors\Api\Order {
     use JoyPla\Application\OutputPorts\Api\Order\OrderRevisedOutputPortInterface;
     use JoyPla\Enterprise\Models\Order;
     use JoyPla\Enterprise\Models\HospitalId;
+    use JoyPla\Enterprise\Models\InventoryCalculation;
+    use JoyPla\Enterprise\Models\Lot;
+    use JoyPla\Enterprise\Models\LotDate;
+    use JoyPla\Enterprise\Models\LotNumber;
     use JoyPla\Enterprise\Models\OrderId;
     use JoyPla\Enterprise\Models\OrderQuantity;
     use JoyPla\Enterprise\Models\OrderStatus;
+    use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
 
     /**
@@ -34,10 +39,11 @@ namespace JoyPla\Application\Interactors\Api\Order {
          * OrderRevisedInteractor constructor.
          * @param OrderRevisedOutputPortInterface $outputPort
          */
-        public function __construct(OrderRevisedOutputPortInterface $outputPort , OrderRepositoryInterface $orderRepository)
+        public function __construct(OrderRevisedOutputPortInterface $outputPort , OrderRepositoryInterface $orderRepository , InventoryCalculationRepositoryInterface $inventoryCalculationRepository)
         {
             $this->outputPort = $outputPort;
             $this->orderRepository = $orderRepository;
+            $this->inventoryCalculationRepository = $inventoryCalculationRepository;
         }
 
         /**
@@ -66,17 +72,30 @@ namespace JoyPla\Application\Interactors\Api\Order {
                 {
                     if( $item->getOrderItemId()->equal($revisedItem->orderItemId))
                     {
+                        $nowOrderQuantity = $item->getOrderQuantity();
                         $orderQuantity = new OrderQuantity($revisedItem->revisedOrderQuantity);
                         
                         $isPlusRevised = (  $item->isPlus() && ($item->getOrderQuantity()->value() >= $orderQuantity->value()) && ($item->getReceivedQuantity()->value() <= $orderQuantity->value()) );
                         $isMinusRevised = (  $item->isMinus() && ($item->getOrderQuantity()->value() <= $orderQuantity->value()) && ($item->getReceivedQuantity()->value() >= $orderQuantity->value()) );
-                    
                         if( ! ( $isPlusRevised || $isMinusRevised ) )
                         {
                             throw new Exception('The number of orders exceeded the number of corrections possible, and therefore, could not be registered.',422);
                         }
 
                         $orderItems[$fkey] = $item->setOrderQuantity($orderQuantity);
+                        
+                        $inventoryCalculations[] = new InventoryCalculation(
+                            $item->getHospitalId(),
+                            $item->getDivision()->getDivisionId(),
+                            $item->getInHospitalItemId(),
+                            ( $item->getOrderQuantity()->value() - $orderQuantity->value() ) * $item->getQuantity()->getQuantityNum() * -1,
+                            2,
+                            (new Lot(
+                                new LotNumber(''),
+                                new LotDate('')
+                            )),
+                            0,
+                        );
                     }
                 }
             }
@@ -86,6 +105,8 @@ namespace JoyPla\Application\Interactors\Api\Order {
             $this->orderRepository->saveToArray(
                 (new HospitalId($inputData->user->hospitalId)),
                 [$order]);
+            
+            $this->inventoryCalculationRepository->saveToArray($inventoryCalculations);
 
             $this->outputPort->output(new OrderRevisedOutputData());
         }

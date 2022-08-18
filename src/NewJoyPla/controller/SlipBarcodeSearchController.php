@@ -33,11 +33,11 @@ class SlipBarcodeSearchController extends Controller
       {
             global $SPIRAL;
             $this->card_title = array(
-                  '02' => HP_BILLING_PAGE,
-                  '03_unorder' => HP_UNORDER_PAGE,
-                  '03_order' => HP_ORDER_PAGE,
-                  '04' => HP_RECEIVING_PAGE,
-                  '06' => HP_RETERN_PAGE,
+                  '02' => HP_BILLING_PAGE,//UI改善により変更
+                  '03_unorder' => HP_UNORDER_PAGE,//UI改善により変更
+                  '03_order' => HP_ORDER_PAGE,//UI改善により変更
+                  '04' => HP_RECEIVING_PAGE,//UI改善により変更
+                  '06' => HP_RETERN_PAGE,//UI改善により変更
                   '05' => HP_PAYOUT_PAGE,
                   '08' => HP_DIVISION_INVENTORY_PAGE,
                   '09' => HP_END_INVENTORY_PAGE,
@@ -72,7 +72,7 @@ class SlipBarcodeSearchController extends Controller
                   $record = '';
                   $content = '';
                   
-                  if(preg_match('/^02/', $search_value) && strlen($search_value) == 18)
+                  if(preg_match('/^02/', $search_value) && ( strlen($search_value) == 18 || strlen($search_value) == 15 ))
                   {
                         //物品請求
                         $result = BillingHistory::where('billingNumber',$search_value)->where('hospitalId',$user_info->getHospitalId())->get();
@@ -83,11 +83,9 @@ class SlipBarcodeSearchController extends Controller
 
                         $record = $result->data->get(0);
 
-                        if(isset($this->card_title['02'])){
-                              $card_title = $this->card_title['02'];
-                        }
+                        $content = json_encode( [ 'code' => 0 , 'message' => 'OK' , 'urls' => [ '%url/rel:mpgt:Root%&path=/consumption/' . $search_value ]],JSON_UNESCAPED_SLASHES);
                   } 
-                  else if(preg_match('/^03/', $search_value) && strlen($search_value) == 18)
+                  else if(preg_match('/^03/', $search_value) && ( strlen($search_value) == 18 || strlen($search_value) == 15 ))
                   {
                         //注文書
                         $result = OrderHistory::where('orderNumber',$search_value)->where('hospitalId',$user_info->getHospitalId())->get();
@@ -98,15 +96,15 @@ class SlipBarcodeSearchController extends Controller
 
                         $record = $result->data->get(0);
                         if($record->orderStatus == '1'){
-                              $card_title = $this->card_title['03_unorder'];
+                              $content = json_encode( [ 'code' => 0 , 'message' => 'OK' , 'urls' => [ '%url/rel:mpgt:Root%&path=/order/unapproved/' . $search_value ]],JSON_UNESCAPED_SLASHES);
                         }
                         else
                         if(isset($this->card_title['03_order'])){
-                              $card_title = $this->card_title['03_order'];
+                              $content = json_encode( [ 'code' => 0 , 'message' => 'OK' , 'urls' => [ '%url/rel:mpgt:Root%&path=/order/' . $search_value ]],JSON_UNESCAPED_SLASHES);
                         }
 
                   } 
-                  else if(preg_match('/^04/', $search_value) && strlen($search_value) == 18)
+                  else if(preg_match('/^04/', $search_value) && ( strlen($search_value) == 18 || strlen($search_value) == 15 ))
                   {
                         //検収書
                         $result = ReceivingHistory::where('receivingHId',$search_value)->where('hospitalId',$user_info->getHospitalId())->get();
@@ -120,9 +118,13 @@ class SlipBarcodeSearchController extends Controller
                         if(isset($this->card_title['04'])){
                               $card_title = $this->card_title['04'];
                         }
+
+                        $content = json_encode( [ 'code' => 0 , 'message' => 'OK' , 'urls' => [ '%url/rel:mpgt:Root%&path=/received/' . $search_value ]],JSON_UNESCAPED_SLASHES);
                   } 
-                  else if(preg_match('/^06/', $search_value) && strlen($search_value) == 18)
+                  else if(preg_match('/^06/', $search_value) && ( strlen($search_value) == 18 || strlen($search_value) == 15 ))
                   {
+                        /*
+                        UI改善により非表示
                         //返品書
                         $result = ReturnHistory::where('returnHistoryID',$search_value)->where('hospitalId',$user_info->getHospitalId())->get();
 
@@ -131,10 +133,11 @@ class SlipBarcodeSearchController extends Controller
                         }
 
                         $record = $result->data->get(0);
-
                         if(isset($this->card_title['06'])){
                               $card_title = $this->card_title['06'];
                         }
+                        
+                        */
                   } 
                   else if(preg_match('/^05/', $search_value) && strlen($search_value) == 18)
                   {

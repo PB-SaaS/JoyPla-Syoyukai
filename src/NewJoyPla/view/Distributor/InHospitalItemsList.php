@@ -3,6 +3,7 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&page=page7">商品・見積</a></li>
                 <li><span>院内商品マスタ</span></li>
             </ul>
             <div class="no_print uk-margin">

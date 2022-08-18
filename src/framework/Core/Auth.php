@@ -11,4 +11,20 @@ class Auth
             $this->{$f} = $SPIRAL->getContextByFieldTitle($f);
         }
     }
+
+    public function collectMerge(Collection $collection , $primaryKey)
+    {
+        if($this->{$primaryKey} === $collection->{$primaryKey})
+        {
+            foreach($collection->all() as $key => $val)
+            {
+                if(! isset($this->{$key}))
+                {
+                    $this->{$key} = $val;
+                }
+            }
+        }
+
+        return $this;
+    }
 } 

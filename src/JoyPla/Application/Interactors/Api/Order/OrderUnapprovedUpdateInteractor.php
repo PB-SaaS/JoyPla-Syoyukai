@@ -20,6 +20,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
     use JoyPla\Enterprise\Models\OrderItemId;
     use JoyPla\Enterprise\Models\OrderQuantity;
     use JoyPla\Enterprise\Models\OrderStatus;
+    use JoyPla\Enterprise\Models\TextArea512Bytes;
     use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
 
     /**
@@ -49,7 +50,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
          */
         public function handle(OrderUnapprovedUpdateInputData $inputData)
         {
-            $hospitalId = new HospitalId($inputData->hospitalId);
+            $hospitalId = new HospitalId($inputData->user->hospitalId);
             $orderId = new OrderId($inputData->orderId);
             $order = $this->orderRepository->index(
                 $hospitalId,
@@ -59,8 +60,12 @@ namespace JoyPla\Application\Interactors\Api\Order {
                 ]
             );
             
-
             if( $order === null ){
+                throw new NotFoundException("Not Found.",404);
+            }
+
+            if($inputData->isOnlyMyDivision && ! $order->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
+            {
                 throw new NotFoundException("Not Found.",404);
             }
 
@@ -73,7 +78,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
             }
 
             $order = $order->setOrderItems($orderItems);
-
+            $order = $order->setOrderComment(new TextArea512Bytes($inputData->comment));
             $order = $order->setAdjustment( (new OrderAdjustment($inputData->adjustment)) );
 
             $this->orderRepository->saveToArray($hospitalId , [$order]);
@@ -90,6 +95,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
  */
 namespace JoyPla\Application\InputPorts\Api\Order {
 
+    use Auth;
     use stdClass;
 
     /**
@@ -101,11 +107,12 @@ namespace JoyPla\Application\InputPorts\Api\Order {
         /**
          * OrderUnapprovedUpdateInputData constructor.
          */
-        public function __construct(string $hospitalId , array $order )
+        public function __construct(Auth $user , array $order , bool $isOnlyMyDivision)
         {
-            $this->hospitalId = $hospitalId;
+            $this->user = $user;
             $this->orderId = $order['orderId'];
             $this->adjustment = $order['adjustment'];
+            $this->comment = $order['comment'];
             $this->updateModel = array_map(function(array $model)
             {
                 return [
@@ -113,6 +120,8 @@ namespace JoyPla\Application\InputPorts\Api\Order {
                     'orderQuantity' => $model['orderQuantity'],
                 ];
             },$order['updateModel']);
+
+            $this->isOnlyMyDivision = $isOnlyMyDivision;
         }
     }
 

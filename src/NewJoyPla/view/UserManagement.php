@@ -3,9 +3,10 @@
 	    <div class="uk-container uk-container-expand">
 	    	<ul class="uk-breadcrumb no_print">
 			    <li><a href="%url/rel:mpg:top%">TOP</a></li>
-			    <li><span>ユーザー管理</span></li>
+                <li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
+			    <li><span>ユーザー一覧</span></li>
 			</ul>
-    			<h2 class="page_title uk-margin-remove">ユーザー管理</h2>
+    			<h2 class="page_title uk-margin-remove">ユーザー一覧</h2>
 	    	<hr>
 	    	<div class="">
 				<div uk-grid uk-margin>

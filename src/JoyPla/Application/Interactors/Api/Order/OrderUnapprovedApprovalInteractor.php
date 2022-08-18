@@ -15,11 +15,16 @@ namespace JoyPla\Application\Interactors\Api\Order {
     use JoyPla\Application\OutputPorts\Api\Order\OrderUnapprovedApprovalOutputPortInterface;
     use JoyPla\Enterprise\Models\Order;
     use JoyPla\Enterprise\Models\HospitalId;
+    use JoyPla\Enterprise\Models\InventoryCalculation;
+    use JoyPla\Enterprise\Models\Lot;
+    use JoyPla\Enterprise\Models\LotDate;
+    use JoyPla\Enterprise\Models\LotNumber;
     use JoyPla\Enterprise\Models\OrderAdjustment;
     use JoyPla\Enterprise\Models\OrderId;
     use JoyPla\Enterprise\Models\OrderItemId;
     use JoyPla\Enterprise\Models\OrderQuantity;
     use JoyPla\Enterprise\Models\OrderStatus;
+    use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
 
     /**
@@ -38,10 +43,11 @@ namespace JoyPla\Application\Interactors\Api\Order {
          * OrderUnapprovedApprovalInteractor constructor.
          * @param OrderUnapprovedApprovalOutputPortInterface $outputPort
          */
-        public function __construct(OrderUnapprovedApprovalOutputPortInterface $outputPort , OrderRepositoryInterface $orderRepository)
+        public function __construct(OrderUnapprovedApprovalOutputPortInterface $outputPort , OrderRepositoryInterface $orderRepository , InventoryCalculationRepositoryInterface $inventoryCalculationRepository)
         {
             $this->outputPort = $outputPort;
             $this->orderRepository = $orderRepository;
+            $this->inventoryCalculationRepository = $inventoryCalculationRepository;
         }
 
         /**
@@ -49,7 +55,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
          */
         public function handle(OrderUnapprovedApprovalInputData $inputData)
         {
-            $hospitalId = new HospitalId($inputData->hospitalId);
+            $hospitalId = new HospitalId($inputData->user->hospitalId);
             $orderId = new OrderId($inputData->orderId);
             $order = $this->orderRepository->index(
                 $hospitalId,
@@ -63,9 +69,32 @@ namespace JoyPla\Application\Interactors\Api\Order {
                 throw new NotFoundException("Not Found.",404);
             }
 
+            if($inputData->isOnlyMyDivision && ! $order->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
+            {
+                throw new NotFoundException("Not Found.",404);
+            }
+
             $order = $order->approval();
             
             $this->orderRepository->saveToArray($hospitalId , [$order]);
+            
+            $inventoryCalculations = [];
+            foreach($order->getOrderItems() as $item)
+            {
+                $inventoryCalculations[] = new InventoryCalculation(
+                    $item->getHospitalId(),
+                    $item->getDivision()->getDivisionId(),
+                    $item->getInHospitalItemId(),
+                    $item->getOrderQuantity()->value() * $item->getQuantity()->getQuantityNum(),
+                    2,
+                    (new Lot(  new LotNumber('') ,new LotDate('')  )),
+                    0
+                );
+            }
+
+            $this->orderRepository->sendApprovalOrderMail($order , $inputData->user);
+
+            $this->inventoryCalculationRepository->saveToArray($inventoryCalculations);
             
             $this->outputPort->output(new OrderUnapprovedApprovalOutputData($order));
         }
@@ -79,6 +108,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
  */
 namespace JoyPla\Application\InputPorts\Api\Order {
 
+    use Auth;
     use stdClass;
 
     /**
@@ -90,10 +120,11 @@ namespace JoyPla\Application\InputPorts\Api\Order {
         /**
          * OrderUnapprovedApprovalInputData constructor.
          */
-        public function __construct(string $hospitalId , string $orderId )
+        public function __construct(Auth $user , string $orderId , bool $isOnlyMyDivision)
         {
-            $this->hospitalId = $hospitalId;
+            $this->user = $user;
             $this->orderId = $orderId;
+            $this->isOnlyMyDivision = $isOnlyMyDivision;
         }
     }
 

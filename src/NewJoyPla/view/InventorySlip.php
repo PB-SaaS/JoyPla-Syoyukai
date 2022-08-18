@@ -4,12 +4,19 @@
 		    <div class="uk-container uk-container-expand">
 		    	<ul class="uk-breadcrumb no_print">
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&path=stocktaking">棚卸メニュー</a></li>
 				    <li><a href="<?php echo $link ?>&table_cache=true"><span>棚卸履歴一覧</span></a></li>
 				    <li><a href="#" onclick="end_inventory_slip.search('%val:usr:inventoryEndId%')"><span>棚卸結果報告</span></a></li>
 				    <li><span>%val:usr:divisionName% 棚卸結果報告</span></li>
 				</ul>
 				<div class="no_print uk-margin" uk-margin>
 					<input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
+					<?php if($updateSaving) : ?>
+					<input class="print_hidden uk-button uk-button-primary" type="button" value="完了する" onclick="end_inventory_slip.updateSaving();return false;" style="text-transform:none;">
+			    	<?php endif ?>
+					<?php if($updateTemporarySaving) : ?>
+					<input class="print_hidden uk-button uk-button-primary" type="button" value="一時保存に戻す" onclick="end_inventory_slip.updateTemporarySaving();return false;" style="text-transform:none;">
+			    	<?php endif ?>
 			    	<?php if($delete_button_view_flg): ?>
 					<input class="print_hidden uk-button uk-button-danger" type="button" value="%val:usr:divisionName% 棚卸取消" onclick="end_inventory_slip.deleteInvForDiv();return false;" style="text-transform:none;">
 			    	<?php endif ?>
@@ -31,6 +38,21 @@
 		    					<td class="uk-text-bold">棚卸更新日時</td>
 		    					<td class="uk-text-right">%val:usr:updateTime%</td>
 		    				</tr>
+		    				<tr>
+		    					<td class="uk-text-bold">保存状態</td>
+		    					<td class="uk-text-right">
+									<script>
+										if('%val:usr:inventoryHStatus:id%' === '2')
+										{
+											document.write('<span class="uk-label uk-padding-small uk-padding-remove-vertical uk-label-success" >%val:usr:inventoryHStatus%</span>');
+										} else 
+										{
+											
+											document.write('<span class="uk-label uk-padding-small uk-padding-remove-vertical uk-label-danger" >%val:usr:inventoryHStatus%</span>');
+										}
+									</script>
+								</td>
+		    				</tr> 
 		    				<tr>
 		    					<td class="uk-text-bold">部署名</td>
 		    					<td class="uk-text-right">%val:usr:divisionName%</td>
@@ -81,13 +103,13 @@
 				    						echo "<td>".$record->itemCode."</td>";
 				    						echo "<td>".$record->itemStandard."</td>";
 				    						echo "<td>".$record->itemJANCode."</td>";
-				    						echo "<td>￥".number_format($record->price,2)."</td>";
-				    						echo "<td>￥".number_format($record->unitPrice,2)."</td>";
+				    						echo "<td>￥".number_format_jp($record->price)."</td>";
+				    						echo "<td>￥".number_format_jp($record->unitPrice)."</td>";
 				    						//echo "<td>".(int)$record->stockQuantity."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
-				    						echo "<td>".(int)$record->calculatingStock."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
-				    						echo "<td>".$record->inventryNum."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
-				    						echo "<td>￥".number_format($record->inventryAmount,2)."</td>";
-				    						echo "<td>".((int)$record->calculatingStock - (int)$record->inventryNum)."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
+				    						echo "<td>".number_format_jp((int)$record->calculatingStock)."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
+				    						echo "<td>".number_format_jp($record->inventryNum)."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
+				    						echo "<td>￥".number_format_jp($record->inventryAmount)."</td>";
+				    						echo "<td>".number_format_jp((int)$record->calculatingStock - (int)$record->inventryNum)."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
 				    						echo "</tr>";
 				    						$num++;
 										}
@@ -99,7 +121,7 @@
 		    	</div>
 
 			    <div class="uk-margin" id="tablearea">
-			    　　<?php echo $table ?>
+			    <?php echo $table ?>
 		        </div>
 		    	
 		    </div>
@@ -108,6 +130,88 @@
 	<script>
 	
 	class EndInventorySlip {
+		updateTemporarySaving(){
+			UIkit.modal.confirm("伝票を一時保存ステータスに更新します。<br>よろしいですか").then(function () {
+				loading();
+				$.ajax({
+					async: false,
+                    url: "<?php echo $api_url ?>",
+                    type:'POST',
+                    data:{
+                        _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+                        Action : "updateTemporarySaving",
+                    },
+					dataType: "json"
+				})
+				// Ajaxリクエストが成功した時発動
+				.done( (data) => {
+					if(data.code == '1'){
+						UIkit.modal.alert(data.message);
+						return false;
+					}
+					if(! data.result){
+						UIkit.modal.alert("更新に失敗しました");
+						return false;
+					}
+					UIkit.modal.alert("一時保存ステータスに更新しました").then(function(){
+						location.reload();
+					});
+					
+				})
+				// Ajaxリクエストが失敗した時発動
+				.fail( (data) => {
+					UIkit.modal.alert("更新に失敗しました");
+					return false;
+				})
+				// Ajaxリクエストが成功・失敗どちらでも発動
+				.always( (data) => {
+					loading_remove();
+				});
+			}, function () {
+				UIkit.modal.alert("中止します");
+			});
+		}
+		updateSaving(){
+			UIkit.modal.confirm("伝票を完了ステータスに更新します。<br>よろしいですか").then(function () {
+				loading();
+				$.ajax({
+					async: false,
+                    url: "<?php echo $api_url ?>",
+                    type:'POST',
+                    data:{
+                        _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+                        Action : "updateSaving",
+                    },
+					dataType: "json"
+				})
+				// Ajaxリクエストが成功した時発動
+				.done( (data) => {
+					if(data.code == '1'){
+						UIkit.modal.alert(data.message);
+						return false;
+					}
+					if(! data.result){
+						UIkit.modal.alert("更新に失敗しました");
+						return false;
+					}
+					UIkit.modal.alert("完了ステータスに更新しました").then(function(){
+						location.reload();
+					});
+				})
+				// Ajaxリクエストが失敗した時発動
+				.fail( (data) => {
+					
+					UIkit.modal.alert("更新に失敗しました");
+					return false;
+				})
+				// Ajaxリクエストが成功・失敗どちらでも発動
+				.always( (data) => {
+					loading_remove();
+				});
+			}, function () {
+				UIkit.modal.alert("中止します");
+			});
+		}
 		deleteInvForDiv(){
 			UIkit.modal.confirm("伝票を取消します。<br>よろしいですか").then(function () {
 				loading();
@@ -124,6 +228,10 @@
 				// Ajaxリクエストが成功した時発動
 				.done( (data) => {
 					
+					if(data.code == '1'){
+						UIkit.modal.alert(data.message);
+						return false;
+					}
 					if(! data.result){
 						UIkit.modal.alert("取消に失敗しました");
 						return false;

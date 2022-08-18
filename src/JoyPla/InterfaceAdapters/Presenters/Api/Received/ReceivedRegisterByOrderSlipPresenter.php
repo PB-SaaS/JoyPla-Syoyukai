@@ -30,8 +30,8 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\Received {
          */
         public function __construct(ReceivedRegisterByOrderSlipOutputData $source)
         {
-            $this->data = $source->stocks;
-            $this->count = $source->count;
+            $this->data = $source->received;
+            $this->count = count($source->received);
             $this->code = 200; 
             $this->message = "success";
         }

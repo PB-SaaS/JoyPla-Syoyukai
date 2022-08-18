@@ -19,7 +19,7 @@ class NotificationController extends Controller
 {
     
     public $links = [
-        'unorderedList' => '%url/rel:mpgt:Order%&Action=unorderedList',
+        'unorderedList' => '%url/rel:mpgt:Root%&path=/order/unapproved/show',
         'stock' => '%url/rel:mpgt:Stock%&Action=stockManagementList',
         'lot' => '%url/rel:mpgt:Lots%&Action=lotManagementList'
         ];

@@ -63,8 +63,10 @@ class ReceivingHistListController extends Controller
                 }
                 $content = $this->view('NewJoyPla/view/template/List', [
                         'title' => '入荷履歴詳細一覧',
-                        'print' => true,
-                        'export' => true,
+                        'submenulink' => "%url/rel:mpg:top%&path=trackrecord",
+                        'submenu' => '実績メニュー',
+                        'print' => false,
+                        'export' => false,
                         'table' => '%sf:usr:search41:mstfilter%',
                         'csrf_token' => Csrf::generate(16),
                         'script' => $division_script->render().($this->view('NewJoyPla/view/Script/OrderHistoryDetailList', ['distributor' => $distributor] , false)->render())
@@ -137,6 +139,8 @@ class ReceivingHistListController extends Controller
                     'title' => '入荷履歴詳細一覧',
                     'print' => true,
                     'export' => true,
+                    'submenulink' => "%url/rel:mpg:top%&path=trackrecord",
+                    'submenu' => '実績メニュー',
                     'table' => '%sf:usr:search41:mstfilter%',
                     'csrf_token' => Csrf::generate(16),
                     'script' => $script

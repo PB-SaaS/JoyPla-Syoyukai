@@ -603,6 +603,7 @@ colors = {
 module.exports = {
     content: [
         "./src/**/*.{html,js,php,vue}", "./src/JoyPla/resources/parts/component/*.php", "./src/JoyPla/resources/parts/*.php", "./src/JoyPla/resources/*.php"
+        //"./src/NewJoyPla/src/HeaderForMypage.php"
     ],
     theme: {
         colors: colors

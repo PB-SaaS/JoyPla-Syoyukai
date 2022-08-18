@@ -115,6 +115,8 @@ class ConsumeController extends Controller
                         'title' => '消費一覧',
                         'table' => '%sf:usr:goodsBillingList:mstfilter%',
                         'csrf_token' => Csrf::generate(16),
+                        'submenulink' => "%url/rel:mpg:top%&page=page1",
+                        'submenu' => '消費・発注',
                         ] , false);
             } else {
                 $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
@@ -174,6 +176,8 @@ class ConsumeController extends Controller
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '消費一覧',
                     'table' => '%sf:usr:goodsBillingList:mstfilter%',
+                    'submenulink' => "%url/rel:mpg:top%&page=page1",
+                    'submenu' => '消費・発注',
                     'csrf_token' => Csrf::generate(16),
                     ] , false);
     

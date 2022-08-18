@@ -1,6 +1,6 @@
 <?php
 
-use App\Lib\LogggingSpiralv2;
+use App\Lib\LoggingSpiralv2;
 
 class Logger 
 {

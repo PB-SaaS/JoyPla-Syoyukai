@@ -90,7 +90,7 @@ const vInput = {
   watch: {
     value(){
       this.changeClass = {
-        "${this.changeClassName}" : true
+        [this.changeClassName] : true
       };
     }
   },
@@ -125,12 +125,12 @@ const vInputNumber = {
     };
 
     const increment = () => {
-      let num = value.value + props.step;
+      let num = parseInt(value.value) + props.step;
       if( num > props.max ){ return }
       value.value = num;
     };
     const decrement = () => {
-      let num = value.value - props.step;
+      let num = parseInt(value.value) - props.step;
       if( num < props.min ){ return }
       value.value = num;
     };
@@ -180,11 +180,7 @@ const vInputNumber = {
         }, { once: true })
       })
     });
-    const checkNumber = (input) => {
-      if (!input.key.match(/[0-9]/)) input.preventDefault()
-    }
     return {
-      checkNumber,
       incrementDom,
       decrementDom,
       changeClass,
@@ -297,7 +293,6 @@ const vInputNumber = {
               :name="name"
               v-model="value"
               class="appearance-none w-5/6 py-2 pl-3 leading-tight h-full text-right flex-initial bg-white"
-              @keydown="checkNumber"
           />
           <div class="px-2 flex items-center justify-center max-w-xs bg-white whitespace-pre"
               :class="changeClass">
@@ -324,8 +319,52 @@ const vInputNumber = {
 };
 
 const vTextarea = {
+  components: {
+    'v-text' : vText
+  },
+  setup(props) {
+    // a simple `name` field with basic required validator
+    const { ref } = Vue;
+    const { value, errorMessage , meta , validate } = VeeValidate.useField(
+      Vue.toRef(props, 'name'),
+      Vue.toRef(props, 'rules') ,
+       {label : props.label });
+
+    const valid = meta.valid;
+    const validated = meta.validated;
+
+    const isRequired = () => {
+      return props.rules.required;
+    }
+
+    const changeClass = ref({});
+
+    const textcount = () => {
+      let len = 0;
+      for (let i = 0; i < value.value.length; i++) {
+        (value.value[i].match(/[ -~]/)) ? len += 1 : len += 2;
+      }
+      return len ;
+    }
+
+    return {
+      textcount,
+      changeClass,
+      isRequired,
+      value,
+      meta,
+      successClassName: ['text-gray-700', 'border-gray-300'],
+      errorClassName: ['text-red-500', 'border-red-500'],
+      errorMessage,
+    };
+  },
   props: {
-    modelValue: { 
+    label: {
+        type: String, 
+        required: false,
+        default: "", 
+    },
+    type: { 
         type: String, 
         required: true 
     },
@@ -337,69 +376,44 @@ const vTextarea = {
         type: String, 
         required: false 
     },
-    rows: { 
-        type: Number, 
-        required: false 
+    rules: {
+        type: Object, 
+        required: false, 
+        default: {}
     },
-    cols: { 
-        type: Number, 
-        required: false 
+    title: {
+        type: String, 
+        required: false,
+        default : ""
+    },
+    changeClassName: {
+      type: String,
+      required: false,
+      default : ""
     }
   },
-  computed: {
-  },
-  methods: {
-    updateValue: function(e) {
-      this.$emit("update:modelValue", e.target.value);
+  watch: {
+    value(){
+      this.changeClass = {
+        [this.changeClassName] : true
+      };
     }
   },
   template: `
-    <textarea
-        :name="name"
-        :value="modelValue"
-        :placeholder="placeholder"
-        :rows="rows"
-        :cols="cols"
-        @input="updateValue"
-    ></textarea>
-    ` 
-};
-const vRadio = {
-  props: {
-    modelValue: { 
-        type: String, 
-        required: true 
-    },
-    options: { 
-        type: Array, 
-        required: true 
-    },
-    name: { 
-        type: String, 
-        required: true 
-    }
-  },
-  computed: {
-  },
-  methods: {
-    updateValue: function(e) {
-      this.$emit("update:modelValue", e.target.value);
-    }
-  },
-  template: `
-    <fieldset>
-        <template v-for="(option, index) in options">
-        <label>
-            <input
-            type="radio"
-            :name="name"
-            :value="option.value"
-            @change="updateValue"
-            />{{ option.label }}
-        </label>
-        </template>
-    </fieldset>
-    ` 
+    <v-text :title="title" :isRequired="isRequired()">
+      <div class="relative">
+        <textarea
+            :type="type"
+            :placeholder="placeholder"
+            v-model="value"
+            class="appearance-none w-full py-2 px-3 leading-tight h-32 text-left flex-initial bg-white border"
+            :class="[ ( ! meta.valid && meta.validated == true) ? errorClassName : successClassName , changeClass]"
+        ></textarea>
+        <span class="absolute bottom-4 right-6">{{ textcount() }}文字</span>
+      </div>
+        <span class="text-red-500">{{ errorMessage }}</span>
+    </v-text>
+     `
 };
 
 const vSelect = {
@@ -464,6 +478,12 @@ const vSelect = {
   methods: {
   },
   watch: {
+    options() {
+      if(this.options.length === 1)
+      {
+        this.value = this.options[0].value;
+      }
+    },
     value(newValue) {
       this.changeClass = {
         [this.changeClassName] : true
@@ -481,7 +501,7 @@ const vSelect = {
         :class="[( ! meta.valid && meta.validated == true) ? errorClassName : successClassName , changeClass]"
         class="appearance-none border w-full py-2 px-3 leading-tight" >
         <template v-for="(option, index) in options">
-          <option :value="option.value">
+          <option :value="option.value" :selected="option.value == value">
             {{ option.label }}
           </option>
         </template>
@@ -501,22 +521,25 @@ const vCheckbox = {
     const { toRef } = Vue;
     const { useField } = VeeValidate;
     // Must use `toRef` to make the checkboxes names reactive
-    const { checked, handleChange , value } = useField(
+    const { checked, handleChange , value, errorMessage } = useField(
       toRef(props, 'name'),
       toRef(props, 'rules'), 
       {
         label : props.label,
-      type: 'checkbox',
-      valueProp: props.value,
-      initialValue: false,
-      uncheckedValue: false,
-    });
+        type: 'checkbox',
+        checkedValue: props.value,
+      });
+
     return {
       checked, // readonly
       handleChange,
+      errorMessage,
     };
   },
   props: {
+    modelValue: {
+      type: null,
+    },
     // Field's own value
     value: {
       type: null,
@@ -540,17 +563,16 @@ const vCheckbox = {
     }
   },
   template: `
-  <fieldset>
     <label>
       <input
         type="checkbox"
-        @input="handleChange"
-        class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer"
+        @input="handleChange(value)"
+        class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain mr-2 cursor-pointer"
         :value="value"
         :name="name"
       />{{ title }}
-    </label>
-  </fieldset>
+    </label><br>
+    <span class="text-red-500">{{ errorMessage }}</span>
     ` 
 };
 const vButtonPrimary = {
@@ -1025,6 +1047,7 @@ const vPagination = {
 
 const vMultipleSelect = {
   components: {
+    'v-text' : vText,
     'v-open-modal' : vOpenModal,
     'v-button-default': vButtonDefault,
   },
@@ -1141,6 +1164,11 @@ const vMultipleSelect = {
         type: String, 
         required: false,
         default: "", 
+    },
+    id: {
+        type: String, 
+        required: false,
+        default: "", 
     }
   },
   mounted() {
@@ -1151,10 +1179,7 @@ const vMultipleSelect = {
   methods: {
   },
   template: `
-  <fieldset>
-    <legend class="block text-gray-700 text-sm font-bold mb-1">
-        {{ title }} <span v-if="isRequired()" class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
-    </legend>
+  <v-text :title="title" :isRequired="isRequired()">
     <div class="relative appearance-none border w-full py-2 px-3 mr-2 mb-2 text-gray-700 leading-tight border-gray-300 h-full cursor-pointer bg-white" @click="open">
       <span v-if="value.length == 0"> 選択されていません </span>
       <span v-else v-for="v in value" class="bg-gray-100 text-gray-800 text-md font-medium inline-flex items-center px-2.5 py-0.5 rounded mr-2 mb-4">
@@ -1166,7 +1191,7 @@ const vMultipleSelect = {
         </svg>
       </div>
     </div>
-    <v-open-modal ref="multiSelectModal" headtext="複数選択" id="multiSelectModal">
+    <v-open-modal ref="multiSelectModal" :id="id" headtext="複数選択">
       <div class="flex flex-col" style="max-height: 68vh;">
         <div class="overflow-y-scroll my-6">
           <template v-for="(option, index) in options" >
@@ -1195,7 +1220,7 @@ const vMultipleSelect = {
         </div>
       </div>
     </v-open-modal>
-  </fieldset>
+  </v-text>
     ` 
 };
 

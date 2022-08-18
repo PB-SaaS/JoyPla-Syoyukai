@@ -69,7 +69,8 @@ class UserManagementController extends Controller
 		
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
-            <li><a href="%url/rel:mpgt:userManagement%">ユーザー管理</a></li>
+            <li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
+            <li><a href="%url/rel:mpgt:userManagement%">ユーザー一覧</a></li>
             <li><span>ユーザー情報登録</span></li>
 EOM;
             $hidden = [
@@ -164,6 +165,7 @@ EOM;
 		
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
+            <li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
             <li><a href="%url/rel:mpgt:userManagement%&Action=divisionList">部署一覧</a></li>
             <li><span>部署登録</span></li>
 EOM;

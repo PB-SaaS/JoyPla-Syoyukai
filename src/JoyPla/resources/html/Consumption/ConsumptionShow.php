@@ -29,7 +29,7 @@
         </div>
         <div class="pt-2 hover:bg-sushi-50" v-for="(consumption) in consumptions">
           <div class="border-b-2 border-solid border-gray-100 w-full ">
-            <div class="lg:flex lg:divide-x my-4">
+            <div class="lg:flex lg:divide-x ">
               <div class="lg:w-1/5 p-2">
                 <p class="text-xl font-bold">{{ consumption.consumptionDate }}</p>
                 <p class="text-md"> 
@@ -45,6 +45,11 @@
                   <v-button-default type="button" class="w-full" @click.native="openPrint( consumption.consumptionId )">
                     消費伝票を印刷
                   </v-button-default>
+                  <?php if( gate('cancellation_of_consumption_slips')->can() ): ?>
+                  <v-button-danger type="button" class="w-full" @click.native="deleteSlip( consumption.consumptionId )">
+                    消費伝票を削除
+                  </v-button-danger>
+                  <?php endif ?>
                 </div>
               </div>
               <div class="lg:w-4/5 p-2">
@@ -68,10 +73,6 @@
                           <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(consumptionItem.consumptionPrice) }}</span>
                           <span class="text-sm text-gray-900">( &yen; {{ numberFormat(consumptionItem.unitPrice) }} / {{ consumptionItem.quantity.quantityUnit }} )</span>
                         </p>
-                      </div>
-                      <div class="flex-auto lg:w-1/5 w-full">
-                        <v-button-default type="button" class="w-full my-2 ">商品情報詳細</v-button-default>
-                        <v-button-default type="button" class="w-full my-2">在庫状況の確認</v-button-default>
                       </div>
                     </div>
                   </div>
@@ -142,13 +143,14 @@
                 title="JANコード"
                 ></v-input>
             </div>
-
+            <?php if( ! gate('list_of_consumption_slips')->isOnlyMyDivision() ): ?>
             <div class="my-4">
               <v-multiple-select-division
                 name="divisionIds"
                 title="部署名"
                 ></v-multiple-select-division>
             </div>
+            <?php endif ?>
             <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
               <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
               <v-button-primary type="button" @click.native="searchExec">絞り込み</v-button-primary>
@@ -176,6 +178,7 @@ var JoyPlaApp = Vue.createApp({
       'v-breadcrumbs': vBreadcrumbs,
       'v-button-default': vButtonDefault,
       'v-button-primary': vButtonPrimary,
+      'v-button-danger': vButtonDanger,
       'header-navi' : headerNavi,
       'v-open-modal': vOpenModal,
       'v-input' : vInput ,
@@ -263,7 +266,7 @@ var JoyPlaApp = Vue.createApp({
           {
             text: '消費メニュー',
             disabled: false,
-            href: '%url/rel:mpgt:Root%&path=/consumption',
+            href: _ROOT + '&path=/consumption',
           },
           {
             text: '消費一覧',
@@ -275,7 +278,7 @@ var JoyPlaApp = Vue.createApp({
 
       const numberFormat = (value) => {
           if (! value ) { return 0; }
-          return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+          return new Intl.NumberFormat('ja-JP').format(value);
       };
 
       const onOpenModal = () => {
@@ -388,7 +391,50 @@ var JoyPlaApp = Vue.createApp({
         location.href = _ROOT + "&path=/consumption/" + url + "/print";    
       }
 
+      const deleteSlip = ( consumptionId ) => 
+      {
+          Swal.fire({
+            title: '消費伝票を削除',
+            text: "削除後は元に戻せません。\r\nよろしいですか？",
+            icon: 'warning',
+            confirmButtonText: '削除します',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+          }).then( async (result) => {
+            if(result.isConfirmed){
+              start();
+              
+              let params = new URLSearchParams();
+              params.append("path", "/api/consumption/"+consumptionId+"/delete");
+              params.append("_csrf", _CSRF);
+
+              const res = await axios.post(_APIURL,params);
+              
+              complete();
+              if(res.data.code != 200) {
+                throw new Error(res.data.message)
+              }
+              Swal.fire({
+                  icon: 'success',
+                  title: '消費伝票の削除が完了しました。',
+              }).then((result) => {
+                location.reload();
+              });
+              return true ;
+            }
+          }).catch((error) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'システムエラー',
+              text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+            });
+          });
+      }
+
       return {
+        deleteSlip,
         loading, 
         start, 
         complete,

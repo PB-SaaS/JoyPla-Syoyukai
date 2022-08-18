@@ -28,7 +28,8 @@ class UserSlipController extends Controller
             
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
-            <li><a href="%url/rel:mpgt:userManagement%">ユーザー管理</a></li>
+            <li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
+            <li><a href="%url/rel:mpgt:userManagement%">ユーザー一覧</a></li>
             <li><span>ユーザー情報変更</span></li>
 EOM;
             $hidden = [
@@ -97,7 +98,8 @@ EOM;
 		
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
-            <li><a href="%url/rel:mpgt:userManagement%">ユーザー管理</a></li>
+            <li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
+            <li><a href="%url/rel:mpgt:userManagement%">ユーザー一覧</a></li>
             <li><span>ユーザー情報削除</span></li>
 EOM;
             $hidden = [

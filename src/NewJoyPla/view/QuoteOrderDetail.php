@@ -17,6 +17,7 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                <li><a href="%url/rel:mpg:top%&path=estimate">見積メニュー</a></li>
                 <li><a href="%url/rel:mpgt:Price%&Action=QuoteList&table_cache=true">見積依頼一覧</a></li>
                 <li><span>見積依頼詳細</span></li>
             </ul>

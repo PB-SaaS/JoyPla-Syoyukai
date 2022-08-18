@@ -13,6 +13,24 @@ function getTwoFieldRequiredParam(params){
   return params;
 }
 
+//全角半角の区別をする文字数チェック
+const strlen = (value, [limit] , ctx) => {
+  // The field is empty so it should pass
+  if (!value || !value.length) {
+    return true;
+  }
+
+  let len = 0;
+  for (let i = 0; i < value.length; i++) {
+    (value[i].match(/[ -~]/)) ? len += 1 : len += 2;
+  }
+
+  if (len > limit) {
+    return `${ctx.field}は全角${limit / 2}文字以内、半角${limit}文字以内で入力してください`;
+  }
+  return true;
+};
+
 //２フィールド間にまたがる入力必須
 const twoFieldRequiredValidator =  (value, params , ctx) => {
       
@@ -31,7 +49,22 @@ const twoFieldRequiredValidator =  (value, params , ctx) => {
       return `${ctx.field}を入力した場合は${targetField}も入力してください`;
 };
 
+VeeValidate.defineRule('lotdate', value => {
+  // Field is empty, should pass
+  if( !value || !value.length ) { return true; }
+  let regex1 = /^[0-9]{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])$/;
+  let regex2 = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
+  let regex3 = /^[0-9]{4}年(0[1-9]|1[0-2])月(0[1-9]|[12][0-9]|3[01])日$/;
+  if (regex1.test(value) || regex2.test(value) || regex3.test(value)) {
+    return true;
+  }
+
+  return false;
+});
+
+
 VeeValidate.defineRule('twoFieldRequired',twoFieldRequiredValidator);
+VeeValidate.defineRule('strlen',strlen);
 
 VeeValidate.defineRule('lotnumber', value => {
   // Field is empty, should pass
@@ -48,6 +81,7 @@ VeeValidate.configure({
   generateMessage: VeeValidateI18n.localize('ja', {
     messages: {
       lotnumber: '{field}は数字記号アルファベット20文字以内で入力してください',
+      lotdate: '{field}のフォーマットが不正です。例：YYYY-MM-DD,YYYY/MM/DD,YYYY年MM月DD日',
     },
   }),
 });

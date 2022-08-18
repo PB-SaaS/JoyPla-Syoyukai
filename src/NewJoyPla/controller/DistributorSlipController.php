@@ -105,6 +105,7 @@ class DistributorSlipController extends Controller
             
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
+            <li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
             <li><a href="{$link}">卸業者一覧</a></li>
             <li><a href="%url/card:page_265119%">卸業者情報詳細</a></li>
             <li><span>卸業者情報変更</span></li>
@@ -181,6 +182,7 @@ EOM;
             
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
+            <li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
             <li><a href="{$link}">卸業者一覧</a></li>
             <li><a href="%url/card:page_265119%">卸業者情報詳細</a></li>
             <li><span>卸業者ユーザー招待</span></li>

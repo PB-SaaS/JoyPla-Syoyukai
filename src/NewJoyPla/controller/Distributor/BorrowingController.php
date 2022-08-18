@@ -171,6 +171,8 @@ class BorrowingController extends Controller
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '未承認使用伝票一覧',
                     'table' => '%sf:usr:search27%',
+                    'submenulink' => "%url/rel:mpg:top%&page=page5",
+                    'submenu' => '貸出',
                     'csrf_token' => Csrf::generate(16),
                     'print' => true
                     ] , false);
@@ -221,6 +223,8 @@ class BorrowingController extends Controller
                     'title' => '承認済み使用伝票一覧',
                     'table' => '%sf:usr:search28%',
                     'csrf_token' => Csrf::generate(16),
+                    'submenulink' => "%url/rel:mpg:top%&page=page5",
+                    'submenu' => '貸出',
                     'print' => true
                     ] , false);
         

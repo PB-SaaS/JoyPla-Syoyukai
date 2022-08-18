@@ -33,6 +33,7 @@ html {
 		<div class="uk-container uk-container-expand">
 	    	<ul class="uk-breadcrumb no_print uk-margin-top">
 			    <li><a href="%url/rel:mpg:top%">TOP</a></li>
+	            <li><a href="%url/rel:mpg:top%&path=product">商品メニュー</a></li>
 			    <li><a href="<?php echo $link ?>&table_cache=true">院内商品マスタ</a></li>
 			    <li><a href="<?php echo $api_url ?>&table_cache=true"><span>院内商品情報</span></a></li>
 			    <li><span>ラベル発行</span></li>
@@ -223,8 +224,8 @@ html {
 	});
 	function generateBarcodeForLabel(idname,value){
 		let height = document.getElementsByName('barcodeHeight')[0].value;
-		JsBarcode("#"+idname,value,{format: "ITF", width: 1.8, height: height,fontSize: 14});
-		//JsBarcode("#"+idname,value,{format: "CODE128", width: 1.8, height: 50,fontSize: 14});
+		JsBarcode("#"+idname,value,{width: 1.8, height: height,fontSize: 14});
+		//JsBarcode("#"+idname,value,{width: 1.8, height: 50,fontSize: 14});
 		//JsBarcode("#"+idname,value,{ width: 1.8, height: 50,fontSize: 14});
 		//$(elm).barcode(value.replace(/\r?\n/g,"").trim(), btype, settings);
 	}

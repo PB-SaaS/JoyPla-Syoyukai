@@ -16,7 +16,7 @@
 <!-- <script type="text/javascript" src="https://i02.smp.ne.jp/u/joypla/new/js/animsition.min.js"></script> -->
 
 	
-    <script src="https://i02.smp.ne.jp/u/joypla/new/js/JsBarcode.all.min.js"></script>
+    <script src="https://i02.smp.ne.jp/u/joypla/new/js/JsBarcode.all.min.js"  charset="UTF-8"></script>
     <script src="https://i02.smp.ne.jp/u/joypla/new/js/BarcodeParser_20220331.js"></script>
 	<script src="https://i02.smp.ne.jp/u/joypla/new/js/vue.js"></script>
 <script src="https://i02.smp.ne.jp/u/joypla/new/js/encoding.min.js"></script>
@@ -129,8 +129,8 @@ function loading_remove(){
 }
 
 function generateBarcode(idname,value){
-	JsBarcode("#"+idname,value,{format: "ITF", width: 1.8, height: 50,fontSize: 14});
-	//JsBarcode("#"+idname,value,{format: "CODE128", width: 1.8, height: 50,fontSize: 14});
+	JsBarcode("#"+idname,value,{width: 1.8, height: 50,fontSize: 14});
+	//JsBarcode("#"+idname,value,{width: 1.8, height: 50,fontSize: 14});
 	//JsBarcode("#"+idname,value,{ width: 1.8, height: 50,fontSize: 14});
 //$(elm).barcode(value.replace(/\r?\n/g,"").trim(), btype, settings);
 }

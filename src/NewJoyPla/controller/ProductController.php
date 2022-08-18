@@ -44,6 +44,8 @@ class ProductController extends Controller
             'table' => '%sf:usr:search31%',
             'print' => true,
             'export' => true,
+            'submenulink' => "%url/rel:mpg:top%&path=product",
+            'submenu' => '商品メニュー',
             'csrf_token' => Csrf::generate(16)
             ] , false);
         

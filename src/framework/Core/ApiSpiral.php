@@ -34,7 +34,6 @@ use Logger;
 	 * @todo 未対応（改善）事項等
 	 */
 	public function __construct(\Spiral $SPIRAL){
-		$this->spiral = $SPIRAL;
 	}
 
 	public function setApiCommunicator($apiCommunicator){
@@ -54,6 +53,7 @@ use Logger;
 			$this->request->put($param_name, $param_value);
 		}
 		$response = $this->apiCommunicator->request($apiHeader[0], $apiHeader[1], $this->request);
+		
 		$this->logging($response);
 		
 		$responseArray = array();
@@ -66,8 +66,9 @@ use Logger;
 
 	public function logging($response)
 	{
+		global $SPIRAL;
         if(! LogConfig::EXPORT_TO_SPIRALV2){ return ""; }
-        $spiralv2 = new LogggingSpiralv2(LogConfig::SPIRALV2_API_KEY , 'https://api.spiral-platform.com/v1/');
+        $spiralv2 = new LoggingSpiralv2(LogConfig::SPIRALV2_API_KEY , 'https://api.spiral-platform.com/v1/');
         $spiralv2->setAppId(LogConfig::LOGGING_APP_TITLE);
         $spiralv2->setDbId(LogConfig::SPIRAL_API_LOGGING_DB_TITLE);
 
@@ -75,7 +76,7 @@ use Logger;
 
 		$body = [
 			'execTime' => Logger::getTime(),
-			'AccountId' => $this->spiral->getAccountId(),
+			'AccountId' => $SPIRAL->getAccountId(),
 			'code' => $response->getResultCode(),
 			'message' =>  $response->getMessage(),
 		];

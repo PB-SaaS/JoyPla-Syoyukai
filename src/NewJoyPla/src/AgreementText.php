@@ -7,7 +7,5 @@
             <p><b>閲覧できない方はこちら</b>: <a href="https://i02.smp.ne.jp/u/joypla/new/pdf/joypla-spdkiyaku20.pdf">PDF をダウンロード</a>.</p>
         </iframe>
     </object>
-
     </div>
-            
 </div>

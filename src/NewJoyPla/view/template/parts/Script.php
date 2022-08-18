@@ -108,8 +108,8 @@ function loading_remove(){
 }
 
 function generateBarcode(idname,value){
-	JsBarcode("#"+idname,value,{format: "ITF", width: 1.8, height: 50,fontSize: 14});
-	//JsBarcode("#"+idname,value,{format: "CODE128", width: 1.8, height: 50,fontSize: 14});
+	JsBarcode("#"+idname,value,{width: 1.8, height: 50,fontSize: 14});
+	//JsBarcode("#"+idname,value,{width: 1.8, height: 50,fontSize: 14});
 	//JsBarcode("#"+idname,value,{ width: 1.8, height: 50,fontSize: 14});
 //$(elm).barcode(value.replace(/\r?\n/g,"").trim(), btype, settings);
 }

@@ -28,6 +28,7 @@ class DivisionSlipController extends Controller
             
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
+            <li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
             <li><a href="%url/rel:mpgt:userManagement%&Action=divisionList">部署一覧</a></li>
             <li><span>部署情報変更</span></li>
 EOM;

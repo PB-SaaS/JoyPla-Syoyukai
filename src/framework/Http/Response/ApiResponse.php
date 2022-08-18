@@ -1,6 +1,6 @@
 <?php
 
-use App\Lib\LogggingSpiralv2;
+use App\Lib\LoggingSpiralv2;
 
 class ApiResponse {
     public $data = null;
@@ -30,7 +30,7 @@ class ApiResponse {
     {
         global $SPIRAL;
         if(! LogConfig::EXPORT_TO_SPIRALV2){ return ""; }
-        $spiralv2 = new LogggingSpiralv2(LogConfig::SPIRALV2_API_KEY , 'https://api.spiral-platform.com/v1/');
+        $spiralv2 = new LoggingSpiralv2(LogConfig::SPIRALV2_API_KEY , 'https://api.spiral-platform.com/v1/');
         $spiralv2->setAppId(LogConfig::LOGGING_APP_TITLE);
         $spiralv2->setDbId(LogConfig::JOYPLA_API_LOGGING_DB_TITLE);
         $logger = new Logger($spiralv2);

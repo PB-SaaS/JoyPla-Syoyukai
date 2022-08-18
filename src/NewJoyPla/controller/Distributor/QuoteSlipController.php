@@ -196,6 +196,7 @@ class QuoteSlipSlipController extends Controller
             
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
+            <li><a href="%url/rel:mpg:top%&page=page7">商品・見積</a></li>
             <li><a href="%url/rel:mpgt:ProductQuotation%&Action=Quotation&table_cache=true">見積依頼一覧 </a></li>
             <li><a href="%url/card:page_266429%">見積依頼詳細</a></li>
             <li><span>見積商品追加</span></li>

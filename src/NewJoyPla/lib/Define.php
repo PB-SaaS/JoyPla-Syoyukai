@@ -24,3 +24,4 @@ define('HP_END_INVENTORY_PAGE', "page_263632");
 
 define('OROSHI_ORDER_PAGE', "page_266218");
 define('OROSHI_RECEIVING_PAGE', "page_266907");
+

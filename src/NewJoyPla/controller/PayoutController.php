@@ -244,7 +244,9 @@ class PayoutController extends Controller
                 $content = $this->view('NewJoyPla/view/template/List', [
                         'title' => '払出履歴一覧',
                         'table' => '%sf:usr:payoutList:mstfilter%',
-                        'csrf_token' => Csrf::generate(16)
+                        'csrf_token' => Csrf::generate(16),
+                        'submenulink' => "%url/rel:mpg:top%&path=payout",
+                        'submenu' => '払出メニュー',
                         ] , false);
             } else {
                 $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
@@ -304,7 +306,9 @@ class PayoutController extends Controller
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '払出履歴一覧',
                     'table' => '%sf:usr:payoutList:mstfilter%',
-                    'csrf_token' => Csrf::generate(16)
+                    'csrf_token' => Csrf::generate(16),
+                    'submenulink' => "%url/rel:mpg:top%&path=payout",
+                    'submenu' => '払出メニュー',
                     ] , false);
     
         } catch ( Exception $ex ) {

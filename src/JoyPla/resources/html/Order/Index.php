@@ -7,8 +7,8 @@
       <div class="index container mx-auto mb-96">
         <h1 class="text-2xl mb-2">発注伝票の詳細</h1>
         <hr>
-        <div class="py-5">
-          <v-button-primary type="button" :disabled="! isChange" @click.native="onUpdate">内容を訂正</v-button-primary>
+        <div class="p-4 text-base bg-gray-100 border border-gray-400 flex flex-col md:flex-row md:gap-6 gap-4 mb-6">
+          <v-button-primary type="button" class="md:w-1/6 w-full" :disabled="! isChange" @click.native="onUpdate">内容を訂正</v-button-primary>
         </div>
         <div class="p-4 text-base bg-gray-100 border border-gray-400">
           <v-text title="登録日" class="flex w-full gap-6">{{ order.registDate }}</v-text>
@@ -39,6 +39,7 @@
           <v-text title="発注元部署" class="flex w-full gap-6">{{ order.division.divisionName }}</v-text>
           <v-text title="発注担当者" class="flex w-full gap-6">{{ order.orderUserName }}</v-text>
           <v-text title="発注タイプ" class="flex w-full gap-6">{{ order.adjustmentToString }}</v-text>
+          <v-text title="備考" class="flex w-full gap-6"><pre>{{ order.orderComment }}</pre></v-text>
         </div>
         <hr>
         <div class="p-4 text-lg font-bold">
@@ -66,6 +67,7 @@
                         <div>
                           <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(item.value.orderPrice) }}</span>
                           <span class="text-sm text-gray-900">( &yen; {{ numberFormat(item.value.price) }} / {{ item.value.quantity.itemUnit }} )</span>
+                          <blowing :message="item.value.priceNotice" title="金額管理備考" v-if="item.value.priceNotice != ''"></blowing>
                         </div>
                       </div>
                       <div class="flex-auto lg:w-2/5 w-full">
@@ -181,12 +183,12 @@ var JoyPlaApp = Vue.createApp({
           {
             text: '発注メニュー',
             disabled: false,
-            href: '%url/rel:mpgt:Root%&path=/order',
+            href: _ROOT + '&path=/order',
           },
           {
             text: '発注一覧',
             disabled: false,
-            href: '%url/rel:mpgt:Root%&path=/order/show&isCache=true',
+            href: _ROOT + '&path=/order/show&isCache=true',
           },
           {
             text: '発注伝票の詳細',
@@ -196,7 +198,7 @@ var JoyPlaApp = Vue.createApp({
 
       const numberFormat = (value) => {
           if (! value ) { return 0; }
-          return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+          return new Intl.NumberFormat('ja-JP').format(value);
       };
       const isChange = ref(false);
 

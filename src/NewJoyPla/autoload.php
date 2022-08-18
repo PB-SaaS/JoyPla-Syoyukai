@@ -15,6 +15,8 @@ require_once "NewJoyPla/core/Util.php";
 require_once "NewJoyPla/core/Csrf.php";
 
 require_once "NewJoyPla/lib/ApiSpiral.php";
+require_once "NewJoyPla/lib/Logger.php";
+require_once "NewJoyPla/lib/LoggingSpiralv2.php";
 require_once 'NewJoyPla/lib/UserInfo.php';
 require_once "NewJoyPla/lib/SpiralDataBase.php";
 require_once "NewJoyPla/lib/SpiralSendMail.php";
@@ -27,6 +29,11 @@ require_once "NewJoyPla/lib/Func.php";
 require_once "NewJoyPla/model/Base.php";
 
 
+function number_format_jp($num)
+{
+    if(empty($num)) { return 0; }
+    return preg_replace("/\.?0+$/","",number_format($num,2));
+}
 
 /** 初期実行しなければならない処理 */
 

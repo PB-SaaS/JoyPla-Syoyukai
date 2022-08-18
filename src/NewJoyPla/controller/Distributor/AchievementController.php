@@ -39,6 +39,9 @@ class AchievementController extends Controller
             
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => $title,
+                    'submenulink' => "%url/rel:mpg:top%&page=page3",
+                    'submenu' => '実績',
+                    'table' => '%sf:usr:search33:table%',
                     'table' => '%sf:usr:search57%',
                     'print' => true,
                     'export' => true,

@@ -3,6 +3,7 @@
 	    <div class="uk-container uk-container-expand">
 	    	<ul class="uk-breadcrumb no_print">
 			    <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&path=stocktaking">棚卸メニュー</a></li>
 			    <li><span>棚卸履歴一覧</span></li>
 			</ul>
 	    	<h2 class="page_title">棚卸履歴一覧</h2>

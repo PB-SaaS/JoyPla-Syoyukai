@@ -210,7 +210,7 @@ html {
         generateBarcodeForLabel(idname,value)
         {
             let height = document.getElementsByName('barcodeHeight')[0].value;
-            JsBarcode("#"+idname,value,{format: "ITF", width: 1.8, height: height,fontSize: 14});
+            JsBarcode("#"+idname,value,{width: 1.8, height: height,fontSize: 14});
         }
     }
 

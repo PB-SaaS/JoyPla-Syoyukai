@@ -22,12 +22,14 @@
             name="divisionId" 
             label="消費部署" 
             :rules="{ required : true }"
-            title="消費部署指定" />
+            title="消費部署指定" 
+            :is-only-my-division="<?php var_export(gate('register_of_consumption_slips')->isOnlyMyDivision()) ?>"
+            />
           </div>
           <div class="my-4 grid grid-cols-3 gap-4 lg:w-1/3">
             <v-button-default type="button" data-micromodal-trigger="inHospitalItemModal">商品検索</v-button-default>
-            <v-inhospitalitem-modal v-on:additem="additem">
-            </v-inhospitalitem-modal>
+            <v-in-hospital-item-modal v-on:additem="additem" :unit-price-use="consumptionUnitPriceUseFlag">
+            </v-in-hospital-item-modal>
           </div>
           <div class="p-2 bg-gray-300">
             <v-barcode-search @additem="addItemByBarcode"></v-barcode-search>
@@ -123,9 +125,59 @@
       </div>
     </div>
   </div>
-  <v-confirm id="modal-confirm" ref="confirm" :headtext="confirmSetting.headtext.value" :message="confirmSetting.message.value" @ok="confirmSetting.okMethod.value" @cancel="confirmSetting.cancelMethod.value" ></v-confirm>
-  <v-alert id="modal-alert" ref="alert" :headtext="alertSetting.headtext.value" :message="alertSetting.message.value" @ok="alertSetting.okMethod.value" ></v-alert>
-  
+  <v-open-modal ref="openModal" headtext="商品選択" id="openModal">
+      <div class="flex flex-col" style="max-height: 68vh;">
+          <div class="overflow-y-scroll my-6">
+              <div class="w-full mb-8 xl:mb-0">
+                  <div class="hidden lg:flex w-full sticky top-0 bg-white py-4 flex-wrap">
+                      <div class="w-full lg:w-5/6">
+                          <h4 class="font-bold font-heading text-gray-500 text-center">商品情報</h4>
+                      </div>
+                      <div class="w-full lg:w-1/6">
+                          <h4 class="font-bold font-heading text-gray-500 text-center">反映</h4>
+                      </div>
+                  </div>
+                  <div class="lg:pt-0 pt-4">
+                      <div
+                          class="flex flex-wrap items-center mb-3"
+                          v-for="(elem, index) in selectInHospitalItems">
+                          <div class="w-full lg:w-5/6 lg:px-4 px-0 mb-6 lg:mb-0">
+                              <div class="flex flex-wrap items-center gap-4">
+                                  <div class="flex-none">
+                                      <item-view class="md:h-44 md:w-44 h-32 w-32" :base64=""></item-view>
+                                  </div>
+                                  <div class="break-words flex-1 box-border w-44">
+                                      <h3 class="text-xl font-bold font-heading">{{ elem.makerName }}</h3>
+                                      <p class="text-md font-bold font-heading">{{ elem.itemName }}</p>
+                                      <p class="text-gray-500">{{ elem.itemCode }}<br>{{ elem.itemStandard }}</p>
+                                      <p class="text-gray-500">{{ elem.quantity }}{{ elem.quantityUnit }}
+                                          入り</p>
+                                      <p>
+                                          <span class="text-xl text-orange-600 font-bold font-heading">&yen;
+                                              {{ numberFormat(elem.price) }}</span>
+                                          <span class="text-gray-400">
+                                              ( &yen;
+                                              {{ numberFormat(elem.unitPrice) }}/{{ elem.quantityUnit }}
+                                              )</span>
+                                      </p>
+                                      <p class="text-gray-800">ロット番号：{{ elem.lotNumber }}</p>
+                                      <p class="text-gray-800">使用期限：{{ elem.lotDate }}</p>
+                                      <p class="text-gray-800">{{ elem.distributorName }}</p>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="w-full lg:block lg:w-1/6 px-4 py-4">
+                              <v-button-default type="button" class="w-full" v-on:click.native="additem(elem)">反映</v-button-default>
+                          </div>
+                          <div class="py-2 px-4 w-full">
+                              <div class="border-t border-gray-200"></div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </v-open-modal>
 </div>
 
 <script> 
@@ -134,6 +186,7 @@ var JoyPlaApp = Vue.createApp({
       
       const { ref, toRef , toRefs , reactive ,onMounted} = Vue;
       const { useFieldArray , useForm } = VeeValidate;
+      const consumptionUnitPriceUseFlag = "<?php echo $consumptionUnitPriceUseFlag ?>";
 
       const loading = ref(false);
       const start = () => {
@@ -166,7 +219,6 @@ var JoyPlaApp = Vue.createApp({
           consumeItems: [],
           divisionId: "",
           consumeDate: yyyy+'-'+mm+'-'+dd,
-          
         },
         validateOnMount : false
       });
@@ -189,7 +241,7 @@ var JoyPlaApp = Vue.createApp({
           {
             text: '消費メニュー',
             disabled: false,
-            href: '%url/rel:mpgt:Root%&path=/consumption',
+            href: _ROOT + '&path=/consumption',
           },
           {
             text: '個別消費',
@@ -242,7 +294,8 @@ var JoyPlaApp = Vue.createApp({
 
       const numberFormat = (value) => {
           if (! value ) { return 0; }
-          return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+          return new Intl.NumberFormat('ja-JP').format(value);
+          //return new Intl.NumberFormat('ja-JP').format(value);
       }
 
       const isRequired = (idx) => {
@@ -340,21 +393,74 @@ var JoyPlaApp = Vue.createApp({
       const additem = (item) =>
       {
         item = JSON.parse(JSON.stringify(item));
-        item.consumeQuantity = 0;
-        item.consumeUnitQuantity = 0;
+        item.consumeQuantity = ( item.consumeQuantity ) ? item.consumeQuantity : 0 ;
+        item.consumeUnitQuantity = ( item.consumeUnitQuantity ) ? item.consumeUnitQuantity : 0 ;
         item.consumeLotNumber = ( item.lotNumber ) ? item.lotNumber : "" ;
         item.consumeLotDate =  ( item.lotDate ) ? item.lotDate : "" ;
         push(item);
       };
 
+      const openModal = ref();
+      const selectInHospitalItems = ref([]);
       const addItemByBarcode = (items) => 
       {
-        console.log(items);
-      }
-      
+        selectInHospitalItems.value = [];
+        if (items.item.length === 0) {
+            return false;
+        }
 
+        if(items.type == "received")
+        {
+          items.item.forEach((x , id)=>{
+            items.item[id].consumeUnitQuantity = 1;
+          });
+        }
+        
+        if(items.type == "payout")
+        {
+          items.item.forEach((x , id)=>{
+            items.item[id].consumeQuantity = items.item[id].payoutQuantity;
+          });
+        }
+        if(items.type == "card")
+        {
+          items.item.forEach((x , id)=>{
+            items.item[id].consumeQuantity = items.item[id].cardQuantity;
+          });
+        }
+        if(items.type == "customlabel")
+        {
+          items.item.forEach((x , id)=>{
+            items.item[id].consumeQuantity = items.item[id].customQuantity;
+          });
+        }
+
+        if (items.item.length === 1) {
+          if(items.item[0].divisionId)
+          {
+            if(values.divisionId !== items.item[0].divisionId)
+            {
+              Swal.fire({
+                icon: 'error',
+                title: 'エラー',
+                text: '読み込んだ値と選択している部署が一致しませんでした',
+              });
+              return false;
+            }
+          }
+          additem(items.item[0]);
+        } else {
+            selectInHospitalItems.value = items.item;
+            openModal
+                .value
+                .open();
+        }
+      }
 
       return {
+        addItemByBarcode,
+        selectInHospitalItems,
+        openModal,
         loading, 
         start, 
         complete,
@@ -376,6 +482,7 @@ var JoyPlaApp = Vue.createApp({
         fields,
         remove,
         validate,
+        consumptionUnitPriceUseFlag,
       };
     },
     watch: {
@@ -406,7 +513,8 @@ var JoyPlaApp = Vue.createApp({
       'v-button-primary': vButtonPrimary,
       'v-button-danger': vButtonDanger,
       'v-input-number': vInputNumber,
-      'v-inhospitalitem-modal': vInHospitalItemModal,
+      'v-in-hospital-item-modal': vInHospitalItemModal,
+      'v-open-modal': vOpenModal,
       'header-navi' : headerNavi
     },
 }).mount('#top');

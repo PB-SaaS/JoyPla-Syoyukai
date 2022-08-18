@@ -16,10 +16,17 @@ class HospitalRepository implements HospitalRepositoryInterface{
 
         return $hospital;
     }
+    public function index( HospitalId $hospitalId )
+    {
+        $hospital = (SpiralDbHospital::where('hospitalId',$hospitalId->value())->get())->data->get(0);
+
+        return $hospital;
+    }
 }
 
 interface HospitalRepositoryInterface 
 {
     public function find( HospitalId $hospitalId );
+    public function index( HospitalId $hospitalId );
     
 }

@@ -3,6 +3,7 @@
 		    <div class="uk-container uk-container-expand">
 		    	<ul class="uk-breadcrumb no_print">
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&page=page1">消費・発注</a></li>
 				    <li><a href="<?php echo $link ?>&table_cache=true"><span>返品一覧</span></a></li>
 				    <li><span>返品伝票</span></li>
 				</ul>
@@ -92,10 +93,10 @@
 				    						echo "<td>".$record->itemJanCode."</td>";
 				    						echo "<td>".$record->lotNumber."</td>";
 				    						echo "<td>".$record->lotDate."</td>";
-				    						echo "<td>".$record->quantity.$record->quantityUnit."</td>";
-				    						echo "<td>".$record->receivingCount.$record->itemUnit."</td>";
-				    						echo "<td>".$record->returnCount.$record->itemUnit."</td>";
-				    						echo "<td>￥".number_format($record->returnPrice,2)."</td>";
+				    						echo "<td>".number_format_jp($record->quantity).$record->quantityUnit."</td>";
+				    						echo "<td>".number_format_jp($record->receivingCount).$record->itemUnit."</td>";
+				    						echo "<td>".number_format_jp($record->returnCount).$record->itemUnit."</td>";
+				    						echo "<td>￥".number_format_jp($record->returnPrice)."</td>";
 				    						echo "</tr>";
 				    						$num++;
 										}

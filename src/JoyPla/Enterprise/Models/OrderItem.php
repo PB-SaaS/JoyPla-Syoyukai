@@ -19,6 +19,8 @@ class OrderItem
     private OrderQuantity $orderQuantity;
     private ReceivedQuantity $receivedQuantity;
     private bool $lotManagement;
+    private string $distributorManagerCode;
+    private string $itemImage;
 
     public function __construct(
         OrderId $orderId,
@@ -32,9 +34,9 @@ class OrderItem
         Price $price,
         OrderQuantity $orderQuantity,
         ReceivedQuantity $receivedQuantity,
+        string $distributorManagerCode,
         bool $lotManagement,
-        $itemImage = ""
-        
+        $itemImage
         )
     {
         $this->orderId = $orderId;
@@ -48,6 +50,7 @@ class OrderItem
         $this->price = $price;
         $this->orderQuantity = $orderQuantity;
         $this->receivedQuantity = $receivedQuantity;
+        $this->distributorManagerCode = $distributorManagerCode;
         $this->lotManagement = $lotManagement;
         $this->itemImage = ($itemImage)? $itemImage : "";
     }
@@ -66,9 +69,35 @@ class OrderItem
             (new Price($input->price) ),
             (new OrderQuantity((int)$input->orderQuantity)) ,
             (new ReceivedQuantity((int)$input->receivingNum)) ,
+            $input->distributorMCode,
             (int) $input->lotManagement ,
             $input->inItemImage,
         );
+    }
+
+    public function getItem()
+    {
+        return $this->item;
+    }
+
+    public function getHospitalId()
+    {
+        return $this->hospitalId;
+    }
+
+    public function getQantity()
+    {
+        return $this->quantity;
+    }
+
+    public function getPrice()
+    {
+        return $this->price;   
+    }
+
+    public function getItemImage()
+    {
+        return $this->itemImage;
     }
 
     public function getOrderItemId()
@@ -79,6 +108,11 @@ class OrderItem
     public function getDivision()
     {
         return $this->division;
+    }
+
+    public function getQuantity()
+    {
+        return $this->quantity;
     }
 
     public function getDistributor()
@@ -101,17 +135,32 @@ class OrderItem
     
     public function setOrderId(OrderId $orderId)
     {
-        $this->orderId = $orderId;
+        return new OrderItem(
+            $orderId,
+            $this->orderItemId,
+            $this->inHospitalItemId,
+            $this->item,
+            $this->hospitalId,
+            $this->division,
+            $this->distributor,
+            $this->quantity,
+            $this->price,
+            $this->orderQuantity,
+            $this->receivedQuantity,
+            $this->distributorManagerCode,
+            $this->lotManagement,
+            $this->itemImage
+        );
     }
-    
+
     public function isMinus()
     {
-        return $this->price() < 0 ;
+        return $this->orderQuantity->value() < 0 ;
     }
 
     public function isPlus()
     {
-        return $this->price() >= 0 ;
+        return $this->orderQuantity->value() >= 0 ;
     }
 
     public function price(){
@@ -132,6 +181,35 @@ class OrderItem
         return $this->receivedQuantity;
     }
 
+    public function addReceivedQuantity( ReceivedQuantity $receivedQuantity )
+    {
+        if( $this->isPlus() && $this->orderQuantity->value() < ( $this->receivedQuantity->value() + $receivedQuantity->value() ) )
+        {
+            throw new Exception('The number of incoming orders exceeds the number of orders placed.',422);
+        }
+        if( $this->isMinus() && $this->orderQuantity->value() > ( $this->receivedQuantity->value() + $receivedQuantity->value() ) )
+        {
+            throw new Exception('The number of incoming orders exceeds the number of orders placed.',422);
+        }
+
+        return new OrderItem(
+            $this->orderId,
+            $this->orderItemId,
+            $this->inHospitalItemId,
+            $this->item,
+            $this->hospitalId,
+            $this->division,
+            $this->distributor,
+            $this->quantity,
+            $this->price,
+            $this->orderQuantity,
+            $this->receivedQuantity->add( $receivedQuantity ),
+            $this->distributorManagerCode,
+            $this->lotManagement,
+            $this->itemImage
+        );
+    }
+
     public function setOrderQuantity(OrderQuantity $orderQuantity)
     {
         return new OrderItem(
@@ -146,7 +224,9 @@ class OrderItem
             $this->price,
             $orderQuantity,
             $this->receivedQuantity,
+            $this->distributorManagerCode,
             $this->lotManagement,
+            $this->itemImage
         );
     }
 
@@ -170,6 +250,11 @@ class OrderItem
         return new OrderItemReceivedStatus(OrderItemReceivedStatus::PartOfTheCollectionIsIn);
     }
 
+    public function receivedFlag()
+    {
+        return $this->orderQuantity->value() === $this->receivedQuantity->value();
+    }
+
     public function toArray()
     {
         return [
@@ -182,11 +267,13 @@ class OrderItem
             'distributor' => $this->distributor->toArray(),
             'quantity' => $this->quantity->toArray(),
             'price' => $this->price->value(),
+            'receivedFlag' => $this->receivedFlag(),
             'orderQuantity' => $this->orderQuantity->value(),
             'receivedQuantity' => $this->receivedQuantity->value(),
             'orderItemReceivedStatus' => $this->getOrderItemReceivedStatus()->value(),
             'orderItemReceivedStatusToString' => $this->getOrderItemReceivedStatus()->toString(),
             'orderPrice' => $this->price(),
+            'distributorManagerCode' => $this->distributorManagerCode,
             'lotManagement' => $this->lotManagement,
             'itemImage' => $this->itemImage
         ];

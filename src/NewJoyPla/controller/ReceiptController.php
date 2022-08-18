@@ -41,7 +41,9 @@ class ReceiptController extends Controller
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '商品別照合一覧',
                     'table' => '%sf:usr:search11%',
-                    'csrf_token' => Csrf::generate(16)
+                    'csrf_token' => Csrf::generate(16),
+                    'submenulink' => "%url/rel:mpg:top%&page=page1",
+                    'submenu' => '消費・発注',
                     ] , false);
     
         } catch ( Exception $ex ) {
@@ -87,6 +89,8 @@ class ReceiptController extends Controller
                 $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '検収書一覧',
                     'table' => '%sf:usr:search100:mstfilter%',
+                    'submenulink' => "%url/rel:mpg:top%&page=page1",
+                    'submenu' => '消費・発注',
                     'csrf_token' => Csrf::generate(16)
                     ] , false);
             } 
@@ -149,6 +153,8 @@ class ReceiptController extends Controller
             $content = $this->view('NewJoyPla/view/template/List', [
                 'title' => '検収書一覧',
                 'table' => '%sf:usr:search100:mstfilter%',
+                'submenulink' => "%url/rel:mpg:top%&page=page1",
+                'submenu' => '消費・発注',
                 'csrf_token' => Csrf::generate(16)
                 ] , false);
     

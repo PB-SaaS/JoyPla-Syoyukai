@@ -86,6 +86,9 @@ class Stock
 
     public function calcOrderQuantity()
     {
+        if($this->quantity->getQuantityNum() == 0 || ($this->calcPlannedInventory() - $this->constant ) == 0 ){
+            return 0 ;
+        }
         return ceil(($this->calcPlannedInventory() - $this->constant ) / $this->quantity->getQuantityNum());
     }
 

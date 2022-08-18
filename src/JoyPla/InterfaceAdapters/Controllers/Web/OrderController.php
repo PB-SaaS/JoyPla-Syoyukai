@@ -5,8 +5,10 @@ namespace JoyPla\InterfaceAdapters\Controllers\Web ;
 use App\SpiralDb\HospitalUser;
 use App\SpiralDb\Order as SpiralDbOrder;
 use Auth;
+use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Http\View;
+use framework\Routing\Router;
 use JoyPla\Application\InputPorts\Web\Order\FixedQuantityOrderInputData;
 use JoyPla\Application\InputPorts\Web\Order\FixedQuantityOrderInputPortInterface;
 use JoyPla\Application\InputPorts\Web\Order\OrderIndexInputData;
@@ -16,51 +18,76 @@ use JoyPla\Enterprise\Models\OrderStatus;
 class OrderController extends Controller
 {
     public function register($vars ) {
+        if(Gate::denies('register_of_unordered_slips'))
+        {
+            Router::abort(403);
+        }
         $body = View::forge('html/Order/Register', [], false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
     }
 
     public function unapprovedShow(){ 
+        if(Gate::denies('list_of_unordered_slips'))
+        {
+            Router::abort(403);
+        }
         $body = View::forge('html/Order/UnapprovedShow', [], false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
     }
 
     public function unapprovedIndex($vars, OrderIndexInputPortInterface $inputPort ) {
-        $inputData = new OrderIndexInputData((new Auth(HospitalUser::class))->hospitalId,$vars['orderId'] , true);
+        if(Gate::denies('list_of_unordered_slips'))
+        {
+            Router::abort(403);
+        }
+
+        $gate = Gate::getGateInstance('list_of_unordered_slips');
+
+        $inputData = new OrderIndexInputData($this->request->user(),$vars['orderId'] , true , $gate->isOnlyMyDivision());
         $inputPort->handle($inputData);
     }
 
     public function fixedQuantityOrder($vars)
     {
-        $body = View::forge('html/Order/FixedQuantityOrder', [], false)->render();
-
-        $auth = new Auth(HospitalUser::class);
-        $unOrder = SpiralDbOrder::where('hospitalId',$auth->hospitalId)->where('orderStatus',OrderStatus::UnOrdered)->value('id');
-        if($unOrder->count == 0)
+        if(Gate::denies('fixed_quantity_order_slips'))
         {
-            $body = <<< EOL
-            <script>
-            Swal.fire({
-                title: '未発注書が存在するため定数発注は使用できません。',
-                text: "未発注書一覧へ遷移します。",
-                icon: 'warning',
-                confirmButtonText: 'OK'
-            }).then((result) => {
-                location.href = _ROOT + "&path=/order/unapproved/show";   
-            })
-            </script>
-            EOL;
+            Router::abort(403);
         }
+        $body = View::forge('html/Order/FixedQuantityOrder', [], false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
     }
     
     public function show(){
+        if(Gate::denies('list_of_order_slips'))
+        {
+            Router::abort(403);
+        }
+
         $body = View::forge('html/Order/Show', [], false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
     }
     
     public function index($vars, OrderIndexInputPortInterface $inputPort ) {
-        $inputData = new OrderIndexInputData((new Auth(HospitalUser::class))->hospitalId,$vars['orderId'] , false);
+        if(Gate::denies('list_of_order_slips'))
+        {
+            Router::abort(403);
+        }
+
+        $gate = Gate::getGateInstance('list_of_order_slips');
+
+        $inputData = new OrderIndexInputData($this->request->user(),$vars['orderId'] , false , $gate->isOnlyMyDivision());
+        $inputPort->handle($inputData);
+    }
+    
+    public function print($vars, OrderIndexInputPortInterface $inputPort ) {
+        if(Gate::denies('list_of_order_slips'))
+        {
+            Router::abort(403);
+        }
+
+        $gate = Gate::getGateInstance('list_of_order_slips');
+
+        $inputData = new OrderIndexInputData($this->request->user(),$vars['orderId'] , false , $gate->isOnlyMyDivision());
         $inputPort->handle($inputData);
     }
 }

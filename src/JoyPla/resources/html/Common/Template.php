@@ -7,11 +7,15 @@
     <?php echo $head ?>
     <?php echo $style; ?>
     <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/normalize.css" />
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/uikit.min.css" />
+    <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/normalize.css" />
 
+    <!-- UIkit JS --> 
     <!-- <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/animsition.min.css"> -->
     <!-- <script type="text/javascript" src="https://i02.smp.ne.jp/u/joypla/new/js/animsition.min.js"></script> -->
 
-    <script src="https://i02.smp.ne.jp/u/joypla/new/js/JsBarcode.all.min.js"></script>
+    <script src="https://i02.smp.ne.jp/u/joypla/new/js/JsBarcode.all.min.js" charset="UTF-8"></script>
     <script src="https://i02.smp.ne.jp/u/joypla/new/js/BarcodeParser_20220331.js"></script>
 
     <script src="https://i02.smp.ne.jp/u/joypla/new/js/encoding.min.js"></script>

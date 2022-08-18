@@ -285,7 +285,7 @@ html {
             {
                 let height = this.label_setting.barcodeHeight;
                 
-                JsBarcode("#"+idname,value,{format: "ITF", width: 1.8, height: height,fontSize: 14});
+                JsBarcode("#"+idname,value,{width: 1.8, height: height,fontSize: 14});
             },
             get_item_object : function(receiving_number)
             {

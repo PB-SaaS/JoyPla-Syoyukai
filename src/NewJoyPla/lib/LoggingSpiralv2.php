@@ -4,7 +4,7 @@ namespace App\Lib;
 use Exception;
 use LoggingObject;
 
-class LogggingSpiralv2 implements LoggingObject
+class LoggingSpiralv2 implements LoggingObject
 {
     private string $baseUrl;
     private string $apiKey;

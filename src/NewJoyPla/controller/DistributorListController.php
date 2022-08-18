@@ -93,6 +93,7 @@ class DistributorListController extends Controller
             
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
+            <li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
             <li><span>卸業者登録</span></li>
 EOM;
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [

@@ -37,6 +37,8 @@ class ReturnController extends Controller
             {
                 $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '返品一覧',
+                    'submenulink' => "%url/rel:mpg:top%&page=page1",
+                    'submenu' => '消費・発注',
                     'table' => '%sf:usr:search82:mstfilter%',
                     'csrf_token' => Csrf::generate(16)
                     ] , false);
@@ -99,6 +101,8 @@ class ReturnController extends Controller
         
             $content = $this->view('NewJoyPla/view/template/List', [
                 'title' => '返品一覧',
+                'submenulink' => "%url/rel:mpg:top%&page=page1",
+                'submenu' => '消費・発注',
                 'table' => '%sf:usr:search82:mstfilter%',
                 'csrf_token' => Csrf::generate(16)
                 ] , false);

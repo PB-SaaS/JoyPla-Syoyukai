@@ -45,13 +45,13 @@ class LabelBarcodeSearchController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
 			}
 			
-			if(preg_match('/^20/', $barcode) && strlen($barcode) == 12){
+			if(preg_match('/^20/', $barcode) && ( strlen($barcode) == 12 || strlen($barcode) == 15 )){
 				if($user_info->isDistributorUser())
 				{
                 	throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
 				}
 				//検収書から発行されたラベル
-				$receiving_num = substr($barcode, 2 , 10);
+				$receiving_num = substr($barcode, 2);
 				if($user_info->isAdmin())
 				{
 					$result = ReceivingView::where('receivingNumber', 'rec_'.$receiving_num)->where('hospitalId',$user_info->getHospitalId())->get();

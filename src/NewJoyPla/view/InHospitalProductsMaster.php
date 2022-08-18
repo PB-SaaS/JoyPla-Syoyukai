@@ -3,6 +3,7 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                <li><a href="%url/rel:mpg:top%&path=product">商品メニュー</a></li>
                 <li><span>院内商品一覧</span></li>
             </ul>
             <div class="no_print uk-margin">

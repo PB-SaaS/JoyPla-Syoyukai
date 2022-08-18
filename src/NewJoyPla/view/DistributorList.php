@@ -3,6 +3,7 @@
 	    <div class="uk-container uk-container-expand">
 	    	<ul class="uk-breadcrumb no_print">
 			    <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                <li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
 			    <li><span>卸業者一覧</span></li>
 			</ul>
 	    	<div class="uk-width-1-1" uk-grid>

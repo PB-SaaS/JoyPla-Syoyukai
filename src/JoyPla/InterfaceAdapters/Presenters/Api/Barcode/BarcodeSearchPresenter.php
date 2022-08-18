@@ -28,7 +28,10 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\Barcode {
          */
         public function __construct(BarcodeSearchOutputData $source)
         {
-            $this->data = $source->inHospitalItems;
+            $this->data = [
+                'item' => $source->inHospitalItems,
+                'type' => $source->type,
+            ];
             $this->count = $source->count;
             $this->code = 200; 
             $this->message = "success";

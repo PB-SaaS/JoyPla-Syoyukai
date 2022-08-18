@@ -106,7 +106,7 @@
                         <tbody>
                             <tr class="uk-text-large">
                                 <td>合計金額</td>
-                                <td class="uk-text-right">￥<?php echo number_format($report['totalAmount'],2); ?></script> -</td>
+                                <td class="uk-text-right">￥<?php echo number_format_jp($report['totalAmount']); ?></script> -</td>
                             </tr>
                         </tbody>
                     </table>
@@ -169,27 +169,27 @@
                                             echo "<td>".$record['itemJANCode']."</td>";
                                         echo "<td>";
                                         foreach ($record['price'] as $price) {
-                                            echo "￥".number_format($price,2)."<br>";
+                                            echo "￥".number_format_jp($price)."<br>";
                                         }
                                         echo "</td>";
                                         echo "<td>";
                                         foreach ($record['unitPrice'] as $unitPrice) {
-                                            echo "￥".number_format($unitPrice,2)."<br>";
+                                            echo "￥".number_format_jp($unitPrice)."<br>";
                                         }
                                         echo "</td>";
                                         echo "<td>";
                                         foreach ($record['quantity'] as $key => $quantity) {
-                                            echo $quantity.$record['quantityUnit'][$key]."<br>";
+                                            echo number_format_jp($quantity).$record['quantityUnit'][$key]."<br>";
                                         }
                                         echo "</td>";
                                         echo "<td>";
                                         foreach ($record['billingQuantity'] as $key => $payoutQuantity) {
-                                            echo $payoutQuantity.$record['quantityUnit'][$key]."<br>";
+                                            echo number_format_jp($payoutQuantity).$record['quantityUnit'][$key]."<br>";
                                         }
                                         echo "</td>";
                                         echo "<td>";
                                         foreach ($record['totalAmount'] as $totalAmount) {
-                                            echo "￥".number_format($totalAmount,2)."<br>";
+                                            echo "￥".number_format_jp($totalAmount)."<br>";
                                         }
                                         echo "</td>";
                                         echo "</tr>";

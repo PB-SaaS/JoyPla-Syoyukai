@@ -3,6 +3,7 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&path=monthlyreport">月次レポートメニュー</a></li>
                 <li><span>月次レポート【消費】</span></li>
             </ul>
             <div class="no_print uk-margin">

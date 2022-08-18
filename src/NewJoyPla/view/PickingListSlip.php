@@ -3,6 +3,7 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&path=payout">払出メニュー</a></li>
                 <li><a :href="picking_list_url">ピッキングリスト一覧</a></li>
                 <li><span>ピッキングリスト</span></li>
             </ul>
@@ -176,7 +177,7 @@ var app = new Vue({
         picking_status : register_data.picking_status,
     },
     created(){
-        JsBarcode("#barcode",this.picking_id,{format: "ITF", width: 1.8, height: 40,fontSize: 14});
+        JsBarcode("#barcode",this.picking_id,{width: 1.8, height: 40,fontSize: 14});
         let vm = this;
         if(vm.picking_status == '1')
         {
@@ -188,7 +189,7 @@ var app = new Vue({
 	filters: {
         number_format: function(value) {
             if (! value ) { return 0; }
-            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+            return new Intl.NumberFormat('ja-JP').format(value);
         },
         date_format: function(value)
         {

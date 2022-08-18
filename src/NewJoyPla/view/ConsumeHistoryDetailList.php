@@ -26,6 +26,7 @@ if($userInfo->isUser() && $myPageID != ''){
 		    <div class="uk-container uk-container-expand">
 		    	<ul class="uk-breadcrumb no_print">
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&page=page1">消費・発注</a></li>
 				    <li><span>消費履歴詳細一覧</span></li>
 				</ul>
 		    	<div class="no_print uk-margin">

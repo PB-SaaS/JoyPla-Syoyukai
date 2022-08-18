@@ -6,7 +6,7 @@ use App\Lib\SpiralDBFilter;
 
 use ApiErrorCode\FactoryApiErrorCode;
 
-class Model
+class SpiralORM
 {
     public const CREATED_AT = "";
     public const UPDATED_AT = "";
@@ -32,12 +32,12 @@ class Model
         $spiralApiRequest = new SpiralApiRequest();
         $this->spiralDataBase = new SpiralDataBase($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
         if(isset($this::$mail_field_title) && $this::$mail_field_title != null)
-        {
+        { 
             $this->spiralSendMail = new SpiralSendMail($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
             $this->spiralDBFilter = new SpiralDBFilter($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
         }
         foreach($this::$guarded as $column)
-        {
+        { 
             $this->{$column} = null;
         }
         foreach($this::$fillable as $column)
@@ -221,9 +221,17 @@ class Model
             throw new Exception(FactoryApiErrorCode::factory((int)$result['code'])->getMessage(),FactoryApiErrorCode::factory((int)$result['code'])->getCode());
         }
         
+        $instance->clear();
+
         return new Collection($result);
     }
     
+    public static function clear()
+    {
+        $instance = self::getInstance();
+        $instance->getNewInstance();
+    }
+
     public static function sort(string $fieldTitle , string $order = 'asc')
     {
         $instance = self::getInstance();

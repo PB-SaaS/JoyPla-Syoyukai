@@ -15,7 +15,7 @@ foreach($history as $h)
     echo "[発注番号]: " . $h["orderNumber"] ." \n";
     echo "[部署名]: " . $h["divisionName"] ." \n";
     echo "[卸業者名]: " . $h["distributorName"] ." \n";
-    echo "[金額]: ￥" . number_format($h["totalAmount"]) ." \n";
+    echo "[金額]: ￥" . $h["totalAmount"] ." \n";
     echo " \n";
 }
 ?>

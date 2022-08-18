@@ -1,6 +1,7 @@
 <?php
 namespace framework\Routing;
 
+use App\Http\Middleware\MiddlewareTrait;
 use Closure;
 use framework\Exception\ClassNotFoundException;
 use framework\Exception\NotFoundException;
@@ -16,6 +17,8 @@ use framework\Service\ServiceProvider;
 class Route
 {
 
+    use MiddlewareTrait;
+
     private string $method;
     private string $pass;
     private $handler;
@@ -27,6 +30,7 @@ class Route
      * @param string             $pass
      * @param array|Closure   $handler
      */
+
     public function __construct(string $method,string $pass,$handler)
     {
         $this->method = $method;
@@ -67,8 +71,6 @@ class Route
 
     final public function process(Request $request , $service)
     {
-        //$this->processMiddleware($request);
-
         $vars = [];
 
         foreach ($this->createTokens($request) as $exploded_uri_pattern => $exploded_uri) {
@@ -76,6 +78,8 @@ class Route
                 $vars[ltrim($exploded_uri_pattern, ':')] = $exploded_uri;
             }
         }
+        $this->processMiddleware($request ,  $vars);
+
         /*
         $handler = is_string($this->handler)
             ? $this->serviceProvider->get($this->handler)

@@ -99,6 +99,7 @@
 		    <div class="uk-container uk-container-expand">
 		    	<ul class="uk-breadcrumb">
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&page=page1">消費・発注</a></li>
 				    <li><span>個別入荷内容入力</span></li>
 				</ul>
 		    	<h2 class="page_title">個別入荷内容入力</h2>
@@ -263,12 +264,12 @@ var app = new Vue({
 		change_class: {'count':false,'lotDate':false,'lotNumber':false},
 		error_class: {'count':false,'lotDate':false,'lotNumber':false},
 		division: resister.division,
-		divisionId: "",
+		divisionId: "<?php echo ($user_info->isUser())? $user_info->getDivisionId() : "" ; ?>",
 	},
 	filters: {
         number_format: function(value) {
             if (! value ) { return 0; }
-            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+            return new Intl.NumberFormat('ja-JP').format(value);
         },
     },
     watch: {
@@ -535,7 +536,7 @@ var modal_sections = new Vue({
 	filters: {
         number_format: function(value) {
             if (! value ) { return 0; }
-            return value.toString().replace( /([0-9]+?)(?=(?:[0-9]{3})+$)/g , '$1,' );
+            return new Intl.NumberFormat('ja-JP').format(value);
         },
     },
 	methods: {
