@@ -9,6 +9,7 @@ use App\SpiralDb\ConsumptionView;
 use App\SpiralDb\Division as SpiralDbDivision;
 use App\SpiralDb\Hospital;
 use App\SpiralDb\InHospitalItemView;
+use Exception;
 use JoyPla\Enterprise\Models\Consumption;
 use JoyPla\Enterprise\Models\ConsumptionId;
 use JoyPla\Enterprise\Models\ConsumptionItem;
@@ -68,7 +69,6 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface{
                 }
             }
             
-
             $result[] = new ConsumptionItem(
                 (new ConsumptionId('') ),
                 (new InHospitalItemId($inHospitalItem[$inHospitalItem_find_key]->inHospitalItemId) ),
@@ -77,7 +77,7 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface{
                 (Division::create($division[$division_find_key]) ),
                 (Quantity::create($inHospitalItem[$inHospitalItem_find_key]) ),
                 (new Price($inHospitalItem[$inHospitalItem_find_key]->price) ),
-                (new UnitPrice($inHospitalItem[$inHospitalItem_find_key]->unitPrice) ),
+                (new UnitPrice($unitprice) ),
                 (new Lot( (new LotNumber($item->consumeLotNumber)) , ( new LotDate($item->consumeLotDate)) , ( $inHospitalItem[$inHospitalItem_find_key]->lotManagement === '1' )) ),
                 (int) $item->consumeQuantity + ( $inHospitalItem[$inHospitalItem_find_key]->quantity * $item->consumeUnitQuantity ) ,
                 (int) $inHospitalItem[$inHospitalItem_find_key]->lotManagement,
@@ -106,7 +106,6 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface{
                 "itemsNumber" => $consumptionToArray['itemCount'],
                 "totalAmount" => $consumptionToArray['totalAmount'],
                 "billingStatus" => $consumptionToArray['consumptionStatus'],
-
             ];
 
             foreach( $consumptionToArray['consumptionItems'] as $consumptionItem )
