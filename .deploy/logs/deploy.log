@@ -48,3 +48,53 @@
 [2022-08-18 13:29:10][INFO] rm directory JoyPla
 [2022-08-18 13:29:11][INFO] upload JoyPla
 [2022-08-18 13:29:12][INFO] git add src/JoyPla/.
+[2022-08-18 13:34:11][INFO] directory logs
+[2022-08-18 13:34:11][INFO] directory tmp
+[2022-08-18 13:34:11][INFO] rm zip file
+[2022-08-18 13:34:21][INFO] npx tailwindcss -i ./src/JoyPla/resources/parts/input.css.php -o ./src/JoyPla/resources/parts/output.css.php
+[2022-08-18 13:34:21][INFO] makeAutoload JoyPla
+[2022-08-18 13:34:28][INFO] git add -N .; git diff --name-only --relative=src/JoyPla/ | xargs -I % cp --parents ./JoyPla/% ../.deploy/tmp/
+[2022-08-18 13:34:28][INFO] zip directory JoyPla
+[2022-08-18 13:34:28][INFO] rm directory JoyPla
+[2022-08-18 13:34:28][INFO] upload JoyPla
+[2022-08-18 13:34:29][INFO] git add src/JoyPla/.
+[2022-08-18 13:35:28][INFO] directory logs
+[2022-08-18 13:35:28][INFO] directory tmp
+[2022-08-18 13:35:28][INFO] rm zip file
+[2022-08-18 13:35:38][INFO] npx tailwindcss -i ./src/JoyPla/resources/parts/input.css.php -o ./src/JoyPla/resources/parts/output.css.php
+[2022-08-18 13:35:38][INFO] makeAutoload JoyPla
+[2022-08-18 13:35:45][INFO] git add -N .; git diff --name-only --relative=src/JoyPla/ | xargs -I % cp --parents ./JoyPla/% ../.deploy/tmp/
+[2022-08-18 13:35:45][INFO] zip directory JoyPla
+[2022-08-18 13:35:45][INFO] rm directory JoyPla
+[2022-08-18 13:35:45][INFO] upload JoyPla
+[2022-08-18 13:35:46][INFO] git add src/JoyPla/.
+[2022-08-18 13:37:37][INFO] directory logs
+[2022-08-18 13:37:37][INFO] directory tmp
+[2022-08-18 13:37:37][INFO] rm zip file
+[2022-08-18 13:37:46][INFO] npx tailwindcss -i ./src/JoyPla/resources/parts/input.css.php -o ./src/JoyPla/resources/parts/output.css.php
+[2022-08-18 13:37:47][INFO] makeAutoload JoyPla
+[2022-08-18 13:37:54][INFO] git add -N .; git diff --name-only --relative=src/JoyPla/ | xargs -I % cp --parents ./JoyPla/% ../.deploy/tmp/
+[2022-08-18 13:37:54][INFO] zip directory JoyPla
+[2022-08-18 13:37:54][INFO] rm directory JoyPla
+[2022-08-18 13:37:55][INFO] upload JoyPla
+[2022-08-18 13:37:55][INFO] git add src/JoyPla/.
+[2022-08-18 13:38:14][INFO] directory logs
+[2022-08-18 13:38:14][INFO] directory tmp
+[2022-08-18 13:38:14][INFO] rm zip file
+[2022-08-18 13:38:22][INFO] npx tailwindcss -i ./src/JoyPla/resources/parts/input.css.php -o ./src/JoyPla/resources/parts/output.css.php
+[2022-08-18 13:38:22][INFO] makeAutoload JoyPla
+[2022-08-18 13:38:29][INFO] git add -N .; git diff --name-only --relative=src/JoyPla/ | xargs -I % cp --parents ./JoyPla/% ../.deploy/tmp/
+[2022-08-18 13:38:29][INFO] zip directory JoyPla
+[2022-08-18 13:38:29][INFO] rm directory JoyPla
+[2022-08-18 13:38:30][INFO] upload JoyPla
+[2022-08-18 13:38:31][INFO] git add src/JoyPla/.
+[2022-08-18 13:38:59][INFO] directory logs
+[2022-08-18 13:38:59][INFO] directory tmp
+[2022-08-18 13:38:59][INFO] rm zip file
+[2022-08-18 13:39:08][INFO] npx tailwindcss -i ./src/JoyPla/resources/parts/input.css.php -o ./src/JoyPla/resources/parts/output.css.php
+[2022-08-18 13:39:09][INFO] makeAutoload JoyPla
+[2022-08-18 13:39:16][INFO] git add -N .; git diff --name-only --relative=src/JoyPla/ | xargs -I % cp --parents ./JoyPla/% ../.deploy/tmp/
+[2022-08-18 13:39:16][INFO] zip directory JoyPla
+[2022-08-18 13:39:16][INFO] rm directory JoyPla
+[2022-08-18 13:39:16][INFO] upload JoyPla
+[2022-08-18 13:39:17][INFO] git add src/JoyPla/.

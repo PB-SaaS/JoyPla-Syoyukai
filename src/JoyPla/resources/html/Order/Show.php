@@ -96,6 +96,17 @@
                             {{ orderItem.orderItemReceivedStatusToString }}
                           </span>
                         </p>
+                        <p v-if="orderItem.useMedicode">
+                          <span class="bg-orange-100 text-orange-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="orderItem.medicodeStatus == 1">
+                            Medicode-Web 未送信
+                          </span>
+                          <span class="bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="orderItem.medicodeStatus == 2">
+                            Medicode-Web 送信済み
+                          </span>
+                          <span class="bg-red-100 text-red-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="orderItem.medicodeStatus == 3">
+                            Medicode-Web 連携エラー
+                          </span>
+                        </p>
                         <p>
                           <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(orderItem.orderPrice) }}</span>
                           <span class="text-sm text-gray-900">( &yen; {{ numberFormat(orderItem.price) }} / {{ orderItem.quantity.itemUnit }} )</span>

@@ -93,6 +93,20 @@
                                 </span>
                               </div>
                           </div>
+                          <div class="md:flex gap-6" v-if="item.value.useMedicode">
+                              <div class="font-bold w-32">Medicode-Web</div>
+                              <div>
+                                  <span class="bg-orange-100 text-orange-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="item.value.medicodeStatus == 1">
+                                    未送信
+                                  </span>
+                                  <span class="bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="item.value.medicodeStatus == 2">
+                                    送信済み
+                                  </span>
+                                  <span class="bg-red-100 text-red-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="item.value.medicodeStatus == 3">
+                                    連携エラー
+                                  </span>
+                              </div>
+                          </div>
                           <template v-if="item.value.orderItemReceivedStatus != 3">
                             <v-input-number
                                 :rules="{ required: true , between: ( (item.value.orderQuantity > 0)? [ item.value.receivedQuantity , item.value.orderQuantity ] : [ item.value.orderQuantity  , item.value.receivedQuantity ] ) }" 
