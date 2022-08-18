@@ -835,6 +835,13 @@ class InventoryController extends Controller
                 ->value('inHospitalItemId')
                 ->value('rackName')
                 ->value('distributorName')
+                ->plain()
+                ->get();
+
+            $data = $content->data->all();
+
+            $inHospitalItems = InHospitalItemView::where('hospitalId',$user_info->getHospitalId())->plain()
+                ->value('inHospitalItemId')
                 ->value('itemName')
                 ->value('itemCode')
                 ->value('itemStandard')
@@ -844,21 +851,41 @@ class InventoryController extends Controller
                 ->value('unitPrice')
                 ->value('quantity')
                 ->value('quantityUnit')
-                ->plain()
-                ->get();
-
-            $data = $content->data->all();
-
-            foreach($data as &$d)
+                ->value('category');
+                
+            foreach($data as $d)
             {
-                $d->price = (int) $d->price ;
-                $d->unitPrice = (float) $d->unitPrice ;
+                $inHospitalItems->orWhere('inHospitalItemId',$d->inHospitalItemId);
+            }
+
+            $inHospitalItems = $inHospitalItems->get();
+            $inHospitalItemsLabel = $inHospitalItems->label->all();
+            foreach($data as $key => $d)
+            {
+                foreach($inHospitalItems->data->all() as $item)
+                {
+                    if($item->inHospitalItemId == $d->inHospitalItemId)
+                    {
+                        $data[$key]->itemName = $item->itemName;
+                        $data[$key]->itemCode = $item->itemCode;
+                        $data[$key]->itemStandard = $item->itemStandard;
+                        $data[$key]->itemJANCode = $item->itemJANCode;
+                        $data[$key]->makerName = $item->makerName;
+                        $data[$key]->price = (float)$item->price;
+                        $data[$key]->unitPrice = (float)$item->unitPrice;
+                        $data[$key]->quantity = $item->quantity;
+                        $data[$key]->quantityUnit = $item->quantityUnit;
+                        $data[$key]->category = $item->category;
+                        $data[$key]->categoryToString = $inHospitalItemsLabel['category']->get($item->category);
+                        break;
+                    }
+                }
                 if($hospital->invUnitPrice != '1')
                 {
-                    $d->unitPrice = 0;
+                    $data[$key]->unitPrice = 0;
                     if((int)$d->quantity !== 0 && (int)$d->price !== 0)
                     {
-                        $d->unitPrice = ((int)$d->price / (int)$d->quantity);
+                        $data[$key]->unitPrice = ((int)$d->price / (int)$d->quantity);
                     }
                 }
             }
