@@ -13981,3 +13981,27 @@
 [2022-08-18 10:44:59][INFO] rm directory NewJoyPla
 [2022-08-18 10:44:59][INFO] upload NewJoyPla
 [2022-08-18 10:45:00][INFO] git add src/NewJoyPla/.
+[2022-08-18 10:52:47][INFO] directory logs
+[2022-08-18 10:52:47][INFO] directory tmp
+[2022-08-18 10:52:47][INFO] rm zip file
+[2022-08-18 10:52:51][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-08-18 10:52:51][INFO] zip directory NewJoyPla
+[2022-08-18 10:52:51][INFO] rm directory NewJoyPla
+[2022-08-18 10:52:52][INFO] upload NewJoyPla
+[2022-08-18 10:52:53][INFO] git add src/NewJoyPla/.
+[2022-08-18 10:54:35][INFO] directory logs
+[2022-08-18 10:54:35][INFO] directory tmp
+[2022-08-18 10:54:35][INFO] rm zip file
+[2022-08-18 10:54:39][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-08-18 10:54:39][INFO] zip directory NewJoyPla
+[2022-08-18 10:54:39][INFO] rm directory NewJoyPla
+[2022-08-18 10:54:40][INFO] upload NewJoyPla
+[2022-08-18 10:54:41][INFO] git add src/NewJoyPla/.
+[2022-08-18 10:55:22][INFO] directory logs
+[2022-08-18 10:55:22][INFO] directory tmp
+[2022-08-18 10:55:22][INFO] rm zip file
+[2022-08-18 10:55:26][INFO] git add -N .; git diff --name-only --relative=src/NewJoyPla/ | xargs -I % cp --parents ./NewJoyPla/% ../.deploy/tmp/
+[2022-08-18 10:55:26][INFO] zip directory NewJoyPla
+[2022-08-18 10:55:26][INFO] rm directory NewJoyPla
+[2022-08-18 10:55:27][INFO] upload NewJoyPla
+[2022-08-18 10:55:28][INFO] git add src/NewJoyPla/.

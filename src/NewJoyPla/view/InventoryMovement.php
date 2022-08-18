@@ -1,3 +1,11 @@
+<style>
+	.asc::after {
+		content: "▲";
+	}
+	.desc::after {
+		content: "▼";
+	}
+</style>
 <div id="app">
     <div class="animsition uk-margin-bottom no_print" uk-height-viewport="expand: true">
         <div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
@@ -57,7 +65,8 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>棚名</th>
+                                        <th>
+								            <a href="#" @click="sortBy('rackName')" :class="addClass('rackName')">棚名</a></th>
                                         <th class="uk-width-1-6">商品情報</th>
                                         <th>卸業者</th>
                                         <th>価格</th>
@@ -74,7 +83,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="( i , key) in items">
+                                    <tr v-for="( i , key) in sort_items">
                                         <td>{{ key + 1 }}</td>
                                         <td>{{ i.rackName }}</td>
                                         <td>
@@ -166,7 +175,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="( i , key) in items">
+                        <tr v-for="( i , key) in sort_items">
                             <td>{{ key + 1 }}</td>
                             <td>{{ i.rackName }}</td>
                             <td>
@@ -227,6 +236,8 @@ var datas = {
     'searchEndDate' : '',
     'complete' : false,
     'completeDate' : '',
+    sort_key: "",
+    sort_asc: true,
 };
 
 var app = new Vue({
@@ -242,7 +253,35 @@ var app = new Vue({
     },
     watch: {
     },
+	computed: {
+		sort_items() {
+			if (this.sort_key != "") {
+			let set = 1;
+			this.sort_asc ? (set = 1) : (set = -1);
+			this.items.sort((a, b) => {
+				if (a[this.sort_key] < b[this.sort_key]) return -1 * set;
+				if (a[this.sort_key] > b[this.sort_key]) return 1 * set;
+				return 0;
+			});
+			return this.items;
+			} else {
+			return this.items;
+			}
+		},
+	},
 	methods: {
+		addClass(key) {
+			return {
+				asc: this.sort_key === key && this.sort_asc,
+				desc: this.sort_key === key && !this.sort_asc,
+			};
+		},
+		sortBy(key) {
+			this.sort_key === key
+			? (this.sort_asc = !this.sort_asc)
+			: (this.sort_asc = true);
+			this.sort_key = key;
+		},
         get_before_inventory_total_price: function()
         {
             let num = 0;

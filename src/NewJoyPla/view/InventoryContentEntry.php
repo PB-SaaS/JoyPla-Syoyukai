@@ -72,13 +72,13 @@
     table.uk-table > tbody > tr > td:first-child::before {
       content: counter(rowCount);
     }
+    
 	.asc::after {
 		content: "▲";
 	}
 	.desc::after {
 		content: "▼";
 	}
-    
 </style>
 <div id="app" class="animsition" uk-height-viewport="expand: true">
     <div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
