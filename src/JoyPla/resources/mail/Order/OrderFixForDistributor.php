@@ -26,3 +26,6 @@ JoyPla からお知らせです。
 <?php echo $login_url ?>
 
 ※このメールへの返信は受け付けていません。
+<?php if($useMedicode): ?>
+※Medicode-web連携は毎時00分,15分,30分,45分に実行されます。
+<?php endif ?>

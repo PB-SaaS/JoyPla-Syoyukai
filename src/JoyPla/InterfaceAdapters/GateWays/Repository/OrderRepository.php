@@ -72,6 +72,8 @@ class OrderRepository implements OrderRepositoryInterface{
                 $inHospitalItem[$inHospitalItem_find_key]->distributorMCode,
                 (int) $inHospitalItem[$inHospitalItem_find_key]->lotManagement,
                 (int) $inHospitalItem[$inHospitalItem_find_key]->inItemImage,
+                false,
+                1,
             );
         }
         return $result;
@@ -460,6 +462,10 @@ class OrderRepository implements OrderRepositoryInterface{
         ->get();
         $distributor = $distributor->data->get(0);
 
+        $useMedicode = in_array(true, array_map(function(array $orderItem){
+            return $orderItem['useMedicode'];
+        },$order['orderItems']), true);
+
         $mail_body = view('mail/Order/OrderFixForDistributor', [
             'name' => '%val:usr:name%',
             'hospital_name' => $order['hospital']['hospitalName'],
@@ -470,6 +476,7 @@ class OrderRepository implements OrderRepositoryInterface{
             'order_date' => $order['orderDate'],
             'order_number' => $order['orderId'],
             'item_num' => $order['itemCount'],
+            'useMedicode' => $useMedicode,
             'total_price' => '￥'.number_format((float)$order['totalAmount']),
             'slip_url' => OROSHI_OrderDetailAccess."?searchValue=".$order['orderId'],
             'login_url' => OROSHI_LOGIN_URL,
@@ -486,7 +493,6 @@ class OrderRepository implements OrderRepositoryInterface{
             ->subject("[JoyPla] 発注が行われました")
             ->from(FROM_ADDRESS,FROM_NAME)
             ->send();
-
         
         {
             

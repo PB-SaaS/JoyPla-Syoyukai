@@ -34,6 +34,11 @@ class OrderItem extends SpiralORM
         "itemId",
         "priceId",
         "adjustment",
+        "useMedicode",
+        "hospitalCode",
+        "distributorCode",
+        "medicodeStatus",
+        "medicodeSentDate",
     ];
 
     //デフォルト値

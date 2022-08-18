@@ -46,7 +46,12 @@ class OrderItemView extends SpiralORM
         "catalogNo",
         "distributorName",
         "adjustment",
-        "inItemImage"
+        "inItemImage",
+        "useMedicode",
+        "hospitalCode",
+        "distributorCode",
+        "medicodeStatus",
+        "medicodeSentDate",
     ];
 
     //デフォルト値

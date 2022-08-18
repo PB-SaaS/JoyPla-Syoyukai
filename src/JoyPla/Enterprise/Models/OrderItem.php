@@ -36,7 +36,9 @@ class OrderItem
         ReceivedQuantity $receivedQuantity,
         string $distributorManagerCode,
         bool $lotManagement,
-        $itemImage
+        $itemImage,
+        bool $useMedicode,
+        int $medicodeStatus
         )
     {
         $this->orderId = $orderId;
@@ -53,6 +55,8 @@ class OrderItem
         $this->distributorManagerCode = $distributorManagerCode;
         $this->lotManagement = $lotManagement;
         $this->itemImage = ($itemImage)? $itemImage : "";
+        $this->useMedicode = $useMedicode;
+        $this->medicodeStatus = $medicodeStatus;
     }
 
     public static function create( Collection $input )
@@ -72,6 +76,8 @@ class OrderItem
             $input->distributorMCode,
             (int) $input->lotManagement ,
             $input->inItemImage,
+            $input->useMedicode,
+            (int)$input->medicodeStatus,
         );
     }
 
@@ -149,7 +155,9 @@ class OrderItem
             $this->receivedQuantity,
             $this->distributorManagerCode,
             $this->lotManagement,
-            $this->itemImage
+            $this->itemImage,
+            $this->useMedicode,
+            $this->medicodeStatus,
         );
     }
 
@@ -206,7 +214,9 @@ class OrderItem
             $this->receivedQuantity->add( $receivedQuantity ),
             $this->distributorManagerCode,
             $this->lotManagement,
-            $this->itemImage
+            $this->itemImage,
+            $this->useMedicode,
+            $this->medicodeStatus,
         );
     }
 
@@ -226,7 +236,9 @@ class OrderItem
             $this->receivedQuantity,
             $this->distributorManagerCode,
             $this->lotManagement,
-            $this->itemImage
+            $this->itemImage,
+            $this->useMedicode,
+            $this->medicodeStatus,
         );
     }
 
@@ -275,7 +287,9 @@ class OrderItem
             'orderPrice' => $this->price(),
             'distributorManagerCode' => $this->distributorManagerCode,
             'lotManagement' => $this->lotManagement,
-            'itemImage' => $this->itemImage
+            'itemImage' => $this->itemImage,
+            'useMedicode' => $this->useMedicode,
+            'medicodeStatus' => $this->medicodeStatus,
         ];
     }
 }
