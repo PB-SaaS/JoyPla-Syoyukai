@@ -447,6 +447,7 @@
 	                        </div>
 				        </div>
 				    </div>
+					<?php /*
 				    <div>
 				        <div class="nj_card content-4">
 	                        <div class="menu-content">
@@ -464,6 +465,7 @@
 	                        </div>
 				        </div>
 				    </div>
+					*/?>
 				    <div>
 				        <div class="nj_card content-5">
 	                        <div class="menu-content">
@@ -518,7 +520,7 @@
 				    <div>
 				    </div>
 				    
-					<div class="uk-width-1-2@m uk-text-left">
+					<div class="uk-width-1-1@m uk-text-left">
 						<div class="topic">
 				    		<div class="title">	
 				    			<div uk-grid>
@@ -535,6 +537,7 @@
 				    		</div>
 			    		</div>
 					</div>
+					<?php /*
 					<div class="uk-width-1-2@m uk-text-left">
 						<div class="topic">
 				    		<div class="title">
@@ -552,7 +555,7 @@
 				    		</div>
 			    		</div>
 					</div>
-					
+					*/ ?>
 				</div>
 		    </div>
 		</div>

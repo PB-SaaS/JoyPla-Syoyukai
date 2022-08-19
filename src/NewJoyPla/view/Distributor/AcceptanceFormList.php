@@ -14,6 +14,8 @@
 				<?php endif ?>
 				<?php echo $add_button ?>
             </div>
+			<?php
+			/*
 			<div uk-grid>
 				<div class="uk-margin uk-width-1-3@m">
 					<label class="uk-form-label" for="form-horizontal-select">所属情報</label>
@@ -33,6 +35,7 @@
 					</div>
 				</div>
 			</div>
+			*/ ?>
 			<h2 class="page_title"><?php echo $title ?></h2>
 	    	<hr>
 	    	<div class="" id="tablearea">

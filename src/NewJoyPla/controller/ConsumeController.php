@@ -108,7 +108,6 @@ class ConsumeController extends Controller
             }
             
             $api_url = "%url/rel:mpgt:Consume%";
-    
             if ($user_info->isHospitalUser() && ( $user_info->isAdmin() || $user_info->isApprover() ))
             {
                 $content = $this->view('NewJoyPla/view/template/List', [

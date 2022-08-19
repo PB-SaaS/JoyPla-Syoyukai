@@ -12,7 +12,8 @@ use App\Model\ReceivingView;
 use App\Model\ReceivingHistory;
 
 use ApiErrorCode\FactoryApiErrorCode;
-
+use App\Model\DistributorAffiliationView;
+use App\Model\DistributorUser;
 use stdClass;
 use Exception;
 
@@ -47,10 +48,22 @@ class AcceptanceDetailController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             }
 
-            $card = ReceivingHistory::where('distributorId',$user_info->getDistributorId())->find($card_Id)->get();
+            $card = ReceivingHistory::find($card_Id)->get();
             $card = $card->data->get(0);
             
-            $receiving_items = ReceivingView::where('distributorId',$user_info->getDistributorId())->where('receivingHId',$card->receivingHId)->get();
+            $affiliations = DistributorAffiliationView::where('loginId',$user_info->getLoginId())->where('distributorId',$card->distributorId)->where('invitingAgree','1')->get();
+                        
+            if($affiliations->count == '0'){
+                  throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+
+            $affiliations = $affiliations->data->get(0);
+
+            DistributorUser::where('loginId',$user_info->getLoginId())->update([
+                  'affiliationId' => $affiliations->affiliationId
+            ]);
+
+            $receiving_items = ReceivingView::where('receivingHId',$card->receivingHId)->get();
             $receiving_items = $receiving_items->data->all();
 
             $api_url = '%url/card:page_266218%';

@@ -4,11 +4,13 @@ include_once 'NewJoyPla/autoload.php';
 use App\Lib\UserInfo;
 use App\Model\Hospital;
 use App\Model\Distributor;
+use App\Model\DistributorUser;
 
 $nav = new StdClass;
-
-$nav->user_info = new UserInfo($SPIRAL);
-
+$nav->user_info = $user_info;
+if(!$user_info){
+	$nav->user_info = new UserInfo($SPIRAL);
+}
 if($nav->user_info->isHospitalUser())
 {
 	$nav->hospital = Hospital::where('hospitalId',$nav->user_info->getHospitalId())->plain()->get();
@@ -16,7 +18,9 @@ if($nav->user_info->isHospitalUser())
 }
 if($nav->user_info->isDistributorUser())
 {
-	$nav->distributor = Distributor::where('distributorId',$nav->user_info->getDistributorId())->plain()->get();
+	$user = DistributorUser::where('loginId', $nav->user_info->getLoginId())->plain()->value('distributorId')->get();
+	$user = $user->data->get(0);
+	$nav->distributor = Distributor::where('distributorId',$user->distributorId)->plain()->get();
 	$nav->distributor = $nav->distributor->data->get(0);
 	$nav->hospital = Hospital::where('hospitalId',$nav->distributor->hospitalId)->get();
 	$nav->hospital = $nav->hospital->data->get(0);

@@ -17,7 +17,8 @@ use App\Model\OrderedItemView;
 use App\Model\OrderHistory;
 
 use ApiErrorCode\FactoryApiErrorCode;
-
+use App\Model\DistributorAffiliationView;
+use App\Model\DistributorUser;
 use stdClass;
 use Exception;
 
@@ -52,10 +53,22 @@ class OrderSlipDetailController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             }
 
-            $card = OrderHistory::where('distributorId',$user_info->getDistributorId())->find($card_Id)->get();
+            $card = OrderHistory::find($card_Id)->get();
             $card = $card->data->get(0);
+
+            $affiliations = DistributorAffiliationView::where('loginId',$user_info->getLoginId())->where('distributorId',$card->distributorId)->where('invitingAgree','1')->get();
+                        
+            if($affiliations->count == '0'){
+                  throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            }
+
+            $affiliations = $affiliations->data->get(0);
+
+            DistributorUser::where('loginId',$user_info->getLoginId())->update([
+                  'affiliationId' => $affiliations->affiliationId
+            ]);
             
-            $order_items = OrderedItemView::where('distributorId',$user_info->getDistributorId())->where('orderNumber',$card->orderNumber)->get();
+            $order_items = OrderedItemView::where('orderNumber',$card->orderNumber)->get();
             $order_items = $order_items->data->all();
             
             foreach($order_items as $key => $item)
@@ -111,7 +124,7 @@ class OrderSlipDetailController extends Controller
             $head = $this->view('NewJoyPla/view/template/parts/Head', ['new'=> true] , false);
 
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
+                'SPIRAL' => $SPIRAL,
             ], false);
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
