@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use View;
@@ -42,20 +43,17 @@ class OrderSlipDetailController extends Controller
             
             $user_info = new UserInfo($SPIRAL);
 
-            if ($user_info->isHospitalUser())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            if ($user_info->isHospitalUser()) {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
             }
             
             $card_Id = (int)$SPIRAL->getCardId();
-            if($card_Id == null)
-            {   
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            if ($card_Id == null) {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
             }
-
             $card = OrderHistory::find($card_Id)->get();
             $card = $card->data->get(0);
-
+            
             $affiliations = DistributorAffiliationView::where('loginId',$user_info->getLoginId())->where('distributorId',$card->distributorId)->where('invitingAgree','1')->get();
                         
             if($affiliations->count == '0'){
@@ -71,27 +69,26 @@ class OrderSlipDetailController extends Controller
             $order_items = OrderedItemView::where('orderNumber',$card->orderNumber)->get();
             $order_items = $order_items->data->all();
             
-            foreach($order_items as $key => $item)
-            {
-                $order_items[$key]->dueDate = \App\lib\changeDateFormat("Y年m月d日" ,$order_items[$key]->dueDate ,'Y-m-d');
+            foreach ($order_items as $key => $item) {
+                $order_items[$key]->dueDate = \App\lib\changeDateFormat("Y年m月d日", $order_items[$key]->dueDate, 'Y-m-d');
                 $order_items[$key]->dueDateStyle = [];
             }
 
             $api_url = '%url/card:page_266218%';
 
             $link_title = "発注書一覧";
-        	$link = '%url/rel:mpgt:OrderD%';
+            $link = '%url/rel:mpgt:OrderD%';
 
-            $hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+            $hospital = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
             $hospital = $hospital->data->get(0);
             $receipt_division = '';
             
-            if($hospital->receivingTarget == '1'){ //大倉庫
-                $division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionType','1')->get();
+            if ($hospital->receivingTarget == '1') { //大倉庫
+                $division = Division::where('hospitalId', $user_info->getHospitalId())->where('divisionType', '1')->get();
                 $division = $division->data->get(0);
                 $receipt_division = $division->divisionName;
             }
-            if($hospital->receivingTarget == '2'){ //発注部署
+            if ($hospital->receivingTarget == '2') { //発注部署
                 $receipt_division = '%val:usr:divisionName%';
             }
 
@@ -99,29 +96,26 @@ class OrderSlipDetailController extends Controller
                 'user_info' => $user_info,
                 'api_url' => $api_url,
                 'csrf_token' => Csrf::generate(16),
-                'orderResetButton' => (int)( $card->orderStatus == 3 || $card->orderStatus == 4 ),
-                'orderFixingButton' => (int)( $card->orderStatus == 2 ),
+                'orderResetButton' => (int)($card->orderStatus == 3 || $card->orderStatus == 4),
+                'orderFixingButton' => (int)($card->orderStatus == 2),
                 'orderItems' => $order_items,
                 /*'pattern' => $pattern,*/
                 'link_title' => $link_title,
                 'link' => $link,
                 'receipt_division' => $receipt_division
                 /*'cardId' => $cardId*/
-            ] , false);
-
-        } catch ( Exception $ex ) {
+            ], false);
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message' => $ex->getMessage(),
-            ] , false);
-
+            ], false);
         } finally {
+            $style   = $this->view('NewJoyPla/view/template/parts/DetailPrintCss', [], false)->render();
+            $style   .= $this->view('NewJoyPla/view/template/parts/StyleCss', [], false)->render();
 
-            $style   = $this->view('NewJoyPla/view/template/parts/DetailPrintCss', [] , false)->render();
-            $style   .= $this->view('NewJoyPla/view/template/parts/StyleCss', [] , false)->render();
-
-            $script   = $this->view('NewJoyPla/view/template/parts/Script', [] , false)->render();
-            $head = $this->view('NewJoyPla/view/template/parts/Head', ['new'=> true] , false);
+            $script   = $this->view('NewJoyPla/view/template/parts/Script', [], false)->render();
+            $head = $this->view('NewJoyPla/view/template/parts/Head', ['new'=> true], false);
 
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL,
@@ -135,75 +129,90 @@ class OrderSlipDetailController extends Controller
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
-            ],false);
+            ], false);
         }
     }
     
     public function orderResetApi()
     {
         global $SPIRAL;
-        try{
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
+        try {
+            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
             
             $user_info = new UserInfo($SPIRAL);
             
             $record_id = (int)$SPIRAL->getCardId();
             
-            $order_history = OrderHistory::where('distributorId',$user_info->getDistributorId())->find($record_id)->get();
+            $order_history = OrderHistory::where('distributorId', $user_info->getDistributorId())->find($record_id)->get();
             $order_history = $order_history->data->get(0);
             
-            if(! ($order_history->orderStatus == 3 || $order_history->orderStatus == 4) )
-            {
+            if (! ($order_history->orderStatus == 3 || $order_history->orderStatus == 4)) {
                 //コードはそのうち考える
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(), FactoryApiErrorCode::factory(191)->getCode());
             }
             
-            $result = OrderHistory::where('distributorId',$user_info->getDistributorId())->find($record_id)->update([
-                    'orderStatus' => 2
+            $comment = ($SPIRAL->getParam('distrComment')) ? urldecode($SPIRAL->getParam('distrComment')) : '';
+            if ($comment) {
+                $comment = $this->html($comment);
+            }
+
+            $length = strlen(mb_convert_encoding($comment, 'SJIS', 'UTF-8'));
+            if ($length > 512) {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(), FactoryApiErrorCode::factory(191)->getCode());
+            }
+
+            $result = OrderHistory::where('distributorId', $user_info->getDistributorId())->find($record_id)->update([
+                    'orderStatus' => 2, 'distrComment' => $comment
                 ]);
 
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['insert']);
             $content = $content->toJson();
-         
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+        } catch (Exception $ex) {
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['insert']);
             $content = $content->toJson();
-        }finally {
+        } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
-            ],false);
+            ], false);
         }
     }
     
     public function orderFixingApi()
     {
         global $SPIRAL;
-        try{
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
+        try {
+            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
             
             $user_info = new UserInfo($SPIRAL);
             
             $record_id = (int)$SPIRAL->getCardId();
             
-            $order_history = OrderHistory::where('distributorId',$user_info->getDistributorId())->find($record_id)->get();
+            $order_history = OrderHistory::where('distributorId', $user_info->getDistributorId())->find($record_id)->get();
             $order_history = $order_history->data->get(0);
             
-            if(! ($order_history->orderStatus == 2) )
-            {
+            if (! ($order_history->orderStatus == 2)) {
                 //コードはそのうち考える
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(), FactoryApiErrorCode::factory(191)->getCode());
+            }
+
+            $comment = ($SPIRAL->getParam('distrComment')) ? urldecode($SPIRAL->getParam('distrComment')) : '';
+            if ($comment) {
+                $comment = $this->html($comment);
+            }
+
+            $length = strlen(mb_convert_encoding($comment, 'SJIS', 'UTF-8'));
+            if ($length > 512) {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(), FactoryApiErrorCode::factory(191)->getCode());
             }
             
             $order_items = $SPIRAL->getParam('lists');
             $update_data = [];
             $orderStatus = 3;
             
-            foreach($order_items as $item)
-            {
-                if($item['dueDate'] != '')
-                {
+            foreach ($order_items as $item) {
+                if ($item['dueDate'] != '') {
                     $orderStatus = 4;
                 }
                 $update_data[] = [
@@ -212,19 +221,18 @@ class OrderSlipDetailController extends Controller
                     ];
             }
             
-            Order::where('orderNumber',$order_history->orderNumber)->bulkUpdate('orderCNumber',$update_data);
+            Order::where('orderNumber', $order_history->orderNumber)->bulkUpdate('orderCNumber', $update_data);
             
-            $result = OrderHistory::where('distributorId',$user_info->getDistributorId())->find($record_id)->update([
-                    'orderStatus' => $orderStatus
+            $result = OrderHistory::where('distributorId', $user_info->getDistributorId())->find($record_id)->update([
+                    'orderStatus' => $orderStatus, 'distrComment' => $comment
                 ]);
             
-            $distributor = Distributor::where('distributorId',$user_info->getDistributorId())->get();
+            $distributor = Distributor::where('distributorId', $user_info->getDistributorId())->get();
             $distributor = $distributor->data->get(0);
             
             $subject = "[JoyPla] 受注されました";
             $text = "受注";
-            if($orderStatus == 4)
-            {
+            if ($orderStatus == 4) {
                 $subject = "[JoyPla] 受注（納期報告）されました";
                 $text = "受注（納期報告）";
             }
@@ -237,9 +245,9 @@ class OrderSlipDetailController extends Controller
                 'orderTime' => $order_history->orderTime,
                 'itemsNumber' => $order_history->itemsNumber,
                 'orderNumber' => $order_history->orderNumber,
-                'totalAmount' => "￥".number_format((float)$order_history->totalAmount,2),
+                'totalAmount' => "￥".number_format((float)$order_history->totalAmount, 2),
                 'url' => LOGIN_URL,
-            ] , false)->render();
+            ], false)->render();
             
             $hospital_user = HospitalUser::getNewInstance();
             
@@ -252,7 +260,7 @@ class OrderSlipDetailController extends Controller
             $test = $hospital_user::selectRule($select_name)
                 ->body($mail_body)
                 ->subject($subject)
-                ->from(FROM_ADDRESS,FROM_NAME)
+                ->from(FROM_ADDRESS, FROM_NAME)
                 ->send();
                 
             $hospital_user = HospitalUser::getNewInstance();
@@ -265,20 +273,64 @@ class OrderSlipDetailController extends Controller
             $test = $hospital_user::selectRule($select_name)
                 ->body($mail_body)
                 ->subject($subject)
-                ->from(FROM_ADDRESS,FROM_NAME)
+                ->from(FROM_ADDRESS, FROM_NAME)
                 ->send();
                 
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['insert']);
             $content = $content->toJson();
-         
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+        } catch (Exception $ex) {
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['insert']);
             $content = $content->toJson();
-        }finally {
+        } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
-            ],false);
+            ], false);
         }
+    }
+
+    public function distrCommentApi()
+    {
+        global $SPIRAL;
+        try {
+            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
+
+            $user_info = new UserInfo($SPIRAL);
+
+            $record_id = (int)$SPIRAL->getCardId();
+
+            $order_history = OrderHistory::where('distributorId', $user_info->getDistributorId())->find($record_id)->get();
+            $order_history = $order_history->data->get(0);
+
+            $comment = ($SPIRAL->getParam('distrComment')) ? urldecode($SPIRAL->getParam('distrComment')) : '';
+            if ($comment) {
+                $comment = $this->html($comment);
+            }
+
+            $length = strlen(mb_convert_encoding($comment, 'SJIS', 'UTF-8'));
+            if ($length > 512) {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(), FactoryApiErrorCode::factory(191)->getCode());
+            }
+
+            $result = OrderHistory::where('distributorId', $user_info->getDistributorId())->find($record_id)->update([
+                    'distrComment' => $comment
+                ]);
+
+            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['update']);
+            $content = $content->toJson();
+        } catch (Exception $ex) {
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['update']);
+            $content = $content->toJson();
+        } finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ], false);
+        }
+    }
+
+    private function html($string = '')
+    {
+        return htmlspecialchars($string, REPLACE_FLAGS, CHARSET);
     }
 }
 
@@ -290,15 +342,13 @@ $OrderSlipDetailController = new OrderSlipDetailController();
 $action = $SPIRAL->getParam('Action');
 
 {
-    if($action === 'orderResetApi')
-    {
+    if ($action === 'orderResetApi') {
         echo $OrderSlipDetailController->orderResetApi()->render();
-    }
-    else if($action === 'orderFixingApi')
-    {
+    } elseif ($action === 'orderFixingApi') {
         echo $OrderSlipDetailController->orderFixingApi()->render();
-    }else
-    {
+    } elseif ($action === 'distrCommentApi') {
+        echo $OrderSlipDetailController->distrCommentApi()->render();
+    } else {
         echo $OrderSlipDetailController->index()->render();
     }
 }
