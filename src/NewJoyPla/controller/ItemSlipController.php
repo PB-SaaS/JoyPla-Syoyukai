@@ -103,6 +103,7 @@ EOM;
                         'SMPFORM'=> '%smpform:330_itemChange%',
                         'itemId' => '%val:usr:itemId%',
                         'category' => '%val:usr:category:id%',
+                        'smallCategory' => '%val:usr:smallCategory%',
                         'itemName' => '%val:usr:itemName%',
                         'itemCode' => '%val:usr:itemCode%',
                         'itemStandard' => '%val:usr:itemStandard%',

@@ -258,7 +258,7 @@ class PriceSlipController extends Controller
                         'itemName' => '%val:usr:itemName%',
                         'itemCode' => '%val:usr:itemCode%',
                         'itemStandard' => '%val:usr:itemStandard%',
-                        'itemJANCode' => '%val:usr:itemJANCode%',
+                        'itemJANCode' => '%val:usr:itemJANCode%', 
                         'priceId' => $priceId,
                     ]
                 ] , false)->render();

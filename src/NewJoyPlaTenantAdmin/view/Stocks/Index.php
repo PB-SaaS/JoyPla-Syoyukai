@@ -2,7 +2,7 @@
     <div class="uk-container uk-container-expand">
     	<h1>在庫管理</h1>
 		<div class="uk-margin spiral_table_area" style="display:none">
-			%sf:usr:search51%
+			%sf:usr:search61%
 		</div>
     </div>
 </div>

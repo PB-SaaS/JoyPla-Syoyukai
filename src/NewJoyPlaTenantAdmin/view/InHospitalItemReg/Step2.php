@@ -23,7 +23,7 @@
                                 $selected = '';
                                 if($currentPriceId === $p->priceId)
                                 {
-                                    $selected = 'selected';
+                                    $selected = 'selected'; 
                                 }
                                 echo "<option value='".$p->priceId."' ".$selected.">".$p->distributorName."：&yen;".number_format_jp($p->price)."/".$p->quantity.$p->quantityUnit."(".$p->itemUnit.")</option>";
                             }

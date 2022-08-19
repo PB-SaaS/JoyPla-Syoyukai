@@ -8,7 +8,7 @@ use App\Model\Tenant;
 use App\Model\Hospital;
 
 use stdClass;
-use Exception;
+use Exception; 
 
 class FacilityController extends Controller
 {

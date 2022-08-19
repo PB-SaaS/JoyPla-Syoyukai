@@ -61,6 +61,7 @@ class ReceivingMRController extends Controller
         if ($SPIRAL->getParam('itemName')) { $itemName = $this->html($SPIRAL->getParam('itemName')); }
         if ($SPIRAL->getParam('itemCode')) { $itemCode = $this->html($SPIRAL->getParam('itemCode')); }
         if ($SPIRAL->getParam('itemStandard')) { $itemStandard = $this->html($SPIRAL->getParam('itemStandard')); }
+        if ($SPIRAL->getParam('smallCategory')) { $smallCategory = $this->html($SPIRAL->getParam('smallCategory')); }
         if ($SPIRAL->getParams('category') && is_array($SPIRAL->getParams('category')))
         {
             foreach ($SPIRAL->getParams('category') as $checked)
@@ -73,7 +74,7 @@ class ReceivingMRController extends Controller
             }
         }
 
-        $result = $this->dataSelect($startMonth,$endMonth,$distributorId,$divisionId,$itemName,$itemCode,$itemStandard,$category_ids,$page,$limit);
+        $result = $this->dataSelect($startMonth,$endMonth,$distributorId,$divisionId,$itemName,$itemCode,$itemStandard,$category_ids,$smallCategory,$page,$limit);
 
         $division = Division::where('hospitalId',$SPIRAL->getParam('hospitalId'))->get();
         
@@ -88,6 +89,7 @@ class ReceivingMRController extends Controller
             'division' => $division,
             'distributor' => $distributor_data,
             'distributorId' => $distributorId,
+            'smallCategory' => $smallCategory,
             'startMonth' => $startMonth,
             'endMonth' => $endMonth,
             'divisionId' => $divisionId,
@@ -105,7 +107,7 @@ class ReceivingMRController extends Controller
         return $content;
     }
     
-    private function dataSelect(string $startMonth = null, string $endMonth = null, string $distributorId = null, string $divisionId = null, string $itemName = null, string $itemCode = null, string $itemStandard = null, array $category_ids = array(), int $page = null, int $maxCount = null)
+    private function dataSelect(string $startMonth = null, string $endMonth = null, string $distributorId = null, string $divisionId = null, string $itemName = null, string $itemCode = null, string $itemStandard = null, array $category_ids = array(),string $smallCategory = null,  int $page = null, int $maxCount = null)
     {
         global $SPIRAL;
         
@@ -133,6 +135,7 @@ class ReceivingMRController extends Controller
         if ($itemName) { InHospitalItemView::where('itemName',"%$itemName%",'LIKE'); }
         if ($itemCode) { InHospitalItemView::where('itemCode',"%$itemCode%",'LIKE'); }
         if ($itemStandard) { InHospitalItemView::where('itemStandard',"%$itemStandard%",'LIKE'); }
+        if ($smallCategory) { InHospitalItemView::where('smallCategory',"%$smallCategory%",'LIKE'); }
         if ($distributorId) { InHospitalItemView::where('distributorId',$distributorId); }
         if ($category_ids)
         {
@@ -154,6 +157,7 @@ class ReceivingMRController extends Controller
                 'inHospitalItemId' => $row->inHospitalItemId,
                 'makerName' => $row->makerName,
                 'category' => $this->category[$row->category]['label'],
+                'smallCategory' => $row->smallCategory,
                 'itemName' => $row->itemName,
                 'itemCode' => $row->itemCode,
                 'itemStandard' => $row->itemStandard,

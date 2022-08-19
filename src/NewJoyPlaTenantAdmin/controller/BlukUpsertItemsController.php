@@ -115,21 +115,22 @@ class BlukUpsertItemsController extends Controller
                         "makerName" => $rows['data'][0],
                         "itemName" => $rows['data'][1],
                         "category" => $rows['data'][2],
-                        "itemCode" => $rows['data'][3],
-                        "itemStandard" => $rows['data'][4],
-                        "itemJANCode" => $rows['data'][5],
-                        "catalogNo" => $rows['data'][6],
-                        "serialNo" => $rows['data'][7],
-                        "minPrice" => $rows['data'][8],
-                        "officialFlag" => $rows['data'][9],
-                        "officialprice" => $rows['data'][10],
-                        "quantity" => $rows['data'][11],
-                        "quantityUnit" => $rows['data'][12],
-                        "itemUnit" => $rows['data'][13],
-                        "lotManagement" => $rows['data'][14],
+                        "smallCategory" => $rows['data'][3],
+                        "itemCode" => $rows['data'][4],
+                        "itemStandard" => $rows['data'][5],
+                        "itemJANCode" => $rows['data'][6],
+                        "catalogNo" => $rows['data'][7],
+                        "serialNo" => $rows['data'][8],
+                        "minPrice" => $rows['data'][9],
+                        "officialFlag" => $rows['data'][10],
+                        "officialprice" => $rows['data'][11],
+                        "quantity" => $rows['data'][12],
+                        "quantityUnit" => $rows['data'][13],
+                        "itemUnit" => $rows['data'][14],
+                        "lotManagement" => $rows['data'][15],
                         "tenantId" => $auth->tenantId,
                     ];
-                $items->orWhere('itemJANCode',$rows['data'][5]);
+                $items->orWhere('itemJANCode',$rows['data'][6]);
             }
             $items = ($items->get())->data->all();
             $insert_data = array_map(

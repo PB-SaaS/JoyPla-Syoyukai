@@ -121,6 +121,12 @@ class itemDB extends FieldTypeValidate
             'notNullFlg' => '',
         ],
         [   
+            'key' => '小分類',
+            'fieldType' => 'TextField128bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
             'key' => '製品コード',
             'fieldType' => 'TextField128bytes',
             'replaceKey' => 't',
@@ -537,6 +543,12 @@ class AllNewItemInsertDB extends FieldTypeValidate
         [   
             'key' => '分類',
             'fieldType' => 'Select_',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
+            'key' => '小分類',
+            'fieldType' => 'TextField128bytes',
             'replaceKey' => 't',
             'notNullFlg' => '',
         ],

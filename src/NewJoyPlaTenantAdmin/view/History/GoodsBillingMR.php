@@ -71,6 +71,14 @@
                     </div>
 
                     <div class="uk-form-controls uk-margin">
+                        <label class="uk-form-label">小分類</label>
+                        <div class="uk-child-width-1-1">
+                            <div>
+                                <input type="text" class="uk-input" name="smallCategory" value="<?php echo $smallCategory; ?>">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="uk-form-controls uk-margin">
                         <label class="uk-form-label">商品名</label>
                         <div class="uk-child-width-1-1">
                             <div>
@@ -143,6 +151,7 @@
                                     <th>院内商品ID</th>
                                     <th>メーカー</th>
                                     <th>分類</th>
+                                    <th>小分類</th>
                                     <th>商品名</th>
                                     <th>製品コード</th>
                                     <th>規格</th>
@@ -163,6 +172,7 @@
                                         echo "<td>".$record['inHospitalItemId']."</td>";
                                         echo "<td>".$record['makerName']."</td>";
                                         echo "<td>".$record['category']."</td>";
+                                        echo "<td>".$record['smallCategory']."</td>";
                                         echo "<td>".$record['itemName']."</td>";
                                         echo "<td>".$record['itemCode']."</td>";
                                         echo "<td>".$record['itemStandard']."</td>";
@@ -239,7 +249,7 @@ class GoodBillingMR
         let k = 0;
         remakeArray[k] = records[0];
         for (let i = 1; i < records.length; i++) {
-            for (let j = 0; j < records[i][8].length; j++) {
+            for (let j = 0; j < records[i][9].length; j++) {
                 k = k + 1;
                 remakeArray[k] = new Array();
                 remakeArray[k][0] = records[i][0];
@@ -250,12 +260,13 @@ class GoodBillingMR
                 remakeArray[k][5] = records[i][5];
                 remakeArray[k][6] = records[i][6];
                 remakeArray[k][7] = records[i][7];
-                remakeArray[k][8] = records[i][8][j];
+                remakeArray[k][8] = records[i][8];
                 remakeArray[k][9] = records[i][9][j];
                 remakeArray[k][10] = records[i][10][j];
                 remakeArray[k][11] = records[i][11][j];
                 remakeArray[k][12] = records[i][12][j];
                 remakeArray[k][13] = records[i][13][j];
+                remakeArray[k][14] = records[i][14][j];
             }
         }
         let data = remakeArray.map((record) => record.join('\t')).join('\r\n');
@@ -285,7 +296,7 @@ class GoodBillingMR
             });
         }
         
-        result.unshift(['id', 'inHospitalItemId', 'makerName', 'category', 'itemName', 'itemCode', 'itemStandard','itemJANCode', 'price', 'unitPrice', 'quantity', 'quantityUnit', 'billingQuantity', 'totalAmount']);
+        result.unshift(['id', '院内商品ID', 'メーカー', '分類', '小分類', '商品名', '製品コード', '規格', 'JANコード', '購買金額', '単価', '入数', '入数単位', '消費数', '合計金額']);
     
         this.exportCSV(result);
     }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja"> 
 <head>
     <title><?php echo $title; ?></title>
     <?php echo $head ?>

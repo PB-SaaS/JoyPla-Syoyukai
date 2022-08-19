@@ -355,8 +355,8 @@ class ReceivingMR
                 result[i].push(tmp.list[i][key]);
             });
         }
-
-        result.unshift(['id', 'inHospitalItemId', 'makerName', 'category','smallCategory', 'itemName', 'itemCode', 'itemStandard', 'itemJANCode', 'distributorName', 'quantity', 'price', 'receivingCount', 'totalAmount', 'itemUnit', 'totalReturnCount', 'adjAmount', 'priceAfterAdj']);
+        
+        result.unshift(['id', '院内商品ID', 'メーカー', '分類', '小分類', '商品名', '製品コード', '規格', 'JANコード', '卸業者名', '入数', '購買金額', '入庫数', '合計金額', '個数単位', '返品数', '調整額', '調整後金額']);
 
         this.exportCSV(result);
     }

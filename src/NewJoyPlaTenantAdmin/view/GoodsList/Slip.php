@@ -89,6 +89,14 @@
             </tr>
             <tr>
                 <th>
+                    小分類
+                </th>
+                <td>
+                    %val:usr:smallCategory%
+                </td>
+            </tr>
+            <tr>
+                <th>
                     メーカー名
                 </th>
                 <td>

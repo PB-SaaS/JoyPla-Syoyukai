@@ -1389,7 +1389,8 @@ class OrderDataView extends Model
         "ordererUserName",
         "ordercomment",
         "orderAuthKey",
-        "receivingTarget"
+        "receivingTarget",
+        "distrComment"
     ];
 
     //デフォルト値
@@ -2164,6 +2165,7 @@ class ItemBulkUpsertTrDB extends Model
         "category",
         "o_category",
         "itemsAuthKey",
+        "smallCategory",
     ];
 
     //デフォルト値
@@ -2398,6 +2400,7 @@ class AllNewItemInsert extends Model
         "measuringInst",
         "notice",
         "tenantId",
+        "smallCategory",
     ];
 
     //デフォルト値

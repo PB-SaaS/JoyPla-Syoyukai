@@ -333,7 +333,7 @@ class PayoutMR
             });
         }
         
-        result.unshift(['id', 'inHospitalItemId', 'makerName', 'category','smallCategory', 'itemName', 'itemCode', 'itemStandard', 'itemJANCode', 'price', 'unitPrice', 'quantity', 'payoutQuantity', 'totalAmount', 'adjAmount', 'priceAfterAdj', 'quantityUnit']);
+        result.unshift(['id', '院内商品ID', 'メーカー', '分類','小分類', '商品名', '製品コード', '規格', 'JANコード', '購買金額', '単価', '入数', '払出数', '合計金額', '調整額', '調整後金額', '入数単位']);
     
         this.exportCSV(result);
     }

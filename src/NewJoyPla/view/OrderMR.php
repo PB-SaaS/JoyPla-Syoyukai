@@ -334,7 +334,7 @@ class OrderMR
             });
         }
 
-        result.unshift(['id', 'inHospitalItemId', 'makerName', 'category', 'smallCategory', 'itemName', 'itemCode', 'itemStandard','itemJANCode', 'price', 'orderQuantity', 'totalAmount', 'itemUnit', 'distributorName']);
+        result.unshift(['id', '院内商品ID', 'メーカー', '分類', '小分類', '商品名', '製品コード', '規格', 'JANコード', '購買金額', '発注数', '合計金額', '個数単位', '卸業者名']);
 
         this.exportCSV(result);
     }

@@ -105,8 +105,11 @@ $auth = new App\Lib\Auth();
                 <?php endif ?>
             </ul>
         </li>
-		<li class="<?php echo $n7 ?>"><a href="%url/rel:mpgt:TopPage%&Action=topics&table_cache=true"><span class="uk-margin-small-right" uk-icon="icon: comments"></span> トピック一覧</a></li>
-		
+		<?php
+        /*
+        <li class="<?php echo $n7 ?>"><a href="%url/rel:mpgt:TopPage%&Action=topics&table_cache=true"><span class="uk-margin-small-right" uk-icon="icon: comments"></span> トピック一覧</a></li>
+		*/
+        ?>
 		<li class="uk-parent <?php echo $n8 ?>">
             <a href="#"><span class="uk-margin-small-right" uk-icon="icon: info"></span> システム通知</a>
             <ul class="uk-nav-sub">
