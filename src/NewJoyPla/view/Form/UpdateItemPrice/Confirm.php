@@ -137,6 +137,15 @@
                                     </dl>
                                     <dl class="cf">
                                         <dt class="title">
+                                            単価
+                                        </dt>
+                                        <dd class="data real">
+                                            $unitPrice$
+                                            <br>
+                                        </dd>
+                                    </dl>
+                                    <dl class="cf">
+                                        <dt class="title">
                                             特記事項
                                         </dt>
                                         <dd class="data ">

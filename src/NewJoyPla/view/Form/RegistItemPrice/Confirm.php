@@ -117,19 +117,19 @@
                                     </dl>
                                     <dl class="cf">
                                         <dt class="title">
-                                            単価
+                                            購買価格
                                         </dt>
                                         <dd class="data real">
-                                            $unitPrice$
+                                            $price$
                                             <br>
                                         </dd>
                                     </dl>
                                     <dl class="cf">
                                         <dt class="title">
-                                            購買価格
+                                            単価
                                         </dt>
                                         <dd class="data real">
-                                            $price$
+                                            $unitPrice$
                                             <br>
                                         </dd>
                                     </dl>

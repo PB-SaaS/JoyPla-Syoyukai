@@ -44,7 +44,9 @@ class GoodsSlipController extends Controller
                 'switch_3' => $switch_3,
                 'switch_4' => $switch_4,
                 'form_url' => '%url/card:page_178572%',
-                'base_url' => $base_url
+                'base_url' => $base_url,
+                'price_api_url' => '%url/rel:mpgt:PriceCont%',
+                'csrf_token' => Csrf::generate(16)
                 ] , false)->render();
             
         } catch ( Exception $ex ) {

@@ -172,23 +172,6 @@
                             </dl>
                             <dl class="cf">
                                 <dt class="title">
-                                    単価
-                                </dt>
-                                <dd class="data real">
-
-                                    <input
-                                        class="input $errorInputColor:unitPrice$"
-                                        type="text"
-                                        name="unitPrice"
-                                        value="$unitPrice$"
-                                        maxlength="20"
-                                        style="text-align: right;">
-                                    <br>
-                                    <span class="msg">$error:unitPrice$</span>
-                                </dd>
-                            </dl>
-                            <dl class="cf">
-                                <dt class="title">
                                     購買価格
                                     <span class="need">必須</span>
                                 </dt>
@@ -203,6 +186,39 @@
                                         style="text-align: right;">
                                     <br>
                                     <span class="msg">$error:price$</span>
+                                </dd>
+                            </dl>
+                            <dl class="cf">
+                                <dt class="title">
+                                    単価
+                                </dt>
+                                <dd class="data real">
+
+                                    <input
+                                        class="input $errorInputColor:unitPrice$"
+                                        type="text"
+                                        name="unitPrice"
+                                        value="$unitPrice$"
+                                        maxlength="20"
+                                        style="text-align: right;">
+                                    <br>
+                                    <button type="button" onclick="getUnitPrice()" class="uk-button uk-button-default">単価を自動計算</button>
+                                    <script>
+                                        function getUnitPrice()
+                                        {
+                                            let price = $('input[name=price]')[0].value;
+                                            let quantity = $('input[name=quantity]')[0].value;
+
+                                            let unitPrice = 0;
+                                            if( price == "" || price == 0 ){ unitPrice = 0 }
+                                            if( quantity == "" || quantity == 0 ){ unitPrice = 0 }
+                                            unitPrice = ( price / quantity );
+
+                                            $('input[name=unitPrice]')[0].value = unitPrice ;
+                                        }
+                                    </script>
+                                    <br>
+                                    <span class="msg">$error:unitPrice$</span>
                                 </dd>
                             </dl>
                             <dl class="cf">

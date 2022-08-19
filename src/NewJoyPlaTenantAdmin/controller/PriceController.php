@@ -12,7 +12,8 @@ use App\Model\DistributorAndHospitalDB;
 use App\Model\Item;
 use App\Model\Price;
 use App\Model\PriceUpsertTrDB;
-
+use App\Model\PriceView;
+use Error;
 use Validate\PriceTrDB;
 
 use stdClass;
@@ -49,6 +50,8 @@ class PriceController extends Controller
             
             $content = $this->view('NewJoyPlaTenantAdmin/view/Price/Index', [
                 'error' => $error,
+                'price_api_url' => '%url/rel:mpgt:PriceCont%',
+                'csrf_token' => Csrf::generate(16)
                 ] , false)->render();
             
         } catch ( Exception $ex ) {
@@ -296,6 +299,65 @@ class PriceController extends Controller
             ],false);
         }
     }
+
+    
+    public function bulkPriceUpdate()
+    {
+        global $SPIRAL;
+        try {
+            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
+            Csrf::validate($token,true);
+            
+            $auth = new Auth();
+            
+            $ids = $this->requestUrldecode($SPIRAL->getParam('ids'));
+            //$rowData = $SPIRAL->getParam('rowData');
+             
+            $insert_data = [];
+            $price = PriceView::where('tenantId',$auth->tenantId);
+            
+            foreach($ids as $id)
+            {
+                $price->orWhere('id',$id);
+            }
+
+            $price = $price->get();
+            $pricedata = $price->data->all();
+
+            foreach($pricedata as $price)
+            {
+                $insert_data[] = 
+                    [
+                        "priceId" => $price->priceId,
+                        "itemsAuthKey" => $price->authKey,
+                        "distributorId" => $price->distributorId,
+                        "itemId" => $price->itemId,
+                        "hospitalId" => $price->hospitalId,
+                        "quantity" => $price->quantity,
+                        "quantityUnit" => $price->quantityUnit,
+                        "itemUnit" => $price->itemUnit,
+                        "unitPrice" => $SPIRAL->getParam('unitPrice'),
+                        "price" => $SPIRAL->getParam('price'),
+                        "notice" => $price->notice,
+                    ];
+            }
+            if(count($insert_data) === 0)
+            {
+                throw new Error('データがありません',404);
+            }
+            $result = PriceUpsertTrDB::insert($insert_data);
+            $content = new ApiResponse($result->ids , count($insert_data) , $result->code, $result->message, ['insert']);
+            $content = $content->toJson();
+        } catch ( Exception $ex ) {
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+            $content = $content->toJson();
+        }finally {
+            return $this->view('NewJoyPla/view/template/ApiResponse', [
+                'content'   => $content,
+            ],false);
+        }
+            
+    }
     
     private function array_obj_find($arr,string $key ,string $findVal)
     {
@@ -351,6 +413,10 @@ $action = $SPIRAL->getParam('Action');
     else if($action === "bulkUpsertApi")
     {
         echo $PriceController->bulkUpsertApi()->render();
+    }
+    else if($action === "bulkPriceUpdate")
+    {
+        echo $PriceController->bulkPriceUpdate()->render();
     }
     else
     {

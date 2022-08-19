@@ -5,6 +5,7 @@ use Controller;
 use Csrf;
 use ApiResponse;
 use App\Lib\Auth;
+use App\Model\InHospitalItem;
 use App\Model\Tenant;
 use App\Model\ItemBulkUpsertTrDB;
 
