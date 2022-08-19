@@ -172,6 +172,23 @@
                             </dl>
                             <dl class="cf">
                                 <dt class="title">
+                                    単価
+                                </dt>
+                                <dd class="data real">
+
+                                    <input
+                                        class="input $errorInputColor:unitPrice$"
+                                        type="text"
+                                        name="unitPrice"
+                                        value="$unitPrice$"
+                                        maxlength="20"
+                                        style="text-align: right;">
+                                    <br>
+                                    <span class="msg">$error:unitPrice$</span>
+                                </dd>
+                            </dl>
+                            <dl class="cf">
+                                <dt class="title">
                                     購買価格
                                     <span class="need">必須</span>
                                 </dt>

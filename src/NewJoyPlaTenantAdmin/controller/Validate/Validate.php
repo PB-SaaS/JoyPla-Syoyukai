@@ -275,6 +275,12 @@ class PriceTrDB extends FieldTypeValidate
             'notNullFlg' => 't',
         ],
         [   
+            'key' => '単価',
+            'fieldType' => 'RealNumber',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [   
             'key' => '購買価格',
             'fieldType' => 'RealNumber',
             'replaceKey' => 't',

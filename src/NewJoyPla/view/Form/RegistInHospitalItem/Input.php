@@ -200,6 +200,9 @@
                                                         <span>入数：<?= $record->quantity ?><?= $record->quantityUnit ?>
                                                             /
                                                             <?= $record->itemUnit ?></span><br>
+                                                        <span>単価：￥<script>
+                                                                price("<?= $price->unitPrice ?>")
+                                                            </script></span><br>
                                                         <span>購買価格：￥<script>
                                                                 price("<?= $record->price ?>")
                                                             </script>
@@ -217,22 +220,6 @@
                                         ?>
                                     </div><br>
                                     <span class="msg">$error:priceId$</span>
-                                </dd>
-                            </dl>
-                            <dl class="cf">
-                                <dt class="title">
-                                    単価
-                                    <span class="need">必須</span>
-                                </dt>
-                                <dd class="data ">
-                                    <input
-                                        class="input $errorInputColor:unitPrice$"
-                                        type="text"
-                                        name="unitPrice"
-                                        value="$unitPrice$"
-                                        maxlength="20"
-                                        style="text-align: right;"><br>
-                                    <span class="msg">$error:unitPrice$</span>
                                 </dd>
                             </dl>
                             <dl class="cf">

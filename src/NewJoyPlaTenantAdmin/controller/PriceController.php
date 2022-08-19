@@ -277,8 +277,9 @@ class PriceController extends Controller
                         "quantity" => $rows['data'][3],
                         "quantityUnit" => $rows['data'][4],
                         "itemUnit" => $rows['data'][5],
-                        "price" => $rows['data'][6],
-                        "notice" => $rows['data'][7],
+                        "unitPrice" => $rows['data'][6],
+                        "price" => $rows['data'][7],
+                        "notice" => $rows['data'][8],
                     ];
             }
             

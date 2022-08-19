@@ -160,6 +160,9 @@
                                                         <span>入数：<?= $price->quantity ?><?= $price->quantityUnit ?>
                                                             /
                                                             <?= $price->itemUnit ?></span><br>
+                                                        <span>単価：￥<script>
+                                                                price("<?= $price->unitPrice ?>")
+                                                            </script></span><br>
                                                         <span>購買価格：￥<script>
                                                                 price("<?= $price->price ?>")
                                                             </script>
@@ -171,16 +174,6 @@
                                             </label>
                                         </div>
                                     </div>
-                                </dd>
-                            </dl>
-                            <dl class="cf">
-                                <dt class="title">
-                                    単価
-                                </dt>
-                                <dd class="data ">
-                                    $unitPrice$
-                                    <br>
-                                    <span class="msg">$error:unitPrice$</span>
                                 </dd>
                             </dl>
                             <dl class="cf">

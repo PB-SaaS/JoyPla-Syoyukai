@@ -1921,7 +1921,8 @@ class PriceView extends Model
         "serialNo",
         "category",
         "lotManagement",
-        "tenantId"
+        "tenantId",
+        "unitPrice"
     ];
 
     //デフォルト値
@@ -2205,7 +2206,8 @@ class PriceUpsertTrDB extends Model
         "itemStandard",
         "itemJANCode",
         "requestFlg",
-        "requestId"
+        "requestId",
+        "unitPrice"
     ];
 
     //デフォルト値
