@@ -479,6 +479,31 @@ namespace JoyPla\Enterprise\Models {
         }
     }
 
+    class CardId {
+        
+        use ValueObjectTrait;
+
+        private string $value = "";
+        private static array $values = [];
+        private static int $count = 0;
+        public function __construct(string $value)
+        {
+            $this->value = $value;
+        }
+
+        public static function generate()
+        {
+            $id = uniqid('90');
+            if( in_array($id, self::$values, true) ){
+                return self::generate(); 
+            }
+            self::$values[] = $id;
+
+            usleep(1000);
+            return new ConsumptionId($id);
+        }
+    }
+
     
     class OrderId {
         

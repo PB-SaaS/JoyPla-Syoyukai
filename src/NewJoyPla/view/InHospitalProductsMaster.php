@@ -64,6 +64,11 @@
                                     </li>
                                     <li>
                                         <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+                                            <label><input class="uk-checkbox chk_29" type="checkbox"> 小分類</label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
                                             <label><input class="uk-checkbox chk_09" type="checkbox"> 商品名</label>
                                         </div>
                                     </li>
@@ -185,7 +190,7 @@ class InHospitalItem
         let storage = JSON.parse(localStorage.getItem("joypla_inHpItemsList"));
         let dispObj = {};
         if (!storage) {
-            for (let i = 1; i <= 28; i++) {
+            for (let i = 1; i <= 29; i++) {
                 dispObj[i] = true;
             }
         } else {

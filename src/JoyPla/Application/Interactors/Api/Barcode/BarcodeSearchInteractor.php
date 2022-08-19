@@ -233,10 +233,16 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                 foreach($inHospitalItems as $key => $val)
                 {
                     $inHospitalItems[$key]->set('lotNumber',$lotNumber);
-                    
+                
                     $inHospitalItems[$key]->set('lotDate',$lotDate);
                 }
             }
+            
+            foreach($inHospitalItems as $key => $val)
+            {            
+                $inHospitalItems[$key]->set('barcode',$inputData->barcode);
+            }
+
             $this->outputPort->output(new BarcodeSearchOutputData($inHospitalItems , $count , $type));
         }
 

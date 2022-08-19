@@ -73,8 +73,10 @@
                     <tr>
                         <th>分類</th>
                         <td>%val:usr:category%</td>
+                        <th>小分類</th>
+                        <td>%val:usr:smallCategory%</td>
                         <th>ロット管理フラグ</th>
-                        <td colspan="3">%val:usr:lotManagement:v%</td>
+                        <td colspan="2">%val:usr:lotManagement:v%</td>
                     </tr>
                     <tr>
                         <th>償還価格フラグ</th>
@@ -163,6 +165,11 @@
                                     <li>
                                         <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
                                             <label><input class="uk-checkbox chk_08" type="checkbox"> 分類</label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+                                            <label><input class="uk-checkbox chk_29" type="checkbox"> 小分類</label>
                                         </div>
                                     </li>
                                     <li>
@@ -287,7 +294,7 @@ class Item
         let storage = JSON.parse(localStorage.getItem("joypla_inHpItemsList"));
         let dispObj = {};
         if (!storage) {
-            for (let i = 1 ; i <= 28 ; i++) {
+            for (let i = 1 ; i <= 29 ; i++) {
                 dispObj[i] = true;
             }
         } else {

@@ -70,6 +70,7 @@ class OrderMRController extends Controller
             if ($SPIRAL->getParam('itemName')) { $itemName = $this->html($SPIRAL->getParam('itemName')); }
             if ($SPIRAL->getParam('itemCode')) { $itemCode = $this->html($SPIRAL->getParam('itemCode')); }
             if ($SPIRAL->getParam('itemStandard')) { $itemStandard = $this->html($SPIRAL->getParam('itemStandard')); }
+            if ($SPIRAL->getParam('smallCategory')) { $smallCategory = $this->html($SPIRAL->getParam('smallCategory')); }
             if ($SPIRAL->getParams('category') && is_array($SPIRAL->getParams('category')))
             {
                 foreach ($SPIRAL->getParams('category') as $checked)
@@ -82,7 +83,7 @@ class OrderMRController extends Controller
                 }
             }
 
-            $result = $this->dataSelect($startMonth,$endMonth,$distributorId,$divisionId,$itemName,$itemCode,$itemStandard,$category_ids,$page,$limit);
+            $result = $this->dataSelect($startMonth,$endMonth,$distributorId,$divisionId,$itemName,$itemCode,$itemStandard,$category_ids,$smallCategory,$page,$limit);
 
             if( ($user_info->isHospitalUser() && ( $user_info->isAdmin() || $user_info->isApprover() ) ))
             {
@@ -113,6 +114,7 @@ class OrderMRController extends Controller
                 'itemCode' => $itemCode,
                 'itemStandard' => $itemStandard,
                 'category' => $category,
+                'smallCategory' => $smallCategory,
                 'report' => $result,
                 'csrf_token' => Csrf::generate(16)
                 ] , false);
@@ -139,7 +141,7 @@ class OrderMRController extends Controller
         }
     }
     
-    private function dataSelect(string $startMonth = null, string $endMonth = null, string $distributorId = null, string $divisionId = null, string $itemName = null, string $itemCode = null, string $itemStandard = null, array $category_ids = array(), int $page = null, int $maxCount = null)
+    private function dataSelect(string $startMonth = null, string $endMonth = null, string $distributorId = null, string $divisionId = null, string $itemName = null, string $itemCode = null, string $itemStandard = null, array $category_ids = array(), string $smallCategory = null , int $page = null, int $maxCount = null)
     {
         global $SPIRAL;
         
@@ -167,6 +169,7 @@ class OrderMRController extends Controller
         {
             InHospitalItemView::orWhere('inHospitalItemId',$order->inHospitalItemId);
         }
+        if ($smallCategory) { InHospitalItemView::where('smallCategory',"%$smallCategory%",'LIKE'); }
         if ($itemName) { InHospitalItemView::where('itemName',"%$itemName%",'LIKE'); }
         if ($itemCode) { InHospitalItemView::where('itemCode',"%$itemCode%",'LIKE'); }
         if ($itemStandard) { InHospitalItemView::where('itemStandard',"%$itemStandard%",'LIKE'); }
@@ -191,6 +194,7 @@ class OrderMRController extends Controller
                 'inHospitalItemId' => $row->inHospitalItemId,
                 'makerName' => $row->makerName,
                 'category' => $this->category[$row->category]['label'],
+                'smallCategory' => $row->smallCategory,
                 'itemName' => $row->itemName,
                 'itemCode' => $row->itemCode,
                 'itemStandard' => $row->itemStandard,

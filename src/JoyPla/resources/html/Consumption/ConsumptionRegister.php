@@ -259,6 +259,7 @@ var JoyPlaApp = Vue.createApp({
             'consumeQuantity': item.consumeQuantity,
             'consumeUnitQuantity': item.consumeUnitQuantity,
             'divisionId' : values.divisionId,
+            'cardId' : item.cardId,
             'lotManagement' : false,
           })}
         });
@@ -299,7 +300,6 @@ var JoyPlaApp = Vue.createApp({
       }
 
       const isRequired = (idx) => {
-        console.log(fields);
         if( fields.value[idx].value.lotManagement == "1" )
         {
           return true;
@@ -390,6 +390,12 @@ var JoyPlaApp = Vue.createApp({
         update(idx, object);
       };
 
+      const searchCardId = (cardId) => {
+        return fields.value.find((x) => 
+          ( x.value.cardId === cardId)
+          );
+      }
+
       const additem = (item) =>
       {
         item = JSON.parse(JSON.stringify(item));
@@ -397,6 +403,7 @@ var JoyPlaApp = Vue.createApp({
         item.consumeUnitQuantity = ( item.consumeUnitQuantity ) ? item.consumeUnitQuantity : 0 ;
         item.consumeLotNumber = ( item.lotNumber ) ? item.lotNumber : "" ;
         item.consumeLotDate =  ( item.lotDate ) ? item.lotDate : "" ;
+        item.cardId = (item.cardId)? item.cardId : "";
         push(item);
       };
 
@@ -424,7 +431,24 @@ var JoyPlaApp = Vue.createApp({
         }
         if(items.type == "card")
         {
+          let exist = false
           items.item.forEach((x , id)=>{
+            if(searchCardId(items.item[id].barcode) !== undefined)
+            {
+              exist = true;
+            }
+          })
+          if( exist )
+          {
+            Swal.fire({
+                icon: 'error',
+                title: 'エラー',
+                text: 'すでに読み込まれたカードです。',
+              });
+            return false;
+          }          
+          items.item.forEach((x , id)=>{
+            items.item[id].cardId = items.item[id].barcode;
             items.item[id].consumeQuantity = items.item[id].cardQuantity;
           });
         }

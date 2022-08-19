@@ -68,6 +68,7 @@ class PayoutMRController extends Controller
             if ($SPIRAL->getParam('itemName')) { $itemName = $this->html($SPIRAL->getParam('itemName')); }
             if ($SPIRAL->getParam('itemCode')) { $itemCode = $this->html($SPIRAL->getParam('itemCode')); }
             if ($SPIRAL->getParam('itemStandard')) { $itemStandard = $this->html($SPIRAL->getParam('itemStandard')); }
+            if ($SPIRAL->getParam('smallCategory')) { $smallCategory = $this->html($SPIRAL->getParam('smallCategory')); }
             if ($SPIRAL->getParams('category') && is_array($SPIRAL->getParams('category')))
             {
                 foreach ($SPIRAL->getParams('category') as $checked)
@@ -80,7 +81,7 @@ class PayoutMRController extends Controller
                 }
             }
 
-            $result = $this->dataSelect($startMonth,$endMonth,$divisionId,$itemName,$itemCode,$itemStandard,$category_ids,$page,$limit);
+            $result = $this->dataSelect($startMonth,$endMonth,$divisionId,$itemName,$itemCode,$itemStandard,$category_ids,$smallCategory,$page,$limit);
 
             if( ($user_info->isHospitalUser() &&  ( $user_info->isAdmin() || $user_info->isApprover() )))
             {
@@ -100,6 +101,7 @@ class PayoutMRController extends Controller
                 'startMonth' => $startMonth,
                 'endMonth' => $endMonth,
                 'divisionId' => $divisionId,
+                'smallCategory' => $smallCategory,
                 'page' => $page,
                 'limit' => $limit,
                 'itemName' => $itemName,
@@ -132,7 +134,7 @@ class PayoutMRController extends Controller
         }
     }
     
-    private function dataSelect(string $startMonth = null, string $endMonth = null, string $divisionId = null, string $itemName = null, string $itemCode = null, string $itemStandard = null, array $category_ids = array(), int $page = null, int $maxCount = null)
+    private function dataSelect(string $startMonth = null, string $endMonth = null, string $divisionId = null, string $itemName = null, string $itemCode = null, string $itemStandard = null, array $category_ids = array(), string $smallCategory = null, int $page = null, int $maxCount = null)
     {
         global $SPIRAL;
         
@@ -159,23 +161,24 @@ class PayoutMRController extends Controller
 
         $this->payout_data = $payoutDB->data->all();
 
-        InHospitalItemView::where('hospitalId',$user_info->getHospitalId());
+        $instance = InHospitalItemView::getNewInstance()->where('hospitalId',$user_info->getHospitalId());
         foreach ($this->payout_data as $payout)
         {
-            InHospitalItemView::orWhere('inHospitalItemId',$payout->inHospitalItemId);
+            $instance::orWhere('inHospitalItemId',$payout->inHospitalItemId);
         }
-        if ($itemName) { InHospitalItemView::where('itemName',"%$itemName%",'LIKE'); }
-        if ($itemCode) { InHospitalItemView::where('itemCode',"%$itemCode%",'LIKE'); }
-        if ($itemStandard) { InHospitalItemView::where('itemStandard',"%$itemStandard%",'LIKE'); }
+        if ($itemName) { $instance::where('itemName',"%$itemName%",'LIKE'); }
+        if ($itemCode) { $instance::where('itemCode',"%$itemCode%",'LIKE'); }
+        if ($itemStandard) { $instance::where('itemStandard',"%$itemStandard%",'LIKE'); }
+        if ($smallCategory) { $instance::where('smallCategory',"%$smallCategory%",'LIKE'); }
         if ($category_ids)
         {
             foreach ($category_ids as $val)
             {
-                InHospitalItemView::orWhere('category',$val);
+                $instance::orWhere('category',$val);
             }
         }
-        if ($page) { InHospitalItemView::page($page); }
-        $inHPItem = InHospitalItemView::paginate($maxCount);
+        if ($page) { $instance::page($page); }
+        $inHPItem = $instance::paginate($maxCount);
         $inHPItem_data = $inHPItem->data->all();
 
         $report['data'] = [];
@@ -186,6 +189,7 @@ class PayoutMRController extends Controller
                 'id' => $row->id,
                 'inHospitalItemId' => $row->inHospitalItemId,
                 'makerName' => $row->makerName,
+                'smallCategory' => $row->smallCategory,
                 'category' => $this->category[$row->category]['label'],
                 'itemName' => $row->itemName,
                 'itemCode' => $row->itemCode,

@@ -64,6 +64,15 @@
                             </dl>
                             <dl class="cf">
                                 <dt class="title">
+                                    小分類
+                                </dt>
+                                <dd class="data ">
+                                    $smallCategory$
+                                    <br>
+                                </dd>
+                            </dl>
+                            <dl class="cf">
+                                <dt class="title">
                                     製品コード
                                 </dt>
                                 <dd class="data ">

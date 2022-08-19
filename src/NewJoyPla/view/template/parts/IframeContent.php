@@ -6,9 +6,9 @@
 <div class="uk-cover-container animsition" uk-height-viewport="expand: true">
     
 <iframe id="iframeForm" name="iframeForm" frameborder="0" style="overflow: hidden; height: 100%;
-        width: 100%; position: absolute;"></iframe>
+        width: 100%;" uk-height-viewport="expand: true"></iframe>
 </div>
-<form action="<?php echo $url ?>" target="iframeForm" id="iframe_form">
+<form action="<?php echo $url ?>" target="iframeForm" id="iframe_form" method="post">
     %SMPAREA%
     <input type="hidden" value="%url/rel:mpg:top%" name="topPageLink">
     <?php 

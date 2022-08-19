@@ -58,6 +58,7 @@
                     {{ order.orderStatusToString}} 
                   </span>
                   <br>
+                  発注タイプ：{{ order.adjustmentToString }}<br>
                   発注元部署：{{ order.division.divisionName }}<br>
                   卸業者：{{ order.distributor.distributorName }}<br>
                   合計金額：&yen; {{ numberFormat( order.totalAmount) }}

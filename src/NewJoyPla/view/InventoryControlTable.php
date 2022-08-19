@@ -13,7 +13,7 @@
             <h2 class="page_title uk-margin">在庫管理表</h2>
             <hr>
             <div class="" id="tablearea">
-                %sf:usr:search18:mstfilter%
+                %sf:usr:search60:mstfilter%
             </div>
         </div>
     </div>

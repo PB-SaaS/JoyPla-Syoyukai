@@ -11,6 +11,7 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
     use JoyPla\Application\InputPorts\Api\Consumption\ConsumptionRegisterInputData;
     use JoyPla\Application\OutputPorts\Api\Consumption\ConsumptionRegisterOutputData;
     use JoyPla\Application\OutputPorts\Api\Consumption\ConsumptionRegisterOutputPortInterface;
+    use JoyPla\Enterprise\Models\CardId;
     use JoyPla\Enterprise\Models\Consumption;
     use JoyPla\Enterprise\Models\DateYearMonthDay;
     use JoyPla\Enterprise\Models\ConsumptionId;
@@ -21,6 +22,7 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
     use JoyPla\Enterprise\Models\HospitalName;
     use JoyPla\Enterprise\Models\InventoryCalculation;
     use JoyPla\Enterprise\Models\Pref;
+    use JoyPla\InterfaceAdapters\GateWays\Repository\CardRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\consumptionRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepositoryInterface;
 
@@ -40,11 +42,16 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
          * ConsumptionRegisterInteractor constructor.
          * @param ConsumptionRegisterOutputPortInterface $outputPort
          */
-        public function __construct(ConsumptionRegisterOutputPortInterface $outputPort , ConsumptionRepositoryInterface $consumptionRepository , InventoryCalculationRepositoryInterface $inventoryCalculationRepository)
+        public function __construct(
+            ConsumptionRegisterOutputPortInterface $outputPort , 
+            ConsumptionRepositoryInterface $consumptionRepository , 
+            InventoryCalculationRepositoryInterface $inventoryCalculationRepository,
+            CardRepositoryInterface $cardRepository)
         {
             $this->outputPort = $outputPort;
             $this->consumptionRepository = $consumptionRepository;
             $this->inventoryCalculationRepository = $inventoryCalculationRepository;
+            $this->cardRepository = $cardRepository;
         }
 
         /**
@@ -52,7 +59,6 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
          */
         public function handle(ConsumptionRegisterInputData $inputData)
         {
-
             $hospitalId = new HospitalId($inputData->user->hospitalId);
 
             $inputData->consumptionItems = array_map(function($v) use ($inputData){
@@ -63,10 +69,19 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
                 return $v;
             },$inputData->consumptionItems);
 
+            $cardIds = [];
+            foreach($inputData->consumptionItems as $i)
+            {
+                if($i->cardId){
+                    $cardIds[] = new CardId($i->cardId);
+                }
+            }
+
             $consumptionItems = $this->consumptionRepository->findByInHospitalItem( $hospitalId , $inputData->consumptionItems );
 
             $ids = [];
             $result = [];
+
             foreach($consumptionItems as $i)
             {
                 $exist = false;
@@ -95,10 +110,15 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
                         ""
                     ) , 
                     $i->getDivision() , 
-                    ( new ConsumptionStatus(ConsumptionStatus::Consumption) ) );
+                    ( new ConsumptionStatus(ConsumptionStatus::Consumption) ) 
+                );
+
             }
 
             $this->consumptionRepository->saveToArray($result);
+
+            $cardIds = $this->cardRepository->get($hospitalId , $cardIds);
+            $this->cardRepository->reset($hospitalId, $cardIds);
 
             $inventoryCalculations = [];
             foreach($result as $r)
@@ -116,6 +136,7 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
                     );
                 }
             }
+
 
             $this->inventoryCalculationRepository->saveToArray($inventoryCalculations);
 
@@ -153,7 +174,8 @@ namespace JoyPla\Application\InputPorts\Api\Consumption {
                 $object->consumeLotNumber = $v['consumeLotNumber'];
                 $object->consumeQuantity = $v['consumeQuantity'];
                 $object->consumeUnitQuantity = $v['consumeUnitQuantity'];
-                $object->divisionId= $v['divisionId'];
+                $object->divisionId = $v['divisionId'];
+                $object->cardId = $v['cardId'];
                 return $object;
             },$consumptionItems);
 

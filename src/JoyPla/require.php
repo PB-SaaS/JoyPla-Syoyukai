@@ -70,6 +70,7 @@ require_once('JoyPla/InterfaceAdapters/Controllers/Web/TopController.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Middleware/PersonalInformationConsentMiddleware.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Middleware/UnorderDataExistMiddleware.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/BarcodeRepository.php');
+require_once('JoyPla/InterfaceAdapters/GateWays/Repository/CardRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/ConsumptionRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/DistributorRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/DivisionRepository.php');
@@ -112,6 +113,7 @@ require_once('JoyPla/InterfaceAdapters/Presenters/Web/Received/OrderReceivedSlip
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/Received/ReceivedIndexPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/Received/ReceivedLabelPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/Received/ReceivedLabelSettingPresenter.php');
+require_once('JoyPla/Enterprise/SpiralDb/Card.php');
 require_once('JoyPla/Enterprise/SpiralDb/CardView.php');
 require_once('JoyPla/Enterprise/SpiralDb/Consumption.php');
 require_once('JoyPla/Enterprise/SpiralDb/ConsumptionItem.php');

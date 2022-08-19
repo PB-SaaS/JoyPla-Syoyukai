@@ -15,9 +15,9 @@
                     <h2>院内商品マスタ</h2>
                 </div>
                 <div class="uk-width-1-4@m uk-padding-remove no_print">
-                    <ul uk-accordion class="uk-background-muted uk-padding-small">
+                    <ul class="uk-background-muted uk-padding-small" uk-accordion >
                         <li>
-                            <a class="uk-accordion-title" href="#">表示項目選択</a>
+                            <a class="uk-accordion-title" href="#" >表示項目選択</a>
                             <div class="uk-accordion-content" hidden>
                                 <a class="uk-button uk-button-secondary uk-button-small uk-width-1-1" href="#" onclick="table_field_selector()">反映</a>
                                 <ul class="uk-list uk-list-striped">
@@ -60,6 +60,11 @@
                                     <li>
                                         <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
                                             <label><input class="uk-checkbox chk_08" type="checkbox"> 分類</label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+                                            <label><input class="uk-checkbox chk_29" type="checkbox"> 小分類</label>
                                         </div>
                                     </li>
                                     <li>
@@ -170,7 +175,7 @@
         let storage = JSON.parse(localStorage.getItem("joypla_inHpItemsList"));
         let dispObj = {};
         if (!storage) {
-            for (let i = 1; i <= 26; i++) {
+            for (let i = 1; i <= 29; i++) {
                 dispObj[i] = true;
             }
         } else {

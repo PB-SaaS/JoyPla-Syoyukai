@@ -70,8 +70,10 @@
                     <tr>
                         <th>分類</th>
                         <td>%val:usr:category%</td>
+                        <th>分類</th>
+                        <td>%val:usr:smallCategory%</td>
                         <th>ロット管理フラグ</th>
-                        <td colspan="3">%val:usr:lotManagement:v%</td>
+                        <td colspan="2">%val:usr:lotManagement:v%</td>
                     </tr>
                     <tr>
                         <th>保険請求分類（医科）</th>

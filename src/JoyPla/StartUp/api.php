@@ -43,6 +43,7 @@ use JoyPla\InterfaceAdapters\Controllers\Api\ReceivedController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ReturnController;
 use JoyPla\InterfaceAdapters\Controllers\Api\StocktakingController;
 use JoyPla\InterfaceAdapters\GateWays\Repository\BarcodeRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\CardRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ConsumptionRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\DistributorRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\DivisionRepository;
@@ -90,7 +91,7 @@ Router::map('POST','/api/distributor/show',[DistributorController::class , 'show
 
 Router::map('POST','/api/inHospitalItem/show',[InHospitalItemController::class,'show'])->service(new InHospitalItemShowInteractor(new InHospitalItemShowPresenter() , new InHospitalItemRepository()) );
 
-Router::map('POST','/api/consumption/register',[ConsumptionController::class,'register'])->service(new ConsumptionRegisterInteractor(new ConsumptionRegisterPresenter() , new ConsumptionRepository() , new InventoryCalculationRepository()) );
+Router::map('POST','/api/consumption/register',[ConsumptionController::class,'register'])->service(new ConsumptionRegisterInteractor(new ConsumptionRegisterPresenter() , new ConsumptionRepository() , new InventoryCalculationRepository() , new CardRepository()) );
 
 Router::map('POST','/api/consumption/show',[ConsumptionController::class,'show'])->service(new ConsumptionShowInteractor(new ConsumptionShowPresenter() , new ConsumptionRepository()) );
 

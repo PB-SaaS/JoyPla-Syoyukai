@@ -910,8 +910,8 @@ class InHospitalItemView extends Model
         "measuringInst",
         "lotManagement",
         "category",
-        "tenantId"
-   
+        "tenantId",
+        "smallCategory",
     ];
 
     //デフォルト値

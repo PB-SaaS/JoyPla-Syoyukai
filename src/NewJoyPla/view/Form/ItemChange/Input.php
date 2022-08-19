@@ -84,6 +84,21 @@
                             </dl>
                             <dl class="cf">
                                 <dt class="title">
+                                    小分類
+                                </dt>
+                                <dd class="data ">
+                                    <input
+                                        class="input $errorInputColor:smallCategory$"
+                                        type="text"
+                                        name="smallCategory"
+                                        value="$smallCategory$"
+                                        maxlength="128">
+                                    <br>
+                                    <span class="msg">$error:smallCategory$</span>
+                                </dd>
+                            </dl>
+                            <dl class="cf">
+                                <dt class="title">
                                     製品コード
                                 </dt>
                                 <dd class="data ">
