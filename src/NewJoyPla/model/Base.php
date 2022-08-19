@@ -1,13 +1,14 @@
 <?php
+
 namespace App\Model;
 
 use Model;
 
 class UsedSlipHistoy extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_UsedSlipHDB";
     public static $guarded = ["id"];
@@ -36,9 +37,9 @@ class UsedSlipHistoy extends Model
 
 class Borrowing extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_Borrowing";
     public static $guarded = ["id"];
@@ -67,9 +68,9 @@ class Borrowing extends Model
 
 class Division extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "deleteFlag";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "deleteFlag";
 
     public static $spiral_db_name = "NJ_divisionDB";
     public static $guarded = ["id"];
@@ -86,14 +87,13 @@ class Division extends Model
 
     //デフォルト値
     public static $attributes = [];
-    
 }
 
 class Billing extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_BillingDB";
     public static $guarded = ["id"];
@@ -124,9 +124,9 @@ class Billing extends Model
 
 class BillingView extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "billingDetailv2";
     public static $guarded = ["id"];
@@ -171,7 +171,7 @@ class BillingView extends Model
 
     //デフォルト値
     public static $attributes = [];
-    
+
     public static $select = [
         "category" => [
             1 => "医療材料",
@@ -180,14 +180,14 @@ class BillingView extends Model
             4 => "日用品",
             99 => "その他"
         ]
-    ];    
+    ];
 }
 
 class BillingHistory extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_BillingHDB";
     public static $guarded = ["id"];
@@ -215,9 +215,9 @@ class BillingHistory extends Model
 
 class Order extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_OrderDB";
     public static $guarded = ["id"];
@@ -260,9 +260,9 @@ class Order extends Model
 
 class OrderHistory extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_OrderHDB";
     public static $guarded = ["id"];
@@ -285,6 +285,7 @@ class OrderHistory extends Model
         "orderAuthKey",
         "staffName",
         "adjustment",
+        "distrComment"
     ];
 
     //デフォルト値
@@ -310,9 +311,9 @@ class OrderHistory extends Model
 
 class Receiving extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_ReceivingDB";
     public static $guarded = ["id"];
@@ -346,9 +347,9 @@ class Receiving extends Model
 
 class ReceivingView extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "330_receItems";
     public static $guarded = ["id"];
@@ -407,9 +408,9 @@ class ReceivingView extends Model
 
 class ReceivingHistoryView extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "receiptHDB";
     public static $guarded = ["id"];
@@ -454,9 +455,9 @@ class ReceivingHistoryView extends Model
 
 class ReceivingHistory extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_ReceivingHDB";
     public static $guarded = ["id"];
@@ -489,9 +490,9 @@ class ReceivingHistory extends Model
 //Return は使用できない文字列なので、ReturnItemにします
 class ReturnItem extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
     public static $spiral_db_name = "NJ_ReturnDB";
     public static $guarded = ["id"];
     public static $primary_key = "receivingNumber";
@@ -519,9 +520,9 @@ class ReturnItem extends Model
 
 class ReturnItemView extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "returnDatav2";
     public static $guarded = ["id"];
@@ -561,9 +562,9 @@ class ReturnItemView extends Model
 
 class ReturnHistory extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_ReturnHDB";
     public static $guarded = ["id"];
@@ -589,9 +590,9 @@ class ReturnHistory extends Model
 
 class PayoutView extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "payoutDatav2";
     public static $guarded = ["id"];
@@ -647,15 +648,14 @@ class PayoutView extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 
 class Payout extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_PayoutDB";
     public static $guarded = ["id"];
@@ -690,14 +690,13 @@ class Payout extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 class PayoutHistory extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_PayoutHDB";
     public static $guarded = ["id"];
@@ -719,14 +718,13 @@ class PayoutHistory extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 class Item extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_itemDB";
     public static $guarded = ["id"];
@@ -782,9 +780,9 @@ class Item extends Model
 
 class InventoryAdjustmentTransaction extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_inventoryTRDB";
     public static $guarded = ["id"];
@@ -816,9 +814,9 @@ class InventoryAdjustmentTransaction extends Model
 
 class InHospitalItem extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_inHPItemDB";
     public static $guarded = ["id"];
@@ -866,9 +864,9 @@ class InHospitalItem extends Model
 
 class InHospitalItemView extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "itemInHospitalv2";
     public static $guarded = ["id"];
@@ -910,8 +908,8 @@ class InHospitalItemView extends Model
         "measuringInst",
         "lotManagement",
         "category",
-        "tenantId"
-   
+        "tenantId",
+        "smallCategory",
     ];
 
     //デフォルト値
@@ -932,9 +930,9 @@ class InHospitalItemView extends Model
 
 class Hospital extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_HospitalDB";
     public static $guarded = ["id"];
@@ -988,9 +986,9 @@ class Hospital extends Model
 
 class HospitalUser extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_HUserDB";
     public static $guarded = ["id"];
@@ -1025,9 +1023,9 @@ class HospitalUser extends Model
 
 class DistributorAffiliationView extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "invitingDB";
     public static $guarded = ["id"];
@@ -1060,9 +1058,9 @@ class DistributorAffiliationView extends Model
 
 class DistributorUser extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_OUserDB";
     public static $guarded = ["id"];
@@ -1095,9 +1093,9 @@ class DistributorUser extends Model
 
 class Distributor extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_distributorDB";
     public static $guarded = ["id"];
@@ -1126,9 +1124,9 @@ class Distributor extends Model
 
 class Tenant extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_TenantAdminDB";
     public static $guarded = ["id"];
@@ -1156,9 +1154,9 @@ class Tenant extends Model
 
 class AssociationTR extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_associationTR";
     public static $guarded = ["id"];
@@ -1179,9 +1177,9 @@ class AssociationTR extends Model
 
 class Stock extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_stockDB";
     public static $guarded = ["id"];
@@ -1213,9 +1211,9 @@ class Stock extends Model
 
 class StockView extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "310_stockMg";
     public static $guarded = ["id"];
@@ -1263,7 +1261,7 @@ class StockView extends Model
         "oldPrice",
         "minPrice",
         "labelId",
-        "barcode",  
+        "barcode",
         "unitPrice",
     ];
 
@@ -1277,9 +1275,9 @@ class StockView extends Model
 
 class Card extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_CardDB";
     public static $guarded = ["id"];
@@ -1303,9 +1301,9 @@ class Card extends Model
 
 class CardInfoView extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "CardInfo";
     public static $guarded = ["id"];
@@ -1359,9 +1357,9 @@ class CardInfoView extends Model
 
 class OrderDataView extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "orderdataDB";
     public static $guarded = ["id"];
@@ -1389,21 +1387,21 @@ class OrderDataView extends Model
         "ordererUserName",
         "ordercomment",
         "orderAuthKey",
-        "receivingTarget"
+        "receivingTarget",
+        "distrComment"
     ];
 
     //デフォルト値
     public static $attributes = [];
 
     public static $select = [];
-
 }
 
 class OrderedItemInfoView extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "333_hacchu";
     public static $guarded = ["id"];
@@ -1445,14 +1443,13 @@ class OrderedItemInfoView extends Model
     public static $attributes = [];
 
     public static $select = [];
-
 }
 
 class OrderedItemView extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "330_hacchuS";
     public static $guarded = ["id"];
@@ -1513,10 +1510,9 @@ class OrderedItemView extends Model
 
 class Lot extends Model
 {
-    
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "330_NJ_LotDB";
     public static $guarded = ["id"];
@@ -1540,16 +1536,13 @@ class Lot extends Model
     public static $attributes = [];
 
     public static $select = [];
-
-    
 }
 
 class Inventory extends Model
 {
-    
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_InventoryDB";
     public static $guarded = ["id"];
@@ -1582,15 +1575,13 @@ class Inventory extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 class InventoryItemView extends Model
 {
-    
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "inventoryData";
     public static $guarded = ["id"];
@@ -1635,15 +1626,13 @@ class InventoryItemView extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 class InventoryEnd extends Model
 {
-    
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_InventoryEDB";
     public static $guarded = ["id"];
@@ -1668,15 +1657,13 @@ class InventoryEnd extends Model
             2 => "棚卸完了"
         ]
     ];
-    
 }
 
 class InventoryHistory extends Model
 {
-    
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_InventoryHDB";
     public static $guarded = ["id"];
@@ -1698,15 +1685,13 @@ class InventoryHistory extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 class InventoryHistoryDivisionView extends Model
 {
-    
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "333_divisionInv";
     public static $guarded = ["id"];
@@ -1730,16 +1715,14 @@ class InventoryHistoryDivisionView extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 
 class InventoryView extends Model
 {
-    
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "invInvEndData";
     public static $guarded = ["id"];
@@ -1764,14 +1747,13 @@ class InventoryView extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 class StockTakingTransaction extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_stocktakingTR";
     public static $guarded = ["id"];
@@ -1805,10 +1787,9 @@ class StockTakingTransaction extends Model
 
 class QuoteRequest extends Model
 {
-    
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_QRequestDB";
     public static $guarded = ["id"];
@@ -1842,15 +1823,13 @@ class QuoteRequest extends Model
             7 => "採用"
         ]
     ];
-    
 }
 
 class Price extends Model
 {
-    
-    const CREATED_AT = "";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_PriceDB";
     public static $guarded = ["id"];
@@ -1887,10 +1866,9 @@ class Price extends Model
 
 class PriceView extends Model
 {
-    
-    const CREATED_AT = "";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "330_ItemsPrice";
     public static $guarded = ["id"];
@@ -1934,15 +1912,13 @@ class PriceView extends Model
             4 => "業者記入済"
         ]
     ];
-    
 }
 
 class QuoteItem extends Model
 {
-    
-    const CREATED_AT = "";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_reqItemDB";
     public static $guarded = ["id"];
@@ -1990,16 +1966,14 @@ class QuoteItem extends Model
             99 => "その他"
         ]
     ];
-    
 }
 
 
 class CommentTr extends Model
 {
-    
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_comment";
     public static $guarded = ["id"];
@@ -2020,15 +1994,13 @@ class CommentTr extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 class Comment extends Model
 {
-    
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_commentDB";
     public static $guarded = ["id"];
@@ -2050,15 +2022,13 @@ class Comment extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 class Topic extends Model
 {
-    
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_TopicDB";
     public static $guarded = ["id"];
@@ -2084,14 +2054,13 @@ class Topic extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 class TenantMaster extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_MasterDB";
     public static $guarded = ["id"];
@@ -2113,15 +2082,14 @@ class TenantMaster extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 
 class ItemBulkUpsertTrDB extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "T_itemBulkUpsert";
     public static $guarded = ["id"];
@@ -2170,15 +2138,14 @@ class ItemBulkUpsertTrDB extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 
 class PriceUpsertTrDB extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "T_Price";
     public static $guarded = ["id"];
@@ -2210,14 +2177,13 @@ class PriceUpsertTrDB extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 class InHospitalTrDb extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "T_inHpTrdb";
     public static $guarded = ["id"];
@@ -2251,15 +2217,14 @@ class InHospitalTrDb extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 
 class PriceInfoView extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "T_PriceList";
     public static $guarded = ["id"];
@@ -2292,14 +2257,13 @@ class PriceInfoView extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 class DistributorAndHospitalDB extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "T_distributor";
     public static $guarded = ["id"];
@@ -2326,13 +2290,12 @@ class DistributorAndHospitalDB extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 class DistributorUpsertDB extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "T_DistributorTr";
     public static $guarded = ["id"];
@@ -2355,14 +2318,13 @@ class DistributorUpsertDB extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 class AllNewItemInsert extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "T_allNewIns";
     public static $guarded = ["id"];
@@ -2404,16 +2366,15 @@ class AllNewItemInsert extends Model
     public static $attributes = [];
 
     public static $select = [];
-    
 }
 
 
 
 class PayScheduleItems extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_PayScheduleDB";
     public static $guarded = ["id"];
@@ -2453,9 +2414,9 @@ class PayScheduleItems extends Model
 
 class PickingHistory extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_PickingSlip";
     public static $guarded = ["id"];
@@ -2484,9 +2445,9 @@ class PickingHistory extends Model
 
 class PayScheduleItemsView extends Model
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "payoutSchedule";
     public static $guarded = ["id"];
