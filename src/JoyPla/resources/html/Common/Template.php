@@ -6,12 +6,6 @@
     <link rel="icon" href="https://i02.smp.ne.jp/u/joypla/new/favicon.ico">
     <?php echo $head ?>
     <?php echo $style; ?>
-    <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/normalize.css" />
-    <!-- UIkit CSS -->
-    <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/uikit.min.css" />
-    <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/normalize.css" />
-
-    <!-- UIkit JS --> 
     <!-- <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/animsition.min.css"> -->
     <!-- <script type="text/javascript" src="https://i02.smp.ne.jp/u/joypla/new/js/animsition.min.js"></script> -->
 

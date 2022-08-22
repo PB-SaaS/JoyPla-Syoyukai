@@ -6,6 +6,8 @@ use App\Model\Hospital;
 use App\Model\Distributor;
 use App\Model\DistributorUser;
 
+use function App\Lib\html;
+
 $nav = new StdClass;
 $nav->user_info = $user_info;
 if(!$user_info){
@@ -48,23 +50,45 @@ if(! $nav->user_info->isHospitalUser())
 			<?php
 			if($nav->user_info->isHospitalUser())
 			{
-				echo $nav->hospital->hospitalName.'<br>';
+				echo html($nav->hospital->hospitalName).'<br>';
 			}
 			if($nav->user_info->isDistributorUser())
 			{
-				echo $nav->distributor->distributorName.'<br>';
-				echo '<span class="uk-text-small">担当施設：'.$nav->hospital->hospitalName. '</span><br>';
+				echo html($nav->distributor->distributorName).'<br>';
+				echo '<span class="uk-text-small">担当施設：'.html($nav->hospital->hospitalName). '</span><br>';
 			}
 			?>
-			<?php echo $nav->user_info->getName();?> 様
+			<?php echo html($nav->user_info->getName()) ;?> 様
 		</p>
 		<ul class="uk-navbar-nav">
-			<li>
-				<a href="https://support.joypla.jp/" target="support" title="ヘルプ">
+			<li ref="supportModal">
+				<a href="#"  v-on:click="supportView = !supportView" title="ヘルプ">
 					<svg xmlns="http://www.w3.org/2000/svg" style="width:30px; height:30px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 					</svg>
 				</a>
+				<div class="md:right-[20px] md:left-auto right-0 left-0 md:w-[400px] block p-0 mt-[15px] absolute z-50 box-border text-[#666] bg-white" style="box-shadow: 0 5px 12px rgb(0 0 0 / 15%);" v-if="supportView">
+                   <div class="uk-card-body">
+				        <ul class="uk-list uk-navbar-dropdown-nav uk-list-large">
+	                        <li>
+                    			<a href="https://support.joypla.jp/" target="support" class="uk-flex" style="align-items: center;">
+									<svg xmlns="http://www.w3.org/2000/svg" style="height:30px; width:30px ; margin-right: 10px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+									</svg>
+									<span>サポートサイト（外部サイト）</span>
+								</a>
+							</li>
+	                        <li>
+                    			<a href="https://reg34.smp.ne.jp/regist/is?SMPFORM=meoj-lirdmf-2830358d2ea157fb8a38fdead8ace8c9" target="support" class="uk-flex" style="align-items: center;">
+									<svg xmlns="http://www.w3.org/2000/svg" style="height:30px; width:30px ; margin-right: 10px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+									</svg>
+									<span>サポート依頼（外部サイト）</span>
+								</a>
+							</li>
+                    	</ul>
+				    </div>
+		        </div>
 			</li>
 			<li ref="notificationModal">
 				<a href="#" title="お知らせ" v-on:click="notificationView = !notificationView" style="position: relative">
@@ -108,7 +132,7 @@ if(! $nav->user_info->isHospitalUser())
 					<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
 				</svg>
 				</a>
-				<div  class="md:right-[20px] md:left-auto right-0 left-0 md:w-[400px] block p-0 mt-[15px] absolute z-50 box-border text-[#666] bg-white" style="box-shadow: 0 5px 12px rgb(0 0 0 / 15%);" v-if="userModalView">
+				<div class="md:right-[20px] md:left-auto right-0 left-0 md:w-[400px] block p-0 mt-[15px] absolute z-50 box-border text-[#666] bg-white" style="box-shadow: 0 5px 12px rgb(0 0 0 / 15%);" v-if="userModalView">
                    <div class="uk-card-body">
 				        <div class="uk-grid-small uk-flex-middle" uk-grid>
 				            <div class="uk-width-expand">
@@ -116,17 +140,17 @@ if(! $nav->user_info->isHospitalUser())
 								<?php
 								if($nav->user_info->isHospitalUser())
 								{
-									echo $nav->hospital->hospitalName.'<br>';
+									echo html($nav->hospital->hospitalName).'<br>';
 								}
 								if($nav->user_info->isDistributorUser())
 								{
-									echo $nav->distributor->distributorName.'<br>';
-									echo '<span class="uk-text-small">担当施設：'.$nav->hospital->hospitalName. '</span><br>';
+									echo html($nav->distributor->distributorName).'<br>';
+									echo '<span class="uk-text-small">担当施設：'.html($nav->hospital->hospitalName). '</span><br>';
 								}
 								?>
 				                </h3>
-								<span class="uk-label uk-padding-small uk-label-success uk-padding-remove-vertical"><?php echo $nav->user_info->getUserPermissionName()?></span>
-								<p><?php echo $nav->user_info->getName();?> 様</p>
+								<span class="uk-label uk-padding-small uk-label-success uk-padding-remove-vertical"><?php echo html($nav->user_info->getUserPermissionName()) ?></span>
+								<p><?php echo html($nav->user_info->getName());?> 様</p>
 				            </div>
 				        </div>
 				        <ul class="uk-list uk-navbar-dropdown-nav uk-list-large">
@@ -155,13 +179,6 @@ if(! $nav->user_info->isHospitalUser())
 								</svg>
 								ユーザー情報変更
 								</a>
-							</li>
-	                        <li>
-								<a href="#" onclick="document.contactUs.submit()">
-								<svg xmlns="http://www.w3.org/2000/svg" style="height:30px; width:30px;  margin-right: 10px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-								</svg>
-								お問合せ</a>
 							</li>
 							<li>
 								<a href="%form:act:logout%">
@@ -204,6 +221,7 @@ var nav = new Vue({
 		notifications: {},
 		notificationView: false,
 		userModalView: false,
+		supportView: false,
 	},
 	mounted(){
 		  this.notification();
@@ -221,6 +239,9 @@ var nav = new Vue({
           // [対象の要素]が[クリックされた要素]を含まない場合
           if (e.target instanceof Node && !this.$refs.userModal?.contains(e.target)) {
             this.userModalView = false;
+          }
+          if (e.target instanceof Node && !this.$refs.supportModal?.contains(e.target)) {
+            this.supportView = false;
           }
         },
 		notification: function ()

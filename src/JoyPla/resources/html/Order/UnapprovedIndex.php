@@ -38,7 +38,7 @@
           </v-textarea>
           <?php else: ?>
           <v-text title="発注タイプ" class="flex w-full gap-6">{{ order.adjustmentToString }}</v-text>
-          <v-text title="備考" class="flex w-full gap-6"><pre>{{ order.orderComment }}</pre></v-text>
+          <v-text title="md:備考" class="flex w-full gap-6"><p class=" whitespace-pre-wrap">{{ order.orderComment }}</p></v-text>
           <?php endif ?>
         </div>
         <hr>

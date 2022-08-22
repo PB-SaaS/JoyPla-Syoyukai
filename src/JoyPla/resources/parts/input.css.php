@@ -8,6 +8,14 @@
 }
 
 
+.uk-text-danger {
+  @apply text-[#f0506e];
+}
+
+.uk-text-bold {
+  @apply font-bold;
+}
+
 input[aria-invalid="true"] {
     @apply text-red-500 border-red-500 border;
 }

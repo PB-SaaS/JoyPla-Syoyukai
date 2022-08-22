@@ -816,6 +816,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   margin-right: 20px;
 }
 
+.mr-\[10px\] {
+  margin-right: 10px;
+}
+
 .mb-\[20px\] {
   margin-bottom: 20px;
 }
@@ -830,10 +834,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .ml-\[30px\] {
   margin-left: 30px;
-}
-
-.mr-\[10px\] {
-  margin-right: 10px;
 }
 
 .box-border {
@@ -1229,6 +1229,11 @@ Ensure the default browser behavior of the `hidden` attribute.
   gap: 0.25rem;
 }
 
+.gap-x-1 {
+  -moz-column-gap: 0.25rem;
+       column-gap: 0.25rem;
+}
+
 .space-y-4 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
   margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
@@ -1283,6 +1288,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .whitespace-pre {
   white-space: pre;
+}
+
+.whitespace-pre-wrap {
+  white-space: pre-wrap;
 }
 
 .break-words {
@@ -1996,6 +2005,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   line-height: 1.75rem;
 }
 
+.text-\[0\.875rem\] {
+  font-size: 0.875rem;
+}
+
 .text-\[11px\] {
   font-size: 11px;
 }
@@ -2006,10 +2019,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .text-\[1\.5rem\] {
   font-size: 1.5rem;
-}
-
-.text-\[0\.875rem\] {
-  font-size: 0.875rem;
 }
 
 .font-bold {
@@ -2217,6 +2226,11 @@ Ensure the default browser behavior of the `hidden` attribute.
   color: rgb(51 51 51 / var(--tw-text-opacity));
 }
 
+.text-\[\#999\] {
+  --tw-text-opacity: 1;
+  color: rgb(153 153 153 / var(--tw-text-opacity));
+}
+
 .underline {
   -webkit-text-decoration-line: underline;
           text-decoration-line: underline;
@@ -2306,6 +2320,15 @@ Ensure the default browser behavior of the `hidden` attribute.
 .text-xxs {
   font-size : 0.5rem;
   line-height: 1rem;
+}
+
+.uk-text-danger {
+  --tw-text-opacity: 1;
+  color: rgb(240 80 110 / var(--tw-text-opacity));
+}
+
+.uk-text-bold {
+  font-weight: 700;
 }
 
 input[aria-invalid="true"] {
@@ -2819,6 +2842,10 @@ input[aria-invalid="true"] {
     --tw-space-x-reverse: 0;
     margin-right: calc(0.75rem * var(--tw-space-x-reverse));
     margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)));
+  }
+
+  .md\:p-\[40px\] {
+    padding: 40px;
   }
 
   .md\:px-10 {

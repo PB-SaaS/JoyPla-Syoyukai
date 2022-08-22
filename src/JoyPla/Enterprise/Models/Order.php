@@ -17,6 +17,7 @@ class Order
     private OrderStatus $orderStatus;
     private OrderAdjustment $adjustment;
     private TextArea512Bytes $orderComment;
+    private TextArea512Bytes $distributorComment;
     private string $orderUserName;
     private int $receivedTarget;
 
@@ -31,6 +32,7 @@ class Order
         OrderStatus $orderStatus,
         OrderAdjustment $adjustment,
         TextArea512Bytes $orderComment,
+        TextArea512Bytes $distributorComment,
         string $orderUserName = "",
         int $receivedTarget = 1 
         )
@@ -48,6 +50,7 @@ class Order
         $this->orderStatus = $orderStatus;
         $this->adjustment = $adjustment;
         $this->orderComment = $orderComment;
+        $this->distributorComment = $distributorComment;
         $this->orderUserName = $orderUserName;
         $this->receivedTarget = $receivedTarget;
     }
@@ -65,6 +68,7 @@ class Order
             (new OrderStatus($input->orderStatus) ),
             (new OrderAdjustment($input->adjustment)),
             (new TextArea512Bytes($input->ordercomment)),
+            (new TextArea512Bytes($input->distrComment)),
             $input->ordererUserName,
             ( $input->receivingTarget != '2' )? 1 : 2, //1	大倉庫  2	発注部署
         );
@@ -151,6 +155,7 @@ class Order
             (new OrderStatus(OrderStatus::OrderCompletion)),
             $this->adjustment,
             $this->orderComment,
+            $this->distributorComment,
             $this->orderUserName,
             $this->receivedTarget
         );
@@ -169,6 +174,7 @@ class Order
             $orderStatus,
             $this->adjustment,
             $this->orderComment,
+            $this->distributorComment,
             $this->orderUserName,
             $this->receivedTarget
         );
@@ -309,6 +315,7 @@ class Order
             $this->orderStatus,
             $this->adjustment,
             $comment,
+            $this->distributorComment,
             $this->orderUserName,
             $this->receivedTarget
         );
@@ -334,6 +341,7 @@ class Order
             $this->orderStatus,
             $this->adjustment,
             $this->orderComment,
+            $this->distributorComment,
             $this->orderUserName,
             $this->receivedTarget
         );
@@ -352,6 +360,7 @@ class Order
             $this->orderStatus,
             $adjustment,
             $this->orderComment,
+            $this->distributorComment,
             $this->orderUserName,
             $this->receivedTarget
         );
@@ -376,6 +385,7 @@ class Order
             'adjustment' => $this->adjustment->value(),
             'adjustmentToString' => $this->adjustment->toString(),
             'orderComment' => $this->orderComment->value(),
+            'distributorComment' => $this->distributorComment->value(),
             'orderUserName' => $this->orderUserName,
             'receivedTarget' => $this->receivedTarget
         ];

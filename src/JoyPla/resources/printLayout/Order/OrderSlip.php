@@ -52,7 +52,7 @@
                                         </div>
                                         <div class="productsLabel mt-6">
                                             <img :src="barcode_src" alt="" class="w-2/3 ml-auto pb-4"/>
-                                            <img :src="qr_src" alt="" class="w-1/4 ml-auto pb-4"/>
+                                            <!-- <img :src="qr_src" alt="" class="w-1/4 ml-auto pb-4"/> -->
                                         </div>
                                     </div>
                                 </div>
@@ -110,7 +110,11 @@
                             <template v-if="key === ( orderItems.length - 1 )">
                                 <div class="flex-col gap-4 mt-4 py-2 bg-gray-100 border-gray-400 border text-xxs">
                                     <div class="flex-auto">備考</div>
-                                    <div class="flex-auto"><pre>{{ order.orderComment }}</pre></div>
+                                    <div class="flex-auto"><p class=" whitespace-pre-wrap">{{ order.orderComment }}</p></div>
+                                </div>
+                                <div class="flex-col gap-4 mt-4 py-2 bg-gray-100 border-gray-400 border text-xxs">
+                                    <div class="flex-auto">卸業者備考</div>
+                                    <div class="flex-auto"><p class=" whitespace-pre-wrap">{{ order.distributorComment }}</p></div>
                                 </div>
                             </template>
                         </main>

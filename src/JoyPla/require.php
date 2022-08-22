@@ -62,6 +62,7 @@ require_once('JoyPla/InterfaceAdapters/Controllers/Api/StockController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Api/StocktakingController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/AgreeFormController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/ConsumptionController.php');
+require_once('JoyPla/InterfaceAdapters/Controllers/Web/OptionController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/OrderController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/ReceivedController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/ReturnController.php');

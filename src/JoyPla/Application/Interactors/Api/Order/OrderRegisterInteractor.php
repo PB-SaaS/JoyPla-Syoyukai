@@ -119,6 +119,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
                     ( new OrderStatus(OrderStatus::UnOrdered) ) , 
                     ( new OrderAdjustment($adjustment)) ,
                     ( new TextArea512Bytes("")),
+                    ( new TextArea512Bytes("")),
                     $inputData->user->name,
                     1
                 );

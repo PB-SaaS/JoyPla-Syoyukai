@@ -168,10 +168,11 @@ const headerNavi = {
         const innerWidth = ref(window.innerWidth);
         const show = ref(false);
 
-        const hospitalName = "<?php echo $hospital->hospitalName ?>";
+        const hospitalName = "<?php echo html($hospital->hospitalName) ?>";
         const userName = "%val:usr:name%";
         const notificationView = ref(false);
         const userModalView = ref(false);
+        const supportView = ref(false);
         const notifications = ref([]);
         const count = ref(0);
         const badge = ref(false);
@@ -195,6 +196,7 @@ const headerNavi = {
         }
         
         const userModal = ref(null); // 対象の要素
+        const supportModal = ref(null); // 対象の要素
         const notificationModal = ref(null); // 対象の要素
 
         const clickOutside = (e) => {
@@ -205,6 +207,10 @@ const headerNavi = {
           // [対象の要素]が[クリックされた要素]を含まない場合
           if (e.target instanceof Node && !userModal.value?.contains(e.target)) {
             userModalView.value = false;
+          }
+
+          if (e.target instanceof Node && !supportModal.value?.contains(e.target)) {
+            supportView.value = false;
           }
         }
 
@@ -222,6 +228,8 @@ const headerNavi = {
           notificationView,
           userModal,
           userModalView,
+          supportModal,
+          supportView,
           show,
           userName,
           hospitalName,
@@ -281,17 +289,39 @@ const headerNavi = {
 			{{ hospitalName }}<br>
 			{{ userName }} 様
 		</p>
-		<ul class="uk-navbar-nav">
-			<li>
-				<a href="https://support.joypla.jp/" target="support" title="ヘルプ">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-[30px] w-[30px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+		<ul class="flex m-0 p-0 list-none" ref="supportModal" >
+			<li class="">
+				<a href="#" title="ヘルプ" v-on:click="supportView = !supportView" class="flex justify-center items-center gap-x-1 box-border px-[15px] text-sm decoration-0 min-h-[80px]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-[30px] w-[30px] text-[#999]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </a>
+				<div class="md:right-[20px] md:left-auto right-0 left-0 top-[80px] md:w-[400px] block p-0 mt-[15px] absolute z-50 box-border text-[#666] bg-white" style="box-shadow: 0 5px 12px rgb(0 0 0 / 15%);" v-if="supportView">
+            <div class="max-h-[450px] flow-root md:p-[40px] p-[30px]">
+              <ul class="text-[0.875rem] p-0 list-none mb-0 text-[#999]" style='font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";'>
+                <li>
+                    <a href="https://support.joypla.jp/" class="flex items-center" target="support">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-[30px] w-[30px] mr-[10px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>サポートサイト（外部サイト）</span>
+                    </a>
+                </li> 
+                <li class="mt-6">
+                    <a href="https://reg34.smp.ne.jp/regist/is?SMPFORM=meoj-lirdmf-2830358d2ea157fb8a38fdead8ace8c9" class="flex items-center" target="support">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-[30px] w-[30px] mr-[10px] " fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      <span>サポート依頼（外部サイト）</span>
+                    </a>
+                </li>
+              </ul>
+				    </div>
+          </div>
 			</li>
 			<li class="inline-block max-w-full align-middle" ref="notificationModal">
-				<a href="#" title="お知らせ" v-on:click="notificationView = !notificationView" class="relative">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-[30px] w-[30px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+				<a href="#" title="お知らせ" v-on:click="notificationView = !notificationView" class="flex justify-center items-center gap-x-1 box-border px-[15px] text-sm decoration-0 min-h-[80px] relative">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-[30px] w-[30px] text-[#999]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
           <div v-show="badge">
@@ -299,7 +329,7 @@ const headerNavi = {
           </div>
         </a>
 				<div class="md:right-[20px] md:left-auto right-0 left-0 top-[80px] md:w-[400px] block p-0 mt-[15px] absolute z-50 box-border text-[#666] bg-white" style="box-shadow: 0 5px 12px rgb(0 0 0 / 15%);" v-if="notificationView">
-            <div class="max-h-[450px] flow-root p-[30px]" style="overflow-y: scroll; padding: 15px">
+            <div class="max-h-[450px] flow-root md:p-[40px] p-[30px]" style="overflow-y: scroll; padding: 15px">
 				        <ul class="p-0 list-none" v-if="notifications.length > 0 ">
 				            <li v-for="notification in notifications">
                       <article style="padding:10px">
@@ -325,14 +355,14 @@ const headerNavi = {
 				    </div>
           </div>
 			</li>
-			<li ref="userModal">
-				<a href="#" v-on:click="userModalView = !userModalView">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-[30px] w-[30px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+			<li ref="userModal" class="">
+				<a href="#" v-on:click="userModalView = !userModalView" class="flex justify-center items-center gap-x-1 box-border px-[15px] text-sm decoration-0 min-h-[80px]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-[30px] w-[30px] text-[#999]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
           </svg>
         </a>
 				<div class="md:right-[20px] md:left-auto right-0 left-0 md:w-[400px] block p-0 mt-[15px] absolute z-50 box-border text-[#666] bg-white" style="box-shadow: 0 5px 12px rgb(0 0 0 / 15%);" v-if="userModalView">
-            <div class="max-h-[450px] flow-root p-[30px]">
+            <div class="max-h-[450px] flow-root md:p-[40px] p-[30px]">
 				        <div class="items-center ml-[-30px] flex flex-wrap m-0 p-0 list-none">
 				            <div class="flex-1 min-w-[1px] box-border w-full max-w-full pl-[30px] m-0 flow-root break-words">
 				                <h3 class="mb-0 text-[1.5rem]" style="line-height: 1.4">
@@ -357,14 +387,6 @@ const headerNavi = {
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                       </svg>
                       ユーザー情報変更
-                    </a>
-                  </li>
-                  <li class="mt-[20px]">
-                    <a href="#" onclick="document.contactUs.submit()"  class="flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-[30px] w-[30px] mr-[10px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                      お問合せ
                     </a>
                   </li>
                   <li class="mt-[20px]">

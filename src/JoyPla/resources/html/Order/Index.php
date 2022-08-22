@@ -39,7 +39,8 @@
           <v-text title="発注元部署" class="flex w-full gap-6">{{ order.division.divisionName }}</v-text>
           <v-text title="発注担当者" class="flex w-full gap-6">{{ order.orderUserName }}</v-text>
           <v-text title="発注タイプ" class="flex w-full gap-6">{{ order.adjustmentToString }}</v-text>
-          <v-text title="備考" class="flex w-full gap-6"><pre>{{ order.orderComment }}</pre></v-text>
+          <v-text title="備考" class="md:flex w-full gap-6"><p class=" whitespace-pre-wrap">{{ order.orderComment }}</p></v-text>
+          <v-text title="卸業者備考" class="md:flex w-full gap-6"><p class=" whitespace-pre-wrap">{{ order.distributorComment }}</p></v-text>
         </div>
         <hr>
         <div class="p-4 text-lg font-bold">

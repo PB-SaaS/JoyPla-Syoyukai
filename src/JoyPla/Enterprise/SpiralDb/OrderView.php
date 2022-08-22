@@ -36,6 +36,7 @@ class OrderView extends SpiralORM
         "orderAuthKey",
         "receivingTarget",
         "adjustment",
+        "distrComment",
     ];
 
     //デフォルト値
