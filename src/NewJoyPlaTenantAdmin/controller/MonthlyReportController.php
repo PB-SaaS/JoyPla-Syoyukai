@@ -15,6 +15,7 @@ use App\Model\Billing;
 use App\Model\Division;
 use App\Model\InHospitalItemView;
 use App\Model\Inventory;
+use App\Model\InventoryEnd;
 use App\Model\InventoryHistoryDivisionView;
 use App\Model\ReceivingView;
 use App\Model\StockView;
@@ -267,7 +268,7 @@ class InventoryMovementController extends Controller
     }
 
     
-    public function divisonInventorySelectApi($SPIRAL)
+    public function hospitalInventorySelectApi($SPIRAL)
     {
         try{
             $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
@@ -277,8 +278,9 @@ class InventoryMovementController extends Controller
             $auth = new Auth();
             
             $hospitalId = $SPIRAL->getParam('hospitalId');
-            $divisionId = $SPIRAL->getParam('divisionId');
-            if($divisionId === '' || $hospitalId === '')
+            //$divisionId = $SPIRAL->getParam('divisionId');
+            //if($divisionId === '' || $hospitalId === '')
+            if($hospitalId === '')
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
@@ -290,14 +292,13 @@ class InventoryMovementController extends Controller
             }
             $hospital = $hospital->data->get(0);
             
-            $content = InventoryHistoryDivisionView::where('divisionId',$divisionId)
-            ->where('hospitalId',$hospital->hospitalId)
+            //$content = InventoryHistoryDivisionView::where('divisionId',$divisionId)
+            $content = InventoryEnd::where('hospitalId',$hospital->hospitalId)
             ->sort('id','desc')
             ->value('inventoryTime')
             ->value('inventoryStatus')
-            ->value('inventoryHId')
-            ->plain()
-            ->get();
+            ->value('inventoryEndId')
+            ->plain()->get();
 
             $data = [];
 
@@ -310,7 +311,7 @@ class InventoryMovementController extends Controller
                 $data[] = [
                     'inventoryTime' => $c->inventoryTime,
                     'inventoryStatus' => $c->inventoryStatus,
-                    'inventoryHId' => $c->inventoryHId,
+                    'inventoryEndId' => $c->inventoryEndId,
                     'searchStartDate' => '',
                     'searchEndDate' => $date,
                 ];
@@ -338,7 +339,7 @@ class InventoryMovementController extends Controller
     }
 
 
-    public function divisonItemsSelectApi($SPIRAL)
+    public function hospitalItemsSelectApi($SPIRAL)
     {
         try{
             $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
@@ -347,8 +348,9 @@ class InventoryMovementController extends Controller
 
             $auth = new Auth();
             $hospitalId = $SPIRAL->getParam('hospitalId');
-            $divisionId = $SPIRAL->getParam('divisionId');
-            if($divisionId === '' || $hospitalId === '')
+            //$divisionId = $SPIRAL->getParam('divisionId');
+            //if($divisionId === '' || $hospitalId === '')
+            if($hospitalId === '')
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
@@ -360,12 +362,20 @@ class InventoryMovementController extends Controller
             }
             $hospital = $hospital->data->get(0);
             
-            $content = StockView::where('divisionId',$divisionId)
-                ->where('hospitalId',$hospital->hospitalId)
+            $content = StockView::where('hospitalId',$hospital->hospitalId)
                 ->sort('id','desc')
                 ->value('inHospitalItemId')
                 ->value('rackName')
                 ->value('distributorName')
+                ->value('divisionName')
+                ->value('divisionId')
+                ->plain()
+                ->get();
+
+            $data = $content->data->all();
+
+            $inHospitalItems = InHospitalItemView::where('hospitalId',$hospital->hospitalId)->plain()
+                ->value('inHospitalItemId')
                 ->value('itemName')
                 ->value('itemCode')
                 ->value('itemStandard')
@@ -375,29 +385,50 @@ class InventoryMovementController extends Controller
                 ->value('unitPrice')
                 ->value('quantity')
                 ->value('quantityUnit')
-                ->plain()
-                ->get();
-
-            $data = $content->data->all();
-
-            foreach($data as &$d)
+                ->value('category');
+                
+            foreach($data as $d)
             {
-                $d->price = (int) $d->price ;
-                if($hospital->invUnitPrice !== '1')
+                $inHospitalItems->orWhere('inHospitalItemId',$d->inHospitalItemId);
+            }
+
+            $inHospitalItems = $inHospitalItems->get();
+            $inHospitalItemsLabel = $inHospitalItems->label->all();
+            foreach($data as $key => $d)
+            {
+                foreach($inHospitalItems->data->all() as $item)
                 {
-                    $d->unitPrice = 0;
+                    if($item->inHospitalItemId == $d->inHospitalItemId)
+                    {
+                        $data[$key]->itemName = $item->itemName;
+                        $data[$key]->itemCode = $item->itemCode;
+                        $data[$key]->itemStandard = $item->itemStandard;
+                        $data[$key]->itemJANCode = $item->itemJANCode;
+                        $data[$key]->makerName = $item->makerName;
+                        $data[$key]->price = (float)$item->price;
+                        $data[$key]->unitPrice = (float)$item->unitPrice;
+                        $data[$key]->quantity = $item->quantity;
+                        $data[$key]->quantityUnit = $item->quantityUnit;
+                        $data[$key]->category = $item->category;
+                        $data[$key]->categoryToString = $inHospitalItemsLabel['category']->get($item->category);
+                        break;
+                    }
+                }
+                if($hospital->invUnitPrice != '1')
+                {
+                    $data[$key]->unitPrice = 0;
                     if((int)$d->quantity !== 0 && (int)$d->price !== 0)
                     {
-                        $d->unitPrice = ((int)$d->price / (int)$d->quantity);
+                        $data[$key]->unitPrice = ((int)$d->price / (int)$d->quantity);
                     }
                 }
             }
 
-            $content = new ApiResponse( $data ,$content->count , 0 , "OK", ['divisonItemsSelectApi']);
+            $content = new ApiResponse( $data ,$content->count , 0 , "OK", ['hospitalItemsSelectApi']);
             $content = $content->toJson();
             
         } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['divisonItemsSelectApi']);
+            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['hospitalItemsSelectApi']);
             $content = $content->toJson();
         } finally {
             return $this->view('NewJoyPlaTenantAdmin/view/Template/ApiResponseBase', [
@@ -416,8 +447,9 @@ class InventoryMovementController extends Controller
 
             $auth = new Auth();
             $hospitalId = $SPIRAL->getParam('hospitalId');
-            $divisionId = $SPIRAL->getParam('divisionId');
-            if($divisionId === '' || $hospitalId === '')
+            //$divisionId = $SPIRAL->getParam('divisionId');
+            //if($divisionId === '' || $hospitalId === '')
+            if($hospitalId === '')
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
@@ -429,18 +461,18 @@ class InventoryMovementController extends Controller
             }
             $hospital = $hospital->data->get(0);
             
-            $inventoryHId = $SPIRAL->getParam('inventoryHId');
-            if($inventoryHId === '')
+            $inventoryEndId = $SPIRAL->getParam('inventoryEndId');
+            if($inventoryEndId === '')
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
 
-            $content = Inventory::where('inventoryHId',$inventoryHId)
-                ->where('divisionId',$divisionId)
+            $content = Inventory::where('inventoryEndId',$inventoryEndId)
                 ->where('hospitalId',$hospital->hospitalId)
                 ->sort('id','desc')
                 ->value('inHospitalItemId')
                 ->value('inventryNum')
+                ->value('divisionId')
                 ->plain()
                 ->get();
 
@@ -448,13 +480,15 @@ class InventoryMovementController extends Controller
             $data['record'] = [];
             foreach($content->data->all() as $d)
             {
-                $check = array_column($data['record'], 'inHospitalItemId');
-                $key = array_search($d->inHospitalItemId, $check);
+                $check = array_column($data['record'], 'uniqKey');
+                $key = array_search($d->divisionId . "_" . $d->inHospitalItemId , $check);
                 if ($key === FALSE)
                 {
                     $data['record'][] = [
                         'inHospitalItemId' => $d->inHospitalItemId,
-                        'count' => (int)$d->inventryNum
+                        'count' => (int)$d->inventryNum,
+                        'divisionId' => $d->divisionId,
+                        'uniqKey' => $d->divisionId . "_" . $d->inHospitalItemId
                     ];
                 } else {
                     $data['record'][$key]['count'] = $data['record'][$key]['count']  + (int)$d->inventryNum;
@@ -484,8 +518,8 @@ class InventoryMovementController extends Controller
 
             $auth = new Auth();
             $hospitalId = $SPIRAL->getParam('hospitalId');
-            $divisionId = $SPIRAL->getParam('divisionId');
-            if($divisionId === '' || $hospitalId === '')
+            //$divisionId = $SPIRAL->getParam('divisionId');
+            if($hospitalId === '')
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
@@ -497,60 +531,56 @@ class InventoryMovementController extends Controller
             }
             $hospital = $hospital->data->get(0);
             
-            $inventoryHId = $SPIRAL->getParam('inventoryHId');
-            if($inventoryHId === '')
+            $inventoryEndId = $SPIRAL->getParam('inventoryEndId');
+            if($inventoryEndId === '')
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
 
-            $content = InventoryHistoryDivisionView::where('divisionId',$divisionId)
+            $content = InventoryEnd::where('inventoryEndId',$inventoryEndId, '!=')
                 ->where('hospitalId',$hospital->hospitalId)
-                ->where('inventoryHId',$inventoryHId ,'<')
                 ->sort('id','desc')
                 ->value('inventoryTime')
                 ->value('inventoryStatus')
-                ->value('inventoryHId')
-                ->plain()
-                ->get();
-
+                ->value('inventoryEndId')->plain()->get();
+                
             $data = [];
             $data['record'] = [];
             $data['date'] = '';
             if($content->count > 0){
-
                 $before = $content->data->get(0);
-                $beforeInventoryHId = $before->inventoryHId;
+                $beforeInventoryEndId = $before->inventoryEndId;
                 $data['date'] = $before->inventoryTime;
 
                 $hospital = Hospital::where('hospitalId', $hospital->hospitalId)->value('invUnitPrice')->plain()->get();
                 $hospital = $hospital->data->get(0);
                 
-                $content = Inventory::where('inventoryHId',$beforeInventoryHId)
-                    ->where('divisionId',$divisionId)
+                $content = Inventory::where('inventoryEndId',$beforeInventoryEndId)
                     ->where('hospitalId',$hospital->hospitalId)
                     ->sort('id','desc')
                     ->value('inHospitalItemId')
                     ->value('inventryNum')
+                    ->value('divisionId')
                     ->plain()
                     ->get();
 
-
                 foreach($content->data->all() as $d)
                 {
-                    $check = array_column($data['record'], 'inHospitalItemId');
-                    $key = array_search($d->inHospitalItemId, $check);
+                    $check = array_column($data['record'], 'uniqKey');
+                    $key = array_search($d->divisionId . "_" . $d->inHospitalItemId , $check);
                     if ($key === FALSE)
                     {
                         $data['record'][] = [
                             'inHospitalItemId' => $d->inHospitalItemId,
                             'count' => (int)$d->inventryNum,
+                            'divisionId' => $d->divisionId,
+                            'uniqKey' => $d->divisionId . "_" . $d->inHospitalItemId
                         ];
                     } else {
                         $data['record'][$key]['count'] = $data['record'][$key]['count'] + (int)$d->inventryNum;
                     }
                 }
             }
-
             $content = new ApiResponse( $data ,$content->count , 0 , "OK", ['getBeforeInventoryItemNumsApi']);
             $content = $content->toJson();
             
@@ -573,8 +603,8 @@ class InventoryMovementController extends Controller
 
             $auth = new Auth();
             $hospitalId = $SPIRAL->getParam('hospitalId');
-            $divisionId = $SPIRAL->getParam('divisionId');
-            if($divisionId === '' || $hospitalId === '')
+            //$divisionId = $SPIRAL->getParam('divisionId');
+            if($hospitalId === '')
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
@@ -589,13 +619,13 @@ class InventoryMovementController extends Controller
             $startDate = $SPIRAL->getParam('startDate');
             $endDate= $SPIRAL->getParam('endDate');
 
-            $content = ReceivingView::where('divisionId',$divisionId)
-                ->where('hospitalId',$hospital->hospitalId)
+            $content = ReceivingView::where('hospitalId',$hospital->hospitalId)
                 ->sort('id','desc')
                 ->value('inHospitalItemId')
                 ->value('receivingCount')
                 ->value('priceAfterAdj')
                 ->value('quantity')
+                ->value('divisionId')
                 ->plain();
                 
             if($startDate)
@@ -615,14 +645,16 @@ class InventoryMovementController extends Controller
 
                 foreach($content->data->all() as $d)
                 {
-                    $check = array_column($data['record'], 'inHospitalItemId');
-                    $key = array_search($d->inHospitalItemId, $check);
+                    $check = array_column($data['record'], 'uniqKey');
+                    $key = array_search($d->divisionId . "_" . $d->inHospitalItemId , $check);
                     if ($key === FALSE)
                     {
                         $data['record'][] = [
                             'inHospitalItemId' => $d->inHospitalItemId,
+                            'divisionId' => $d->divisionId, 
                             'count' => (int)$d->receivingCount * (int)$d->quantity,
                             'price' => (float)$d->priceAfterAdj,
+                            'uniqKey' => $d->divisionId . "_" . $d->inHospitalItemId
                         ];
                     } else {
                         $data['record'][$key]['count'] = $data['record'][$key]['count'] + ((int)$d->receivingCount * (int)$d->quantity);
@@ -654,8 +686,8 @@ class InventoryMovementController extends Controller
 
             $auth = new Auth();
             $hospitalId = $SPIRAL->getParam('hospitalId');
-            $divisionId = $SPIRAL->getParam('divisionId');
-            if($divisionId === '' || $hospitalId === '')
+            //$divisionId = $SPIRAL->getParam('divisionId');
+            if( $hospitalId === '')
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
@@ -670,14 +702,10 @@ class InventoryMovementController extends Controller
             $startDate = $SPIRAL->getParam('startDate');
             $endDate= $SPIRAL->getParam('endDate');
 
-            if($divisionId === '')
-            {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
-            }
 
-            $content = Billing::where('divisionId',$divisionId)
-                ->where('hospitalId',$hospital->hospitalId)
+            $content = Billing::where('hospitalId',$hospital->hospitalId)
                 ->sort('id','desc')
+                ->value('divisionId')
                 ->value('inHospitalItemId')
                 ->value('billingQuantity')
                 ->value('billingAmount')
@@ -700,14 +728,16 @@ class InventoryMovementController extends Controller
 
                 foreach($content->data->all() as $d)
                 {
-                    $check = array_column($data['record'], 'inHospitalItemId');
-                    $key = array_search($d->inHospitalItemId, $check);
+                    $check = array_column($data['record'], 'uniqKey');
+                    $key = array_search($d->divisionId . "_" . $d->inHospitalItemId , $check);
                     if ($key === FALSE)
                     {
                         $data['record'][] = [
                             'inHospitalItemId' => $d->inHospitalItemId,
                             'count' => (int)$d->billingQuantity,
                             'price' => (float)$d->billingAmount,
+                            'divisionId' => $d->divisionId,
+                            'uniqKey' => $d->divisionId . "_" . $d->inHospitalItemId,
                         ];
                     } else {
                         $data['record'][$key]['count'] = $data['record'][$key]['count'] + (int)$d->billingQuantity;
@@ -771,13 +801,13 @@ $action = $SPIRAL->getParam('Action');
     {
         echo $InventoryMovementController->divisionSelectApi($SPIRAL)->render();
     }
-    else if($action === 'divisonInventorySelectApi')
+    else if($action === 'hospitalInventorySelectApi')
     {
-        echo $InventoryMovementController->divisonInventorySelectApi($SPIRAL)->render();
+        echo $InventoryMovementController->hospitalInventorySelectApi($SPIRAL)->render();
     }
-    else if($action === 'divisonItemsSelectApi')
+    else if($action === 'hospitalItemsSelectApi')
     {
-        echo $InventoryMovementController->divisonItemsSelectApi($SPIRAL)->render();
+        echo $InventoryMovementController->hospitalItemsSelectApi($SPIRAL)->render();
     }
     else if($action === 'getInventoryItemNumsApi')
     {

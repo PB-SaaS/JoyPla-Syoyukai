@@ -1,3 +1,11 @@
+<style>
+	.asc::after {
+		content: "▲";
+	}
+	.desc::after {
+		content: "▼";
+	}
+</style>
 <script>
 
     $(document).ready(function () {
@@ -58,29 +66,15 @@
                             </div>
                         </div>
                         <div class="uk-form-controls uk-margin">
-                            <label class="uk-form-label">部署</label>
-                            <div class="uk-child-width-1-1">
-                                <div>
-                                    <select
-                                        class="uk-select"
-                                        v-model="select_data.divisionId"
-                                        v-on:change="divisionSelected">
-                                        <option value="">----- 選択してください -----</option>
-                                        <option v-for="d in divisions" :value="d.divisionId">{{ d.divisionName }}</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="uk-form-controls uk-margin">
                             <label class="uk-form-label">基準棚卸日</label>
                             <div class="uk-child-width-1-1">
                                 <div>
                                     <select
                                         class="uk-select"
-                                        v-model="select_data.inventoryHId"
+                                        v-model="select_data.inventoryEndId"
                                         v-on:change="getItemNums">
                                         <option value="">----- 選択してください -----</option>
-                                        <option v-for="h in histories" :value="h.inventoryHId">
+                                        <option v-for="h in histories" :value="h.inventoryEndId">
                                             <template v-if="h.inventoryTime == ''">
                                                 現在日時（棚卸中）
                                             </template>
@@ -104,6 +98,9 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
+                                    <th><a href="#" @click="sortBy('divisionName')" :class="addClass('divisionName')">部署名</a></th>
+                                    <th><a href="#" @click="sortBy('rackName')" :class="addClass('rackName')">棚名</a></th>
+                                    <th><a href="#" @click="sortBy('categoryToString')" :class="addClass('categoryToString')">分類</a></th>
                                     <th class="uk-width-1-6">商品情報</th>
                                     <th>卸業者</th>
                                     <th>価格</th>
@@ -120,8 +117,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="( i , key) in items">
+                                <tr v-for="( i , key) in sort_items">
                                     <td>{{ key + 1 }}</td>
+                                    <td>{{ i.divisionName }}</td>
+                                    <td>{{ i.rackName }}</td>
+                                    <td>{{ i.categoryToString }}</td>
                                     <td>
                                         <div margin="0">
                                             <div>{{ i.makerName }}</div>
@@ -134,19 +134,19 @@
                                     <td>{{ i.distributorName }}</td>
                                     <td>&yen;{{ i.price | number_format }}</td>
                                     <td>&yen;{{ i.unitPrice  | number_format }}</td>
-                                    <td>{{ i.quantity }}{{ i.quantityUnit }}</td>
-                                    <td>{{ get_before_inventory_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
-                                    <td>&yen;{{ Math.round( get_before_inventory_nums(i.inHospitalItemId).count * i.unitPrice * 100 ) / 100 | number_format }}</td>
-                                    <td>{{ get_receiving_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
-                                    <td>&yen;{{ get_receiving_nums(i.inHospitalItemId).price  | number_format }}</td>
-                                    <td>{{ get_consumed_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
-                                    <td>&yen;{{ get_consumed_nums(i.inHospitalItemId).price  | number_format }}</td>
-                                    <td>{{ get_inventory_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
-                                    <td>&yen;{{ Math.round( get_inventory_nums(i.inHospitalItemId).count * i.unitPrice * 100 ) / 100  | number_format }}</td>
+                                    <td>{{ i.quantity | number_format }}{{ i.quantityUnit }}</td>
+                                    <td>{{ get_before_inventory_nums(i.inHospitalItemId , i.divisionId).count }}{{ i.quantityUnit }}</td>
+                                    <td>&yen;{{ Math.round( get_before_inventory_nums(i.inHospitalItemId , i.divisionId).count * i.unitPrice * 100 ) / 100 | number_format }}</td>
+                                    <td>{{ get_receiving_nums(i.inHospitalItemId , i.divisionId).count }}{{ i.quantityUnit }}</td>
+                                    <td>&yen;{{ get_receiving_nums(i.inHospitalItemId , i.divisionId).price  | number_format }}</td>
+                                    <td>{{ get_consumed_nums(i.inHospitalItemId , i.divisionId).count }}{{ i.quantityUnit }}</td>
+                                    <td>&yen;{{ get_consumed_nums(i.inHospitalItemId , i.divisionId).price  | number_format }}</td>
+                                    <td>{{ get_inventory_nums(i.inHospitalItemId , i.divisionId).count }}{{ i.quantityUnit }}</td>
+                                    <td>&yen;{{ Math.round( get_inventory_nums(i.inHospitalItemId , i.divisionId).count * i.unitPrice * 100 ) / 100  | number_format }}</td>
                                 </tr>
                             </tbody>
                             <tfoot>
-                                <td colspan=6>合計</td>
+                                <td colspan="9">合計</td>
                                 <td></td>
                                 <td>&yen;{{ get_before_inventory_total_price() | number_format }}</td>
                                 <td></td>
@@ -174,7 +174,6 @@
                             ~
                             {{searchEndDate}}</span><br>
                         <span>病院名：{{get_hospital(select_data.hospitalId).hospitalName}}</span><br>
-                        <span>部署名：{{get_division(select_data.divisionId).divisionName}}</span>
                     </div>
                     <div class="uk-width-1-3" style="height:100pt">
                         <table style="line-height: normal;" class="print-table">
@@ -195,6 +194,9 @@
                     <thead>
                         <tr>
                             <th>No</th>
+                            <th>部署名</th>
+                            <th>棚名</th>
+                            <th>分類</th>
                             <th class="uk-width-1-6">商品情報</th>
                             <th>卸業者</th>
                             <th>価格</th>
@@ -211,8 +213,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="( i , key) in items">
+                        <tr v-for="( i , key) in sort_items">
                             <td>{{ key + 1 }}</td>
+                            <th>{{ i.divisionName }}</th>
+                            <th>{{ i.rackName }}</th>
+                            <th>{{ i.categoryToString }}</th>
                             <td>
                                 <div margin="0">
                                     <div>{{ i.makerName }}</div>
@@ -224,20 +229,20 @@
                             </td>
                             <td>{{ i.distributorName }}</td>
                             <td>&yen;{{ i.price | number_format }}</td>
-                            <td>&yen;{{ i.unitPrice  | number_format }}</td>
-                            <td>{{ i.quantity }}{{ i.quantityUnit }}</td>
-                            <td>{{ get_before_inventory_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
-                            <td>&yen;{{ Math.round( get_before_inventory_nums(i.inHospitalItemId).count * i.unitPrice * 100 ) / 100 | number_format }}</td>
-                            <td>{{ get_receiving_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
-                            <td>&yen;{{ get_receiving_nums(i.inHospitalItemId).price  | number_format }}</td>
-                            <td>{{ get_consumed_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
-                            <td>&yen;{{ get_consumed_nums(i.inHospitalItemId).price  | number_format }}</td>
-                            <td>{{ get_inventory_nums(i.inHospitalItemId).count }}{{ i.quantityUnit }}</td>
-                            <td>&yen;{{ Math.round( get_inventory_nums(i.inHospitalItemId).count * i.unitPrice * 100 ) / 100  | number_format }}</td>
+                            <td>&yen;{{ i.unitPrice  | number_format }}</td> 
+                            <td>{{ i.quantity | number_format }}{{ i.quantityUnit }}</td>
+                            <td>{{ get_before_inventory_nums(i.inHospitalItemId , i.divisionId).count }}{{ i.quantityUnit }}</td>
+                            <td>&yen;{{ Math.round( get_before_inventory_nums(i.inHospitalItemId , i.divisionId).count * i.unitPrice * 100 ) / 100 | number_format }}</td>
+                            <td>{{ get_receiving_nums(i.inHospitalItemId , i.divisionId).count }}{{ i.quantityUnit }}</td>
+                            <td>&yen;{{ get_receiving_nums(i.inHospitalItemId , i.divisionId).price  | number_format }}</td>
+                            <td>{{ get_consumed_nums(i.inHospitalItemId , i.divisionId).count }}{{ i.quantityUnit }}</td>
+                            <td>&yen;{{ get_consumed_nums(i.inHospitalItemId , i.divisionId).price  | number_format }}</td>
+                            <td>{{ get_inventory_nums(i.inHospitalItemId , i.divisionId).count }}{{ i.quantityUnit }}</td>
+                            <td>&yen;{{ Math.round( get_inventory_nums(i.inHospitalItemId , i.divisionId).count * i.unitPrice * 100 ) / 100  | number_format }}</td>
                         </tr>
                     </tbody>
                     <tfoot>
-                        <td colspan=6>合計</td>
+                        <td colspan=9>合計</td>
                         <td></td>
                         <td>&yen;{{ get_before_inventory_total_price() | number_format }}</td>
                         <td></td>
@@ -260,7 +265,7 @@
         'hospitalName': '',
         'histories': {},
         'select_data': {
-            inventoryHId: "",
+            inventoryEndId: "",
             divisionId: "",
             hospitalId: ""
         },
@@ -273,12 +278,30 @@
         'searchEndDate': '',
         'complete': false,
         'completeDate' : '',
+        sort_key: "",
+        sort_asc: true,
     };
 
     var app = new Vue({
         el: '#app',
         data: datas,
         mounted() {},
+        computed: {
+            sort_items() {
+                if (this.sort_key != "") {
+                let set = 1;
+                this.sort_asc ? (set = 1) : (set = -1);
+                this.items.sort((a, b) => {
+                    if (a[this.sort_key] < b[this.sort_key]) return -1 * set;
+                    if (a[this.sort_key] > b[this.sort_key]) return 1 * set;
+                    return 0;
+                });
+                return this.items;
+                } else {
+                return this.items;
+                }
+            },
+        },
         filters: {
             number_format: function (value) {
                 if (!value) {
@@ -291,11 +314,23 @@
         },
         watch: {},
         methods: {
+            addClass(key) {
+                return {
+                    asc: this.sort_key === key && this.sort_asc,
+                    desc: this.sort_key === key && !this.sort_asc,
+                };
+            },
+            sortBy(key) {
+                this.sort_key === key
+                ? (this.sort_asc = !this.sort_asc)
+                : (this.sort_asc = true);
+                this.sort_key = key;
+            },
             get_before_inventory_total_price: function()
             {
                 let num = 0;
                 this.items.forEach(function(i){
-                    num += Math.round( app.get_before_inventory_nums(i.inHospitalItemId).count * i.unitPrice * 100 ) / 100;
+                    num += Math.round( app.get_before_inventory_nums(i.inHospitalItemId , i.divisionId).count * i.unitPrice * 100 ) / 100;
                 }); 
                 return num;
             },
@@ -303,7 +338,7 @@
             {
                 let num = 0;
                 this.items.forEach(function(i){
-                    num += Math.round( app.get_receiving_nums(i.inHospitalItemId).count * i.unitPrice * 100 ) / 100;
+                    num += Math.round( app.get_receiving_nums(i.inHospitalItemId , i.divisionId).count * i.unitPrice * 100 ) / 100;
                 }); 
                 return num;
             },
@@ -311,7 +346,7 @@
             {
                 let num = 0;
                 this.items.forEach(function(i){
-                    num += Math.round( app.get_consumed_nums(i.inHospitalItemId).count * i.unitPrice * 100 ) / 100;
+                    num += Math.round( app.get_consumed_nums(i.inHospitalItemId , i.divisionId).count * i.unitPrice * 100 ) / 100;
                 }); 
                 return num;
             },
@@ -319,13 +354,17 @@
             {
                 let num = 0;
                 this.items.forEach(function(i){
-                    num += Math.round( app.get_inventory_nums(i.inHospitalItemId).count * i.unitPrice * 100 ) / 100;
+                    num += Math.round( app.get_inventory_nums(i.inHospitalItemId , i.divisionId).count * i.unitPrice * 100 ) / 100;
                 }); 
                 return num;
             },
             get_hospital: function (hospitalId) {
                 if (!hospitalId) {
-                    return {}
+                    return {'hospitalName': ''};
+                }
+                if ( app.hospitals.length === 0 )
+                {
+                    return {'hospitalName': ''};
                 }
                 let res = app
                     .hospitals
@@ -333,68 +372,71 @@
                 if (res) {
                     return res;
                 } else {
-                    return {'divisionName': ''};
+                    return {'hospitalName': ''};
                 }
             },
-            get_division: function (divisionId) {
-                if (!divisionId) {
-                    return {}
-                }
-                let res = app
-                    .divisions
-                    .find(i => i.divisionId === divisionId);
-                if (res) {
-                    return res;
-                } else {
-                    return {'divisionName': ''};
-                }
-            },
-            get_before_inventory_nums: function (in_hospital_id) {
+            get_before_inventory_nums: function (in_hospital_id , division_id) {
                 if (!in_hospital_id) {
-                    return {}
+                    return {'count': 0, 'price': 0};
+                }
+                if ( app.beforeInventoryNums.length === 0 )
+                {
+                    return {'count': 0, 'price': 0};
                 }
                 let res = app
                     .beforeInventoryNums
-                    .find(i => i.inHospitalItemId === in_hospital_id);
+                    .find(i => i.inHospitalItemId === in_hospital_id && i.divisionId === division_id);
                 if (res) {
                     return res;
                 } else {
                     return {'count': 0, 'price': 0};
                 }
             },
-            get_inventory_nums: function (in_hospital_id) {
+            get_inventory_nums: function (in_hospital_id, division_id) {
                 if (!in_hospital_id) {
-                    return {}
+                    return {'count': 0, 'price': 0};
+                }
+                if ( app.inventoryNums.length === 0 )
+                {
+                    return {'count': 0, 'price': 0};
                 }
                 let res = app
                     .inventoryNums
-                    .find(i => i.inHospitalItemId === in_hospital_id);
+                    .find(i => i.inHospitalItemId === in_hospital_id && i.divisionId === division_id);
                 if (res) {
                     return res;
                 } else {
                     return {'count': 0, 'price': 0};
                 }
             },
-            get_receiving_nums: function (in_hospital_id) {
+            get_receiving_nums: function (in_hospital_id, division_id) {
                 if (!in_hospital_id) {
-                    return {}
+                    return {'count': 0, 'price': 0};
+                }
+                if ( app.receivingNums.length === 0 )
+                {
+                    return {'count': 0, 'price': 0};
                 }
                 let res = app
                     .receivingNums
-                    .find(i => i.inHospitalItemId === in_hospital_id);
+                    .find(i => i.inHospitalItemId === in_hospital_id && i.divisionId === division_id);
                 if (res) {
                     return res;
                 } else {
                     return {'count': 0, 'price': 0};
                 }
             },
-            get_consumed_nums: function (in_hospital_id) {
+            get_consumed_nums: function (in_hospital_id, division_id) {
                 if (!in_hospital_id) {
-                    return {}
+                    return {'count': 0, 'price': 0};
+                }
+                if ( app.consumedNums.length === 0 )
+                {
+                    return {'count': 0, 'price': 0};
                 }
                 let res = app
                     .consumedNums
-                    .find(i => i.inHospitalItemId === in_hospital_id);
+                    .find(i => i.inHospitalItemId === in_hospital_id && i.divisionId === division_id);
                 if (res) {
                     return res;
                 } else {
@@ -402,8 +444,7 @@
                 }
             },
             hospitalSelected: function () {
-                app.select_data.divisionId = '';
-                app.select_data.inventoryHId = '';
+                app.select_data.inventoryEndId = '';
                 app.inventoryNums = [];
                 app.receivingNums = [];
                 app.consumedNums = [];
@@ -424,49 +465,9 @@
                             url: '%url/rel:mpgt:MonthlyReport%',
                             type: 'POST',
                             data: {
-                                Action: "divisionSelectApi",
-                                _csrf: "<?php echo $csrf_token ?>",
-                                hospitalId: app.select_data.hospitalId
-                            },
-                            dataType: 'json'
-                        })
-                        .done(function (returnData) {
-                            app.divisions = returnData.data;
-                        });
-                    // fail()は省略
-                    return dfd.promise();
-                }
-                loading();
-                setTimeout(function () {
-                    ajax1().then(loading_remove());
-                }, 0);
-            },
-            divisionSelected: function () {
-                app.select_data.inventoryHId = '';
-                app.inventoryNums = [];
-                app.receivingNums = [];
-                app.consumedNums = [];
-                app.beforeInventoryNums = [];
-                app.items = [];
-                app.searchStartDate = '';
-                app.searchEndDate = '';
-                app.complete = false;
-                app.completeDate = '',
-
-                custom_loading = true;
-
-                function ajax1() {
-                    let dfd = $.Deferred();
-                    $
-                        .ajax({
-                            async: true,
-                            url: '%url/rel:mpgt:MonthlyReport%',
-                            type: 'POST',
-                            data: {
-                                Action: "divisonInventorySelectApi",
+                                Action: "hospitalInventorySelectApi",
                                 _csrf: "<?php echo $csrf_token ?>",
                                 hospitalId: app.select_data.hospitalId,
-                                divisionId: app.select_data.divisionId
                             },
                             dataType: 'json'
                         })
@@ -485,10 +486,9 @@
                             url: '%url/rel:mpgt:MonthlyReport%',
                             type: 'POST',
                             data: {
-                                Action: "divisonItemsSelectApi",
+                                Action: "hospitalItemsSelectApi",
                                 _csrf: "<?php echo $csrf_token ?>",
                                 hospitalId: app.select_data.hospitalId,
-                                divisionId: app.select_data.divisionId
                             },
                             dataType: 'json'
                         })
@@ -519,19 +519,19 @@
                 app
                     .histories
                     .forEach(
-                        e => (app.select_data.inventoryHId === e.inventoryHId)
+                        e => (app.select_data.inventoryEndId === e.inventoryEndId)
                             ? app.searchStartDate = e.searchStartDate
                             : ""
                     );
                 app
                     .histories
                     .forEach(
-                        e => (app.select_data.inventoryHId === e.inventoryHId)
+                        e => (app.select_data.inventoryEndId === e.inventoryEndId)
                             ? app.searchEndDate = e.searchEndDate
                             : ""
                     );
 
-                app.histories.forEach(e => (app.select_data.inventoryHId === e.inventoryHId)? app.completeDate = e.inventoryTime : "");
+                app.histories.forEach(e => (app.select_data.inventoryEndId === e.inventoryEndId)? app.completeDate = e.inventoryTime : "");
                 custom_loading = true;
 
                 function ajax1() {
@@ -545,8 +545,7 @@
                                 _csrf: "<?php echo $csrf_token ?>",
                                 Action: "getInventoryItemNumsApi",
                                 hospitalId: app.select_data.hospitalId,
-                                divisionId: app.select_data.divisionId,
-                                inventoryHId: app.select_data.inventoryHId
+                                inventoryEndId: app.select_data.inventoryEndId
                             },
                             dataType: 'json'
                         })
@@ -568,9 +567,8 @@
                             data: {
                                 _csrf: "<?php echo $csrf_token ?>",
                                 Action: "getBeforeInventoryItemNumsApi",
-                                inventoryHId: app.select_data.inventoryHId,
+                                inventoryEndId: app.select_data.inventoryEndId,
                                 hospitalId: app.select_data.hospitalId,
-                                divisionId: app.select_data.divisionId
                             },
                             dataType: 'json'
                         })
@@ -595,8 +593,7 @@
                                 _csrf: "<?php echo $csrf_token ?>",
                                 Action: "getReceivingItemNumsApi",
                                 hospitalId: app.select_data.hospitalId,
-                                inventoryHId: app.select_data.inventoryHId,
-                                divisionId: app.select_data.divisionId,
+                                inventoryEndId: app.select_data.inventoryEndId,
                                 startDate: encodeURI(app.searchStartDate),
                                 endDate: encodeURI(app.searchEndDate)
                             },
@@ -620,8 +617,7 @@
                                 _csrf: "<?php echo $csrf_token ?>",
                                 Action: "getConsumedItemNumsApi",
                                 hospitalId: app.select_data.hospitalId,
-                                inventoryHId: app.select_data.inventoryHId,
-                                divisionId: app.select_data.divisionId,
+                                inventoryEndId: app.select_data.inventoryEndId,
                                 startDate: encodeURI(app.searchStartDate),
                                 endDate: encodeURI(app.searchEndDate)
                             },
@@ -634,7 +630,7 @@
                     return dfd.promise();
                 }
 
-                if (app.select_data.inventoryHId !== '' && app.select_data.divisionId !== '') {
+                if (app.select_data.inventoryEndId !== '') {
                     loading();
                     setTimeout(function () {
                         ajax1()
@@ -677,6 +673,8 @@
                 for (let i = 0; i < app.items.length; i++) {
                     result[i] = [
                         i+1,
+                        app.items[i].rackName,
+                        app.items[i].categoryToString,
                         app.items[i].itemName,
                         app.items[i].itemCode,
                         app.items[i].itemStandard,
@@ -687,20 +685,16 @@
                         app.items[i].unitPrice,
                         app.items[i].quantity,
                         app.items[i].quantityUnit,
-                        app.get_before_inventory_nums(app.items[i].inHospitalItemId).count,
-                        Math.round( app.get_before_inventory_nums(app.items[i].inHospitalItemId).count * app.items[i].unitPrice * 100 ) / 100,
-                        app.get_receiving_nums(app.items[i].inHospitalItemId).count,
-                        app.get_receiving_nums(app.items[i].inHospitalItemId).price,
-                        app.get_consumed_nums(app.items[i].inHospitalItemId).count,
-                        app.get_consumed_nums(app.items[i].inHospitalItemId).price,
-                        app.get_inventory_nums(app.items[i].inHospitalItemId).count,
-                        Math.round( app.get_inventory_nums(app.items[i].inHospitalItemId).count * app.items[i].unitPrice * 100 ) / 100,
-                        app
-                            .get_hospital(app.select_data.hospitalId)
-                            .hospitalName,
-                        app
-                            .get_division(app.select_data.divisionId)
-                            .divisionName
+                        app.get_before_inventory_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).count,
+                        Math.round( app.get_before_inventory_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).count * app.items[i].unitPrice * 100 ) / 100,
+                        app.get_receiving_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).count,
+                        app.get_receiving_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).price,
+                        app.get_consumed_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).count,
+                        app.get_consumed_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).price,
+                        app.get_inventory_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).count,
+                        Math.round( app.get_inventory_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).count * app.items[i].unitPrice * 100 ) / 100,
+                        app.get_hospital(app.select_data.hospitalId).hospitalName,
+                        app.items[i].divisionName
                     ];
                 }
 
@@ -708,6 +702,8 @@
 
                 result.unshift([
                     'id',
+                    '棚名',
+                    '分類',
                     '商品名',
                     '製品コード',
                     '規格',
