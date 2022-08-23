@@ -1,4 +1,7 @@
 const vText = {
+  setup(props) {
+    console.log(props);
+  },
   props: {
     title : {
         type: String, 
@@ -9,14 +12,14 @@ const vText = {
         type: String, 
         required: false,
         default: false
-    }
+    },
   },
   template: `
   <fieldset>
     <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal" v-if="title != ''">
         {{ title }} <span v-if="isRequired" class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
     </div>
-    <div class="flex-auto w-5/6">
+    <div class="flex-auto">
         <slot></slot>
     </div>
   </fieldset>

@@ -268,59 +268,33 @@
                         </svg>
                     </card-button>
                 </div>
-                <div id="news-area" class="mx-auto md:w-2/3 my-6">
+                <div id="news-area" class="mx-auto md:w-2/3 w-full my-6">
                     <div class="bg-eastern-blue-700 text-white">
-                        <p class="my-2 font-bold text-lg mx-4">News</p>
+                        <p class="my-2 font-bold text-lg mx-4">最新のお知らせ</p>
                     </div>
-                    <!-- -->
-                    <div class="flex mx-4 mb-4 last:mb-0 items-center">
-                        <div class=" pr-4">
-                            <span
-                                class="text-center text-xs font-semibold inline-block py-1 px-2 rounded text-white bg-eastern-blue-900 w-16">
-                                お知らせ
-                            </span>
-                        </div>
-                        <div class="flex-auto">
-                            2022/01/10
-                            <a href="#" class="no-underline hover:underline">
-                                XXXXXお知らせ
-                            </a>
-                        </div>
-                    </div>
-                    <!-- -->
-                    <div class="flex mx-4 mb-4 last:mb-0">
-                        <div class=" pr-4">
-                            <span
-                                class="text-center text-xs font-semibold inline-block py-1 px-2 rounded text-white bg-eastern-blue-900 w-16">
-                                お知らせ
-                            </span>
-                        </div>
-                        <div class="flex-auto">
-                            2022/01/10
-                            <a href="#" class="no-underline hover:underline">
-                                XXXXXお知らせ
-                            </a>
-                        </div>
-                    </div>
-                    <!-- -->
-                    <div class="flex mx-4 mb-4 last:mb-0">
-                        <div class=" pr-4">
-                            <span
-                                class="text-center text-xs font-semibold inline-block py-1 px-2 rounded text-white bg-eastern-blue-900 w-16 ">
-                                お知らせ
-                            </span>
-                        </div>
-                        <div class="flex-auto">
-                            2022/01/10
-                            <a href="#" class="no-underline hover:underline">
-                                XXXXXお知らせ
-                            </a>
+                    <div class="hover:bg-sushi-50" v-for="(notification) in notifications">
+                        <div class="border-b-2 border-solid border-gray-100 w-full">
+                            <div class="flex gap-4 items-center p-2 ">
+                                <div v-if="notification.type == '2'" class="flex-initia text-center text-xs font-semibold inline-block py-1 px-2 rounded text-white bg-eastern-blue-900 w-24">
+                                    重要なお知らせ
+                                </div>
+                                <div v-else-if="notification.type == '3'" class="flex-initial text-center text-xs font-semibold inline-block py-1 px-2 rounded text-white bg-eastern-blue-900 w-24">
+                                    メンテナンス
+                                </div>
+                                <div v-else class="flex-initial text-center text-xs font-semibold inline-block py-1 px-2 rounded text-white bg-eastern-blue-900 w-24">
+                                    お知らせ
+                                </div>
+                                <div class="flex-initial w-32">{{ (notification.registrationTime).split(' ')[0] }}</div>
+                                <div class="flex-1">
+                                    <a :href="_ROOT+'&path=/notification/'+notification.notificationId" class="no-underline hover:underline">{{ notification.title }}</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="text-center">
-                        <button
+                        <a :href="_ROOT + '&path=/notification'"
                             type="button"
-                            class="text-white bg-eastern-blue-700 hover:bg-eastern-blue-800 focus:outline-none focus:ring-4 rounded-full text-sm px-5 py-2.5 text-center mr-2 mb-2">過去のお知らせを表示</button>
+                            class="text-white bg-eastern-blue-700 hover:bg-eastern-blue-800 focus:outline-none focus:ring-4 rounded-full text-sm px-5 py-2.5 text-center mr-2 my-2">過去のお知らせを表示</a>
                     </div>
                 </div>
             </div>
@@ -332,6 +306,8 @@
         .createApp({
             setup() {
                 const {ref , onCreated , onMounted} = Vue;
+                const { useForm } = VeeValidate;
+
                 const loading = ref(false);
                 const start = () => {
                     loading.value = true;
@@ -347,14 +323,44 @@
                     }, 500);
                 }
                 start();
-                
-                onMounted( () => {
-                  sleepComplate()
-                });
 
                 const searchValue = ref("");
 
-                return {loading, start, complete , searchValue }
+                const notifications = ref([]);
+                
+                const { meta , validate , values , setFieldValue , resetForm} = useForm({
+                    initialValues: {
+                        perPage: 3,
+                        currentPage : 1,
+                    },
+                });
+                const listGet = () => {
+                    let params = new URLSearchParams();
+                    params.append("path", "/api/notification/show");
+                    params.append("search", JSON.stringify(encodeURIToObject(values)));
+                    params.append("_csrf", _CSRF);
+
+                    start();
+
+                    axios.post(_APIURL,params)
+                    .then( (response) => {
+                        notifications.value = response.data.data;
+                        totalCount.value = parseInt(response.data.count);
+                    }) 
+                    .catch((error) => {
+                        complete();
+                    })
+                    .then(() => {
+                        complete();
+                    });
+                };
+                
+                onMounted( () => {
+                  sleepComplate()
+                  listGet()
+                });
+
+                return {loading, start, complete , searchValue , notifications }
             },
             components: {
                 'v-barcode-slip-search': vBarcodeSlipSearch,

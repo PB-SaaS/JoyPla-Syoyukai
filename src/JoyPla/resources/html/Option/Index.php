@@ -5,54 +5,88 @@
   <div id="content" class="flex h-full px-1">
     <div class="flex-auto">
       <div class="index container mx-auto bg-white">
+        <h1 class="text-2xl mb-2">オプション</h1>
+        <hr>
+		<div class=" whitespace-pre-line p-4 text-base bg-gray-100 border border-gray-400 ">
+			<v-text title="テナント種別" class="flex w-full gap-6">
+				<span v-if="option.tenantKind == '1'">シングル</span>
+				<span v-else="option.tenantKind != '1'">マルチ</span>
+			</v-text>
+			<v-text title="入庫先設定" class="flex w-full gap-6">
+				<span v-if="option.receivingTarget == '1'">大倉庫</span>
+				<span v-else="option.receivingTarget != '1'">発注部署</span>
+			</v-text>
+			<v-text title="登録可能ユーザー数" class="flex w-full gap-6">
+				<span>{{option.registerableNum}}人まで</span>
+			</v-text>
+			<v-text title="消費計算方法" class="flex w-full gap-6">
+				<span v-if="option.billingUnitPrice == '1'">単価フィールドを使用する</span>
+				<span v-else="option.billingUnitPrice != '1'">購買価格を使用する</span>
+			</v-text>
+			<v-text title="払出計算方法" class="flex w-full gap-6">
+				<span v-if="option.payoutUnitPrice == '1'">単価フィールドを使用する</span>
+				<span v-else="option.payoutUnitPrice != '1'">購買価格を使用する</span>
+			</v-text>
+			<v-text title="棚卸計算方法" class="flex w-full gap-6">
+				<span v-if="option.invUnitPrice == '1'">単価フィールドを使用する</span>
+				<span v-else="option.invUnitPrice != '1'">購買価格を使用する</span>
+			</v-text>
+		</div>
       </div>
     </div>
   </div>
 </div>
+<script>
+const PHPData = <?php echo json_encode($viewModel, true) ?>;
+var JoyPlaApp = Vue.createApp({
+    components: {
+      'v-loading' : vLoading,
+      'card-button' : cardButton,
+      'v-breadcrumbs': vBreadcrumbs,
+      'v-button-default': vButtonDefault,
+      'v-button-primary': vButtonPrimary,
+      'v-button-danger': vButtonDanger,
+      'header-navi' : headerNavi,
+      'v-open-modal': vOpenModal,
+      'v-input' : vInput ,
+      'item-view': itemView,
+      'v-pagination' : vPagination,
+      'v-select' : vSelect,
+      'v-text' : vText,
+    },
+    setup(){
+      const { ref , onMounted } = Vue;
+      const { useForm } = VeeValidate;
 
+	  const option = PHPData;
 
-<div class="animsition" uk-height-viewport="expand: true">
-  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
-	    <div class="uk-container uk-container-expand">
-	    	<ul class="uk-breadcrumb no_print">
-			    <li><a href="%url/rel:mpg:top%">TOP</a></li>
-			    <li><span>オプション情報</span></li>
-			</ul>
-			
-	    	<div class='uk-width-1-1' uk-grid>
-	    		<div class="uk-width-5-6@m uk-width-2-3">
-	    			<h2>オプション情報</h2>
-				</div>
-	    	</div>
-    		<p class="uk-text-warning">オプションの変更はお問合せよりご連絡ください。</p>
-	    	<div class='uk-width-4-5@m uk-margin-auto uk-margin-remove-top' >
-	    		<table class="uk-table uk-table-divider uk-table-responsive">
-				        <tr>
-				            <th>テナント種別</th>
-				            <td><?php echo ($tenant->tenantKind == '1')? "シングル" : "マルチ" ;?></td>
-				        </tr>
-				        <tr>
-				            <th>入庫先設定</th>
-				            <td><?php echo ($hospital->receivingTarget == '1')? "大倉庫" : "発注部署" ;?></td>
-				        </tr>
-				        <tr>
-				            <th>登録可能ユーザー数</th>
-				            <td><?php echo $hospital->registerableNum ?> 人まで</td>
-				        </tr>
-				        <tr>
-				            <th>消費計算方法</th>
-				            <td><?php echo ($hospital->billingUnitPrice == '1')? '単価フィールドを使用する' : '購買価格を使用する' ?></td>
-				        </tr>
-				        <tr>
-				            <th>払出計算方法</th>
-				            <td><?php echo ($hospital->payoutUnitPrice == '1')? '単価フィールドを使用する' : '購買価格を使用する' ?></td>
-				        </tr>
-				        <tr>
-				            <th>棚卸計算方法</th>
-				            <td><?php echo ($hospital->invUnitPrice == '1')? '単価フィールドを使用する' : '購買価格を使用する' ?></td>
-				        </tr>
-				</table>
-	    	</div>
-		</div>
-	</div>
-</div>
+      const loading = ref(false);
+      const start = () => {
+          loading.value = true;
+      }
+
+      const complete = () => {
+          loading.value = false;
+      }
+
+      const breadcrumbs = [
+          {
+            text: 'オプション',
+            disabled: true, 
+          }
+        ];
+
+      return {
+		loading,
+		option,
+        breadcrumbs,
+      }
+  },
+  watch: {
+    'values.currentPage': function(val) {
+      this.listGet();
+      window.scrollTo(0, 0);
+    }
+  }
+}).mount('#top');
+</script>

@@ -784,6 +784,44 @@ namespace JoyPla\Enterprise\Models {
         }
     }
 
+    /**
+     * 数字・記号・アルファベット(32 bytes)
+     */
+    class NumberSymbolAlphabet32Bytes
+    {
+        use ValueObjectTrait;
+        
+        const FORMAT = "/[ぁ-ん]+|[ァ-ヴー]+|[一-龠]/u";
+        const LIMIT_BYTES_NUMBER = 32;
+
+        public function __construct($value)
+        {
+            if(!self::isValid($value))
+            {
+                throw new Exception(self::class . " is valid error.", 422);
+            }
+            $this->value = $value;
+        }
+
+        public static function isValid($value)
+        {
+            if( $value === "" || $value === null )
+            {
+                return true;
+            }
+
+            if (preg_match(NumberSymbolAlphabet32Bytes::FORMAT, $value)) {
+                return false;
+            }
+
+            if (self::isLimitOverSingleByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
     class DateYearMonthDayHourMinutesSecond
     {
         use ValueObjectTrait;
@@ -822,6 +860,272 @@ namespace JoyPla\Enterprise\Models {
 
     }
 
+    /**
+     * テキストフィールド(32 bytes)
+     */
+    class TextFieldType32Bytes
+    {
+        use ValueObjectTrait;
+        
+        const LIMIT_BYTES_NUMBER = 32;
+
+        public function __construct($value)
+        {
+            if (!self::isValid($value))
+            {
+                throw new Exception(self::class . " is valid error.", 422);
+            }
+            $this->value = $value;
+        }
+
+        public static function isValid($value)
+        {
+            if (self::isValueEmpty($value))
+            {
+                return true;
+            }
+
+            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    /**
+     * テキストフィールド(64 bytes)
+     */
+    class TextFieldType64Bytes
+    {
+        use ValueObjectTrait;
+        
+        const LIMIT_BYTES_NUMBER = 64;
+
+        public function __construct($value)
+        {
+            if (!self::isValid($value))
+            {
+                throw new Exception(self::class . " is valid error.", 422);
+            }
+            $this->value = $value;
+        }
+
+        public static function isValid($value)
+        {
+            if (self::isValueEmpty($value))
+            {
+                return true;
+            }
+
+            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+
+    /**
+     * テキストフィールド(128 bytes)
+     */
+    class TextFieldType128Bytes
+    {
+        use ValueObjectTrait;
+        
+        const LIMIT_BYTES_NUMBER = 128;
+
+        public function __construct($value)
+        {
+            if (!self::isValid($value))
+            {
+                throw new Exception(self::class . " is valid error.", 422);
+            }
+            $this->value = $value;
+        }
+
+        public static function isValid($value)
+        {
+            if (self::isValueEmpty($value))
+            {
+                return true;
+            }
+
+            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    /**
+     * テキストエリア(256 bytes)
+     */
+    class TextArea256Bytes
+    {
+        use ValueObjectTrait;
+        
+        const LIMIT_BYTES_NUMBER = 256;
+
+        public function __construct($value)
+        {
+            if (!self::isValid($value))
+            {
+                throw new Exception(self::class . " is valid error.", 422);
+            }
+            $this->value = $value;
+        }
+
+        public static function isValid($value)
+        {
+            if (self::isValueEmpty($value))
+            {
+                return true;
+            }
+
+            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+    
+    
+    /**
+     * テキストエリア(512 bytes)
+     */
+    class TextArea512Bytes
+    {
+        use ValueObjectTrait;
+        
+        const LIMIT_BYTES_NUMBER = 512;
+
+        public function __construct($value)
+        {
+            if (!self::isValid($value))
+            {
+                throw new Exception(self::class . " is valid error.", 422);
+            }
+            $this->value = $value;
+        }
+
+        public static function isValid($value)
+        {
+            if (self::isValueEmpty($value))
+            {
+                return true;
+            }
+
+            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    /**
+     * テキストエリア(1024 bytes)
+     */
+    class TextArea1024Bytes
+    {
+        use ValueObjectTrait;
+        
+        const LIMIT_BYTES_NUMBER = 1024;
+
+        public function __construct($value)
+        {
+            if (!self::isValid($value))
+            {
+                throw new Exception(self::class . " is valid error.", 422);
+            }
+            $this->value = $value;
+        }
+
+        public static function isValid($value)
+        {
+            if (self::isValueEmpty($value))
+            {
+                return true;
+            }
+
+            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    /**
+     * テキストエリア(4096 bytes)
+     */
+    class TextArea4096Bytes
+    {
+        use ValueObjectTrait;
+
+        const LIMIT_BYTES_NUMBER = 4096;
+
+        public function __construct($value)
+        {
+            if (!self::isValid($value))
+            {
+                throw new Exception(self::class . " is valid error.", 422);
+            }
+            $this->value = $value;
+        }
+
+        public static function isValid($value)
+        {
+            if (self::isValueEmpty($value))
+            {
+                return true;
+            }
+
+            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    /**
+     * テキストエリア(8192 bytes)
+     */
+    class TextArea8192Bytes
+    {
+        use ValueObjectTrait;
+
+        const LIMIT_BYTES_NUMBER = 8192;
+
+        public function __construct($value)
+        {
+            if (!self::isValid($value))
+            {
+                throw new Exception(self::class . " is valid error.", 422);
+            }
+            $this->value = $value;
+        }
+
+        public static function isValid($value)
+        {
+            if (self::isValueEmpty($value))
+            {
+                return true;
+            }
+
+            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
     class DateYearMonth
     {
         use ValueObjectTrait;
@@ -834,6 +1138,11 @@ namespace JoyPla\Enterprise\Models {
 
         public function __construct($value)
         {
+            if(! self::isValid($value))
+            {
+                throw new Exception(self::class . " is valid error.", 422);
+            }
+
             if( preg_match(self::FORMAT_DELIMITER_SLASH, $value) )
             {
                 $value = $value . "/01";
@@ -1137,40 +1446,7 @@ namespace JoyPla\Enterprise\Models {
         }
     }
 
-    /**
-     * テキストエリア(512 bytes)
-     */
-    class TextArea512Bytes 
-    {
-        use ValueObjectTrait;
 
-        const LIMIT_BYTES_NUMBER = 512;
-
-        public function __construct($value = "")
-        {
-            if(! self::isValid($value))
-            {
-                throw new Exception('Over 512 characters.',422);
-            }
-            $this->value = $value;
-        }
-
-        
-        public static function isValid($value)
-        {
-            if( $value === "" || $value === null )
-            {
-                return true;
-            }
-            $width = mb_strwidth($value, "UTF-8");
-            if ($width <= self::LIMIT_BYTES_NUMBER) { 
-                return true;
-            }
-            return false;
-        }
-    }
-
-    
     /**
      * 都道府県
      */

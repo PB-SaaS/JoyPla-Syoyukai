@@ -70,7 +70,7 @@ namespace Sanitize
 namespace SpiralError
 {
     /**
-     * JoyPlaのエラーを表現する規定インターフェース
+     * Spiralのエラーを表現する規定インターフェース
      */
     interface SpiralError
     {

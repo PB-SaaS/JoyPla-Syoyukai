@@ -1012,6 +1012,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   width: 24rem;
 }
 
+.w-24 {
+  width: 6rem;
+}
+
 .w-1\/3 {
   width: 33.333333%;
 }
@@ -1290,6 +1294,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   white-space: pre;
 }
 
+.whitespace-pre-line {
+  white-space: pre-line;
+}
+
 .whitespace-pre-wrap {
   white-space: pre-wrap;
 }
@@ -1333,6 +1341,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .border-0 {
   border-width: 0px;
+}
+
+.border-2 {
+  border-width: 2px;
 }
 
 .border-t {
@@ -1418,6 +1430,16 @@ Ensure the default browser behavior of the `hidden` attribute.
 .border-slate-600 {
   --tw-border-opacity: 1;
   border-color: rgb(71 85 105 / var(--tw-border-opacity));
+}
+
+.border-chelsea-cucumber-400 {
+  --tw-border-opacity: 1;
+  border-color: rgb(168 204 142 / var(--tw-border-opacity));
+}
+
+.border-l-chelsea-cucumber-400 {
+  --tw-border-opacity: 1;
+  border-left-color: rgb(168 204 142 / var(--tw-border-opacity));
 }
 
 .bg-white {
@@ -2588,10 +2610,6 @@ input[aria-invalid="true"] {
   background-color: rgb(255, 204, 153);
 }
 
-.last\:mb-0:last-child {
-  margin-bottom: 0px;
-}
-
 .checked\:border-blue-600:checked {
   --tw-border-opacity: 1;
   border-color: rgb(37 99 235 / var(--tw-border-opacity));
@@ -2622,14 +2640,14 @@ input[aria-invalid="true"] {
   border-color: rgb(209 213 219 / var(--tw-border-opacity));
 }
 
-.hover\:bg-eastern-blue-800:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(8 36 41 / var(--tw-bg-opacity));
-}
-
 .hover\:bg-sushi-50:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(248 251 245 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-eastern-blue-800:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(8 36 41 / var(--tw-bg-opacity));
 }
 
 .hover\:bg-blue-400:hover {

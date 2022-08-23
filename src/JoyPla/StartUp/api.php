@@ -17,6 +17,7 @@ use JoyPla\Application\Interactors\Api\Consumption\ConsumptionShowInteractor;
 use JoyPla\Application\Interactors\Api\Distributor\DistributorShowInteractor;
 use JoyPla\Application\Interactors\Api\Division\DivisionShowInteractor;
 use JoyPla\Application\Interactors\Api\InHospitalItem\InHospitalItemShowInteractor;
+use JoyPla\Application\Interactors\Api\Notification\NotificationShowInteractor;
 use JoyPla\Application\Interactors\Api\ReceivedReturn\ReturnShowInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderShowInteractor;
@@ -25,19 +26,18 @@ use JoyPla\Application\Interactors\Api\Order\OrderUnapprovedDeleteInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderUnapprovedItemDeleteInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderUnapprovedUpdateInteractor;
 use JoyPla\Application\Interactors\Api\Order\FixedQuantityOrderInteractor;
-use JoyPla\Application\Interactors\Api\Order\OrderItemShowInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderRevisedInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderUnReceivedShowInteractor;
 use JoyPla\Application\Interactors\Api\Received\ReceivedRegisterByOrderSlipInteractor;
 use JoyPla\Application\Interactors\Api\Received\ReceivedRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Received\ReceivedReturnRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Received\ReceivedShowInteractor;
-use JoyPla\Enterprise\Models\InventoryCalculation;
 use JoyPla\InterfaceAdapters\Controllers\Api\BarcodeController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ConsumptionController;
 use JoyPla\InterfaceAdapters\Controllers\Api\DistributorController;
 use JoyPla\InterfaceAdapters\Controllers\Api\DivisionController;
 use JoyPla\InterfaceAdapters\Controllers\Api\InHospitalItemController;
+use JoyPla\InterfaceAdapters\Controllers\Api\NotificationController;
 use JoyPla\InterfaceAdapters\Controllers\Api\OrderController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ReceivedController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ReturnController;
@@ -50,7 +50,7 @@ use JoyPla\InterfaceAdapters\GateWays\Repository\DivisionRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\HospitalRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\InHospitalItemRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepository;
-use JoyPla\InterfaceAdapters\GateWays\Repository\OrderItemRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\NotificationRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ReceivedRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ReturnRepository;
@@ -63,6 +63,7 @@ use JoyPla\InterfaceAdapters\Presenters\Api\Consumption\ConsumptionShowPresenter
 use JoyPla\InterfaceAdapters\Presenters\Api\Distributor\DistributorShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Division\DivisionShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\InHospitalItem\InHospitalItemShowPresenter;
+use JoyPla\InterfaceAdapters\Presenters\Api\Notification\NotificationShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\ReceivedReturn\ReturnShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderUnapprovedApprovalPresenter;
@@ -71,7 +72,6 @@ use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderUnapprovedItemDeletePrese
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderUnapprovedShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderUnapprovedUpdatePresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\FixedQuantityOrderPresenter;
-use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderItemShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderRevisedPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderUnReceivedShowPresenter;
@@ -103,22 +103,17 @@ Router::map('POST','/api/fixedQuantityOrder/register',[OrderController::class,'f
 
 Router::map('POST','/api/order/unapproved/show',[OrderController::class,'unapprovedShow'])->service(new OrderShowInteractor(new OrderUnapprovedShowPresenter() , new OrderRepository()) );
 
-Router::map('POST','/api/order/unapproved/:orderId/update',[OrderController::class,'unapprovedUpdate'])
-    ->service(new OrderUnapprovedUpdateInteractor(new OrderUnapprovedUpdatePresenter() , new OrderRepository()) );
+Router::map('POST','/api/order/unapproved/:orderId/update',[OrderController::class,'unapprovedUpdate'])->service(new OrderUnapprovedUpdateInteractor(new OrderUnapprovedUpdatePresenter() , new OrderRepository()) );
     
 Router::map('POST', '/api/order/fixedQuantityOrder', [OrderController::class,'fixedQuantityOrder'])->service(new FixedQuantityOrderInteractor(new FixedQuantityOrderPresenter() , new StockRepository()) );
 
-Router::map('POST','/api/order/unreceivedShow',[OrderController::class,'unreceivedShow'])
-->service(new OrderUnReceivedShowInteractor(new OrderUnReceivedShowPresenter() , new OrderRepository()) );
+Router::map('POST','/api/order/unreceivedShow',[OrderController::class,'unreceivedShow'])->service(new OrderUnReceivedShowInteractor(new OrderUnReceivedShowPresenter() , new OrderRepository()) );
 
-Router::map('POST','/api/order/unapproved/:orderId/delete',[OrderController::class,'unapprovedDelete'])
-    ->service(new OrderUnapprovedDeleteInteractor(new OrderUnapprovedDeletePresenter() , new OrderRepository()) );
+Router::map('POST','/api/order/unapproved/:orderId/delete',[OrderController::class,'unapprovedDelete'])->service(new OrderUnapprovedDeleteInteractor(new OrderUnapprovedDeletePresenter() , new OrderRepository()) );
 
-Router::map('POST','/api/order/unapproved/:orderId/approval',[OrderController::class,'approval'])
-    ->service(new OrderUnapprovedApprovalInteractor(new OrderUnapprovedApprovalPresenter() , new OrderRepository() , new InventoryCalculationRepository()) );
+Router::map('POST','/api/order/unapproved/:orderId/approval',[OrderController::class,'approval'])->service(new OrderUnapprovedApprovalInteractor(new OrderUnapprovedApprovalPresenter() , new OrderRepository() , new InventoryCalculationRepository()) );
 
-Router::map('POST','/api/order/unapproved/:orderId/:orderItemId/delete',[OrderController::class,'unapprovedItemDelete'])
-    ->service(new OrderUnapprovedItemDeleteInteractor(new OrderUnapprovedItemDeletePresenter() , new OrderRepository()) );
+Router::map('POST','/api/order/unapproved/:orderId/:orderItemId/delete',[OrderController::class,'unapprovedItemDelete'])->service(new OrderUnapprovedItemDeleteInteractor(new OrderUnapprovedItemDeletePresenter() , new OrderRepository()) );
 
 Router::map('POST','/api/order/show',[OrderController::class,'show'])->service(new OrderShowInteractor(new OrderShowPresenter() , new OrderRepository()) );
 
@@ -128,8 +123,7 @@ Router::map('POST','/api/received/order/list',[ReceivedController::class,'orderL
 
 Router::map('POST','/api/:orderId/received/register',[ReceivedController::class,'orderRegister'])->service(new ReceivedRegisterByOrderSlipInteractor(new ReceivedRegisterByOrderSlipPresenter() , new OrderRepository() , new ReceivedRepository() , new DivisionRepository() , new InventoryCalculationRepository()) );
 
-Router::map('POST','/api/:receivedId/return/register',[ReceivedController::class,'returnRegister'])
-->service(new ReceivedReturnRegisterInteractor( new ReceivedReturnRegisterPresenter() , new ReceivedRepository() , new ReturnRepository() , new HospitalRepository() , new DivisionRepository , new InventoryCalculationRepository() ));
+Router::map('POST','/api/:receivedId/return/register',[ReceivedController::class,'returnRegister'])->service(new ReceivedReturnRegisterInteractor( new ReceivedReturnRegisterPresenter() , new ReceivedRepository() , new ReturnRepository() , new HospitalRepository() , new DivisionRepository , new InventoryCalculationRepository() ));
 
 Router::map('POST','/api/received/show',[ReceivedController::class,'show'])->service(new ReceivedShowInteractor(new ReceivedShowPresenter() , new ReceivedRepository()) );
 
@@ -142,6 +136,8 @@ Router::map('POST','/api/barcode/search',[BarcodeController::class,'search'])->s
 Router::map('POST','/api/barcode/order/search',[BarcodeController::class,'orderSearch'])->service(new BarcodeOrderSearchInteractor( new BarcodeOrderSearchPresenter() , new BarcodeRepository() ));
 
 Router::map('POST','/api/stocktaking/inHospitalItem',[StocktakingController::class,'inHospitalItem']);
+ 
+Router::map('POST','/api/notification/show',[NotificationController::class,'show'])->service(new NotificationShowInteractor( new NotificationShowPresenter() , new NotificationRepository() ));
  
 try{ 
     $router = new Router();

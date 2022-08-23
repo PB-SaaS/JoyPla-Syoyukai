@@ -17,6 +17,7 @@ use JoyPla\Application\Interactors\Web\Received\ReceivedIndexInteractor;
 use JoyPla\Application\Interactors\Web\Received\ReceivedLabelInteractor;
 use JoyPla\InterfaceAdapters\Controllers\Web\AgreeFormController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ConsumptionController;
+use JoyPla\InterfaceAdapters\Controllers\Web\NotificationController;
 use JoyPla\InterfaceAdapters\Controllers\Web\OptionController;
 use JoyPla\InterfaceAdapters\Controllers\Web\OrderController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ReceivedController;
@@ -125,6 +126,10 @@ Router::group(PersonalInformationConsentMiddleware::class, function(){
     Router::map('POST', '/return/show', [ReturnController::class,'show']);
 
     Router::map('POST', '/stocktakingimport', [StocktakingController::class,'import']);
+    
+    Router::map('POST', '/notification', [NotificationController::class,'show']);
+    
+    Router::map('POST', '/notification/:notificationId', [NotificationController::class,'index']);
     
 });
 try{ 
