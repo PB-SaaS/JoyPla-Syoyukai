@@ -20,6 +20,8 @@ use Logger;
 	protected $request;
 	protected $apiCommunicator;
 
+	public static Logger $logger ;
+
 	/**
 	 *  Public requestAPI 
 	 * 
@@ -54,7 +56,7 @@ use Logger;
 		}
 		$response = $this->apiCommunicator->request($apiHeader[0], $apiHeader[1], $this->request);
 		
-		$this->logging($response);
+		$this->logging($apiHeader[0] ."/". $apiHeader[1], $this->request , $response);
 		
 		$responseArray = array();
 		foreach($response->entrySet() as $key => $val){
@@ -64,24 +66,30 @@ use Logger;
 		return $responseArray;
 	}
 
-	public function logging($response)
+	public function logging($header , $request ,$response)
 	{
 		global $SPIRAL;
+		/*
         if(! LogConfig::EXPORT_TO_SPIRALV2){ return ""; }
         $spiralv2 = new LoggingSpiralv2(LogConfig::SPIRALV2_API_KEY , 'https://api.spiral-platform.com/v1/');
         $spiralv2->setAppId(LogConfig::LOGGING_APP_TITLE);
         $spiralv2->setDbId(LogConfig::SPIRAL_API_LOGGING_DB_TITLE);
 
         $logger = new Logger($spiralv2);
+		*/
+		if( $this::$logger )
+		{
+			$body = [
+				'execTime' => Logger::getTime(),
+				'AccountId' => $SPIRAL->getAccountId(),
+				'request' => $request->get('db_title'),
+				'header' => $header,
+				'code' => $response->getResultCode(),
+				'message' =>  $response->getMessage(),
+			];
 
-		$body = [
-			'execTime' => Logger::getTime(),
-			'AccountId' => $SPIRAL->getAccountId(),
-			'code' => $response->getResultCode(),
-			'message' =>  $response->getMessage(),
-		];
-
-		$logger->out($body);
+			$this::$logger->out($body);
+		}
 	}
 	
 	/**

@@ -12,7 +12,7 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\InHospitalItem {
         public function output(InHospitalItemShowOutputData $outputData)
         {
             $viewModel = new InHospitalItemShowViewModel($outputData);
-            echo (new ApiResponse( $viewModel->data, $viewModel->count , $viewModel->code, $viewModel->message))->toJson();
+            echo (new ApiResponse( $viewModel->data, $viewModel->count , $viewModel->code, $viewModel->message, ['InHospitalItemShowPresenter']))->toJson();
         }
     }
         

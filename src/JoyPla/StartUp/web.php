@@ -6,6 +6,7 @@ require_once "JoyPla/require.php";
 /** components */
 
 use App\SpiralDb\HospitalUser;
+use App\SpiralDb\Notification;
 use framework\Application;
 use framework\Http\Request;
 use framework\Http\View;
@@ -133,6 +134,7 @@ Router::group(PersonalInformationConsentMiddleware::class, function(){
     
 });
 try{ 
+
     $router = new Router();
     //$router->middleware();毎回必ずチェックする場合はこっち
     $app = new JoyPlaApplication();
@@ -142,7 +144,7 @@ try{
     $kernel->handle($request);
 } catch(Exception $e) {
     $body = View::forge('html/Common/Error', [ 
-        'code' => $e->getCode(),
+        'code' => $e->getCode(), 
         'message' => $e->getMessage()
     ], false)->render();
     echo view('html/Common/Template', compact('body'), false)->render();

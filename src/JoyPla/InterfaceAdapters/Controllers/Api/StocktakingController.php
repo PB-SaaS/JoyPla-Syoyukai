@@ -28,7 +28,7 @@ class StocktakingController extends Controller
 
         $instance = InHospitalItemView::where('hospitalId', $user->hospitalId)->value('inHospitalItemId')->value('lotManagement')->get();
 
-        echo ( new ApiResponse($instance->data->all() , $instance->count , 200 , "") )->toJson();
+        echo ( new ApiResponse($instance->data->all() , $instance->count , 200 , "" , ['StocktakingController@inHospitalItem']) )->toJson();
     }
 }
  

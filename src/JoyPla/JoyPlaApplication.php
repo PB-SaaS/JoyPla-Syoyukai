@@ -2,15 +2,26 @@
 
 namespace JoyPla;
 
+use ApiResponse;
+use App\Lib\ApiSpiral;
 use App\SpiralDb\HospitalUser;
 use App\SpiralDb\Tenant;
 use Auth;
 use framework\Application;
 use framework\Facades\Gate;
+use JoyPla\Application\LoggingObject\Spiralv2LogginObject;
 use JoyPla\Enterprise\CommonModels\GatePermissionModel;
+use Logger;
 
 class JoyPlaApplication extends Application
 {
+    const LOG_LEVEL = 3;
+    const EXPORT_TO_SPIRALV2 = true; // SPIRALv2オブジェクトで出力する
+    const SPIRAL_API_LOGGING_DB_TITLE = '73308'; // SPIRALv1v2オブジェクトで出力する場合に設定するDBタイトル
+    const JOYPLA_API_LOGGING_DB_TITLE = '73304'; // SPIRALv1v2オブジェクトで出力する場合に設定するDBタイトル
+    const LOGGING_APP_TITLE = '24083'; // SPIRALv1v2オブジェクトで出力する場合に設定するAPPタイトル
+    const SPIRALV2_API_KEY = 'dGFvQlZ9VUU4emE4TDMwbnp4T0hiUiRd'; // SPIRALv1v2オブジェクトで出力する場合に設定するAPPタイトル
+
     public function __construct()
     {
         $this->boot();
@@ -18,6 +29,10 @@ class JoyPlaApplication extends Application
 
     public function boot()
     {
+        /** logger 設定 */
+        ApiSpiral::$logger = new Logger( new Spiralv2LogginObject( $this::SPIRALV2_API_KEY , $this::LOGGING_APP_TITLE ,$this::SPIRAL_API_LOGGING_DB_TITLE  ) );
+        ApiResponse::$logger = new Logger( new Spiralv2LogginObject( $this::SPIRALV2_API_KEY , $this::LOGGING_APP_TITLE ,$this::JOYPLA_API_LOGGING_DB_TITLE  ) );
+
         $auth = new Auth(HospitalUser::class);
 
         $tenant = Tenant::where('tenantId', $auth->tenantId)->get();

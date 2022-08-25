@@ -14,7 +14,7 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\ReceivedReturn {
         {
             
             $viewModel = new ReturnShowViewModel($outputData);
-            echo (new ApiResponse( $viewModel->data, $viewModel->count , $viewModel->code, $viewModel->message))->toJson();
+            echo (new ApiResponse( $viewModel->data, $viewModel->count , $viewModel->code, $viewModel->message, ['ReturnShowPresenter']))->toJson();
         }
     }
     

@@ -5,11 +5,12 @@ use App\Lib\LoggingSpiralv2;
 class Logger 
 {
     // ログレベル
-    const LOG_LEVEL_ERROR = 0;
-    const LOG_LEVEL_WARN = 1;
-    const LOG_LEVEL_INFO = 2;
-    const LOG_LEVEL_DEBUG = 3;
+    public const LOG_LEVEL_ERROR = 0;
+    public const LOG_LEVEL_WARN = 1;
+    public const LOG_LEVEL_INFO = 2;
+    public const LOG_LEVEL_DEBUG = 3;
 
+    public const LOG_LEVEL = 0;
 
     private static $singleton;
     private $object;
@@ -18,6 +19,7 @@ class Logger
      * コンストラクタ
      */
     public function __construct(LoggingObject $object) {
+        $this->LOG_LEVEL = $object->logLevel; 
         $this->object = $object;
     }
 
@@ -26,7 +28,7 @@ class Logger
      * @param string $level ログレベル
      * @param string $msg メッセージ
      */
-    public function out( $data) {
+    public function out( array $data) {
         $this->object->insert($data);
     }
 
@@ -44,5 +46,5 @@ class Logger
 
 interface LoggingObject 
 {
-    public function insert($data);
+    public function insert(array $data);
 }

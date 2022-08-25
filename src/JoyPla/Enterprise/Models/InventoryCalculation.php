@@ -20,10 +20,10 @@ class InventoryCalculation
         HospitalId $hospitalId,
         DivisionId $divisionId,
         InHospitalItemId $inHospitalItemId,
-        int $orderedQuantity,
+        int $orderedQuantity = 0,
         int $pattern,
         Lot $lot,
-        int $calculationQuantity
+        int $calculationQuantity = 0
     )
     {
         $this->hospitalId = $hospitalId;

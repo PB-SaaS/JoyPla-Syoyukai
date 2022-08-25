@@ -12,7 +12,7 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\Order {
         public function output(OrderUnapprovedApprovalOutputData $outputData)
         {
             $viewModel = new OrderUnapprovedApprovalViewModel($outputData);
-            echo (new ApiResponse( $viewModel->data, $viewModel->count , $viewModel->code, $viewModel->message))->toJson();
+            echo (new ApiResponse( $viewModel->data, $viewModel->count , $viewModel->code, $viewModel->message, ['OrderUnapprovedApprovalPresenter']))->toJson();
         }
     }
         

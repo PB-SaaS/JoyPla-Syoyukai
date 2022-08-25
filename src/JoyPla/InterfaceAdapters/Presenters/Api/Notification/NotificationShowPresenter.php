@@ -12,7 +12,7 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\Notification {
         public function output(NotificationShowOutputData $outputData)
         {
             $viewModel = new NotificationShowViewModel($outputData);
-            echo (new ApiResponse( $viewModel->data, $viewModel->count , $viewModel->code, $viewModel->message))->toJson();
+            echo (new ApiResponse( $viewModel->data, $viewModel->count , $viewModel->code, $viewModel->message, ['NotificationShowPresenter']))->toJson();
         }
     }
         

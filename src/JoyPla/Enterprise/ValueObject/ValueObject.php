@@ -151,7 +151,7 @@ namespace JoyPla\Enterprise\Models {
     class UnitPrice {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private float $value = 0;
         
         public function __construct(float $value)
         {
@@ -214,11 +214,11 @@ namespace JoyPla\Enterprise\Models {
     class Price {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private float $value = 0;
         
-        public function __construct(float $value)
+        public function __construct( $value )
         {
-            $this->value = $value;
+            $this->value = (float)$value;
         }
     }
 

@@ -5,6 +5,7 @@ require_once "JoyPla/require.php";
 
 /** components */
 
+use App\Http\Middleware\VerifyCsrfTokenMiddleware;
 use App\SpiralDb\HospitalUser;
 use framework\Application;
 use framework\Http\Request;
@@ -85,60 +86,62 @@ use JoyPla\JoyPlaApplication;
 
 const VIEW_FILE_ROOT = "JoyPla/resources";
 
-Router::map('POST','/api/division/show',[DivisionController::class , 'show'])->service(new DivisionShowInteractor(new DivisionShowPresenter() , new DivisionRepository()) );
+Router::group(VerifyCsrfTokenMiddleware::class, function(){
+    Router::map('POST','/api/division/show',[DivisionController::class , 'show'])->service(new DivisionShowInteractor(new DivisionShowPresenter() , new DivisionRepository()) );
 
-Router::map('POST','/api/distributor/show',[DistributorController::class , 'show'])->service(new DistributorShowInteractor(new DistributorShowPresenter() , new DistributorRepository()) );
+    Router::map('POST','/api/distributor/show',[DistributorController::class , 'show'])->service(new DistributorShowInteractor(new DistributorShowPresenter() , new DistributorRepository()) );
 
-Router::map('POST','/api/inHospitalItem/show',[InHospitalItemController::class,'show'])->service(new InHospitalItemShowInteractor(new InHospitalItemShowPresenter() , new InHospitalItemRepository()) );
+    Router::map('POST','/api/inHospitalItem/show',[InHospitalItemController::class,'show'])->service(new InHospitalItemShowInteractor(new InHospitalItemShowPresenter() , new InHospitalItemRepository()) );
 
-Router::map('POST','/api/consumption/register',[ConsumptionController::class,'register'])->service(new ConsumptionRegisterInteractor(new ConsumptionRegisterPresenter() , new ConsumptionRepository() , new InventoryCalculationRepository() , new CardRepository()) );
+    Router::map('POST','/api/consumption/register',[ConsumptionController::class,'register'])->service(new ConsumptionRegisterInteractor(new ConsumptionRegisterPresenter() , new ConsumptionRepository() , new InventoryCalculationRepository() , new CardRepository()) );
 
-Router::map('POST','/api/consumption/show',[ConsumptionController::class,'show'])->service(new ConsumptionShowInteractor(new ConsumptionShowPresenter() , new ConsumptionRepository()) );
+    Router::map('POST','/api/consumption/show',[ConsumptionController::class,'show'])->service(new ConsumptionShowInteractor(new ConsumptionShowPresenter() , new ConsumptionRepository()) );
 
-Router::map('POST','/api/consumption/:consumptionId/delete',[ConsumptionController::class,'delete'])->service(new ConsumptionDeleteInteractor(new ConsumptionDeletePresenter() , new ConsumptionRepository(), new InventoryCalculationRepository()));
+    Router::map('POST','/api/consumption/:consumptionId/delete',[ConsumptionController::class,'delete'])->service(new ConsumptionDeleteInteractor(new ConsumptionDeletePresenter() , new ConsumptionRepository(), new InventoryCalculationRepository()));
 
-Router::map('POST','/api/order/register',[OrderController::class,'register'])->service(new OrderRegisterInteractor(new OrderRegisterPresenter() , new OrderRepository(), new HospitalRepository()) );
+    Router::map('POST','/api/order/register',[OrderController::class,'register'])->service(new OrderRegisterInteractor(new OrderRegisterPresenter() , new OrderRepository(), new HospitalRepository()) );
 
-Router::map('POST','/api/fixedQuantityOrder/register',[OrderController::class,'fixedQuantityOrderRegister'])->service(new OrderRegisterInteractor(new OrderRegisterPresenter() , new OrderRepository() , new HospitalRepository()) );
+    Router::map('POST','/api/fixedQuantityOrder/register',[OrderController::class,'fixedQuantityOrderRegister'])->service(new OrderRegisterInteractor(new OrderRegisterPresenter() , new OrderRepository() , new HospitalRepository()) );
 
-Router::map('POST','/api/order/unapproved/show',[OrderController::class,'unapprovedShow'])->service(new OrderShowInteractor(new OrderUnapprovedShowPresenter() , new OrderRepository()) );
+    Router::map('POST','/api/order/unapproved/show',[OrderController::class,'unapprovedShow'])->service(new OrderShowInteractor(new OrderUnapprovedShowPresenter() , new OrderRepository()) );
 
-Router::map('POST','/api/order/unapproved/:orderId/update',[OrderController::class,'unapprovedUpdate'])->service(new OrderUnapprovedUpdateInteractor(new OrderUnapprovedUpdatePresenter() , new OrderRepository()) );
+    Router::map('POST','/api/order/unapproved/:orderId/update',[OrderController::class,'unapprovedUpdate'])->service(new OrderUnapprovedUpdateInteractor(new OrderUnapprovedUpdatePresenter() , new OrderRepository()) );
+        
+    Router::map('POST', '/api/order/fixedQuantityOrder', [OrderController::class,'fixedQuantityOrder'])->service(new FixedQuantityOrderInteractor(new FixedQuantityOrderPresenter() , new StockRepository()) );
+
+    Router::map('POST','/api/order/unreceivedShow',[OrderController::class,'unreceivedShow'])->service(new OrderUnReceivedShowInteractor(new OrderUnReceivedShowPresenter() , new OrderRepository()) );
+
+    Router::map('POST','/api/order/unapproved/:orderId/delete',[OrderController::class,'unapprovedDelete'])->service(new OrderUnapprovedDeleteInteractor(new OrderUnapprovedDeletePresenter() , new OrderRepository()) );
+
+    Router::map('POST','/api/order/unapproved/:orderId/approval',[OrderController::class,'approval'])->service(new OrderUnapprovedApprovalInteractor(new OrderUnapprovedApprovalPresenter() , new OrderRepository() , new InventoryCalculationRepository()) );
+
+    Router::map('POST','/api/order/unapproved/:orderId/:orderItemId/delete',[OrderController::class,'unapprovedItemDelete'])->service(new OrderUnapprovedItemDeleteInteractor(new OrderUnapprovedItemDeletePresenter() , new OrderRepository()) );
+
+    Router::map('POST','/api/order/show',[OrderController::class,'show'])->service(new OrderShowInteractor(new OrderShowPresenter() , new OrderRepository()) );
+
+    Router::map('POST','/api/order/:orderId/revised',[OrderController::class,'revised'])->service(new OrderRevisedInteractor(new OrderRevisedPresenter() , new OrderRepository() , new InventoryCalculationRepository()) );
+
+    Router::map('POST','/api/received/order/list',[ReceivedController::class,'orderList'])->service(new OrderShowInteractor(new OrderShowPresenter() , new OrderRepository()) );
+
+    Router::map('POST','/api/:orderId/received/register',[ReceivedController::class,'orderRegister'])->service(new ReceivedRegisterByOrderSlipInteractor(new ReceivedRegisterByOrderSlipPresenter() , new OrderRepository() , new ReceivedRepository() , new DivisionRepository() , new InventoryCalculationRepository()) );
+
+    Router::map('POST','/api/:receivedId/return/register',[ReceivedController::class,'returnRegister'])->service(new ReceivedReturnRegisterInteractor( new ReceivedReturnRegisterPresenter() , new ReceivedRepository() , new ReturnRepository() , new HospitalRepository() , new DivisionRepository , new InventoryCalculationRepository() ));
+
+    Router::map('POST','/api/received/show',[ReceivedController::class,'show'])->service(new ReceivedShowInteractor(new ReceivedShowPresenter() , new ReceivedRepository()) );
+
+    Router::map('POST','/api/received/register',[ReceivedController::class,'register'])->service(new ReceivedRegisterInteractor(new ReceivedRegisterPresenter() , new OrderRepository() , new ReceivedRepository() , new DivisionRepository() , new InventoryCalculationRepository()) );
+
+    Router::map('POST','/api/return/show',[ReturnController::class,'show'])->service(new ReturnShowInteractor(new ReturnShowPresenter() , new ReturnRepository()) );
+
+    Router::map('POST','/api/barcode/search',[BarcodeController::class,'search'])->service(new BarcodeSearchInteractor( new BarcodeSearchPresenter() , new BarcodeRepository() ));
+
+    Router::map('POST','/api/barcode/order/search',[BarcodeController::class,'orderSearch'])->service(new BarcodeOrderSearchInteractor( new BarcodeOrderSearchPresenter() , new BarcodeRepository() ));
+
+    Router::map('POST','/api/stocktaking/inHospitalItem',[StocktakingController::class,'inHospitalItem']);
     
-Router::map('POST', '/api/order/fixedQuantityOrder', [OrderController::class,'fixedQuantityOrder'])->service(new FixedQuantityOrderInteractor(new FixedQuantityOrderPresenter() , new StockRepository()) );
+    Router::map('POST','/api/notification/show',[NotificationController::class,'show'])->service(new NotificationShowInteractor( new NotificationShowPresenter() , new NotificationRepository() ));
+});
 
-Router::map('POST','/api/order/unreceivedShow',[OrderController::class,'unreceivedShow'])->service(new OrderUnReceivedShowInteractor(new OrderUnReceivedShowPresenter() , new OrderRepository()) );
-
-Router::map('POST','/api/order/unapproved/:orderId/delete',[OrderController::class,'unapprovedDelete'])->service(new OrderUnapprovedDeleteInteractor(new OrderUnapprovedDeletePresenter() , new OrderRepository()) );
-
-Router::map('POST','/api/order/unapproved/:orderId/approval',[OrderController::class,'approval'])->service(new OrderUnapprovedApprovalInteractor(new OrderUnapprovedApprovalPresenter() , new OrderRepository() , new InventoryCalculationRepository()) );
-
-Router::map('POST','/api/order/unapproved/:orderId/:orderItemId/delete',[OrderController::class,'unapprovedItemDelete'])->service(new OrderUnapprovedItemDeleteInteractor(new OrderUnapprovedItemDeletePresenter() , new OrderRepository()) );
-
-Router::map('POST','/api/order/show',[OrderController::class,'show'])->service(new OrderShowInteractor(new OrderShowPresenter() , new OrderRepository()) );
-
-Router::map('POST','/api/order/:orderId/revised',[OrderController::class,'revised'])->service(new OrderRevisedInteractor(new OrderRevisedPresenter() , new OrderRepository() , new InventoryCalculationRepository()) );
-
-Router::map('POST','/api/received/order/list',[ReceivedController::class,'orderList'])->service(new OrderShowInteractor(new OrderShowPresenter() , new OrderRepository()) );
-
-Router::map('POST','/api/:orderId/received/register',[ReceivedController::class,'orderRegister'])->service(new ReceivedRegisterByOrderSlipInteractor(new ReceivedRegisterByOrderSlipPresenter() , new OrderRepository() , new ReceivedRepository() , new DivisionRepository() , new InventoryCalculationRepository()) );
-
-Router::map('POST','/api/:receivedId/return/register',[ReceivedController::class,'returnRegister'])->service(new ReceivedReturnRegisterInteractor( new ReceivedReturnRegisterPresenter() , new ReceivedRepository() , new ReturnRepository() , new HospitalRepository() , new DivisionRepository , new InventoryCalculationRepository() ));
-
-Router::map('POST','/api/received/show',[ReceivedController::class,'show'])->service(new ReceivedShowInteractor(new ReceivedShowPresenter() , new ReceivedRepository()) );
-
-Router::map('POST','/api/received/register',[ReceivedController::class,'register'])->service(new ReceivedRegisterInteractor(new ReceivedRegisterPresenter() , new OrderRepository() , new ReceivedRepository() , new DivisionRepository() , new InventoryCalculationRepository()) );
-
-Router::map('POST','/api/return/show',[ReturnController::class,'show'])->service(new ReturnShowInteractor(new ReturnShowPresenter() , new ReturnRepository()) );
-
-Router::map('POST','/api/barcode/search',[BarcodeController::class,'search'])->service(new BarcodeSearchInteractor( new BarcodeSearchPresenter() , new BarcodeRepository() ));
-
-Router::map('POST','/api/barcode/order/search',[BarcodeController::class,'orderSearch'])->service(new BarcodeOrderSearchInteractor( new BarcodeOrderSearchPresenter() , new BarcodeRepository() ));
-
-Router::map('POST','/api/stocktaking/inHospitalItem',[StocktakingController::class,'inHospitalItem']);
- 
-Router::map('POST','/api/notification/show',[NotificationController::class,'show'])->service(new NotificationShowInteractor( new NotificationShowPresenter() , new NotificationRepository() ));
- 
 try{ 
     $router = new Router();
     $app = new JoyPlaApplication();
@@ -147,5 +150,5 @@ try{
     $request->setUserModel(HospitalUser::class);
     $kernel->handle($request);
 } catch(Exception $e) { 
-    echo (new ApiResponse( [], 0 , $e->getCode(), $e->getMessage()))->toJson();
+    echo (new ApiResponse( [], 0 , $e->getCode(), $e->getMessage() , [ "path" , $request->getRequestUri() ]))->toJson();
 }

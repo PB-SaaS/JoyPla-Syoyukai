@@ -43,5 +43,5 @@ class Logger
 
 interface LoggingObject 
 {
-    public function insert($data);
+    public function insert(array $data);
 }

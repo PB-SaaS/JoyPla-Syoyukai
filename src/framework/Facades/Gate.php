@@ -45,6 +45,10 @@ class Gate {
     {
         foreach (self::$gates as $gate) {
             if ($gate->processable($pass)) {
+                if(self::$auth === null)
+                {
+                    return $gate->process(...$instances);
+                }
                 return $gate->process(self::$auth , ...$instances);
             }
         }

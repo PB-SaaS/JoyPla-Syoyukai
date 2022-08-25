@@ -12,7 +12,7 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\Consumption {
         public function output(ConsumptionDeleteOutputData $outputData)
         {
             $viewModel = new ConsumptionDeleteViewModel($outputData);
-            echo (new ApiResponse( $viewModel->data, $viewModel->count , $viewModel->code, $viewModel->message))->toJson();
+            echo (new ApiResponse( $viewModel->data, $viewModel->count , $viewModel->code, $viewModel->message , ['ConsumptionDeletePresenter']))->toJson();
         }
     }
     

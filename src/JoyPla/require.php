@@ -29,6 +29,7 @@ require_once('JoyPla/Application/Interactors/Web/Order/OrderIndexInteractor.php'
 require_once('JoyPla/Application/Interactors/Web/Received/OrderReceivedSlipIndexInteractor.php');
 require_once('JoyPla/Application/Interactors/Web/Received/ReceivedIndexInteractor.php');
 require_once('JoyPla/Application/Interactors/Web/Received/ReceivedLabelInteractor.php');
+require_once('JoyPla/Application/LoggingObject/Spiralv2LogginObject.php');
 require_once('JoyPla/Enterprise/Traits/ValueObjectTrait.php');
 require_once('JoyPla/Enterprise/Models/Consumption.php');
 require_once('JoyPla/Enterprise/Models/ConsumptionItem.php');

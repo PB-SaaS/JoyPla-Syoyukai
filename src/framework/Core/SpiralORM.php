@@ -49,6 +49,13 @@ class SpiralORM
         $this->plain = true;
     }
     
+    public static function title($title)
+    {
+        $instance = self::getInstance();
+        $instance::$spiral_db_name = $title;
+        return $instance;
+    }
+    
     private function getDataToInstance(array $data)
     {
         $result = [];
@@ -148,7 +155,14 @@ class SpiralORM
     public static function value($fieldTitle)
     {
         $instance = self::getInstance();
-        $instance->select_fields[] = $fieldTitle;
+        if(is_array($fieldTitle))
+        {
+            $instance->select_fields = $fieldTitle;
+        }
+        else 
+        {
+            $instance->select_fields[] = $fieldTitle;
+        }
         return $instance;
     }
 
@@ -356,7 +370,9 @@ class SpiralORM
     private function makeUpdateArray(array $update_data)
     {
         $update_array = [];
-        $update_array[] = ['name'=>static::UPDATED_AT , 'value'=>'now'];
+        if(static::UPDATED_AT != "" ){
+            $update_array[] = ['name'=>static::UPDATED_AT , 'value'=>'now'];
+        }
 
         foreach($update_data as $field => $val)
         {
@@ -370,8 +386,8 @@ class SpiralORM
     {
         $instance = self::getInstance();
         $instance->spiralDataBase->setDataBase($instance::$spiral_db_name);
-        $update_data = $instance->makeBulkUpdateArray($update_data);
-        $result = $instance->spiralDataBase->doBulkUpdate($key , $update_data['fillable'], $update_data['data']);
+        [$fileds , $update] = $instance->makeBulkUpdateArray($update_data);
+        $result = $instance->spiralDataBase->doBulkUpdate($key , $fileds , $update);
         if($result['code'] != 0)
         {
             throw new Exception(FactoryApiErrorCode::factory((int)$result['code'])->getMessage(),FactoryApiErrorCode::factory((int)$result['code'])->getCode());
@@ -379,6 +395,36 @@ class SpiralORM
         return new Collection($result);
     }
 
+    private function makeBulkUpdateArray(array $update_data)
+    {
+        $create_array = [];
+        $fieldnames = [];
+        foreach($update_data[0] as $index => $data)
+        {
+            $fieldnames[] = $index;
+        }
+
+        if(static::UPDATED_AT != "" && in_array(static::UPDATED_AT , $fieldnames) === false)
+        {
+            $fieldnames[] = static::UPDATED_AT;
+        }
+
+        foreach($update_data as $index => $data)
+        {
+            $insert = [];
+            if(! $data[static::UPDATED_AT])
+            {
+                $data[static::UPDATED_AT] = 'now';
+            }
+            foreach($fieldnames as $field) {
+                $insert[] = ( isset($data[$field]) )? (string)$data[$field] : "";
+            }
+            $create_array[$index] = $insert;
+        }
+
+        return [ $fieldnames , $create_array ];
+    }
+    
     public static function delete()
     {
         $instance = self::getInstance();
@@ -391,38 +437,6 @@ class SpiralORM
         return new Collection($result);
     }
 
-    private function makeBulkUpdateArray(array $update_data)
-    {
-        $update_array = [];
-        $update_fillable = [];
-
-        foreach($update_data as $index => $data)
-        {
-            $datas = [];
-            foreach($this::$fillable as $column)
-            {
-                if(static::UPDATED_AT == $column){
-                    if(! in_array($column, $update_fillable)) {
-                        $update_fillable[] = (string)$column;
-                    }
-                    $datas[] = 'now' ;
-                }
-                else if(array_key_exists($column, $data))
-                {
-                    if(! in_array($column, $update_fillable)) {
-                        $update_fillable[] = (string)$column;
-                    }
-                    $datas[] = (string)$data[$column];
-                }
-            }
-            $update_array[] = $datas;
-        }
-        $result = [
-            'data' => $update_array,
-            'fillable' => $update_fillable,
-        ];
-        return $result;
-    }
 
     public static function create(array $create_data)
     {
@@ -441,12 +455,15 @@ class SpiralORM
     private function makeCreateArray(array $create_data)
     {
         $create_array = [];
-        $create_array[] = ['name'=>static::CREATED_AT , 'value'=>'now'];
-
+        if(static::CREATED_AT != "" ){
+            $create_array[] = ['name'=>static::CREATED_AT , 'value'=>'now'];
+        }
+        /*
         foreach($this::$attributes as $field => $val)
         {
             $create_array[] = ['name' => $field , 'value' => (string)$val];
         }
+        */
 
         foreach($create_data as $field => $val)
         {
@@ -461,17 +478,22 @@ class SpiralORM
     {
         $instance = self::getInstance();
         $instance->spiralDataBase->setDataBase($instance::$spiral_db_name);
-        $upsert_data = $instance->makeUpsertArray($upsert_data);
-        $fields = $instance::$fillable;
+        [$fields , $upsert] = $instance->makeUpsertArray($upsert_data);
+        //$fields = $instance::$fillable;
+        /*
         $fkey = array_search($instance::CREATED_AT,$instance::$fillable);
         if($fkey !== false)
         {
             unset($fields[$fkey]);
             $fields = array_values($fields);
         }
-        $result = $instance->spiralDataBase->doBulkUpsert($key , $fields, $upsert_data);
+        */
+        $result = $instance->spiralDataBase->doBulkUpsert($key , $fields, $upsert);
         if($result['code'] != 0)
         {
+            var_dump($instance::$spiral_db_name);
+            var_dump($fields);
+            var_dump($upsert);
             throw new Exception(FactoryApiErrorCode::factory((int)$result['code'])->getMessage(),FactoryApiErrorCode::factory((int)$result['code'])->getCode());
         }
         return new Collection($result);
@@ -479,6 +501,32 @@ class SpiralORM
 
     private function makeUpsertArray(array $upsert_data)
     {
+        $create_array = [];
+        $fieldnames = [];
+        foreach($upsert_data[0] as $index => $data)
+        {
+            $fieldnames[] = $index;
+        }
+
+        if(static::UPDATED_AT != "" && in_array(static::UPDATED_AT , $fieldnames) === false)
+        {
+            $fieldnames[] = static::UPDATED_AT;
+        }
+
+        foreach($upsert_data as $index => $data)
+        {
+            $insert = [];
+            if(! $data[static::UPDATED_AT])
+            {
+                $data[static::UPDATED_AT] = 'now';
+            }
+            foreach($fieldnames as $field) {
+                $insert[] = ( isset($data[$field]) )? (string)$data[$field] : "";
+            }
+            $create_array[$index] = $insert;
+        }
+        return [ $fieldnames , $create_array ];
+        /*
         $create_array = [];
         foreach($upsert_data as $index => $data)
         {
@@ -499,6 +547,7 @@ class SpiralORM
             }
         }
         return $create_array;
+        */
     }
 
     
@@ -506,8 +555,8 @@ class SpiralORM
     {
         $instance = self::getInstance();
         $instance->spiralDataBase->setDataBase($instance::$spiral_db_name);
-        $insert_data = $instance->makeInsertArray($insert_data);
-        $result = $instance->spiralDataBase->doBulkInsert($instance::$fillable,$insert_data);
+        [$fields , $insert] = $instance->makeInsertArray($insert_data);
+        $result = $instance->spiralDataBase->doBulkInsert($fields,$insert);
         if($result['code'] != 0)
         {
             throw new Exception(FactoryApiErrorCode::factory((int)$result['code'])->getMessage(),FactoryApiErrorCode::factory((int)$result['code'])->getCode());
@@ -518,6 +567,30 @@ class SpiralORM
     private function makeInsertArray(array $insert_data)
     {
         $create_array = [];
+        $fieldnames = [];
+        foreach($insert_data[0] as $index => $data)
+        {
+            $fieldnames[] = $index;
+        }
+
+        if(static::CREATED_AT != "" && in_array(static::CREATED_AT , $fieldnames) === false)
+        {
+            $fieldnames[] = static::CREATED_AT;
+        }
+
+        foreach($insert_data as $index => $data)
+        {
+            $insert = [];
+            if(! $data[static::CREATED_AT])
+            {
+                $data[static::CREATED_AT] = 'now';
+            }
+            foreach($fieldnames as $field) {
+                $insert[] = ( isset($data[$field]) )? (string)$data[$field] : "";
+            }
+            $create_array[$index] = $insert;
+        }
+        /*
         foreach($insert_data as $index => $data)
         {
             $create_array[$index] = [];
@@ -530,7 +603,8 @@ class SpiralORM
                 $create_array[$index][] = (isset($data[$column]))? (string)$data[$column] : ((isset($this::$attributes[$column]))? (string)$this::$attributes[$column]: (string)$def) ;
             }
         }
-        return $create_array;
+        */
+        return [ $fieldnames , $create_array ];
     }
 
 
