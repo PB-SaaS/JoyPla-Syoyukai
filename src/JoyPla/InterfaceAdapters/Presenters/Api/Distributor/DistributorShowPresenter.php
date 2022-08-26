@@ -12,7 +12,7 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\Distributor {
         public function output(DistributorShowOutputData $outputData)
         {
             $viewModel = new DistributorViewModel($outputData);
-            echo (new ApiResponse( $viewModel->data, $viewModel->count , $viewModel->code, $viewModel->message))->toJson();
+            echo (new ApiResponse( $viewModel->data, $viewModel->count , $viewModel->code, $viewModel->message, ['DistributorShowPresenter']))->toJson();
         }
     }
         
