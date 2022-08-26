@@ -3,7 +3,7 @@
 namespace JoyPla\InterfaceAdapters\Presenters\Api\Distributor {
 
     use ApiResponse;
-    use framework\Http\View;
+    use framework\Http\View; 
     use JoyPla\Application\OutputPorts\Api\Distributor\DistributorShowOutputData;
     use JoyPla\Application\OutputPorts\Api\Distributor\DistributorShowOutputPortInterface;
 

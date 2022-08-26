@@ -2,7 +2,7 @@
 
 namespace JoyPla\InterfaceAdapters\Presenters\Api\Division {
 
-    use ApiResponse;
+    use ApiResponse; 
     use framework\Http\View;
     use JoyPla\Application\OutputPorts\Api\Division\DivisionShowOutputData;
     use JoyPla\Application\OutputPorts\Api\Division\DivisionShowOutputPortInterface;

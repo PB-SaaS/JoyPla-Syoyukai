@@ -8,7 +8,7 @@
         <h1 class="text-2xl mb-2">お知らせ</h1>
         <hr>
         <div class="w-full flex border-b-2 border-gray-200 py-4">
-          <div class="flex-auto w-1/2">
+          <div class="w-1/2">
             <v-select
                 name="perPage"
                 :options="perPageOptions"

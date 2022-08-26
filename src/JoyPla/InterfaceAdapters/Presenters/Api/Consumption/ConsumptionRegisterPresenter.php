@@ -35,3 +35,4 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\Consumption {
         }
     }
 }
+ 
