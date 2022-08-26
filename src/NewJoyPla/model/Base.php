@@ -171,7 +171,7 @@ class BillingView extends Model
 
     //デフォルト値
     public static $attributes = [];
-    
+
     public static $select = [
         "category" => [
             1 => "医療材料",
@@ -180,7 +180,7 @@ class BillingView extends Model
             4 => "日用品",
             99 => "その他"
         ]
-    ];    
+    ];
 }
 
 class BillingHistory extends Model
@@ -1261,7 +1261,7 @@ class StockView extends Model
         "oldPrice",
         "minPrice",
         "labelId",
-        "barcode",  
+        "barcode",
         "unitPrice",
     ];
 
@@ -1495,6 +1495,7 @@ class OrderedItemView extends Model
         "lotManagement",
         "category",
         "adjustment",
+        "distributorMCode"
     ];
 
     //デフォルト値
