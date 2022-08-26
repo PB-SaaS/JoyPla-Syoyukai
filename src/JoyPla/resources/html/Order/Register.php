@@ -14,6 +14,7 @@
             label="発注部署" 
             :rules="{ required : true }"
             title="発注部署指定" 
+            :disabled="values.divisionId != '' && fields.length > 0"
             :is-only-my-division="<?php var_export(gate('register_of_unordered_slips')->isOnlyMyDivision()) ?>"
             />
           </div>
@@ -415,6 +416,7 @@ var JoyPlaApp = Vue.createApp({
       }
 
       return {
+        values,
         openModal,
         selectInHospitalItems ,
         addItemByBarcode,

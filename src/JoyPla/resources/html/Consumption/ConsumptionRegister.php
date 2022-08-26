@@ -22,7 +22,8 @@
             name="divisionId" 
             label="消費部署" 
             :rules="{ required : true }"
-            title="消費部署指定" 
+            title="消費部署指定"
+            :disabled="values.divisionId != '' && fields.length > 0"
             :is-only-my-division="<?php var_export(gate('register_of_consumption_slips')->isOnlyMyDivision()) ?>"
             />
           </div>
@@ -482,6 +483,7 @@ var JoyPlaApp = Vue.createApp({
       }
 
       return {
+        values,
         addItemByBarcode,
         selectInHospitalItems,
         openModal,

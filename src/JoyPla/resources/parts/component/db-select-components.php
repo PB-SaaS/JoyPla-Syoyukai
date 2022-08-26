@@ -27,7 +27,7 @@ const vSelectDivision = {
             type: Boolean,
             required: false,
             default: false
-        }
+        },
     },
     watch: {},
     data() {
@@ -69,7 +69,7 @@ const vSelectDivision = {
         }
     },
     template: `
-  <v-select :options="options" :name="name" :rules="rules" :title="title" :label="label"></v-select>
+  <v-select :options="options" :name="name" :rules="rules" :title="title" :label="label" :disabled="disabled"></v-select>
     `
 };
 
