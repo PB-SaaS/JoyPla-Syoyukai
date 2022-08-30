@@ -422,7 +422,7 @@ SiValidator::defineRule('email',function( $value ) {
     return false;
 });
 
-SiValidator::language('ja');
+SiValidator::language('ja'); 
 SiValidator::errorMessages(
     [
         'ja' => [

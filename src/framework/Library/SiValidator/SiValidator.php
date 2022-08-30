@@ -180,7 +180,7 @@ class SiValidator {
     }
 }
 
-class SiValidateResult {
+class SiValidateResult { 
 
     private bool $result = true;
     private string $message = '';

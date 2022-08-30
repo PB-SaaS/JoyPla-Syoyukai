@@ -33,4 +33,6 @@ require_once('framework/Core/SpiralORM.php');
 require_once('framework/Core/SpiralSendMail.php');
 require_once('framework/Core/SpiralTable.php');
 require_once('framework/Core/Util.php');
+require_once('framework/Library/SiValidator/SiValidator.php');
+require_once('framework/Library/SiValidator/SiValidatorDefineRule.php');
 require_once('framework/Application.php');
