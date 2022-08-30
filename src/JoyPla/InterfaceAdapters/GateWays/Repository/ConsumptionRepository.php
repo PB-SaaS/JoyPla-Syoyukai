@@ -56,7 +56,12 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface{
             $division_find_key = array_search($item->divisionId, collect_column($division, 'divisionId'));
             $inHospitalItem_find_key = array_search($item->inHospitalItemId, collect_column($inHospitalItem, 'inHospitalItemId'));
 
-            $unitprice = $inHospitalItem[$inHospitalItem_find_key]->unitPrice;
+            $unitprice = 0;
+            if(is_numeric($inHospitalItem[$inHospitalItem_find_key]->unitPrice))
+            {
+                $unitprice = (float)$inHospitalItem[$inHospitalItem_find_key]->unitPrice;
+            }
+            
             if($consumptionUnitPriceUseFlag->billingUnitPrice !== '1')
             {
                 if($inHospitalItem[$inHospitalItem_find_key]->quantity != 0 && $inHospitalItem[$inHospitalItem_find_key]->price != 0)

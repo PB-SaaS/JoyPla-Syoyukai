@@ -27,6 +27,11 @@ foreach(scanDirctory('../src/framework/Core') as $file){
     $outputtext .= "require_once('$file');".PHP_EOL; 
 }
 
+foreach(scanDirctory('../src/framework/Library') as $file){
+    $file = str_replace("../src/", "", $file);
+    $outputtext .= "require_once('$file');".PHP_EOL; 
+}
+
 
 $outputtext .= "require_once('framework/Application.php');".PHP_EOL;
 

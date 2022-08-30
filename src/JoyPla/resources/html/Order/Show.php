@@ -109,6 +109,10 @@
                           </span>
                         </p>
                         <p>
+                          <span class="text-blue-700 text-lg mr-4" v-if="orderItem.dueDate != ''">納期：{{ orderItem.dueDate }}</span>
+                          <span class="text-orange-700 text-lg mr-4" v-else>納期：未定</span>
+                        </p>
+                        <p>
                           <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(orderItem.orderPrice) }}</span>
                           <span class="text-sm text-gray-900">( &yen; {{ numberFormat(orderItem.price) }} / {{ orderItem.quantity.itemUnit }} )</span>
                         </p>

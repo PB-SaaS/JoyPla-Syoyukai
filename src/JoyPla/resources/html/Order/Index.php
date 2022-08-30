@@ -80,6 +80,10 @@
                         <p class="text-md text-gray-500">{{ item.value.item.itemStandard }}</p>
                         <p class="text-md text-gray-500">{{ item.value.item.itemJANCode }}</p>
                         <div>
+                            <span class="text-blue-700 text-lg mr-4" v-if="item.value.dueDate != ''">納期：{{ item.value.dueDate }}</span>
+                            <span class="text-orange-700 text-lg mr-4" v-else>納期：未定</span>
+                        </div>
+                        <div>
                           <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(item.value.orderPrice) }}</span>
                           <span class="text-sm text-gray-900">( &yen; {{ numberFormat(item.value.price) }} / {{ item.value.quantity.itemUnit }} )</span>
                           <blowing :message="item.value.priceNotice" title="金額管理備考" v-if="item.value.priceNotice != ''"></blowing>

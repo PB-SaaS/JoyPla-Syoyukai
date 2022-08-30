@@ -73,7 +73,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
                 $historyOrders = $this->orderRepository->getUnapprovedOrder($hospitalId , $orderItems);
             }
             $ids = [];
-            $result = [];
+            $orders = [];
             foreach($orderItems as $i)
             {
                 $exist = false;
@@ -86,13 +86,13 @@ namespace JoyPla\Application\Interactors\Api\Order {
                         )
                         { 
                             $exist = true;
-                            $result[] = $h->addOrderItem($i);
+                            $orders[] = $h->addOrderItem($i);
                             break;
                         }
                     }
                 }
                 if(!$exist){
-                    foreach($result as $key => $r)
+                    foreach($orders as $key => $r)
                     {
                         if( 
                             $r->equalOrderSlip($i->getDivision() , $i->getDistributor()) 
@@ -100,7 +100,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
                         )
                         { 
                             $exist = true;
-                            $result[ $key ] = $r->addOrderItem($i);
+                            $orders[ $key ] = $r->addOrderItem($i);
                             break;
                         }
                     }
@@ -108,7 +108,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
                 if($exist){ continue; }
                 $id = OrderId::generate();
                 //登録時には病院名は必要ないので、いったんhogeでいい
-                $result[] = new Order( 
+                $orders[] = new Order( 
                     $id , 
                     ( new DateYearMonthDayHourMinutesSecond("") ), 
                     ( new DateYearMonthDayHourMinutesSecond("") ), 
@@ -126,30 +126,13 @@ namespace JoyPla\Application\Interactors\Api\Order {
             }
 
 
-            $this->orderRepository->saveToArray( $hospitalId , $result);
+            $this->orderRepository->saveToArray( $hospitalId , $orders);
             
-            $unapprovedOrderMailViewModel = [];
-            
-            $unapprovedOrderDataModel = [
-                'hospitalName' => $hospital->getHospitalName()->value() ,
-                'ordererUserName'=> $inputData->user->name
-            ];
-
-            foreach($result as $order){
-                $orderToArray = $order->toArray();
-                $unapprovedOrderMailViewModel[] = [
-                    'orderNumber' => $orderToArray['orderId'],
-                    'divisionName' => $orderToArray['division']['divisionName'],
-                    'distributorName' => $orderToArray['distributor']['distributorName'],
-                    'totalAmount' => $orderToArray['totalAmount'],
-                ];
-            }
-            
-            $this->orderRepository->sendUnapprovedOrderMail($unapprovedOrderDataModel , $unapprovedOrderMailViewModel, $inputData->user);
+            $this->orderRepository->sendUnapprovedOrderMail($orders, $inputData->user);
 
             $ids = [];
 
-            foreach($result as $order)
+            foreach($orders as $order)
             {
                 $ids[] = $order->getOrderId()->value();
             }

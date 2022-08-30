@@ -18,6 +18,7 @@ class OrderItem
     private Price $price;
     private OrderQuantity $orderQuantity;
     private ReceivedQuantity $receivedQuantity;
+    private DateYearMonthDay $dueDate;
     private bool $lotManagement;
     private string $distributorManagerCode;
     private string $itemImage;
@@ -34,6 +35,7 @@ class OrderItem
         Price $price,
         OrderQuantity $orderQuantity,
         ReceivedQuantity $receivedQuantity,
+        DateYearMonthDay $dueDate,
         string $distributorManagerCode,
         bool $lotManagement,
         $itemImage,
@@ -52,6 +54,7 @@ class OrderItem
         $this->price = $price;
         $this->orderQuantity = $orderQuantity;
         $this->receivedQuantity = $receivedQuantity;
+        $this->dueDate = $dueDate;
         $this->distributorManagerCode = $distributorManagerCode;
         $this->lotManagement = $lotManagement;
         $this->itemImage = ($itemImage)? $itemImage : "";
@@ -73,6 +76,7 @@ class OrderItem
             (new Price($input->price) ),
             (new OrderQuantity((int)$input->orderQuantity)) ,
             (new ReceivedQuantity((int)$input->receivingNum)) ,
+            (new DateYearMonthDay($input->dueDate)) ,
             $input->distributorMCode,
             (int) $input->lotManagement ,
             $input->inItemImage,
@@ -153,6 +157,7 @@ class OrderItem
             $this->price,
             $this->orderQuantity,
             $this->receivedQuantity,
+            $this->dueDate,
             $this->distributorManagerCode,
             $this->lotManagement,
             $this->itemImage,
@@ -212,6 +217,7 @@ class OrderItem
             $this->price,
             $this->orderQuantity,
             $this->receivedQuantity->add( $receivedQuantity ),
+            $this->dueDate,
             $this->distributorManagerCode,
             $this->lotManagement,
             $this->itemImage,
@@ -234,6 +240,7 @@ class OrderItem
             $this->price,
             $orderQuantity,
             $this->receivedQuantity,
+            $this->dueDate,
             $this->distributorManagerCode,
             $this->lotManagement,
             $this->itemImage,
@@ -285,6 +292,7 @@ class OrderItem
             'orderItemReceivedStatus' => $this->getOrderItemReceivedStatus()->value(),
             'orderItemReceivedStatusToString' => $this->getOrderItemReceivedStatus()->toString(),
             'orderPrice' => $this->price(),
+            'dueDate' => $this->dueDate->value(),
             'distributorManagerCode' => $this->distributorManagerCode,
             'lotManagement' => $this->lotManagement,
             'itemImage' => $this->itemImage,

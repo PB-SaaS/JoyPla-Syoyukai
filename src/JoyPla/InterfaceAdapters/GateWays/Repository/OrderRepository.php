@@ -16,6 +16,7 @@ use JoyPla\Enterprise\Models\Order;
 use JoyPla\Enterprise\Models\OrderId;
 use JoyPla\Enterprise\Models\OrderItem;
 use JoyPla\Enterprise\Models\DateYearMonth;
+use JoyPla\Enterprise\Models\DateYearMonthDay;
 use JoyPla\Enterprise\Models\Distributor;
 use JoyPla\Enterprise\Models\Division;
 use JoyPla\Enterprise\Models\HospitalId;
@@ -69,6 +70,7 @@ class OrderRepository implements OrderRepositoryInterface{
                 (new Price($inHospitalItem[$inHospitalItem_find_key]->price) ),
                 (new OrderQuantity((int)$item->orderUnitQuantity)),
                 (new ReceivedQuantity((int)$item->receivingNum)),
+                (new DateYearMonthDay('')),
                 $inHospitalItem[$inHospitalItem_find_key]->distributorMCode,
                 (int) $inHospitalItem[$inHospitalItem_find_key]->lotManagement,
                 (int) $inHospitalItem[$inHospitalItem_find_key]->inItemImage,
@@ -428,13 +430,29 @@ class OrderRepository implements OrderRepositoryInterface{
         return $orders;
     }
 
-    public function sendUnapprovedOrderMail(array $unapprovedOrderDataModel , array $unapprovedOrderItemDataModel , Auth $user)
+    public function sendUnapprovedOrderMail(array $orders , Auth $user)
     {
+        $orders = array_map(function(Order $order){
+            return $order;
+        },$orders);
+        
+        $unapprovedOrderMailViewModel = [];
+            
+        foreach($orders as $order){
+            $orderToArray = $order->toArray();
+            $unapprovedOrderMailViewModel[] = [
+                'orderNumber' => $orderToArray['orderId'],
+                'divisionName' => $orderToArray['division']['divisionName'],
+                'distributorName' => $orderToArray['distributor']['distributorName'],
+                'totalAmount' => number_format_jp($orderToArray['totalAmount']),
+            ];
+        }
+        
         $mail_body = view('mail/Order/RegistUnapprovedOrderMail', [
             'name' => '%val:usr:name%',
-            'hospitalName' => $unapprovedOrderDataModel['hospitalName'],
-            'ordererUserName' => $unapprovedOrderDataModel['ordererUserName'],
-            'history' => $unapprovedOrderItemDataModel,
+            'hospitalName' => $orders[0]->getHospital()->getHospitalName()->value(),
+            'ordererUserName' =>  $user->name,
+            'history' => $unapprovedOrderMailViewModel,
             'url' => LOGIN_URL,
         ] , false)->render();
         $hospitalUser = HospitalUser::getNewInstance();
@@ -556,7 +574,7 @@ interface OrderRepositoryInterface
 
     public function delete( HospitalId $hospitalId , OrderId $orderId);
 
-    public function sendUnapprovedOrderMail(array $unapprovedOrderDataModel , array $unapprovedOrderItemDataModel , Auth $user);
+    public function sendUnapprovedOrderMail(array $orders , Auth $user);
     
     public function getOrderByOrderItemId( HospitalId $hospitalId , array $orderItemIds );
     
