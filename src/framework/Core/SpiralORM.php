@@ -491,9 +491,6 @@ class SpiralORM
         $result = $instance->spiralDataBase->doBulkUpsert($key , $fields, $upsert);
         if($result['code'] != 0)
         {
-            var_dump($instance::$spiral_db_name);
-            var_dump($fields);
-            var_dump($upsert);
             throw new Exception(FactoryApiErrorCode::factory((int)$result['code'])->getMessage(),FactoryApiErrorCode::factory((int)$result['code'])->getCode());
         }
         return new Collection($result);

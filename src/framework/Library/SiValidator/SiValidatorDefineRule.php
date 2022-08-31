@@ -439,7 +439,7 @@ SiValidator::defineRule('unique:',function( $value ) {
     $format = "/^[a-zA-Z0-9_+-]+(.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/";
     if($value == "" || is_null($value))
     {
-        return true;
+        return true; 
     }
     if(
         preg_match($format, $value) && filter_var($value, FILTER_VALIDATE_EMAIL)

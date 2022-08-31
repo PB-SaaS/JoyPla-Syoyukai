@@ -153,7 +153,7 @@ class SiValidator {
     }
 
     private static function errorMessage($validateRule , $field)
-    {
+    { 
         $ruleName = self::getRuleName($validateRule);
         $param = self::param($validateRule);
         $message = self::getErrorMessage($ruleName);

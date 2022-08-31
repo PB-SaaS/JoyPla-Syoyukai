@@ -7,8 +7,6 @@ use Auth;
 use Csrf;
 use framework\Http\Controller;
 use framework\Http\View;
-use framework\Library\SiValidator;
-use framework\Library\SpiralDbRule;
 use framework\Routing\Router;
 
 class AgreeFormController extends Controller

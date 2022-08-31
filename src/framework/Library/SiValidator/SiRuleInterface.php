@@ -28,7 +28,7 @@ class SpiralDbRule extends SpiralORM implements SiRule{
         $result = $this->where($this->uniqueKey , $value )->paginate(1);
         if($result->count == 0)
         {
-            return true;
+            return true; 
         }
 
         return false;
