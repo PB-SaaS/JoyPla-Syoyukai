@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use View;
@@ -18,32 +19,29 @@ class ItemSlipController extends Controller
     public function __construct()
     {
     }
-    
+
     public function index()
     {
         global $SPIRAL;
         try {
-            
             $user_info = new UserInfo($SPIRAL);
-            
+
             $api_url = '%url/card:page_177122%';
-            
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
 
             $cardId = $SPIRAL->getCardId();
-            if($cardId == null)
-            {
-                throw new Exception("ページが存在しません",404);
+            if ($cardId == null) {
+                throw new Exception("ページが存在しません", 404);
             }
 
             $tenantKind = '';
             $tenantId = $user_info->getTenantId();
-            if ($tenantId)
-            {
-                $tenant = Tenant::where('tenantId',$tenantId)->get();
+            if ($tenantId) {
+                $tenant = Tenant::where('tenantId', $tenantId)->get();
                 $tenant = $tenant->data->all()[0];
                 $tenantKind = $tenant->tenantKind;
             }
@@ -53,17 +51,15 @@ class ItemSlipController extends Controller
                 'userInfo' => $user_info,
                 'csrf_token' => Csrf::generate(16),
                 'tenantKind' => $tenantKind
-            ] , false);
-
-        } catch ( Exception $ex ) {
+            ], false);
+        } catch (Exception $ex) {
             $title = 'JoyPla エラー';
             $header = $this->view('NewJoyPla/src/Header', [], false);
-            
+
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message' => $ex->getMessage(),
-            ] , false);
-
+            ], false);
         } finally {
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
@@ -72,20 +68,19 @@ class ItemSlipController extends Controller
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
-            ],false);
+            ], false);
         }
     }
-    
-    
+
+
     public function itemChangeForm(): View
     {
         global $SPIRAL;
         try {
-            
             $user_info = new UserInfo($SPIRAL);
-            
+
             $api_url = '%url/card:page_177122%';
-            
+
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
             <li><a href="%url/rel:mpg:top%&path=product">商品メニュー</a></li>
@@ -122,20 +117,18 @@ EOM;
                         'minPrice' => '%val:usr:minPrice%',
                         'lotManagement' => '%val:usr:lotManagement%',
                     ]
-                ] , false);
-            
-        } catch ( Exception $ex ) {
+                ], false);
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message'=> $ex->getMessage(),
-                ] , false);
+                ], false);
         } finally {
-            
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
-            
+
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 商品情報変更',
@@ -143,19 +136,18 @@ EOM;
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
-            ],false);
+            ], false);
         }
     }
-    
+
     public function priceRegist(): View
     {
         global $SPIRAL;
         try {
-            
             $user_info = new UserInfo($SPIRAL);
-            
+
             $api_url = '%url/card:page_177122%';
-            
+
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
             <li><a href="%url/rel:mpg:top%&path=product">商品メニュー</a></li>
@@ -163,7 +155,7 @@ EOM;
             <li><a href="%url/card:page_177122%">商品情報詳細</a></li>
             <li><span>金額情報登録</span></li>
 EOM;
-            
+
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
                 'breadcrumb' => $breadcrumb,
                 'title' => '金額情報登録',
@@ -180,25 +172,23 @@ EOM;
                         "quantity" => "%val:usr:quantity%",
                         "quantityUnit" => "%val:usr:quantityUnit%",
                         "itemUnit" => "%val:usr:itemUnit%",
-                        "SMPFORM" => "%smpform:310_priceReg%",
-                        "hospitalId" => "%val:@usr:hospitalId%", 
+                        "SMPFORM" => "%smpform:340_priceReg%",
+                        "hospitalId" => "%val:@usr:hospitalId%",
                         "user_login_id" => "%val:@usr:loginId%",
                         "user_auth_key" => "%val:@usr:authKey%",
                     ]
-                ] , false);
-            
-        } catch ( Exception $ex ) {
+                ], false);
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message'=> $ex->getMessage(),
-                ] , false);
+                ], false);
         } finally {
-            
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
-            
+
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 金額情報登録',
@@ -206,20 +196,19 @@ EOM;
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
-            ],false);
+            ], false);
         }
     }
-    
-    
+
+
     public function inHospitalItemRegist(): View
     {
         global $SPIRAL;
         try {
-            
             $user_info = new UserInfo($SPIRAL);
-            
+
             $api_url = '%url/card:page_177122%';
-            
+
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
             <li><a href="%url/rel:mpg:top%&path=product">商品メニュー</a></li>
@@ -227,7 +216,7 @@ EOM;
             <li><a href="%url/card:page_177122%">商品情報詳細</a></li>
             <li><span>院内商品情報登録</span></li>
 EOM;
-            
+
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
                 'breadcrumb' => $breadcrumb,
                 'title' => '院内商品情報登録',
@@ -251,20 +240,18 @@ EOM;
                         "user_login_id" => "%val:usr:loginId%",
                         "user_auth_key" => "%val:usr:authKey%",
                     ]
-                ] , false);
-            
-        } catch ( Exception $ex ) {
+                ], false);
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message'=> $ex->getMessage(),
-                ] , false);
+                ], false);
         } finally {
-            
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
-            
+
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 院内商品情報登録',
@@ -272,7 +259,7 @@ EOM;
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
-            ],false);
+            ], false);
         }
     }
 }
@@ -285,20 +272,13 @@ $ItemSlipController = new ItemSlipController();
 $action = $SPIRAL->getParam('Action');
 
 {
-    if($action === 'itemChangeForm')
-    {
+    if ($action === 'itemChangeForm') {
         echo $ItemSlipController->itemChangeForm()->render();
-    }
-    else if($action === 'priceRegist')
-    {
+    } elseif ($action === 'priceRegist') {
         echo $ItemSlipController->priceRegist()->render();
-    } 
-    else if($action === 'inHospitalItemRegist')
-    {
+    } elseif ($action === 'inHospitalItemRegist') {
         echo $ItemSlipController->inHospitalItemRegist()->render();
-    } 
-    else
-    {
+    } else {
         echo $ItemSlipController->index()->render();
     }
 }
