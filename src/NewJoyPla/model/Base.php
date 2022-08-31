@@ -1848,7 +1848,8 @@ class Price extends Model
         "itemUnit",
         "notice",
         "notUsedFlag",
-        "requestId"
+        "requestId",
+        "unitPrice"
     ];
 
     //デフォルト値
@@ -2174,7 +2175,8 @@ class PriceUpsertTrDB extends Model
         "itemJANCode",
         "requestFlg",
         "requestId",
-        "unitPrice"
+        "unitPrice",
+        "distributorMCode"
     ];
 
     //デフォルト値
@@ -2215,6 +2217,7 @@ class InHospitalTrDb extends Model
         "unitPrice",
         "measuringInst",
         "notice",
+        "distributorMCode"
     ];
 
     //デフォルト値
@@ -2255,6 +2258,7 @@ class PriceInfoView extends Model
         "itemJANCode",
         "makerName",
         "tenantId",
+        "distributorMCode"
     ];
 
     //デフォルト値
@@ -2365,6 +2369,7 @@ class AllNewItemInsert extends Model
         "notice",
         "tenantId",
         "smallCategory",
+        "distributorMCode"
     ];
 
     //デフォルト値

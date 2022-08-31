@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use Controller;
@@ -19,20 +20,20 @@ class PriceSlipController extends Controller
     public function __construct()
     {
     }
-    
+
     public function index()
     {
         global $SPIRAL;
         try {
             $session = $SPIRAL->getSession();
-            $session->put('PriceSlip',$_SERVER['REQUEST_URI']);
-            
+            $session->put('PriceSlip', $_SERVER['REQUEST_URI']);
+
             $switcher = $SPIRAL->getParam('Switcher');
             $base_url = "%url/card:page_178889%";
-            
-            $switch_1 = ($switcher == "")? "uk-active" : "";
-            $switch_2 = ($switcher == "InHospitalItem")? "uk-active" : "";
-            
+
+            $switch_1 = ($switcher == "") ? "uk-active" : "";
+            $switch_2 = ($switcher == "InHospitalItem") ? "uk-active" : "";
+
             $back_key = $SPIRAL->getParam('BACK');
             $back_url = "%url/rel:mpgt:PriceCont%&table_cache=true";
             $back_text = "金額管理";
@@ -40,46 +41,43 @@ class PriceSlipController extends Controller
                 'n3' => 'uk-active uk-open',
                 'n3_4' => 'uk-active',
             ];
-            
-            if($back_key == "ItemSlip" && $session->containsKey($back_key))
-            {
+
+            if ($back_key == "ItemSlip" && $session->containsKey($back_key)) {
                 $sidemenu = [
                     'n3' => 'uk-active uk-open',
                     'n3_1' => 'uk-active',
                 ];
                 $back_text = "商品情報詳細";
                 $back_url = $session->get($back_key);
-            }
-            else if($back_key === "")
-            {
+            } elseif ($back_key === "") {
                 $back_key = "PriceSlip";
             }
-            
-            
-            
+
+
+
             $base_url = $base_url ."&BACK=".$back_key;
             $content = $this->view('NewJoyPlaTenantAdmin/view/PriceList/Slip', [
                 //'error' => $error,
                 'back_key' => $back_key,
                 'switch_1' => $switch_1,
-                'switch_2' => $switch_2,	
-                //'back_key' => $back_key, 
+                'switch_2' => $switch_2,
+                //'back_key' => $back_key,
                 'form_url' => '%url/card:page_178889%&BACK='.$back_key,
                 'base_url' => $base_url
-                ] , false)->render();
-        } catch ( Exception $ex ) {
+                ], false)->render();
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPlaTenantAdmin/view/Template/Error', [
                 'code' => $ex->getCode(),
                 'message' => $ex->getMessage(),
-            ] , false)->render();
+            ], false)->render();
         } finally {
-            $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [] , false)->render();
-            $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [] , false)->render();
-            $sidemenu = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/SideMenu', $sidemenu , false)->render();
-            $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [] , false)->render();
+            $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [], false)->render();
+            $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [], false)->render();
+            $sidemenu = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/SideMenu', $sidemenu, false)->render();
+            $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [], false)->render();
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            
+
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => $back_text,
@@ -90,11 +88,11 @@ class PriceSlipController extends Controller
                 'header' => $header,
                 'style' => $style,
                 'before_script' => $script,
-            ],false);
+            ], false);
         }
     }
-    
-    
+
+
     public function update()
     {
         global $SPIRAL;
@@ -104,12 +102,12 @@ class PriceSlipController extends Controller
             $error = [];
             $step_check = 0;
             $api_url = "%url/card:page_178572%";
-            
+
             $back_url = "";
             $back_text = "";
             $sidemenu = [];
             $base_url = "%url/card:page_178889%";
-            
+
             $session = $SPIRAL->getSession();
             $back_key = $SPIRAL->getParam('BACK');
             $back_url = "%url/card:page_178572%";
@@ -118,64 +116,55 @@ class PriceSlipController extends Controller
                 'n3' => 'uk-active uk-open',
                 'n3_4' => 'uk-active',
             ];
-            
-            if($back_key == "ItemSlip" && $session->containsKey($back_key))
-            {
+
+            if ($back_key == "ItemSlip" && $session->containsKey($back_key)) {
                 $sidemenu = [
                     'n3' => 'uk-active uk-open',
                     'n3_1' => 'uk-active',
                 ];
             }
-            
+
             $base_url = $base_url ."&BACK=".$back_key;
-            
+
             $card_id = $SPIRAL->getCardId();
             $price_info_view = PriceInfoView::find($card_id)->get();
             $price_info_view = $price_info_view->data->get(0);
-            
-            if($step == "" || $step == "1")
-            {
+
+            if ($step == "" || $step == "1") {
                 $step_check = 1;
             }
-            if($step == "2")
-            {
+            if ($step == "2") {
                 $hospitalId = $price_info_view->hospitalId;
                 $distributorId = $SPIRAL->getParam('distributorId');
-                if($distributorId == "")
-                {
+                if ($distributorId == "") {
                     $step_check = 1;
                     $error['distributorId'] = "入力必須です";
-                }
-                else
-                {
-                    $count = Distributor::where('hospitalId',$hospitalId)->where('distributorId',$distributorId)->count();
-                    if($count != 1)
-                    {
+                } else {
+                    $count = Distributor::where('hospitalId', $hospitalId)->where('distributorId', $distributorId)->count();
+                    if ($count != 1) {
                         $step_check = 1;
                         $error['distributorId'] = "値を確認してください";
-                    }
-                    else 
-                    {
+                    } else {
                         $step_check = 2;
                     }
                 }
             }
-            if($step_check == 1){
-                $distributor = Distributor::where('hospitalId',$price_info_view->hospitalId)->get();
+            if ($step_check == 1) {
+                $distributor = Distributor::where('hospitalId', $price_info_view->hospitalId)->get();
                 $content = $this->view('NewJoyPlaTenantAdmin/view/PriceUpdate/Step1', [
                     'price_info_view' => $price_info_view,
                     'distributor' => $distributor->data->all(),
                     'current_distributorId' => $SPIRAL->getParam('distributorId'),
                     'error' => $error,
                     'api_url' => $api_url
-                    ] , false)->render();
+                    ], false)->render();
             }
-            
-            if($step_check == 2){
+
+            if ($step_check == 2) {
                 $distributorId = $SPIRAL->getParam('distributorId');
-                $distributor = Distributor::where('distributorId',$distributorId)->where('hospitalId',$hospitalId)->get();
+                $distributor = Distributor::where('distributorId', $distributorId)->where('hospitalId', $hospitalId)->get();
                 $distributor = $distributor->data->get(0);
-                
+
                 $content = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/IframeContent', [
                     'title' => '金額情報変更',
                     'width' => '100%',
@@ -200,23 +189,24 @@ class PriceSlipController extends Controller
                             'notice' => '%val:usr:notice%',
                             'priceId' => '%val:usr:priceId%',
                             'itemsAuthKey' => '%val:usr:authKey%',
+                            'unitPrice' => '%val:usr:unitPrice%',
+                            'distributorMCode' => '%val:usr:distributorMCode%'
                         ]
-                    ] , false)->render();
+                    ], false)->render();
             }
-            
-        } catch ( Exception $ex ) {
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPlaTenantAdmin/view/Template/Error', [
                 'code' => $ex->getCode(),
                 'message' => $ex->getMessage(),
-            ] , false)->render();
+            ], false)->render();
         } finally {
-            $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [] , false)->render();
-            $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [] , false)->render();
-            $sidemenu = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/SideMenu', $sidemenu , false)->render();
-            $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [] , false)->render();
+            $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [], false)->render();
+            $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [], false)->render();
+            $sidemenu = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/SideMenu', $sidemenu, false)->render();
+            $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [], false)->render();
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            
+
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
                 'back_url' => $back_url,
                 'back_text' => $back_text,
@@ -227,17 +217,17 @@ class PriceSlipController extends Controller
                 'header' => $header,
                 'style' => $style,
                 'before_script' => $script,
-            ],false);
+            ], false);
         }
     }
-    
+
     public function registInHospitalItem()
     {
         global $SPIRAL;
         try {
             $auth = new Auth();
             $id = $SPIRAL->getCardId();
-            
+
             $priceinfo = PriceInfoView::find($id)->get();
             $priceinfo = $priceinfo->data->get(0);
             $priceId = $priceinfo->priceId;
@@ -258,25 +248,23 @@ class PriceSlipController extends Controller
                         'itemName' => '%val:usr:itemName%',
                         'itemCode' => '%val:usr:itemCode%',
                         'itemStandard' => '%val:usr:itemStandard%',
-                        'itemJANCode' => '%val:usr:itemJANCode%', 
+                        'itemJANCode' => '%val:usr:itemJANCode%',
                         'priceId' => $priceId,
                     ]
-                ] , false)->render();
-            
-        } catch ( Exception $ex ) {
+                ], false)->render();
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message'=> $ex->getMessage(),
-                ] , false)->render();
+                ], false)->render();
         } finally {
-            
-            $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [] , false)->render();
-            $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [] , false)->render();
+            $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [], false)->render();
+            $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [], false)->render();
             $sidemenu = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/SideMenu', [
                 'n3' => 'uk-active uk-open',
                 'n3_4' => 'uk-active',
-                ] , false)->render();
-            $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [] , false)->render();
+                ], false)->render();
+            $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [], false)->render();
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
@@ -289,10 +277,9 @@ class PriceSlipController extends Controller
                 'header' => $header,
                 'style' => $style,
                 'before_script' => $script,
-            ],false);
+            ], false);
         }
     }
-    
 }
 
 /***
@@ -303,16 +290,11 @@ $PriceSlipController = new PriceSlipController();
 $action = $SPIRAL->getParam('Action');
 
 {
-    if($action === "update")
-    {
+    if ($action === "update") {
         echo $PriceSlipController->update()->render();
-    }
-    else if($action === "registInHospitalItem")
-    {
+    } elseif ($action === "registInHospitalItem") {
         echo $PriceSlipController->registInHospitalItem()->render();
-    }
-    else
-    {
+    } else {
         echo $PriceSlipController->index()->render();
     }
 }
