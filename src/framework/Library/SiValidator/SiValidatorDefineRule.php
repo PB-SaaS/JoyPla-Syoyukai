@@ -294,7 +294,20 @@ SiValidator::defineRule('between:min,max',function( $value , array $param ) {
     {
         return true;
     }
-    if((int)$value >= (int)$param['min'] && (int)$value <= (int)$param['max'])
+    $num = 0;
+    if(is_int($value))
+    {
+        $num = (int)$value;
+    }
+    if(is_string($value))
+    {
+        $num = strlen($value);
+    }
+    if(is_numeric($value))
+    {
+        $num = (float)$value;
+    }
+    if($num >= (int)$param['min'] && $num <= (int)$param['max'])
     {
         return true;
     }
@@ -422,6 +435,21 @@ SiValidator::defineRule('email',function( $value ) {
     return false;
 });
 
+SiValidator::defineRule('unique:',function( $value ) { 
+    $format = "/^[a-zA-Z0-9_+-]+(.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/";
+    if($value == "" || is_null($value))
+    {
+        return true;
+    }
+    if(
+        preg_match($format, $value) && filter_var($value, FILTER_VALIDATE_EMAIL)
+    )
+    {
+        return true;
+    }
+    return false;
+});
+
 SiValidator::language('ja'); 
 SiValidator::errorMessages(
     [
@@ -445,7 +473,7 @@ SiValidator::errorMessages(
             'alpha_num' => "{field}はアルファベットと数字で入力してください",
             'different:value' => "{field}は{value}ではない値を入力してください",
             'digits:num' => "{field}は{num}桁ではありません",
-            'digits_between:min,max' => "{field}は{min}以上{max}以下でなければいけません",
+            'digits_between:min,max' => "{field}は{min}桁以上{max}桁以下でなければいけません",
             'email'  => "{field}は有効なメールアドレスではありません",
         ]
     ]

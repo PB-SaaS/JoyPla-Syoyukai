@@ -1,17 +1,6 @@
 <?php
-
-function view(string $template, array $param = array() , bool $filter = true): framework\Http\View
-{
-    return new framework\Http\View($template , $param , $filter);
-}
-
-function html($string = '') {
-    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
-}
-
 // ビューの生成
 namespace framework\Http;
-
 use stdClass;
 class View {
 
@@ -137,4 +126,3 @@ class View {
         return $html;
     }
 }
-

@@ -56,11 +56,19 @@ class SiValidator {
         return true;
     }
     
-    private static function validate($value , $field , array $rules)
+    public static function validate($value , $field , array $rules)
     {
+        $result = new SiValidateResult(true , '' , $value);
         foreach($rules as $rule)
         {
-            if(  ! is_string($rule) && is_callable($rule))
+            if( $rule instanceof SiRule )
+            {
+                self::errorMessages($rule->message());
+                $result = $rule->processable($value);
+                $message = (! $result )? self::getErrorMessage($rule->name()) : "";
+                $message = self::messageReplace($message , $field);
+                $result = new SiValidateResult($result , $message , $value);
+            } else if(  ! is_string($rule) && is_callable($rule))
             {
                 $message = $rule($value, $field );
                 $result = new SiValidateResult((is_string($message) && $message === '') , $message , $value);
@@ -137,7 +145,7 @@ class SiValidator {
 
     public static function errorMessages( array $errorMessages )
     {
-        self::$errorMessages = array_merge(self::$errorMessages , $errorMessages);
+        self::$errorMessages = array_merge_recursive(self::$errorMessages , $errorMessages);
     }
 
     public static function startsWith($haystack, $needle) {
@@ -148,7 +156,17 @@ class SiValidator {
     {
         $ruleName = self::getRuleName($validateRule);
         $param = self::param($validateRule);
-        $message = self::$errorMessages[self::$language][ $ruleName ];
+        $message = self::getErrorMessage($ruleName);
+        return self::messageReplace($message , $field , $param);
+    }
+
+    private static function getErrorMessage($ruleName)
+    {
+       return self::$errorMessages[self::$language][ $ruleName ];
+    }
+
+    private static function messageReplace($message , $field , $param = [])
+    {
         $message = str_replace('{field}', $field , $message);
 
         if(isset($param['other']) && isset(self::$labels[$param['other']] ))
