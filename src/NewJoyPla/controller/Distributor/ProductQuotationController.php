@@ -87,7 +87,7 @@ class ProductQuotationController extends Controller
                 'title' => '見積依頼一覧',
                 'table' => '<div class="uk-margin-auto uk-width-4-5@m">%sf:usr:search92%</div>',
                 'csrf_token' => Csrf::generate(16),
-                'submenulink' => "%url/rel:mpg:top%&page=page7",
+                'submenulink' => "%url/rel:mpg:top%&page=page1",
                 'submenu' => '商品・見積',
                 ] , false);
 
@@ -125,7 +125,7 @@ class ProductQuotationController extends Controller
                     'title' => '金額情報一覧',
                     'print' => true,
                     'export' => true,
-                    'submenulink' => "%url/rel:mpg:top%&page=page7",
+                    'submenulink' => "%url/rel:mpg:top%&page=page1",
                     'submenu' => '商品・見積',
                     'table' => '%sf:usr:search58%',
                     'userInfo' => $user_info,

@@ -34,7 +34,7 @@ class ApiResponse {
     {
         global $SPIRAL;
         if($this::$logger){
-            if($this->code != 0)
+            if($this->code != 0 && $this->code != 1 )
             {
                 $body = [
                     'execTime' => Logger::getTime(),

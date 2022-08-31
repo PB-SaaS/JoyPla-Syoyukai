@@ -20,7 +20,7 @@
 		    <div class="uk-container uk-container-expand">
 		    	<ul class="uk-breadcrumb no_print">
 				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
-                	<li><a href="%url/rel:mpg:top%&page=page7">商品・見積</a></li>
+                	<li><a href="%url/rel:mpg:top%&page=page1">商品・見積</a></li>
 				    <li><a href="<?php echo $link ?>&table_cache=true">院内商品マスタ</a></li>
 				    <li><span>院内商品情報</span></li>
 				</ul>

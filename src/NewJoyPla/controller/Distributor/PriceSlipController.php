@@ -29,7 +29,7 @@ class PriceSlipController extends Controller
             if($user_info->isDistributorUser()){
                 $breadcrumb = <<<EOM
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
-                <li><a href="%url/rel:mpg:top%&page=page7">商品・見積</a></li>
+                <li><a href="%url/rel:mpg:top%&page=page1">商品・見積</a></li>
                 <li><a href="%url/rel:mpgt:ProductQuotation%&Action=PriceList&table_cache=true">金額情報一覧</a></li>
                 <li><span>金額情報変更</span></li>
 EOM;
