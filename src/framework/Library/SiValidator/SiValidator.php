@@ -58,18 +58,21 @@ class SiValidator {
     
     private static function validate($value , $field , array $rules)
     {
-        $result = [];
         foreach($rules as $rule)
         {
             if(  ! is_string($rule) && is_callable($rule))
             {
                 $message = $rule($value, $field );
-                $result[] = new SiValidateResult((is_string($message) && $message === '') , $message , $value);
-                continue;
+                $result = new SiValidateResult((is_string($message) && $message === '') , $message , $value);
+            } else {
+                //return ($rule !== '')? self::errorMessage( $rule , $field) : "";
+                $message = (! self::isValid($value , $rule))? self::errorMessage( $rule , $field) : "";
+                $result = new SiValidateResult(($rule === '') , $message , $value);
             }
-            //return ($rule !== '')? self::errorMessage( $rule , $field) : "";
-            $message = (! self::isValid($value , $rule))? self::errorMessage( $rule , $field) : "";
-            $result[] = new SiValidateResult(($rule === '') , $message , $value);
+            if(!$result->isValid())
+            {
+                return $result;
+            }
         }
         return $result;
     }
@@ -208,3 +211,20 @@ class SiValidateResult {
         return $this->result;
     }
 }
+
+$validated = SiValidator::make(
+    [
+        'mail' => 'ito.shun@pi-pe.co.jp',
+        'number' => 100,
+    ],
+    [
+        'mail' => [ 'required' , 'email' ],
+         'number' => [ 'digits_between:1,99' ], 
+    ],
+    [
+        'mail' => 'メールアドレス',
+        'number' => '年齢',
+    ]
+ );
+
+ var_dump($validated );
