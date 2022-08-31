@@ -211,20 +211,3 @@ class SiValidateResult {
         return $this->result;
     }
 }
-
-$validated = SiValidator::make(
-    [
-        'mail' => 'ito.shun@pi-pe.co.jp',
-        'number' => 100,
-    ],
-    [
-        'mail' => [ 'required' , 'email' ],
-         'number' => [ 'digits_between:1,99' ], 
-    ],
-    [
-        'mail' => 'メールアドレス',
-        'number' => '年齢',
-    ]
- );
-
- var_dump($validated );
