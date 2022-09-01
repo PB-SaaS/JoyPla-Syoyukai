@@ -124,6 +124,26 @@ class SpiralORM
         return $instance;
     }
 
+    public static function whereIn(string $field , array $values )
+    {
+        $instance = self::getInstance();
+        foreach($values as $val){
+            $instance->spiralDataBase->addSearchCondition($field , $val , '=');
+            $instance->search[] = [$field , $val , '=' , 'or'];
+        }
+        return $instance;
+    }
+
+    public static function whereNotIn(string $field , array $values )
+    {
+        $instance = self::getInstance();
+        foreach($values as $val){
+            $instance->spiralDataBase->addSearchCondition($field , $val , '!=');
+            $instance->search[] = [$field , $val , '!=' , 'or'];
+        }
+        return $instance;
+    }
+
     public static function where(string $field , string $val , string $op = '=')
     {
         $instance = self::getInstance();

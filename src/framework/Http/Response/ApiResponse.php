@@ -10,7 +10,7 @@ class ApiResponse {
     public $header = array();
     public $result = false;
 
-	public static Logger $logger ;
+	public static ?Logger $logger = null ;
 
 
     public function __construct( $data = null ,  $count = 0 ,  $code = 0 , $message = null , $header = array())

@@ -20,7 +20,7 @@ use Logger;
 	protected $request;
 	protected $apiCommunicator;
 
-	public static Logger $logger ;
+	public static ?Logger $logger = null ;
 
 	/**
 	 *  Public requestAPI 

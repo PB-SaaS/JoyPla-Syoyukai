@@ -114,8 +114,8 @@ class OrderMRController extends Controller
         $total_amount = 0;
     
         OrderedItemView::where('hospitalId',$SPIRAL->getParam('hospitalId'))->where('orderStatus','1','!=');
-        if ($startMonth) { OrderedItemView::where('registrationTime', $startMonth, '>='); }
-        if ($endMonth) { OrderedItemView::where('registrationTime', (date('Y-m-d', strtotime($endMonth . '+1 day'))), '<='); }
+        if ($startMonth) { OrderedItemView::where('orderTime', $startMonth, '>='); }
+        if ($endMonth) { OrderedItemView::where('orderTime', (date('Y-m-d', strtotime($endMonth . '+1 day'))), '<='); }
         if ($divisionId) { OrderedItemView::where('divisionId', $divisionId); }
         if ($distributorId) { OrderedItemView::where('distributorId',$distributorId); }
         $orderDB = OrderedItemView::get();

@@ -1495,7 +1495,8 @@ class OrderedItemView extends Model
         "lotManagement",
         "category",
         "adjustment",
-        "distributorMCode"
+        "distributorMCode",
+        "orderTime"
     ];
 
     //デフォルト値
