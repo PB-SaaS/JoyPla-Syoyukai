@@ -78,7 +78,12 @@ class ItemSlipController extends Controller
         global $SPIRAL;
         try {
             $user_info = new UserInfo($SPIRAL);
-
+            
+            if(!$user_info->isAdmin())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+            
             $api_url = '%url/card:page_177122%';
 
             $breadcrumb = <<<EOM

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use View;
@@ -34,11 +35,11 @@ use Exception;
 class UsedSlipController extends Controller
 {
     public $in_hospital_items = [];
-    
+
     public function __construct()
     {
     }
-    
+
     public function index()
     {
         global $SPIRAL;
@@ -46,40 +47,34 @@ class UsedSlipController extends Controller
         $title = '';
 
         try {
-            
             $user_info = new UserInfo($SPIRAL);
 
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
 
             $cardId = $SPIRAL->getCardId();
-            if($cardId == null)
-            {   
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            if ($cardId == null) {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
             }
 
-            $used_slip_history = UsedSlipHistoy::where('id',$cardId)->get();
+            $used_slip_history = UsedSlipHistoy::where('id', $cardId)->get();
             $used_slip_history = $used_slip_history->data->all()[0];
 
-            $borrowing = Borrowing::where('usedSlipId',$used_slip_history->usedSlipId)->get();
+            $borrowing = Borrowing::where('usedSlipId', $used_slip_history->usedSlipId)->get();
             $borrowing = $borrowing->data->all();
 
             $instance = InHospitalItem::getInstance();
-            foreach($borrowing as $data)
-            {
-                $instance::orWhere('inHospitalItemId',$data->inHospitalItemId);
+            foreach ($borrowing as $data) {
+                $instance::orWhere('inHospitalItemId', $data->inHospitalItemId);
             }
 
             $in_Hospital_item = $instance::get();
 
-            foreach($borrowing as $borrowing_key => $data)
-            {
-                foreach($in_Hospital_item->data->all() as $item)
-                {
-                    if($item->inHospitalItemId === $data->inHospitalItemId)
-                    {
+            foreach ($borrowing as $borrowing_key => $data) {
+                foreach ($in_Hospital_item->data->all() as $item) {
+                    if ($item->inHospitalItemId === $data->inHospitalItemId) {
                         $borrowing[$borrowing_key]->makerName = $item->makerName;
                         $borrowing[$borrowing_key]->itemName = $item->itemName;
                         $borrowing[$borrowing_key]->itemCode = $item->itemCode;
@@ -92,22 +87,18 @@ class UsedSlipController extends Controller
 
             $api_url = "%url/card:page_176719%";
             $base = "%url/rel:mpgt:Borrowing%";
-            
-            if($user_info->isDistributorUser())
-            {
+
+            if ($user_info->isDistributorUser()) {
                 $base = "%url/rel:mpgt:BorrowingForD%";
             }
-    
+
 
             $association = [];
-            if($used_slip_history->usedSlipStatus == '2')
-            {
+            if ($used_slip_history->usedSlipStatus == '2') {
                 $link = $base."&Action=approvedUsedSlip";
-            
-                if($user_info->isUser())
-                {
-                    if (preg_match("/Action=approvedUsedSlipDivision/", $_SERVER['HTTP_REFERER'])) 
-                    {
+
+                if ($user_info->isUser()) {
+                    if (preg_match("/Action=approvedUsedSlipDivision/", $_SERVER['HTTP_REFERER'])) {
                         $box = parse_url($_SERVER['HTTP_REFERER']);
                         $link = $box['path']."?".$box['query'];
                     }
@@ -115,19 +106,14 @@ class UsedSlipController extends Controller
                 $link_name = "貸出伝票一覧";
                 $title = 'JoyPla 貸出伝票一覧';
 
-                if( $user_info->isHospitalUser())
-                {
-                    $association = AssociationTR::where('usedSlipId',$used_slip_history->usedSlipId)->get();
+                if ($user_info->isHospitalUser()) {
+                    $association = AssociationTR::where('usedSlipId', $used_slip_history->usedSlipId)->get();
                     $association = $association->data->all();
                 }
-            }
-            else 
-            {
+            } else {
                 $link = $base."&Action=unapprovedUsedSlip";
-                if($user_info->isUser())
-                {
-                    if (preg_match("/Action=unapprovedUsedSlipDivision/", $_SERVER['HTTP_REFERER'])) 
-                    {
+                if ($user_info->isUser()) {
+                    if (preg_match("/Action=unapprovedUsedSlipDivision/", $_SERVER['HTTP_REFERER'])) {
                         $box = parse_url($_SERVER['HTTP_REFERER']);
                         $link = $box['path']."?".$box['query'];
                     }
@@ -146,17 +132,15 @@ class UsedSlipController extends Controller
                 'link_name' => $link_name,
                 'association' => $association,
                 'current_name' => '貸出伝票',
-            ] , false);
-
-        } catch ( Exception $ex ) {
+            ], false);
+        } catch (Exception $ex) {
             $title = 'JoyPla エラー';
             $header = $this->view('NewJoyPla/src/Header', [], false);
-            
+
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message' => $ex->getMessage(),
-            ] , false);
-
+            ], false);
         } finally {
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
@@ -165,67 +149,61 @@ class UsedSlipController extends Controller
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
-            ],false);
+            ], false);
         }
     }
-    
-    
+
+
     public function usedSlipApprovalApi()
     {
         global $SPIRAL;
-        try{
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
-            
+        try {
+            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
+
             $record_id = (int)$SPIRAL->getCardId();
 
             $user_info = new UserInfo($SPIRAL);
-            
-            if($user_info->isDistributorUser())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(203)->getMessage(),FactoryApiErrorCode::factory(203)->getCode());
+
+            if ($user_info->isDistributorUser()) {
+                throw new Exception(FactoryApiErrorCode::factory(203)->getMessage(), FactoryApiErrorCode::factory(203)->getCode());
             }
 
-            $used_slip_history = UsedSlipHistoy::find($record_id)->where('hospitalId',$user_info->getHospitalId())->get();
+            $used_slip_history = UsedSlipHistoy::find($record_id)->where('hospitalId', $user_info->getHospitalId())->get();
 
-            if($used_slip_history->count == 0 )
-            {
-                throw new Exception(FactoryApiErrorCode::factory(203)->getMessage(),FactoryApiErrorCode::factory(203)->getCode());
+            if ($used_slip_history->count == 0) {
+                throw new Exception(FactoryApiErrorCode::factory(203)->getMessage(), FactoryApiErrorCode::factory(203)->getCode());
             }
 
             $used_slip_history = $used_slip_history->data->get(0);
 
-            if($used_slip_history->usedSlipStatus != 1 )
-            {
-                throw new Exception(FactoryApiErrorCode::factory(900)->getMessage(),FactoryApiErrorCode::factory(900)->getCode());
+            if ($used_slip_history->usedSlipStatus != 1) {
+                throw new Exception(FactoryApiErrorCode::factory(900)->getMessage(), FactoryApiErrorCode::factory(900)->getCode());
             }
 
-            $borrowing = Borrowing::where('usedSlipId' , $used_slip_history->usedSlipId)->get();
+            $borrowing = Borrowing::where('usedSlipId', $used_slip_history->usedSlipId)->get();
             $borrowing = $borrowing->data->all();
 
             $all_create_data = $this->usedReportApi($borrowing);
 
             $used_slip_create_data = ['ids' => []];
-            foreach($borrowing as $item)
-            {
-                if(! isset($used_slip_create_data['ids'][$item->divisionId . $item->distributorId . $item->usedDate]) || 
-                ! $used_slip_create_data['ids'][$item->divisionId . $item->distributorId . $item->usedDate])
-                {
-                    $used_slip_create_data['ids'][$item->divisionId . $item->distributorId . $item->usedDate] = [ 
+            foreach ($borrowing as $item) {
+                if (! isset($used_slip_create_data['ids'][$item->divisionId . $item->distributorId . $item->usedDate]) ||
+                ! $used_slip_create_data['ids'][$item->divisionId . $item->distributorId . $item->usedDate]) {
+                    $used_slip_create_data['ids'][$item->divisionId . $item->distributorId . $item->usedDate] = [
                         'usedSlipId' => $item->usedSlipId,
                     ];
                 }
             }
-            
-            $result = $this->association($used_slip_create_data['ids'],$all_create_data['ids']);
-            
-            
-            $hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+
+            $result = $this->association($used_slip_create_data['ids'], $all_create_data['ids']);
+
+
+            $hospital = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
             $hospital = $hospital->data->get(0);
-            
+
             /** メールを作成 */
-            foreach($used_slip_create_data['ids'] as $history)
-            {  
+            foreach ($used_slip_create_data['ids'] as $history) {
                 $mail_body = $this->view('NewJoyPla/view/Mail/UsingRegistration', [
                     'name' => '%val:usr:name%',
                     'hospital_name' => $hospital->hospitalName,
@@ -233,15 +211,15 @@ class UsedSlipController extends Controller
                     'used_date' => $used_slip_history->usedTime,
                     'used_slip_number' => $used_slip_history->usedSlipId,
                     'used_item_num' => $used_slip_history->itemsNumber,
-                    'total_price' => "￥".number_format((float)$used_slip_history->totalAmount,2),
+                    'total_price' => "￥".number_format((float)$used_slip_history->totalAmount, 2),
                     'login_url' => OROSHI_LOGIN_URL,
-                ] , false)->render();
-                
+                ], false)->render();
+
                 $select_name = $this->makeId($used_slip_history->distributorId);
-                
+
                 $test = DistributorAffiliationView::selectName($select_name)->rule(
                     ['name'=>'distributorId','label'=>'name_'.$used_slip_history->distributorId,'value1'=>$used_slip_history->distributorId,'condition'=>'matches']
-                    )
+                )
                     ->rule(
                         ['name'=>'invitingAgree','label'=>'invitingAgree','value1'=>'t','condition'=>'is_boolean']
                     )->filterCreate();
@@ -249,53 +227,47 @@ class UsedSlipController extends Controller
                 $test = DistributorAffiliationView::selectRule($select_name)
                     ->body($mail_body)
                     ->subject("[JoyPla] 貸出品の使用登録がありました")
-                    ->from(FROM_ADDRESS,FROM_NAME)
+                    ->from(FROM_ADDRESS, FROM_NAME)
                     ->send();
             }
 
-            $result = UsedSlipHistoy::find($record_id)->where('hospitalId',$user_info->getHospitalId())->update([
+            $result = UsedSlipHistoy::find($record_id)->where('hospitalId', $user_info->getHospitalId())->update([
                 'usedSlipStatus' => 2
                 ]);
 
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['insert']);
             $content = $content->toJson();
-         
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+        } catch (Exception $ex) {
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['insert']);
             $content = $content->toJson();
-        }finally {
+        } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
-            ],false);
+            ], false);
         }
     }
-    
+
     private function usedReportApi(array $borrowing_data)
     {
         global $SPIRAL;
         $all_create_data = [ 'ids' => [] , 'borrowingData' => []];
 
         $user_info = new UserInfo($SPIRAL);
-        
-        $hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+
+        $hospital = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
         $hospital = $hospital->data->get(0);
-        if($this->in_hospital_items == null)
-        {
+        if ($this->in_hospital_items == null) {
             $in_hospital_items_instance = InHospitalItem::getInstance();
-            foreach($borrowing_data as $data)
-            {
-                $in_hospital_items_instance = $in_hospital_items_instance::orWhere('inHospitalItemId',$data->inHospitalItemId);
+            foreach ($borrowing_data as $data) {
+                $in_hospital_items_instance = $in_hospital_items_instance::orWhere('inHospitalItemId', $data->inHospitalItemId);
             }
             $this->in_hospital_items = $in_hospital_items_instance::get();
         }
         $used_report = [];
-        foreach($borrowing_data as $borrowing_key => $data)
-        {
-            $used_report[$borrowing_key] = new StdClass;
-            foreach($this->in_hospital_items->data->all() as $key => $val)
-            {
-                if($val->inHospitalItemId == $data->inHospitalItemId)
-                {
+        foreach ($borrowing_data as $borrowing_key => $data) {
+            $used_report[$borrowing_key] = new StdClass();
+            foreach ($this->in_hospital_items->data->all() as $key => $val) {
+                if ($val->inHospitalItemId == $data->inHospitalItemId) {
                     $used_report[$borrowing_key]->inHospitalItemId = $val->inHospitalItemId;
                     $used_report[$borrowing_key]->hospitalId = $val->hospitalId;
                     $used_report[$borrowing_key]->distributorId = $val->distributorId;
@@ -326,14 +298,12 @@ class UsedSlipController extends Controller
         $all_create_data['borrowingData'] = $used_report;
 
         $history_ids = [];
-        foreach($used_report as $item)
-        {
-            if(! isset($history_ids[$item->divisionId . $item->distributorId . $item->usedDate]) || ! $history_ids[$item->divisionId . $item->distributorId . $item->usedDate])
-            {
+        foreach ($used_report as $item) {
+            if (! isset($history_ids[$item->divisionId . $item->distributorId . $item->usedDate]) || ! $history_ids[$item->divisionId . $item->distributorId . $item->usedDate]) {
                 $order_id = $this->makeId('03');
                 $receiving_id = $this->makeId('04');
                 $billing_id = $this->makeId('02');
-                $history_ids[$item->divisionId . $item->distributorId . $item->usedDate] = [ 
+                $history_ids[$item->divisionId . $item->distributorId . $item->usedDate] = [
                     'orderHistoryId' => $order_id,
                     'receivingHistoryId' => $receiving_id,
                     'billingHistoryId' => $billing_id,
@@ -347,10 +317,8 @@ class UsedSlipController extends Controller
         /****** 発注登録 ******/
 
         $order_insert_data = [];
-        foreach($used_report as $item)
-        {
-            if(!$order_insert_data[$item->inHospitalItemId])
-            {
+        foreach ($used_report as $item) {
+            if (!$order_insert_data[$item->inHospitalItemId]) {
                 $order_insert_data[$item->inHospitalItemId] = [
                     'registrationTime' => $item->usedDate,
                     'orderTime' => $item->usedDate,
@@ -372,22 +340,18 @@ class UsedSlipController extends Controller
                 ];
             }
             $order_insert_data[$item->inHospitalItemId]['orderQuantity'] = $order_insert_data[$item->inHospitalItemId]['orderQuantity'] + (float)$item->countNum;
-            $order_insert_data[$item->inHospitalItemId]['orderPrice'] = $order_insert_data[$item->inHospitalItemId]['orderPrice'] + ( (float)$item->price * (float)$item->countNum );
+            $order_insert_data[$item->inHospitalItemId]['orderPrice'] = $order_insert_data[$item->inHospitalItemId]['orderPrice'] + ((float)$item->price * (float)$item->countNum);
             $order_insert_data[$item->inHospitalItemId]['receivingNum'] = $order_insert_data[$item->inHospitalItemId]['receivingNum'] + (float)$item->countNum;
         }
 
         $order_history_insert_data = [];
-        foreach($history_ids as $divisionId_distributorId_usedDate => $history_data)
-        {
+        foreach ($history_ids as $divisionId_distributorId_usedDate => $history_data) {
             $order_price = [];
             $in_hospital_item_ids = [];
-            foreach($order_insert_data as $insert_record)
-            {
-                if($insert_record['orderNumber'] === $history_data['orderHistoryId'])
-                {
+            foreach ($order_insert_data as $insert_record) {
+                if ($insert_record['orderNumber'] === $history_data['orderHistoryId']) {
                     $order_price[] = (float)$insert_record['orderPrice'];
-                    if(! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids))
-                    {
+                    if (! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids)) {
                         $in_hospital_item_ids[] = $insert_record['inHospitalItemId'];
                     }
                 }
@@ -411,13 +375,10 @@ class UsedSlipController extends Controller
         /****** 入荷登録 ******/
 
         $receiving_insert_data = [];
-        foreach($used_report as $item)
-        {
-            foreach($order_insert_data as $order_data)
-            {
+        foreach ($used_report as $item) {
+            foreach ($order_insert_data as $order_data) {
                 $orderCNumber = '';
-                if($item->inHospitalItemId == $order_data['inHospitalItemId'])
-                {
+                if ($item->inHospitalItemId == $order_data['inHospitalItemId']) {
                     $orderCNumber = $order_data['orderCNumber'];
                     break; //ループ終了
                 }
@@ -442,17 +403,13 @@ class UsedSlipController extends Controller
         }
 
         $receiving_history_insert_data = [];
-        foreach($history_ids as $divisionId_distributorId_usedDate => $history_data)
-        {
+        foreach ($history_ids as $divisionId_distributorId_usedDate => $history_data) {
             $receiving_price = [];
             $in_hospital_item_ids = [];
-            foreach($receiving_insert_data as $insert_record)
-            {
-                if($insert_record['receivingHId'] === $history_data['receivingHistoryId'])
-                {
+            foreach ($receiving_insert_data as $insert_record) {
+                if ($insert_record['receivingHId'] === $history_data['receivingHistoryId']) {
                     $receiving_price[] = (float)$insert_record['receivingPrice'];
-                    if(! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids))
-                    {
+                    if (! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids)) {
                         $in_hospital_item_ids[] = $insert_record['inHospitalItemId'];
                     }
                 }
@@ -473,12 +430,11 @@ class UsedSlipController extends Controller
         /****** 入荷登録 ******/
         /****** 消費登録 ******/
         $billing_insert_data = [];
-        foreach($used_report as $item)
-        {
+        foreach ($used_report as $item) {
             $unitPrice = ($hospital->billingUnitPrice)
-                ?(float)$item->unitPrice 
-                :(((float)$item->price == 0 || (float)$item->quantity == 0)
-                    ? 0 
+                ? (float)$item->unitPrice
+                : (((float)$item->price == 0 || (float)$item->quantity == 0)
+                    ? 0
                     : (float)$item->price / (float)$item->quantity);
             $billing_insert_data[] = [
                 'registrationTime' => $item->usedDate,
@@ -499,17 +455,13 @@ class UsedSlipController extends Controller
         }
 
         $billing_history_insert_data = [];
-        foreach($history_ids as $divisionId_distributorId_usedDate => $history_data)
-        {
+        foreach ($history_ids as $divisionId_distributorId_usedDate => $history_data) {
             $total_amount = [];
             $in_hospital_item_ids = [];
-            foreach($billing_insert_data as $insert_record)
-            {
-                if($insert_record['billingNumber'] === $history_data['billingHistoryId'])
-                {
+            foreach ($billing_insert_data as $insert_record) {
+                if ($insert_record['billingNumber'] === $history_data['billingHistoryId']) {
                     $total_amount[] = (float)$insert_record['billingAmount'];
-                    if(! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids))
-                    {
+                    if (! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids)) {
                         $in_hospital_item_ids[] = $insert_record['inHospitalItemId'];
                     }
                 }
@@ -527,25 +479,24 @@ class UsedSlipController extends Controller
 
         /****** 貸出更新 ******/
         $result = OrderHistory::insert($order_history_insert_data);
-        
+
         $result = Order::insert($order_insert_data);
 
         $result = ReceivingHistory::insert($receiving_history_insert_data);
-        
+
         $result = Receiving::insert($receiving_insert_data);
 
         $result = BillingHistory::insert($billing_history_insert_data);
-        
+
         $result = Billing::insert($billing_insert_data);
-        
+
         return $all_create_data;
     }
-    
-    private function association(array $used_slip_ids , array $other_ids)
+
+    private function association(array $used_slip_ids, array $other_ids)
     {
         $insert_data = [];
-        foreach($used_slip_ids as $divisionId_distributorId_usedDate => $data)
-        {
+        foreach ($used_slip_ids as $divisionId_distributorId_usedDate => $data) {
             $insert_data[] = [
                 'usedSlipId' => $used_slip_ids[$divisionId_distributorId_usedDate]['usedSlipId'],
                 'orderNumber' => $other_ids[$divisionId_distributorId_usedDate]['orderHistoryId'],
@@ -558,46 +509,43 @@ class UsedSlipController extends Controller
 
         return $result;
     }
-    
+
     public function cancelApi()
     {
         global $SPIRAL;
-        try{
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
-            
+        try {
+            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
+
             $record_id = (int)$SPIRAL->getCardId();
-            
-            $user_info = new UserInfo($SPIRAL);    
 
-            $used_slip_history = UsedSlipHistoy::find($record_id)->where('hospitalId',$user_info->getHospitalId())->get();
+            $user_info = new UserInfo($SPIRAL);
 
-            if($used_slip_history->count == 0 )
-            {
-                throw new Exception(FactoryApiErrorCode::factory(203)->getMessage(),FactoryApiErrorCode::factory(203)->getCode());
+            $used_slip_history = UsedSlipHistoy::find($record_id)->where('hospitalId', $user_info->getHospitalId())->get();
+
+            if ($used_slip_history->count == 0) {
+                throw new Exception(FactoryApiErrorCode::factory(203)->getMessage(), FactoryApiErrorCode::factory(203)->getCode());
             }
 
             $used_slip_history = $used_slip_history->data->all()[0];
 
-            if($used_slip_history->usedSlipStatus != 1 )
-            {
-                throw new Exception(FactoryApiErrorCode::factory(900)->getMessage(),FactoryApiErrorCode::factory(900)->getCode());
+            if ($used_slip_history->usedSlipStatus != 1) {
+                throw new Exception(FactoryApiErrorCode::factory(900)->getMessage(), FactoryApiErrorCode::factory(900)->getCode());
             }
 
-            $result = Borrowing::where('usedSlipId' , $used_slip_history->usedSlipId)->update(['usedSlipId' => '']);
-            
-            $result = UsedSlipHistoy::find($record_id)->where('hospitalId',$user_info->getHospitalId())->delete();
+            $result = Borrowing::where('usedSlipId', $used_slip_history->usedSlipId)->update(['usedSlipId' => '']);
 
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+            $result = UsedSlipHistoy::find($record_id)->where('hospitalId', $user_info->getHospitalId())->delete();
+
+            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['insert']);
             $content = $content->toJson();
-         
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+        } catch (Exception $ex) {
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['insert']);
             $content = $content->toJson();
-        }finally {
+        } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
-            ],false);
+            ], false);
         }
     }
 }
@@ -610,18 +558,13 @@ $UsedSlipController = new UsedSlipController();
 $action = $SPIRAL->getParam('Action');
 
 {
-    if($action === 'usedSlipApprovalApi')
-    {
+    if ($action === 'usedSlipApprovalApi') {
         //承認
         echo $UsedSlipController->usedSlipApprovalApi()->render();
-    }
-    else if($action === 'cancelApi')
-    {
+    } elseif ($action === 'cancelApi') {
         //キャンセル
         echo $UsedSlipController->cancelApi()->render();
-    }
-    else
-    {
+    } else {
         echo $UsedSlipController->index()->render();
     }
 }

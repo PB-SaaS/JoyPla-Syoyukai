@@ -317,6 +317,12 @@ class JoyPlaApplication extends Application
             {
                 return new GatePermissionModel(false , false);
             }
+            
+            if($auth->userPermission == '3')//承認者
+            {
+                return new GatePermissionModel(false, false);
+            }
+            
             return new GatePermissionModel(true , false);
         });
         

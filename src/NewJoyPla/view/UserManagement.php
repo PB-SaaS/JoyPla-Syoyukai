@@ -13,15 +13,23 @@
 					<div class="uk-width-2-3@m">
 						<h3>病院ユーザー一覧</h3>
 					</div>
+					<?php if($user_info->isHospitalUser() && $user_info->isAdmin()): ?>
 					<div class="uk-width-1-3@m uk-text-right@m">
 						<form action="%url/rel:mpgt:userManagement%" method="post">
 							<input type="hidden" value="userRegist" name="Action">
 							<input type="submit" value="病院ユーザー登録" class="uk-button uk-button-primary">
 						</form>
 					</div>
+					<?php endif ?>
 				</div>
+				
 				<div class="uk-margin">
-					%sf:usr:search78:table%
+				<?php if($user_info->isHospitalUser() && $user_info->isAdmin()): ?>
+	    		%sf:usr:search78:table%
+				<?php endif ?>
+				<?php if($user_info->isHospitalUser() && $user_info->isApprover()): ?>
+				%sf:usr:search62:table%
+				<?php endif ?>
 				</div>
 	    	</div>
 	    </div>
