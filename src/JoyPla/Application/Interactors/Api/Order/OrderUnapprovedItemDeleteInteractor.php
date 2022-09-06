@@ -48,7 +48,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
         public function handle(OrderUnapprovedItemDeleteInputData $inputData)
         {
             $order = $this->orderRepository->index(
-                (new HospitalId($inputData->hospitalId)),
+                (new HospitalId($inputData->user->hospitalId)),
                 (new OrderId($inputData->orderId)),
                 [
                     OrderStatus::UnOrdered,
