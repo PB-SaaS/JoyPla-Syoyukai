@@ -82,7 +82,8 @@ class Division extends Model
         "divisionName",
         "divisionType",
         "deleteFlag",
-        "authkey"
+        "authkey",
+        "deliveryDestCode"
     ];
 
     //デフォルト値
@@ -245,6 +246,7 @@ class Order extends Model
         "itemId",
         "priceId",
         "adjustment",
+        "deliveryDestCode"
     ];
 
     //デフォルト値

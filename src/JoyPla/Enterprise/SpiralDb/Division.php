@@ -1,12 +1,14 @@
 <?php
+
 namespace App\SpiralDb;
+
 use SpiralORM;
 
 class Division extends SpiralORM
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "";
-    const DELETED_AT = "deleteFlag";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "";
+    public const DELETED_AT = "deleteFlag";
 
     public static $spiral_db_name = "NJ_divisionDB";
     public static $guarded = ["id"];
@@ -18,11 +20,10 @@ class Division extends SpiralORM
         "divisionName",
         "divisionType",
         "deleteFlag",
-        "authkey"
+        "authkey",
+        "deliveryDestCode"
     ];
 
     //デフォルト値
     public static $attributes = [];
-    
 }
- 

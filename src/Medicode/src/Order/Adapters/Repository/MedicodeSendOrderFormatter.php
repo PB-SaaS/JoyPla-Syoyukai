@@ -10,14 +10,12 @@ class MedicodeSendOrderFormatter
     {
         $sendData = [];
         $stringData = '';
-        
+
         $SEQNO = 1;
         foreach ($orderList as $order) {
-            
             if ($order->getIsValid()) {
-                
                 $orderNumber = $order->getOrderNumber();
-                
+
                 if (!array_key_exists($orderNumber, $sendData)) {
                     $sendData[$orderNumber]['Srecord'] = [
                         'S',
@@ -35,7 +33,7 @@ class MedicodeSendOrderFormatter
                     ];
                     $SEQNO++;
                 }
-                
+
                 $sendData[$orderNumber]['Drecord'][] = [
                     'D',
                     '15',
@@ -46,18 +44,17 @@ class MedicodeSendOrderFormatter
                     str_pad('', 40),
                     self::formatQuantity((string)$order->getQuantity()),
                     str_pad('', 6, '0'),
-                    str_pad('', 2, '0'),
+                    self::formatDeliveryDestCode((string)$order->getDeliveryDestCode()),
                     self::formatRecordId($order->getId()),
                     str_pad('', 31)
                 ];
             }
         }
-        
-        if (count($sendData) === 0)
-        {
+
+        if (count($sendData) === 0) {
             return $stringData;
         }
-        
+
         foreach ($sendData as $key => $value) {
             $count = count($value['Drecord']);
             $sendData[$key]['Erecord'] = [
@@ -68,17 +65,17 @@ class MedicodeSendOrderFormatter
                 str_pad('', 113)
             ];
         }
-        
+
         $stringData = self::sendDataToString($sendData);
-        
+
         return self::makePostFields($stringData);
     }
-    
-    
+
+
     private function sendDataToString(array $sendData): string
     {
         $stringData = '';
-        
+
         foreach ($sendData as $orderNumber => $order) {
             foreach ($order as $type => $row) {
                 if ($type === 'Srecord') {
@@ -87,7 +84,7 @@ class MedicodeSendOrderFormatter
                     }
                     $stringData .= NEWLINE;
                 }
-                
+
                 if ($type === 'Drecord') {
                     foreach ($row as $array) {
                         foreach ($array as $column) {
@@ -96,7 +93,7 @@ class MedicodeSendOrderFormatter
                         $stringData .= NEWLINE;
                     }
                 }
-                
+
                 if ($type === 'Erecord') {
                     foreach ($row as $column) {
                         $stringData .= $column;
@@ -105,20 +102,20 @@ class MedicodeSendOrderFormatter
                 }
             }
         }
-        
+
         $stringData = mb_convert_encoding($stringData, 'sjis', 'auto');
-        
+
         return $stringData;
     }
-    
-    
+
+
     /**
      * @return string
      */
     private static function makePostFields(string $stringData): string
     {
-        $name = 'data';
-        
+        $name = SENDFILE.date("YmdHi");
+
         $postFields = '';
         $postFields .= "--" . MEDICODE_BOUNDARY . "\r\n";
         $postFields .= 'Content-Disposition: form-data; name="' . $name . '";' .
@@ -127,21 +124,21 @@ class MedicodeSendOrderFormatter
         $postFields .= "\r\n";
         $postFields .= $stringData . "\r\n";
         $postFields .= "--" . MEDICODE_BOUNDARY . "--\r\n";
-        
+
         return $postFields;
     }
-    
-    
+
+
     /**
-     * @param int $id
+     * @param string $id
      * @return string
      */
     private static function formatRecordId(string $id): string
     {
         return str_pad($id, 10);
     }
-    
-    
+
+
     /**
      * @param string $code
      * @return string
@@ -150,18 +147,18 @@ class MedicodeSendOrderFormatter
     {
         return str_pad($code, 10, '0', STR_PAD_LEFT);
     }
-    
-    
+
+
     /**
      * @param string $code
      * @return string
      */
     private static function formatDistributorCode(string $code): string
-    {;
+    {
         return str_pad($code, 10);
     }
-    
-    
+
+
     /**
      * @param string $code
      * @return string
@@ -170,14 +167,27 @@ class MedicodeSendOrderFormatter
     {
         return str_pad($code, 14);
     }
-    
-    
+
+
     /**
-     * @param int $quantity
+     * @param string $quantity
      * @return string
      */
     private static function formatQuantity(string $quantity): string
     {
         return str_pad($quantity, 5, '0', STR_PAD_LEFT);
+    }
+
+
+    /**
+     * @param string $deliveryDestCode
+     * @return string
+     */
+    private static function formatDeliveryDestCode(?string $deliveryDestCode): string
+    {
+        if (empty($deliveryDestCode)) {
+            return '00';
+        }
+        return str_pad($deliveryDestCode, 2, '0', STR_PAD_LEFT);
     }
 }

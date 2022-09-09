@@ -30,43 +30,43 @@ use JoyPla\Enterprise\Models\Quantity;
 use JoyPla\Enterprise\Models\ReceivedQuantity;
 use JoyPla\Enterprise\Models\SelectName;
 
-class OrderRepository implements OrderRepositoryInterface{
-
-    public function findByHospitalId( HospitalId $hospitalId )
+class OrderRepository implements OrderRepositoryInterface
+{
+    public function findByHospitalId(HospitalId $hospitalId)
     {
-        $orderHistory = (OrderItemView::where('hospitalId',$hospitalId->value())->get())->data->all();
+        $orderHistory = (OrderItemView::where('hospitalId', $hospitalId->value())->get())->data->all();
 
         return $orderHistory;
     }
 
-    public function findByInHospitalItem( HospitalId $hospitalId , array $orderItems ){
-
-        $division = SpiralDbDivision::where('hospitalId',$hospitalId->value());
-        foreach($orderItems as $item){
-            $division = $division->orWhere('divisionId',$item->divisionId);
+    public function findByInHospitalItem(HospitalId $hospitalId, array $orderItems)
+    {
+        $division = SpiralDbDivision::where('hospitalId', $hospitalId->value());
+        foreach ($orderItems as $item) {
+            $division = $division->orWhere('divisionId', $item->divisionId);
         }
 
         $division = ($division->get())->data->all();
-        
-        $inHospitalItem = InHospitalItemView::where('hospitalId',$hospitalId->value());
-        foreach($orderItems as $item){
-            $inHospitalItem->orWhere('inHospitalItemId',$item->inHospitalItemId);
+
+        $inHospitalItem = InHospitalItemView::where('hospitalId', $hospitalId->value());
+        foreach ($orderItems as $item) {
+            $inHospitalItem->orWhere('inHospitalItemId', $item->inHospitalItemId);
         }
 
         $inHospitalItem = ($inHospitalItem->get())->data->all();
 
-        foreach($orderItems as $item){
+        foreach ($orderItems as $item) {
             $division_find_key = array_search($item->divisionId, collect_column($division, 'divisionId'));
             $inHospitalItem_find_key = array_search($item->inHospitalItemId, collect_column($inHospitalItem, 'inHospitalItemId'));
             $result[] = new OrderItem(
                 (new OrderId('') ),
-                (OrderItemId::generate() ),
+                (OrderItemId::generate()),
                 (new InHospitalItemId($inHospitalItem[$inHospitalItem_find_key]->inHospitalItemId) ),
-                (Item::create($inHospitalItem[$inHospitalItem_find_key]) ),
+                (Item::create($inHospitalItem[$inHospitalItem_find_key])),
                 $hospitalId,
-                (Division::create($division[$division_find_key]) ),
-                (Distributor::create($inHospitalItem[$inHospitalItem_find_key]) ),
-                (Quantity::create($inHospitalItem[$inHospitalItem_find_key]) ),
+                (Division::create($division[$division_find_key])),
+                (Distributor::create($inHospitalItem[$inHospitalItem_find_key])),
+                (Quantity::create($inHospitalItem[$inHospitalItem_find_key])),
                 (new Price($inHospitalItem[$inHospitalItem_find_key]->price) ),
                 (new OrderQuantity((int)$item->orderUnitQuantity)),
                 (new ReceivedQuantity((int)$item->receivingNum)),
@@ -81,27 +81,26 @@ class OrderRepository implements OrderRepositoryInterface{
         return $result;
     }
 
-    public function saveToArray(HospitalId $hospitalId , array $orders , array $attr = [])
+    public function saveToArray(HospitalId $hospitalId, array $orders, array $attr = [])
     {
-        $orders = array_map(function(Order $order){
+        $orders = array_map(function (Order $order) {
             return $order;
-        },$orders);
+        }, $orders);
 
         $history = [];
         $items = [];
 
         $deleteOrderIds = [];
 
-        foreach($orders as $oKey => $order){
-            if($order->itemCount() === 0)
-            {
+        foreach ($orders as $oKey => $order) {
+            if ($order->itemCount() === 0) {
                 $deleteOrderIds[] = $order->getOrderId();
                 unset($orders[$oKey]);
                 continue;
             }
 
             $orderToArray = $order->toArray();
-            $history[] = [ 
+            $history[] = [
                 "orderNumber" => (string)$orderToArray['orderId'],
                 "orderTime" => (string)$orderToArray['orderDate'],
                 "hospitalId" => (string)$orderToArray['hospital']['hospitalId'],
@@ -115,8 +114,17 @@ class OrderRepository implements OrderRepositoryInterface{
                 "ordererUserName" => (string)$orderToArray['orderUserName'],
             ];
 
-            foreach( $orderToArray['orderItems'] as $orderItem )
-            {
+            $receivingDivisionCode = '';
+            if ($order->getOrderStatus()->value() === OrderStatus::OrderCompletion) {
+                if ($order->getReceivedTarget() === 1) { // 大倉庫
+                    $receivingDivisionCode = (SpiralDbDivision::where('hospitalId', $hospitalId->value())->where('divisionType', '1')->get())->data->get(0)->deliveryDestCode;
+                }
+                if ($order->getReceivedTarget() === 2) { // 部署
+                    $receivingDivisionCode =(SpiralDbDivision::where('hospitalId', $hospitalId->value())->where('divisionId', $order->getDivision()->getDivisionId()->value())->get())->data->get(0)->deliveryDestCode;
+                }
+            }
+
+            foreach ($orderToArray['orderItems'] as $orderItem) {
                 $item = [
                     "inHospitalItemId" => (string)$orderItem['inHospitalItemId'],
                     "orderNumber" => (string)$orderToArray['orderId'],
@@ -133,123 +141,114 @@ class OrderRepository implements OrderRepositoryInterface{
                     "quantityUnit" => (string)$orderItem['quantity']['quantityUnit'],
                     "itemUnit" => (string)$orderItem['quantity']['itemUnit'],
                     "lotManagement" => (string)$orderItem['lotManagement'],
-                    "itemId" => (string)$orderItem['item']['itemId'],
+                    "itemId" => (string)$orderItem['item']['itemId']
                 ];
-                
-                if(isset($attr['isReceived']) === true)
-                {
+
+                if (isset($attr['isReceived']) === true) {
                     $item['receivingTime'] = 'now';
+                }
+
+                if (($order->getOrderStatus()->value() === OrderStatus::OrderCompletion) &&
+                   ((bool)$orderItem['useMedicode'])) {
+                    $item['deliveryDestCode'] = (string)$receivingDivisionCode;
                 }
                 $items[] = $item;
             }
         }
 
-        if( count($deleteOrderIds) > 0 ) {
+        if (count($deleteOrderIds) > 0) {
             $instance = SpiralDbOrder::getNewInstance();
-            foreach($deleteOrderIds as $orderId)
-            {
-                $instance->orWhere('orderNumber',$orderId->value());
+            foreach ($deleteOrderIds as $orderId) {
+                $instance->orWhere('orderNumber', $orderId->value());
             }
             $instance->delete();
         }
 
-        if(count($items) > 0) {
+        if (count($items) > 0) {
             $instance = SpiralDbOrderItem::getNewInstance();
-            foreach($items as $item)
-            {
-                $instance->orWhere('orderNumber',$item['orderNumber']);
-                $instance->where('orderCNumber',$item['orderCNumber'], '!=');
+            foreach ($items as $item) {
+                $instance->orWhere('orderNumber', $item['orderNumber']);
+                $instance->where('orderCNumber', $item['orderCNumber'], '!=');
             }
             $instance->delete();
         }
-        
-        if(count($history) > 0) {
-            SpiralDbOrder::getNewInstance()->upsert('orderNumber',$history);
+
+        if (count($history) > 0) {
+            SpiralDbOrder::getNewInstance()->upsert('orderNumber', $history);
         }
-        if(count($items) > 0) {
-            SpiralDbOrderItem::getNewInstance()->upsert('orderCNumber',$items);
+        if (count($items) > 0) {
+            SpiralDbOrderItem::getNewInstance()->upsert('orderCNumber', $items);
         }
         return array_values($orders);
     }
 
-    public function search( HospitalId $hospitalId , object $search)
+    public function search(HospitalId $hospitalId, object $search)
     {
         $itemSearchFlag = false;
-        $itemViewInstance = OrderItemView::where('hospitalId',$hospitalId->value())->value('orderNumber')->value('orderCNumber');
-        $historyViewInstance = OrderView::where('hospitalId',$hospitalId->value());
+        $itemViewInstance = OrderItemView::where('hospitalId', $hospitalId->value())->value('orderNumber')->value('orderCNumber');
+        $historyViewInstance = OrderView::where('hospitalId', $hospitalId->value());
 
-        if($search->itemName)
-        {
-            $itemViewInstance->orWhere('itemName',"%".$search->itemName."%","LIKE");
-            $itemSearchFlag = true; 
-        }
-        if($search->makerName)
-        {
-            $itemViewInstance->orWhere('makerName',"%".$search->makerName."%","LIKE");
+        if ($search->itemName) {
+            $itemViewInstance->orWhere('itemName', "%".$search->itemName."%", "LIKE");
             $itemSearchFlag = true;
         }
-        if($search->itemCode)
-        {
-            $itemViewInstance->orWhere('itemCode',"%".$search->itemCode."%","LIKE");
+        if ($search->makerName) {
+            $itemViewInstance->orWhere('makerName', "%".$search->makerName."%", "LIKE");
             $itemSearchFlag = true;
         }
-        if($search->itemStandard)
-        {
-            $itemViewInstance->orWhere('itemStandard',"%".$search->itemStandard."%","LIKE");
+        if ($search->itemCode) {
+            $itemViewInstance->orWhere('itemCode', "%".$search->itemCode."%", "LIKE");
             $itemSearchFlag = true;
         }
-        if($search->itemJANCode)
-        {
-            $itemViewInstance->orWhere('itemJANCode',"%".$search->itemJANCode."%","LIKE");
+        if ($search->itemStandard) {
+            $itemViewInstance->orWhere('itemStandard', "%".$search->itemStandard."%", "LIKE");
+            $itemSearchFlag = true;
+        }
+        if ($search->itemJANCode) {
+            $itemViewInstance->orWhere('itemJANCode', "%".$search->itemJANCode."%", "LIKE");
             $itemSearchFlag = true;
         }
 
-        if($search->receivedFlag === 0)
-        {
-            $itemViewInstance->orWhere('receivingFlag',"0","=");
-            $itemViewInstance->orWhere('receivingFlag',"0","ISNULL");
+        if ($search->receivedFlag === 0) {
+            $itemViewInstance->orWhere('receivingFlag', "0", "=");
+            $itemViewInstance->orWhere('receivingFlag', "0", "ISNULL");
             $itemSearchFlag = true;
         }
-        if($search->receivedFlag === 1)
-        {
-            $itemViewInstance->where('receivingFlag',"1","=");
+        if ($search->receivedFlag === 1) {
+            $itemViewInstance->where('receivingFlag', "1", "=");
             $itemSearchFlag = true;
         }
-        
+
         $orderCNumbers = [];
-        if($itemSearchFlag) {
+        if ($itemSearchFlag) {
             $itemViewInstance = $itemViewInstance->get();
-            if($itemViewInstance->count == 0 )
-            {
+            if ($itemViewInstance->count == 0) {
                 return [[],0];
             }
-            foreach($itemViewInstance->data->all() as $item){
-                $historyViewInstance = $historyViewInstance->orWhere('orderNumber' , $item->orderNumber);
+            foreach ($itemViewInstance->data->all() as $item) {
+                $historyViewInstance = $historyViewInstance->orWhere('orderNumber', $item->orderNumber);
                 $orderCNumbers[] = $item->orderCNumber;
             }
         }
 
-        if(is_array($search->distributorIds) && count($search->distributorIds) > 0)
-        {   
-            foreach($search->distributorIds as $distributorId){
+        if (is_array($search->distributorIds) && count($search->distributorIds) > 0) {
+            foreach ($search->distributorIds as $distributorId) {
                 $historyViewInstance->orWhere('distributorId', $distributorId);
             }
-        }   
+        }
 
-        if(is_array($search->divisionIds) && count($search->divisionIds) > 0)
-        {   
-            foreach($search->divisionIds as $divisionId){
+        if (is_array($search->divisionIds) && count($search->divisionIds) > 0) {
+            foreach ($search->divisionIds as $divisionId) {
                 $historyViewInstance->orWhere('divisionId', $divisionId);
             }
-        }   
+        }
 
-        if(is_array($search->orderStatus) && count($search->orderStatus) > 0)
-        {   
-            foreach($search->orderStatus as $orderStatus){
+        if (is_array($search->orderStatus) && count($search->orderStatus) > 0) {
+            foreach ($search->orderStatus as $orderStatus) {
                 $historyViewInstance->orWhere('orderStatus', $orderStatus);
             }
         }
-        if($search->registerDate){
+        if ($search->registerDate) {
             $registerDate = new DateYearMonth($search->registerDate);
             $nextMonth =  $registerDate->nextMonth();
 
@@ -258,7 +257,7 @@ class OrderRepository implements OrderRepositoryInterface{
         }
 
 
-        if($search->orderDate){
+        if ($search->orderDate) {
             $yearMonth = new DateYearMonth($search->orderDate);
             $nextMonth =  $yearMonth->nextMonth();
 
@@ -266,30 +265,26 @@ class OrderRepository implements OrderRepositoryInterface{
             $historyViewInstance->where('orderTime', $nextMonth->format('Y-m-01'), '<');
         }
 
-        $historys = $historyViewInstance->sort('id','desc')->page($search->currentPage)->paginate($search->perPage);
-        if($historys->count == 0)
-        {
+        $historys = $historyViewInstance->sort('id', 'desc')->page($search->currentPage)->paginate($search->perPage);
+        if ($historys->count == 0) {
             return [[],0];
         }
-        
-        $itemViewInstance = OrderItemView::getNewInstance()->where('hospitalId',$hospitalId->value());
-        foreach($historys->data->all() as $history){
-            $itemViewInstance = $itemViewInstance->orWhere('orderNumber' , $history->orderNumber);
+
+        $itemViewInstance = OrderItemView::getNewInstance()->where('hospitalId', $hospitalId->value());
+        foreach ($historys->data->all() as $history) {
+            $itemViewInstance = $itemViewInstance->orWhere('orderNumber', $history->orderNumber);
         }
-        foreach($orderCNumbers as $orderCNumber)
-        {
-            $itemViewInstance = $itemViewInstance->orWhere('orderCNumber' , $orderCNumber);
+        foreach ($orderCNumbers as $orderCNumber) {
+            $itemViewInstance = $itemViewInstance->orWhere('orderCNumber', $orderCNumber);
         }
 
         $items = $itemViewInstance->get();
         $orders = [];
-        foreach($historys->data->all() as $history)
-        {
-           $order = Order::create($history);
+        foreach ($historys->data->all() as $history) {
+            $order = Order::create($history);
 
-            foreach($items->data->all() as $item) {
-                if( $order->getOrderId()->equal($item->orderNumber) )
-                {
+            foreach ($items->data->all() as $item) {
+                if ($order->getOrderId()->equal($item->orderNumber)) {
                     $order = $order->addOrderItem(OrderItem::create($item));
                 }
             }
@@ -301,76 +296,71 @@ class OrderRepository implements OrderRepositoryInterface{
     }
 
 
-    public function index( HospitalId $hospitalId , OrderId $orderId , array $orderStatus = [OrderStatus::UnOrdered])
+    public function index(HospitalId $hospitalId, OrderId $orderId, array $orderStatus = [OrderStatus::UnOrdered])
     {
-        $orderView = OrderView::where('hospitalId',$hospitalId->value())->where('orderNumber',$orderId->value());
+        $orderView = OrderView::where('hospitalId', $hospitalId->value())->where('orderNumber', $orderId->value());
 
-        if(count($orderStatus) > 0)
-        {
-            foreach($orderStatus as $o)
-            {
-                $orderView->orWhere('orderStatus', $o );
+        if (count($orderStatus) > 0) {
+            foreach ($orderStatus as $o) {
+                $orderView->orWhere('orderStatus', $o);
             }
         }
-        
+
         $orderView = $orderView->get();
 
-        if((int)$orderView->count === 0)
-        {
+        if ((int)$orderView->count === 0) {
             return null;
         }
-        $orderItemView = OrderItemView::sort('id','asc')->where('hospitalId',$hospitalId->value())->where('orderNumber',$orderId->value())->get();
-        
+        $orderItemView = OrderItemView::sort('id', 'asc')->where('hospitalId', $hospitalId->value())->where('orderNumber', $orderId->value())->get();
+
         $order = Order::create($orderView->data->get(0));
-        
-        foreach($orderItemView->data->all() as $item) {
+
+        foreach ($orderItemView->data->all() as $item) {
             $order = $order->addOrderItem(OrderItem::create($item));
         }
 
         return $order;
     }
 
-    public function delete( HospitalId $hospitalId , OrderId $orderId)
+    public function delete(HospitalId $hospitalId, OrderId $orderId)
     {
-        $result = SpiralDbOrder::where('hospitalId',$hospitalId->value())->where('orderNumber',$orderId->value())->delete();
+        $result = SpiralDbOrder::where('hospitalId', $hospitalId->value())->where('orderNumber', $orderId->value())->delete();
         return $result->count;
     }
-    
-    public function getOrderByOrderItemId( HospitalId $hospitalId , array $orderItemIds )
+
+    public function getOrderByOrderItemId(HospitalId $hospitalId, array $orderItemIds)
     {
-        $items = OrderItemView::getNewInstance()->where('hospitalId',$hospitalId->value())->value('orderNumber');
-        if(count($orderItemIds) === 0){ return []; }
-        foreach($orderItemIds as $id)
-        {
-            $items->orWhere('orderCNumber' , $id);
+        $items = OrderItemView::getNewInstance()->where('hospitalId', $hospitalId->value())->value('orderNumber');
+        if (count($orderItemIds) === 0) {
+            return [];
+        }
+        foreach ($orderItemIds as $id) {
+            $items->orWhere('orderCNumber', $id);
         }
 
         $items = $items->get();
 
-        $historyViewInstance = OrderView::sort('id','desc')->where('hospitalId',$hospitalId->value());
+        $historyViewInstance = OrderView::sort('id', 'desc')->where('hospitalId', $hospitalId->value());
 
-        foreach($items->data->all() as $item)
-        {
-            $historyViewInstance->orWhere('orderNumber',$item->orderNumber);
+        foreach ($items->data->all() as $item) {
+            $historyViewInstance->orWhere('orderNumber', $item->orderNumber);
         }
 
         $historys = ($historyViewInstance->get())->data->all();
 
-        $itemViewInstance = OrderItemView::getNewInstance()->where('hospitalId',$hospitalId->value());
+        $itemViewInstance = OrderItemView::getNewInstance()->where('hospitalId', $hospitalId->value());
 
-        foreach($historys as $history){
-            $itemViewInstance = $itemViewInstance->orWhere('orderNumber' , $history->orderNumber);
+        foreach ($historys as $history) {
+            $itemViewInstance = $itemViewInstance->orWhere('orderNumber', $history->orderNumber);
         }
 
         $items = $itemViewInstance->get();
         $orders = [];
-        foreach($historys as $history)
-        {
-           $order = Order::create($history);
+        foreach ($historys as $history) {
+            $order = Order::create($history);
 
-            foreach($items->data->all() as $item) {
-                if( $order->getOrderId()->equal($item->orderNumber) )
-                {
+            foreach ($items->data->all() as $item) {
+                if ($order->getOrderId()->equal($item->orderNumber)) {
                     $order = $order->addOrderItem(OrderItem::create($item));
                 }
             }
@@ -387,39 +377,37 @@ class OrderRepository implements OrderRepositoryInterface{
      * @param OrderItem[] $orderItems
      * @return void
      */
-    public function getUnapprovedOrder( HospitalId $hospitalId , array $orderItems )
+    public function getUnapprovedOrder(HospitalId $hospitalId, array $orderItems)
     {
         $orderItems = array_map(
-            function(OrderItem $i){
+            function (OrderItem $i) {
                 return $i;
-            },$orderItems
+            },
+            $orderItems
         );
 
-        $historyViewInstance = OrderView::sort('id','desc')->where('hospitalId',$hospitalId->value())->where('orderStatus','1');
+        $historyViewInstance = OrderView::sort('id', 'desc')->where('hospitalId', $hospitalId->value())->where('orderStatus', '1');
 
-        foreach($orderItems as $item)
-        {
-            $historyViewInstance->where('divisionId',$item->getDivision()->getDivisionId()->value());
-            $historyViewInstance->orWhere('distributorId',$item->getDistributor()->getDistributorId()->value());
+        foreach ($orderItems as $item) {
+            $historyViewInstance->where('divisionId', $item->getDivision()->getDivisionId()->value());
+            $historyViewInstance->orWhere('distributorId', $item->getDistributor()->getDistributorId()->value());
         }
 
         $historys = ($historyViewInstance->get())->data->all();
 
-        $itemViewInstance = OrderItemView::where('hospitalId',$hospitalId->value());
+        $itemViewInstance = OrderItemView::where('hospitalId', $hospitalId->value());
 
-        foreach($historys as $history){
-            $itemViewInstance = $itemViewInstance->orWhere('orderNumber' , $history->orderNumber);
+        foreach ($historys as $history) {
+            $itemViewInstance = $itemViewInstance->orWhere('orderNumber', $history->orderNumber);
         }
 
         $items = $itemViewInstance->get();
         $orders = [];
-        foreach($historys as $history)
-        {
-           $order = Order::create($history);
+        foreach ($historys as $history) {
+            $order = Order::create($history);
 
-            foreach($items->data->all() as $item) {
-                if( $order->getOrderId()->equal($item->orderNumber) )
-                {
+            foreach ($items->data->all() as $item) {
+                if ($order->getOrderId()->equal($item->orderNumber)) {
                     $order = $order->addOrderItem(OrderItem::create($item));
                 }
             }
@@ -430,15 +418,15 @@ class OrderRepository implements OrderRepositoryInterface{
         return $orders;
     }
 
-    public function sendUnapprovedOrderMail(array $orders , Auth $user)
+    public function sendUnapprovedOrderMail(array $orders, Auth $user)
     {
-        $orders = array_map(function(Order $order){
+        $orders = array_map(function (Order $order) {
             return $order;
-        },$orders);
-        
+        }, $orders);
+
         $unapprovedOrderMailViewModel = [];
-            
-        foreach($orders as $order){
+
+        foreach ($orders as $order) {
             $orderToArray = $order->toArray();
             $unapprovedOrderMailViewModel[] = [
                 'orderNumber' => $orderToArray['orderId'],
@@ -447,14 +435,14 @@ class OrderRepository implements OrderRepositoryInterface{
                 'totalAmount' => number_format_jp($orderToArray['totalAmount']),
             ];
         }
-        
+
         $mail_body = view('mail/Order/RegistUnapprovedOrderMail', [
             'name' => '%val:usr:name%',
             'hospitalName' => $orders[0]->getHospital()->getHospitalName()->value(),
             'ordererUserName' =>  $user->name,
             'history' => $unapprovedOrderMailViewModel,
             'url' => LOGIN_URL,
-        ] , false)->render();
+        ], false)->render();
         $hospitalUser = HospitalUser::getNewInstance();
         $selectName = SelectName::generate($user->hospitalId);
         $hospitalUser::selectName($selectName->value())
@@ -464,15 +452,15 @@ class OrderRepository implements OrderRepositoryInterface{
         $hospitalUser::selectRule($selectName->value())
             ->body($mail_body)
             ->subject('[JoyPla] 未発注書が作成されました')
-            ->from(FROM_ADDRESS,FROM_NAME)
+            ->from(FROM_ADDRESS, FROM_NAME)
             ->send();
     }
 
-    public function sendApprovalOrderMail(Order $order , Auth $user)
+    public function sendApprovalOrderMail(Order $order, Auth $user)
     {
         $order = $order->toArray();
-        
-        $distributor = SpiralDbDistributor::where('distributorId',$order['distributor']['distributorId'])
+
+        $distributor = SpiralDbDistributor::where('distributorId', $order['distributor']['distributorId'])
         ->value('distributorName')
         ->value('postalCode')
         ->value('prefectures')
@@ -480,9 +468,9 @@ class OrderRepository implements OrderRepositoryInterface{
         ->get();
         $distributor = $distributor->data->get(0);
 
-        $useMedicode = in_array(true, array_map(function(array $orderItem){
+        $useMedicode = in_array(true, array_map(function (array $orderItem) {
             return $orderItem['useMedicode'];
-        },$order['orderItems']), true);
+        }, $order['orderItems']), true);
 
         $mail_body = view('mail/Order/OrderFixForDistributor', [
             'name' => '%val:usr:name%',
@@ -509,11 +497,10 @@ class OrderRepository implements OrderRepositoryInterface{
         $test = DistributorAffiliationView::selectRule($select_name->value())
             ->body($mail_body)
             ->subject("[JoyPla] 発注が行われました")
-            ->from(FROM_ADDRESS,FROM_NAME)
+            ->from(FROM_ADDRESS, FROM_NAME)
             ->send();
-        
+
         {
-            
             $mail_body = view('mail/Order/OrderFix', [
                 'name' => '%val:usr:name%',
                 'distributor_name' => $distributor->distributorName,
@@ -531,20 +518,20 @@ class OrderRepository implements OrderRepositoryInterface{
                 'total_price' => '￥'.number_format((float)$order['totalAmount']),
                 'login_url' => LOGIN_URL,
             ])->render();
-            
+
             $hospital_user = HospitalUser::getNewInstance();
             $select_name = SelectName::generate($user->hospitalId);
             $test = $hospital_user::selectName($select_name->value())
                 ->rule(['name'=>'hospitalId','label'=>'name_'.$user->hospitalId,'value1'=>$user->hospitalId,'condition'=>'matches'])
                 ->rule(['name'=>'userPermission','label'=>'permission_admin2','value1'=>'1,3','condition'=>'contains'])
                 ->filterCreate();
-                
+
             $test = $hospital_user::selectRule($select_name->value())
                 ->body($mail_body)
                 ->subject("[JoyPla] 発注が行われました")
-                ->from(FROM_ADDRESS,FROM_NAME)
+                ->from(FROM_ADDRESS, FROM_NAME)
                 ->send();
-                
+
             $hospital_user = HospitalUser::getNewInstance();
             $select_name = SelectName::generate($user->hospitalId);
             $test = $hospital_user::selectName($select_name->value())
@@ -555,28 +542,28 @@ class OrderRepository implements OrderRepositoryInterface{
             $test = $hospital_user::selectRule($select_name->value())
                 ->body($mail_body)
                 ->subject("[JoyPla] 発注が行われました")
-                ->from(FROM_ADDRESS,FROM_NAME)
+                ->from(FROM_ADDRESS, FROM_NAME)
                 ->send();
         }
     }
 }
 
-interface OrderRepositoryInterface 
+interface OrderRepositoryInterface
 {
-    public function findByHospitalId( HospitalId $hospitalId );
-    public function findByInHospitalItem( HospitalId $hospitalId , array $orderItems );
-    public function getUnapprovedOrder( HospitalId $hospitalId , array $orderItems );
-    public function saveToArray(HospitalId $hospitalId , array $orders);
+    public function findByHospitalId(HospitalId $hospitalId);
+    public function findByInHospitalItem(HospitalId $hospitalId, array $orderItems);
+    public function getUnapprovedOrder(HospitalId $hospitalId, array $orderItems);
+    public function saveToArray(HospitalId $hospitalId, array $orders);
 
-    public function search( HospitalId $hospitalId , object $search);
+    public function search(HospitalId $hospitalId, object $search);
 
-    public function index( HospitalId $hospitalId , OrderId $orderId ,  array $orderStatus);
+    public function index(HospitalId $hospitalId, OrderId $orderId, array $orderStatus);
 
-    public function delete( HospitalId $hospitalId , OrderId $orderId);
+    public function delete(HospitalId $hospitalId, OrderId $orderId);
 
-    public function sendUnapprovedOrderMail(array $orders , Auth $user);
-    
-    public function getOrderByOrderItemId( HospitalId $hospitalId , array $orderItemIds );
-    
-    public function sendApprovalOrderMail(Order $order , Auth $user);
+    public function sendUnapprovedOrderMail(array $orders, Auth $user);
+
+    public function getOrderByOrderItemId(HospitalId $hospitalId, array $orderItemIds);
+
+    public function sendApprovalOrderMail(Order $order, Auth $user);
 }

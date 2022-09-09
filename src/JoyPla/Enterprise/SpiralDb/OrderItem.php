@@ -1,12 +1,14 @@
 <?php
+
 namespace App\SpiralDb;
+
 use SpiralORM;
 
 class OrderItem extends SpiralORM
 {
-    const CREATED_AT = "registrationTime";
-    const UPDATED_AT = "updateTime";
-    const DELETED_AT = "";
+    public const CREATED_AT = "registrationTime";
+    public const UPDATED_AT = "updateTime";
+    public const DELETED_AT = "";
 
     public static $spiral_db_name = "NJ_OrderDB";
     public static $guarded = ["id"];
@@ -39,6 +41,7 @@ class OrderItem extends SpiralORM
         "distributorCode",
         "medicodeStatus",
         "medicodeSentDate",
+        "deliveryDestCode"
     ];
 
     //デフォルト値

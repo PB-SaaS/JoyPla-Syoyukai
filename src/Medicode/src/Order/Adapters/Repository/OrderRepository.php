@@ -25,11 +25,11 @@ class OrderRepository implements IOrderRepository
         $orders = [];
         $records = [];
         $count = 1;
-        
+
         $param = [
             'db_title' => ORDER_ITEM_DB,
             'lines_per_page' => LINES_PER_PAGE,
-            'select_columns' => ['recordId', 'orderCNumber', 'orderNumber', 'hospitalCode', 'distributorCode', 'itemJANCode', 'orderQuantity'],
+            'select_columns' => ['recordId', 'orderCNumber', 'orderNumber', 'hospitalCode', 'distributorCode', 'itemJANCode', 'orderQuantity', 'deliveryDestCode'],
             'sort' => [['name' => 'registrationTime', 'order' => 'asc']],
             'search_condition' => [
                 ['name' => 'useMedicode', 'value' => 1],
@@ -43,16 +43,16 @@ class OrderRepository implements IOrderRepository
                 ['name' => 'recordId', 'value' => '', 'operator' => 'ISNOTNULL']
             ]
         ];
-        
+
         for ($page = 1; $page <= ceil($count / LINES_PER_PAGE); $page++) {
             $param['page'] = $page;
             $result = $this->api('database', 'select', $param);
             $code = (int)$result->get('code');
-            
+
             if ($code !== 0) {
                 throw new ApiException($result->get('message'), $code);
             }
-            
+
             if ($code === 0) {
                 $count = (int)$result->get('count');
                 if ($count === 0) {
@@ -62,7 +62,7 @@ class OrderRepository implements IOrderRepository
                 $records = array_merge($records, $data);
             }
         }
-        
+
         $tmp = [];
         $columns = count($param['select_columns']);
         foreach ($records as $record) {
@@ -70,15 +70,15 @@ class OrderRepository implements IOrderRepository
                 $tmp[$record[1]][$param['select_columns'][$i]] = $record[$i];
             }
         }
-        
+
         foreach ($tmp as $row) {
             $orders[] = OrderFactory::create($row);
         }
-        
+
         return $orders;
     }
-    
-    
+
+
     /**
      * @param OrderList $orderList
      */
@@ -91,7 +91,7 @@ class OrderRepository implements IOrderRepository
             'key' => 'orderCNumber',
             'columns' => ['orderCNumber', 'updateTime', 'medicodeStatus', 'medicodeSentDate']
         ];
-        
+
         foreach ($orderList->getOrders() as $order) {
             $status = ($order->getIsValid()) ? 2 : 3;
             $date = ($order->getIsValid()) ? 'now' : '';
@@ -102,7 +102,7 @@ class OrderRepository implements IOrderRepository
                 $date
             ];
         }
-        
+
         foreach (array_chunk($updateData, 1000) as $tmp) {
             $param['data'] = $tmp;
             $result = $this->api('database', 'bulk_update', $param);
@@ -112,8 +112,8 @@ class OrderRepository implements IOrderRepository
             }
         }
     }
-    
-    
+
+
     private function api($_app, $_method, $_params)
     {
         global $SPIRAL;
@@ -122,8 +122,8 @@ class OrderRepository implements IOrderRepository
         $request->putAll($_params);
         return $communicator->request($_app, $_method, $request);
     }
-    
-    
+
+
     /**
      * @param AccessToken $accessToken
      * @param OrderList $orderList
@@ -132,19 +132,18 @@ class OrderRepository implements IOrderRepository
     public function send(AccessToken $accessToken, OrderList $orderList): array
     {
         $token = $accessToken->getValue();
-        
+
         $postFields = MedicodeSendOrderFormatter::getPostFields($orderList->getOrders());
-        
-        if (!$postFields)
-        {
+
+        if (!$postFields) {
             $this->bulkUpdate($orderList);
             throw new ApiException('対象の全発注データにフォーマットの誤りがある為、処理を中止しました。', 999);
         }
-        
+
         $responseHeader = [];
         $response = '';
         $status = 0;
-        
+
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, SENDAPI_URL);
         curl_setopt($curl, CURLOPT_SSL_CIPHER_LIST, SSL_CIPHER_LIST);
@@ -154,44 +153,41 @@ class OrderRepository implements IOrderRepository
         curl_setopt($curl, CURLOPT_TIMEOUT, 30);
         curl_setopt($curl, CURLOPT_HEADER, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        
+
         $response = curl_exec($curl);
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         $errno = curl_errno($curl);
         $error = curl_error($curl);
         $info = curl_getinfo($curl);
-       
+
         curl_close($curl);
-        
-        if (!$response)
-        {
+
+        if (!$response) {
             throw new ApiException('メディコード送信APIの実行に失敗しました。', 806);
         }
-        
+
         if ($httpCode !== 200) {
             throw new ApiException($errno.' : '.$error, $httpCode);
         }
-        
+
         $header = substr($response, 0, $info['header_size']);
         $responseHeader = $this->getHeaderArray($header);
         $status = (int)$responseHeader['X-API-Status'];
-        
-        if ($status === 991)
-        {
+
+        if ($status === 991) {
             return ['code' => $status, 'message' => 'Access token is expired.'];
         }
-        
-        if ($status !== 200)
-        {
+
+        if ($status !== 200) {
             throw new ApiException('メディコード送信APIの実行に失敗しました。', $status);
         }
-        
+
         $this->bulkUpdate($orderList);
-        
+
         return ['code' => $status, 'message' => 'communicateKey = '.$responseHeader['X-API-CommunicateKey']];
     }
-    
-    
+
+
     /**
      * @param string $header
      * @return array

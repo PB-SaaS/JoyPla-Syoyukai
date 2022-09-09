@@ -12,40 +12,46 @@ final class OrderFactory
     {
         $id = '';
         $orderCNumber = '';
-        $orderumber = '';
+        $orderNumber = '';
         $hospitalCode = '';
         $distributorCode = '';
         $JANCode = '';
         $quantity = 0;
-        
+        $deliveryDestCode = '';
+
         if (array_key_exists('recordId', $values)) {
             $id = $values['recordId'];
         }
-        
+
         if (array_key_exists('orderCNumber', $values)) {
             $orderCNumber = $values['orderCNumber'];
         }
-        
+
         if (array_key_exists('orderNumber', $values)) {
             $orderNumber = $values['orderNumber'];
         }
-        
+
         if (array_key_exists('hospitalCode', $values)) {
             $hospitalCode = trim($values['hospitalCode']);
         }
-        
+
         if (array_key_exists('distributorCode', $values)) {
             $distributorCode = trim($values['distributorCode']);
         }
-        
+
         if (array_key_exists('itemJANCode', $values)) {
             $JANCode = trim($values['itemJANCode']);
         }
-        
+
         if (array_key_exists('orderQuantity', $values)) {
             $quantity = (int)$values['orderQuantity'];
         }
-        
-        return new Order($id, $orderCNumber, $orderNumber, $hospitalCode, $distributorCode, $JANCode, $quantity);
+
+
+        if (array_key_exists('deliveryDestCode', $values)) {
+            $deliveryDestCode = (string)$values['deliveryDestCode'];
+        }
+
+        return new Order($id, $orderCNumber, $orderNumber, $hospitalCode, $distributorCode, $JANCode, $quantity, $deliveryDestCode);
     }
 }

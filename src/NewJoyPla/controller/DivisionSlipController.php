@@ -45,6 +45,7 @@ EOM;
                 "user_id" => "%val:@sys:id%",
                 "user_auth_key" => "%val:@usr:authKey%",
                 "hospitalId" => "%val:usr:hospitalId%",
+                "deliveryDestCode" => "%val:usr:deliveryDestCode%"
                 ];
 
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [

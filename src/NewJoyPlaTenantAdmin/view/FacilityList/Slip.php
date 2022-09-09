@@ -1,4 +1,4 @@
-<?php 
+<?php
 $auth = new App\Lib\Auth();
 ?>
 <div class="uk-section uk-section-default uk-preserve-color uk-padding-remove">
@@ -8,22 +8,35 @@ $auth = new App\Lib\Auth();
                 <h1>病院情報詳細[%val:usr:hospitalName%]</h1>
             </div>
             <div class="uk-width-1-2@m uk-text-right">
-                <form action="<?php echo $form_url ?>" method="post" uk-margin>
+                <form action="<?php echo $form_url ?>" method="post"
+                    uk-margin>
                     <?php if($auth->Gate('FacilityUpdate')): ?>
-        	        <button type="submit" class="uk-button uk-button-primary" name="Action" value="update">病院情報更新</button>
-        	        <?php endif ?>
-        	        <button type="submit" class="uk-button uk-button-primary" name="Action" value="divisionReg">部署登録</button>
-        	        <button type="submit" class="uk-button uk-button-primary" name="Action" value="hospitalUserRegDivisionList">病院ユーザー追加</button>
-        	        <button type="submit" class="uk-button uk-button-primary" name="Action" value="distributorReg">卸業者登録</button>
+                    <button type="submit" class="uk-button uk-button-primary" name="Action"
+                        value="update">病院情報更新</button>
+                    <?php endif ?>
+                    <button type="submit" class="uk-button uk-button-primary" name="Action"
+                        value="divisionReg">部署登録</button>
+                    <button type="submit" class="uk-button uk-button-primary" name="Action"
+                        value="hospitalUserRegDivisionList">病院ユーザー追加</button>
+                    <button type="submit" class="uk-button uk-button-primary" name="Action"
+                        value="distributorReg">卸業者登録</button>
                 </form>
             </div>
         </div>
         <div>
             <ul class="uk-child-width-expand uk-tab">
-                <li class="<?php echo $switch_1 ?>"><a href="#" onclick="location.href='<?php echo $base_url ?>&table_cache=true'">基本情報</a></li>
-                <li class="<?php echo $switch_2 ?>"><a href="#" onclick="location.href='<?php echo $base_url ?>&Switcher=Division&table_cache=true'">部署情報</a></li>
-                <li class="<?php echo $switch_3 ?>"><a href="#" onclick="location.href='<?php echo $base_url ?>&Switcher=Users&table_cache=true'">ユーザー情報</a></li>
-                <li class="<?php echo $switch_4 ?>"><a href="#" onclick="location.href='<?php echo $base_url ?>&Switcher=Distributor&table_cache=true'">卸業者情報</a></li>
+                <li class="<?php echo $switch_1 ?>"><a href="#"
+                        onclick="location.href='<?php echo $base_url ?>&table_cache=true'">基本情報</a>
+                </li>
+                <li class="<?php echo $switch_2 ?>"><a href="#"
+                        onclick="location.href='<?php echo $base_url ?>&Switcher=Division&table_cache=true'">部署情報</a>
+                </li>
+                <li class="<?php echo $switch_3 ?>"><a href="#"
+                        onclick="location.href='<?php echo $base_url ?>&Switcher=Users&table_cache=true'">ユーザー情報</a>
+                </li>
+                <li class="<?php echo $switch_4 ?>"><a href="#"
+                        onclick="location.href='<?php echo $base_url ?>&Switcher=Distributor&table_cache=true'">卸業者情報</a>
+                </li>
             </ul>
             <?php if($switch_1 != ""): ?>
             <table class="uk-table uk-table-divider">
@@ -178,24 +191,24 @@ $auth = new App\Lib\Auth();
                 </tfoot>
             </table>
             <?php elseif($switch_2 != ""): ?>
-           
-        	<h3>部署一覧</h3>
-    		<div class="uk-margin spiral_table_area" style="display:none">
-    			%sf:usr:search6:table:mstfilter%
-    		</div>
+
+            <h3>部署一覧</h3>
+            <div class="uk-margin spiral_table_area" style="display:none">
+                %sf:usr:search6:table:mstfilter%
+            </div>
             <?php elseif($switch_3 != ""): ?>
-           
-        	<h3>ユーザー一覧</h3>
-    		<div class="uk-margin spiral_table_area" style="display:none">
-    			%sf:usr:search9:table:mstfilter%
-    		</div>
-            	
+
+            <h3>ユーザー一覧</h3>
+            <div class="uk-margin spiral_table_area" style="display:none">
+                %sf:usr:search9:table:mstfilter%
+            </div>
+
             <?php elseif($switch_4 != ""): ?>
-           
-        	<h3>卸業者一覧</h3>
-    		<div class="uk-margin spiral_table_area" style="display:none">
-    			%sf:usr:search19:table:mstfilter%
-    		</div>
+
+            <h3>卸業者一覧</h3>
+            <div class="uk-margin spiral_table_area" style="display:none">
+                %sf:usr:search19:table:mstfilter%
+            </div>
             <?php else: ?>
 
 
@@ -203,12 +216,62 @@ $auth = new App\Lib\Auth();
             <script>
                 let elem = $('table tbody a');
                 let param = "FacilitySlip";
-                if(param != "")
-                {
-                	for(let index = 0 ; index < elem.length ; index++){
-                		elem[index].href += "&BACK="+param;
-                	};
+                if (param != "") {
+                    for (let index = 0; index < elem.length; index++) {
+                        elem[index].href += "&BACK=" + param;
+                    };
                 }
+
+                $(function() {
+                    $(document).on('change', '.deliveryDestCode', function() {
+                        let code = $(this).val();
+                        if (!code) {
+                            return;
+                        }
+                        if (!code.match(/^[0-9]{2}/)) {
+                            UIkit.modal.alert('納品指定場所は半角数字2桁で入力してください');
+                        }
+                        if (code === '00') {
+                            UIkit.modal.alert('納品指定場所に「00」は使用できません');
+                        }
+                        return;
+                    });
+
+                    $(document).on('click', '#division-update-button', function() {
+                        let message = '';
+                        $(document).find('form[name="tenantDivision"]').find('.uk-checkbox:checked')
+                            .parents('tr').find('.deliveryDestCode')
+                            .each(function() {
+                                let code = $(this).val();
+                                let index = $('table .deliveryDestCode').index($(this)) + 1;
+                                if (!code) {
+                                    return true;
+                                }
+                                if (!code.match(/^[0-9]{2}/)) {
+                                    message += index + "行目: 納品指定場所は半角数字2桁で入力してください<br>";
+                                }
+                                if (code === '00') {
+                                    message += index + "行目: 納品指定場所に「00」は使用できません<br>";
+                                }
+                            });
+
+                        if (message) {
+                            UIkit.modal.alert(message);
+                            return false;
+                        }
+
+                        const tableId = $(document).find('#tableId').val();
+                        const updateButton = document.getElementById('division-update-button');
+                        if (!SpiralTable.confirmation(tableId, updateButton)) {
+                            return false;
+                        } else {
+                            $(document).find('form[name="tenantDivision"]').append(
+                                '<input id="smp-table-update-button" type="submit" name="smp-table-submit-button" value="更新" >'
+                            );
+                            $(document).find('#smp-table-update-button').trigger('click');
+                        }
+                    });
+                });
             </script>
         </div>
     </div>

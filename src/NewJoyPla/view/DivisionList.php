@@ -6,6 +6,10 @@
 				<li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
 				<li><span>部署一覧</span></li>
 			</ul>
+			<div class="no_print uk-margin">
+				<input class="print_hidden uk-button uk-button-primary" type="button" value="出力"
+					onclick="$('#exportButton').click()">
+			</div>
 			<h2 class="page_title uk-margin-remove">部署一覧</h2>
 			<hr>
 

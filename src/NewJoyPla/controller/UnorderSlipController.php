@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use View;
@@ -26,11 +27,10 @@ use Exception;
 
 class UnorderSlipController extends Controller
 {
-    
     public function __construct()
     {
     }
-    
+
     public function index(): View
     {
         global $SPIRAL;
@@ -38,64 +38,55 @@ class UnorderSlipController extends Controller
         //$mytable = new mytable();
         // テンプレートにパラメータを渡し、HTMLを生成し返却
         try {
-
             $ItemsToJs = [];
             $order_data = [];
             $is_deleted = false;
             $user_info = new UserInfo($SPIRAL);
-            
-            if ($user_info->isDistributorUser())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+
+            if ($user_info->isDistributorUser()) {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
             }
             $record_id = (int)$SPIRAL->getCardId();
-            
-            $card_data = OrderHistory::where('hospitalId',$user_info->getHospitalId())->find($record_id)->get();
+
+            $card_data = OrderHistory::where('hospitalId', $user_info->getHospitalId())->find($record_id)->get();
             $card_data = $card_data->data->get(0);
-            
-            $order_data = OrderedItemView::where('hospitalId',$user_info->getHospitalId())->where('orderNumber',$card_data->orderNumber)->get();
-            
+
+            $order_data = OrderedItemView::where('hospitalId', $user_info->getHospitalId())->where('orderNumber', $card_data->orderNumber)->get();
+
             $order_data = $order_data->data->all();
             $is_deleted = (count($order_data) == 0);
-            
-            if($is_deleted)
-            {
+
+            if ($is_deleted) {
                 $card_data->destroy($card_data->id);
-            } 
-            else if($card_data->orderStatus != "1")
-            {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
-            } 
-            else
-            {
+            } elseif ($card_data->orderStatus != "1") {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+            } else {
                 $total_price = 0;
                 $in_hospital_item_ids = [];
-                foreach($order_data as $order_item)
-                {
+                foreach ($order_data as $order_item) {
                     $total_price = $total_price + (float)$order_item->orderPrice;
                     if (array_search($order_item->inHospitalItemId, $in_hospital_item_ids) === false) {
                         $in_hospital_item_ids[] = $order_item->inHospitalItemId;
                     }
                 }
-                OrderHistory::where('hospitalId',$user_info->getHospitalId())->find($record_id)->update([
+                OrderHistory::where('hospitalId', $user_info->getHospitalId())->find($record_id)->update([
                     'totalAmount'=>$total_price,
                     'itemsNumber' => count($in_hospital_item_ids),//院内商品マスタID数
                     ]);
-                
-                foreach($order_data as $record){
-                	$ItemsToJs[$record->inHospitalItemId] = [
-                		"countNum"=> $record->orderQuantity,
-                		"quantity" => $record->quantity
-            		];
+
+                foreach ($order_data as $record) {
+                    $ItemsToJs[$record->inHospitalItemId] = [
+                        "countNum"=> $record->orderQuantity,
+                        "quantity" => $record->quantity
+                    ];
                 }
-                
             }
-            
-        	$link = '%url/rel:mpgt:Order%&Action=unorderedList';
-            if($user_info->isUser()){
+
+            $link = '%url/rel:mpgt:Order%&Action=unorderedList';
+            if ($user_info->isUser()) {
                 if (preg_match("/Action=unorderedListForDivision/", $_SERVER['HTTP_REFERER'])) {
                     $box = parse_url($_SERVER['HTTP_REFERER']);
-            	    $link = $box['path']."?".$box['query'];
+                    $link = $box['path']."?".$box['query'];
                 }
             }
             $api_url = "%url/card:page_262926%";
@@ -107,15 +98,14 @@ class UnorderSlipController extends Controller
                 'ItemsToJs' => $ItemsToJs,
                 'link'=> $this->sanitize($link),
                 'csrf_token' => Csrf::generate(16)
-                ] , false);
-            
-        } catch ( Exception $ex ) {
+                ], false);
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message'=> $ex->getMessage(),
-                ] , false);
+                ], false);
         } finally {
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
@@ -127,180 +117,171 @@ class UnorderSlipController extends Controller
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
-            ],false);
+            ], false);
         }
     }
-    
+
     public function orderCommentApi()
     {
-        
         global $SPIRAL;
 
         $content = '';
 
         try {
             $user_info = new UserInfo($SPIRAL);
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
+            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
 
-            if ($user_info->isApprover())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            if ($user_info->isApprover()) {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
             }
-            
+
             $id = (int)$SPIRAL->getCardId();
             $comment = ($SPIRAL->getParam('ordercomment')) ? urldecode($SPIRAL->getParam('ordercomment')) : '';
-            if ($comment) { $comment = $this->html($comment); }
-            
-            if(strlen($comment) > 512)
-            {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            if ($comment) {
+                $comment = $this->html($comment);
             }
-            
-            $result = OrderHistory::where('hospitalId',$user_info->getHospitalId())->find($id)->update(['ordercomment'=>$comment]);
-            
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+
+            if (strlen($comment) > 512) {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(), FactoryApiErrorCode::factory(191)->getCode());
+            }
+
+            $result = OrderHistory::where('hospitalId', $user_info->getHospitalId())->find($id)->update(['ordercomment'=>$comment]);
+
+            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['insert']);
             $content = $content->toJson();
             /** TODO
-             *  spiralDatabaseのレスポンスをApiResponseに変更 
+             *  spiralDatabaseのレスポンスをApiResponseに変更
              **/
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+        } catch (Exception $ex) {
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['insert']);
             $content = $content->toJson();
-        }finally {
+        } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
-            ],false);
+            ], false);
         }
     }
-    
+
     public function itemDelete()
     {
-        
         global $SPIRAL;
 
         $content = '';
 
         try {
             $user_info = new UserInfo($SPIRAL);
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
+            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
 
-            if ($user_info->isApprover())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            if ($user_info->isApprover()) {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
             }
 
             $id = (int)$SPIRAL->getCardId();
             $items = $SPIRAL->getParam('data');
-            
-            $order_instance = Order::where('hospitalId',$user_info->getHospitalId());
-            
-            foreach($items as $item)
-            {
-                $order_instance->orWhere('orderCNumber',$item['orderCNumber']);
+
+            $order_instance = Order::where('hospitalId', $user_info->getHospitalId());
+
+            foreach ($items as $item) {
+                $order_instance->orWhere('orderCNumber', $item['orderCNumber']);
             }
-            
+
             $result = $order_instance->delete();
-            
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+
+            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['insert']);
             $content = $content->toJson();
             /** TODO
-             *  spiralDatabaseのレスポンスをApiResponseに変更 
+             *  spiralDatabaseのレスポンスをApiResponseに変更
              **/
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+        } catch (Exception $ex) {
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['insert']);
             $content = $content->toJson();
-        }finally {
+        } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
-            ],false);
+            ], false);
         }
     }
-    
+
     public function itemUpdate()
     {
-        
         global $SPIRAL;
 
         $content = '';
 
         try {
             $user_info = new UserInfo($SPIRAL);
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
+            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
 
-            if ($user_info->isApprover())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            if ($user_info->isApprover()) {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
             }
 
             $id = (int)$SPIRAL->getCardId();
             $items = $SPIRAL->getParam('data');
-            
-            $order_instance = Order::where('hospitalId',$user_info->getHospitalId());
+
+            $order_instance = Order::where('hospitalId', $user_info->getHospitalId());
             $update = [];
-            foreach($items as $item)
-            {
+            foreach ($items as $item) {
                 $update[] = [
                     'orderCNumber' => $item['orderCNumber'],
                     'orderQuantity' => $item['num'],
                 ];
             }
-            
-            $result = $order_instance->bulkUpdate('orderCNumber',$update);
-            
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+
+            $result = $order_instance->bulkUpdate('orderCNumber', $update);
+
+            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['insert']);
             $content = $content->toJson();
             /** TODO
-             *  spiralDatabaseのレスポンスをApiResponseに変更 
+             *  spiralDatabaseのレスポンスをApiResponseに変更
              **/
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+        } catch (Exception $ex) {
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['insert']);
             $content = $content->toJson();
-        }finally {
+        } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
-            ],false);
+            ], false);
         }
     }
-    
+
     public function orderDelete()
     {
-        
         global $SPIRAL;
 
         $content = '';
 
         try {
             $user_info = new UserInfo($SPIRAL);
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
+            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
 
-            if ($user_info->isApprover())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            if ($user_info->isApprover()) {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
             }
 
             $id = (int)$SPIRAL->getCardId();
-            
-            $result = OrderHistory::where('hospitalId',$user_info->getHospitalId())->find($id)->delete();
-            
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+
+            $result = OrderHistory::where('hospitalId', $user_info->getHospitalId())->find($id)->delete();
+
+            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['insert']);
             $content = $content->toJson();
             /** TODO
-             *  spiralDatabaseのレスポンスをApiResponseに変更 
+             *  spiralDatabaseのレスポンスをApiResponseに変更
              **/
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+        } catch (Exception $ex) {
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['insert']);
             $content = $content->toJson();
-        }finally {
+        } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
-            ],false);
+            ], false);
         }
     }
-    
+
     public function orderFix()
     {
         global $SPIRAL;
@@ -309,56 +290,62 @@ class UnorderSlipController extends Controller
 
         try {
             $user_info = new UserInfo($SPIRAL);
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
+            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
 
             $id = (int)$SPIRAL->getCardId();
             $comment = ($SPIRAL->getParam('ordercomment')) ? urldecode($SPIRAL->getParam('ordercomment')) : '';
-            if ($comment) { $comment = $this->html($comment); }
-            $adjustment = ($SPIRAL->getParam('adjustment') === '1' || $SPIRAL->getParam('adjustment') === '2') ? $SPIRAL->getParam('adjustment') : "";
-            
-            if(strlen($comment) > 512)
-            {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            if ($comment) {
+                $comment = $this->html($comment);
             }
-            
-            $result = OrderHistory::where('hospitalId',$user_info->getHospitalId())->find($id)->update([
+            $adjustment = ($SPIRAL->getParam('adjustment') === '1' || $SPIRAL->getParam('adjustment') === '2') ? $SPIRAL->getParam('adjustment') : "";
+
+            if (strlen($comment) > 512) {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(), FactoryApiErrorCode::factory(191)->getCode());
+            }
+
+            $result = OrderHistory::where('hospitalId', $user_info->getHospitalId())->find($id)->update([
                 'ordercomment'=> $comment,
                 'orderStatus' => 2,
                 'orderTime' => 'now',
                 'adjustment' => $adjustment,
             ]);
-            
-            $order_history = OrderDataView::where('hospitalId',$user_info->getHospitalId())->find($id)->get();
+
+            $order_history = OrderDataView::where('hospitalId', $user_info->getHospitalId())->find($id)->get();
             $order_history = $order_history->data->get(0);
-            
-            $hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+
+            $hospital = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
             $hospital = $hospital->data->get(0);
 
-            if($hospital->receivingTarget == '1'){ //大倉庫
-                $division = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionType','1')->get();
+            if ($hospital->receivingTarget == '1') { //大倉庫
+                $division = Division::where('hospitalId', $user_info->getHospitalId())->where('divisionType', '1')->get();
                 $division = $division->data->get(0);
                 $divisionId = $division->divisionId;
+                $deliveryDestCode = $division->deliveryDestCode;
             }
-            if($hospital->receivingTarget == '2'){ //発注部署
+            if ($hospital->receivingTarget == '2') { //発注部署
                 $divisionId = $order_history->divisionId;
+                $division = Division::where('hospitalId', $user_info->getHospitalId())->where('divisionId', $divisionId)->get();
+                $division = $division->data->get(0);
+                $deliveryDestCode = $division->deliveryDestCode;
             }
-            
-            $order_items = OrderedItemView::where('hospitalId',$user_info->getHospitalId())->where('orderNumber',$order_history->orderNumber)->get();
+
+            $order_items = OrderedItemView::where('hospitalId', $user_info->getHospitalId())->where('orderNumber', $order_history->orderNumber)->get();
             $inventory_adjustment_trdata = [];
-            foreach($order_items->data->all() as $item)
-    		{
-                if($item->orderQuantity <= 0){ continue; }
-        		$inventory_adjustment_trdata[] = [
+            foreach ($order_items->data->all() as $item) {
+                if ($item->orderQuantity <= 0) {
+                    continue;
+                }
+                $inventory_adjustment_trdata[] = [
                     'divisionId' => $divisionId,
                     'pattern' => 2,
                     'inHospitalItemId' => $item->inHospitalItemId,
                     'count' => 0,
                     'orderWithinCount' => ((float)$item->orderQuantity * (float)$item->quantity),
                     'hospitalId' => $user_info->getHospitalId(),
-                ];   
-    		}
-            
+                ];
+            }
+
             {
                 $mail_body = $this->view('NewJoyPla/view/Mail/OrderFixForDistributor', [
                     'name' => '%val:usr:name%',
@@ -373,7 +360,7 @@ class UnorderSlipController extends Controller
                     'total_price' => '￥'.number_format((float)$order_history->totalAmount),
                     'slip_url' => OROSHI_OrderDetailAccess."?searchValue=".$order_history->orderNumber,
                     'login_url' => OROSHI_LOGIN_URL,
-                ] , false)->render();
+                ], false)->render();
                 $select_name = $this->makeId($order_history->distributorId);
 
                 $test = DistributorAffiliationView::selectName($select_name)
@@ -384,20 +371,20 @@ class UnorderSlipController extends Controller
                 $test = DistributorAffiliationView::selectRule($select_name)
                     ->body($mail_body)
                     ->subject("[JoyPla] 発注が行われました")
-                    ->from(FROM_ADDRESS,FROM_NAME)
+                    ->from(FROM_ADDRESS, FROM_NAME)
                     ->send();
             }
 
-            
+
             {
-                $distributor = Distributor::where('distributorId',$order_history->distributorId)->plain()
+                $distributor = Distributor::where('distributorId', $order_history->distributorId)->plain()
                 ->value('distributorName')
                 ->value('postalCode')
                 ->value('prefectures')
                 ->value('address')
                 ->get();
                 $distributor = $distributor->data->get(0);
-                
+
                 $mail_body = $this->view('NewJoyPla/view/Mail/OrderFix', [
                     'name' => '%val:usr:name%',
                     'distributor_name' => $distributor->distributorName,
@@ -414,21 +401,21 @@ class UnorderSlipController extends Controller
                     'item_num' => $order_history->itemsNumber,
                     'total_price' => '￥'.number_format((float)$order_history->totalAmount),
                     'login_url' => LOGIN_URL,
-                ] , false)->render();
-                
+                ], false)->render();
+
                 $hospital_user = HospitalUser::getNewInstance();
                 $select_name = $this->makeId($hospital->hospitalId);
                 $test = $hospital_user::selectName($select_name)
                     ->rule(['name'=>'hospitalId','label'=>'name_'.$hospital->hospitalId,'value1'=>$hospital->hospitalId,'condition'=>'matches'])
                     ->rule(['name'=>'userPermission','label'=>'permission_admin2','value1'=>'1,3','condition'=>'contains'])
                     ->filterCreate();
-                    
+
                 $test = $hospital_user::selectRule($select_name)
                     ->body($mail_body)
                     ->subject("[JoyPla] 発注が行われました")
-                    ->from(FROM_ADDRESS,FROM_NAME)
+                    ->from(FROM_ADDRESS, FROM_NAME)
                     ->send();
-                    
+
                 $hospital_user = HospitalUser::getNewInstance();
                 $select_name = $this->makeId($hospital->hospitalId);
                 $test = $hospital_user::selectName($select_name)
@@ -439,26 +426,31 @@ class UnorderSlipController extends Controller
                 $test = $hospital_user::selectRule($select_name)
                     ->body($mail_body)
                     ->subject("[JoyPla] 発注が行われました")
-                    ->from(FROM_ADDRESS,FROM_NAME)
+                    ->from(FROM_ADDRESS, FROM_NAME)
                     ->send();
             }
 
             $result = InventoryAdjustmentTransaction::insert($inventory_adjustment_trdata);
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+            $result = Order::where('hospitalId', $user_info->getHospitalId())->where('orderNumber', $order_history->orderNumber)->update([
+                'updateTime' => 'now',
+                'deliveryDestCode' => $deliveryDestCode
+            ]);
+
+            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['insert']);
             $content = $content->toJson();
             /** TODO
-             *  spiralDatabaseのレスポンスをApiResponseに変更 
+             *  spiralDatabaseのレスポンスをApiResponseに変更
              **/
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+        } catch (Exception $ex) {
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['insert']);
             $content = $content->toJson();
-        }finally {
+        } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
-            ],false);
+            ], false);
         }
     }
-    
+
     private function html($string = '')
     {
         return htmlspecialchars($string, REPLACE_FLAGS, CHARSET);
@@ -472,28 +464,17 @@ $UnorderSlipController = new UnorderSlipController();
 $action = $SPIRAL->getParam('Action');
 
 {
-    if($action === 'orderCommentApi')
-    {
+    if ($action === 'orderCommentApi') {
         echo $UnorderSlipController->orderCommentApi()->render();
-    }
-    else if($action === 'itemDelete')
-    {
+    } elseif ($action === 'itemDelete') {
         echo $UnorderSlipController->itemDelete()->render();
-    }
-    else if($action === 'itemUpdate')
-    {
+    } elseif ($action === 'itemUpdate') {
         echo $UnorderSlipController->itemUpdate()->render();
-    }
-    else if($action === 'orderDelete')
-    {
+    } elseif ($action === 'orderDelete') {
         echo $UnorderSlipController->orderDelete()->render();
-    }
-    else if($action === 'orderFix')
-    {
+    } elseif ($action === 'orderFix') {
         echo $UnorderSlipController->orderFix()->render();
-    }
-    else 
-    {
+    } else {
         echo $UnorderSlipController->index()->render();
     }
 }

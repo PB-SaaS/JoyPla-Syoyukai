@@ -13,8 +13,9 @@ class Order
     private string $orderNumber;
     private string $JANCode;
     private int $quantity;
+    private string $deliveryDestCode;
     private bool $isValid = true;
-    
+
     /**
      * OrderRecord constructor.
      * @param string $id
@@ -23,6 +24,7 @@ class Order
      * @param string $distributorCode
      * @param string $orderNumber
      * @param string $JANCode
+     * @param string $deliveryDestCode
      * @param int $quantity
      */
     public function __construct(
@@ -32,7 +34,8 @@ class Order
         string $hospitalCode,
         string $distributorCode,
         string $JANCode,
-        int $quantity
+        int $quantity,
+        string $deliveryDestCode
     ) {
         $this->id = $id;
         $this->orderCNumber = $orderCNumber;
@@ -41,36 +44,41 @@ class Order
         $this->distributorCode = $distributorCode;
         $this->JANCode = $JANCode;
         $this->quantity = $quantity;
+        $this->deliveryDestCode = $deliveryDestCode;
         $this->isValid = $this->checkIsValid();
     }
-    
-    
+
+
     private function checkIsValid(): bool
     {
         if (!$this->id || strlen($this->id) > 11) {
             return false;
         }
-        
+
         if (!$this->hospitalCode || !$this->checkCode($this->hospitalCode, 10)) {
             return false;
         }
-        
+
         if (!$this->distributorCode || !$this->checkCode($this->distributorCode, 9)) {
             return false;
         }
-        
+
         if (!$this->JANCode || !$this->checkCode($this->JANCode, 13)) {
             return false;
         }
-        
+
         if (!$this->quantity || !$this->checkQuntity($this->quantity)) {
             return false;
         }
-        
+
+        if (!$this->checkDeliveryDestCode($this->deliveryDestCode)) {
+            return false;
+        }
+
         return true;
     }
-    
-    
+
+
     /**
      * @param string $value
      * @param int $digit
@@ -81,8 +89,8 @@ class Order
     {
         return preg_match('/^[0-9]{'.$digit.'}$/', $value) > 0;
     }
-    
-    
+
+
     /**
      * @param int $value
      * @return bool
@@ -92,8 +100,22 @@ class Order
     {
         return $value > 0 && $value < 100000;
     }
-    
-    
+
+
+    /**
+     * @param string $value
+     * @return bool
+     * 納品場所番号チェック
+     */
+    private function checkDeliveryDestCode(string $value): bool
+    {
+        if (empty($value)) {
+            return true;
+        }
+
+        return $this->checkCode($value, 2);
+    }
+
     /**
      * @return int
      */
@@ -101,8 +123,8 @@ class Order
     {
         return $this->id;
     }
-    
-    
+
+
     /**
      * @return string
      */
@@ -110,8 +132,8 @@ class Order
     {
         return $this->hospitalCode;
     }
-    
-    
+
+
     /**
      * @return string
      */
@@ -119,8 +141,8 @@ class Order
     {
         return $this->distributorCode;
     }
-    
-    
+
+
     /**
      * @return string
      */
@@ -128,8 +150,8 @@ class Order
     {
         return $this->orderNumber;
     }
-    
-    
+
+
     /**
      * @return string
      */
@@ -137,8 +159,8 @@ class Order
     {
         return $this->orderCNumber;
     }
-    
-    
+
+
     /**
      * @return string
      */
@@ -146,17 +168,25 @@ class Order
     {
         return $this->JANCode;
     }
-    
-    
+
+
     /**
-     * @return string
+     * @return int
      */
     public function getQuantity(): int
     {
         return $this->quantity;
     }
-    
-    
+
+    /**
+     * @return string
+     */
+    public function getDeliveryDestCode(): string
+    {
+        return $this->deliveryDestCode;
+    }
+
+
     /**
      * @return bool
      */

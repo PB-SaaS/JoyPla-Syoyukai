@@ -11,6 +11,7 @@ define("SENDAPI_URL", "https://www.e-mednet.jp/NASApp/medi/api/send/01");
 define("MEDICODE_BOUNDARY", "----MedicodeAPIBoundary");
 define("SSL_CIPHER_LIST", "DEFAULT:!DH");
 define("NEWLINE", "\r\n");
+define("SENDFILE", "JoyPlaOrderData_");
 
 /* SPIRAL
 ----------------------------*/
