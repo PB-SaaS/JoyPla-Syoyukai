@@ -84,7 +84,8 @@ class Request
     {
         if(empty($this->get('_method')))
         {
-            return $this->server['REQUEST_METHOD'];
+            //return $this->server['REQUEST_METHOD'];
+            return 'get';
         }
         return $this->get('_method');
     }

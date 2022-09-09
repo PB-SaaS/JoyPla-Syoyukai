@@ -75,14 +75,24 @@ else
     errorlog "makeAutoload ${TARGET}"
 fi
 
-cd ../src/
+FULL=$1: ${FULL:=''}
 
-if git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/ ;then
-    cd -
-    log "git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/"
-else
-    cd -
-    errorlog "git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/"
+if [ ${FULL} = "-f" ]; then
+    if cp -r ../${TARGET_DIR}/${TARGET} tmp ;then
+        log "cp directory ${TARGET}"
+    else
+        errorlog "cp directory ${TARGET}"
+    fi
+else 
+    cd ../src/
+
+    if git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/ ;then
+        cd -
+        log "git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/"
+    else
+        cd -
+        errorlog "git add -N .; git diff --name-only --relative=${TARGET_DIR}/${TARGET}/ | xargs -I % cp --parents ./${TARGET}/% ../.deploy/tmp/"
+    fi
 fi
 
 cd tmp

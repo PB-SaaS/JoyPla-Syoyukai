@@ -388,6 +388,9 @@ var JoyPlaApp = Vue.createApp({
             
             let params = new URLSearchParams();
             params.append("path", "/api/received/register");
+            
+            params.append("_method", 'post');
+
             params.append("_csrf", _CSRF);
             params.append("receivedItems", JSON.stringify(encodeURIToObject(receivedModels)));
 

@@ -483,6 +483,7 @@ var JoyPlaApp = Vue.createApp({
               
               let params = new URLSearchParams();
               params.append("path", "/api/fixedQuantityOrder/register");
+              params.append("_method", 'post');
               params.append("_csrf", _CSRF);
               params.append("orderItems", JSON.stringify(encodeURIToObject(orderModels)));
 

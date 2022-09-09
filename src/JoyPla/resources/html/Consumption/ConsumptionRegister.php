@@ -358,6 +358,7 @@ var JoyPlaApp = Vue.createApp({
             
             let params = new URLSearchParams();
             params.append("path", "/api/consumption/register");
+            params.append("_method", 'post');
             params.append("_csrf", _CSRF);
             params.append("consumptionDate", values.consumeDate);
             params.append("consumptionItems", JSON.stringify(encodeURIToObject(consumptionModels)));

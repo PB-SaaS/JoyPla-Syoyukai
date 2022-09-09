@@ -141,8 +141,8 @@ class OrderHistListController extends Controller
             
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '発注履歴詳細一覧',
-                    'print' => true,
-                    'export' => true,
+                    'print' => false,
+                    'export' => false,
                     'table' => '%sf:usr:search17:mstfilter%',
                     'submenulink' => "%url/rel:mpg:top%&path=trackrecord",
                     'submenu' => '実績メニュー',

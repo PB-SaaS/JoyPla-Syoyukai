@@ -301,6 +301,7 @@ var JoyPlaApp = Vue.createApp({
             
             let params = new URLSearchParams();
             params.append("path", "/api/order/register");
+            params.append("_method", 'post');
             params.append("_csrf", _CSRF);
             params.append("orderDate", values.orderDate);
             params.append("integrate", integrate.value);

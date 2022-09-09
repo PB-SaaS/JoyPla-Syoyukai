@@ -271,6 +271,8 @@ var JoyPlaApp = Vue.createApp({
                 let params = new URLSearchParams();
                 const revisedOrderQuantityModel = createRevisedOrderQuantityModel();
                 params.append("path", "/api/order/"+values.orderId+"/revised");
+                params.append("_method", 'patch');
+
                 params.append("revisedOrderQuantityModel", JSON.stringify(encodeURIToObject(revisedOrderQuantityModel)));
                 params.append("_csrf", _CSRF);
 

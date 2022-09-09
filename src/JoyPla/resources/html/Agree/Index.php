@@ -17,6 +17,7 @@
                         </v-text>
                     </div>
                     <input type="hidden" :value="_CSRF" name="_token">
+                    <input type="hidden" value="post" name="_method">
                     <input type="hidden" value="/agree/send" name="path">
                     <div class="flex justify-center gap-6">
                         <v-button-primary type="submit">送信</v-button-primary>

@@ -29,14 +29,10 @@ if($userInfo->isUser() && $myPageID != ''){
                 	<li><a href="%url/rel:mpg:top%&page=page1">消費・発注</a></li>
 				    <li><span>消費履歴詳細一覧</span></li>
 				</ul>
-		    	<div class="no_print uk-margin">
-				  <input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
-				  <input class="print_hidden uk-button uk-button-primary" type="button" value="出力" onclick="$('#exportButton').click()">
-				</div>
 		    	<h2 class="page_title uk-margin-remove">消費履歴詳細一覧</h2>
 		    	<hr>
 		    	<div class="" id="tablearea">
-					%sf:usr:search29:mstfilter%
+					%sf:usr:search29:mstfilter% 
 		    	</div>
 			</div>
 		</div>

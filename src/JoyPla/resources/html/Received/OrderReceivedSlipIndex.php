@@ -397,6 +397,7 @@ setup() {
                             const registerModel = createRegisterModel();
                             let params = new URLSearchParams();
                             params.append("path", "/api/" + values.orderId + "/received/register");
+                            params.append("_method", 'post');
                             params.append("_csrf", _CSRF);
                             params.append("registerModel", JSON.stringify(encodeURIToObject(registerModel)));
 

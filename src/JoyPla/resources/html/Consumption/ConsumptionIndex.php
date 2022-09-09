@@ -155,6 +155,7 @@ var JoyPlaApp = Vue.createApp({
               
               let params = new URLSearchParams();
               params.append("path", "/api/consumption/"+consumptionId+"/delete");
+              params.append("_method", 'delete');
               params.append("_csrf", _CSRF);
 
               const res = await axios.post(_APIURL,params);

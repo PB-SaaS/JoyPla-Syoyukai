@@ -415,6 +415,7 @@ var JoyPlaApp = Vue.createApp({
             start();
             let params = new URLSearchParams();
             params.append("path", "/api/order/unapproved/"+orderId+"/approval");
+            params.append("_method", 'patch');
             params.append("_csrf", _CSRF);
 
             const res = await axios.post(_APIURL,params);
@@ -457,6 +458,7 @@ var JoyPlaApp = Vue.createApp({
             
             let params = new URLSearchParams();
             params.append("path", "/api/order/unapproved/"+orderId+"/delete");
+            params.append("_method", 'delete');
             params.append("_csrf", _CSRF);
 
             const res = await axios.post(_APIURL,params);
