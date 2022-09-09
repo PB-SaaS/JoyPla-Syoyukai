@@ -6,16 +6,16 @@ JoyPla からお知らせです。
 
 <?php
 
-echo "[施設名]: " . $hospitalName ." \n";
-echo "[担当者]: " . $ordererUserName ." \n";
+echo "施設名: " . $hospitalName ." \n";
+echo "担当者: " . $ordererUserName ." \n";
 echo " \n";
 echo " \n";
 foreach($history as $h)
 {
-    echo "[発注番号]: " . $h["orderNumber"] ." \n";
-    echo "[部署名]: " . $h["divisionName"] ." \n";
-    echo "[卸業者名]: " . $h["distributorName"] ." \n";
-    echo "[金額]: ￥" . $h["totalAmount"] ." \n";
+    echo "発注番号: " . $h["orderNumber"] ." \n";
+    echo "部署名: " . $h["divisionName"] ." \n";
+    echo "卸業者名: " . $h["distributorName"] ." \n";
+    echo "金額: ￥" . $h["totalAmount"] ." \n";
     echo " \n";
 }
 ?>

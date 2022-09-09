@@ -43,7 +43,7 @@ use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedLabelPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedLabelSettingPresenter;
 use JoyPla\JoyPlaApplication;
 
-//SPIRALはすべてPOSTになる
+//param _method="" を指定すると POST PUT DELETE GET PATCH を区別できる
 
 const VIEW_FILE_ROOT = "JoyPla/resources";
 

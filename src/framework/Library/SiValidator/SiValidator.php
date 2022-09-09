@@ -13,6 +13,32 @@ class SiValidator {
     private static array $errorMessages = [];
     private static array $values = [];
     private static array $labels = [];
+    private array $result = [];
+
+    public function __construct($result = [])
+    {
+        $this->result = array_map(function(SiValidateResult $r){
+            return $r;
+        },$result);
+    }
+
+    public function isError()
+    {
+        foreach($this->result as $r)
+        {
+            if(! $r->isValid())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function getResults()
+    {
+        return array_map(function($r){ return $r->toArray(); },$this->result);
+    }
 
     public static function make($values , $rules , $labels = [] , $messages = [] )
     {
@@ -29,7 +55,7 @@ class SiValidator {
             $result[$key] = self::validate($value, $label , $rules[$key]);
         }
 
-        return $result;
+        return new SiValidator($result);
     }
 
     public static function language($lang)
@@ -65,17 +91,17 @@ class SiValidator {
             {
                 self::errorMessages($rule->message());
                 $result = $rule->processable($value);
-                $message = (! $result )? self::getErrorMessage($rule->name()) : "";
+                $message = (! $result )? $rule->message()[self::$language][ $rule->name() ] : "";
                 $message = self::messageReplace($message , $field);
                 $result = new SiValidateResult($result , $message , $value);
             } else if(  ! is_string($rule) && is_callable($rule))
             {
                 $message = $rule($value, $field );
-                $result = new SiValidateResult((is_string($message) && $message === '') , $message , $value);
+                $result = new SiValidateResult( ($message == '') , $message , $value);
             } else {
                 //return ($rule !== '')? self::errorMessage( $rule , $field) : "";
                 $message = (! self::isValid($value , $rule))? self::errorMessage( $rule , $field) : "";
-                $result = new SiValidateResult(($rule === '') , $message , $value);
+                $result = new SiValidateResult( ($message == '') , $message , $value);
             }
             if(!$result->isValid())
             {
@@ -145,7 +171,7 @@ class SiValidator {
 
     public static function errorMessages( array $errorMessages )
     {
-        self::$errorMessages = array_merge_recursive(self::$errorMessages , $errorMessages);
+        self::$errorMessages = array_merge(self::$errorMessages , $errorMessages) ;
     }
 
     public static function startsWith($haystack, $needle) {
@@ -227,5 +253,14 @@ class SiValidateResult {
     public function isValid()
     {
         return $this->result;
+    }
+
+    public function toArray()
+    {
+        return [
+            'value' => $this->value,
+            'result' => $this->result,
+            'message' => $this->message,
+        ];
     }
 }

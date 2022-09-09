@@ -9,6 +9,15 @@ class HttpRequest
     {
         
     }
+    public function setUrl(string $url = '')
+    {
+        $this->url = $url;
+    }
+
+    public function setHeader(array $header = [])
+    {
+        $this->httpHeader = $header;
+    }
 
     public function get( HttpRequestParameter $param )
     {

@@ -82,7 +82,11 @@ class Request
 
     public function getMethod(): string
     {
-        return $this->server['REQUEST_METHOD'];
+        if(empty($this->get('_method')))
+        {
+            return $this->server['REQUEST_METHOD'];
+        }
+        return $this->get('_method');
     }
 
     public function get($key)

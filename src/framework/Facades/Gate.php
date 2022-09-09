@@ -44,7 +44,7 @@ class Gate {
     final public static function getGateInstance(string $pass , ...$instances)
     {
         foreach (self::$gates as $gate) {
-            if ($gate->processable($pass)) {
+            if ($gate->processable($pass)) { 
                 if(self::$auth === null)
                 {
                     return $gate->process(...$instances);

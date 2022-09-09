@@ -82,8 +82,7 @@ use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedReturnRegisterPrese
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedShowPresenter;
 use JoyPla\JoyPlaApplication;
 
-//SPIRALはすべてPOSTになる
-
+//param _method="" を指定すると POST PUT DELETE GET PATCH を区別できる
 const VIEW_FILE_ROOT = "JoyPla/resources";
 
 Router::group(VerifyCsrfTokenMiddleware::class, function(){

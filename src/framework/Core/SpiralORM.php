@@ -12,6 +12,7 @@ class SpiralORM
     public const UPDATED_AT = "";
     public const DELETED_AT = "";
     private static $spiral_db_name = "";
+    private static array $leftJoin = [];
     private static $instances = [];
     public static $guarded = [];
     public static $fillable = [];
@@ -30,6 +31,9 @@ class SpiralORM
         global $SPIRAL;
         $spiralApiCommunicator = $SPIRAL->getSpiralApiCommunicator();
         $spiralApiRequest = new SpiralApiRequest();
+
+        $this::$leftJoin = [];
+        
         $this->spiralDataBase = new SpiralDataBase($SPIRAL,$spiralApiCommunicator,$spiralApiRequest);
         if(isset($this::$mail_field_title) && $this::$mail_field_title != null)
         { 
@@ -172,6 +176,17 @@ class SpiralORM
         return $instance;
     }
 
+    public static function leftJoin($title , $rightKey , $op , $leftKey , $fields = [])
+    {
+        $instance = self::getInstance();
+        if(! isset($instance::$leftJoin[$instance::$spiral_db_name]))
+        {
+            $instance::$leftJoin[$instance::$spiral_db_name] = [];
+        }
+        $instance::$leftJoin[$instance::$spiral_db_name][] = [ 'title' => $title ,'rightKey' => $rightKey , 'op' => $op , 'leftKey' => $leftKey , 'fields'=> $fields];
+        return $instance;
+    }
+
     public static function value($fieldTitle)
     {
         $instance = self::getInstance();
@@ -248,16 +263,58 @@ class SpiralORM
             if( $instance->select_fields === null && $instance->plain === null){
                 $result['data'] = $instance->getDataToInstance($result['data']);
             }
-        }
+        } 
         
         if($result['code'] != 0)
         {
             throw new Exception(FactoryApiErrorCode::factory((int)$result['code'])->getMessage(),FactoryApiErrorCode::factory((int)$result['code'])->getCode());
         }
+        $collection = new Collection($result);
+        $collection = $instance::getLeftJoin($collection);
         
         $instance->clear();
 
-        return new Collection($result);
+        return $collection;
+    }
+
+    private static function getLeftJoin($collection)
+    {
+        $instance = self::getInstance();
+        if(! isset($instance::$leftJoin[$instance::$spiral_db_name]) )
+        {
+        	return $collection;
+        }
+        foreach($instance::$leftJoin[$instance::$spiral_db_name] as $j)
+        {
+            $values = collect_column($collection->data->all() , $j['leftKey']);
+            $spiraldb = SpiralORM::title($j['title']);
+            $spiraldb->value($j['fields']);
+            foreach($values as $v)
+            {
+                $spiraldb->orWhere($j['rightKey'] , $v , $j['op']);
+            }
+            $result = $spiraldb->get();
+            $result = $result->data->all();
+            foreach( $collection->data->all() as &$c )
+            {
+                foreach( $result as $d ) 
+                {
+                    if($c->{ $j['leftKey'] } === $d->{ $j['rightKey'] })
+                    {
+                        $col = [];
+                        if(isset($c->{$j['title']}))
+                        {
+                            $col = $c->{$j['title']};
+                        }
+                        $col[] = $d ;
+                        $c->set($j['title'] , $col );
+                    }
+                }
+            }
+
+        }
+
+        return $collection;
     }
     
     public static function clear()

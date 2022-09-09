@@ -97,7 +97,7 @@
                                                 <p class="truncate">&yen; {{ numberFormat(orderItem.price) }}</p>
                                             </td>
                                             <td class="border border-slate-600 p-1">
-                                                <p class="truncate">&yen; {{ numberFormat(orderItem.quantity.quantityNum) }} {{ orderItem.quantity.quantityUnit }}</p>
+                                                <p class="truncate">{{ numberFormat(orderItem.quantity.quantityNum) }} {{ orderItem.quantity.quantityUnit }}</p>
                                             </td>
                                             <td class="border border-slate-600 p-1">
                                                 <p class="truncate">{{ numberFormat(orderItem.orderQuantity) }}{{ orderItem.quantity.itemUnit }}</p>

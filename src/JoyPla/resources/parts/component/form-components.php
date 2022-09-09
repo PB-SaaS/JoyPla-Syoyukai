@@ -679,7 +679,7 @@ const vAlert = {
     },
   },
   template : `
-  <div class="modal micromodal-slide" :id="id" aria-hidden="true">
+  <div class="modal micromodal-slide" :id="id">
     <div class="modal__overlay z-10">
       <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-alert-title">
         <header class="modal__header">
@@ -750,7 +750,7 @@ const vConfirm = {
     },
   },
   template : `
-  <div class="modal micromodal-slide" :id="id" aria-hidden="true">
+  <div class="modal micromodal-slide" :id="id">
     <div class="modal__overlay z-10">
       <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-confirm-title">
         <header class="modal__header">
@@ -806,7 +806,7 @@ const vOpenModal = {
     },
   },
   template : `
-  <div class="modal micromodal-slide" :id="id" aria-hidden="true">
+  <div class="modal micromodal-slide" :id="id">
     <div class="modal__overlay z-10">
       <div class="bg-white py-7 px-4 lg:px-7 rounded overflow-y-auto box-border lg:w-2/3 w-full max-w-none" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="flex flex-col h-full">

@@ -47,7 +47,7 @@ class Route
 
     final public function processable(Request $request): bool
     {
-        if ($request->getMethod() !== $this->method) { 
+        if (mb_strtolower($request->getMethod()) !== mb_strtolower($this->method)) { 
             return false;
         }
 

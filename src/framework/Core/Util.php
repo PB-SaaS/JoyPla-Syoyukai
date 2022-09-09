@@ -25,7 +25,7 @@ namespace validate
     function isOnlyKana ($value): bool
     {
         return preg_match("/^[ァ-ヾ]+$/u", $value);
-    }
+    } 
 
     function isOnlyKanaAndBlankSpace($value): bool
     {

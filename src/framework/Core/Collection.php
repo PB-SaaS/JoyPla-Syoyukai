@@ -1,5 +1,5 @@
 <?php
-class Collection
+class Collection extends stdClass
 {
 
     private $array = [];
