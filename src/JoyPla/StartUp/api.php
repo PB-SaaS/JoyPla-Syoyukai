@@ -112,7 +112,7 @@ Router::group(VerifyCsrfTokenMiddleware::class, function(){
 
     Router::map('POST','/api/order/unapproved/:orderId/delete',[OrderController::class,'unapprovedDelete'])->service(new OrderUnapprovedDeleteInteractor(new OrderUnapprovedDeletePresenter() , new OrderRepository()) );
 
-    Router::map('POST','/api/order/unapproved/:orderId/approval',[OrderController::class,'approval'])->service(new OrderUnapprovedApprovalInteractor(new OrderUnapprovedApprovalPresenter() , new OrderRepository() , new InventoryCalculationRepository()) );
+    Router::map('POST','/api/order/unapproved/:orderId/approval',[OrderController::class,'approval'])->service(new OrderUnapprovedApprovalInteractor(new OrderUnapprovedApprovalPresenter() , new OrderRepository() , new DivisionRepository() , new InventoryCalculationRepository()) );
 
     Router::map('POST','/api/order/unapproved/:orderId/:orderItemId/delete',[OrderController::class,'unapprovedItemDelete'])->service(new OrderUnapprovedItemDeleteInteractor(new OrderUnapprovedItemDeletePresenter() , new OrderRepository()) );
 

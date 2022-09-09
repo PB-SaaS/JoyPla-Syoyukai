@@ -6,10 +6,10 @@ use App\SpiralDb\Consumption as SpiralDbConsumption;
 use App\SpiralDb\ConsumptionItem as SpiralDbConsumptionItem;
 use App\SpiralDb\ConsumptionItemView;
 use App\SpiralDb\ConsumptionView;
-use App\SpiralDb\Division as SpiralDbDivision;
 use App\SpiralDb\Hospital;
 use App\SpiralDb\InHospitalItemView;
 use Exception;
+use framework\SpiralConnecter\SpiralDB;
 use JoyPla\Enterprise\Models\Consumption;
 use JoyPla\Enterprise\Models\ConsumptionId;
 use JoyPla\Enterprise\Models\ConsumptionItem;
@@ -38,12 +38,27 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface{
 
         $consumptionUnitPriceUseFlag = (Hospital::where('hospitalId', $hospitalId->value())->value('billingUnitPrice')->get())->data->get(0);
 
-        $division = SpiralDbDivision::where('hospitalId',$hospitalId->value());
+        //$division = SpiralDbDivision::where('hospitalId',$hospitalId->value());
+
+        $division = SpiralDB::title('NJ_divisionDB')->value([
+            "registrationTime",
+            "divisionId",
+            "hospitalId",
+            "divisionName",
+            "divisionType",
+            "deleteFlag",
+            "authkey",
+            "deliveryDestCode"
+        ]);
+
+        $division->where('hospitalId',$hospitalId->value());
+
         foreach($consumptionItems as $item){
-            $division = $division->orWhere('divisionId',$item->divisionId);
+            $division->orWhere('divisionId',$item->divisionId);
         }
 
-        $division = ($division->get())->data->all();
+        $division = $division->get();
+        $division = $division->all();
 
         $inHospitalItem = InHospitalItemView::where('hospitalId',$hospitalId->value());
         foreach($consumptionItems as $item){

@@ -8,10 +8,10 @@ use App\SpiralDb\Order as SpiralDbOrder;
 use App\SpiralDb\OrderItem as SpiralDbOrderItem;
 use App\SpiralDb\OrderItemView;
 use App\SpiralDb\OrderView;
-use App\SpiralDb\Division as SpiralDbDivision;
 use App\SpiralDb\HospitalUser;
 use App\SpiralDb\InHospitalItemView;
 use Auth;
+use framework\SpiralConnecter\SpiralDB;
 use JoyPla\Enterprise\Models\Order;
 use JoyPla\Enterprise\Models\OrderId;
 use JoyPla\Enterprise\Models\OrderItem;
@@ -41,12 +41,23 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function findByInHospitalItem(HospitalId $hospitalId, array $orderItems)
     {
-        $division = SpiralDbDivision::where('hospitalId', $hospitalId->value());
+        $division = SpiralDB::title('NJ_divisionDB')->value([
+            "registrationTime",
+            "divisionId",
+            "hospitalId",
+            "divisionName",
+            "divisionType",
+            "deleteFlag",
+            "authkey",
+            "deliveryDestCode"
+        ]);
+
         foreach ($orderItems as $item) {
-            $division = $division->orWhere('divisionId', $item->divisionId);
+            $division->orWhere('divisionId', $item->divisionId);
         }
 
-        $division = ($division->get())->data->all();
+        $division = $division->get();
+        $division = $division->all();
 
         $inHospitalItem = InHospitalItemView::where('hospitalId', $hospitalId->value());
         foreach ($orderItems as $item) {
@@ -117,10 +128,21 @@ class OrderRepository implements OrderRepositoryInterface
             $receivingDivisionCode = '';
             if ($order->getOrderStatus()->value() === OrderStatus::OrderCompletion) {
                 if ($order->getReceivedTarget() === 1) { // 大倉庫
-                    $receivingDivisionCode = (SpiralDbDivision::where('hospitalId', $hospitalId->value())->where('divisionType', '1')->get())->data->get(0)->deliveryDestCode;
+                    
+                    $division = SpiralDB::title('NJ_divisionDB')->value(["deliveryDestCode"])
+                        ->where('hospitalId', $hospitalId->value())
+                        ->where('divisionType', '1')->get();
+                    
+                    $receivingDivisionCode = $division->first()->deliveryDestCode;
+                    //$receivingDivisionCode = (SpiralDbDivision::where('hospitalId', $hospitalId->value())->where('divisionType', '1')->get())->data->get(0)->deliveryDestCode;
                 }
                 if ($order->getReceivedTarget() === 2) { // 部署
-                    $receivingDivisionCode =(SpiralDbDivision::where('hospitalId', $hospitalId->value())->where('divisionId', $order->getDivision()->getDivisionId()->value())->get())->data->get(0)->deliveryDestCode;
+                    $division = SpiralDB::title('NJ_divisionDB')->value(["deliveryDestCode"])
+                        ->where('hospitalId', $hospitalId->value())
+                        ->where('divisionId', $order->getDivision()->getDivisionId()->value())->get();
+                        
+                    $receivingDivisionCode = $division->first()->deliveryDestCode;
+                    //$receivingDivisionCode =(SpiralDbDivision::where('hospitalId', $hospitalId->value())->where('divisionId', $order->getDivision()->getDivisionId()->value())->get())->data->get(0)->deliveryDestCode;
                 }
             }
 

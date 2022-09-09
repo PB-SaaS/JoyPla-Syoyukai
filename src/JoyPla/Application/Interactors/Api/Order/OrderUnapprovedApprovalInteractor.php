@@ -24,6 +24,8 @@ namespace JoyPla\Application\Interactors\Api\Order {
     use JoyPla\Enterprise\Models\OrderItemId;
     use JoyPla\Enterprise\Models\OrderQuantity;
     use JoyPla\Enterprise\Models\OrderStatus;
+    use JoyPla\InterfaceAdapters\GateWays\Repository\DivisionRepository;
+    use JoyPla\InterfaceAdapters\GateWays\Repository\DivisionRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
 
@@ -38,15 +40,26 @@ namespace JoyPla\Application\Interactors\Api\Order {
 
         /** @var OrderRepositoryInterface */
         private OrderRepositoryInterface $orderRepository;
+        
+        /** @var DivisionRepositoryInterface */
+        private DivisionRepositoryInterface $divisionRepository;
+        
+        /** @var InventoryCalculationRepositoryInterface */
+        private InventoryCalculationRepositoryInterface $inventoryCalculationRepository;
 
         /**
          * OrderUnapprovedApprovalInteractor constructor.
          * @param OrderUnapprovedApprovalOutputPortInterface $outputPort
          */
-        public function __construct(OrderUnapprovedApprovalOutputPortInterface $outputPort , OrderRepositoryInterface $orderRepository , InventoryCalculationRepositoryInterface $inventoryCalculationRepository)
+        public function __construct(
+            OrderUnapprovedApprovalOutputPortInterface $outputPort , 
+            OrderRepositoryInterface $orderRepository , 
+            DivisionRepositoryInterface $divisionRepository,
+            InventoryCalculationRepositoryInterface $inventoryCalculationRepository)
         {
             $this->outputPort = $outputPort;
             $this->orderRepository = $orderRepository;
+            $this->divisionRepository = $divisionRepository;
             $this->inventoryCalculationRepository = $inventoryCalculationRepository;
         }
 
@@ -79,17 +92,36 @@ namespace JoyPla\Application\Interactors\Api\Order {
             $this->orderRepository->saveToArray($hospitalId , [$order]);
             
             $inventoryCalculations = [];
-            foreach($order->getOrderItems() as $item)
-            {
-                $inventoryCalculations[] = new InventoryCalculation(
-                    $item->getHospitalId(),
-                    $item->getDivision()->getDivisionId(),
-                    $item->getInHospitalItemId(),
-                    $item->getOrderQuantity()->value() * $item->getQuantity()->getQuantityNum(),
-                    2,
-                    (new Lot(  new LotNumber('') ,new LotDate('')  )),
-                    0
-                );
+
+
+            if ($order->getReceivedTarget() === 1) { // 大倉庫
+                $division = $this->divisionRepository->getStorehouse($hospitalId);
+                foreach($order->getOrderItems() as $item)
+                {
+                    $inventoryCalculations[] = new InventoryCalculation(
+                        $item->getHospitalId(),
+                        $division->getDivisionId(),
+                        $item->getInHospitalItemId(),
+                        $item->getOrderQuantity()->value() * $item->getQuantity()->getQuantityNum(),
+                        2,
+                        (new Lot(  new LotNumber('') ,new LotDate('')  )),
+                        0
+                    );
+                }
+            }
+            if ($order->getReceivedTarget() === 2) { // 部署
+                foreach($order->getOrderItems() as $item)
+                {
+                    $inventoryCalculations[] = new InventoryCalculation(
+                        $item->getHospitalId(),
+                        $item->getDivision()->getDivisionId(),
+                        $item->getInHospitalItemId(),
+                        $item->getOrderQuantity()->value() * $item->getQuantity()->getQuantityNum(),
+                        2,
+                        (new Lot(  new LotNumber('') ,new LotDate('')  )),
+                        0
+                    );
+                }
             }
 
             $this->orderRepository->sendApprovalOrderMail($order , $inputData->user);

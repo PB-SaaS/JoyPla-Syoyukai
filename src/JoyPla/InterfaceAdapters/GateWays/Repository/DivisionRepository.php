@@ -2,7 +2,7 @@
 
 namespace JoyPla\InterfaceAdapters\GateWays\Repository;
 
-use App\SpiralDb\Division as SpiralDbDivision;
+use framework\SpiralConnecter\SpiralDB;
 use JoyPla\Enterprise\Models\Division;
 use JoyPla\Enterprise\Models\DivisionId;
 use JoyPla\Enterprise\Models\HospitalId;
@@ -11,7 +11,18 @@ class DivisionRepository implements DivisionRepositoryInterface{
 
     public function findByHospitalId( HospitalId $hospitalId)
     {
-        $division = (SpiralDbDivision::where('hospitalId',$hospitalId->value())->get())->data->all();
+        $division = SpiralDB::title('NJ_divisionDB')->where('hospitalId',$hospitalId->value())->get([
+            "registrationTime",
+            "divisionId",
+            "hospitalId",
+            "divisionName",
+            "divisionType",
+            "deleteFlag",
+            "authkey",
+            "deliveryDestCode"
+        ]);
+        
+        //$division = (SpiralDbDivision::where('hospitalId',$hospitalId->value())->get())->data->all();
 
         $result = [];
         foreach($division as $d)
@@ -24,15 +35,46 @@ class DivisionRepository implements DivisionRepositoryInterface{
 
     public function find( HospitalId $hospitalId , DivisionId $divisionId)
     {
-        $division = (SpiralDbDivision::where('hospitalId',$hospitalId->value())->where('divisionId',$divisionId->value())->get())->data->get(0);
+        //$division = (SpiralDbDivision::where('hospitalId',$hospitalId->value())->where('divisionId',$divisionId->value())->get())->data->get(0);
 
-        return Division::create($division);
+        $division = SpiralDB::title('NJ_divisionDB')
+        ->where('hospitalId',$hospitalId->value())
+        ->where('divisionId',$divisionId->value())->get([
+            "registrationTime",
+            "divisionId",
+            "hospitalId",
+            "divisionName",
+            "divisionType",
+            "deleteFlag",
+            "authkey",
+            "deliveryDestCode"
+        ]);
+
+        if($division->count() === 0)
+        {
+            return null;
+        }
+
+        return Division::create($division->first());
     } 
 
     public function getStorehouse( HospitalId $hospitalId )
     {
-        $division = (SpiralDbDivision::where('hospitalId',$hospitalId->value())->where('divisionType' , '1')->get())->data->get(0);
-        return Division::create($division);
+        
+        $division = SpiralDB::title('NJ_divisionDB')
+        ->where('hospitalId',$hospitalId->value())
+        ->where('divisionType' , '1')->get([
+            "registrationTime",
+            "divisionId",
+            "hospitalId",
+            "divisionName",
+            "divisionType",
+            "deleteFlag",
+            "authkey",
+            "deliveryDestCode"
+        ]);
+        //$division = (SpiralDbDivision::where('hospitalId',$hospitalId->value())->where('divisionType' , '1')->get())->data->get(0);
+        return Division::create($division->first());
     }
 }
 

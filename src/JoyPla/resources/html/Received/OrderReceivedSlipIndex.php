@@ -393,6 +393,7 @@ setup() {
                 .then(async (result) => {
                     try {
                         if (result.isConfirmed) {
+                            start();
                             const registerModel = createRegisterModel();
                             let params = new URLSearchParams();
                             params.append("path", "/api/" + values.orderId + "/received/register");
@@ -400,7 +401,7 @@ setup() {
                             params.append("registerModel", JSON.stringify(encodeURIToObject(registerModel)));
 
                             const res = await axios.post(_APIURL, params);
-
+                            complete();
                             if (res.data.code != 200) {
                                 throw new Error(res.data.message)
                             }

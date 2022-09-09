@@ -146,11 +146,12 @@ namespace JoyPla\Application\Interactors\Api\Received {
                                         $receivedItem->getHospitalId(),
                                         $storehouse->getDivisionId(),
                                         $receivedItem->getInHospitalItemId(),
-                                        0,
+                                        $receivedItem->getReceivedQuantity()->value() * $receivedItem->getQuantity()->getQuantityNum() * -1,
                                         3,
                                         $receivedItem->getLot(),
                                         $receivedItem->getReceivedQuantity()->value() * $receivedItem->getQuantity()->getQuantityNum(),
                                     );
+                                    /*
                                     $inventoryCalculations[] = new InventoryCalculation(
                                         $receivedItem->getHospitalId(),
                                         $receivedItem->getDivision()->getDivisionId(),
@@ -160,6 +161,7 @@ namespace JoyPla\Application\Interactors\Api\Received {
                                         $receivedItem->getLot(),
                                         0,
                                     );
+                                    */
                                 } else 
                                 {
                                     $inventoryCalculations[] = new InventoryCalculation(

@@ -6,13 +6,13 @@
 namespace JoyPla\Application\Interactors\Api\Barcode {
 
     use App\SpiralDb\CardView;
-    use App\SpiralDb\Division;
     use App\SpiralDb\Hospital;
     use App\SpiralDb\HospitalUser;
     use App\SpiralDb\InHospitalItemView;
     use App\SpiralDb\PayoutItem;
     use App\SpiralDb\ReceivedItemView;
     use Exception;
+    use framework\SpiralConnecter\SpiralDB;
     use JoyPla\Application\InputPorts\Api\Barcode\BarcodeSearchInputPortInterface;
     use JoyPla\Application\InputPorts\Api\Barcode\BarcodeSearchInputData;
     use JoyPla\Application\OutputPorts\Api\Barcode\BarcodeSearchOutputData;
@@ -80,8 +80,14 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
 				$divisionId = $record->divisionId;
 				
 				if($hospital->receivingTarget == "1"){
-					$division = Division::where('hospitalId',$inputData->user->hospitalId)->where('divisionType','1')->get();
-					$division = $division->data->get(0);
+
+                    $division = SpiralDB::title('NJ_divisionDB')
+                        ->where('hospitalId',$inputData->user->hospitalId)
+                        ->where('divisionType','1')->get([
+                            "divisionId",
+                        ]);
+
+					$division = $division->first();
 					$divisionId = $division->divisionId;
 				}
 

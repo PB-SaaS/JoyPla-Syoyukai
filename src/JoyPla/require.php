@@ -130,7 +130,6 @@ require_once('JoyPla/Enterprise/SpiralDb/ConsumptionItemView.php');
 require_once('JoyPla/Enterprise/SpiralDb/ConsumptionView.php');
 require_once('JoyPla/Enterprise/SpiralDb/Distributor.php');
 require_once('JoyPla/Enterprise/SpiralDb/DistributorAffiliationView.php');
-require_once('JoyPla/Enterprise/SpiralDb/Division.php');
 require_once('JoyPla/Enterprise/SpiralDb/Hospital.php');
 require_once('JoyPla/Enterprise/SpiralDb/HospitalUser.php');
 require_once('JoyPla/Enterprise/SpiralDb/InHospitalItem.php');
