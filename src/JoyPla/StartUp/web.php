@@ -47,10 +47,6 @@ use JoyPla\JoyPlaApplication;
 
 const VIEW_FILE_ROOT = "JoyPla/resources";
 
-Router::map('GET', '/top', function($vars , Request $req){
-    Router::redirect('/order/register',$req);
-})->service(new Request());
-
 Router::map('GET', '/agree', [AgreeFormController:: class , 'index']);
 
 Router::map('POST', '/agree/send', [AgreeFormController:: class , 'send']);
