@@ -92,7 +92,7 @@ Router::group(VerifyCsrfTokenMiddleware::class, function(){
 
     Router::map('GET','/api/inHospitalItem/show',[InHospitalItemController::class,'show'])->service(new InHospitalItemShowInteractor(new InHospitalItemShowPresenter() , new InHospitalItemRepository()) );
 
-    Router::map('GET','/api/consumption/register',[ConsumptionController::class,'register'])->service(new ConsumptionRegisterInteractor(new ConsumptionRegisterPresenter() , new ConsumptionRepository() , new InventoryCalculationRepository() , new CardRepository()) );
+    Router::map('POST','/api/consumption/register',[ConsumptionController::class,'register'])->service(new ConsumptionRegisterInteractor(new ConsumptionRegisterPresenter() , new ConsumptionRepository() , new InventoryCalculationRepository() , new CardRepository()) );
 
     Router::map('GET','/api/consumption/show',[ConsumptionController::class,'show'])->service(new ConsumptionShowInteractor(new ConsumptionShowPresenter() , new ConsumptionRepository()) );
 
@@ -139,6 +139,7 @@ Router::group(VerifyCsrfTokenMiddleware::class, function(){
     Router::map('GET','/api/stocktaking/inHospitalItem',[StocktakingController::class,'inHospitalItem']);
     
     Router::map('GET','/api/notification/show',[NotificationController::class,'show'])->service(new NotificationShowInteractor( new NotificationShowPresenter() , new NotificationRepository() ));
+    
 });
 
 try{ 

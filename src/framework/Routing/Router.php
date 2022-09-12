@@ -45,10 +45,10 @@ class Router
      *
      * @return Response
      */
-    final public function dispatch(Request $request)
+    final public function dispatch(Request $request, $isMethodCheck = true)
     {
         foreach (self::$routes as $route) {
-            if ($route->processable($request)) {
+            if ($route->processable($request , $isMethodCheck)) {
                 $route->middleware($this->middlewares);
                 return $route->process($request , $route->service);
             }
@@ -60,7 +60,7 @@ class Router
     public static function redirect($uri , Request $request){
         $request->setRequestUri($uri);
         $router = new Router();
-        return $router->dispatch($request);
+        return $router->dispatch($request , false);
     }
 
     public static function abort(int $code , string $message = "")

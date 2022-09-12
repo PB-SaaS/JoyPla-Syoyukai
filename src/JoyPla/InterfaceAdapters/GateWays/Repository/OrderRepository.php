@@ -505,7 +505,7 @@ class OrderRepository implements OrderRepositoryInterface
             'order_number' => $order['orderId'],
             'item_num' => $order['itemCount'],
             'useMedicode' => $useMedicode,
-            'total_price' => '￥'.number_format((float)$order['totalAmount']),
+            'total_price' => '￥'.number_format_jp((float)$order['totalAmount']),
             'slip_url' => OROSHI_OrderDetailAccess."?searchValue=".$order['orderId'],
             'login_url' => OROSHI_LOGIN_URL,
         ])->render();
@@ -537,7 +537,7 @@ class OrderRepository implements OrderRepositoryInterface
                 'order_date' => $order['orderDate'],
                 'order_number' => $order['orderId'],
                 'item_num' => $order['itemCount'],
-                'total_price' => '￥'.number_format((float)$order['totalAmount']),
+                'total_price' => '￥'.number_format_jp((float)$order['totalAmount']),
                 'login_url' => LOGIN_URL,
             ])->render();
 

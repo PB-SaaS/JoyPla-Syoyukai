@@ -37,10 +37,6 @@ class DistributorUserSlipController extends Controller
             $link = "%url/rel:mpgt:DistributorList%";
             $api_url = "%url/card:page_265119%";
 
-            if ($user_info->isDistributorUser()) {
-                $link = "%url/rel:mpgt:DistributorInfo%";
-            }
-
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
             <li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
@@ -48,6 +44,19 @@ class DistributorUserSlipController extends Controller
             <li><a href="javascript:history.back()">卸業者情報詳細</a></li>
             <li><span>卸業者ユーザー招待情報更新</span></li>
 EOM;
+
+            if ($user_info->isDistributorUser()) {
+
+                $link = "%url/rel:mpgt:DistributorInfo%";
+                $breadcrumb = <<<EOM
+                <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                <li><a href="%url/rel:mpg:top%&page=page8">ユーザー管理</a></li>
+                <li><a href="{$link}">卸業者一覧</a></li>
+                <li><a href="javascript:history.back()">卸業者情報詳細</a></li>
+                <li><span>卸業者ユーザー招待情報更新</span></li>
+EOM;
+            }
+
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
                 'breadcrumb' => $breadcrumb,
                 'title' => '卸業者ユーザー招待情報更新',
@@ -109,10 +118,6 @@ EOM;
             $link = "%url/rel:mpgt:DistributorList%";
             $api_url = "%url/card:page_265119%";
 
-            if ($user_info->isDistributorUser()) {
-                $link = "%url/rel:mpgt:DistributorInfo%";
-            }
-
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
             <li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
@@ -120,6 +125,17 @@ EOM;
             <li><a href="javascript:history.back()">卸業者情報詳細</a></li>
             <li><span>卸業者ユーザー招待情報削除</span></li>
 EOM;
+            if ($user_info->isDistributorUser()) {
+                $link = "%url/rel:mpgt:DistributorInfo%";
+                $breadcrumb = <<<EOM
+                <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                <li><a href="%url/rel:mpg:top%&page=page8">ユーザー管理</a></li>
+                <li><a href="{$link}">卸業者一覧</a></li>
+                <li><a href="javascript:history.back()">卸業者情報詳細</a></li>
+                <li><span>卸業者ユーザー招待情報削除</span></li>
+EOM;
+            }
+
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
                 'breadcrumb' => $breadcrumb,
                 'title' => '卸業者ユーザー招待情報削除',

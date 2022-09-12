@@ -85,6 +85,7 @@ class BorrowingController extends Controller
             
             $content = $this->view('NewJoyPla/view/BorrowingRegistration', [
                 'api_url' => $api_url,
+                'isOldTopPage' => true,
                 'label_api_url' => '%url/rel:mpgt:labelBSOAPI%',
                 'user_info' => $user_info,
                 'divisionData'=> $divisionData,
@@ -124,8 +125,10 @@ class BorrowingController extends Controller
             $user_info = new UserInfo($SPIRAL);
     
             $api_url = "%url/rel:mpgt:Borrowing%";
+            $isOldTopPage = false;
             if( $user_info->isDistributorUser())
             {
+                $isOldTopPage = true;
                 $api_url = "%url/rel:mpgt:BorrowingForD%";
             }
     
@@ -137,6 +140,7 @@ class BorrowingController extends Controller
             $content = $this->view('NewJoyPla/view/BorrowingList', [
                 'api_url' => $api_url,
                 'user_info' => $user_info,
+                'isOldTopPage' => $isOldTopPage,
                 'csrf_token' => Csrf::generate(16)
             ] , false);
             
@@ -831,7 +835,7 @@ class BorrowingController extends Controller
                     'used_date' => $history['usedTime'],
                     'used_slip_number' => $history['usedSlipId'],
                     'used_item_num' => $history['itemsNumber'],
-                    'total_price' => "￥".number_format((float)$history['totalAmount'],2),
+                    'total_price' => "￥".number_format_jp((float)$history['totalAmount'],2),
                     'login_url' => LOGIN_URL,
                 ] , false)->render();
                 $select_name = $this->makeId($history['hospitalId']);

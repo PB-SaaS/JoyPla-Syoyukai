@@ -763,7 +763,7 @@ class OrderSlipDetailController extends Controller
                 'order_date'=> $card->orderTime,
                 'order_number'=> $card->orderNumber,
                 'item_num'=> $card->itemsNumber,
-                'total_price'=>"￥".number_format(collect(array_column($order_items,'orderPrice'))->sum(),2),
+                'total_price'=>"￥".number_format_jp(collect(array_column($order_items,'orderPrice'))->sum(),2),
                 'comment' => $request->ordercomment,
                 'slip_url' => OROSHI_OrderDetailAccess."?searchValue=".$card->orderNumber,
                 'login_url' => OROSHI_LOGIN_URL,

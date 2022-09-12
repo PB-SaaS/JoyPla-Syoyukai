@@ -353,6 +353,14 @@ class JoyPlaApplication extends Application
             return new GatePermissionModel(true , false);
         });
         
+        Gate::define('show_of_picking_history',function(Auth $auth){
+            //ユーザー情報一覧
+            if($auth->userPermission  == '2')//担当者
+            {
+                return new GatePermissionModel(true , true);
+            }
+            return new GatePermissionModel(true , false);
+        });
         
         
     }

@@ -47,13 +47,13 @@ class SpiralExpressManager {
         }
 
         if( 
-            $time === date("Y/m/d H:i:00", strtotime($time)) ||
-            $time === date("Y/m/d H:i:30", strtotime($time))
+            $time === date("Y/m/d H:00", strtotime($time)) ||
+            $time === date("Y/m/d H:30", strtotime($time))
         ){
             $this->request->set('reserve_date' , $time);
         } else 
         {
-            throw new LogicException('reserveDate format is YYYY/MM/DD HH:MM:(00 | 30)');
+            throw new LogicException('reserveDate format is YYYY/MM/DD HH:(00 | 30)');
         }
 
         return $this;
@@ -115,9 +115,31 @@ class SpiralExpressManager {
         return $this;
     }
 
-    public function send()
+    public function ruleId($ruleId)
+    {
+        $this->request->set('rule_id' , $ruleId);
+        return $this;
+    }
+
+    public function standby(bool $standby)
+    {
+        $this->request->set('standby' , ($standby)? 't' : 'f' );
+        return $this;
+    }
+
+    public function regist()
     {
         $xSpiralApiHeader = new XSpiralApiHeaderObject('deliver_express2','regist');
-        $this->connection->request($xSpiralApiHeader , $this->request);
+        $request = $this->connection->request($xSpiralApiHeader , $this->request);
+        return $request['rule_id'];
+    }
+
+    public function sampling(array $ids)
+    {
+        foreach(array_chunk($ids , 100) as $id ){
+            $this->request->set('ids' , $id);
+            $xSpiralApiHeader = new XSpiralApiHeaderObject('deliver_express2','sampling');
+            $this->connection->request($xSpiralApiHeader , $this->request);
+        }
     }
 }

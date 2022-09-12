@@ -30,8 +30,10 @@ class DistributorSlipController extends Controller
         try {
             $user_info = new UserInfo($SPIRAL);
 
+            $isOldTopPage = false;
 
             if ($user_info->isDistributorUser()) {
+                $isOldTopPage = true;
                 $hospital = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
                 $hospital = $hospital->data->get(0);
                 $tenant = Tenant::where('tenantId', $hospital->tenantId)->get();
@@ -47,6 +49,7 @@ class DistributorSlipController extends Controller
 
             $content = $this->view('NewJoyPla/view/DistributorInformationSlip', [
                         'user_info' => $user_info,
+                        'isOldTopPage' => $isOldTopPage,
                         'link' => $link,
                         'tenant' => $tenant,
                         'api_url' => $api_url,
@@ -91,9 +94,6 @@ class DistributorSlipController extends Controller
             $link = "%url/rel:mpgt:DistributorList%";
             $api_url = "%url/card:page_265119%";
 
-            if ($user_info->isDistributorUser()) {
-                $link = "%url/rel:mpgt:DistributorInfo%";
-            }
 
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
@@ -102,6 +102,18 @@ class DistributorSlipController extends Controller
             <li><a href="%url/card:page_265119%">卸業者情報詳細</a></li>
             <li><span>卸業者情報変更</span></li>
 EOM;
+
+            if ($user_info->isDistributorUser()) {
+                $link = "%url/rel:mpgt:DistributorInfo%";
+
+                $breadcrumb = <<<EOM
+                <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                <li><a href="%url/rel:mpg:top%&page=page8">ユーザー管理</a></li>
+                <li><a href="{$link}">卸業者一覧</a></li>
+                <li><a href="%url/card:page_265119%">卸業者情報詳細</a></li>
+                <li><span>卸業者情報変更</span></li>
+EOM;
+            }
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
                 'breadcrumb' => $breadcrumb,
                 'title' => '卸業者情報変更',
@@ -163,9 +175,6 @@ EOM;
             $link = "%url/rel:mpgt:DistributorList%";
             $api_url = "%url/card:page_265119%";
 
-            if ($user_info->isDistributorUser()) {
-                $link = "%url/rel:mpgt:DistributorInfo%";
-            }
 
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
@@ -174,6 +183,16 @@ EOM;
             <li><a href="%url/card:page_265119%">卸業者情報詳細</a></li>
             <li><span>卸業者ユーザー招待</span></li>
 EOM;
+            if ($user_info->isDistributorUser()) {
+                $link = "%url/rel:mpgt:DistributorInfo%";
+                $breadcrumb =  <<<EOM
+                <li><a href="%url/rel:mpg:top%">TOP</a></li>
+                <li><a href="%url/rel:mpg:top%&page=page8">ユーザー管理</a></li>
+                <li><a href="{$link}">卸業者一覧</a></li>
+                <li><a href="%url/card:page_265119%">卸業者情報詳細</a></li>
+                <li><span>卸業者ユーザー招待</span></li>
+EOM;
+            }
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
                 'breadcrumb' => $breadcrumb,
                 'title' => '卸業者ユーザー招待',

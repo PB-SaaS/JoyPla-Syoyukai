@@ -357,7 +357,7 @@ class UnorderSlipController extends Controller
                     'order_date' => $order_history->orderTime,
                     'order_number' => $order_history->orderNumber,
                     'item_num' => $order_history->itemsNumber,
-                    'total_price' => '￥'.number_format((float)$order_history->totalAmount),
+                    'total_price' => '￥'.number_format_jp((float)$order_history->totalAmount),
                     'slip_url' => OROSHI_OrderDetailAccess."?searchValue=".$order_history->orderNumber,
                     'login_url' => OROSHI_LOGIN_URL,
                 ], false)->render();
@@ -399,7 +399,7 @@ class UnorderSlipController extends Controller
                     'order_date' => $order_history->orderTime,
                     'order_number' => $order_history->orderNumber,
                     'item_num' => $order_history->itemsNumber,
-                    'total_price' => '￥'.number_format((float)$order_history->totalAmount),
+                    'total_price' => '￥'.number_format_jp((float)$order_history->totalAmount),
                     'login_url' => LOGIN_URL,
                 ], false)->render();
 

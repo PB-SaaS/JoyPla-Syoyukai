@@ -245,7 +245,7 @@ class OrderSlipDetailController extends Controller
                 'orderTime' => $order_history->orderTime,
                 'itemsNumber' => $order_history->itemsNumber,
                 'orderNumber' => $order_history->orderNumber,
-                'totalAmount' => "￥".number_format((float)$order_history->totalAmount, 2),
+                'totalAmount' => "￥".number_format_jp((float)$order_history->totalAmount, 2),
                 'url' => LOGIN_URL,
             ], false)->render();
             

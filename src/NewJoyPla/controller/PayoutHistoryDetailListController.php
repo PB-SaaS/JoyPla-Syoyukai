@@ -132,6 +132,119 @@ class PayoutHistListController extends Controller
         }
     }
 
+    
+    
+    public function pickingItemHistory(): View
+    {
+        global $SPIRAL;
+        try {
+
+            $user_info = new UserInfo($SPIRAL);
+            
+            if ($user_info->isDistributorUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+            
+            if($user_info->isUser())
+            {
+                $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
+                    'table' => '%sf:usr:search65:table%',
+                    'title' => '払出予定商品実績 - 部署選択',
+                    'param' => 'PayoutHistListForDivision',
+                    ] , false);
+            }
+            else
+            {
+                $content = $this->view('NewJoyPla/view/template/List', [
+                        'title' => '払出予定商品実績',
+                        'print' => false,
+                        'export' => false,
+                        'submenulink' => "%url/rel:mpg:top%&path=trackrecord",
+                        'submenu' => '実績メニュー',
+                        'table' => '%sf:usr:search64:mstfilter%',
+                        'csrf_token' => Csrf::generate(16),
+                        ] , false);
+            }
+    
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
+            
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla 払出予定商品実績',
+                'script' => '',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
+    }
+    
+    public function pickingItemHistoryForDivision(): View
+    {
+        global $SPIRAL;
+        try {
+
+            $user_info = new UserInfo($SPIRAL);
+            
+            if ($user_info->isDistributorUser())
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+            
+            if ($user_info->isHospitalUser() && ( $user_info->isApprover() || $user_info->isAdmin()) )
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+            
+            if ( \App\lib\isMypage() )
+            {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            }
+    
+            $content = $this->view('NewJoyPla/view/template/List', [
+                    'title' => '払出予定商品実績',
+                    'print' => false,
+                    'export' => false,
+                    'submenulink' => "%url/rel:mpg:top%&path=trackrecord",
+                    'submenu' => '実績メニュー',
+                    'table' => '%sf:usr:search64:mstfilter%',
+                    'csrf_token' => Csrf::generate(16),
+                    ] , false);
+    
+        } catch ( Exception $ex ) {
+            $content = $this->view('NewJoyPla/view/template/Error', [
+                'code' => $ex->getCode(),
+                'message'=> $ex->getMessage(),
+                ] , false);
+        } finally {
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            
+            return $this->view('NewJoyPla/view/template/Template', [
+                'title'     => 'JoyPla 払出予定商品実績',
+                'script' => '',
+                'content'   => $content->render(),
+                'head' => $head->render(),
+                'header' => $header->render(),
+                'baseUrl' => '',
+            ],false);
+        }
+    }
+
 }
 
 /***
@@ -142,7 +255,15 @@ $PayoutHistListController = new PayoutHistListController();
 $action = $SPIRAL->getParam('Action');
 
 {
-    if($action === 'PayoutHistListForDivision')
+    
+    if($action === 'pickingItemHistoryForDivision')
+    {
+        echo $PayoutHistListController->pickingItemHistoryForDivision()->render();
+    }
+    else if($action === 'pickingItemHistory')
+    {
+        echo $PayoutHistListController->pickingItemHistory()->render();
+    }else if($action === 'PayoutHistListForDivision')
     {
         echo $PayoutHistListController->PayoutHistListForDivision()->render();
     }

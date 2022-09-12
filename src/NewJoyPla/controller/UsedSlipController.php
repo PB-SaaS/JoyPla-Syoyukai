@@ -87,8 +87,9 @@ class UsedSlipController extends Controller
 
             $api_url = "%url/card:page_176719%";
             $base = "%url/rel:mpgt:Borrowing%";
-
+            $isOldTopPage = false;
             if ($user_info->isDistributorUser()) {
+                $isOldTopPage = true;
                 $base = "%url/rel:mpgt:BorrowingForD%";
             }
 
@@ -125,6 +126,7 @@ class UsedSlipController extends Controller
             $content = $this->view('NewJoyPla/view/UsedSlip', [
                 'user_info' => $user_info,
                 'api_url' => $api_url,
+                'isOldTopPage'=> $isOldTopPage,
                 'csrf_token' => Csrf::generate(16),
                 'used_slip_history' => $used_slip_history,
                 'borrowing' => $borrowing,
@@ -211,7 +213,7 @@ class UsedSlipController extends Controller
                     'used_date' => $used_slip_history->usedTime,
                     'used_slip_number' => $used_slip_history->usedSlipId,
                     'used_item_num' => $used_slip_history->itemsNumber,
-                    'total_price' => "￥".number_format((float)$used_slip_history->totalAmount, 2),
+                    'total_price' => "￥".number_format_jp((float)$used_slip_history->totalAmount, 2),
                     'login_url' => OROSHI_LOGIN_URL,
                 ], false)->render();
 

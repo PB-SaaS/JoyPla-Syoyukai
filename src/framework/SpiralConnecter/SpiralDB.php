@@ -26,6 +26,11 @@ namespace framework\SpiralConnecter {
             self::$secret = $secret;
         }
 
+        public static function filter($title)
+        {
+            return (new SpiralFilterManager(self::$connecter))->setTitle($title);
+        }
+
         public static function mail($title)
         {
             return (new SpiralExpressManager(self::$connecter))->setTitle($title);

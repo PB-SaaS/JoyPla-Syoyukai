@@ -81,7 +81,11 @@
         <div class="uk-container uk-container-expand uk-margin-top">
             <ul class="uk-breadcrumb">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
-                <li><a href="%url/rel:mpg:top%&path=lending">貸出メニュー</a></li>
+				<?php if($isOldTopPage): ?>
+                <li><a href="%url/rel:mpg:top%&page=page5">貸出</a></li>
+				<?php else: ?>
+				<li><a href="%url/rel:mpg:top%&path=lending">貸出メニュー</a></li>
+				<?php endif ?>
                 <li><span>貸出内容入力</span></li>
             </ul>
             <h2 class="page_title">貸出内容入力</h2>

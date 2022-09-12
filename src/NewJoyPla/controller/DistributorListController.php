@@ -28,8 +28,9 @@ class DistributorListController extends Controller
         global $SPIRAL;
         try {
             $user_info = new UserInfo($SPIRAL);
-
+            $isOldTopPage = false;
             if ($user_info->isDistributorUser()) {
+                $isOldTopPage = true;
                 $hospital = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
                 $hospital = $hospital->data->get(0);
                 $tenant = Tenant::where('tenantId', $hospital->tenantId)->get();
@@ -41,10 +42,10 @@ class DistributorListController extends Controller
                 $api_url = "%url/rel:mpgt:DistributorList%";
             }
 
-
             $content = $this->view('NewJoyPla/view/DistributorList', [
                         'user_info' => $user_info,
                         'tenant' => $tenant,
+                        'isOldTopPage' => $isOldTopPage,
                         'api_url' => $api_url,
                     ], false);
         } catch (Exception $ex) {

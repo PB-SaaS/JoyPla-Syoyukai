@@ -45,9 +45,9 @@ class Route
         }
     }
 
-    final public function processable(Request $request): bool
+    final public function processable(Request $request , $isMethodCheck = true): bool
     {
-        if (mb_strtolower($request->getMethod()) !== mb_strtolower($this->method)) { 
+        if ($isMethodCheck && mb_strtolower($request->getMethod()) !== mb_strtolower($this->method)) { 
             return false;
         }
 

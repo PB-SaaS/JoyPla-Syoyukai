@@ -3,7 +3,11 @@
         <div class="uk-container uk-container-expand">
             <ul class="uk-breadcrumb no_print">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
-                	<li><a href="%url/rel:mpg:top%&page=page1">消費・発注</a></li>
+				<?php if($isOldTopPage): ?>
+                <li><a href="%url/rel:mpg:top%&page=page5">貸出</a></li>
+				<?php else: ?>
+				<li><a href="%url/rel:mpg:top%&path=lending">貸出メニュー</a></li>
+				<?php endif ?>
                 <li><a href="<?php echo $link ?>&table_cache=true"><span><?php echo $link_name ?></span></a></li>
                 <li><span><?php echo $current_name ?></span></li>
             </ul>
@@ -98,7 +102,7 @@
                                         echo "<td class='uk-text-nowrap'>".$record->borrowingNum.$record->itemUnit."</td>";
                                         echo "<td>".$record->lotNumber."</td>";
                                         echo "<td>".$record->lotDate."</td>";
-                                        echo "<td class='uk-text-nowrap'>￥".number_format((int)$record->price * (int)$record->borrowingNum,2)."</td>";
+                                        echo "<td class='uk-text-nowrap'>￥".number_format_jp((int)$record->price * (int)$record->borrowingNum)."</td>";
                                         echo "</tr>";
                                         $num++;
                                     }
