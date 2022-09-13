@@ -1,17 +1,22 @@
 <?php
 
-class Auth 
+use framework\SpiralConnecter\SpiralDB;
+
+class Auth extends stdClass
 {
-    public function __construct(String $model)
+    public function __construct($dbTitle , $fields)
     {
-        global $SPIRAL;
-        if(class_exists($model))
+        if(class_exists('Spiral'))
         {
-            $column = array_merge($model::$fillable,$model::$guarded);
-            foreach($column as $f)
+            global $SPIRAL;
+            foreach($fields as $f)
             {
                 $this->{$f} = $SPIRAL->getContextByFieldTitle($f);
             }
+        }
+        else 
+        {
+            //SpiralDB::title(self::$dbTitle);
         }
     }
 
@@ -21,13 +26,12 @@ class Auth
         {
             foreach($collection->all() as $key => $val)
             {
-                if(! isset($this->{$key}))
-                {
+                if(! isset($this->{$key})) 
+                { 
                     $this->{$key} = $val;
                 }
             }
         }
-
         return $this;
     }
 } 

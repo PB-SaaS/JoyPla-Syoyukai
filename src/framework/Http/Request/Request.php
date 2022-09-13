@@ -32,13 +32,13 @@ class Request
         return $this->server['SERVER_NAME'];
     }
 
-    public function setUserModel($model)
+    public function setUser(Auth $auth)
     {
-        $this->user = new Auth($model);
+        $this->user = $auth;
     }
 
     public function user()
-    {
+    { 
         return $this->user;
     }
     

@@ -12,6 +12,7 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
     use App\SpiralDb\PayoutItem;
     use App\SpiralDb\ReceivedItemView;
     use Exception;
+    use framework\Facades\Gate;
     use framework\SpiralConnecter\SpiralDB;
     use JoyPla\Application\InputPorts\Api\Barcode\BarcodeSearchInputPortInterface;
     use JoyPla\Application\InputPorts\Api\Barcode\BarcodeSearchInputData;
@@ -52,7 +53,7 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
             $count = 0;
             if($inputData->barcode === "" )
             {
-                throw new Exception("Barcode is Null",422);
+                throw new Exception("Barcode is Null",200);
             }
             if(preg_match('/^20/', $inputData->barcode) && ( strlen($inputData->barcode) == 12 || strlen($inputData->barcode) == 15) ){ //received
 
@@ -60,8 +61,8 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                 //TODO Repository化は後でやる
 				//検収書から発行されたラベル
 				$receivedItemId = substr($inputData->barcode, 2);
-				if(HospitalUser::isAdmin($inputData->user))
-				{
+				if(Gate::allows('is_admin'))
+                {
 					$result = ReceivedItemView::where('receivingNumber', 'rec_'.$receivedItemId)->where('hospitalId',$inputData->user->hospitalId)->get();
 				}
 				else
@@ -106,11 +107,11 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
 
             } else if(preg_match('/^30/', $inputData->barcode) && strlen($inputData->barcode) == 12){ //payout
             
-                //TODO Repository化は後でやる
+                //TODO Repository化は後でやる 
                 $type = 'payout';
 				//払出から発行されたラベル
 				$payout_num = substr($inputData->barcode, 2);
-				if(HospitalUser::isAdmin($inputData->user))
+				if(Gate::allows('is_admin'))
 				{
 					$result = PayoutItem::where('payoutId', 'payout_'.$payout_num)->where('hospitalId',$inputData->user->hospitalId)->get();
 				}
@@ -150,7 +151,7 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
             
                 $type = 'card';
 
-				if(HospitalUser::isAdmin($inputData->user))
+				if(Gate::allows('is_admin'))
 				{
 					$result = CardView::where('cardId', $inputData->barcode)->where('hospitalId',$inputData->user->hospitalId)->get();
 					$record = $result->data->get(0);
@@ -223,24 +224,28 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                 }
 
             } else {
-                $type = 'gs1-128';
+                try{
+                    $type = 'gs1-128';
 
-                $decoder = new Decoder($delimiter = ' ');
-                $barcode = $decoder->decode($inputData->barcode);
-                $gs1128Data = $barcode->toArray();
+                    $decoder = new Decoder($delimiter = ' ');
+                    $barcode = $decoder->decode($inputData->barcode);
+                    $gs1128Data = $barcode->toArray();
 
-                $gtin13 = self::gtin14ToGtin13Convert($gs1128Data['identifiers']['01']['content']);
+                    $gtin13 = self::gtin14ToGtin13Convert($gs1128Data['identifiers']['01']['content']);
 
-                [ $inHospitalItems , $count ] = $this->barcodeRepository->searchByJanCode((new HospitalId($inputData->user->hospitalId)) , (string)$gtin13);
-                
-                $lotNumber = $gs1128Data['identifiers']['10']['content'];
-                $lotDate = ( $gs1128Data['identifiers']['17']['content'] )? $gs1128Data['identifiers']['17']['content']->format('Y-m-d') : "";
-                
-                foreach($inHospitalItems as $key => $val)
-                {
-                    $inHospitalItems[$key]->set('lotNumber',$lotNumber);
-                
-                    $inHospitalItems[$key]->set('lotDate',$lotDate);
+                    [ $inHospitalItems , $count ] = $this->barcodeRepository->searchByJanCode((new HospitalId($inputData->user->hospitalId)) , (string)$gtin13);
+                    
+                    $lotNumber = $gs1128Data['identifiers']['10']['content'];
+                    $lotDate = ( $gs1128Data['identifiers']['17']['content'] )? $gs1128Data['identifiers']['17']['content']->format('Y-m-d') : "";
+                    
+                    foreach($inHospitalItems as $key => $val)
+                    {
+                        $inHospitalItems[$key]->set('lotNumber',$lotNumber);
+                    
+                        $inHospitalItems[$key]->set('lotDate',$lotDate);
+                    }
+                } catch (Exception $e) {
+                    throw new Exception("Barcode is Null",200);
                 }
             }
             

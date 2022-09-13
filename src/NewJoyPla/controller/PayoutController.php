@@ -23,10 +23,12 @@ use App\Model\InventoryAdjustmentTransaction;
 use App\Model\StockView;
 
 use ApiErrorCode\FactoryApiErrorCode;
+use App\Model\HospitalUser;
 use stdClass;
 use validate\FieldSet;
 use Exception;
 use DateTime;
+use Error;
 
 class PayoutController extends Controller
 {
@@ -757,11 +759,44 @@ EOM;
 
             $insert = [];
 
+            $division = Division::getNewInstance()->plain()->value('divisionId')->value('divisionName')->where('hospitalId', $user_info->getHospitalId());
+
             foreach($items as $item)
             {
+                $division->orWhere('divisionId',$item['source_division'])->orWhere('divisionId',$item['target_division']);
+            }
+
+            $division = ($division->get())->data->all();
+
+            $divisionCheck = function($divisions , $divisionId)
+            {
+                foreach($divisions as $division)
+                {
+                    if($division->divisionId === $divisionId)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            };
+            $psis = [];
+            
+            foreach($items as $item)
+            {
+                if(!$divisionCheck($division , $item['source_division']))
+                {
+                    throw new Exception('source_division is not exist');
+                }
+                if(!$divisionCheck($division , $item['target_division']))
+                {
+                    throw new Exception('target_division is not exist');
+                }
+                $psi = $this->makeId('psi');
+                $psis[] = $psi;
+
                 $insert[] = [
                     "payoutPlanTime" => $item['payout_schedule'],
-                    "payoutPlanId" => $this->makeId('psi'),//payout schedule item
+                    "payoutPlanId" => $psi,//payout schedule item
                     "pickingId" => '',
                     "inHospitalItemId" => $item['recordId'],
                     "itemId" => $item['itemId'],
@@ -774,6 +809,78 @@ EOM;
             }
 
             $result = PayScheduleItems::insert($insert);
+            $instance = PayScheduleItemsView::getNewInstance();
+            foreach($psis as $psi)
+            {
+                $instance->orwhere('payoutPlanId' , $psi);
+            }
+
+            $instance = $instance->get();
+
+            $instance = $instance->data->all();
+
+            $items = [];
+            foreach($instance as $i)
+            {
+                if(!array_key_exists($i->sourceDivisionId , $items))
+                {
+                    $items[$i->sourceDivisionId] = [];
+                }
+                $items[$i->sourceDivisionId][] = [
+                    'targetDivisionName' => $i->targetDivision,
+                    'payoutPlanTime' => $i->payoutPlanTime,
+                    'makerName' => $i->makerName,
+                    'itemName' => $i->itemName,
+                    'itemCode' => $i->itemCode,
+                    'itemStandard' => $i->itemStandard,
+                    'itemJANCode' => $i->itemJANCode,
+                    'payoutQuantity' => $i->payoutQuantity,
+                    'quantityUnit' => $i->quantityUnit,
+                    'cardId' => $i->cardId,
+                ];
+            }
+
+            foreach($items as $divisionId => $item){
+                $hospital_user = HospitalUser::getNewInstance();
+                $select_name = $this->makeId($user_info->getHospitalId());
+                $test = $hospital_user::selectName($select_name)
+                    ->rule(['name'=>'hospitalId','label'=>'name_'.$user_info->getHospitalId(),'value1'=>$user_info->getHospitalId(),'condition'=>'matches'])
+                    ->rule(['name'=>'userPermission','label'=>'permission_2','value1'=>'2','condition'=>'contains'])
+                    ->rule(['name'=>'divisionId','label'=>'permission_division','value1'=>$divisionId,'condition'=>'matches'])
+                    ->filterCreate();
+
+                $mail_body = $this->view('NewJoyPla/view/Mail/RegPayoutScheduled', [
+                    'name' => '%val:usr:name%',
+                    'items' => $item,
+                    'login_url' => LOGIN_URL,
+                ] , false)->render();
+
+                $test = $hospital_user::selectRule($select_name)
+                    ->body($mail_body)
+                    ->subject("[JoyPla] 払出予定商品が追加されました")
+                    ->from(FROM_ADDRESS, FROM_NAME)
+                    ->send();
+            }
+            
+            $hospital_user = HospitalUser::getNewInstance();
+            $select_name = $this->makeId($user_info->getHospitalId());
+            $test = $hospital_user::selectName($select_name)
+                ->rule(['name'=>'hospitalId','label'=>'name_'.$user_info->getHospitalId(),'value1'=>$user_info->getHospitalId(),'condition'=>'matches'])
+                ->rule(['name'=>'userPermission','label'=>'permission_admin','value1'=>'1,3','condition'=>'contains'])
+                ->filterCreate();
+
+            $mail_body = $this->view('NewJoyPla/view/Mail/RegPayoutScheduled', [
+                'name' => '%val:usr:name%',
+                'items' => array_reduce($items, 'array_merge', []),
+                'login_url' => LOGIN_URL,
+            ] , false)->render();
+
+            $test = $hospital_user::selectRule($select_name)
+                ->body($mail_body)
+                ->subject("[JoyPla] 払出予定商品が追加されました")
+                ->from(FROM_ADDRESS, FROM_NAME)
+                ->send();
+
 
             $content = new ApiResponse($result->ids, $result->count , $result->code, $result->message, ['insert']);
             $content = $content->toJson();

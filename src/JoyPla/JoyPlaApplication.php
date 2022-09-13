@@ -33,7 +33,25 @@ class JoyPlaApplication extends Application
         ApiSpiral::$logger = new Logger( new Spiralv2LogginObject( $this::SPIRALV2_API_KEY , $this::LOGGING_APP_TITLE ,$this::SPIRAL_API_LOGGING_DB_TITLE  ) );
         ApiResponse::$logger = new Logger( new Spiralv2LogginObject( $this::SPIRALV2_API_KEY , $this::LOGGING_APP_TITLE ,$this::JOYPLA_API_LOGGING_DB_TITLE  ) );
 
-        $auth = new Auth(HospitalUser::class);
+        $auth = new Auth('NJ_HUserDB',[
+            "registrationTime",
+            "updateTime",
+            "authKey",
+            "hospitalId",
+            "divisionId",
+            "userPermission",
+            "loginId",
+            "loginPassword",
+            "name",
+            "nameKana",
+            "mailAddress",
+            "remarks",
+            "termsAgreement",
+            "tenantId",
+            "agreementDate",
+            "hospitalAuthKey",
+            "userCheck"
+        ]);
 
         $tenant = Tenant::where('tenantId', $auth->tenantId)->get();
         $tenant = $tenant->data->get(0);
@@ -45,6 +63,34 @@ class JoyPlaApplication extends Application
         Gate::define('auth_check',function(Auth $auth){
             return $auth->id != "";
         });
+
+
+
+        Gate::define('is_admin',function(Auth $auth){
+            if($auth->userPermission == '1')
+            {
+                return true;
+            }
+            return false;
+        });
+
+
+        Gate::define('is_user',function(Auth $auth){
+            if($auth->userPermission == '2')
+            {
+                return true;
+            } 
+            return false;
+        });
+
+        Gate::define('is_approver',function(Auth $auth){
+            if($auth->userPermission == '3')
+            {
+                return true;
+            }
+            return false;
+        });
+
 
         Gate::define('register_of_consumption_slips',function(Auth $auth){
             //消費伝票登録

@@ -22,7 +22,7 @@ class AgreeFormController extends Controller
         
         $body = View::forge('html/Agree/Index', [], false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
-    }
+    }   
     
     public function send($vars) {
         
@@ -46,6 +46,6 @@ class AgreeFormController extends Controller
         }
         
         echo Router::redirect('/agree',$this->request);
-    }
+    } 
 }
 

@@ -2503,6 +2503,8 @@ class PayScheduleItemsView extends Model
         "distributorName",
         "lotManagement",
         "category",
+        "sourceDivision",
+        "targetDivision",
     ];
 
     //デフォルト値

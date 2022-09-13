@@ -434,6 +434,7 @@ var app = new Vue({
 					app.lists[index].payout_schedule = app.payout_schedule;
 				});
 				
+				loading();
 				$.ajax({
 	                url: "<?php echo $api_url ?>",
 					type:'POST',
@@ -460,6 +461,7 @@ var app = new Vue({
 				})
 				// Ajaxリクエストが成功・失敗どちらでも発動
 				.always( (data) => {
+				loading_remove();
 				});
 				
 			},function(){
@@ -487,6 +489,7 @@ var app = new Vue({
 					return false;
 				}
 			}
+				loading();
 			$.ajax({
 				async: false,
                 url:'%url/rel:mpgt:labelBarcodeSAPI%',

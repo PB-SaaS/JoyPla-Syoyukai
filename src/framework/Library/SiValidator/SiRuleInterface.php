@@ -2,7 +2,9 @@
 
 namespace framework\Library;
 
-use SpiralORM;
+use framework\SpiralConnecter\Paginator;
+use framework\SpiralConnecter\SpiralDB;
+use framework\SpiralConnecter\SpiralManager;
 
 interface SiRule {
     public function processable($value);
@@ -10,27 +12,36 @@ interface SiRule {
     public function name();
 }
 
-class SpiralDbRule extends SpiralORM implements SiRule{
+class SpiralDbUniqueRule implements SiRule{
 
     private string $name = 'spiralDbUnique';
     private string $uniqueKey = "";
+    private SpiralManager $table;
 
-    public static function unique($tableName , $uniqueKey)
+    public function __construct(SpiralManager $table , $uniqueKey)
     {
-        $instance = new SpiralDbRule();
-        $instance->uniqueKey = $uniqueKey;
-        $instance::title($tableName);
-        return $instance;
+        $this->table = $table;
+        $this->uniqueKey = $uniqueKey;
+    }
+
+    public static function unique($tableName , $uniqueKey , ?callable $searchCallable = null)
+    {
+        $instance = SpiralDB::title($tableName);
+        if( is_callable( $searchCallable ))
+        {
+            $instance = $searchCallable($instance);
+        }
+        $self = new self($instance , $uniqueKey);
+        return $self; 
     }
 
     public function processable($value)
     {
-        $result = $this->where($this->uniqueKey , $value )->paginate(1);
-        if($result->count == 0)
-        {
+        $result = $this->table->where($this->uniqueKey , $value )->paginate(1);
+        if($result instanceof Paginator && $result->getTotal() == 0)
+        { 
             return true; 
         }
-
         return false;
     }
    

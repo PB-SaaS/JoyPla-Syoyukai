@@ -136,7 +136,28 @@ try{
     $app = new JoyPlaApplication();
     $kernel = new \framework\Http\Kernel($app, $router);
     $request = new Request();
-    $request->setUserModel(HospitalUser::class);
+    
+    $auth = new Auth('NJ_HUserDB',[
+        "registrationTime",
+        "updateTime",
+        "authKey",
+        "hospitalId",
+        "divisionId",
+        "userPermission",
+        "loginId",
+        "loginPassword",
+        "name",
+        "nameKana",
+        "mailAddress",
+        "remarks",
+        "termsAgreement",
+        "tenantId",
+        "agreementDate",
+        "hospitalAuthKey",
+        "userCheck"
+    ]); 
+
+    $request->setUser($auth);
     $kernel->handle($request);
 } catch(Exception $e) {
     $body = View::forge('html/Common/Error', [ 
