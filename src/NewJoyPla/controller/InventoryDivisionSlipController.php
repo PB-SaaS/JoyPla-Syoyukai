@@ -169,7 +169,7 @@ class InventoryDivisionSlipController extends Controller
             $useUnitPrice = $hospital_data->invUnitPrice;
 
 
-            $api_url = "%url/card:page_263632%";
+            $api_url = "%url/card:page_263646%";
             $content = $this->view('NewJoyPla/view/InventorySlipItem', [
                 'api_url' => $api_url,
                 'user_info' => $user_info,

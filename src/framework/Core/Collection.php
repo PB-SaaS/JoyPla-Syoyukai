@@ -95,9 +95,17 @@ class Collection extends stdClass
     {
         $tmp = [];
         foreach($this->array as $ary_key => $ary){
-            if(isset($ary[$key]) && $ary[$key] === $val)
+            if(is_object($ary))
             {
-                $tmp[$ary_key] = $ary;
+                if(isset($ary->{$key}) && $ary->{$key} === $val)
+                {
+                    $tmp[] = $ary;
+                }
+            }else if(is_array($ary)){
+                if(isset($ary[$key]) && $ary[$key] === $val)
+                {
+                    $tmp[] = $ary;
+                }
             }
         }
         return new Collection($tmp);
@@ -107,9 +115,17 @@ class Collection extends stdClass
     {
         $tmp = [];
         foreach($this->array as $ary_key => $ary){
-            if(isset($ary[$key]) && in_array($ary[$key], $val_in))
+            if(is_object($ary))
             {
-                $tmp[$ary_key] = $ary;
+                if(isset($ary->{$key}) && in_array($ary->{$key} , $val_in))
+                {
+                    $tmp[] = $ary;
+                }
+            }else if(is_array($ary)){
+                if(isset($ary[$key]) && in_array($ary[$key], $val_in))
+                {
+                    $tmp[] = $ary;
+                }
             }
         }
         return new Collection($tmp);
@@ -119,9 +135,17 @@ class Collection extends stdClass
     {
         $tmp = [];
         foreach($this->array as $ary_key => $ary){
-            if(isset($ary[$key]) && !in_array($ary[$key], $val_in))
+            if(is_object($ary))
             {
-                $tmp[$ary_key] = $ary;
+                if(isset($ary->{$key}) && !in_array($ary->{$key} , $val_in))
+                {
+                    $tmp[] = $ary;
+                }
+            }else if(is_array($ary)){
+                if(isset($ary[$key]) && !in_array($ary[$key], $val_in))
+                {
+                    $tmp[] = $ary;
+                }
             }
         }
         return new Collection($tmp);

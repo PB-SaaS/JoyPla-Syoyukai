@@ -49,7 +49,7 @@ const VIEW_FILE_ROOT = "JoyPla/resources";
 
 Router::map('GET', '/agree', [AgreeFormController:: class , 'index']);
 
-Router::map('POST', '/agree/send', [AgreeFormController:: class , 'send']);
+Router::map('POST', '/agree', [AgreeFormController:: class , 'send']);
 
 Router::group(PersonalInformationConsentMiddleware::class, function(){
 

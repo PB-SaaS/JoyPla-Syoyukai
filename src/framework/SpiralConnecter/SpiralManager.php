@@ -323,6 +323,45 @@ class SpiralManager {
             $request['count']);
     }
 
+    public function getMulti(array $fields = [])
+    {
+        
+        $count = 1; // 1件以上ある想定
+        $res = [];
+        if(is_null($this->request->get('select_columns')))
+        {
+            if( count($this->defaultFields) > 0)
+            {
+                $this->value($this->defaultFields);
+            }
+            else
+            {
+                $this->value('id');
+            }
+        }
+
+        $xSpiralApiHeader = new XSpiralApiHeaderObject('database','select');
+        $this->value($fields);
+
+        $result = $this->paginate(1);
+
+        $count = $result->getTotal();
+
+        $requests = [];
+
+        $this->request->set('lines_per_page' , 1000);
+
+        for($page = 1; $page <= ceil($count / 1000 ); $page++) {
+            $request = $this->request->remake();
+            $request->set('page' , $page);
+            $requests[] = $request;
+        }
+        $res = $this->connection->bulkRequest($xSpiralApiHeader , $requests);
+
+        $res = $this->combine($this->request->get('select_columns') , $res );
+        return new Collection($res);
+    }
+
     public function get( array $fields = [] )
     {
         $count = 1; // 1件以上ある想定
@@ -524,6 +563,11 @@ class SpiralManager {
     {
         $db = SpiralDB::title($this->request->get('db_title'))->paginate(1);
         return $db->getTotal();
+    }
+
+    public function reInstance()
+    {
+        return (new self($this->connection))->setTitle($this->request->get('db_title'));
     }
 }
 

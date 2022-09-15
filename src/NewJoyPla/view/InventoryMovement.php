@@ -395,9 +395,14 @@ var app = new Vue({
             app.searchEndDate = '';
             app.complete = false;
             app.completeDate = '',
+            app.histories = [];
             
             custom_loading = true;
 
+            if(app.select_data.divisionId === "")
+            {
+                return "";
+            }
             function ajax1() {
                 let dfd = $.Deferred();
                 $.ajax({

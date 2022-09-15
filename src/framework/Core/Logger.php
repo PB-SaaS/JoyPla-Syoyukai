@@ -31,6 +31,10 @@ class Logger
     public function out( array $data) {
         $this->object->insert($data);
     }
+    
+    public function outBulk( array $data) {
+        $this->object->bulkInsert($data);
+    }
 
     /**
      * 現在時刻を取得する
@@ -47,4 +51,6 @@ class Logger
 interface LoggingObject 
 {
     public function insert(array $data);
+    public function bulkInsert(array $data);
+
 }
