@@ -9,11 +9,7 @@
         <hr>
         <div class="w-full flex border-b-2 border-gray-200 py-4">
           <div class="flex-auto w-1/2">
-            <v-select
-                name="perPage"
-                :options="perPageOptions"
-                @change="changeParPage"
-              ></v-select>
+            <v-select name="perPage" :options="perPageOptions" @change="changeParPage"></v-select>
           </div>
           <div class="flex-auto w-1/2">
             <div class="ml-auto h-10 w-20 cursor-pointer" data-micromodal-trigger="openModal">
@@ -33,69 +29,55 @@
           <v-button-primary type="button" class="w-full" @click.native="onSubmit">発注登録</v-button-primary>
         </div>
         <div class="pt-2 w-full lg:flex mt-3" v-for="(stock , idx) in fields">
-            <div class="lg:flex-1 flex">
-                <item-view class="md:h-44 md:w-44 h-32 w-32" :base64="stock.value.itemImage"></item-view>
-                <div class="flex-1 pl-4 lg:flex gap-6 break-all">
-                    <div class="flex-auto lg:w-2/3 w-full">
-                        <h3 class="text-xl font-bold font-heading">{{ stock.value.division.divisionName }}[ {{ stock.value.rackName }} ]</h3>
-                        <h3 class="text-xl font-bold font-heading">{{ stock.value.item.makerName }}</h3>
-                        <p class="text-md font-bold font-heading">{{ stock.value.item.itemName }}</p>
-                        <p class="text-md text-gray-500">{{ stock.value.item.itemCode }}</p>
-                        <p class="text-md text-gray-500">{{ stock.value.item.itemStandard }}</p>
-                        <p class="text-md text-gray-500">
-                          {{ stock.value.item.itemJANCode }}
-                        </p>
-                        <div class="w-full text-lg font-bold font-heading flex gap-6">
-                          <span class="text-xl text-orange-600 font-bold font-heading">&yen; {{ numberFormat(stock.value.price) }}/{{ stock.value.quantity.itemUnit }}</span>
-                          <blowing :message="stock.value.priceNotice" title="金額管理備考" v-if="stock.value.priceNotice != ''"></blowing>
-                        </div>
-                        <p class="text-base text-gray-900">
-                        {{ numberFormat(stock.value.quantity.quantityNum) }}{{ stock.value.quantity.quantityUnit }}
-                        </p>
-                        <p class="text-base text-gray-900">
-                        {{ stock.value.distributor.distributorName }}
-                        </p>
-
-                    </div>
-                    <div class="flex-auto lg:w-1/3 w-full">
-                        <div class="lg:flex gap-6 ">
-                            <div class="font-bold w-32">部署定数</div>
-                            <div>{{ numberFormat(stock.value.constant) }} {{ stock.value.quantity.quantityUnit }}</div>
-                        </div>
-                        <div class="lg:flex gap-6 ">
-                            <div class="font-bold w-32">現在在庫数</div>
-                            <div>{{ numberFormat(stock.value.inventory) }} {{ stock.value.quantity.quantityUnit }}</div>
-                        </div>
-                        <div class="lg:flex gap-6 ">
-                            <div class="font-bold w-32">発注済数</div>
-                            <div>{{ numberFormat(stock.value.orderedQuantity) }} {{ stock.value.quantity.quantityUnit }}</div>
-                        </div>
-                        <div class="lg:flex gap-6 ">
-                            <div class="font-bold w-32">必要数</div>
-                            <div>{{ numberFormat(( stock.value.orderedQuantity + stock.value.inventory) - stock.value.constant ) }} {{ stock.value.quantity.quantityUnit }} / 
-                                {{ numberFormat( stock.value.orderQuantity ) }} {{ stock.value.quantity.itemUnit }}
-                            </div>
-                        </div>
-                        <v-input-number 
-                            :rules="{ between: [0 , 99999] }" 
-                            :name="`stockItems[${idx}].orderUnitQuantity`"
-                            label="発注数" 
-                            :min="0" 
-                            :unit="stock.value.quantity.itemUnit" 
-                            :step="1" 
-                            :title="`発注数`" 
-                            change-class-name="inputChange"
-                            ></v-input-number>
-                    </div>
+          <div class="lg:flex-1 flex">
+            <item-view class="md:h-44 md:w-44 h-32 w-32" :base64="stock.value.itemImage"></item-view>
+            <div class="flex-1 pl-4 lg:flex gap-6 break-all">
+              <div class="flex-auto lg:w-2/3 w-full">
+                <h3 class="text-xl font-bold font-heading">{{ stock.value.division.divisionName }}[ {{ stock.value.rackName }} ]</h3>
+                <h3 class="text-xl font-bold font-heading">{{ stock.value.item.makerName }}</h3>
+                <p class="text-md font-bold font-heading">{{ stock.value.item.itemName }}</p>
+                <p class="text-md text-gray-500">{{ stock.value.item.itemCode }}</p>
+                <p class="text-md text-gray-500">{{ stock.value.item.itemStandard }}</p>
+                <p class="text-md text-gray-500">
+                  {{ stock.value.item.itemJANCode }}
+                </p>
+                <div class="w-full text-lg font-bold font-heading flex gap-6">
+                  <span class="text-xl text-orange-600 font-bold font-heading">&yen; {{ numberFormat(stock.value.price) }}/{{ stock.value.quantity.itemUnit }}</span>
+                  <blowing :message="stock.value.priceNotice" title="金額管理備考" v-if="stock.value.priceNotice != ''"></blowing>
                 </div>
+                <p class="text-base text-gray-900">
+                  {{ numberFormat(stock.value.quantity.quantityNum) }}{{ stock.value.quantity.quantityUnit }}
+                </p>
+                <p class="text-base text-gray-900">
+                  {{ stock.value.distributor.distributorName }}
+                </p>
+
+              </div>
+              <div class="flex-auto lg:w-1/3 w-full">
+                <div class="lg:flex gap-6 ">
+                  <div class="font-bold w-32">部署定数</div>
+                  <div>{{ numberFormat(stock.value.constant) }} {{ stock.value.quantity.quantityUnit }}</div>
+                </div>
+                <div class="lg:flex gap-6 ">
+                  <div class="font-bold w-32">現在在庫数</div>
+                  <div>{{ numberFormat(stock.value.inventory) }} {{ stock.value.quantity.quantityUnit }}</div>
+                </div>
+                <div class="lg:flex gap-6 ">
+                  <div class="font-bold w-32">発注済数</div>
+                  <div>{{ numberFormat(stock.value.orderedQuantity) }} {{ stock.value.quantity.quantityUnit }}</div>
+                </div>
+                <div class="lg:flex gap-6 ">
+                  <div class="font-bold w-32">必要数</div>
+                  <div>{{ numberFormat( stock.value.numberOfOrdersRequired )  }} {{ stock.value.quantity.quantityUnit }} /
+                    {{ numberFormat( stock.value.orderQuantity )  }} {{ stock.value.quantity.itemUnit }}
+                  </div>
+                </div>
+                <v-input-number :rules="{ between: [0 , 99999] }" :name="`stockItems[${idx}].orderUnitQuantity`" label="発注数" :min="0" :unit="stock.value.quantity.itemUnit" :step="1" :title="`発注数`" change-class-name="inputChange"></v-input-number>
+              </div>
             </div>
+          </div>
         </div>
-        <v-pagination
-        :show-pages="showPages"
-        v-model:current-page="values.currentPage"
-        :total-count="totalCount"
-        :per-page="parseInt(values.perPage)"
-        ></v-pagination>
+        <v-pagination :show-pages="showPages" v-model:current-page="values.currentPage" :total-count="totalCount" :per-page="parseInt(values.perPage)"></v-pagination>
       </div>
     </div>
   </div>
@@ -105,52 +87,24 @@
         <div class="flex flex-wrap">
           <div class="w-full px-3 my-6 md:mb-0">
             <div class="my-4">
-              <v-input
-                name="makerName"
-                type="text"
-                label="メーカー名"
-                title="メーカー名"
-                ></v-input>
+              <v-input name="makerName" type="text" label="メーカー名" title="メーカー名"></v-input>
             </div>
             <div class="my-4">
-              <v-input
-                name="itemName"
-                type="text"
-                label="商品名"
-                title="商品名"
-                ></v-input>
+              <v-input name="itemName" type="text" label="商品名" title="商品名"></v-input>
             </div>
             <div class="my-4">
-              <v-input
-                name="itemCode"
-                type="text"
-                label="製品コード"
-                title="製品コード"
-                ></v-input>
+              <v-input name="itemCode" type="text" label="製品コード" title="製品コード"></v-input>
             </div>
             <div class="my-4">
-              <v-input
-                name="itemStandard"
-                type="text"
-                label="規格"
-                title="規格"
-                ></v-input>
+              <v-input name="itemStandard" type="text" label="規格" title="規格"></v-input>
             </div>
             <div class="my-4">
-              <v-input
-                name="itemJANCode"
-                type="text"
-                label="JANコード"
-                title="JANコード"
-                ></v-input>
+              <v-input name="itemJANCode" type="text" label="JANコード" title="JANコード"></v-input>
             </div>
-            <?php if(! gate('fixed_quantity_order_slips' )->isOnlyMyDivision ): ?>
-            <div class="my-4">
-              <v-multiple-select-division
-                name="divisionIds"
-                title="発注書元部署名"
-                ></v-multiple-select-division>
-            </div>
+            <?php if (!gate('fixed_quantity_order_slips')->isOnlyMyDivision) : ?>
+              <div class="my-4">
+                <v-multiple-select-division name="divisionIds" title="発注書元部署名"></v-multiple-select-division>
+              </div>
             <?php endif ?>
             <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
               <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
@@ -172,142 +126,167 @@
   </div>
 </div>
 <script>
-var JoyPlaApp = Vue.createApp({
+  var JoyPlaApp = Vue.createApp({
     components: {
-      'v-loading' : vLoading,
+      'v-loading': vLoading,
       'v-breadcrumbs': vBreadcrumbs,
       'v-button-default': vButtonDefault,
       'v-button-primary': vButtonPrimary,
       'v-button-danger': vButtonDanger,
-      'header-navi' : headerNavi,
+      'header-navi': headerNavi,
       'v-open-modal': vOpenModal,
-      'v-input' : vInput ,
+      'v-input': vInput,
       'item-view': itemView,
-      'v-pagination' : vPagination,
-      'v-select' : vSelect,
-      'v-text' : vText,
+      'v-pagination': vPagination,
+      'v-select': vSelect,
+      'v-text': vText,
       'v-input-number': vInputNumber,
-      'v-multiple-select-division' : vMultipleSelectDivision,
-      'blowing' : blowing
+      'v-multiple-select-division': vMultipleSelectDivision,
+      'blowing': blowing
     },
-    setup(){
-        
-      const { ref, toRef , toRefs , reactive ,onMounted} = Vue;
-      const { useFieldArray , useForm } = VeeValidate;
+    setup() {
+
+      const {
+        ref,
+        toRef,
+        toRefs,
+        reactive,
+        onMounted
+      } = Vue;
+      const {
+        useFieldArray,
+        useForm
+      } = VeeValidate;
 
       const loading = ref(false);
       const start = () => {
-          loading.value = true;
+        loading.value = true;
       }
 
       const complete = () => {
-          loading.value = false;
+        loading.value = false;
       }
 
       const sleepComplate = () => {
-          window.setTimeout(function () {
-              complete();
-          }, 500);
+        window.setTimeout(function() {
+          complete();
+        }, 500);
       }
       start();
-      
-      onMounted( () => {
+
+      onMounted(() => {
         sleepComplate()
       });
 
       const date = new Date();
       const yyyy = date.getFullYear();
-      const mm = ("0"+(date.getMonth()+1)).slice(-2);
-      const dd = ("0"+date.getDate()).slice(-2);
+      const mm = ("0" + (date.getMonth() + 1)).slice(-2);
+      const dd = ("0" + date.getDate()).slice(-2);
 
       const getCache = () => {
-          let url = window.location.href;
-          name = 'isCache';
-          var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-              results = regex.exec(url);
-          if (!results) return null;
-          if (!results[2]) return '';
-          return decodeURIComponent(results[2].replace(/\+/g, " "));
+        let url = window.location.href;
+        name = 'isCache';
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+          results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
       }
 
       const getParam = (name) => {
-          let url = window.location.href;
-          name = name.replace(/[\[\]]/g, "\\$&");
+        let url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
 
-          if(getCache() === "true")
-          {
-            let obj = sessionStorage.getItem(pagetitle);
-            if(obj===null){ return "" }
-            return (JSON.parse(obj))[name];
+        if (getCache() === "true") {
+          let obj = sessionStorage.getItem(pagetitle);
+          if (obj === null) {
+            return ""
           }
+          return (JSON.parse(obj))[name];
+        }
 
-          var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-              results = regex.exec(url);
-          if (!results) return null;
-          if (!results[2]) return '';
-          return decodeURIComponent(results[2].replace(/\+/g, " "));
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+          results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
       }
 
-      
+
       const setParam = (values) => {
-        sessionStorage.setItem(pagetitle,JSON.stringify(values));
+        sessionStorage.setItem(pagetitle, JSON.stringify(values));
         const url = new URL(window.location);
-        url.searchParams.set('itemName',values.itemName);
-        url.searchParams.set('makerName',values.makerName);
-        url.searchParams.set('itemCode',values.itemCode);
-        url.searchParams.set('itemStandard',values.itemStandard);
-        url.searchParams.set('itemJANCode',values.itemJANCode);
-        url.searchParams.set('registerDate',values.registerDate);
-        url.searchParams.set('perPage',values.perPage);
-        url.searchParams.set('currentPage',values.currentPage);
-        url.searchParams.set('divisionIds',values.divisionIds);
+        url.searchParams.set('itemName', values.itemName);
+        url.searchParams.set('makerName', values.makerName);
+        url.searchParams.set('itemCode', values.itemCode);
+        url.searchParams.set('itemStandard', values.itemStandard);
+        url.searchParams.set('itemJANCode', values.itemJANCode);
+        url.searchParams.set('registerDate', values.registerDate);
+        url.searchParams.set('perPage', values.perPage);
+        url.searchParams.set('currentPage', values.currentPage);
+        url.searchParams.set('divisionIds', values.divisionIds);
         history.pushState({}, '', url);
       }
 
 
-      const { handleSubmit , control, meta , validate , values , isSubmitting , resetForm  } = useForm({
+      const {
+        handleSubmit,
+        control,
+        meta,
+        validate,
+        values,
+        isSubmitting,
+        resetForm
+      } = useForm({
         initialValues: {
-          itemName  : (getParam("itemName")) ? getParam("itemName") : "",
-          makerName : (getParam("makerName")) ? getParam("makerName") : "",
-          itemCode : (getParam("itemCode")) ? getParam("itemCode") : "",
-          itemStandard : (getParam("itemStandard")) ? getParam("itemStandard") : "",
-          itemJANCode : (getParam("itemJANCode")) ? getParam("itemJANCode") : "",
+          itemName: (getParam("itemName")) ? getParam("itemName") : "",
+          makerName: (getParam("makerName")) ? getParam("makerName") : "",
+          itemCode: (getParam("itemCode")) ? getParam("itemCode") : "",
+          itemStandard: (getParam("itemStandard")) ? getParam("itemStandard") : "",
+          itemJANCode: (getParam("itemJANCode")) ? getParam("itemJANCode") : "",
           registerDate: (getParam("registerDate")) ? getParam("registerDate") : "",
           perPage: (Number.isInteger(getParam("perPage"))) ? getParam("perPage") : "100",
-          currentPage : (Number.isInteger(parseInt(getParam("currentPage")))) ? parseInt(getParam("currentPage")) : 1,
-          divisionIds: (getParam("divisionIds")) ? ( Array.isArray(getParam("divisionIds"))? getParam("divisionIds") : (getParam("divisionIds")).split(',') ) : [],
+          currentPage: (Number.isInteger(parseInt(getParam("currentPage")))) ? parseInt(getParam("currentPage")) : 1,
+          divisionIds: (getParam("divisionIds")) ? (Array.isArray(getParam("divisionIds")) ? getParam("divisionIds") : (getParam("divisionIds")).split(',')) : [],
           stockItems: [],
         },
-        validateOnMount : false
+        validateOnMount: false
       });
-      const { remove, push, fields , update , replace } = useFieldArray('stockItems' , control);
-    
+      const {
+        remove,
+        push,
+        fields,
+        update,
+        replace
+      } = useFieldArray('stockItems', control);
+
 
       const pagetitle = "stockshow";
 
-      const breadcrumbs = [
-          {
-            text: '発注メニュー',
-            disabled: false,
-            href: _ROOT + '&path=/order',
-          },
-          {
-            text: '定数発注',
-            disabled: true, 
-          }
-        ];
+      const breadcrumbs = [{
+          text: '発注メニュー',
+          disabled: false,
+          href: _ROOT + '&path=/order',
+        },
+        {
+          text: '定数発注',
+          disabled: true,
+        }
+      ];
 
       const openModal = ref();
 
       const numberFormat = (value) => {
-          if (! value ) { return 0; }
-          return new Intl.NumberFormat('ja-JP').format(value);
+        if (!value) {
+          return 0;
+        }
+        return new Intl.NumberFormat('ja-JP').format(value);
       };
 
       const onOpenModal = () => {
         openModal.value.open();
       }
-      
+
       const Toast = Swal.mixin({
         toast: true,
         position: 'top-end',
@@ -325,12 +304,24 @@ var JoyPlaApp = Vue.createApp({
       const totalCount = ref(0);
 
       const stocks = ref([]);
-            
-      const perPageOptions = [{ label: "10件表示", value: "10" },{ label: "50件表示", value: "50" },{ label: "100件表示", value: "100" },{ label: "1000件表示", value: "1000" }];
+
+      const perPageOptions = [{
+        label: "10件表示",
+        value: "10"
+      }, {
+        label: "50件表示",
+        value: "50"
+      }, {
+        label: "100件表示",
+        value: "100"
+      }, {
+        label: "1000件表示",
+        value: "1000"
+      }];
 
 
       const searchCount = ref(0);
-      
+
       const listGet = () => {
         let params = new URLSearchParams();
         params.append("path", "/api/order/fixedQuantityOrder");
@@ -342,48 +333,47 @@ var JoyPlaApp = Vue.createApp({
         start();
         replace([]);
 
-        axios.post(_APIURL,params)
-        .then( (response) => {
+        axios.post(_APIURL, params)
+          .then((response) => {
 
-            let data = response.data.data.map((x)=>{
-                x.orderUnitQuantity = x.orderQuantity;
-                return x;
+            let data = response.data.data.map((x) => {
+              x.orderUnitQuantity = x.orderQuantity;
+              return x;
             });
-            
 
-          replace(data);
-          totalCount.value = parseInt(response.data.count);
-        }) 
-        .catch((error) => {
-          complete();
-          if(searchCount.value > 0){
-            Toast.fire({
-              icon: 'error',
-              title: '検索に失敗しました。再度お試しください。'
-            })
-          }
-          searchCount.value ++;
-        })
-        .then(() => {
-          complete();
-          if(searchCount.value > 0){
-            Toast.fire({
-              icon: 'success', 
-              title: '検索が完了しました'
-            })
-          }
-          searchCount.value ++;
-        });
+
+            replace(data);
+            totalCount.value = parseInt(response.data.count);
+          })
+          .catch((error) => {
+            complete();
+            if (searchCount.value > 0) {
+              Toast.fire({
+                icon: 'error',
+                title: '検索に失敗しました。再度お試しください。'
+              })
+            }
+            searchCount.value++;
+          })
+          .then(() => {
+            complete();
+            if (searchCount.value > 0) {
+              Toast.fire({
+                icon: 'success',
+                title: '検索が完了しました'
+              })
+            }
+            searchCount.value++;
+          });
       };
 
-      const changeParPage = () =>
-      {
+      const changeParPage = () => {
         values.currentPage = 1;
         listGet();
       };
 
       const add = (elem) => {
-        context.emit('additem',elem);
+        context.emit('additem', elem);
         Toast.fire({
           icon: 'success',
           title: '反映しました'
@@ -398,58 +388,58 @@ var JoyPlaApp = Vue.createApp({
         values.currentPage = 1;
         listGet();
       };
-      const searchClear = () =>
-      {
+      const searchClear = () => {
         values.currentPage = 1;
         resetForm({
-          itemName  : "",
-          makerName : "",
-          itemCode : "",
-          itemStandard :  "",
-          itemJANCode :  "",
+          itemName: "",
+          makerName: "",
+          itemCode: "",
+          itemStandard: "",
+          itemJANCode: "",
           registerDate: "",
           divisionIds: [],
-          currentPage : 1,
+          currentPage: 1,
           perPage: values.perPage,
         });
         listGet();
       };
 
-      const openSlip = ( url ) => {
-        location.href = _ROOT + "&path=/order/unapproved/" + url;    
+      const openSlip = (url) => {
+        location.href = _ROOT + "&path=/order/unapproved/" + url;
       }
-      const openPrint = ( url ) => {
-        location.href = _ROOT + "&path=/order/" + url + "/print";    
+      const openPrint = (url) => {
+        location.href = _ROOT + "&path=/order/" + url + "/print";
       }
 
-      
-      const createOrderModel = ( values ) => {
+
+      const createOrderModel = (values) => {
         let items = values.stockItems;
         let stockItems = [];
-        items.forEach(function(item, idx){
-          if( item.orderUnitQuantity != 0 ){ 
+        items.forEach(function(item, idx) {
+          if (item.orderUnitQuantity != 0) {
             stockItems.push({
               'inHospitalItemId': item.inHospitalItemId,
               'orderUnitQuantity': item.orderUnitQuantity,
-              'divisionId' : item.division.divisionId,
+              'divisionId': item.division.divisionId,
             })
           }
         });
         return stockItems;
       };
 
-      const onSubmit = async () =>{
-        const { valid, errors } = await validate();
+      const onSubmit = async () => {
+        const {
+          valid,
+          errors
+        } = await validate();
 
-        if(!valid){
+        if (!valid) {
           Swal.fire({
             icon: 'error',
             title: '入力エラー',
             text: '入力エラーがございます。ご確認ください',
           })
-        } 
-        else 
-        {
+        } else {
           Swal.fire({
             title: '発注登録を行います。',
             text: "よろしいですか？",
@@ -460,7 +450,7 @@ var JoyPlaApp = Vue.createApp({
             cancelButtonColor: '#d33',
             confirmButtonText: 'OK'
           }).then((result) => {
-            if(result.isConfirmed){
+            if (result.isConfirmed) {
               orderRegister();
             }
           })
@@ -469,42 +459,41 @@ var JoyPlaApp = Vue.createApp({
 
       const orderRegister = handleSubmit(async (values) => {
         try {
-              start();
-              const orderModels = createOrderModel(values);
-              if( orderModels.length === 0)
-              {
-                Swal.fire({
-                  icon: 'error',
-                  title: '登録する商品がありませんでした。',
-                  text: '内容を確認の上、再送信をしてください。',
-                })
-                return false;
-              }
-              
-              let params = new URLSearchParams();
-              params.append("path", "/api/fixedQuantityOrder/register");
-              params.append("_method", 'post');
-              params.append("_csrf", _CSRF);
-              params.append("orderItems", JSON.stringify(encodeURIToObject(orderModels)));
-
-              const res = await axios.post(_APIURL,params);
-              complete();
-              if(res.data.code != 200) {
-                throw new Error(res.data.message)
-              }
-              Swal.fire({
-                  icon: 'success',
-                  title: '登録が完了しました。',
-                  text: 'メールに登録した発注番号を記載しています',
-              }).then((result) => {
-                location.href = _ROOT + "&path=/order/unapproved/show";
-              });
-              return true ;
-          } catch (error) {
+          start();
+          const orderModels = createOrderModel(values);
+          if (orderModels.length === 0) {
             Swal.fire({
               icon: 'error',
-              title: 'システムエラー',
-              text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+              title: '登録する商品がありませんでした。',
+              text: '内容を確認の上、再送信をしてください。',
+            })
+            return false;
+          }
+
+          let params = new URLSearchParams();
+          params.append("path", "/api/fixedQuantityOrder/register");
+          params.append("_method", 'post');
+          params.append("_csrf", _CSRF);
+          params.append("orderItems", JSON.stringify(encodeURIToObject(orderModels)));
+
+          const res = await axios.post(_APIURL, params);
+          complete();
+          if (res.data.code != 200) {
+            throw new Error(res.data.message)
+          }
+          Swal.fire({
+            icon: 'success',
+            title: '登録が完了しました。',
+            text: 'メールに登録した発注番号を記載しています',
+          }).then((result) => {
+            location.href = _ROOT + "&path=/order/unapproved/show";
+          });
+          return true;
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'システムエラー',
+            text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
           });
         }
       });
@@ -524,14 +513,14 @@ var JoyPlaApp = Vue.createApp({
       const itemCount = () => {
         let num = 0;
         values.stockItems.forEach((v, idx) => {
-          num += ( v.orderUnitQuantity > 0 )? 1 : 0;
+          num += (v.orderUnitQuantity > 0) ? 1 : 0;
         });
         return num;
       };
 
       return {
-        loading, 
-        start, 
+        loading,
+        start,
         complete,
         openPrint,
         openSlip,
@@ -553,12 +542,12 @@ var JoyPlaApp = Vue.createApp({
         totalAmount,
         itemCount
       }
-  },
-  watch: {
-    'values.currentPage': function(val) {
-      this.listGet();
-      window.scrollTo(0, 0);
+    },
+    watch: {
+      'values.currentPage': function(val) {
+        this.listGet();
+        window.scrollTo(0, 0);
+      }
     }
-  }
-}).mount('#top');
-</script> 
+  }).mount('#top');
+</script>

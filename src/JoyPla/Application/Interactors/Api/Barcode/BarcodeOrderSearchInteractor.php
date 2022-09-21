@@ -119,29 +119,33 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                     $result[] = $tmp;
                 }
             } else {
-                $decoder = new Decoder($delimiter = ' ');
-                $barcode = $decoder->decode($inputData->barcode);
-                $gs1128Data = $barcode->toArray();
+                try{
+                    $decoder = new Decoder($delimiter = ' ');
+                    $barcode = $decoder->decode($inputData->barcode);
+                    $type = 'gs1-128';
+                    $gs1128Data = $barcode->toArray();
 
-                $gtin13 = self::gtin14ToGtin13Convert($gs1128Data['identifiers']['01']['content']);
+                    $gtin13 = self::gtin14ToGtin13Convert($gs1128Data['identifiers']['01']['content']);
 
-                [ $orders , $count ] = $this->barcodeRepository->orderSearchByJanCode((new HospitalId($inputData->user->hospitalId)) , (string)$gtin13 , $divisionId);
-                
-                $lotNumber = $gs1128Data['identifiers']['10']['content'];
-                $lotDate = ( $gs1128Data['identifiers']['17']['content'] )? $gs1128Data['identifiers']['17']['content']->format('Y-m-d') : "";
-                
-                $result = [];
-                foreach($orders as $key => $order)
-                {
-                    $tmp = $order->toArray();
-                    foreach($tmp['orderItems'] as $key => $orderItems)
+                    [ $orders , $count ] = $this->barcodeRepository->orderSearchByJanCode((new HospitalId($inputData->user->hospitalId)) , (string)$gtin13 , $divisionId);
+                    
+                    $lotNumber = $gs1128Data['identifiers']['10']['content'];
+                    $lotDate = ( $gs1128Data['identifiers']['17']['content'] )? $gs1128Data['identifiers']['17']['content']->format('Y-m-d') : "";
+                    
+                    $result = [];
+                    foreach($orders as $key => $order)
                     {
-                        $tmp['orderItems'][$key]['lotNumber'] = $lotNumber;
-                        $tmp['orderItems'][$key]['lotDate'] = $lotDate;
+                        $tmp = $order->toArray();
+                        foreach($tmp['orderItems'] as $key => $orderItems)
+                        {
+                            $tmp['orderItems'][$key]['lotNumber'] = $lotNumber;
+                            $tmp['orderItems'][$key]['lotDate'] = $lotDate;
+                        }
+                        $result[] = $tmp;
                     }
-                    $result[] = $tmp;
+                } catch (Exception $e) {
+                    throw new Exception("Barcode is Null",200);
                 }
-                
             }
             $this->outputPort->output(new BarcodeOrderSearchOutputData($result , $count, $type));
         }

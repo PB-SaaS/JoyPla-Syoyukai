@@ -7,7 +7,7 @@
       <div class="index container mx-auto mb-96">
         <h1 class="text-2xl mb-2">個別入荷</h1>
         <hr>
-        <form>
+        <form method="" action="" onsubmit="return false">
           <div class="my-4 grid grid-cols-2 gap-4 lg:w-1/2 items-center">
             <v-button-default type="button" data-micromodal-trigger="orderItemModal">発注済商品検索</v-button-default>
             <v-order-item-modal v-on:additem="additem" :is-only-my-division="<?php var_export(gate('receipt')->isOnlyMyDivision()) ?>">
@@ -43,18 +43,13 @@
                 </div>
                 <div class="gap-2">
                   <div class="flex-1">
-                      合計入荷数
-                      {{ item.value.sumReceivedQuantity }}{{ item.value.quantity.itemUnit }}
-                      / 入荷可能数(
-                      {{ item.value.orderQuantity - item.value.receivedQuantity }}{{ item.value.quantity.itemUnit }}
-                      )
+                    合計入荷数
+                    {{ item.value.sumReceivedQuantity }}{{ item.value.quantity.itemUnit }}
+                    / 入荷可能数(
+                    {{ item.value.orderQuantity - item.value.receivedQuantity }}{{ item.value.quantity.itemUnit }}
+                    )
                   </div>
-                  <v-input
-                      :name="`receivedItems[${idx}].sumReceivedQuantity`"
-                      label="合計入荷数"
-                      :rules="{ between: ( (item.value.orderQuantity > 0)? [ 0 , item.value.orderQuantity - item.value.receivedQuantity ] : [ item.value.orderQuantity - item.value.receivedQuantity , 0 ] ) }"
-                      type="hidden"
-                      title=""></v-input>
+                  <v-input :name="`receivedItems[${idx}].sumReceivedQuantity`" label="合計入荷数" :rules="{ between: ( (item.value.orderQuantity > 0)? [ 0 , item.value.orderQuantity - item.value.receivedQuantity ] : [ item.value.orderQuantity - item.value.receivedQuantity , 0 ] ) }" type="hidden" title=""></v-input>
                 </div>
               </div>
               <div class="w-full lg:flex mt-3">
@@ -82,214 +77,212 @@
                 <div v-for="(received , rid) in item.value.receiveds">
                   <div class="lg:flex gap-6 py-4">
                     <div class="lg:w-1/3">
-                      <v-input 
-                      :name="`receivedItems[${idx}].receiveds[${rid}].lotNumber`" 
-                      label="ロット番号" 
-                      :rules="{ required : isRequired(idx) ,lotnumber: true , twoFieldRequired : [ '消費期限', `@receivedItems[${idx}].receiveds[${rid}].lotDate`]  }" 
-                      type="text" 
-                      change-class-name="inputChange"
-                      title="ロット番号"></v-input>
+                      <v-input :name="`receivedItems[${idx}].receiveds[${rid}].lotNumber`" label="ロット番号" :rules="{ required : isRequired(idx) ,lotnumber: true , twoFieldRequired : [ '消費期限', `@receivedItems[${idx}].receiveds[${rid}].lotDate`]  }" type="text" change-class-name="inputChange" title="ロット番号"></v-input>
                     </div>
                     <div class="lg:w-1/3">
-                      <v-input 
-                      :name="`receivedItems[${idx}].receiveds[${rid}].lotDate`" 
-                      label="消費期限" 
-                      :rules="{ required : isRequired(idx) , twoFieldRequired : [ 'ロット番号' , `@receivedItems[${idx}].receiveds[${rid}].lotNumber`] }" 
-                      type="date" 
-                      change-class-name="inputChange"
-                      title="消費期限"></v-input>
+                      <v-input :name="`receivedItems[${idx}].receiveds[${rid}].lotDate`" label="消費期限" :rules="{ required : isRequired(idx) , twoFieldRequired : [ 'ロット番号' , `@receivedItems[${idx}].receiveds[${rid}].lotNumber`] }" type="date" change-class-name="inputChange" title="消費期限"></v-input>
                     </div>
                     <div class="lg:w-1/3">
-                      <v-input-number 
-                      :rules="{ required : true , between: ( (item.value.orderQuantity > 0)? [ 0 , item.value.orderQuantity - item.value.receivedQuantity ] : [ item.value.orderQuantity - item.value.receivedQuantity , 0 ] ) }" 
-                      :name="`receivedItems[${idx}].receiveds[${rid}].receivedUnitQuantity`"
-                      label="入荷数（個数）" 
-                      :unit="item.value.quantity.itemUnit" 
-                      @change="receivedQuantitySum(idx)"  
-                      change-class-name="inputChange"
-                      :step="1" 
-                      :title="`入荷数（個数）/${item.value.quantity.quantityNum}${ item.value.quantity.quantityUnit }入り`" ></v-input-number>
+                      <v-input-number :rules="{ required : true , between: ( (item.value.orderQuantity > 0)? [ 0 , item.value.orderQuantity - item.value.receivedQuantity ] : [ item.value.orderQuantity - item.value.receivedQuantity , 0 ] ) }" :name="`receivedItems[${idx}].receiveds[${rid}].receivedUnitQuantity`" label="入荷数（個数）" :unit="item.value.quantity.itemUnit" @change="receivedQuantitySum(idx)" change-class-name="inputChange" :step="1" :title="`入荷数（個数）/${item.value.quantity.quantityNum}${ item.value.quantity.quantityUnit }入り`"></v-input-number>
                     </div>
                     <div class="lg:mt-0 mt-2 flex justify-between gap-4">
-                      <v-text
-                          title=" ">
-                          <v-button-danger 
-                          type="button" 
-                          class="whitespace-pre" 
-                          @click.native="deleteReceived(idx,rid)">削除</v-button-danger>
+                      <v-text title=" ">
+                        <v-button-danger type="button" class="whitespace-pre" @click.native="deleteReceived(idx,rid)">削除</v-button-danger>
                       </v-text>
-                      <v-text class="order-last"
-                          title=" ">
-                          <v-button-primary 
-                          type="button" 
-                          class="whitespace-pre" 
-                          @click.native="addReceived(idx)">追加</v-button-primary>
+                      <v-text class="order-last" title=" ">
+                        <v-button-primary type="button" class="whitespace-pre" @click.native="addReceived(idx)">追加</v-button-primary>
                       </v-text>
                     </div>
+                  </div>
+                  <div class="pt-4 pb-2 w-full">
+                    <div class="border-t border-gray-200"></div>
+                  </div>
+                </div>
+                <div class="mt-4 flex">
+                  <div class="flex-1 items-center ">
+                    <p class="text-xl text-gray-800 font-bold font-heading text-right">&yen; {{ numberFormat(receivedPrice(idx) ) }} ( {{ item.value.sumReceivedQuantity }}{{ item.value.quantity.itemUnit }} )</p>
+                  </div>
                 </div>
                 <div class="pt-4 pb-2 w-full">
                   <div class="border-t border-gray-200"></div>
-                </div> 
-              </div>
-              <div class="mt-4 flex">
-                <div class="flex-1 items-center ">
-                  <p class="text-xl text-gray-800 font-bold font-heading text-right">&yen; {{ numberFormat(receivedPrice(idx) ) }} ( {{ item.value.sumReceivedQuantity }}{{ item.value.quantity.itemUnit }} )</p>
                 </div>
               </div>
-              <div class="pt-4 pb-2 w-full">
-                <div class="border-t border-gray-200"></div>
-              </div> 
-            </div>
           </transition-group>
         </form>
       </div>
     </div>
   </div>
   <v-open-modal ref="openModal" headtext="商品選択" id="openModal">
-      <div class="flex flex-col" style="max-height: 68vh;">
-          <div class="overflow-y-scroll my-6">
-              <div class="w-full mb-8 xl:mb-0">
-                  <div class="hidden lg:flex w-full sticky top-0 bg-white py-4 flex-wrap">
-                      <div class="w-full lg:w-5/6">
-                          <h4 class="font-bold font-heading text-gray-500 text-center">商品情報</h4>
-                      </div>
-                      <div class="w-full lg:w-1/6">
-                          <h4 class="font-bold font-heading text-gray-500 text-center">反映</h4>
-                      </div>
-                  </div>
-                  <div class="lg:pt-0 pt-4">
-                      <template
-                          v-for="(order, index) in selectOrderItems">
-                          <template v-for="(orderItem , idx ) in order.orderItems">
-                            <div class="p-4 text-base lg:mx-4 mx-0 bg-gray-100 border border-gray-400 my-2">
-                              
-                              <div class="flex gap-2">
-                                <div class="flex-none">発注番号</div>
-                                <div class="flex-1">{{ order.orderId }}</div>
-                              </div>
-                              <div class="flex gap-2">
-                                <div class="flex-none">発注日</div>
-                                <div class="flex-1">{{ order.orderDate }}</div>
-                              </div>
-                              <div class="flex gap-2">
-                                <div class="flex-none">発注元部署</div>
-                                <div class="flex-1">{{ orderItem.division.divisionName }}</div>
-                              </div>
-                            </div>
-                            <div class="flex flex-wrap items-center mb-3">
-                              <div class="w-full lg:w-5/6 lg:px-4 px-0 mb-6 lg:mb-0">
-                                <div class="flex flex-wrap items-center gap-4">
-                                  <div class="flex-none">
-                                    <item-view class="md:h-44 md:w-44 h-32 w-32" :base64="orderItem.itemImage"></item-view>
-                                  </div>
-                                  <div class="break-words flex-1 box-border w-44">
-                                    <h3 class="text-xl font-bold font-heading">{{ orderItem.item.makerName }}</h3>
-                                    <p class="text-md font-bold font-heading">{{ orderItem.item.itemName }}</p>
-                                    <p class="text-md font-bold font-heading">{{ orderItem.item.itemJANCode }}</p>
-                                    <p class="text-gray-500">{{ orderItem.item.itemCode }}<br>{{ orderItem.item.itemStandard }}</p>
-                                    <p class="text-gray-500">{{ orderItem.quantity.quantityNum }}{{ orderItem.quantity.quantityUnit }} 入り</p>
-                                    <p>
-                                      <span class="text-xl text-orange-600 font-bold font-heading">
-                                        {{ numberFormat( orderItem.orderQuantity ) }}{{ orderItem.quantity.itemUnit }} 発注中
-                                      </span>
-                                      <span class="text-xl text-orange-600 font-bold font-heading">
-                                        {{ numberFormat( ( orderItem.orderQuantity - orderItem.receivedQuantity) ) }}{{ orderItem.quantity.itemUnit }} 未入荷
-                                      </span>
-                                    </p>
-                                    <p class="text-gray-800">ロット番号：{{ orderItem.lotNumber }}</p>
-                                    <p class="text-gray-800">使用期限：{{ orderItem.lotDate }}</p>
-                                    <p class="text-gray-800">{{ orderItem.distributor.distributorName }}</p>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="w-full lg:block lg:w-1/6 px-4 py-4">
-                                <v-button-default type="button" class="w-full" v-on:click.native="additem(order , idx)">反映</v-button-default>
-                              </div>
-                              <div class="py-2 px-4 w-full">
-                                <div class="border-t border-gray-200"></div>
-                              </div>
-                            </div>
-                          </template>
-                      </template>
-                  </div>
-              </div>
+    <div class="flex flex-col" style="max-height: 68vh;">
+      <div class="overflow-y-scroll my-6">
+        <div class="w-full mb-8 xl:mb-0">
+          <div class="hidden lg:flex w-full sticky top-0 bg-white py-4 flex-wrap">
+            <div class="w-full lg:w-5/6">
+              <h4 class="font-bold font-heading text-gray-500 text-center">商品情報</h4>
+            </div>
+            <div class="w-full lg:w-1/6">
+              <h4 class="font-bold font-heading text-gray-500 text-center">反映</h4>
+            </div>
           </div>
+          <div class="lg:pt-0 pt-4">
+            <template v-for="(order, index) in selectOrderItems">
+              <template v-for="(orderItem , idx ) in order.orderItems">
+                <div class="p-4 text-base lg:mx-4 mx-0 bg-gray-100 border border-gray-400 my-2">
+
+                  <div class="flex gap-2">
+                    <div class="flex-none">発注番号</div>
+                    <div class="flex-1">{{ order.orderId }}</div>
+                  </div>
+                  <div class="flex gap-2">
+                    <div class="flex-none">発注日</div>
+                    <div class="flex-1">{{ order.orderDate }}</div>
+                  </div>
+                  <div class="flex gap-2">
+                    <div class="flex-none">発注元部署</div>
+                    <div class="flex-1">{{ orderItem.division.divisionName }}</div>
+                  </div>
+                </div>
+                <div class="flex flex-wrap items-center mb-3">
+                  <div class="w-full lg:w-5/6 lg:px-4 px-0 mb-6 lg:mb-0">
+                    <div class="flex flex-wrap items-center gap-4">
+                      <div class="flex-none">
+                        <item-view class="md:h-44 md:w-44 h-32 w-32" :base64="orderItem.itemImage"></item-view>
+                      </div>
+                      <div class="break-words flex-1 box-border w-44">
+                        <h3 class="text-xl font-bold font-heading">{{ orderItem.item.makerName }}</h3>
+                        <p class="text-md font-bold font-heading">{{ orderItem.item.itemName }}</p>
+                        <p class="text-md font-bold font-heading">{{ orderItem.item.itemJANCode }}</p>
+                        <p class="text-gray-500">{{ orderItem.item.itemCode }}<br>{{ orderItem.item.itemStandard }}</p>
+                        <p class="text-gray-500">{{ orderItem.quantity.quantityNum }}{{ orderItem.quantity.quantityUnit }} 入り</p>
+                        <p>
+                          <span class="text-xl text-orange-600 font-bold font-heading">
+                            {{ numberFormat( orderItem.orderQuantity ) }}{{ orderItem.quantity.itemUnit }} 発注中
+                          </span>
+                          <span class="text-xl text-orange-600 font-bold font-heading" v-if="(orderItem.orderQuantity - orderItem.receivedQuantity) > 0">
+                            {{ numberFormat( ( orderItem.orderQuantity - orderItem.receivedQuantity) ) }}{{ orderItem.quantity.itemUnit }} 未入荷
+                          </span>
+                        </p>
+                        <p class="text-gray-800">ロット番号：{{ orderItem.lotNumber }}</p>
+                        <p class="text-gray-800">使用期限：{{ orderItem.lotDate }}</p>
+                        <p class="text-gray-800">{{ orderItem.distributor.distributorName }}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="w-full lg:block lg:w-1/6 px-4 py-4">
+                    <v-button-default type="button" class="w-full" v-on:click.native="additem(order , idx)">反映</v-button-default>
+                  </div>
+                  <div class="py-2 px-4 w-full">
+                    <div class="border-t border-gray-200"></div>
+                  </div>
+                </div>
+              </template>
+            </template>
+          </div>
+        </div>
       </div>
+    </div>
   </v-open-modal>
 </div>
 
-<script> 
-var JoyPlaApp = Vue.createApp({
+<script>
+  var JoyPlaApp = Vue.createApp({
     setup() {
-      
-      const { ref, toRef , toRefs , reactive ,onMounted} = Vue;
-      const { useFieldArray , useForm } = VeeValidate;
+
+      const {
+        ref,
+        toRef,
+        toRefs,
+        reactive,
+        onMounted
+      } = Vue;
+      const {
+        useFieldArray,
+        useForm
+      } = VeeValidate;
 
       const loading = ref(false);
       const start = () => {
-          loading.value = true;
+        loading.value = true;
       }
 
       const complete = () => {
-          loading.value = false;
+        loading.value = false;
       }
 
       const sleepComplate = () => {
-          window.setTimeout(function () {
-              complete();
-          }, 500);
+        window.setTimeout(function() {
+          complete();
+        }, 500);
       }
       start();
-      
-      onMounted( () => {
+
+      onMounted(() => {
         sleepComplate()
       });
 
       const date = new Date();
       const yyyy = date.getFullYear();
-      const mm = ("0"+(date.getMonth()+1)).slice(-2);
-      const dd = ("0"+date.getDate()).slice(-2);
+      const mm = ("0" + (date.getMonth() + 1)).slice(-2);
+      const dd = ("0" + date.getDate()).slice(-2);
 
-      const { handleSubmit , control, meta , validate , values , isSubmitting  } = useForm({
+      const {
+        handleSubmit,
+        control,
+        meta,
+        validate,
+        values,
+        isSubmitting
+      } = useForm({
         initialValues: {
           receivedItems: [],
           barcode: "",
-          orderDate: yyyy+'-'+mm+'-'+dd,
+          orderDate: yyyy + '-' + mm + '-' + dd,
         },
-        validateOnMount : false
+        validateOnMount: false
       });
-      const { remove, push, fields , update , replace } = useFieldArray('receivedItems' , control);
-    
+      const {
+        remove,
+        push,
+        fields,
+        update,
+        replace
+      } = useFieldArray('receivedItems', control);
+
       const alertModel = reactive({
         message: "",
         headtext: "",
-        okMethod: function(){ console.log('') },
+        okMethod: function() {
+          console.log('')
+        },
       });
 
       const confirmModel = reactive({
         message: "",
         headtext: "",
-        okMethod: function(){ console.log('') },
-        cancelMethod: function(){ console.log('') },
+        okMethod: function() {
+          console.log('')
+        },
+        cancelMethod: function() {
+          console.log('')
+        },
       });
 
-      const breadcrumbs = [ 
-          {
-            text: '発注メニュー',
-            disabled: false,
-            href: _ROOT + '&path=/order',
-          },
-          {
-            text: '個別入荷',
-            disabled: true, 
-          }];
+      const breadcrumbs = [{
+          text: '発注メニュー',
+          disabled: false,
+          href: _ROOT + '&path=/order',
+        },
+        {
+          text: '個別入荷',
+          disabled: true,
+        }
+      ];
 
-      const createReceivedModel = ( values ) => {
+      const createReceivedModel = (values) => {
         let items = values.receivedItems;
         let receivedItems = [];
-        items.forEach(function(item, idx){
-          if(item.sumReceivedQuantity != 0)
-          {
+        items.forEach(function(item, idx) {
+          if (item.sumReceivedQuantity != 0) {
             receivedItems.push({
               'orderItemId': item.orderItemId,
               'receiveds': item.receiveds,
@@ -301,23 +294,23 @@ var JoyPlaApp = Vue.createApp({
 
       const receivedQuantitySum = (idx) => {
         if (!fields.value[idx] || !fields.value[idx].value.receiveds) {
-            fields
-                .value[idx]
-                .value
-                .receiveds = [];
+          fields
+            .value[idx]
+            .value
+            .receiveds = [];
         }
         fields
-            .value[idx]
-            .value
-            .sumReceivedQuantity = fields
-            .value[idx]
-            .value
-            .receiveds
-            .reduce(function (sum, element) {
-                return sum + element.receivedUnitQuantity;
-            }, 0);
+          .value[idx]
+          .value
+          .sumReceivedQuantity = fields
+          .value[idx]
+          .value
+          .receiveds
+          .reduce(function(sum, element) {
+            return sum + element.receivedUnitQuantity;
+          }, 0);
       }
-    
+
 
       const receivedPrice = (idx) => {
         return values.receivedItems[idx].price * values.receivedItems[idx].sumReceivedQuantity;
@@ -334,27 +327,30 @@ var JoyPlaApp = Vue.createApp({
       const itemCount = () => {
         let num = 0;
         values.receivedItems.forEach((v, idx) => {
-          num += ( v.sumReceivedQuantity > 0 )? 1 : 0;
+          num += (v.sumReceivedQuantity > 0) ? 1 : 0;
         });
         return num;
       };
 
       const numberFormat = (value) => {
-          if (! value ) { return 0; }
-          return new Intl.NumberFormat('ja-JP').format(value);
+        if (!value) {
+          return 0;
+        }
+        return new Intl.NumberFormat('ja-JP').format(value);
       }
-      const onSubmit = async () =>{
-        const { valid, errors } = await validate();
+      const onSubmit = async () => {
+        const {
+          valid,
+          errors
+        } = await validate();
 
-        if(!valid){
+        if (!valid) {
           Swal.fire({
             icon: 'error',
             title: '入力エラー',
             text: '入力エラーがございます。ご確認ください',
           })
-        } 
-        else 
-        {
+        } else {
           Swal.fire({
             title: '個別入荷登録を行います。',
             text: "よろしいですか？",
@@ -365,7 +361,7 @@ var JoyPlaApp = Vue.createApp({
             cancelButtonColor: '#d33',
             confirmButtonText: 'OK'
           }).then((result) => {
-            if(result.isConfirmed){
+            if (result.isConfirmed) {
               receivedRegister();
             }
           })
@@ -374,51 +370,50 @@ var JoyPlaApp = Vue.createApp({
 
       const receivedRegister = handleSubmit(async (values) => {
         try {
-              
-            const receivedModels = createReceivedModel(values);
-            if( receivedModels.length === 0)
-            {
-              Swal.fire({
-                icon: 'error',
-                title: '登録する商品がありませんでした。',
-                text: '内容を確認の上、再送信をしてください。',
-              })
-              return false;
-            }
-            
-            let params = new URLSearchParams();
-            params.append("path", "/api/received/register");
-            
-            params.append("_method", 'post');
 
-            params.append("_csrf", _CSRF);
-            params.append("receivedItems", JSON.stringify(encodeURIToObject(receivedModels)));
-
-            const res = await axios.post(_APIURL,params);
-            
-            if(res.data.code != 200) {
-              throw new Error(res.data.message)
-            }
-            
-            Swal.fire({
-                icon: 'success',
-                title: '登録が完了しました。',
-            }).then((result) => {
-              let tmp = [];
-              replace(tmp);
-            });
-            return true ;
-          } catch (error) {
+          const receivedModels = createReceivedModel(values);
+          if (receivedModels.length === 0) {
             Swal.fire({
               icon: 'error',
-              title: 'システムエラー',
-              text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
-            });
+              title: '登録する商品がありませんでした。',
+              text: '内容を確認の上、再送信をしてください。',
+            })
+            return false;
           }
-          
+
+          let params = new URLSearchParams();
+          params.append("path", "/api/received/register");
+
+          params.append("_method", 'post');
+
+          params.append("_csrf", _CSRF);
+          params.append("receivedItems", JSON.stringify(encodeURIToObject(receivedModels)));
+
+          const res = await axios.post(_APIURL, params);
+
+          if (res.data.code != 200) {
+            throw new Error(res.data.message)
+          }
+
+          Swal.fire({
+            icon: 'success',
+            title: '登録が完了しました。',
+          }).then((result) => {
+            let tmp = [];
+            replace(tmp);
+          });
+          return true;
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'システムエラー',
+            text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+          });
+        }
+
       });
 
-      const updateItem = (idx, key , value) => {
+      const updateItem = (idx, key, value) => {
         let object = JSON.parse(JSON.stringify(fields[idx].value));
         object[key] = value;
         update(idx, object);
@@ -427,76 +422,72 @@ var JoyPlaApp = Vue.createApp({
       const deleteReceived = (idx, ridx) => {
         let result = fields.value[idx].value.receiveds.filter((value, index) => {
             if (index === ridx) {
-                return;
+              return;
             }
             return value;
-        })
-        .filter(e => e);
+          })
+          .filter(e => e);
         fields
-            .value[idx]
-            .value
-            .receiveds = (result)
-                ? result
-                : [];
+          .value[idx]
+          .value
+          .receiveds = (result) ?
+          result : [];
 
-        if( !fields.value[idx].value.receiveds || fields.value[idx].value.receiveds.length === 0 )
-        {
+        if (!fields.value[idx].value.receiveds || fields.value[idx].value.receiveds.length === 0) {
           remove(idx);
         }
-    };
+      };
 
-    const isChange = ref(false);
-      
-    const addReceived = (idx) => {
+      const isChange = ref(false);
+
+      const addReceived = (idx) => {
         if (!fields.value[idx].value.receiveds) {
-            fields
-                .value[idx]
-                .value
-                .receiveds = [];
-        }
-        fields
+          fields
             .value[idx]
             .value
-            .receiveds
-            .push({'receivedUnitQuantity': 1, 'lotNumber': "", 'lotDate': ""});
+            .receiveds = [];
+        }
+        fields
+          .value[idx]
+          .value
+          .receiveds
+          .push({
+            'receivedUnitQuantity': 1,
+            'lotNumber': "",
+            'lotDate': ""
+          });
         receivedQuantitySum(idx);
-    };
+      };
 
 
-      const additem = (list , idx) =>
-      {
+      const additem = (list, idx) => {
         list.orderItems[idx].orderDate = list.orderDate;
         let item = list.orderItems[idx];
-        item = JSON.parse(JSON.stringify(item)); 
+        item = JSON.parse(JSON.stringify(item));
         item.sumReceivedQuantity = 1;
-        item.receiveds = [
-          {
-            'lotNumber' : (item.lotNumber)? item.lotNumber : "" ,
-            'lotDate' : (item.lotDate)? item.lotDate : "",
-            'receivedUnitQuantity' : 1,
-          }
-        ];
+        item.receiveds = [{
+          'lotNumber': (item.lotNumber) ? item.lotNumber : "",
+          'lotDate': (item.lotDate) ? item.lotDate : "",
+          'receivedUnitQuantity': 1,
+        }];
 
         let checked = false;
-        if(Array.isArray(values.receivedItems))
-        {
-            values.receivedItems.forEach((v, idx) => {
-            if( 
+        if (Array.isArray(values.receivedItems)) {
+          values.receivedItems.forEach((v, idx) => {
+            if (
               v.orderItemId === item.orderItemId
-            )
-            {
+            ) {
               let lotCheck = false;
               v.receiveds.forEach((received) => {
-                if(
+                if (
                   received.lotNumber === item.receiveds[0].lotNumber &&
                   received.lotDate === item.receiveds[0].lotDate
-                ){
+                ) {
                   received.receivedUnitQuantity++;
                   lotCheck = true;
                 }
               });
-              if(!lotCheck)
-              {
+              if (!lotCheck) {
                 v.receiveds.push(item.receiveds[0]);
               }
               receivedQuantitySum(idx);
@@ -504,14 +495,13 @@ var JoyPlaApp = Vue.createApp({
             }
           });
         }
-        if( ! checked ){        
+        if (!checked) {
           push(item);
         }
       };
 
       const isRequired = (idx) => {
-        if( fields.value[idx].value.lotManagement == "1" )
-        {
+        if (fields.value[idx].value.lotManagement == "1") {
           return true;
         }
         return false;
@@ -519,23 +509,22 @@ var JoyPlaApp = Vue.createApp({
       const openModal = ref();
       const selectOrderItems = ref([]);
       const addItemByBarcode = (items) => {
-          selectOrderItems.value = [];
-          if (items.item.length === 0) {
-              return false;
-          }
+        selectOrderItems.value = [];
+        if (items.item.length === 0) {
+          return false;
+        }
 
-          if(items.type != "gs1-128" && items.type != "jancode" && items.type != "customLabel")
-          {
-            Swal.fire({
-              icon: 'error',
-              title: 'エラー',
-              text: 'GS1-128・JANコード・ラベル以外のバーコードは読むことができません',
-            });
-          }
-          selectOrderItems.value = items.item;
-          openModal
-              .value
-              .open();
+        if (items.type != "gs1-128" && items.type != "jancode" && items.type != "customLabel") {
+          Swal.fire({
+            icon: 'error',
+            title: 'エラー',
+            text: 'GS1-128・JANコード・ラベル以外のバーコードは読むことができません',
+          });
+        }
+        selectOrderItems.value = items.item;
+        openModal
+          .value
+          .open();
       };
       return {
         isChange,
@@ -545,9 +534,9 @@ var JoyPlaApp = Vue.createApp({
         openModal,
         selectOrderItems,
         addItemByBarcode,
-        loading, 
+        loading,
         isRequired,
-        start, 
+        start,
         complete,
         itemCount,
         isSubmitting,
@@ -564,8 +553,8 @@ var JoyPlaApp = Vue.createApp({
       };
     },
     watch: {
-      isSubmitting(){
-        this.loading = this.isSubmitting; 
+      isSubmitting() {
+        this.loading = this.isSubmitting;
       },
       fields: {
         async handler(val, oldVal) {
@@ -575,10 +564,10 @@ var JoyPlaApp = Vue.createApp({
       },
     },
     components: {
-      'v-text' : vText,
-      'v-barcode-search-for-order-data' : vBarcodeSearchForOrderData,
-      'v-switch' : vSwitch,
-      'v-loading' : vLoading,
+      'v-text': vText,
+      'v-barcode-search-for-order-data': vBarcodeSearchForOrderData,
+      'v-switch': vSwitch,
+      'v-loading': vLoading,
       'item-view': itemView,
       VForm: VeeValidate.Form,
       'v-field': VeeValidate.Field,
@@ -592,9 +581,9 @@ var JoyPlaApp = Vue.createApp({
       'v-button-danger': vButtonDanger,
       'v-input-number': vInputNumber,
       'v-order-item-modal': vOrderItemModal,
-      'header-navi' : headerNavi,
-      'blowing' : blowing,
-      'v-open-modal' : vOpenModal
+      'header-navi': headerNavi,
+      'blowing': blowing,
+      'v-open-modal': vOpenModal
     },
-}).mount('#top');
-</script> 
+  }).mount('#top');
+</script>

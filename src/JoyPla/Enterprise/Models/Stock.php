@@ -39,8 +39,7 @@ class Stock
         int $orderedQuantity,
         int $constant,
         $itemImage
-        )
-    {
+    ) {
         $this->id = $id;
         $this->registDate = $registDate;
         $this->updateDate = $updateDate;
@@ -58,7 +57,7 @@ class Stock
         $this->itemImage = $itemImage;
     }
 
-    public static function create( Collection $input)
+    public static function create(Collection $input)
     {
         return new Stock(
             (int)$input->recordId,
@@ -69,29 +68,40 @@ class Stock
             (new Price($input->price)),
             (Quantity::create($input)),
             (Division::create($input)),
-            (Distributor::create($input) ),
-            ((string) $input->rackName ),
-            (new DateYearMonthDayHourMinutesSecond($input->invFinishTime ) ),
+            (Distributor::create($input)),
+            ((string) $input->rackName),
+            (new DateYearMonthDayHourMinutesSecond($input->invFinishTime)),
             (int)$input->stockQuantity,
-            (int)$input->orderWithinCount ,
+            (int)$input->orderWithinCount,
             (int)$input->constantByDiv,
             $input->inItemImage
         );
     }
 
+    public function calcNumberOfOrdersRequired()
+    {
+        if ($this->constant - ($this->calcPlannedInventory()) < 0) {
+            return 0;
+        }
+
+        return $this->constant - ($this->calcPlannedInventory());
+    }
+
     public function calcPlannedInventory()
     {
+        if (($this->inventory + $this->orderedQuantity) < 0) {
+            return 0;
+        }
         return $this->inventory + $this->orderedQuantity;
     }
 
     public function calcOrderQuantity()
     {
-        if($this->quantity->getQuantityNum() == 0 || ($this->calcPlannedInventory() - $this->constant ) == 0 ){
-            return 0 ;
+        if ($this->quantity->getQuantityNum() == 0 || ($this->calcNumberOfOrdersRequired()) < 0) {
+            return 0;
         }
-        return ceil(($this->calcPlannedInventory() - $this->constant ) / $this->quantity->getQuantityNum());
+        return ceil($this->calcNumberOfOrdersRequired() / $this->quantity->getQuantityNum());
     }
-
 
     public function toArray()
     {
@@ -107,12 +117,13 @@ class Stock
             'distributor' => $this->distributor->toArray(),
             'rackName' => $this->rackName,
             'lastInventoryDate' => $this->lastInventoryDate->value(),
-            'inventory' => $this->inventory ,
+            'inventory' => $this->inventory,
             'orderedQuantity' => $this->orderedQuantity,
             'constant' => $this->constant,
             'itemImage' => $this->itemImage,
             'orderQuantity' => $this->calcOrderQuantity(),
             'plannedInventory' => $this->calcPlannedInventory(),
+            'numberOfOrdersRequired' => $this->calcNumberOfOrdersRequired()
         ];
-    } 
+    }
 }

@@ -125,6 +125,8 @@ if [ -e tmp/${TARGET} ] ;then
     fi
 fi
 
+<< COMMENTOUT
+
 cd ../
 
 if git add ${TARGET_DIR}/${TARGET}/. ;then
@@ -135,6 +137,7 @@ else
     errorlog "git add ${TARGET_DIR}/${TARGET}/."
 fi
 
+COMMENTOUT
 #if java -jar custom_module.jar -t $TOKEN -s $SECRET tmp/upload_data.zip ;then
 #    log "upload ${TARGET}"
 #else 
