@@ -113,7 +113,7 @@ if [ -e tmp/${TARGET} ] ;then
     fi
 fi
 
-cd ../
+#cd ../
 
 if git add ${TARGET_DIR}/${TARGET}/. ;then
     cd -

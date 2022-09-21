@@ -1,7 +1,8 @@
 <style>
-    table.uk-table td, table.uk-table th {
-        line-break: anywhere;  
-        min-width:120px;
+    table.uk-table td,
+    table.uk-table th {
+        line-break: anywhere;
+        min-width: 120px;
     }
 </style>
 <div class="animsition" uk-height-viewport="expand: true">
@@ -16,14 +17,14 @@
             <div class="no_print uk-margin">
                 <input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
 
-            <?php if ($userInfo->isAdmin() || $userInfo->isApprover()): ?>
+                <?php if ($userInfo->isAdmin() || $userInfo->isApprover()) : ?>
 
-                <input class="print_hidden uk-button uk-button-primary" type="submit" value="院内商品情報変更" onclick="document.itemsChange.submit()">
-                <form action="<?php echo $api_url ?>" method="post" name="itemsChange" class="uk-hidden">
-                    <input type="hidden" name="Action" value="InHospitalItemUpdate">
-                </form>
+                    <input class="print_hidden uk-button uk-button-primary" type="submit" value="院内商品情報変更" onclick="document.itemsChange.submit()">
+                    <form action="<?php echo $api_url ?>" method="post" name="itemsChange" class="uk-hidden">
+                        <input type="hidden" name="Action" value="InHospitalItemUpdate">
+                    </form>
 
-            <?php endif ?>
+                <?php endif ?>
 
                 <a class="print_hidden uk-button uk-button-primary" href="#modal-label" uk-toggle>ラベル発行</a>
             </div>
@@ -70,7 +71,7 @@
                     <tr>
                         <th>分類</th>
                         <td>%val:usr:category%</td>
-                        <th>分類</th>
+                        <th>小分類</th>
                         <td>%val:usr:smallCategory%</td>
                         <th>ロット管理フラグ</th>
                         <td colspan="2">%val:usr:lotManagement:v%</td>
@@ -90,11 +91,15 @@
                         <td>%val:usr:officialFlag:v%</td>
                         <th>償還価格</th>
                         <td>
-                            <script>price(fixed("%val:usr:officialprice%"))</script>円
+                            <script>
+                                price(fixed("%val:usr:officialprice%"))
+                            </script>円
                         </td>
                         <th>旧償還価格</th>
                         <td>
-                            <script>price(fixed("%val:usr:officialpriceOld%"))</script>円
+                            <script>
+                                price(fixed("%val:usr:officialpriceOld%"))
+                            </script>円
                         </td>
                     </tr>
                     <tr>
@@ -107,7 +112,9 @@
                         <th>個数単位</th>
                         <td>%val:usr:itemUnit%</td>
                         <th>価格</th>
-                        <td>￥<script>price(fixed("%val:usr:price%"))</script> / %val:usr:itemUnit%</td>
+                        <td>￥<script>
+                                price(fixed("%val:usr:price%"))
+                            </script> / %val:usr:itemUnit%</td>
                         <!--
                       <th>旧価格</th>
                       <td><script>price(fixed("%val:usr:oldPrice%"))</script>円</td>
@@ -115,7 +122,9 @@
                     </tr>
                     <tr>
                         <th>単価</th>
-                        <td colspan="5">￥<script>price(fixed("%val:usr:unitPrice%"))</script>
+                        <td colspan="5">￥<script>
+                                price(fixed("%val:usr:unitPrice%"))
+                            </script>
                         </td>
                     </tr>
                     <!--
@@ -203,52 +212,45 @@
     </div>
 </div>
 <script>
-class InHospitalItemDetail
-{
-    constructor()
-    {
-        let label = "";
-        let notUsedFlag = "%val:usr:notUsedFlag:id%";
-        if (notUsedFlag == "0") {
-            label = "uk-label-success";
-        } else {
-            label = "uk-label-danger";
-        }
-    
-        $("#notUsedFlag").addClass(label);
+    class InHospitalItemDetail {
+        constructor() {
+            let label = "";
+            let notUsedFlag = "%val:usr:notUsedFlag:id%";
+            if (notUsedFlag == "0") {
+                label = "uk-label-success";
+            } else {
+                label = "uk-label-danger";
+            }
 
+            $("#notUsedFlag").addClass(label);
+
+        }
+
+        createLabel(inHospitalItemId) {
+            if (!this.setVal()) {
+                UIkit.modal.alert('入力値に不正があります。<br>ご確認ください');
+                return false;
+            }
+
+            return true;
+        }
+
+        setVal() {
+            $('input[name="printCount"]').removeClass('uk-form-danger');
+            $('input[name="quantity"]').removeClass('uk-form-danger');
+
+            let flg = true;
+            if ($('input[name="printCount"]').val() == '' || $('input[name="printCount"]').val() < 1) {
+                $('input[name="printCount"]').addClass('uk-form-danger');
+                flg = false;
+            }
+            if ($('input[name="quantity"]').val() == '' || $('input[name="quantity"]').val() < 1) {
+                $('input[name="quantity"]').addClass('uk-form-danger');
+                flg = false;
+            }
+            return flg;
+        }
     }
 
-    createLabel(inHospitalItemId)
-    {
-        if (!this.setVal())
-        {
-            UIkit.modal.alert('入力値に不正があります。<br>ご確認ください');
-            return false;
-        }
-      
-        return true;
-    }
-
-    setVal()
-    {
-        $('input[name="printCount"]').removeClass('uk-form-danger');
-        $('input[name="quantity"]').removeClass('uk-form-danger');
-      
-        let flg = true;
-        if ($('input[name="printCount"]').val() == '' || $('input[name="printCount"]').val() < 1 )
-        {
-            $('input[name="printCount"]').addClass('uk-form-danger');
-            flg = false;
-        }
-        if ($('input[name="quantity"]').val() == '' || $('input[name="quantity"]').val() < 1 )
-        {
-            $('input[name="quantity"]').addClass('uk-form-danger');
-            flg = false;
-        }
-        return flg;
-    }
-}
-
-let inHP_detail = new InHospitalItemDetail();
+    let inHP_detail = new InHospitalItemDetail();
 </script>
