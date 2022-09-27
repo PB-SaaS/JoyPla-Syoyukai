@@ -408,7 +408,7 @@ const vInHospitalItemModal = {
     template: `
   <v-loading :show="loading"></v-loading>
   <teleport to="body">
-    <v-open-modal id="inHospitalItemModal" headtext="商品検索">
+    <v-open-modal id="inHospitalItemModal" headtext="商品検索" @show="listGet">
       <div class="flex flex-col" style="max-height: 68vh;">
         <div>
           <v-tab ref="tab"
@@ -572,6 +572,7 @@ const vOrderItemModal = {
 
         onMounted(() => {
             sleepComplate()
+            listGet();
         });
 
         const {meta, validate, values, setFieldValue} = useForm({
@@ -704,10 +705,6 @@ const vOrderItemModal = {
             Toast.fire({icon: 'success', title: '反映しました'})
         };
 
-        onMounted(() => {
-            listGet();
-        });
-
         return {
             loading,
             start,
@@ -767,7 +764,7 @@ const vOrderItemModal = {
     template: `
   <v-loading :show="loading"></v-loading>
   <teleport to="body">
-    <v-open-modal id="orderItemModal" headtext="商品検索">
+    <v-open-modal id="orderItemModal" headtext="商品検索" @show="listGet">
       <div class="flex flex-col" style="max-height: 68vh;">
         <div>
           <v-tab ref="tab"

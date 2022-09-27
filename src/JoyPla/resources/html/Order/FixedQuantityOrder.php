@@ -459,7 +459,6 @@
 
       const orderRegister = handleSubmit(async (values) => {
         try {
-          start();
           const orderModels = createOrderModel(values);
           if (orderModels.length === 0) {
             Swal.fire({
@@ -469,6 +468,7 @@
             })
             return false;
           }
+          start();
 
           let params = new URLSearchParams();
           params.append("path", "/api/fixedQuantityOrder/register");

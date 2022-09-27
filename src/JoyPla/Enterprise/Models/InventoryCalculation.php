@@ -41,7 +41,7 @@ class InventoryCalculation
         {
             return "";
         }
-        return $this->hospitalId->value() . $this->divisionId->value() . $this->inHospitalItemId->value() . $this->lot->getLotNumber()->value() . $this->lot->getLotDate()->value();
+        return $this->hospitalId->value() . $this->divisionId->value() . $this->inHospitalItemId->value() . $this->lot->getLotNumber()->value() . $this->lot->getLotDate()->format("Y-m-d");
     }
 
     public function toArray()

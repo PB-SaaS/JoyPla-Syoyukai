@@ -43,7 +43,7 @@ function number_format_jp($num)
     return preg_replace("/\.?0+$/","",number_format($num,2));
 }
 
-const LOG_LEVEL = 3;
+const LOG_LEVEL = 1;
 const EXPORT_TO_SPIRALV2 = true; // SPIRALv2オブジェクトで出力する
 const SPIRAL_API_LOGGING_DB_TITLE = '73308'; // SPIRALv1v2オブジェクトで出力する場合に設定するDBタイトル
 const JOYPLA_API_LOGGING_DB_TITLE = '73304'; // SPIRALv1v2オブジェクトで出力する場合に設定するDBタイトル

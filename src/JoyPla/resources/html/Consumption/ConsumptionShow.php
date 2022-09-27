@@ -67,7 +67,7 @@
                         ロット情報：{{ consumptionItem.lot.lotNumber }} / {{ consumptionItem.lot.lotDate }}
                         </p>
                         <p class="text-base text-gray-900">
-                        {{ numberFormat(consumptionItem.consumptionQuantity) }}枚
+                        {{ numberFormat(consumptionItem.consumptionQuantity) }} {{ consumptionItem.quantity.quantityUnit }}
                         </p>
                         <p>
                           <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(consumptionItem.consumptionPrice) }}</span>

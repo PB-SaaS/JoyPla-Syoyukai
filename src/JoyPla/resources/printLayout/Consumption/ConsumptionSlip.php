@@ -80,9 +80,9 @@
                                                 <p class="truncate w-20">{{ numberFormat(consumptionItem.consumptionQuantity) }}{{ consumptionItem.quantity.quantityUnit }}</p>
                                             </td>
                                             <td class="border border-slate-600 p-1">
-                                                <p class="truncate w-20">&yen; {{ numberFormat(consumptionItem.unitPrice) }}</p>
+                                                <p class="truncate w-20 text-right">&yen;{{ numberFormat(consumptionItem.unitPrice) }}</p>
                                             </td>
-                                            <td class="border border-slate-600 p-1">&yen; {{ numberFormat(consumptionItem.consumptionPrice) }}</td>
+                                            <td class="border border-slate-600 p-1 text-right">&yen;{{ numberFormat(consumptionItem.consumptionPrice) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>

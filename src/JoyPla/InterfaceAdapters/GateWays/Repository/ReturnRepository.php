@@ -172,6 +172,7 @@ class ReturnRepository implements ReturnRepositoryInterface{
                 if( $return->getReturnId()->equal($item->returnHistoryID) )
                 {
                     $item->set('divisionName', $history->divisionName);
+                    
                     $return = $return->addReturnItem(ReturnItem::create($item));
                 }
             }

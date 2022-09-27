@@ -1052,6 +1052,7 @@ class BorrowingController extends Controller
             }
             $billing_history_insert_data[] = [
                 'registrationTime' => $history_data['usedDate'],
+                'billingDate' => $history_data['usedDate'],
                 'billingNumber' => $history_data['billingHistoryId'],
                 'hospitalId' => $user_info->getHospitalId(),
                 'divisionId' => $history_data['divisionId'],

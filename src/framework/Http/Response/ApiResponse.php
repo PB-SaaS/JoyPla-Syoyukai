@@ -51,7 +51,7 @@ class ApiResponse {
                     'message' => json_encode(array("count"=> $this->count ,"code"=> $this->code ,"message"=> $this->message ,"header"=> $this->header),JSON_UNESCAPED_SLASHES),
                 ];
                 $this::$logger->out($body);
-            }else if($this::$logger->LOG_LEVEL <= 3)
+            }else if($this::$logger->LOG_LEVEL >= 3)
             {
                 $body = [
                     'execTime' => Logger::getTime(),

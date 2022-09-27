@@ -10,7 +10,7 @@ define('TENANT_ADMIN_LOGIN_URL', "https://area18.smp.ne.jp/area/p/mjtf5qcsjo4lhs
  * 設定クラス
  */
 class LogConfig {
-    const LOG_LEVEL = 3;
+    const LOG_LEVEL = 1;
     const EXPORT_TO_SPIRALV2 = true; // SPIRALv2オブジェクトで出力する
     const SPIRAL_API_LOGGING_DB_TITLE = '73308'; // SPIRALv1v2オブジェクトで出力する場合に設定するDBタイトル
     const JOYPLA_API_LOGGING_DB_TITLE = '73304'; // SPIRALv1v2オブジェクトで出力する場合に設定するDBタイトル

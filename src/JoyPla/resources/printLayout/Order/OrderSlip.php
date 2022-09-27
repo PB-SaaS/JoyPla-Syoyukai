@@ -74,7 +74,7 @@
                                             <th class="border border-slate-600 w-auto p-1">価格</th>
                                             <th class="border border-slate-600 w-auto p-1">入数</th>
                                             <th class="border border-slate-600 w-auto p-1">発注数</th>
-                                            <th class="border border-slate-600 w-auto p-1">価格</th>
+                                            <th class="border border-slate-600 w-auto p-1">合計金額</th>
                                         </tr>
                                     </thead>
                                     <tbody class="text-xxs">
@@ -93,8 +93,8 @@
                                             <td class="border border-slate-600 p-1">
                                                 <p class="truncat">{{ orderItem.distributorManagerCode }}</p>
                                             </td>
-                                            <td class="border border-slate-600 p-1">
-                                                <p class="truncate">&yen; {{ numberFormat(orderItem.price) }}</p>
+                                            <td class="border border-slate-600 p-1 text-right">
+                                                <p class="truncate">&yen;{{ numberFormat(orderItem.price) }}</p>
                                             </td>
                                             <td class="border border-slate-600 p-1">
                                                 <p class="truncate">{{ numberFormat(orderItem.quantity.quantityNum) }} {{ orderItem.quantity.quantityUnit }}</p>
@@ -102,7 +102,7 @@
                                             <td class="border border-slate-600 p-1">
                                                 <p class="truncate">{{ numberFormat(orderItem.orderQuantity) }}{{ orderItem.quantity.itemUnit }}</p>
                                             </td>
-                                            <td class="border border-slate-600 p-1">&yen; {{ numberFormat(orderItem.orderPrice) }}</td>
+                                            <td class="border border-slate-600 p-1 text-right">&yen;{{ numberFormat(orderItem.orderPrice) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>

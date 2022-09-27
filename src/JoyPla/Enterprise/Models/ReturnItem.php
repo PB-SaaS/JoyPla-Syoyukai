@@ -99,7 +99,7 @@ class ReturnItem
             (Distributor::create($input) ),
             (Quantity::create($input) ),
             (new Price($input->price) ),
-            (new ReturnQuantity((int)$input->totalReturnCount)) ,
+            (new ReturnQuantity((int)$input->returnCount)) ,
             (Lot::create($input) ),
             $input->inItemImage,
         );

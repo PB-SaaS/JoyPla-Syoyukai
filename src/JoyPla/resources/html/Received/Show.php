@@ -36,7 +36,10 @@
                   発注番号：{{ received.orderId }}<br>
                   検収番号：{{ received.receivedId }}<br>
                   発注元部署：{{ received.division.divisionName }}<br>
-                  合計金額：&yen; {{ numberFormat( received.totalAmount) }}
+                  合計金額：&yen; {{ numberFormat( received.totalAmount) }}<br>
+                </p>
+                <p class="text-md text-red-700" v-if="received.isReturnItems">
+                  差額：&yen; {{ numberFormat( received.calcReturnBeforeTotalAmount) }}
                 </p>
                 <div class="flex flex-col gap-3">
                   <v-button-default type="button" class="w-full" @click.native="openSlip( received.receivedId )">
@@ -61,9 +64,16 @@
                         <p class="text-base text-gray-900">
                         {{ numberFormat(receivedItem.receivedQuantity) }}{{ receivedItem.quantity.itemUnit }}
                         </p>
+                        <p class="text-base text-red-700" v-if="receivedItem.returnQuantity > 0">
+                        返品数：{{ numberFormat(receivedItem.returnQuantity) }}{{ receivedItem.quantity.itemUnit }}
+                        </p>
                         <p>
                           <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(receivedItem.receivedPrice) }}</span>
                           <span class="text-sm text-gray-900">( &yen; {{ numberFormat(receivedItem.price) }} / {{ receivedItem.quantity.itemUnit }} )</span>
+                        </p>
+                        <p v-if="receivedItem.returnQuantity > 0">
+                          <span class="text-red-700 text-lg mr-4">返品額: &yen; {{ numberFormat(receivedItem.returnPrice) }}</span>
+                          <span class="text-red-700 text-lg mr-4">差額: &yen; {{ numberFormat(receivedItem.calcReturnBeforeTotalPrice) }}</span>
                         </p>
                       </div>
                     </div>

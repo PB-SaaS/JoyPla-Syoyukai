@@ -328,7 +328,7 @@
                     return values.orderItems.map(x => {
                         return {
                             'orderItemId': x.orderItemId,
-                            'receiveds': x.receiveds,
+                            'receiveds': (x.receiveds)? x.receiveds : [],
                         };
                     });
                 }
@@ -453,15 +453,19 @@
                         .receiveds
                         .push({
                             'receivedQuantity': 1,
-                            'lotNumber': item.lotNumber,
-                            'lotDate': item.lotDate
+                            'lotNumber': ( item.lotNumber )? item.lotNumber : "" ,
+                            'lotDate': ( item.lotDate )? item.lotDate : ""
                         });
 
                     receivedQuantitySum(idx);
                 };
                 const addItemByBarcode = (items) => {
                     selectInHospitalItems.value = [];
-                    if (items.length === 0) {
+                    if (items.length === 0 || items.item.length === 0) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: '商品が見つかりませんでした',
+                        });
                         return false;
                     }
 
@@ -480,7 +484,14 @@
                         })
                         .filter(x => x);
 
-                    if (inHospitalitems.length === 1) {
+                    
+                    if (inHospitalitems.length === 0) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: '商品が見つかりませんでした',
+                        });
+                        return false;
+                    }else if (inHospitalitems.length === 1) {
                         addItem(inHospitalitems[0].id, inHospitalitems[0].item);
                     } else {
                         selectInHospitalItems.value = inHospitalitems;

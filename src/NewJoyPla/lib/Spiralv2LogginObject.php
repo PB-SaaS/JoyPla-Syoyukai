@@ -9,7 +9,7 @@ class Spiralv2LogginObject extends HttpRequest implements LoggingObject
 {
     private string $baseUrl = "https://api.spiral-platform.com/v1/";
 
-    public int $logLevel = 3;
+    public int $logLevel = 0;
 
     public function __construct($apiKey , $appId , $dbId)
     {
@@ -23,6 +23,18 @@ class Spiralv2LogginObject extends HttpRequest implements LoggingObject
     }
 
     public function insert(array $data)
+    {
+        $param = new HttpRequestParameter();
+
+        foreach($data as $key => $v)
+        {
+            $param->set($key , $v);
+        } 
+
+        $this->post($param);
+    }
+    
+    public function bulkInsert(array $data)
     {
         $param = new HttpRequestParameter();
 

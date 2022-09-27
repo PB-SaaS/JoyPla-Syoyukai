@@ -114,10 +114,14 @@ namespace JoyPla\Application\Interactors\Api\Received {
                     throw new Exception('The item with this OrderItemId does not exist.',422);
                 }
 
+                if(! isset($inputData->receivedItems[$fkey]['receiveds'])){
+                    continue;
+                }
+
                 foreach($inputData->receivedItems[$fkey]['receiveds'] as $receivedItem)
                 {
                     $receivedQuantity = new ReceivedQuantity((int)$receivedItem['receivedQuantity']);
-                    $items[$key] = $item->addReceivedQuantity($receivedQuantity);// 入庫数を更新
+                    $items[$key] = $items[$key]->addReceivedQuantity($receivedQuantity);// 入庫数を更新
                     $receivedItem = new ReceivedItem(
                         $item->getOrderItemId(),
                         $received->getReceivedId(),
@@ -217,12 +221,15 @@ namespace JoyPla\Application\InputPorts\Api\Received {
             $this->orderId = $orderId;
             $this->receivedItems = array_map(function($item){
                 $d['orderItemId'] = $item['orderItemId'];
-                $d['receiveds'] = array_map(function($item){
-                    $s['receivedQuantity'] = $item['receivedQuantity'];
-                    $s['lotNumber'] = $item['lotNumber'];
-                    $s['lotDate'] = $item['lotDate'];
-                    return $s;
-                }, $item['receiveds']);
+                $d['receiveds'] = [];
+                if(isset($item['receiveds']) ){
+                    $d['receiveds'] = array_map(function($item){
+                        $s['receivedQuantity'] = $item['receivedQuantity'];
+                        $s['lotNumber'] = $item['lotNumber'];
+                        $s['lotDate'] = $item['lotDate'];
+                        return $s;
+                    }, $item['receiveds']);
+                }
                 return $d;
             },$receivedItems);
             $this->isOnlyMyDivision = $isOnlyMyDivision;

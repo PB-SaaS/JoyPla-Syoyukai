@@ -7,6 +7,7 @@ namespace JoyPla\Application\Interactors\Web\Consumption {
 
     use App\Model\Division;
     use Exception;
+    use framework\Exception\NotFoundException;
     use JoyPla\Application\InputPorts\Web\Consumption\ConsumptionIndexInputData;
     use JoyPla\Application\InputPorts\Web\Consumption\ConsumptionIndexInputPortInterface;
     use JoyPla\Application\OutputPorts\Web\Consumption\ConsumptionIndexOutputData;
@@ -47,6 +48,10 @@ namespace JoyPla\Application\Interactors\Web\Consumption {
             $consumptionId = new ConsumptionId($inputData->consumptionId);
 
             $consumption = $this->consumptionRepository->index($hospitalId,$consumptionId);
+
+            if(empty($consumption)){
+                throw new NotFoundException('not found.',404);
+            }
 
             if($inputData->isMyOnlyDivision && !$consumption->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
             {

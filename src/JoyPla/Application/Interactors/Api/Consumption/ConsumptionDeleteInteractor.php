@@ -7,6 +7,7 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
 
     use App\Model\Division;
     use Exception;
+    use framework\Exception\NotFoundException;
     use JoyPla\Application\InputPorts\Api\Consumption\ConsumptionDeleteInputPortInterface;
     use JoyPla\Application\InputPorts\Api\Consumption\ConsumptionDeleteInputData;
     use JoyPla\Application\OutputPorts\Api\Consumption\ConsumptionDeleteOutputData;
@@ -57,6 +58,10 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
 
             $consumption = $this->consumptionRepository->index($hospitalId , new ConsumptionId($inputData->consumptionId));
 
+            if(empty($consumption)){
+                throw new NotFoundException('not found.',404);
+            }
+
             if($inputData->isOnlyMyDivision && ! $consumption->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
             {
                 throw new Exception('Illegal request',403);
@@ -77,6 +82,8 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
             }
 
             $this->consumptionRepository->delete($hospitalId , $consumption->getConsumptionId());
+
+            $this->inventoryCalculationRepository->saveToArray($inventoryCalculations);
 
             $this->outputPort->output(new ConsumptionDeleteOutputData());
         }

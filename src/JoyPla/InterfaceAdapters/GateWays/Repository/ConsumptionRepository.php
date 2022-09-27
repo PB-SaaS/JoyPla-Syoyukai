@@ -115,10 +115,12 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface{
 
         $history = [];
         $items = [];
+
         foreach($consumptions as $consumption){
             $consumptionToArray = $consumption->toArray();
 
             $history[] = [
+                "registrationTime" => $consumptionToArray['consumptionDate'],
                 "billingDate" => $consumptionToArray['consumptionDate'],
                 "billingNumber" => $consumptionToArray['consumptionId'],
                 "hospitalId" => $consumptionToArray['hospital']['hospitalId'],
@@ -131,6 +133,7 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface{
             foreach( $consumptionToArray['consumptionItems'] as $consumptionItem )
             {
                 $items[] = [
+                    "registrationTime" => $consumptionToArray['consumptionDate'],
                     "inHospitalItemId" => $consumptionItem['inHospitalItemId'],
                     "billingNumber" => $consumptionToArray['consumptionId'],
                     "price" => $consumptionItem['price'],
@@ -252,6 +255,10 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface{
     public function index( HospitalId $hospitalId , ConsumptionId $consumptionId)
     {
         $consumptionView = ConsumptionView::where('hospitalId',$hospitalId->value())->where('billingNumber',$consumptionId->value())->get();
+        if($consumptionView->count <= 0)
+        {
+            return null;
+        }
         $consumptionItemView = ConsumptionItemView::sort('id','asc')->where('hospitalId',$hospitalId->value())->where('billingNumber',$consumptionId->value())->get();
         
         $consumption = Consumption::create($consumptionView->data->get(0));

@@ -510,7 +510,11 @@
       const selectOrderItems = ref([]);
       const addItemByBarcode = (items) => {
         selectOrderItems.value = [];
-        if (items.item.length === 0) {
+        if (items.length === 0 || items.item.length === 0) {
+          Swal.fire({
+              icon: 'info',
+              title: '商品が見つかりませんでした',
+          });
           return false;
         }
 
@@ -521,11 +525,18 @@
             text: 'GS1-128・JANコード・ラベル以外のバーコードは読むことができません',
           });
         }
+
+        
         selectOrderItems.value = items.item;
-        openModal
-          .value
-          .open();
+        if (selectOrderItems.value.length === 1) {
+          additem(selectOrderItems.value[0], 0);
+        } else {
+          openModal
+            .value
+            .open();
+        }
       };
+
       return {
         isChange,
         addReceived,

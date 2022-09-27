@@ -24,6 +24,7 @@ class InventoryCalculationRepository implements InventoryCalculationRepositoryIn
                 "inHospitalItemId" => $inventoryCalculation['inHospitalItemId'],
                 "orderWithinCount" => $inventoryCalculation['orderedQuantity'],
                 "count" => $inventoryCalculation['calculationQuantity'],
+                "stockQuantity" => $inventoryCalculation['calculationQuantity'],
                 "pattern" => $inventoryCalculation['pattern'],
                 "lotNumber" => $inventoryCalculation['lot']['lotNumber'],
                 "lotDate" => $inventoryCalculation['lot']['lotDate'],

@@ -142,9 +142,23 @@ class ReceivedItem
     {
         return $this->receivedItemId;
     }
+    
+    public function getReturnQuantity()
+    {
+        return $this->returnQuantity;
+    }
 
     public function price(){
         return (float)$this->price->value() * (float)$this->receivedQuantity->value();
+    }
+
+    public function returnPrice(){
+        return (float)$this->price->value() * (float)$this->returnQuantity->value();
+    }
+
+    public function calcReturnBeforeTotalPrice()
+    {
+        return $this->price() - $this->returnPrice();
     }
 
     public function getRedemption()
@@ -197,6 +211,8 @@ class ReceivedItem
             'quantity' => $this->quantity->toArray(),
             'price' => $this->price->value(),
             'receivedPrice' => $this->price(),
+            'returnPrice' => $this->returnPrice(),
+            'calcReturnBeforeTotalPrice' => $this->calcReturnBeforeTotalPrice(),
             'returnQuantity' => $this->returnQuantity->value(),
             'priceAfterAdjustment' => $this->priceAfterAdjustment(),
             'adjustmentAmount' => $this->adjustmentAmount,

@@ -776,9 +776,14 @@ const vConfirm = {
 const vOpenModal = {
   setup(props,{emit}){
     const { onMounted } = Vue;
+
+    const onShow = () => {
+      emit('show');
+    }
     onMounted(() => {
       MicroModal.init({
-          disableScroll: true 
+          onShow: onShow,
+          disableScroll: true
       });
     });
 
@@ -795,6 +800,7 @@ const vOpenModal = {
       close
     }
   },
+  emits: ['show'],
   props: {
     id: { 
         type: String, 

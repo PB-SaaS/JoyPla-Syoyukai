@@ -27,6 +27,12 @@
                             {{ numberFormat( received.totalAmount) }}
                         </div>
                     </div>
+                    <div class="flex w-full gap-6 text-red-700" v-if="received.isReturnItems">
+                        <div class="flex-initial lg:w-1/6 w-1/3">返品後差額</div>
+                        <div class="flex-auto">&yen;
+                            {{ numberFormat( received.calcReturnBeforeTotalAmount) }}
+                        </div>
+                    </div>
                 </div>
                 <hr>
                 <div class="p-4 text-base">
@@ -56,6 +62,10 @@
                                                         {{ item.value.quantity.itemUnit }}
                                                         )</span>
                                                 </div>
+                                                <div v-if="item.value.returnQuantity > 0">
+                                                    <span class="text-red-700 text-lg">返品額: &yen; {{ numberFormat(item.value.returnPrice) }}</span><br>
+                                                    <span class="text-red-700 text-lg">差額: &yen; {{ numberFormat(item.value.calcReturnBeforeTotalPrice) }}</span>
+                                                </div>
                                             </div>
                                             <div class="flex-auto lg:w-2/5 w-full">
                                                 <div class="md:flex gap-6 ">
@@ -72,7 +82,7 @@
                                                 </div>
                                                 <?php if (gate('register_return_slips')->can()) : ?>
                                                     <div class="p-4 text-base bg-gray-100 border border-gray-400 my-2" v-if="( item.value.receivedQuantity - item.value.returnQuantity ) > 0">
-                                                        <v-input-number :rules="{ between: [ 1 , ( item.value.receivedQuantity - item.value.returnQuantity) ] }" :name="`receivedItems[${idx}].returnQuantityEdit`" label="返品数" :unit="item.value.quantity.itemUnit" :step="1" @change="isChange = true" change-class-name="inputChange" title="返品数"></v-input-number>
+                                                        <v-input-number :rules="{ between: [ 0 , ( item.value.receivedQuantity - item.value.returnQuantity) ] }" :name="`receivedItems[${idx}].returnQuantityEdit`" label="返品数" :unit="item.value.quantity.itemUnit" :step="1" @change="isChange = true" change-class-name="inputChange" title="返品数"></v-input-number>
                                                     </div>
                                                 <?php endif ?>
                                             </div>
@@ -203,12 +213,17 @@
                 const isChange = ref(false);
 
                 const createRegisterModel = () => {
-                    return values.receivedItems.map(x => {
-                        return {
-                            'receivedItemId': x.receivedItemId,
-                            'returnQuantity': x.returnQuantityEdit,
-                        };
+                    let model = [];
+                    values.receivedItems.forEach(x => {
+                        if(x.returnQuantityEdit != 0)
+                        {
+                            model.push( {
+                                'receivedItemId': x.receivedItemId,
+                                'returnQuantity': x.returnQuantityEdit,
+                            });
+                        }
                     });
+                    return model;
                 }
 
                 const onRegister = async () => {
@@ -216,6 +231,18 @@
                         valid,
                         errors
                     } = await validate();
+
+                    const returnItems = createRegisterModel();
+
+                    if(returnItems.length === 0)
+                    {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '入力エラー',
+                            text: '登録する情報がありません。'
+                        })
+                        return false;
+                    }
 
                     if (!valid) {
                         Swal.fire({
@@ -238,7 +265,6 @@
                             .then(async (result) => {
                                 try {
                                     if (result.isConfirmed) {
-                                        const returnItems = createRegisterModel();
                                         let params = new URLSearchParams();
                                         params.append("path", "/api/" + values.receivedId + "/return/register");
                                         params.append("_method", 'post');
@@ -301,6 +327,10 @@
                 const addItemByBarcode = (items) => {
                     selectInHospitalItems.value = [];
                     if (items.length === 0) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: '商品が見つかりませんでした',
+                        });
                         return false;
                     }
 
@@ -319,7 +349,13 @@
                         })
                         .filter(x => x);
 
-                    if (inHospitalitems.length === 1) {
+                    if (inHospitalitems.length === 0) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: '商品が見つかりませんでした',
+                        });
+                        return false;
+                    }else if (inHospitalitems.length === 1) {
                         addItem(inHospitalitems[0].id, inHospitalitems[0].item);
                     } else {
                         selectInHospitalItems.value = inHospitalitems;

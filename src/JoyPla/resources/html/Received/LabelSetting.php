@@ -266,6 +266,10 @@
                 const addItemByBarcode = (items) => {
                     selectInHospitalItems.value = [];
                     if (items.length === 0) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: '商品が見つかりませんでした',
+                        });
                         return false;
                     }
 
@@ -284,7 +288,14 @@
                         })
                         .filter(x => x);
 
-                    if (inHospitalitems.length === 1) {
+                    
+                    if (inHospitalitems.length === 0) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: '商品が見つかりませんでした',
+                        });
+                        return false;
+                    }else if (inHospitalitems.length === 1) {
                         addItem(inHospitalitems[0].id, inHospitalitems[0].item);
                     } else {
                         selectInHospitalItems.value = inHospitalitems;

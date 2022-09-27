@@ -92,11 +92,11 @@
                       <div class="flex-auto lg:w-2/5 w-full">
                           <div class="md:flex gap-6 ">
                               <div class="font-bold w-32">発注数</div>
-                              <div>{{ numberFormat(item.value.orderQuantity) }} {{ item.value.quantity.quantityUnit }}</div>
+                              <div>{{ numberFormat(item.value.orderQuantity) }} {{ item.value.quantity.itemUnit }}</div>
                           </div>
                           <div class="md:flex gap-6 ">
                               <div class="font-bold w-32">現在入庫数</div>
-                              <div>{{ numberFormat(item.value.receivedQuantity) }} {{ item.value.quantity.quantityUnit }}</div>
+                              <div>{{ numberFormat(item.value.receivedQuantity) }} {{ item.value.quantity.itemUnit }}</div>
                           </div>
                           <div class="md:flex gap-6 ">
                               <div class="font-bold w-32">入庫状況</div>
@@ -109,7 +109,7 @@
                                 </span>
                                 <span class="bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="item.value.orderItemReceivedStatus == 3">
                                   {{ item.value.orderItemReceivedStatusToString }}
-                                </span>
+                                </span> 
                               </div>
                           </div>
                           <div class="md:flex gap-6" v-if="item.value.useMedicode">

@@ -5,6 +5,7 @@ namespace JoyPla\Enterprise\Models {
     use DateTime;
     use JoyPla\Enterprise\Traits\ValueObjectTrait;
     use Exception;
+    use framework\Library\SiDateTime;
 
     class MakerName {
         use ValueObjectTrait;
@@ -58,12 +59,18 @@ namespace JoyPla\Enterprise\Models {
 
 
         private string $value = "";
+        private $date;
         public function __construct(string $value)
         {
             if(!self::isValid($value))
             {
                 throw new Exception(self::class . " is valid error.", 422);
             }   
+
+            $date = SiDateTime::parse($value);
+
+            $this->date = $date;
+
             $this->value = $value;
         } 
 
@@ -81,6 +88,11 @@ namespace JoyPla\Enterprise\Models {
                 return true;
             }
             return false;
+        }
+
+        public function format($format)
+        {
+            return $this->date->format($format);
         }
     }
 

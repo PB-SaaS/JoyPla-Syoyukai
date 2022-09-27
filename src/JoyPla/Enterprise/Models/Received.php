@@ -109,6 +109,28 @@ class Received
         return $num;
     }
 
+    public function calcReturnBeforeTotalAmount()
+    {
+        $num = 0;
+        foreach($this->receivedItems as $item)
+        {
+            $num += $item->calcReturnBeforeTotalPrice();
+        }
+        return $num;
+    }
+
+    public function isReturnItems()
+    {
+        foreach($this->receivedItems as $item)
+        {
+            if($item->getReturnQuantity()->value() > 0)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function setReceivedItems(array $receivedItems)
     {
         return new self(
@@ -143,6 +165,8 @@ class Received
                 return $v->toArray();
             },$this->receivedItems),
             'itemCount' => $this->itemCount(),
+            'isReturnItems' => $this->isReturnItems(),
+            'calcReturnBeforeTotalAmount' => $this->calcReturnBeforeTotalAmount(),
             'slipCategory' => $this->slipCategory(),
             'totalAmount' => $this->totalAmount(),
             'hospital' => $this->hospital->toArray(),

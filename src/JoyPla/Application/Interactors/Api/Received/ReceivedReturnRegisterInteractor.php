@@ -102,6 +102,19 @@ namespace JoyPla\Application\Interactors\Api\Received {
             {
                 $storehouse = $this->divisionRepository->getStorehouse($hospitalId);
             }
+            $returnItemExist = false;
+            foreach($inputData->returnItems as $returnItem)
+            {
+                if($returnItem->returnQuantity != 0)
+                {
+                    $returnItemExist = true;
+                }
+            }
+
+            if( ! $returnItemExist )
+            {
+                throw new NotFoundException("not return Items",403);
+            }
 
             $items = $received->getReceivedItems();
 
@@ -120,6 +133,10 @@ namespace JoyPla\Application\Interactors\Api\Received {
             foreach($items as $key => $item){
                 foreach($inputData->returnItems as $returnItem)
                 {
+                    if($returnItem->returnQuantity === 0)
+                    {
+                        continue;
+                    }
                     if($item->getReceivedItemId()->equal($returnItem->receivedItemId))
                     {
                         $items[$key] = $item->addReturnQuantity( new ReturnQuantity($returnItem->returnQuantity) );

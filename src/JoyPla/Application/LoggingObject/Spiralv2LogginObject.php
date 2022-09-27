@@ -12,7 +12,7 @@ class Spiralv2LogginObject extends HttpRequest implements LoggingObject
     private string $appId = "";
     private string $dbId = "";
 
-    public int $logLevel = 3;
+    public int $logLevel = 0;
 
     public function __construct($apiKey , $appId , $dbId)
     {
