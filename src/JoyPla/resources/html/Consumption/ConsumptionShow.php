@@ -66,7 +66,7 @@
                         <p class="text-md text-gray-900" v-if="( consumptionItem.lot.lotNumber != '' && consumptionItem.lot.lotDate != '' )">
                         ロット情報：{{ consumptionItem.lot.lotNumber }} / {{ consumptionItem.lot.lotDate }}
                         </p>
-                        <p class="text-base text-gray-900">
+                        <p class="text-base text-gray-900"> 
                         {{ numberFormat(consumptionItem.consumptionQuantity) }} {{ consumptionItem.quantity.quantityUnit }}
                         </p>
                         <p>

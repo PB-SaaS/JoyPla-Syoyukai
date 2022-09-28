@@ -31,7 +31,7 @@ class ApiResponse {
 
     public function logging()
     {
-        global $SPIRAL;
+        global $SPIRAL; 
         /*
         if( ! class_exists(LogConfig::class) ) { return ""; }
         if(! LogConfig::EXPORT_TO_SPIRALV2){ return ""; }

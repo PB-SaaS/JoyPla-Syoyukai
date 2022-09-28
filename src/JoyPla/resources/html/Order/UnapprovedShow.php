@@ -73,7 +73,7 @@
                         <p class="text-md text-gray-500">{{ orderItem.item.itemStandard }}</p>
                         <p class="text-md text-gray-500">{{ orderItem.item.itemJANCode }}</p>
                         <p class="text-base text-gray-900">
-                        {{ numberFormat(orderItem.orderQuantity) }}{{ orderItem.quantity.quantityUnit }}
+                        {{ numberFormat(orderItem.orderQuantity) }}{{ orderItem.quantity.itemUnit }}
                         </p>
                         <p>
                           <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(orderItem.orderPrice) }}</span>
