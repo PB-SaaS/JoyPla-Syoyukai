@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use View;
@@ -34,7 +35,7 @@ class BorrowingController extends Controller
     public function __construct()
     {
     }
-    
+
     /**
      * 貸出品登録
      */
@@ -46,43 +47,39 @@ class BorrowingController extends Controller
             //$mytable = new mytable();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             $param = array();
-    
+
             $user_info = new UserInfo($SPIRAL);
-    
-            if( ($user_info->isHospitalUser() && !$user_info->isUser())
-            || $user_info->isDistributorUser() ) {
-                $divisionData = Division::where('hospitalId',$user_info->getHospitalId())->get();
+
+            if (($user_info->isHospitalUser() && !$user_info->isUser())
+            || $user_info->isDistributorUser()) {
+                $divisionData = Division::where('hospitalId', $user_info->getHospitalId())->get();
             } else {
-                $divisionData = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
+                $divisionData = Division::where('hospitalId', $user_info->getHospitalId())->where('divisionId', $user_info->getDivisionId())->get();
             }
-    
+
             $api_url = "%url/rel:mpgt:Borrowing%";
-            if( $user_info->isDistributorUser())
-            {
+            if ($user_info->isDistributorUser()) {
                 $api_url = "%url/rel:mpgt:BorrowingForD%";
             }
-    
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
-            
-            if($user_info->isAdmin() || $user_info->isApprover())
-            {
+
+            if ($user_info->isAdmin() || $user_info->isApprover()) {
                 $borrowingAction = 'borrowingRegistrationToUsedReportApi';
             }
-            if($user_info->isUser()) 
-            {
+            if ($user_info->isUser()) {
                 $borrowingAction = 'borrowingRegistrationToUnapprovedUsedSlipApi';
             }
-            if($user_info->isDistributorUser())
-            {
+            if ($user_info->isDistributorUser()) {
                 $borrowingAction = '';
             }
-            
-            $hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+
+            $hospital = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
             $hospital = $hospital->data->get(0);
-            
+
             $content = $this->view('NewJoyPla/view/BorrowingRegistration', [
                 'api_url' => $api_url,
                 'isOldTopPage' => true,
@@ -92,12 +89,12 @@ class BorrowingController extends Controller
                 'csrf_token' => Csrf::generate(16),
                 'borrowingAction' => $borrowingAction,
                 'useUnitPrice' => $hospital->billingUnitPrice,
-                ] , false);
-        } catch ( Exception $ex ) {
+                ], false);
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message'=> $ex->getMessage(),
-                ] , false);
+                ], false);
         } finally {
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
@@ -106,7 +103,7 @@ class BorrowingController extends Controller
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
-            ],false);
+            ], false);
         }
     }
 
@@ -121,43 +118,41 @@ class BorrowingController extends Controller
             //$mytable = new mytable();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             $param = array();
-    
+
             $user_info = new UserInfo($SPIRAL);
-    
+
             $api_url = "%url/rel:mpgt:Borrowing%";
             $isOldTopPage = false;
-            if( $user_info->isDistributorUser())
-            {
+            if ($user_info->isDistributorUser()) {
                 $isOldTopPage = true;
                 $api_url = "%url/rel:mpgt:BorrowingForD%";
             }
-    
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
-    
+
             $content = $this->view('NewJoyPla/view/BorrowingList', [
                 'api_url' => $api_url,
                 'user_info' => $user_info,
                 'isOldTopPage' => $isOldTopPage,
                 'csrf_token' => Csrf::generate(16)
-            ] , false);
-            
-        } catch ( Exception $ex ) {
+            ], false);
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message'=> $ex->getMessage(),
-                ] , false);
+                ], false);
         } finally {
-        // テンプレートにパラメータを渡し、HTMLを生成し返却
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 貸出リスト',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
-            ],false);
+            ], false);
         }
     }
 
@@ -168,10 +163,9 @@ class BorrowingController extends Controller
     {
         global $SPIRAL;
         try {
-    
             $user_info = new UserInfo($SPIRAL);
-    
-            
+
+
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '未承認使用伝票一覧',
                     'table' => '%sf:usr:search27%',
@@ -179,20 +173,18 @@ class BorrowingController extends Controller
                     'submenu' => '貸出',
                     'csrf_token' => Csrf::generate(16),
                     'print' => true
-                    ] , false);
-                
-        } catch ( Exception $ex ) {
+                    ], false);
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message'=> $ex->getMessage(),
-                ] , false);
+                ], false);
         } finally {
-        
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
-            
+
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 未承認使用伝票一覧',
@@ -200,7 +192,7 @@ class BorrowingController extends Controller
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
-            ],false);
+            ], false);
         }
     }
     /**
@@ -214,15 +206,15 @@ class BorrowingController extends Controller
             //$mytable = new mytable();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             $param = array();
-    
+
             $user_info = new UserInfo($SPIRAL);
-    
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
-            
-            
+
+
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '承認済み使用伝票一覧',
                     'table' => '%sf:usr:search28%',
@@ -230,98 +222,93 @@ class BorrowingController extends Controller
                     'submenulink' => "%url/rel:mpg:top%&page=page5",
                     'submenu' => '貸出',
                     'print' => true
-                    ] , false);
-        
-        } catch ( Exception $ex ) {
+                    ], false);
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message'=> $ex->getMessage(),
-                ] , false);
+                ], false);
         } finally {
-        // テンプレートにパラメータを渡し、HTMLを生成し返却
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 承認済み使用伝票一覧',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
-            ],false);
+            ], false);
         }
     }
     /**
      * 貸出品登録
      */
     public function borrowingRegistApi(): View
-    { 
+    {
         global $SPIRAL;
 
         $content = '';
 
         try {
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
+            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
 
             $result = $this->borrowingRegist();
-            
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+
+            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['insert']);
             $content = $content->toJson();
             /** TODO
-             *  spiralDatabaseのレスポンスをApiResponseに変更 
+             *  spiralDatabaseのレスポンスをApiResponseに変更
              **/
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+        } catch (Exception $ex) {
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['insert']);
             $content = $content->toJson();
-        }finally {
+        } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
-            ],false);
+            ], false);
         }
     }
 
     public function borrowingRegistrationToUnapprovedUsedSlipApi()
     {
         global $SPIRAL;
-        try{
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
+        try {
+            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
 
             $user_info = new UserInfo($SPIRAL);
 
-            if( $user_info->isDistributorUser() )
-            {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            if ($user_info->isDistributorUser()) {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(), FactoryApiErrorCode::factory(191)->getCode());
             }
-            
-            if(! ( $user_info->isHospitalUser() && $user_info->isUser() ))
-            {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+
+            if (! ($user_info->isHospitalUser() && $user_info->isUser())) {
+                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(), FactoryApiErrorCode::factory(191)->getCode());
             }
             $borrowing_regist_result = $this->borrowingRegist();
 
-            $used_slip_create_data = $this->usedSlipHisotoyRegist($borrowing_regist_result->insert_data , 1);
+            $used_slip_create_data = $this->usedSlipHisotoyRegist($borrowing_regist_result->insert_data, 1);
 
             $all_create_data = $this->usedReportApi($borrowing_regist_result->insert_data);
 
-            $result = $this->association($used_slip_create_data['ids'],$all_create_data['ids']);
-        
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
-            $content = $content->toJson();
+            $result = $this->association($used_slip_create_data['ids'], $all_create_data['ids']);
 
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['insert']);
             $content = $content->toJson();
-        }finally {
+        } catch (Exception $ex) {
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['insert']);
+            $content = $content->toJson();
+        } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
-            ],false);
-        } 
+            ], false);
+        }
     }
 
-    private function association(array $used_slip_ids , array $other_ids)
+    private function association(array $used_slip_ids, array $other_ids)
     {
         $insert_data = [];
-        foreach($used_slip_ids as $divisionId_distributorId_usedDate => $data)
-        {
+        foreach ($used_slip_ids as $divisionId_distributorId_usedDate => $data) {
             $insert_data[] = [
                 'usedSlipId' => $used_slip_ids[$divisionId_distributorId_usedDate]['usedSlipId'],
                 'orderNumber' => $other_ids[$divisionId_distributorId_usedDate]['orderHistoryId'],
@@ -335,34 +322,29 @@ class BorrowingController extends Controller
         return $result;
     }
 
-    private function usedSlipHisotoyRegist(array $borrowing_insert_items , int $used_slip_status = 1)
+    private function usedSlipHisotoyRegist(array $borrowing_insert_items, int $used_slip_status = 1)
     {
         global $SPIRAL;
         $user_info = new UserInfo($SPIRAL);
-        
+
         $used_slip_ids = [];
         $all_create_data = [ 'ids' => [] , 'history_data' => []];
 
-        if($this->in_hospital_items == null)
-        {
+        if ($this->in_hospital_items == null) {
             $in_hospital_items_instance = InHospitalItem::getInstance();
-            foreach($borrowing_insert_items as $data)
-            {
-                $in_hospital_items_instance = $in_hospital_items_instance::orWhere('inHospitalItemId',$data->inHospitalItemId);
+            foreach ($borrowing_insert_items as $data) {
+                $in_hospital_items_instance = $in_hospital_items_instance::orWhere('inHospitalItemId', $data->inHospitalItemId);
             }
             $this->in_hospital_items = $in_hospital_items_instance::get();
         }
-        foreach($borrowing_insert_items as $key => $item)
-        {
+        foreach ($borrowing_insert_items as $key => $item) {
             $price = '';
             $quantity = '';
             $quantityUnit = '';
             $itemUnit = '';
             $distributorId = '';
-            foreach($this->in_hospital_items->data as $in_hp_item)
-            {
-                if($item->inHospitalItemId == $in_hp_item->inHospitalItemId)
-                {
+            foreach ($this->in_hospital_items->data as $in_hp_item) {
+                if ($item->inHospitalItemId == $in_hp_item->inHospitalItemId) {
                     $price = $in_hp_item->price;
                     $quantity = $in_hp_item->quantity;
                     $quantityUnit = $in_hp_item->quantityUnit;
@@ -376,14 +358,13 @@ class BorrowingController extends Controller
             $borrowing_insert_items[$key]->quantityUnit = $quantityUnit;
             $borrowing_insert_items[$key]->itemUnit = $itemUnit;
             $borrowing_insert_items[$key]->distributorId = $distributorId;
-            
+
             $ids_key = $borrowing_insert_items[$key]->divisionId . $distributorId  . $borrowing_insert_items[$key]->usedDate;
 
-            if(! isset($used_slip_ids[$ids_key])
-            || ! $used_slip_ids[$ids_key])
-            {
+            if (! isset($used_slip_ids[$ids_key])
+            || ! $used_slip_ids[$ids_key]) {
                 $id = $this->makeId('07');
-                $used_slip_ids[$ids_key] = [ 
+                $used_slip_ids[$ids_key] = [
                     'usedSlipId' =>  $id,
                     'distributorId' => $borrowing_insert_items[$key]->distributorId,
                     'divisionId' => $borrowing_insert_items[$key]->divisionId,
@@ -394,39 +375,31 @@ class BorrowingController extends Controller
         $all_create_data['ids'] = $used_slip_ids;
 
         $update_data = [];
-        foreach($borrowing_insert_items as $item)
-        {
-            $item->usedSlipId = $used_slip_ids[$item->divisionId . $item->distributorId . $item->usedDate]['usedSlipId'];//todo 
+        foreach ($borrowing_insert_items as $item) {
+            $item->usedSlipId = $used_slip_ids[$item->divisionId . $item->distributorId . $item->usedDate]['usedSlipId'];//todo
             $update_data[] = (array)$item;
         }
 
         $used_slip_insert_data = [];
 
         $facility_name = "";
-        if( $user_info->isHospitalUser())
-        {
-            $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+        if ($user_info->isHospitalUser()) {
+            $hospital_data = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
             $hospital_data = $hospital_data->data->all();
             $facility_name = $hospital_data[0]->hospitalName;
-        } 
-        else if( $user_info->isDistributorUser())
-        {
-            $distributor_data = Distributor::where('distributorId',$user_info->getDistributorId())->get();
+        } elseif ($user_info->isDistributorUser()) {
+            $distributor_data = Distributor::where('distributorId', $user_info->getDistributorId())->get();
             $distributor_data = $distributor_data->data->all();
             $facility_name = $distributor_data[0]->distributorName;
         }
 
-        foreach($used_slip_ids as $divisionId_distributorId_usedDate => $history_data)
-        {
+        foreach ($used_slip_ids as $divisionId_distributorId_usedDate => $history_data) {
             $used_slip_price = [];
             $in_hospital_item_ids = [];
-            foreach($update_data as $update_item)
-            {
-                if($update_item['usedSlipId'] === $history_data['usedSlipId'])
-                {
+            foreach ($update_data as $update_item) {
+                if ($update_item['usedSlipId'] === $history_data['usedSlipId']) {
                     $used_slip_price[] = (float)$update_item['price'] * (float)$update_item['borrowingNum'];
-                    if(! in_array($update_item['inHospitalItemId'], $in_hospital_item_ids))
-                    {
+                    if (! in_array($update_item['inHospitalItemId'], $in_hospital_item_ids)) {
                         $in_hospital_item_ids[] = $update_item['inHospitalItemId'];
                     }
                 }
@@ -444,10 +417,10 @@ class BorrowingController extends Controller
                 'facility_name' => $facility_name
             ];
         }
-        
+
         $all_create_data['history_data'] = $used_slip_insert_data;
-        
-        $result = Borrowing::bulkUpdate('borrowingId',$update_data);
+
+        $result = Borrowing::bulkUpdate('borrowingId', $update_data);
 
         $result = UsedSlipHistoy::insert($used_slip_insert_data);
         return $all_create_data;
@@ -457,62 +430,56 @@ class BorrowingController extends Controller
     {
         global $SPIRAL;
         $user_info = new UserInfo($SPIRAL);
-        
+
         $borrowing_items = $SPIRAL->getParam('borrowing');
         $borrowing_items = array_merge($borrowing_items); // 連番の再採番
-        if(( ! is_array($borrowing_items) || ! count($borrowing_items) > 0) )
-        {
-            throw new Exception(FactoryApiErrorCode::factory(900)->getMessage(),FactoryApiErrorCode::factory(900)->getCode());
+        if ((! is_array($borrowing_items) || ! count($borrowing_items) > 0)) {
+            throw new Exception(FactoryApiErrorCode::factory(900)->getMessage(), FactoryApiErrorCode::factory(900)->getCode());
         }
         $insert_data = [];
         $divisionId = $SPIRAL->getParam('divisionId');
 
         $in_hospital_item = InHospitalItemView::where('hospitalId', $user_info->getHospitalId());
-        foreach($borrowing_items as $key => $record)
-        {
-            $in_hospital_item->orWhere('inHospitalItemId',$record['recordId']);
+        foreach ($borrowing_items as $key => $record) {
+            $in_hospital_item->orWhere('inHospitalItemId', $record['recordId']);
         }
         $in_hospital_item = $in_hospital_item->get();
-        foreach($borrowing_items as $key =>  $item)
-        {
-            foreach($in_hospital_item->data->all() as $in_hp_item)
-            {
+        foreach ($borrowing_items as $key => $item) {
+            $exist = false;
+            foreach ($in_hospital_item->data->all() as $in_hp_item) {
                 $lot_flag = 0;
-                if($item['recordId'] == $in_hp_item->inHospitalItemId)
-                {
+                if ($item['recordId'] == $in_hp_item->inHospitalItemId) {
+                    $exist = true;
                     $lot_flag = (int)$in_hp_item->lotManagement;
                     break;
                 }
             }
-            if($lot_flag && $item['lotNumber'] == '' && $item['lotDate'] == '' )
-            {
-                throw new Exception('invalid lot',100);
+            if ($lot_flag && $item['lotNumber'] == '' && $item['lotDate'] == '') {
+                throw new Exception('invalid lot', 100);
             }
-            if( ($item['lotNumber'] != '' && $item['lotDate'] == '' ) || ($item['lotNumber'] == '' && $item['lotDate'] != ''))
-            {
-                throw new Exception('invalid lotNumber',101);
+            if (($item['lotNumber'] != '' && $item['lotDate'] == '') || ($item['lotNumber'] == '' && $item['lotDate'] != '')) {
+                throw new Exception('invalid lotNumber', 101);
             }
-            if (($item['lotNumber'] != '') && ($item['lotDate'] != '')) 
-            {
-            //if ((!ctype_alnum($item['lotNumber'])) || (strlen($item['lotNumber']) > 20))
-                if ((!preg_match('/^[a-zA-Z0-9!-\/:-@¥[-`{-~]+$/', $item['lotNumber'])) || (strlen($item['lotNumber']) > 20))
-                {
-                    throw new Exception('invalid lotNumber format',102);
+            if (($item['lotNumber'] != '') && ($item['lotDate'] != '')) {
+                //if ((!ctype_alnum($item['lotNumber'])) || (strlen($item['lotNumber']) > 20))
+                if ((!preg_match('/^[a-zA-Z0-9!-\/:-@\[-`{-~]+$/', $item['lotNumber'])) || (strlen($item['lotNumber']) > 20)) {
+                    throw new Exception('invalid lotNumber format', 102);
                 }
             }
-            $insert_data[$key] = [
-                'inHospitalItemId' => $item['recordId'],
-                'borrowingNum' => 1,
-                'lotNumber' => $item['lotNumber'],
-                'lotDate' => $item['lotDate'],
-                'divisionId' => $divisionId,
-            ];
+            if ($exist) {
+                $insert_data[$key] = [
+                    'inHospitalItemId' => $item['recordId'],
+                    'borrowingNum' => 1,
+                    'lotNumber' => $item['lotNumber'],
+                    'lotDate' => $item['lotDate'],
+                    'divisionId' => $divisionId,
+                ];
+            }
         }
         $result = Borrowing::insert($insert_data);
 
         $result->insert_data = [];
-        foreach($borrowing_items as $key => $record)
-        {
+        foreach ($borrowing_items as $key => $record) {
             $model = new Borrowing();
             $model->borrowingId = 'B_'.str_pad($result->ids->all()[$key], 10, "0", STR_PAD_LEFT);
             $model->usedSlipId = '';
@@ -524,7 +491,7 @@ class BorrowingController extends Controller
             $model->usedDate = $record['usedDate'];
             $result->insert_data[] = $model;
         }
-        return $result ;
+        return $result;
     }
 
     private function usedReportApi(array $borrowing_data)
@@ -533,26 +500,21 @@ class BorrowingController extends Controller
         $all_create_data = [ 'ids' => [] , 'borrowingData' => []];
 
         $user_info = new UserInfo($SPIRAL);
-        
-        $hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+
+        $hospital = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
         $hospital = $hospital->data->all();
-        if($this->in_hospital_items == null)
-        {
+        if ($this->in_hospital_items == null) {
             $in_hospital_items_instance = InHospitalItem::getInstance();
-            foreach($borrowing_data as $data)
-            {
-                $in_hospital_items_instance = $in_hospital_items_instance::orWhere('inHospitalItemId',$data->inHospitalItemId);
+            foreach ($borrowing_data as $data) {
+                $in_hospital_items_instance = $in_hospital_items_instance::orWhere('inHospitalItemId', $data->inHospitalItemId);
             }
             $this->in_hospital_items = $in_hospital_items_instance::get();
         }
         $used_report = [];
-        foreach($borrowing_data as $borrowing_key => $data)
-        {
-            $used_report[$borrowing_key] = new StdClass;
-            foreach($this->in_hospital_items->data as $key => $val)
-            {
-                if($val->inHospitalItemId == $data->inHospitalItemId)
-                {
+        foreach ($borrowing_data as $borrowing_key => $data) {
+            $used_report[$borrowing_key] = new StdClass();
+            foreach ($this->in_hospital_items->data as $key => $val) {
+                if ($val->inHospitalItemId == $data->inHospitalItemId) {
                     $used_report[$borrowing_key]->inHospitalItemId = $val->inHospitalItemId;
                     $used_report[$borrowing_key]->hospitalId = $val->hospitalId;
                     $used_report[$borrowing_key]->distributorId = $val->distributorId;
@@ -583,14 +545,12 @@ class BorrowingController extends Controller
         $all_create_data['borrowingData'] = $used_report;
 
         $history_ids = [];
-        foreach($used_report as $item)
-        {
-            if(! isset($history_ids[$item->divisionId . $item->distributorId . $item->usedDate]) || ! $history_ids[$item->divisionId . $item->distributorId . $item->usedDate])
-            {
+        foreach ($used_report as $item) {
+            if (! isset($history_ids[$item->divisionId . $item->distributorId . $item->usedDate]) || ! $history_ids[$item->divisionId . $item->distributorId . $item->usedDate]) {
                 $order_id = $this->makeId('03');
                 $receiving_id = $this->makeId('04');
                 $billing_id = $this->makeId('02');
-                $history_ids[$item->divisionId . $item->distributorId . $item->usedDate] = [ 
+                $history_ids[$item->divisionId . $item->distributorId . $item->usedDate] = [
                     'orderHistoryId' => $order_id,
                     'receivingHistoryId' => $receiving_id,
                     'billingHistoryId' => $billing_id,
@@ -604,10 +564,8 @@ class BorrowingController extends Controller
         /****** 発注登録 ******/
 
         $order_insert_data = [];
-        foreach($used_report as $item)
-        {
-            if(!$order_insert_data[$item->inHospitalItemId])
-            {
+        foreach ($used_report as $item) {
+            if (!$order_insert_data[$item->inHospitalItemId]) {
                 $order_insert_data[$item->inHospitalItemId] = [
                     'registrationTime' => $item->usedDate,
                     'orderTime' => $item->usedDate,
@@ -629,22 +587,18 @@ class BorrowingController extends Controller
                 ];
             }
             $order_insert_data[$item->inHospitalItemId]['orderQuantity'] = ($order_insert_data[$item->inHospitalItemId]['orderQuantity'] + (float)$item->countNum);
-            $order_insert_data[$item->inHospitalItemId]['orderPrice'] = $order_insert_data[$item->inHospitalItemId]['orderPrice'] + ( (float)$item->price * (float)$item->countNum );
+            $order_insert_data[$item->inHospitalItemId]['orderPrice'] = $order_insert_data[$item->inHospitalItemId]['orderPrice'] + ((float)$item->price * (float)$item->countNum);
             $order_insert_data[$item->inHospitalItemId]['receivingNum'] = $order_insert_data[$item->inHospitalItemId]['receivingNum'] + (float)$item->countNum;
         }
 
         $order_history_insert_data = [];
-        foreach($history_ids as $divisionId_distributorId_usedDate => $history_data)
-        {
+        foreach ($history_ids as $divisionId_distributorId_usedDate => $history_data) {
             $order_price = [];
             $in_hospital_item_ids = [];
-            foreach($order_insert_data as $insert_record)
-            {
-                if($insert_record['orderNumber'] === $history_data['orderHistoryId'])
-                {
+            foreach ($order_insert_data as $insert_record) {
+                if ($insert_record['orderNumber'] === $history_data['orderHistoryId']) {
                     $order_price[] = (float)$insert_record['orderPrice'];
-                    if(! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids))
-                    {
+                    if (! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids)) {
                         $in_hospital_item_ids[] = $insert_record['inHospitalItemId'];
                     }
                 }
@@ -668,13 +622,10 @@ class BorrowingController extends Controller
         /****** 入荷登録 ******/
 
         $receiving_insert_data = [];
-        foreach($used_report as $item)
-        {
-            foreach($order_insert_data as $order_data)
-            {
+        foreach ($used_report as $item) {
+            foreach ($order_insert_data as $order_data) {
                 $orderCNumber = '';
-                if($item->inHospitalItemId == $order_data['inHospitalItemId'])
-                {
+                if ($item->inHospitalItemId == $order_data['inHospitalItemId']) {
                     $orderCNumber = $order_data['orderCNumber'];
                     break; //ループ終了
                 }
@@ -699,17 +650,13 @@ class BorrowingController extends Controller
         }
 
         $receiving_history_insert_data = [];
-        foreach($history_ids as $divisionId_distributorId_usedDate => $history_data)
-        {
+        foreach ($history_ids as $divisionId_distributorId_usedDate => $history_data) {
             //$receiving_price = [];
             $in_hospital_item_ids = [];
-            foreach($receiving_insert_data as $insert_record)
-            {
-                if($insert_record['receivingHId'] === $history_data['receivingHistoryId'])
-                {
+            foreach ($receiving_insert_data as $insert_record) {
+                if ($insert_record['receivingHId'] === $history_data['receivingHistoryId']) {
                     //$receiving_price[] = (float)$insert_record['receivingPrice'];
-                    if(! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids))
-                    {
+                    if (! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids)) {
                         $in_hospital_item_ids[] = $insert_record['inHospitalItemId'];
                     }
                 }
@@ -729,12 +676,11 @@ class BorrowingController extends Controller
         /****** 入荷登録 ******/
         /****** 消費登録 ******/
         $billing_insert_data = [];
-        foreach($used_report as $item)
-        {
+        foreach ($used_report as $item) {
             $unitPrice = ($hospital->billingUnitPrice)
-                ?(float)$item->unitPrice 
-                :(((float)$item->price == 0 || (float)$item->quantity == 0)
-                    ? 0 
+                ? (float)$item->unitPrice
+                : (((float)$item->price == 0 || (float)$item->quantity == 0)
+                    ? 0
                     : (float)$item->price / (float)$item->quantity);
             $billing_insert_data[] = [
                 'registrationTime' => $item->usedDate,
@@ -755,17 +701,13 @@ class BorrowingController extends Controller
         }
 
         $billing_history_insert_data = [];
-        foreach($history_ids as $divisionId_distributorId_usedDate => $history_data)
-        {
+        foreach ($history_ids as $divisionId_distributorId_usedDate => $history_data) {
             $total_amount = [];
             $in_hospital_item_ids = [];
-            foreach($billing_insert_data as $insert_record)
-            {
-                if($insert_record['billingNumber'] === $history_data['billingHistoryId'])
-                {
+            foreach ($billing_insert_data as $insert_record) {
+                if ($insert_record['billingNumber'] === $history_data['billingHistoryId']) {
                     $total_amount[] = (float)$insert_record['billingAmount'];
-                    if(! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids))
-                    {
+                    if (! in_array($insert_record['inHospitalItemId'], $in_hospital_item_ids)) {
                         $in_hospital_item_ids[] = $insert_record['inHospitalItemId'];
                     }
                 }
@@ -783,27 +725,27 @@ class BorrowingController extends Controller
 
         /****** 貸出更新 ******/
         $result = OrderHistory::insert($order_history_insert_data);
-        
+
         $result = Order::insert($order_insert_data);
 
         $result = ReceivingHistory::insert($receiving_history_insert_data);
-        
+
         $result = Receiving::insert($receiving_insert_data);
 
         $result = BillingHistory::insert($billing_history_insert_data);
-        
+
         $result = Billing::insert($billing_insert_data);
-        
+
         return $all_create_data;
     }
-    
-    
+
+
     public function usedTemporaryReportApi()
     {
         global $SPIRAL;
-        try{
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
+        try {
+            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
 
             $user_info = new UserInfo($SPIRAL);
             $all_create_data = [];
@@ -812,23 +754,20 @@ class BorrowingController extends Controller
             $used_date = $SPIRAL->getParam('used_date');
 
             $model = Borrowing::getInstance();
-            foreach($used_ids as $id)
-            {
-                Borrowing::orWhere('id',$id);
+            foreach ($used_ids as $id) {
+                Borrowing::orWhere('id', $id);
             }
             $result = Borrowing::get();
-            
+
             $borrowing_items = [];
-            foreach($result->data->all() as $key => $record)
-            {
+            foreach ($result->data->all() as $key => $record) {
                 $record->usedDate = $used_date;
                 $borrowing_items[$key] = $record;
             }
 
-            $used_slip_create_data = $this->usedSlipHisotoyRegist($borrowing_items , 1);
+            $used_slip_create_data = $this->usedSlipHisotoyRegist($borrowing_items, 1);
             /** メールを作成 */
-            foreach($used_slip_create_data['history_data'] as $history)
-            {  
+            foreach ($used_slip_create_data['history_data'] as $history) {
                 $mail_body = $this->view('NewJoyPla/view/Mail/UsingRequest', [
                     'name' => '%val:usr:name%',
                     'distributor_name' => $history['facility_name'],
@@ -836,20 +775,20 @@ class BorrowingController extends Controller
                     'used_date' => $history['usedTime'],
                     'used_slip_number' => $history['usedSlipId'],
                     'used_item_num' => $history['itemsNumber'],
-                    'total_price' => "￥".number_format_jp((float)$history['totalAmount'],2),
+                    'total_price' => "￥".number_format_jp((float)$history['totalAmount'], 2),
                     'login_url' => LOGIN_URL,
-                ] , false)->render();
+                ], false)->render();
                 $select_name = $this->makeId($history['hospitalId']);
 
                 $hospital_user = HospitalUser::getNewInstance();
                 $test = $hospital_user::selectName($select_name)->rule(
                     ['name'=>'hospitalId','label'=>'name_'.$history['hospitalId'],'value1'=>$history['hospitalId'],'condition'=>'matches']
-                    )->filterCreate();
+                )->filterCreate();
 
                 $test = $hospital_user::selectRule($select_name)
                     ->body($mail_body)
                     ->subject("[JoyPla] 貸出品の使用申請がありました")
-                    ->from(FROM_ADDRESS,FROM_NAME)
+                    ->from(FROM_ADDRESS, FROM_NAME)
                     ->send();
             }
 
@@ -858,16 +797,15 @@ class BorrowingController extends Controller
             $result->message = 'OK' ;
             $result->count = 0;
 
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['insert']);
             $content = $content->toJson();
-         
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['insert']);
+        } catch (Exception $ex) {
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['insert']);
             $content = $content->toJson();
-        }finally {
+        } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
-            ],false);
+            ], false);
         }
     }
 }
@@ -880,33 +818,22 @@ $BorrowingController = new BorrowingController();
 $action = $SPIRAL->getParam('Action');
 
 {
-    if($action === 'borrowingRegistApi')
-    {
+    if ($action === 'borrowingRegistApi') {
         //貸出品の登録
         echo $BorrowingController->borrowingRegistApi()->render();
-    }
-    else if($action === 'usedTemporaryReportApi')
-    {
+    } elseif ($action === 'usedTemporaryReportApi') {
         //貸出品リストから申請
         echo $BorrowingController->usedTemporaryReportApi()->render();
-    }
-    else if($action === 'borrowingList')
-    {
+    } elseif ($action === 'borrowingList') {
         //貸出品リスト
         echo $BorrowingController->borrowingList()->render();
-    }
-    else if($action === 'unapprovedUsedSlip')
-    {
+    } elseif ($action === 'unapprovedUsedSlip') {
         //承認リスト
         echo $BorrowingController->unapprovedUsedSlip()->render();
-    }
-    else if($action === 'approvedUsedSlip')
-    {
+    } elseif ($action === 'approvedUsedSlip') {
         //未承認リスト
         echo $BorrowingController->approvedUsedSlip()->render();
-    }
-    else 
-    {
+    } else {
         //貸出品登録
         echo $BorrowingController->index()->render();
     }
