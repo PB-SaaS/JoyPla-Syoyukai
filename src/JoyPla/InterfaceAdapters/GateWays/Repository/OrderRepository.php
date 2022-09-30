@@ -568,6 +568,85 @@ class OrderRepository implements OrderRepositoryInterface
                 ->send();
         }
     }
+
+    //** メンテナンス用 */
+    public function all()
+    {
+        $items = OrderItemView::get();
+        $historys = OrderView::orWhere('orderStatus', OrderStatus::OrderCompletion)->orWhere('orderStatus', OrderStatus::OrderFinished)->orWhere('orderStatus', OrderStatus::PartOfTheCollectionIsIn)->orWhere('orderStatus', OrderStatus::DeliveryDateReported)->get();
+
+        foreach ($historys->data->all() as $history) {
+            $order = Order::create($history);
+
+            foreach ($items->data->all() as $item) {
+                if ($order->getOrderId()->equal($item->orderNumber)) {
+                    $order = $order->addOrderItem(OrderItem::create($item));
+                }
+            }
+            $orders[] = $order;
+        }
+        return $orders;
+    }
+    
+    //** メンテナンス用 */
+    public function updateAll(array $orders)
+    {
+        $orders = array_map(function (Order $order) {
+            return $order;
+        }, $orders);
+
+        $history = [];
+        $items = [];
+
+        $deleteOrderIds = [];
+
+        foreach ($orders as $oKey => $order) {
+            $orderToArray = $order->toArray();
+            $history[] = [
+                "orderNumber" => (string)$orderToArray['orderId'],
+                "orderTime" => (string)$orderToArray['orderDate'],
+                "hospitalId" => (string)$orderToArray['hospital']['hospitalId'],
+                "divisionId" => (string)$orderToArray['division']['divisionId'],
+                "distributorId" => (string)$orderToArray['distributor']['distributorId'],
+                "itemsNumber" => (string)$orderToArray['itemCount'],
+                "totalAmount" => (string)$orderToArray['totalAmount'],
+                "orderStatus" => (string)$orderToArray['orderStatus'],
+                "adjustment" => (string)$orderToArray['adjustment'],
+                "ordercomment" => (string)$orderToArray['orderComment'],
+                "ordererUserName" => (string)$orderToArray['orderUserName'],
+            ];
+
+            foreach ($orderToArray['orderItems'] as $orderItem) {
+                $item = [
+                    "inHospitalItemId" => (string)$orderItem['inHospitalItemId'],
+                    "orderNumber" => (string)$orderToArray['orderId'],
+                    "orderCNumber" => (string)$orderItem['orderItemId'],
+                    "price" => (string)$orderItem['price'],
+                    "orderQuantity" => (string)$orderItem['orderQuantity'],
+                    "receivingNum" => (string)$orderItem['receivedQuantity'],
+                    "orderPrice" => (string)$orderItem['orderPrice'],
+                    "hospitalId" => (string)$orderItem['hospitalId'],
+                    "receivingFlag" => (string)$orderItem['receivedFlag'],
+                    "divisionId" => (string)$orderItem['division']['divisionId'],
+                    "distributorId" => (string)$orderItem['distributor']['distributorId'],
+                    "quantity" => (string)$orderItem['quantity']['quantityNum'],
+                    "quantityUnit" => (string)$orderItem['quantity']['quantityUnit'],
+                    "itemUnit" => (string)$orderItem['quantity']['itemUnit'],
+                    "lotManagement" => (string)$orderItem['lotManagement'],
+                    "itemId" => (string)$orderItem['item']['itemId']
+                ];
+
+                $items[] = $item;
+            }
+        }
+        if (count($history) > 0) {
+            SpiralDB::title('NJ_OrderHDB')->updateBulk('orderNumber', $history);
+        }
+        if (count($items) > 0) {
+            SpiralDB::title('NJ_OrderDB')->updateBulk('orderCNumber', $items);
+        }
+        return array_values($orders);
+    }
 }
 
 interface OrderRepositoryInterface

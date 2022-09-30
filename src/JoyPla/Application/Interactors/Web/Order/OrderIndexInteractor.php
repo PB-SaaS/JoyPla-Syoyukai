@@ -90,6 +90,7 @@ namespace JoyPla\Application\Interactors\Web\Order {
             {
                 throw new NotFoundException("Not Found.",404);
             }
+            
 
             $order = $order->toArray();
             

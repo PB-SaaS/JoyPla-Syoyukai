@@ -417,35 +417,40 @@ const vInHospitalItemModal = {
               @currentTab="getCurrentTab"></v-tab>
         </div>
         <template v-if="currentTab === 'search'">
-          <form class="w-full overflow-y-auto" style="max-height: 85vh;">
+          <div class="w-full overflow-y-auto" style="max-height: 85vh;">
             <div class="flex flex-wrap">
               <div class="w-full px-3 my-6 md:mb-0">
                 <div class="mx-auto lg:w-2/3 mb-4">
                   <v-input 
+                  @keypress.enter="searchExec"
                   type="text"
                   name="makerName"
                   title="メーカー"></v-input>
                 </div>
                 <div class="mx-auto lg:w-2/3 mb-4">
                   <v-input 
+                  @keypress.enter="searchExec"
                   type="text"
                   name="itemName"
                   title="商品名"></v-input>
                 </div>
                 <div class="mx-auto lg:w-2/3">
                   <v-input 
+                  @keypress.enter="searchExec"
                   type="text"
                   name="itemCode"
                   title="製品コード"></v-input>
                 </div>
                 <div class="mx-auto lg:w-2/3 mb-4">
                   <v-input 
+                  @keypress.enter="searchExec"
                   type="text"
                   name="itemStandard"
                   title="規格"></v-input>
                 </div>
                 <div class="mx-auto lg:w-2/3 mb-4">
                   <v-input 
+                  @keypress.enter="searchExec"
                   type="text"
                   name="itemJANCode" 
                   title="JANコード"></v-input>
@@ -463,7 +468,7 @@ const vInHospitalItemModal = {
                 </div>
               </div>
             </div>
-          </form>
+          </div>
         </template>
         <template v-else-if="currentTab === 'list'">
           <div class="flex">
@@ -773,41 +778,47 @@ const vOrderItemModal = {
               @currentTab="getCurrentTab"></v-tab>
         </div>
         <template v-if="currentTab === 'search'">
-          <form class="w-full overflow-y-auto" style="max-height: 85vh;">
+          <div class="w-full overflow-y-auto" style="max-height: 85vh;">
             <div class="flex flex-wrap">
               <div class="w-full px-3 my-6 md:mb-0">
                 <div class="mx-auto lg:w-2/3 mb-4">
                   <v-input 
+                  @keypress.enter="searchExec"
                   type="month"
                   name="orderDate"
                   title="発注日"></v-input>
                 </div>
                 <div class="mx-auto lg:w-2/3 mb-4">
                   <v-input 
+                  @keypress.enter="searchExec"
                   type="text"
                   name="makerName"
                   title="メーカー"></v-input>
                 </div>
                 <div class="mx-auto lg:w-2/3 mb-4">
                   <v-input 
+                  @keypress.enter="searchExec"
                   type="text"
                   name="itemName"
                   title="商品名"></v-input>
                 </div>
                 <div class="mx-auto lg:w-2/3">
                   <v-input 
+                  @keypress.enter="searchExec"
                   type="text"
                   name="itemCode"
                   title="製品コード"></v-input>
                 </div>
                 <div class="mx-auto lg:w-2/3 mb-4">
                   <v-input 
+                  @keypress.enter="searchExec"
                   type="text"
                   name="itemStandard"
                   title="規格"></v-input>
                 </div>
                 <div class="mx-auto lg:w-2/3 mb-4">
                   <v-input 
+                  @keypress.enter="searchExec"
                   type="text"
                   name="itemJANCode" 
                   title="JANコード"></v-input>
@@ -831,7 +842,7 @@ const vOrderItemModal = {
                 </div>
               </div>
             </div>
-          </form>
+          </div>
         </template>
         <template v-else-if="currentTab === 'list'">
           <div class="flex">
@@ -1035,7 +1046,7 @@ const vBarcodeSearch = {
       title=""
       class="flex-1 w-5/6"
       autocomplete="false"
-      @keyup.enter.native="onEnter"></v-input>
+      @keypress.enter.native="onEnter"></v-input>
       <v-button-primary type="button" class="flex-none" @click.native="onEnter">検索</v-button-primary>
     </fieldset>
   `
@@ -1148,7 +1159,7 @@ const vBarcodeSlipSearch = {
       title=""
       class="flex-1 w-5/6"
       autocomplete="false"
-      @keyup.enter.native="onEnter"></v-input>
+      @keypress.enter.native="onEnter"></v-input>
       <v-button-primary type="button" class="flex-none" @click.native="onEnter">検索</v-button-primary>
     </fieldset>
   `
@@ -1253,7 +1264,7 @@ const vBarcodeSearchForOrderData = {
       title=""
       class="flex-1 w-5/6"
       autocomplete="false"
-      @keyup.enter.native="onEnter"></v-input>
+      @keypress.enter.native="onEnter"></v-input>
       <v-button-primary type="button" class="flex-none" @click.native="onEnter">検索</v-button-primary>
     </fieldset>
   `

@@ -100,6 +100,7 @@ const vInput = {
   template: `
     <v-text :title="title" :isRequired="isRequired()">
       <input
+      
             :type="type"
             :placeholder="placeholder"
             v-model="value"

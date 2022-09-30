@@ -85,6 +85,8 @@ use JoyPla\JoyPlaApplication;
 //param _method="" を指定すると GET PUT DELETE GET PATCH を区別できる
 const VIEW_FILE_ROOT = "JoyPla/resources";
 
+//Router::map('Get','/api/order/maintenance',[OrderController::class,'maintenance']);
+
 Router::group(VerifyCsrfTokenMiddleware::class, function(){
     Router::map('GET','/api/division/show',[DivisionController::class , 'show'])->service(new DivisionShowInteractor(new DivisionShowPresenter() , new DivisionRepository()) );
 

@@ -51,6 +51,29 @@ Router::map('GET', '/agree', [AgreeFormController:: class , 'index']);
 
 Router::map('POST', '/agree', [AgreeFormController:: class , 'send']);
 
+Router::map('GET','/maintenance',function(){
+    $rep = new OrderRepository();
+    $orders = $rep->all();
+
+    $cloneOrders = [];
+
+    foreach($orders as $key => $order)
+    {
+        $cloneOrders[$key] = $order->updateOrderStatus();
+    }
+
+    $updateOrders = [];
+    foreach($cloneOrders as $key => $order)
+    {
+        if($orders[$key]->getOrderStatus()->value() !== $cloneOrders[$key]->getOrderStatus()->value())
+        {
+            $updateOrders[] = $cloneOrders[$key];
+        }
+    }
+
+    $rep->updateAll($updateOrders);
+});
+
 Router::group(PersonalInformationConsentMiddleware::class, function(){
 
     Router::map('GET', '/', [TopController:: class , 'index']);

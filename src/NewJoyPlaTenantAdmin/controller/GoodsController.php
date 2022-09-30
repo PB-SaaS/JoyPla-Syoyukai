@@ -164,7 +164,7 @@ class GoodsController extends Controller
                         'distributorMCode' => $row['data'][1],
                         'itemName' => $row['data'][2],
                         'category' => $row['data'][3],
-                        'category' => $row['data'][4],
+                        'smallCategory' => $row['data'][4],
                         'itemCode' => $row['data'][5],
                         'itemStandard' => $row['data'][6],
                         'itemJANCode' => $row['data'][7],
@@ -188,6 +188,7 @@ class GoodsController extends Controller
                         'tenantId' => $auth->tenantId,
                     ];
             }
+
             $result = AllNewItemInsert::insert($insert_data);
 
             $content = new ApiResponse($result->ids, count($insert_data), $result->code, $result->message, ['insert']);
@@ -237,7 +238,7 @@ class GoodsController extends Controller
 
         foreach ($rowData as $row) {
             $distributor->orWhere('distributorId', $row['data'][0]);
-            $item->orWhere('itemJANCode', $row['data'][5]);
+            $item->orWhere('itemJANCode', $row['data'][7]);
         }
 
         $distributor = $distributor->get();
@@ -256,7 +257,7 @@ class GoodsController extends Controller
 
             $check = false;
             foreach ($item->data->all() as $i) {
-                if ($i->itemJANCode === $row['data'][5]) {
+                if ($i->itemJANCode === $row['data'][7]) {
                     $check = true;
                 }
             }
@@ -279,7 +280,7 @@ $GoodsController = new GoodsController();
 
 $action = $SPIRAL->getParam('Action');
 
-{
+{  
     if ($action === "insert") {
         echo $GoodsController->insert()->render();
     } elseif ($action === "allBulkInsert") {

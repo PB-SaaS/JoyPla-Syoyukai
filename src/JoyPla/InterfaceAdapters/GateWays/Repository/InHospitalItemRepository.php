@@ -88,7 +88,7 @@ class InHospitalItemRepository implements InHospitalItemRepositoryInterface{
             $instance->where('notUsedFlag','1','!=');
         }
 
-        $result = $instance->page($search->currentPage)->paginate($search->perPage);
+        $result = $instance->sort('id','asc')->page($search->currentPage)->paginate($search->perPage);
 
         $inHospitalItems = $result->data->all();
 
