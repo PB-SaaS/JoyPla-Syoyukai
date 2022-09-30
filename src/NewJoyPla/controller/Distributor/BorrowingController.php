@@ -45,26 +45,19 @@ class BorrowingController extends Controller
             // GETで呼ばれた
             //$mytable = new mytable();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            $param = array();
 
             $user_info = new UserInfo($SPIRAL);
 
-            if (($user_info->isHospitalUser() && !$user_info->isUser())
-            || $user_info->isDistributorUser()) {
-                $divisionData = Division::where('hospitalId', $user_info->getHospitalId())->get();
-            } else {
-                $divisionData = Division::where('hospitalId', $user_info->getHospitalId())->where('divisionId', $user_info->getDivisionId())->get();
+            if ($user_info->isHospitalUser()) {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
             }
 
-            $api_url = "%url/rel:mpgt:Borrowing%";
+            $divisionData = Division::where('hospitalId', $user_info->getHospitalId())->get();
+
+            $api_url = '';
             if ($user_info->isDistributorUser()) {
                 $api_url = "%url/rel:mpgt:BorrowingForD%";
             }
-
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
-            ], false);
 
             $borrowingAction = '';
 
@@ -87,6 +80,11 @@ class BorrowingController extends Controller
                 'message'=> $ex->getMessage(),
                 ], false);
         } finally {
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 貸出登録',
@@ -108,21 +106,19 @@ class BorrowingController extends Controller
             // GETで呼ばれた
             //$mytable = new mytable();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            $param = array();
 
             $user_info = new UserInfo($SPIRAL);
 
-            $api_url = "%url/rel:mpgt:Borrowing%";
+            if ($user_info->isHospitalUser()) {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+            }
+
+            $api_url = '';
             $isOldTopPage = false;
             if ($user_info->isDistributorUser()) {
                 $isOldTopPage = true;
                 $api_url = "%url/rel:mpgt:BorrowingForD%";
             }
-
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
-            ], false);
 
             $content = $this->view('NewJoyPla/view/BorrowingList', [
                 'api_url' => $api_url,
@@ -136,6 +132,11 @@ class BorrowingController extends Controller
                 'message'=> $ex->getMessage(),
                 ], false);
         } finally {
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 貸出リスト',
@@ -155,6 +156,10 @@ class BorrowingController extends Controller
         global $SPIRAL;
         try {
             $user_info = new UserInfo($SPIRAL);
+
+            if ($user_info->isHospitalUser()) {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+            }
 
 
             $content = $this->view('NewJoyPla/view/template/List', [
@@ -186,6 +191,7 @@ class BorrowingController extends Controller
             ], false);
         }
     }
+
     /**
      * 使用済みリスト（承認）
      */
@@ -196,15 +202,12 @@ class BorrowingController extends Controller
             // GETで呼ばれた
             //$mytable = new mytable();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            $param = array();
 
             $user_info = new UserInfo($SPIRAL);
 
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
-            ], false);
-
+            if ($user_info->isHospitalUser()) {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+            }
 
             $content = $this->view('NewJoyPla/view/template/List', [
                     'title' => '承認済み使用伝票一覧',
@@ -220,6 +223,11 @@ class BorrowingController extends Controller
                 'message'=> $ex->getMessage(),
                 ], false);
         } finally {
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
+            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
+                'SPIRAL' => $SPIRAL
+            ], false);
+
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 承認済み使用伝票一覧',
@@ -230,13 +238,13 @@ class BorrowingController extends Controller
             ], false);
         }
     }
+
     /**
      * 貸出品登録
      */
     public function borrowingRegistApi(): View
     {
         global $SPIRAL;
-
         $content = '';
 
         try {
@@ -255,7 +263,7 @@ class BorrowingController extends Controller
             $content = $content->toJson();
         } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
-                'content'   => $content,
+                'content' => $content,
             ], false);
         }
     }
@@ -264,6 +272,10 @@ class BorrowingController extends Controller
     {
         global $SPIRAL;
         $user_info = new UserInfo($SPIRAL);
+
+        if ($user_info->isHospitalUser()) {
+            throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+        }
 
         $used_slip_ids = [];
         $all_create_data = [ 'ids' => [] , 'history_data' => []];
@@ -320,16 +332,10 @@ class BorrowingController extends Controller
 
         $used_slip_insert_data = [];
 
-        $facility_name = "";
-        if ($user_info->isHospitalUser()) {
-            $hospital_data = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
-            $hospital_data = $hospital_data->data->all();
-            $facility_name = $hospital_data[0]->hospitalName;
-        } elseif ($user_info->isDistributorUser()) {
-            $distributor_data = Distributor::where('distributorId', $user_info->getDistributorId())->get();
-            $distributor_data = $distributor_data->data->all();
-            $facility_name = $distributor_data[0]->distributorName;
-        }
+        $facility_name = '';
+        $distributor_data = Distributor::where('distributorId', $user_info->getDistributorId())->get();
+        $distributor_data = $distributor_data->data->all();
+        $facility_name = $distributor_data[0]->distributorName;
 
         foreach ($used_slip_ids as $divisionId_distributorId_usedDate => $history_data) {
             $used_slip_price = [];
@@ -368,6 +374,10 @@ class BorrowingController extends Controller
     {
         global $SPIRAL;
         $user_info = new UserInfo($SPIRAL);
+
+        if ($user_info->isHospitalUser()) {
+            throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+        }
 
         $borrowing_items = $SPIRAL->getParam('borrowing');
         $borrowing_items = array_merge($borrowing_items); // 連番の再採番
@@ -443,6 +453,11 @@ class BorrowingController extends Controller
             Csrf::validate($token, true);
 
             $user_info = new UserInfo($SPIRAL);
+
+            if ($user_info->isHospitalUser()) {
+                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+            }
+
             $all_create_data = [];
 
             $used_ids = $SPIRAL->getParam('used_ids');
@@ -499,7 +514,7 @@ class BorrowingController extends Controller
             $content = $content->toJson();
         } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
-                'content'   => $content,
+                'content' => $content,
             ], false);
         }
     }
