@@ -462,7 +462,7 @@ class BorrowingController extends Controller
             }
             if (($item['lotNumber'] != '') && ($item['lotDate'] != '')) {
                 //if ((!ctype_alnum($item['lotNumber'])) || (strlen($item['lotNumber']) > 20))
-                if ((!preg_match('/^[a-zA-Z0-9!-\/:-@\[-`{-~]+$/', $item['lotNumber'])) || (strlen($item['lotNumber']) > 20)) {
+                if ((!preg_match('/^[a-zA-Z0-9!-\/:-@¥[-`{-~]+$/', $item['lotNumber'])) || (strlen($item['lotNumber']) > 20)) {
                     throw new Exception('invalid lotNumber format', 102);
                 }
             }
