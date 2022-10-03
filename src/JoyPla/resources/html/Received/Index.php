@@ -18,6 +18,7 @@
                     <v-text title="発注番号" class="flex w-full gap-6">{{ received.orderId }}</v-text>
                     <v-text title="入庫番号" class="flex w-full gap-6">{{ received.receivedId }}</v-text>
                     <v-text title="発注元部署" class="flex w-full gap-6">{{ received.division.divisionName }}</v-text>
+                    <v-text title="卸業者" class="flex w-full gap-6">{{ received.distributor.distributorName }}</v-text>
                 </div>
                 <hr>
                 <div class="p-4 text-lg font-bold">

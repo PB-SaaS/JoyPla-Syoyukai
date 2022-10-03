@@ -63,7 +63,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
                     OrderStatus::DeliveryIsCanceled,
                     OrderStatus::Borrowing,
                 ]
-            );
+            ); 
 
             $orderItems = $order->getOrderItems();
             foreach($orderItems as $fkey => $item)
@@ -107,6 +107,8 @@ namespace JoyPla\Application\Interactors\Api\Order {
                 [$order]);
             
             $this->inventoryCalculationRepository->saveToArray($inventoryCalculations);
+
+            $this->orderRepository->sendRevisedOrderMail($order , $inputData->user);
 
             $this->outputPort->output(new OrderRevisedOutputData());
         }

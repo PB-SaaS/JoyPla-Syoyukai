@@ -901,7 +901,7 @@ const vOrderItemModal = {
                                 <span class="text-xl text-orange-600 font-bold font-heading">
                                   {{ numberFormat( orderItem.orderQuantity ) }}{{ orderItem.quantity.itemUnit }} 発注中
                                 </span>
-                                <span class="text-xl text-orange-600 font-bold font-heading" v-if="(orderItem.orderQuantity - orderItem.receivedQuantity) > 0">
+                                <span class="text-xl text-orange-600 font-bold font-heading" v-if="(orderItem.orderQuantity - orderItem.receivedQuantity) != 0">
                                   {{ numberFormat( ( orderItem.orderQuantity - orderItem.receivedQuantity) ) }}{{ orderItem.quantity.itemUnit }} 未入荷
                                 </span>
                               </p>

@@ -36,6 +36,7 @@
                   発注番号：{{ received.orderId }}<br>
                   検収番号：{{ received.receivedId }}<br>
                   発注元部署：{{ received.division.divisionName }}<br>
+                  卸業者：{{ received.distributor.distributorName }}<br>
                   合計金額：&yen; {{ numberFormat( received.totalAmount) }}<br>
                 </p>
                 <p class="text-md text-red-700" v-if="received.isReturnItems">

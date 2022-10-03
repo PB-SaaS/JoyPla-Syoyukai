@@ -32,13 +32,14 @@
           </v-text>
           <v-text title="発注元部署" class="lg:flex w-full gap-6">{{ order.division.divisionName }}</v-text>
           <v-text title="発注担当者" class="lg:flex w-full gap-6">{{ order.orderUserName }}</v-text>
+          <v-text title="卸業者" class="lg:flex w-full gap-6">{{ order.distributor.distributorName }}</v-text>
           <?php if( gate('revision_of_unordered_slips')->can() ): ?>
           <v-select class="lg:flex w-full gap-6" @change="isChange = true" change-class-name="inputChange" :options="[{ label: '定数発注', value: 1 },{ label: '個別発注', value: 2 }]" name="adjustment" :rules="{required: true}" title="発注タイプ" label="発注タイプ"></v-select>
           <v-textarea title="備考" @change="isChange = true" change-class-name="inputChange" name="comment" :rules="{strlen: 512}" label="備考" class="lg:flex w-full gap-6 mt-4">
           </v-textarea>
           <?php else: ?>
           <v-text title="発注タイプ" class="flex w-full gap-6">{{ order.adjustmentToString }}</v-text>
-          <v-text title="md:備考" class="flex w-full gap-6"><p class=" whitespace-pre-wrap">{{ order.orderComment }}</p></v-text>
+          <v-text title="備考" class="flex w-full gap-6"><p class=" whitespace-pre-wrap">{{ order.orderComment }}</p></v-text>
           <?php endif ?>
         </div>
         <hr>
@@ -80,7 +81,7 @@
                         <?php else: ?>
                         <div class="md:flex gap-6 ">
                             <div class="font-bold w-32">発注数</div>
-                            <div>{{ numberFormat(item.value.orderQuantity) }} {{ item.value.quantity.quantityUnit }}</div>
+                            <div>{{ numberFormat(item.value.orderQuantity) }} {{ item.value.quantity.itemUnit }}</div>
                         </div>
                         <?php endif ?>
                         <div>

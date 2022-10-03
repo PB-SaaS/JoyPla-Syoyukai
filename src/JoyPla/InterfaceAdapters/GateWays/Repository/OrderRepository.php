@@ -478,6 +478,52 @@ class OrderRepository implements OrderRepositoryInterface
             ->send();
     }
 
+    public function sendRevisedOrderMail(Order $order, Auth $user)
+    {
+        $order = $order->toArray();
+
+        $distributor = SpiralDbDistributor::where('distributorId', $order['distributor']['distributorId'])
+        ->value('distributorName')
+        ->value('postalCode')
+        ->value('prefectures')
+        ->value('address')
+        ->get();
+        $distributor = $distributor->data->get(0);
+
+        $useMedicode = in_array(true, array_map(function (array $orderItem) {
+            return $orderItem['useMedicode'];
+        }, $order['orderItems']), true);
+
+        $mail_body = view('mail/Order/OrderRevised', [
+            'name' => '%val:usr:name%',
+            'hospital_name' => $order['hospital']['hospitalName'],
+            'prefectures' => $order['hospital']['prefectures'],
+            'address' => $order['hospital']['address'],
+            'distributor_name' => $distributor->distributorName,
+            'division_name' => $order['division']['divisionName'],
+            'order_date' => $order['orderDate'],
+            'order_number' => $order['orderId'],
+            'item_num' => $order['itemCount'],
+            'useMedicode' => $useMedicode,
+            'total_price' => '￥'.number_format_jp((float)$order['totalAmount']),
+            'slip_url' => OROSHI_OrderDetailAccess."?searchValue=".$order['orderId'],
+            'login_url' => OROSHI_LOGIN_URL,
+        ])->render();
+        $select_name = SelectName::generate($user->hospitalId);
+
+        $test = DistributorAffiliationView::selectName($select_name->value())
+            ->rule(['name'=>'distributorId','label'=>'name_'.$order['distributor']['distributorId'],'value1'=>$order['distributor']['distributorId'],'condition'=>'matches'])
+            ->rule(['name'=>'invitingAgree','label'=>'invitingAgree','value1'=>'t','condition'=>'is_boolean'])
+            ->filterCreate();
+
+        $test = DistributorAffiliationView::selectRule($select_name->value())
+            ->body($mail_body)
+            ->subject("[JoyPla] 発注書に変更がありました")
+            ->from(FROM_ADDRESS, FROM_NAME)
+            ->send();
+
+    }
+
     public function sendApprovalOrderMail(Order $order, Auth $user)
     {
         $order = $order->toArray();
@@ -665,6 +711,7 @@ interface OrderRepositoryInterface
     public function sendUnapprovedOrderMail(array $orders, Auth $user);
 
     public function getOrderByOrderItemId(HospitalId $hospitalId, array $orderItemIds);
-
+    
     public function sendApprovalOrderMail(Order $order, Auth $user);
+    public function sendRevisedOrderMail(Order $order, Auth $user);
 }
