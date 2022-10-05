@@ -62,6 +62,11 @@ foreach(scanDirctory('src/JoyPla/Enterprise/SpiralDb') as $file){
     $outputtext .= "require_once('$file');".PHP_EOL; 
 }
 
+foreach(scanDirctory('src/JoyPla/Exceptions') as $file){
+    $file = str_replace("src/", "", $file);
+    $outputtext .= "require_once('$file');".PHP_EOL; 
+}
+
 
 file_put_contents("src/JoyPla/require.php", $outputtext);
 //file_put_contents($argv[1], $outputtext);

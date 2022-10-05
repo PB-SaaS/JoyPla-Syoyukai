@@ -8,6 +8,7 @@ require_once "JoyPla/require.php";
 use App\Http\Middleware\VerifyCsrfTokenMiddleware;
 use App\SpiralDb\HospitalUser;
 use framework\Application;
+use framework\Exception\ExceptionHandler;
 use framework\Http\Request;
 use framework\Routing\Router;
 use JoyPla\Application\Interactors\Api\Barcode\BarcodeOrderSearchInteractor;
@@ -81,6 +82,7 @@ use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedReturnRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedShowPresenter;
 use JoyPla\JoyPlaApplication;
+use Test\Exceptions\ApiExceptionHandler;
 
 //param _method="" を指定すると GET PUT DELETE GET PATCH を区別できる
 const VIEW_FILE_ROOT = "JoyPla/resources";
@@ -144,33 +146,30 @@ Router::group(VerifyCsrfTokenMiddleware::class, function(){
     
 });
 
-try{ 
-    $router = new Router();
-    $app = new JoyPlaApplication();
-    $kernel = new \framework\Http\Kernel($app, $router);
-    $request = new Request();
-    $auth = new Auth('NJ_HUserDB',[
-        "registrationTime",
-        "updateTime",
-        "authKey",
-        "hospitalId",
-        "divisionId",
-        "userPermission",
-        "loginId",
-        "loginPassword",
-        "name",
-        "nameKana",
-        "mailAddress",
-        "remarks",
-        "termsAgreement",
-        "tenantId",
-        "agreementDate",
-        "hospitalAuthKey",
-        "userCheck" 
-    ]);
+$router = new Router();
+$app = new JoyPlaApplication();
+$exceptionHandler = new ApiExceptionHandler();
+$kernel = new \framework\Http\Kernel($app, $router , $exceptionHandler);
+$request = new Request();
+$auth = new Auth('NJ_HUserDB',[
+    "registrationTime",
+    "updateTime",
+    "authKey",
+    "hospitalId",
+    "divisionId",
+    "userPermission",
+    "loginId",
+    "loginPassword",
+    "name",
+    "nameKana",
+    "mailAddress",
+    "remarks",
+    "termsAgreement",
+    "tenantId",
+    "agreementDate",
+    "hospitalAuthKey",
+    "userCheck" 
+]);
 
-    $request->setUser($auth);
-    $kernel->handle($request);
-} catch(Exception $e) { 
-    echo (new ApiResponse( [], 0 , $e->getCode(), $e->getMessage() , [ "path" , $request->getRequestUri() ]))->toJson();
-}
+$request->setUser($auth);
+$kernel->handle($request);
