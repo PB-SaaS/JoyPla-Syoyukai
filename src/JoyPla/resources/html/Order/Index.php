@@ -38,6 +38,7 @@
           </v-text>
           <v-text title="発注元部署" class="flex w-full gap-6">{{ order.division.divisionName }}</v-text>
           <v-text title="発注担当者" class="flex w-full gap-6">{{ order.orderUserName }}</v-text>
+          <v-text title="卸業者" class="lg:flex w-full gap-6">{{ order.distributor.distributorName }}</v-text>
           <v-text title="発注タイプ" class="flex w-full gap-6">{{ order.adjustmentToString }}</v-text>
           <fieldset class="md:flex w-full gap-6">
             <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal" v-if="title != ''">
@@ -275,9 +276,9 @@ var JoyPlaApp = Vue.createApp({
 
                 params.append("revisedOrderQuantityModel", JSON.stringify(encodeURIToObject(revisedOrderQuantityModel)));
                 params.append("_csrf", _CSRF);
-
+                start();
                 const res = await axios.post(_APIURL,params);
-                
+                complete();
                 if(res.data.code != 200) {
                   throw new Error(res.data.message)
                 }

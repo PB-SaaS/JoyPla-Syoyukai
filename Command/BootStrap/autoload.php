@@ -1,13 +1,12 @@
 <?php
-$outputtext = "<?php".PHP_EOL; 
 
-foreach(scanDirctory('../src/Library/gs1128-decoder') as $file){
-    $file = str_replace("../src/", "", $file);
-    $outputtext .= "require_once('$file');".PHP_EOL; 
+foreach(scanDirctory('Command/Basis') as $file){
+    require_once($file); 
 }
 
-//file_put_contents("../src/NewJoyPla/require.php", $outputtext);
-file_put_contents($argv[1], $outputtext);
+foreach(scanDirctory('Command/Commands') as $file){
+    require_once($file); 
+}
 
 function scanDirctory($dir) {
     $files = glob(rtrim($dir, '/') . '/*');

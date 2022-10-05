@@ -1,0 +1,19 @@
+<?php
+
+use Clarc\Basis\Console\Kernel;
+use Command\Basis\Request\CommandArgv;
+use Command\Basis\Request\Commander;
+use Command\Commands\ApplicationDeploy;
+use Command\Commands\ApplicationInitalize;
+use Command\Commands\Interactor\CreateProjectInteractor;
+
+require_once "Command/BootStrap/autoload.php";
+
+$commander = Commander::init();
+$commander->add(new ApplicationInitalize(new CreateProjectInteractor()));
+$commander->add(new ApplicationDeploy());
+
+
+$kernel = new Kernel($commander);
+$commandArgv = new CommandArgv($argv);
+$kernel->handle($commandArgv);

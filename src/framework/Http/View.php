@@ -11,6 +11,10 @@ class View {
     {
         $this->file = $file;
         foreach($data as $key => $d){
+            if($d instanceof View)
+            {
+                $d = $d->render();
+            }
             if($filter){
                 $d = $this->filter($d);
             }
@@ -48,6 +52,10 @@ class View {
     public function add_values(array $data , bool $filter = true): void
     {
         foreach($data as $key => $d){
+            if($d instanceof View)
+            {
+                $d = $d->render();
+            }
             if($filter){
                 $d = $this->filter($d);
             }
@@ -87,21 +95,28 @@ class View {
         return $value;
     }
 
-    public function render( string $file = null ): string
+    public function render( bool $isFullPath = false ): string
     {
-        if($file != null){
-            $this->file = $file ;
-        }
         if(is_array($this->data)){
             extract($this->data, EXTR_PREFIX_SAME, "t_");
         }
         ob_start(); //バッファ制御スタート
-        include( VIEW_FILE_ROOT ."/". $this->file.'.php');
+        
+        if($isFullPath){
+            require( $this->file.'.php');
+        } else 
+        {
+            require( VIEW_FILE_ROOT ."/". $this->file.'.php');
+        }
         $html = ob_get_clean(); //バッファ制御終了＆変数を取得
 
         return $html;
     }
     
+    public function __toString()
+    {
+        return $this->render();
+    }
     
     public function form_render( string $file = null ): string
     {

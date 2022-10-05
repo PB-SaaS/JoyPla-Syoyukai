@@ -35,3 +35,13 @@ function number_format_jp($num)
     if(empty($num)) { return 0; }
     return preg_replace("/\.?0+$/","",number_format($num,2));
 }
+
+function config($key , $default = '')
+{
+    return (new Config())->get($key , $default);
+}
+
+function config_path($path)
+{
+    Config::setPath($path);
+}

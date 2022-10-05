@@ -50,7 +50,8 @@ class Request
         {
             return ""; 
         }
-        return $this->post['path'];
+
+        return ltrim($this->post['path'], '/');
     }
 
     public function setRequestUri(string $path)
@@ -97,8 +98,25 @@ class Request
         return self::requestUrldecode($SPIRAL->getParam($key));
     }
 
+    public function __get($key)
+    {
+        return $this->get($key);
+    }
+
     public function set($key , $val)
     {
         $this->post[$key] = $val;
+    }
+
+    public function is(string $pattern)
+    {
+        $pattern = ltrim($pattern, '/');
+
+        $pattern = str_replace('.', '/', $pattern);
+        $pattern = str_replace('*', '.*', $pattern);
+        $pattern = explode('/',$pattern);
+        $pattern = implode('\/',$pattern);
+
+        return (preg_match('/^'.$pattern.'$/', $this->getRequestUri()) === 1);
     }
 }

@@ -37,6 +37,7 @@
                   検収番号：{{ receivedReturn.receivedId }}<br>
                   返品番号：{{ receivedReturn.returnId }}<br>
                   発注元部署：{{ receivedReturn.division.divisionName }}<br>
+                  卸業者：{{ receivedReturn.distributor.distributorName }}<br>
                   合計金額：&yen; {{ numberFormat( receivedReturn.totalAmount) }}
                 </p>
               </div>

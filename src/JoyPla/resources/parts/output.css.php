@@ -876,16 +876,16 @@ Ensure the default browser behavior of the `hidden` attribute.
   display: none;
 }
 
+.h-screen {
+  height: 100vh;
+}
+
 .h-full {
   height: 100%;
 }
 
 .h-72 {
   height: 18rem;
-}
-
-.h-screen {
-  height: 100vh;
 }
 
 .h-32 {
@@ -940,12 +940,12 @@ Ensure the default browser behavior of the `hidden` attribute.
   min-height: 80px;
 }
 
-.w-full {
-  width: 100%;
-}
-
 .w-screen {
   width: 100vw;
+}
+
+.w-full {
+  width: 100%;
 }
 
 .w-16 {
@@ -1447,6 +1447,11 @@ Ensure the default browser behavior of the `hidden` attribute.
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 
+.bg-gray-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 250 251 / var(--tw-bg-opacity));
+}
+
 .bg-gray-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(243 244 246 / var(--tw-bg-opacity));
@@ -1460,11 +1465,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 .bg-cornflower-blue-600 {
   --tw-bg-opacity: 1;
   background-color: rgb(47 122 203 / var(--tw-bg-opacity));
-}
-
-.bg-gray-50 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(249 250 251 / var(--tw-bg-opacity));
 }
 
 .bg-scooter-500 {
@@ -1813,6 +1813,16 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding: 15px;
 }
 
+.px-40 {
+  padding-left: 10rem;
+  padding-right: 10rem;
+}
+
+.py-20 {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
 .px-1 {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
@@ -1831,16 +1841,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 .px-3 {
   padding-left: 0.75rem;
   padding-right: 0.75rem;
-}
-
-.px-40 {
-  padding-left: 10rem;
-  padding-right: 10rem;
-}
-
-.py-20 {
-  padding-top: 5rem;
-  padding-bottom: 5rem;
 }
 
 .px-2 {
@@ -1997,6 +1997,11 @@ Ensure the default browser behavior of the `hidden` attribute.
   vertical-align: middle;
 }
 
+.text-9xl {
+  font-size: 8rem;
+  line-height: 1;
+}
+
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
@@ -2005,11 +2010,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 .text-base {
   font-size: 1rem;
   line-height: 1.5rem;
-}
-
-.text-9xl {
-  font-size: 8rem;
-  line-height: 1;
 }
 
 .text-lg {
@@ -2093,16 +2093,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   color: rgb(102 102 102 / var(--tw-text-opacity));
 }
 
-.text-red-500 {
-  --tw-text-opacity: 1;
-  color: rgb(239 68 68 / var(--tw-text-opacity));
-}
-
-.text-cornflower-blue-50 {
-  --tw-text-opacity: 1;
-  color: rgb(245 249 254 / var(--tw-text-opacity));
-}
-
 .text-sushi-600 {
   --tw-text-opacity: 1;
   color: rgb(110 157 49 / var(--tw-text-opacity));
@@ -2116,6 +2106,16 @@ Ensure the default browser behavior of the `hidden` attribute.
 .text-gray-500 {
   --tw-text-opacity: 1;
   color: rgb(107 114 128 / var(--tw-text-opacity));
+}
+
+.text-red-500 {
+  --tw-text-opacity: 1;
+  color: rgb(239 68 68 / var(--tw-text-opacity));
+}
+
+.text-cornflower-blue-50 {
+  --tw-text-opacity: 1;
+  color: rgb(245 249 254 / var(--tw-text-opacity));
 }
 
 .text-scooter-50 {
