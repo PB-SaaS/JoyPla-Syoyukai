@@ -1,12 +1,5 @@
-src/NewJoyPla.zip
-.deploy/tmp
-.deploy/tmp/*
-.deploy/logs
-.deploy/logs/
-.deploy/logs/deploy.log
-.deploy/env.php
-src/customModule20210420171147.zip
-.vs/JoyPla/v16/.suo
-.vs/VSWorkspaceState.json
-.vs/slnx.sqlite
-.vscode
+.tmp/
+.vs/
+.env.php
+.tmp/
+.vscode/

@@ -1,6 +1,6 @@
 <?php
 // ビューの生成
-namespace framework\Http;
+namespace Command\Basis\Core;
 use stdClass;
 class View {
 
@@ -95,49 +95,24 @@ class View {
         return $value;
     }
 
-    public function render( bool $isFullPath = false ): string
+    public function __toString()
     {
+        return $this->render();
+    }
+
+    public function render( string $file = null ): string
+    {
+        if($file != null){
+            $this->file = $file ;
+        }
         if(is_array($this->data)){
             extract($this->data, EXTR_PREFIX_SAME, "t_");
         }
         ob_start(); //バッファ制御スタート
-        
-        if($isFullPath){
-            require( $this->file.'.php');
-        } else 
-        {
-            require( VIEW_FILE_ROOT ."/". $this->file.'.php');
-        }
+        require( $this->file.'.php');
         $html = ob_get_clean(); //バッファ制御終了＆変数を取得
 
         return $html;
     }
     
-    public function __toString()
-    {
-        return $this->render();
-    }
-    
-    public function form_render( string $file = null ): string
-    {
-        global $SPIRAL;
-        
-        $is_error = ( $SPIRAL->getParam('detect') != '' && $SPIRAL->getParam('confirm') == '');
-        
-        $html = $this->render();
-        
-        $pattern = "/<!--SMP:DISP:ERR:START-->(.*)<!--SMP:DISP:ERR:END-->/s";
-        
-        if($is_error)
-        {
-            $pattern = "/<!--SMP:DISP:REG:START-->(.*)<!--SMP:DISP:REG:END-->/s";
-        }
-        
-        if (preg_match($pattern, $html)) 
-        {
-            $html = preg_replace($pattern, '', $html);
-        }
-
-        return $html;
-    }
 }

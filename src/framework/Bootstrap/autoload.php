@@ -1,6 +1,7 @@
 <?php
 require_once('framework/Exception/ClassNotFoundException.php');
 require_once('framework/Exception/DependencyResolveFailedException.php');
+require_once('framework/Exception/ExceptionHandler.php');
 require_once('framework/Exception/NotFoundException.php');
 require_once('framework/Facades/Gate.php');
 require_once('framework/Facades/GateDefine.php');
@@ -19,11 +20,10 @@ require_once('framework/Http/Response/Response.php');
 require_once('framework/Http/View.php');
 require_once('framework/Routing/Route.php');
 require_once('framework/Routing/Router.php');
-require_once('framework/Routing/Route.php');
-require_once('framework/Routing/Router.php');
 require_once('framework/Core/ApiSpiral.php');
 require_once('framework/Core/Auth.php');
 require_once('framework/Core/Collection.php');
+require_once('framework/Core/Config.php');
 require_once('framework/Core/Csrf.php');
 require_once('framework/Core/Func.php');
 require_once('framework/Core/Logger.php');
