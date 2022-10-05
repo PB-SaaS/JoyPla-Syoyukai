@@ -154,3 +154,5 @@ require_once('JoyPla/Enterprise/SpiralDb/ReturnView.php');
 require_once('JoyPla/Enterprise/SpiralDb/Stock.php');
 require_once('JoyPla/Enterprise/SpiralDb/StockView.php');
 require_once('JoyPla/Enterprise/SpiralDb/Tenant.php');
+require_once('JoyPla/Exceptions/ApiExceptionHandler.php');
+require_once('JoyPla/Exceptions/WebExceptionHandler.php');

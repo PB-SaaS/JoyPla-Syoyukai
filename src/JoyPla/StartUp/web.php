@@ -42,6 +42,7 @@ use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedIndexPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedLabelPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedLabelSettingPresenter;
 use JoyPla\JoyPlaApplication;
+use Test\Exceptions\WebExceptionHandler;
 
 //param _method="" を指定すると GET PUT DELETE GET PATCH を区別できる
 
@@ -152,40 +153,33 @@ Router::group(PersonalInformationConsentMiddleware::class, function(){
     Router::map('GET', '/notification/:notificationId', [NotificationController::class,'index']);
     
 });
-try{ 
 
-    $router = new Router();
-    //$router->middleware();毎回必ずチェックする場合はこっち
-    $app = new JoyPlaApplication();
-    $kernel = new \framework\Http\Kernel($app, $router);
-    $request = new Request();
-    
-    $auth = new Auth('NJ_HUserDB',[
-        "registrationTime",
-        "updateTime",
-        "authKey",
-        "hospitalId",
-        "divisionId",
-        "userPermission",
-        "loginId",
-        "loginPassword",
-        "name",
-        "nameKana",
-        "mailAddress",
-        "remarks",
-        "termsAgreement",
-        "tenantId",
-        "agreementDate",
-        "hospitalAuthKey",
-        "userCheck"
-    ]); 
+$router = new Router();
+//$router->middleware();毎回必ずチェックする場合はこっち
+$app = new JoyPlaApplication();
+$exceptionHandler = new WebExceptionHandler();
+$kernel = new \framework\Http\Kernel($app, $router,$exceptionHandler);
+$request = new Request();
 
-    $request->setUser($auth);
-    $kernel->handle($request);
-} catch(Exception $e) {
-    $body = View::forge('html/Common/Error', [ 
-        'code' => $e->getCode(), 
-        'message' => $e->getMessage()
-    ], false)->render();
-    echo view('html/Common/Template', compact('body'), false)->render();
-}  
+$auth = new Auth('NJ_HUserDB',[
+    "registrationTime",
+    "updateTime",
+    "authKey",
+    "hospitalId",
+    "divisionId",
+    "userPermission",
+    "loginId",
+    "loginPassword",
+    "name",
+    "nameKana",
+    "mailAddress",
+    "remarks",
+    "termsAgreement",
+    "tenantId",
+    "agreementDate",
+    "hospitalAuthKey",
+    "userCheck"
+]); 
+
+$request->setUser($auth);
+$kernel->handle($request);
