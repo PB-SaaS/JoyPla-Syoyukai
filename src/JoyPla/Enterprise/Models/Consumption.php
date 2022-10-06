@@ -6,7 +6,7 @@ use Collection;
 class Consumption
 {
     private ConsumptionId $consumptionId;
-    private DateYearMonthDay $consumptionDate;
+    private ConsumptionDate $consumptionDate;
     private array $consumptionItems;
     private Hospital $hospital;
     private Division $division;
@@ -14,7 +14,7 @@ class Consumption
 
     public function __construct(
         ConsumptionId $consumptionId,
-        DateYearMonthDay $consumptionDate,
+        ConsumptionDate $consumptionDate,
         array $consumptionItems,
         Hospital $hospital,
         Division $division,
@@ -36,7 +36,7 @@ class Consumption
     {
         return new Consumption(
             (new ConsumptionId($input->billingNumber) ),
-            (new DateYearMonthDay($input->billingDate) ),
+            (new ConsumptionDate($input->billingDate) ),
             [],
             (Hospital::create($input) ),
             (Division::create($input) ),
@@ -46,6 +46,11 @@ class Consumption
     public function getConsumptionId()
     {
         return $this->consumptionId;
+    }
+
+    public function getConsumptionDate()
+    {
+        return $this->consumptionDate;
     }
     
     public function getConsumptionItems()

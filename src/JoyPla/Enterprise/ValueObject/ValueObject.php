@@ -491,6 +491,28 @@ namespace JoyPla\Enterprise\Models {
         }
     }
 
+    class ConsumptionDate {
+        
+        use ValueObjectTrait;
+
+        private SiDateTime $siDateTime;
+
+        public function __construct(string $value)
+        {
+            $this->siDateTime = new SiDateTime($value) ;
+        }
+
+        public function isToday()
+        {
+            return $this->siDateTime->isToday();
+        }
+
+        public function value()
+        {
+            return $this->siDateTime->toJapanDateString();
+        }
+    }
+
     class CardId {
         
         use ValueObjectTrait;

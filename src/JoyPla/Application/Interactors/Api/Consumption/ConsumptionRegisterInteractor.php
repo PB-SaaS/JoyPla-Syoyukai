@@ -13,6 +13,7 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
     use JoyPla\Application\OutputPorts\Api\Consumption\ConsumptionRegisterOutputPortInterface;
     use JoyPla\Enterprise\Models\CardId;
     use JoyPla\Enterprise\Models\Consumption;
+    use JoyPla\Enterprise\Models\ConsumptionDate;
     use JoyPla\Enterprise\Models\DateYearMonthDay;
     use JoyPla\Enterprise\Models\ConsumptionId;
     use JoyPla\Enterprise\Models\ConsumptionStatus;
@@ -99,7 +100,7 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
                 //登録時には病院名は必要ないので、いったんhogeでいい
                 $result[] = new Consumption( 
                     $id , 
-                    ( new DateYearMonthDay($inputData->consumeDate) ), 
+                    ( new ConsumptionDate($inputData->consumeDate) ), 
                     [$i] , 
                     new Hospital(
                         $hospitalId, 

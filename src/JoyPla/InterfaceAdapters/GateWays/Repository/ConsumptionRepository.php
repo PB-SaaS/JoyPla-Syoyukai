@@ -120,7 +120,7 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface{
             $consumptionToArray = $consumption->toArray();
 
             $history[] = [
-                "registrationTime" => $consumptionToArray['consumptionDate'],
+                "registrationTime" => ($consumption->getConsumptionDate()->isToday())? "now" : $consumptionToArray['consumptionDate'],
                 "billingDate" => $consumptionToArray['consumptionDate'],
                 "billingNumber" => $consumptionToArray['consumptionId'],
                 "hospitalId" => $consumptionToArray['hospital']['hospitalId'],
@@ -133,7 +133,7 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface{
             foreach( $consumptionToArray['consumptionItems'] as $consumptionItem )
             {
                 $items[] = [
-                    "registrationTime" => $consumptionToArray['consumptionDate'],
+                    "registrationTime" => ($consumption->getConsumptionDate()->isToday())? "now" : $consumptionToArray['consumptionDate'],
                     "inHospitalItemId" => $consumptionItem['inHospitalItemId'],
                     "billingNumber" => $consumptionToArray['consumptionId'],
                     "price" => $consumptionItem['price'],
