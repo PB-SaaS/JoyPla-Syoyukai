@@ -300,14 +300,14 @@
             get_receivig_total_price: function() {
                 let num = 0;
                 this.items.forEach(function(i) {
-                    num += Math.round(app.get_receiving_nums(i.inHospitalItemId).count * i.unitPrice * 100) / 100;
+                    num += app.get_receiving_nums(i.inHospitalItemId).price;
                 });
                 return num;
             },
             get_consumed_total_price: function() {
                 let num = 0;
                 this.items.forEach(function(i) {
-                    num += Math.round(app.get_consumed_nums(i.inHospitalItemId).count * i.unitPrice * 100) / 100;
+                    num += app.get_consumed_nums(i.inHospitalItemId).price;
                 });
                 return num;
             },
