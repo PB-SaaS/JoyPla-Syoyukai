@@ -25,6 +25,7 @@ class JoyPlaApplication extends Application
 
     public function __construct()
     {
+        config_path('JoyPla/Config/app');
         $this->boot();
     }
 

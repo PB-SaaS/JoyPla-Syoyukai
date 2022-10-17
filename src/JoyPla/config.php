@@ -9,4 +9,3 @@ define('FROM_ADDRESS', "joypla-spd@pi-pe.co.jp");
 define('FROM_NAME', "joypla");
 define('HP_MAIL_FIELD_TITLE', "mailAddress");
 define('OROSHI_MAIL_FIELD_TITLE', "mailAddress");
-

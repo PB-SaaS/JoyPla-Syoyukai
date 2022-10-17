@@ -306,7 +306,7 @@
             },
             get_consumed_total_price: function() {
                 let num = 0;
-                this.items.forEach(function(i) {
+                this.items.forEach(function(i) { 
                     num += app.get_consumed_nums(i.inHospitalItemId).price;
                 });
                 return num;

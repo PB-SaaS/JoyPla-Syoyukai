@@ -129,7 +129,7 @@ class BlukUpsertItemsController extends Controller
                         "itemUnit" => $rows['data'][14],
                         "lotManagement" => $rows['data'][15],
                         "tenantId" => $auth->tenantId,
-                    ];
+                    ]; 
                 $items->orWhere('itemJANCode',$rows['data'][6]);
             }
             $items = ($items->get())->data->all();

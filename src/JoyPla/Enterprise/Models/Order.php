@@ -81,12 +81,24 @@ class Order
 
     public function isMinus()
     {
-        return $this->totalAmount() < 0 ;
+        foreach($this->orderItems as $item){
+            if($item->isMinus())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function isPlus()
     {
-        return $this->totalAmount() >= 0 ;
+        foreach($this->orderItems as $item){
+            if($item->isPlus())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function isExistOrderItemId(OrderItemId $orderItemId)
