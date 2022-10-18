@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="ja">
     <head>
-        <title>JoyPla
-            <?php echo $title; ?></title>
+        <title>JoyPla <?php echo $title; ?></title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="icon" href="https://i02.smp.ne.jp/u/joypla/new/favicon.ico">
         <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/normalize.css" />
-        <script src="https://unpkg.com/vue@3.2.36"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.1.0/dist/bwip-js.min.js"></script>
+        <script src="https://i02.smp.ne.jp/u/joypla_developer/340/vue3.2.36.global.js"></script>
+        <script src="https://i02.smp.ne.jp/u/joypla_developer/340/bwip-js.min.js"></script>
         <script>
         const _CSRF = "<?php echo Csrf::generate(16) ?>";
         const _APIURL = "%url/rel:mpgt:ApiRoot%";
