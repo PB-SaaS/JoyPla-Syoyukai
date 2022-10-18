@@ -9,7 +9,6 @@
 <body>
     <div uk-grid>
         <div id="sidemenu" class="uk-width-auto">
-            <!-- 各アクションの内容を読み込む-->
             <?php echo $sidemenu; ?>
         </div>
         <div id="content" class="uk-width-expand uk-padding-remove uk-panel-scrollable uk-inline" uk-height-viewport>
@@ -20,7 +19,6 @@
                 </div>
             </div>
             <div>
-                <!-- header.phpファイルを読み込む-->
                 <?php echo $header ?>
             </div>
             <div>
@@ -34,11 +32,9 @@
                     </div>
                 </div>
                 <?php endif ?>
-                <!-- 各アクションの内容を読み込む-->
                 <?php echo $content; ?>
             </div>
             <div>
-                <!-- footer.phpファイルを読み込む-->
                 <?php echo $footer; ?>
             </div>
         </div>

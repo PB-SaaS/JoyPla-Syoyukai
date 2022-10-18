@@ -87,16 +87,13 @@
 </head>
 <body>
     <div>
-        <!-- header.phpファイルを読み込む-->
-    <?php echo $header ?>
+      <?php echo $header ?>
     </div>
     <div id="content">
-        <!-- 各アクションの内容を読み込む-->
-        <?php echo $content; ?>
+      <?php echo $content; ?>
     </div>
     <footer>
-        <!-- footer.phpファイルを読み込む-->
-        <?php echo $footer; ?>
+      <?php echo $footer; ?>
     </footer>
     <?php echo $before_script; ?>
     <script>
