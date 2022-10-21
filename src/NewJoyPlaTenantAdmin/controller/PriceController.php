@@ -33,13 +33,13 @@ class PriceController extends Controller
             $auth = new Auth();
             $hospital = Hospital::where('tenantId', $auth->tenantId)->get();
             $distributor = DistributorAndHospitalDB::where('tenantId', $auth->tenantId)->get();
-            $select_hospital = [['text'=> '----- 選択してください -----' ,'value'=> '' ]];
+            $select_hospital = [['text' => '----- 選択してください -----', 'value' => '']];
             foreach ($hospital->data->all() as $h) {
-                $select_hospital[] = ['text'=> $h->hospitalName ,'value'=> $h->hospitalName ];
+                $select_hospital[] = ['text' => $h->hospitalName, 'value' => $h->hospitalName];
             }
-            $select_distributor = [['text'=> '----- 選択してください -----' ,'value'=> '' ]];
+            $select_distributor = [['text' => '----- 選択してください -----', 'value' => '']];
             foreach ($distributor->data->all() as $d) {
-                $select_distributor[] = ['text'=> $d->distributorName ,'value'=> $d->distributorName ];
+                $select_distributor[] = ['text' => $d->distributorName, 'value' => $d->distributorName];
             }
 
             $session = $SPIRAL->getSession(true, 3600);
@@ -50,7 +50,7 @@ class PriceController extends Controller
                 'error' => $error,
                 'price_api_url' => '%url/rel:mpgt:PriceCont%',
                 'csrf_token' => Csrf::generate(16)
-                ], false)->render();
+            ], false)->render();
         } catch (Exception $ex) {
             $content = $this->view('NewJoyPlaTenantAdmin/view/Template/Error', [
                 'code' => $ex->getCode(),
@@ -58,14 +58,14 @@ class PriceController extends Controller
             ], false)->render();
         } finally {
             $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [
-                'select_hospital'=>$select_hospital,
-                'select_distributor'=>$select_distributor,
-                ], false)->render();
+                'select_hospital' => $select_hospital,
+                'select_distributor' => $select_distributor,
+            ], false)->render();
             $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [], false)->render();
             $sidemenu = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/SideMenu', [
                 'n3' => 'uk-active uk-open',
                 'n3_4' => 'uk-active',
-                ], false)->render();
+            ], false)->render();
             $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [], false)->render();
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
@@ -102,7 +102,7 @@ class PriceController extends Controller
                 'api_url' => $api_url,
                 'hospital' => $hospital,
                 'csrf_token' => Csrf::generate(16)
-                ], false)->render();
+            ], false)->render();
         } catch (Exception $ex) {
             $content = $this->view('NewJoyPlaTenantAdmin/view/Template/Error', [
                 'code' => $ex->getCode(),
@@ -114,7 +114,7 @@ class PriceController extends Controller
             $sidemenu = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/SideMenu', [
                 'n3' => 'uk-active uk-open',
                 'n3_5' => 'uk-active',
-                ], false)->render();
+            ], false)->render();
             $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [], false)->render();
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
@@ -160,7 +160,9 @@ class PriceController extends Controller
         $item = Item::where('tenantId', $auth->tenantId);
         $price = Price::where('hospitalId', $_POST['hospitalId']);
 
-        $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
+        $target = new PriceTrDB();
+        $rowData = $target->rowData;
+        //$rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
         //$rowData = $SPIRAL->getParam('rowData');
         $messages = [];
 
@@ -232,7 +234,9 @@ class PriceController extends Controller
 
             $auth = new Auth();
 
-            $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
+            $target = new PriceTrDB();
+            $rowData = $target->rowData;
+            //$rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
             //$rowData = $SPIRAL->getParam('rowData');
 
             $insert_data = [];
@@ -359,9 +363,7 @@ class PriceController extends Controller
  */
 $PriceController = new PriceController();
 
-$action = $SPIRAL->getParam('Action');
-
-{
+$action = $SPIRAL->getParam('Action'); {
     if ($action === "bulkUpsert") {
         echo $PriceController->bulkUpsert()->render();
     } elseif ($action === "bulkUpsertValidateCheckApi") {
