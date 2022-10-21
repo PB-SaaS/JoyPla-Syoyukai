@@ -18,7 +18,7 @@ use Exception;
 
 
 /**
- * 発注書
+ * 商品・見積
  */
 class ProductQuotationController extends Controller
 {
@@ -122,15 +122,14 @@ class ProductQuotationController extends Controller
             $user_info = new UserInfo($SPIRAL);
 
             $content = $this->view('NewJoyPla/view/template/List', [
-                    'title' => '金額情報一覧',
+                    'title' => '金額一覧',
                     'print' => true,
                     'export' => true,
                     'submenulink' => "%url/rel:mpg:top%&page=page1",
                     'submenu' => '商品・見積',
-                    'table' => '%sf:usr:search58%',
+                    'table' => '%sf:usr:search66%',
                     'userInfo' => $user_info,
                     'csrf_token' => Csrf::generate(16),
-                    'distributor' => $distributor,
                     ] , false);
         
         } catch ( Exception $ex ) {
@@ -145,7 +144,7 @@ class ProductQuotationController extends Controller
             ], false);
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 金額情報一覧',
+                'title'     => 'JoyPla 金額一覧',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),
