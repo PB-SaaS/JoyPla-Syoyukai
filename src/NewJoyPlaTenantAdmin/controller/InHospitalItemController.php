@@ -32,19 +32,19 @@ class InHospitalItemController extends Controller
             $auth = new Auth();
             $hospital = Hospital::where('tenantId', $auth->tenantId)->get();
             $distributor = DistributorAndHospitalDB::where('tenantId', $auth->tenantId)->get();
-            $select_hospital = [['text'=> '----- 選択してください -----' ,'value'=> '' ]];
+            $select_hospital = [['text' => '----- 選択してください -----', 'value' => '']];
             foreach ($hospital->data->all() as $h) {
-                $select_hospital[] = ['text'=> $h->hospitalName ,'value'=> $h->hospitalName ];
+                $select_hospital[] = ['text' => $h->hospitalName, 'value' => $h->hospitalName];
             }
-            $select_distributor = [['text'=> '----- 選択してください -----' ,'value'=> '' ]];
+            $select_distributor = [['text' => '----- 選択してください -----', 'value' => '']];
             foreach ($distributor->data->all() as $d) {
-                $select_distributor[] = ['text'=> $d->distributorName ,'value'=> $d->distributorName ];
+                $select_distributor[] = ['text' => $d->distributorName, 'value' => $d->distributorName];
             }
             $error = $SPIRAL->getParam('errorMsg');
 
             $content = $this->view('NewJoyPlaTenantAdmin/view/InHospitalItem/Index', [
                 'error' => $error,
-                ], false)->render();
+            ], false)->render();
         } catch (Exception $ex) {
             $content = $this->view('NewJoyPlaTenantAdmin/view/Template/Error', [
                 'code' => $ex->getCode(),
@@ -52,14 +52,14 @@ class InHospitalItemController extends Controller
             ], false)->render();
         } finally {
             $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [
-                'select_hospital'=>$select_hospital,
-                'select_distributor'=>$select_distributor,
-                ], false)->render();
+                'select_hospital' => $select_hospital,
+                'select_distributor' => $select_distributor,
+            ], false)->render();
             $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [], false)->render();
             $sidemenu = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/SideMenu', [
                 'n3' => 'uk-active uk-open',
                 'n3_6' => 'uk-active',
-                ], false)->render();
+            ], false)->render();
             $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [], false)->render();
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
@@ -92,7 +92,7 @@ class InHospitalItemController extends Controller
                 'error' => $error,
                 'api_url' => $api_url,
                 'csrf_token' => Csrf::generate(16)
-                ], false)->render();
+            ], false)->render();
         } catch (Exception $ex) {
             $content = $this->view('NewJoyPlaTenantAdmin/view/Template/Error', [
                 'code' => $ex->getCode(),
@@ -104,7 +104,7 @@ class InHospitalItemController extends Controller
             $sidemenu = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/SideMenu', [
                 'n3' => 'uk-active uk-open',
                 'n3_7' => 'uk-active',
-                ], false)->render();
+            ], false)->render();
             $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [], false)->render();
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
@@ -144,7 +144,9 @@ class InHospitalItemController extends Controller
         $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
         Csrf::validate($token, true);
 
-        $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
+        $target = new InHospitalNewInsertDb();
+        $rowData = $target->rowData;
+        //$rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
         //$rowData = $SPIRAL->getParam('rowData');
         $messages = [];
 
@@ -198,7 +200,9 @@ class InHospitalItemController extends Controller
 
             $auth = new Auth();
 
-            $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
+            $target = new InHospitalNewInsertDb();
+            $rowData = $target->rowData;
+            //$rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
             //$rowData =  $SPIRAL->getParam('rowData');
 
             $insert_data = [];
@@ -238,9 +242,7 @@ class InHospitalItemController extends Controller
  */
 $InHospitalItemController = new InHospitalItemController();
 
-$action = $SPIRAL->getParam('Action');
-
-{
+$action = $SPIRAL->getParam('Action'); {
     if ($action === "bulkInsert") {
         echo $InHospitalItemController->bulkInsert()->render();
     } elseif ($action === "bulkInsertValidateCheckApi") {
