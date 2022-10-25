@@ -117,6 +117,11 @@ class InventoryController extends Controller
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
             }
             
+            if (($user_info->isUser()) && ($SPIRAL->getParam('divisionId') !== $user_info->getDivisionId()))
+            {
+                throw new Exception('invalid division was sent.', 999);
+            }
+            
             $inventory = $SPIRAL->getParam('inventory');
             $inventory = $this->requestUrldecode($inventory);
             $divisionId = $SPIRAL->getParam('divisionId');
