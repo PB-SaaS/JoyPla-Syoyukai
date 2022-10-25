@@ -330,7 +330,6 @@ class Item
 }
 
 let item_detail = new Item();
-let is_inHPItemsRegChecked = false;
 function inHPItemsRegConfirm()
 {
     if($("#inHP .smp-row-data").length > 0 && is_inHPItemsRegChecked === false){
