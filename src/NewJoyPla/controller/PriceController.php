@@ -56,7 +56,7 @@ class PriceController extends Controller
                     'submenu' => '商品メニュー',
                     'csrf_token' => Csrf::generate(16),
                     'distributor' => $distributor,
-                    'script' => $this->view('NewJoyPla/view/Script/PriceList', ['distributor' => $distributor,] , false)->render()
+                    'script' => $this->view('NewJoyPla/view/Script/PriceList', ['distributor' => $distributor, 'tenantKind' => $tenant->tenantKind, ] , false)->render()
                     ] , false);
         
         } catch ( Exception $ex ) {

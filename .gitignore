@@ -3,3 +3,4 @@
 .env.php
 .tmp/
 .vscode/
+/node_modules

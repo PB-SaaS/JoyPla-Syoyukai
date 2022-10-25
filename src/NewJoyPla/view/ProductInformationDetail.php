@@ -31,7 +31,7 @@
                 <?php endif ?>
                 <?php if($userInfo->isAdmin() || $userInfo->isApprover()): ?>
 
-                <input class="print_hidden uk-button uk-button-primary" type="submit" value="院内商品として追加" onclick="document.inHPItemsReg.submit()">
+                <input class="print_hidden uk-button uk-button-primary" type="submit" value="院内商品として追加" onclick="inHPItemsRegConfirm()">
                 <form action="<?php echo $api_url ?>"  method="post" name="inHPItemsReg" class="uk-hidden">
                     <input type="hidden" name="Action" value="inHospitalItemRegist">
                 </form>
@@ -279,7 +279,7 @@
                 </div>
             </div>
 
-            <div class="uk-width-1-1 uk-margin-top">
+            <div class="uk-width-1-1 uk-margin-top" id="inHP">
                 %sf:usr:search23:mstfilter:table%
             </div>
 
@@ -330,4 +330,19 @@ class Item
 }
 
 let item_detail = new Item();
+let is_inHPItemsRegChecked = false;
+function inHPItemsRegConfirm()
+{
+    if($("#inHP .smp-row-data").length > 0 && is_inHPItemsRegChecked === false){
+        UIkit.modal.confirm('院内商品情報は登録済みです。追加で登録しますか？').then(function(){
+            console.log("登録する");
+            document.inHPItemsReg.submit();
+        }, function(){
+            console.log("登録しない");
+        });
+        is_inHPItemsRegChecked = true;
+    }else{
+        document.inHPItemsReg.submit()
+    }
+}
 </script>

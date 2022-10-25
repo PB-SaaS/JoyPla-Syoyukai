@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "tailwindcss": "^3.0.24"
+    "tailwindcss": "^3.2.1"
   },
   "dependencies": {
     "@heroicons/vue": "^1.0.6"
