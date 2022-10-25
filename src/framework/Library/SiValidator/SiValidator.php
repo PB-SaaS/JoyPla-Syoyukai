@@ -82,7 +82,7 @@ class SiValidator {
         return true;
     }
     
-    public static function validate($value , $field , array $rules)
+    public static function validate($value , $label , array $rules)
     {
         $result = new SiValidateResult(true , '' , $value);
         foreach($rules as $rule)
@@ -92,15 +92,15 @@ class SiValidator {
                 self::errorMessages($rule->message());
                 $result = $rule->processable($value);
                 $message = (! $result )? $rule->message()[self::$language][ $rule->name() ] : "";
-                $message = self::messageReplace($message , $field);
+                $message = self::messageReplace($message , $label);
                 $result = new SiValidateResult($result , $message , $value);
             } else if(  ! is_string($rule) && is_callable($rule))
             {
-                $message = $rule($value, $field );
+                $message = $rule($value, $label );
                 $result = new SiValidateResult( ($message == '') , $message , $value);
             } else {
                 //return ($rule !== '')? self::errorMessage( $rule , $field) : "";
-                $message = (! self::isValid($value , $rule))? self::errorMessage( $rule , $field) : "";
+                $message = (! self::isValid($value , $rule))? self::errorMessage( $rule , $label) : "";
                 $result = new SiValidateResult( ($message == '') , $message , $value);
             }
             if(!$result->isValid())
@@ -224,6 +224,11 @@ class SiValidator {
         }
 
         print_r($help);
+    }
+
+    public function __get($name)
+    {
+        return $this->result[$name];
     }
 }
 

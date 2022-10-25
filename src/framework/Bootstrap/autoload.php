@@ -17,6 +17,7 @@ require_once('framework/Http/Request/HttpRequestParameter.php');
 require_once('framework/Http/Request/Request.php');
 require_once('framework/Http/Response/ApiResponse.php');
 require_once('framework/Http/Response/Response.php');
+require_once('framework/Http/Session/Session.php');
 require_once('framework/Http/View.php');
 require_once('framework/Routing/Route.php');
 require_once('framework/Routing/Router.php');

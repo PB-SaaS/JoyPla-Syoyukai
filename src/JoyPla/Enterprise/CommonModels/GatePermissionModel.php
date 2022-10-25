@@ -2,6 +2,8 @@
 
 namespace JoyPla\Enterprise\CommonModels;
 
+use framework\Enterprise\CommonModels\GateInterface;
+
 class GatePermissionModel implements GateInterface
 
 {

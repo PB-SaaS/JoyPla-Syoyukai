@@ -3,6 +3,8 @@
 namespace framework\Http;
 
 use Auth;
+use framework\Http\Session\RequestSession;
+use framework\Library\SiValidator;
 
 /**
  * Class Request
@@ -11,15 +13,16 @@ use Auth;
  */
 class Request
 {
-    private array $post = [] ;
+    private array $request = [] ;
     private array $server = [] ;
+    private ?RequestSession $session = null ;
     private $user;
-
 
     public function __construct()
     {
-        $this->post = $_POST;
+        $this->request = $_REQUEST;
         $this->server = $_SERVER;
+        $this->session =  new RequestSession();
     }
 
     public function isSsl(): bool
@@ -44,14 +47,13 @@ class Request
     
     public function getRequestUri(): string
     { 
-        //SPIRALはREQUEST_URIを任意設定ができないので POST値でとる
         //return $_SERVER['REQUEST_URI'];
-        if(!isset($this->post['path']))
+        if(!isset($this->request['path']))
         {
             return ""; 
         }
 
-        return ltrim($this->post['path'], '/');
+        return ltrim($this->request['path'], '/');
     }
 
     public function setRequestUri(string $path)
@@ -66,7 +68,7 @@ class Request
 
     public function getRequestBody(): array
     {
-        return self::requestUrldecode($this->post);
+        return self::requestUrldecode($this->request);
     }
 
     private static function requestUrldecode($v){
@@ -91,11 +93,36 @@ class Request
         return $this->get('_method');
     }
 
-    public function get($key)
+    public function get($key , $default = '')
     {
-        global $SPIRAL;
-        if($SPIRAL === null || ( $SPIRAL->getParam($key) == null )){ return self::requestUrldecode($this->post[$key]); }
-        return self::requestUrldecode($SPIRAL->getParam($key));
+        $value = ($this->request[$key])? $this->request[$key] : $default;
+        return self::requestUrldecode($value);
+    }
+
+    public function only(array $keys)
+    {
+        $val = [];
+        foreach($keys as $k)
+        {
+            $val[$k] = $this->get($k , '');
+        }
+
+        return $val;
+    }
+    
+    public function except(array $keys)
+    {
+        $val = $this->all();
+        foreach($keys as $k)
+        {
+            unset($val[$k]);
+        }
+
+        return $val;
+    }
+
+    public function all(){
+        return (array)$this->request;
     }
 
     public function __get($key)
@@ -105,7 +132,12 @@ class Request
 
     public function set($key , $val)
     {
-        $this->post[$key] = $val;
+        $this->request[$key] = $val;
+    }
+
+    public function merge(array $value)
+    {
+        $this->request = array_merge($this->request , $value );
     }
 
     public function is(string $pattern)
@@ -118,5 +150,25 @@ class Request
         $pattern = implode('\/',$pattern);
 
         return (preg_match('/^'.$pattern.'$/', $this->getRequestUri()) === 1);
+    }
+
+    public function validate(array $rules , $labels = [])
+    {
+        $values = [];
+        foreach($rules as $key => $rule)
+        {
+            $values[$key] = $this->get($key, $this->session()->get($key , ''));
+        }
+
+        return SiValidator::make(
+            $values,
+            $rules,
+            $labels
+        );
+    }
+
+    public function session()
+    {
+        return $this->session;
     }
 }

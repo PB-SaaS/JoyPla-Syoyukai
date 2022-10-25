@@ -1,6 +1,7 @@
 <?php
 
 use framework\Facades\Gate;
+use framework\Http\Session\Session;
 
 function view(string $template, array $param = array() , bool $filter = true): framework\Http\View
 {
@@ -44,4 +45,9 @@ function config($key , $default = '')
 function config_path($path)
 {
     Config::setPath($path);
+}
+
+function shiftjis_strlen($value)
+{
+    return strlen( mb_convert_encoding($value, 'SJIS', 'UTF-8') );
 }
