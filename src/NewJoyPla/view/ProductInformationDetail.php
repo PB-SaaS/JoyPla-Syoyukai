@@ -332,7 +332,7 @@ class Item
 let item_detail = new Item();
 function inHPItemsRegConfirm()
 {
-    if($("#inHP .smp-row-data").length > 0 && is_inHPItemsRegChecked === false){
+    if($("#inHP .smp-row-data").length > 0){
         UIkit.modal.confirm('院内商品情報は登録済みです。追加で登録しますか？').then(function(){
             console.log("登録する");
             document.inHPItemsReg.submit();
