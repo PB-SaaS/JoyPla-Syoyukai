@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use Controller;
@@ -19,14 +20,14 @@ class BlukUpsertItemsController extends Controller
     public function __construct()
     {
     }
-    
+
     public function index()
     {
         global $SPIRAL;
         try {
             $auth = new Auth();
             $auth->browseAuthority('ItemBulkUpsert');
-                
+
             $api_url = "%url/rel:mpgt:BulkItem%";
             $error = $SPIRAL->getParam('errorMsg');
             /*
@@ -58,23 +59,21 @@ class BlukUpsertItemsController extends Controller
             $content = $this->view('NewJoyPlaTenantAdmin/view/BlukUpsertItems/Index', [
                 'api_url' => $api_url,
                 'csrf_token' => Csrf::generate(16)
-                ] , false)->render();
-            
-        } catch ( Exception $ex ) {
-            
+            ], false)->render();
+        } catch (Exception $ex) {
+
             $content = $this->view('NewJoyPlaTenantAdmin/view/Template/Error', [
                 'code' => $ex->getCode(),
                 'message' => $ex->getMessage(),
-            ] , false)->render();
-            
+            ], false)->render();
         } finally {
-            $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [] , false)->render();
-            $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [] , false)->render();
+            $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [], false)->render();
+            $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [], false)->render();
             $sidemenu = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/SideMenu', [
                 'n3' => 'uk-active uk-open',
                 'n3_2' => 'uk-active',
-                ] , false)->render();
-            $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [] , false)->render();
+            ], false)->render();
+            $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [], false)->render();
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
@@ -85,32 +84,33 @@ class BlukUpsertItemsController extends Controller
                 'header' => $header,
                 'style' => $style,
                 'before_script' => $script,
-            ],false);
+            ], false);
         }
     }
-    
+
     public function regist()
     {
         global $SPIRAL;
         $time_start = microtime(true);
 
         try {
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
-            
+            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
+
             $auth = new Auth();
-            
-            $rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
+
+            $target = new itemDB();
+            $rowData = $target->rowData;
+            //$rowData = $this->requestUrldecode($SPIRAL->getParam('rowData'));
             //$rowData = $SPIRAL->getParam('rowData');
-            $items = Item::where('tenantId',$auth->tenantId)->plain()
-            ->value('itemId')
-            ->value('itemJANCode')
-            ->value("itemsAuthKey");
+            $items = Item::where('tenantId', $auth->tenantId)->plain()
+                ->value('itemId')
+                ->value('itemJANCode')
+                ->value("itemsAuthKey");
 
             $insert_data = [];
-            foreach($rowData as $rows)
-            {
-                $insert_data[] = 
+            foreach ($rowData as $rows) {
+                $insert_data[] =
                     [
                         "makerName" => $rows['data'][0],
                         "itemName" => $rows['data'][1],
@@ -130,16 +130,13 @@ class BlukUpsertItemsController extends Controller
                         "lotManagement" => $rows['data'][15],
                         "tenantId" => $auth->tenantId,
                     ];
-                $items->orWhere('itemJANCode',$rows['data'][6]);
+                $items->orWhere('itemJANCode', $rows['data'][6]);
             }
             $items = ($items->get())->data->all();
             $insert_data = array_map(
-                function(array $i) use ($items)
-                {
-                    foreach($items as $item)
-                    {
-                        if( $item->itemJANCode == $i['itemJANCode'] )
-                        {
+                function (array $i) use ($items) {
+                    foreach ($items as $item) {
+                        if ($item->itemJANCode == $i['itemJANCode']) {
                             $i['itemId'] = $item->itemId;
                             $i['itemsAuthKey'] = $item->itemsAuthKey;
                             return $i;
@@ -148,67 +145,67 @@ class BlukUpsertItemsController extends Controller
                     $i['itemId'] = "";
                     $i['itemsAuthKey'] = "";
                     return $i;
-                },$insert_data
+                },
+                $insert_data
             );
             $result = ItemBulkUpsertTrDB::insert($insert_data);
-        
+
             //$content = new ApiResponse([] , count($insert_data) , 0, '', ['insert']);
             $time = microtime(true) - $time_start;
-            $content = new ApiResponse($result->ids , count($insert_data) , $result->code, $result->message, [$time."秒"]);
+            $content = new ApiResponse($result->ids, count($insert_data), $result->code, $result->message, [$time . "秒"]);
             $content = $content->toJson();
-            
-        } catch ( Exception $ex ) {
+        } catch (Exception $ex) {
             $time = microtime(true) - $time_start;
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), [$time."秒"]);
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), [$time . "秒"]);
             $content = $content->toJson();
-        }finally {
+        } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
-            ],false);
+            ], false);
         }
     }
-    
+
     public function validateCheckApi()
     {
         global $SPIRAL;
-        
-        $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-        Csrf::validate($token,true);
-        
+
+        $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+        Csrf::validate($token, true);
+
         $target = new itemDB();
-        $content =  json_encode(array_map(function($t) { return $t->getValue(); }, $target->getTryDbFieldList()->getFailedObjects()), JSON_UNESCAPED_UNICODE);
+        $content =  json_encode(array_map(function ($t) {
+            return $t->getValue();
+        }, $target->getTryDbFieldList()->getFailedObjects()), JSON_UNESCAPED_UNICODE);
         return $this->view('NewJoyPlaTenantAdmin/view/Template/ApiResponseBase', [
             'content'   => $content,
-        ],false);
+        ], false);
     }
-    
+
     public function logsList()
     {
         global $SPIRAL;
         try {
             $api_url = "%url/rel:mpgt:BulkItem%";
             $error = $SPIRAL->getParam('errorMsg');
-            
+
             $content = $this->view('NewJoyPlaTenantAdmin/view/BlukUpsertItems/LogsList', [
                 'api_url' => $api_url,
                 'csrf_token' => Csrf::generate(16)
-                ] , false)->render();
-            
-        } catch ( Exception $ex ) {
-            
+            ], false)->render();
+        } catch (Exception $ex) {
+
             $content = $this->view('NewJoyPlaTenantAdmin/view/Template/Error', [
                 'code' => $ex->getCode(),
                 'message' => $ex->getMessage(),
-            ] , false)->render();
-            
+            ], false)->render();
         } finally {
-            $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [] , false)->render();
-            $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [] , false)->render();
+            $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [], false)->render();
+            $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [], false)->render();
             $sidemenu = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/SideMenu', [
                 'n3' => 'uk-active uk-open',
                 'n3_3' => 'uk-active',
-                ] , false)->render();
-            $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [] , false)->render();
+            ], false)->render();
+            $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [], false)->render();
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
@@ -219,7 +216,7 @@ class BlukUpsertItemsController extends Controller
                 'header' => $header,
                 'style' => $style,
                 'before_script' => $script,
-            ],false);
+            ], false);
         }
     }
 }
@@ -229,23 +226,14 @@ class BlukUpsertItemsController extends Controller
  */
 $BlukUpsertItemsController = new BlukUpsertItemsController();
 
-$action = $SPIRAL->getParam('Action');
-
-{
-    if($action === 'validateCheckApi')
-    {
+$action = $SPIRAL->getParam('Action'); {
+    if ($action === 'validateCheckApi') {
         echo $BlukUpsertItemsController->validateCheckApi()->render();
-    }
-    else if($action === 'regist')
-    {
+    } else if ($action === 'regist') {
         echo $BlukUpsertItemsController->regist()->render();
-    }
-    else if($action === 'logsList')
-    {
+    } else if ($action === 'logsList') {
         echo $BlukUpsertItemsController->logsList()->render();
-    }
-    else
-    {
+    } else {
         echo $BlukUpsertItemsController->index()->render();
     }
 }

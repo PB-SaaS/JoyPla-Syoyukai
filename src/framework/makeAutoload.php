@@ -31,9 +31,10 @@
             $outputtext .= "require_once('framework/SpiralConnecter/SpiralConnecter.php');".PHP_EOL;
             $outputtext .= "require_once('framework/SpiralConnecter/SpiralDB.php');".PHP_EOL;
             $outputtext .= "require_once('framework/SpiralConnecter/SpiralManager.php');".PHP_EOL;
+            $outputtext .= "require_once('framework/SpiralConnecter/SpiralExpressManager.php');".PHP_EOL;
             $outputtext .= "require_once('framework/SpiralConnecter/Paginator.php');".PHP_EOL;
             $outputtext .= "require_once('framework/SpiralConnecter/SpiralApiConnecter.php');".PHP_EOL;
-
+            
             $outputtext .= "require_once('framework/Application.php');".PHP_EOL;
             file_put_contents('src/framework/Bootstrap/autoload.php', $outputtext);
             

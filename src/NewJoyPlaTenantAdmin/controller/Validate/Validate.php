@@ -9,6 +9,7 @@ use monad\Try_;
 use monad\TryList;
 
 use Exception;
+use monad\Success;
 
 use function Sanitize\htmlSanitize;
 use function validate\isValueEmpty;
@@ -51,12 +52,12 @@ abstract class FieldTypeValidate
                 break;
             }
             if (count($fieldInfoList) !== count($rowData[$rowNumber]['data'])) {
-                throw new Exception("header length(".count($fieldInfoList)."), body length(".count($rowData[$rowNumber]['data']).") is not equal ");
+                throw new Exception("header length(" . count($fieldInfoList) . "), body length(" . count($rowData[$rowNumber]['data']) . ") is not equal ");
             }
             //$row = explode("\t", $_POST["rowData[" . $rowNumber . "]"]);
             $row = $rowData[$rowNumber]['data'];
             $index = $rowData[$rowNumber]['index'];
-            foreach (array_map(null, $fieldInfoList, $row) as [ $info, $column ]) {
+            foreach (array_map(null, $fieldInfoList, $row) as [$info, $column]) {
                 $signingColumn = (isValueEmpty($column)) ? "" : htmlSanitize($column);
                 /* 2021/11追加ここから */
                 /*
@@ -64,8 +65,7 @@ abstract class FieldTypeValidate
                 参考：【PHP】マルチバイト(全角スペース等)対応のtrim処理 - Qiita
                 https://qiita.com/fallout/items/a13cebb07015d421fde3
                 */
-                $signingColumn = urldecode($signingColumn);
-                $signingColumn = (is_string($signingColumn)) ? preg_replace('/\A[\p{Cc}\p{Cf}\p{Z}]++|[\p{Cc}\p{Cf}\p{Z}]++\z/u', '', $signingColumn) : $signingColumn;
+
                 /* 2021/11追加ここまで */
                 $dbField = DbField::of($info["key"], $info["fieldType"], $info["replaceKey"], $signingColumn, $info);
                 $validatedResult = $this->personalValidate($dbField);
@@ -94,6 +94,30 @@ abstract class FieldTypeValidate
     {
         return ($rowNumber + 1) . "行目の" . $key . "：" . $detailSentence;
     }
+
+    private function trim($column)
+    {
+        $column = urldecode($column);
+        return $column = (is_string($column)) ? preg_replace('/\A[\p{Cc}\p{Cf}\p{Z}]++|[\p{Cc}\p{Cf}\p{Z}]++\z/u', '', $column) : $column;
+    }
+
+    protected function trimRowData($rowData)
+    {
+        for ($i = 0; true; $i++) {
+            $rowNumber = $i;
+            if ($rowData[$rowNumber]['data'] === "" || is_null($rowData[$rowNumber]['data'])) {
+                break;
+            }
+            //$row = explode("\t", $_POST["rowData[" . $rowNumber . "]"]);
+            $row = $rowData[$rowNumber]['data'];
+            foreach ($row as $key => $column) {
+                $signingColumn = (isValueEmpty($column)) ? "" : htmlSanitize($column);
+                $rowData[$rowNumber]['data'][$key] = $this->trim($signingColumn);
+            }
+        }
+
+        return $rowData;
+    }
 }
 
 class itemDB extends FieldTypeValidate
@@ -102,7 +126,7 @@ class itemDB extends FieldTypeValidate
 
     public const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
 
-    public $dbFieldInfo =[
+    public $dbFieldInfo = [
         [
             'key' => 'メーカー',
             'fieldType' => 'TextField128bytes',
@@ -203,11 +227,11 @@ class itemDB extends FieldTypeValidate
 
     public $rowData = [
         //"商品名\t商品コード（製品コード）\t商品規格\t1235\tメーカー名\tカタログNo\tあ000\t1\t100\t10\t枚\t個",
-        ];
+    ];
 
     public function __construct()
     {
-        $this->rowData = $_POST['rowData'];
+        $this->rowData = $this->trimRowData($_POST['rowData']);
 
         $this->startRowNumber = $_POST['startRowNumber'];
         //$this->startRowNumber = $_POST['startRowNumber'];
@@ -238,7 +262,7 @@ class PriceTrDB extends FieldTypeValidate
 
     public const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
 
-    public $dbFieldInfo =[
+    public $dbFieldInfo = [
         [
             'key' => '金額管理ID',
             'fieldType' => 'NumberSymbolAlphabet32bytes',
@@ -303,11 +327,11 @@ class PriceTrDB extends FieldTypeValidate
 
     public $rowData = [
         //"商品名\t商品コード（製品コード）\t商品規格\t1235\tメーカー名\tカタログNo\tあ000\t1\t100\t10\t枚\t個",
-        ];
+    ];
 
     public function __construct()
     {
-        $this->rowData = $_POST['rowData'];
+        $this->rowData = $this->trimRowData($_POST['rowData']);
 
         $this->startRowNumber = $_POST['startRowNumber'];
         parent::__construct();
@@ -336,7 +360,7 @@ class InHospitalNewInsertDb extends FieldTypeValidate
 
     public const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
 
-    public $dbFieldInfo =[
+    public $dbFieldInfo = [
         [
             'key' => '商品ID',
             'fieldType' => 'NumberSymbolAlphabet32bytes',
@@ -415,11 +439,11 @@ class InHospitalNewInsertDb extends FieldTypeValidate
 
     public $rowData = [
         //"商品名\t商品コード（製品コード）\t商品規格\t1235\tメーカー名\tカタログNo\tあ000\t1\t100\t10\t枚\t個",
-        ];
+    ];
 
     public function __construct()
     {
-        $this->rowData = $_POST['rowData'];
+        $this->rowData = $this->trimRowData($_POST['rowData']);
 
         $this->startRowNumber = $_POST['startRowNumber'];
         parent::__construct();
@@ -448,7 +472,7 @@ class DistributorDB extends FieldTypeValidate
 
     public const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
 
-    public $dbFieldInfo =[
+    public $dbFieldInfo = [
         [
             'key' => '卸業者名',
             'fieldType' => 'TextField128bytes',
@@ -507,11 +531,11 @@ class DistributorDB extends FieldTypeValidate
 
     public $rowData = [
         //"商品名\t商品コード（製品コード）\t商品規格\t1235\tメーカー名\tカタログNo\tあ000\t1\t100\t10\t枚\t個",
-        ];
+    ];
 
     public function __construct()
     {
-        $this->rowData = $_POST['rowData'];
+        $this->rowData = $this->trimRowData($_POST['rowData']);
 
         $this->startRowNumber = $_POST['startRowNumber'];
         parent::__construct();
@@ -540,7 +564,7 @@ class AllNewItemInsertDB extends FieldTypeValidate
 
     public const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
 
-    public $dbFieldInfo =[
+    public $dbFieldInfo = [
         [
             'key' => '卸業者ID',
             'fieldType' => 'NumberSymbolAlphabet32bytes',
@@ -689,11 +713,11 @@ class AllNewItemInsertDB extends FieldTypeValidate
 
     public $rowData = [
         //"商品名\t商品コード（製品コード）\t商品規格\t1235\tメーカー名\tカタログNo\tあ000\t1\t100\t10\t枚\t個",
-        ];
+    ];
 
     public function __construct()
     {
-        $this->rowData = $_POST['rowData'];
+        $this->rowData = $this->trimRowData($_POST['rowData']);
 
         $this->startRowNumber = $_POST['startRowNumber'];
         parent::__construct();
@@ -721,7 +745,7 @@ class CardDB extends FieldTypeValidate
 
     public const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
 
-    public $dbFieldInfo =[
+    public $dbFieldInfo = [
         [
             'key' => '部署ID',
             'fieldType' => 'NumberSymbolAlphabet32bytes',
@@ -744,11 +768,11 @@ class CardDB extends FieldTypeValidate
 
     public $rowData = [
         //"商品名\t商品コード（製品コード）\t商品規格\t1235\tメーカー名\tカタログNo\tあ000\t1\t100\t10\t枚\t個",
-        ];
+    ];
 
     public function __construct()
     {
-        $this->rowData = $_POST['rowData'];
+        $this->rowData = $this->trimRowData($_POST['rowData']);
 
         $this->startRowNumber = $_POST['startRowNumber'];
         parent::__construct();

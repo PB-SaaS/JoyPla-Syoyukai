@@ -458,46 +458,50 @@ class OrderRepository implements OrderRepositoryInterface
             ];
         }
 
-        $mail_body = view('mail/Order/RegistUnapprovedOrderMail', [
+        $mailBody = view('mail/Order/RegistUnapprovedOrderMail', [
             'name' => '%val:usr:name%',
             'hospitalName' => $orders[0]->getHospital()->getHospitalName()->value(),
             'ordererUserName' =>  $user->name,
             'history' => $unapprovedOrderMailViewModel,
-            'url' => LOGIN_URL,
+            'url' => config('url.hospital',''),
         ], false)->render();
-        $hospitalUser = HospitalUser::getNewInstance();
-        $selectName = SelectName::generate($user->hospitalId);
-        $hospitalUser::selectName($selectName->value())
-            ->rule(['name'=>'hospitalId','label'=>'name_'.($user->hospitalId),'value1'=>($user->hospitalId),'condition'=>'matches'])
-            ->rule(['name'=>'userPermission','label'=>'permission_admin2','value1'=>'1,3','condition'=>'contains'])
-            ->filterCreate();
-        $hospitalUser::selectRule($selectName->value())
-            ->body($mail_body)
-            ->subject('[JoyPla] 未発注書が作成されました')
-            ->from(FROM_ADDRESS, FROM_NAME)
-            ->send();
+
+        $ids = SpiralDb::title('NJ_HUserDB')->where('hospitalId', $user->hospitalId)->value('id')->whereIn('userPermission' , [1,3])->get();
+        
+        $mailId = SpiralDb::mail('NJ_HUserDB')->subject('[JoyPla] 未発注書が作成されました')
+            ->standby(false)->reserveDate('now')->bodyText($mailBody)->formAddress(FROM_ADDRESS)->formName(FROM_NAME)->mailField('mailAddress')->regist();
+
+        $ids = array_values(array_column($ids->toArray(),'id'));
+
+        SpiralDb::mail('NJ_HUserDB')->ruleId($mailId)->sampling($ids);
+
     }
 
     public function sendRevisedOrderMail(Order $order, Auth $user)
     {
         $order = $order->toArray();
 
-        $distributor = SpiralDbDistributor::where('distributorId', $order['distributor']['distributorId'])
-        ->value('distributorName')
-        ->value('postalCode')
-        ->value('prefectures')
-        ->value('address')
-        ->get();
-        $distributor = $distributor->data->get(0);
+        $distributor = SpiralDb::title('NJ_distributorDB')->where('distributorId', $order['distributor']['distributorId'])
+            ->value([
+                'distributorId',
+                'distributorName',
+                'postalCode',
+                'prefectures',
+                'address',
+            ])->get();
+        
+        $distributor = $distributor->first();
 
         $useMedicode = in_array(true, array_map(function (array $orderItem) {
             return $orderItem['useMedicode'];
         }, $order['orderItems']), true);
 
-        $mail_body = view('mail/Order/OrderRevised', [
+
+        $mailBody = view('mail/Order/OrderRevised', [
             'name' => '%val:usr:name%',
             'hospital_name' => $order['hospital']['hospitalName'],
             'prefectures' => $order['hospital']['prefectures'],
+            'postal_code' => $order['hospital']['postalCode'],
             'address' => $order['hospital']['address'],
             'distributor_name' => $distributor->distributorName,
             'division_name' => $order['division']['divisionName'],
@@ -506,21 +510,18 @@ class OrderRepository implements OrderRepositoryInterface
             'item_num' => $order['itemCount'],
             'useMedicode' => $useMedicode,
             'total_price' => '￥'.number_format_jp((float)$order['totalAmount']),
-            'slip_url' => OROSHI_OrderDetailAccess."?searchValue=".$order['orderId'],
-            'login_url' => OROSHI_LOGIN_URL,
+            'slip_url' => config('url.distributorBarcodeSearch','')."?searchValue=".$order['orderId'],
+            'login_url' => config('url.distributor',''),
         ])->render();
-        $select_name = SelectName::generate($user->hospitalId);
 
-        $test = DistributorAffiliationView::selectName($select_name->value())
-            ->rule(['name'=>'distributorId','label'=>'name_'.$order['distributor']['distributorId'],'value1'=>$order['distributor']['distributorId'],'condition'=>'matches'])
-            ->rule(['name'=>'invitingAgree','label'=>'invitingAgree','value1'=>'t','condition'=>'is_boolean'])
-            ->filterCreate();
+        $ids = SpiralDb::title('invitingDB')->where('distributorId', $order['distributor']['distributorId'])->where('invitingAgree', 't')->value('id')->get();
+        
+        $mailId = SpiralDb::mail('invitingDB')->subject('[JoyPla] 発注書に変更がありました')
+            ->standby(false)->reserveDate('now')->bodyText($mailBody)->formAddress(FROM_ADDRESS)->formName(FROM_NAME)->mailField('mailAddress')->regist();
 
-        $test = DistributorAffiliationView::selectRule($select_name->value())
-            ->body($mail_body)
-            ->subject("[JoyPla] 発注書に変更がありました")
-            ->from(FROM_ADDRESS, FROM_NAME)
-            ->send();
+        $ids = array_values(array_column($ids->toArray(),'id'));
+
+        SpiralDb::mail('invitingDB')->ruleId($mailId)->sampling($ids);
 
     }
 
@@ -528,23 +529,28 @@ class OrderRepository implements OrderRepositoryInterface
     {
         $order = $order->toArray();
 
-        $distributor = SpiralDbDistributor::where('distributorId', $order['distributor']['distributorId'])
-        ->value('distributorName')
-        ->value('postalCode')
-        ->value('prefectures')
-        ->value('address')
-        ->get();
-        $distributor = $distributor->data->get(0);
+
+        $distributor = SpiralDb::title('NJ_distributorDB')->where('distributorId', $order['distributor']['distributorId'])
+            ->value([
+                'distributorId',
+                'distributorName',
+                'postalCode',
+                'prefectures',
+                'address',
+            ])->get();
+        
+        $distributor = $distributor->first();
 
         $useMedicode = in_array(true, array_map(function (array $orderItem) {
             return $orderItem['useMedicode'];
         }, $order['orderItems']), true);
 
-        $mail_body = view('mail/Order/OrderFixForDistributor', [
+        $mailBody = view('mail/Order/OrderFixForDistributor', [
             'name' => '%val:usr:name%',
             'hospital_name' => $order['hospital']['hospitalName'],
             'prefectures' => $order['hospital']['prefectures'],
             'address' => $order['hospital']['address'],
+            'postal_code' => $order['hospital']['postalCode'],
             'distributor_name' => $distributor->distributorName,
             'division_name' => $order['division']['divisionName'],
             'order_date' => $order['orderDate'],
@@ -552,67 +558,50 @@ class OrderRepository implements OrderRepositoryInterface
             'item_num' => $order['itemCount'],
             'useMedicode' => $useMedicode,
             'total_price' => '￥'.number_format_jp((float)$order['totalAmount']),
-            'slip_url' => OROSHI_OrderDetailAccess."?searchValue=".$order['orderId'],
-            'login_url' => OROSHI_LOGIN_URL,
+            'slip_url' => config('url.distributorBarcodeSearch','')."?searchValue=".$order['orderId'],
+            'login_url' => config('url.distributor',''),
         ])->render();
-        $select_name = SelectName::generate($user->hospitalId);
+        
 
-        $test = DistributorAffiliationView::selectName($select_name->value())
-            ->rule(['name'=>'distributorId','label'=>'name_'.$order['distributor']['distributorId'],'value1'=>$order['distributor']['distributorId'],'condition'=>'matches'])
-            ->rule(['name'=>'invitingAgree','label'=>'invitingAgree','value1'=>'t','condition'=>'is_boolean'])
-            ->filterCreate();
+        $ids = SpiralDb::title('invitingDB')->where('distributorId', $order['distributor']['distributorId'])->where('invitingAgree', 't')->value('id')->get();
+                
+        $mailId = SpiralDb::mail('invitingDB')->subject('[JoyPla] 発注が行われました')
+            ->standby(false)->reserveDate('now')->bodyText($mailBody)->formAddress(FROM_ADDRESS)->formName(FROM_NAME)->mailField('mailAddress')->regist();
 
-        $test = DistributorAffiliationView::selectRule($select_name->value())
-            ->body($mail_body)
-            ->subject("[JoyPla] 発注が行われました")
-            ->from(FROM_ADDRESS, FROM_NAME)
-            ->send();
+        $ids = array_values(array_column($ids->toArray(),'id'));
 
-        {
-            $mail_body = view('mail/Order/OrderFix', [
-                'name' => '%val:usr:name%',
-                'distributor_name' => $distributor->distributorName,
-                'distributor_postal_code' => $distributor->postalCode,
-                'distributor_prefectures' => $distributor->prefectures,
-                'distributor_address' => $distributor->address,
-                'hospital_name' => $order['hospital']['hospitalName'],
-                'postal_code' => $order['hospital']['postalCode'],
-                'prefectures' => $order['hospital']['prefectures'],
-                'address' =>  $order['hospital']['address'],
-                'division_name' => $order['division']['divisionName'],
-                'order_date' => $order['orderDate'],
-                'order_number' => $order['orderId'],
-                'item_num' => $order['itemCount'],
-                'total_price' => '￥'.number_format_jp((float)$order['totalAmount']),
-                'login_url' => LOGIN_URL,
-            ])->render();
+        SpiralDb::mail('invitingDB')->ruleId($mailId)->sampling($ids);
 
-            $hospital_user = HospitalUser::getNewInstance();
-            $select_name = SelectName::generate($user->hospitalId);
-            $test = $hospital_user::selectName($select_name->value())
-                ->rule(['name'=>'hospitalId','label'=>'name_'.$user->hospitalId,'value1'=>$user->hospitalId,'condition'=>'matches'])
-                ->rule(['name'=>'userPermission','label'=>'permission_admin2','value1'=>'1,3','condition'=>'contains'])
-                ->filterCreate();
+        $mailBody = view('mail/Order/OrderFix', [
+            'name' => '%val:usr:name%',
+            'distributor_name' => $distributor->distributorName,
+            'distributor_postal_code' => $distributor->postalCode,
+            'distributor_prefectures' => $distributor->prefectures,
+            'distributor_address' => $distributor->address,
+            'hospital_name' => $order['hospital']['hospitalName'],
+            'postal_code' => $order['hospital']['postalCode'],
+            'prefectures' => $order['hospital']['prefectures'],
+            'address' =>  $order['hospital']['address'],
+            'division_name' => $order['division']['divisionName'],
+            'order_date' => $order['orderDate'],
+            'order_number' => $order['orderId'],
+            'item_num' => $order['itemCount'],
+            'total_price' => '￥'.number_format_jp((float)$order['totalAmount']),
+            'login_url' => config('url.hospital',''),
+        ])->render();
 
-            $test = $hospital_user::selectRule($select_name->value())
-                ->body($mail_body)
-                ->subject("[JoyPla] 発注が行われました")
-                ->from(FROM_ADDRESS, FROM_NAME)
-                ->send();
+        $ids = SpiralDb::title('NJ_HUserDB')->where('hospitalId', $user->hospitalId)->whereIn('userPermission' , [1,3])->value('id')->get();
+        $ids = array_values(array_column($ids->toArray(),'id'));
+        
+        $ids2 = SpiralDb::title('NJ_HUserDB')->where('hospitalId', $user->hospitalId)->where('divisionId', $order['division']['divisionId'])->whereIn('userPermission' , [2])->value('id')->get();
+        
+        $ids = array_merge($ids , array_values(array_column($ids2->toArray(),'id')));
 
-            $hospital_user = HospitalUser::getNewInstance();
-            $select_name = SelectName::generate($user->hospitalId);
-            $test = $hospital_user::selectName($select_name->value())
-                ->rule(['name'=>'hospitalId','label'=>'name_'.$user->hospitalId,'value1'=>$user->hospitalId,'condition'=>'matches'])
-                ->rule(['name'=>'userPermission','label'=>'permission_admin2','value1'=>'2','condition'=>'contains'])
-                ->rule(['name'=>'divisionId','label'=>'permission_division','value1'=>$order['division']['divisionId'],'condition'=>'matches'])
-                ->filterCreate();
-            $test = $hospital_user::selectRule($select_name->value())
-                ->body($mail_body)
-                ->subject("[JoyPla] 発注が行われました")
-                ->from(FROM_ADDRESS, FROM_NAME)
-                ->send();
-        }
+        $mailId = SpiralDb::mail('NJ_HUserDB')->subject('[JoyPla] 発注が行われました')
+            ->standby(false)->reserveDate('now')->bodyText($mailBody)->formAddress(FROM_ADDRESS)->formName(FROM_NAME)->mailField('mailAddress')->regist();
+
+        SpiralDb::mail('NJ_HUserDB')->ruleId($mailId)->sampling($ids);
+
     }
 
     //** メンテナンス用 */

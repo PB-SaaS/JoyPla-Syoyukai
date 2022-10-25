@@ -43,6 +43,7 @@ require_once('framework/SpiralConnecter/SpiralConnecterInterface.php');
 require_once('framework/SpiralConnecter/SpiralConnecter.php');
 require_once('framework/SpiralConnecter/SpiralDB.php');
 require_once('framework/SpiralConnecter/SpiralManager.php');
+require_once('framework/SpiralConnecter/SpiralExpressManager.php');
 require_once('framework/SpiralConnecter/Paginator.php');
 require_once('framework/SpiralConnecter/SpiralApiConnecter.php');
 require_once('framework/Application.php');
