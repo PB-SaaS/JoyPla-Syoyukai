@@ -1,6 +1,6 @@
 <?php
 
-namespace JoyPla\Enterprise\CommonModels;
+namespace framework\Enterprise\CommonModels;
 
 Interface GateInterface
 {

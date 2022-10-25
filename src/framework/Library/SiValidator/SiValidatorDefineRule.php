@@ -301,7 +301,7 @@ SiValidator::defineRule('between:min,max',function( $value , array $param ) {
     }
     if(is_string($value))
     {
-        $num = strlen($value);
+        $num = shiftjis_strlen($value);
     }
     if(is_numeric($value))
     {
@@ -450,6 +450,13 @@ SiValidator::defineRule('unique:',function( $value ) {
     return false;
 });
 
+
+SiValidator::defineRule('maxword:min',function( $value , $param) { 
+    $value = str_replace(array("\r\n", "\r", "\n"), '', $value);
+    $length = shiftjis_strlen($value);
+    return (int)$param['min'] >= $length;
+});
+
 SiValidator::language('ja'); 
 SiValidator::errorMessages(
     [
@@ -475,6 +482,7 @@ SiValidator::errorMessages(
             'digits:num' => "{field}は{num}桁ではありません",
             'digits_between:min,max' => "{field}は{min}桁以上{max}桁以下でなければいけません",
             'email'  => "{field}は有効なメールアドレスではありません",
+            'maxword:min' => "{field}は半角{min}文字以内で入力してください（全角は半分の文字数以内で入力してください）"
         ]
     ]
 );

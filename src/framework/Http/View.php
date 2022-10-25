@@ -1,6 +1,8 @@
 <?php
 // ビューの生成
 namespace framework\Http;
+
+use Collection;
 use stdClass;
 class View {
 
@@ -66,11 +68,8 @@ class View {
     public function filter($value)
     {
         if ( ! is_object($value) && ! is_array($value)  ) return htmlspecialchars($value, ENT_QUOTES, "UTF-8");//PHPサーバーはUTF-8
-        
-        if( is_object($value)){
-            unset($value->spiralDataBase);
-            unset($value->spiralSendMail);
-            unset($value->spiralDBFilter);
+
+        if( $value instanceof Collection){
             $tmp = new stdClass;
             foreach((array)$value as $k => $t)
             {
@@ -80,7 +79,6 @@ class View {
             
             return $tmp;
         }
-
         
         if( is_array($value)){
             $tmp = [];

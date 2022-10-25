@@ -26,6 +26,7 @@ class Kernel
 
     final public function handle(Request $request)
     {
+        $this->app->boot();
         // add global middleware.
         // $this->router->middleware($this->middlewares);
         try {

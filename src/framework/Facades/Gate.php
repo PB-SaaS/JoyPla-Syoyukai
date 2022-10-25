@@ -4,7 +4,7 @@ namespace framework\Facades;
 
 use Auth;
 use framework\Exception\NotFoundException;
-use JoyPla\Enterprise\CommonModels\GateInterface;
+use framework\Enterprise\CommonModels\GateInterface;
 
 class Gate {
 
