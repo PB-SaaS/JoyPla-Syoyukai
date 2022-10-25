@@ -48,8 +48,8 @@ class PriceList
     switchLink()
     {
         let userPermission = %val:usr:userPermission:id%;
-        let tenantKind = <?php echo $tenantKind; ?>;
-        if((userPermission === 1 || userPermission === 2) && tenantKind === 1){
+        let tenantKind = "<?php echo $tenantKind; ?>";
+        if((userPermission === 1 || userPermission === 2) && tenantKind === "1"){
             $("a.smp-cell-id").css("display", "inline");
         }else{
             $("a.smp-cell-id").css("display", "none");
