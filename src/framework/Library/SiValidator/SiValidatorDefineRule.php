@@ -451,10 +451,10 @@ SiValidator::defineRule('unique:',function( $value ) {
 });
 
 
-SiValidator::defineRule('maxword:min',function( $value , $param) { 
+SiValidator::defineRule('maxword:max',function( $value , $param) { 
     $value = str_replace(array("\r\n", "\r", "\n"), '', $value);
     $length = shiftjis_strlen($value);
-    return (int)$param['min'] >= $length;
+    return (int)$param['max'] >= $length;
 });
 
 SiValidator::language('ja'); 
@@ -482,7 +482,7 @@ SiValidator::errorMessages(
             'digits:num' => "{field}は{num}桁ではありません",
             'digits_between:min,max' => "{field}は{min}桁以上{max}桁以下でなければいけません",
             'email'  => "{field}は有効なメールアドレスではありません",
-            'maxword:min' => "{field}は半角{min}文字以内で入力してください（全角は半分の文字数以内で入力してください）"
+            'maxword:max' => "{field}は半角{max}文字以内で入力してください（全角は半分の文字数以内で入力してください）"
         ]
     ]
 );

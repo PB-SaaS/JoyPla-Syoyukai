@@ -43,7 +43,7 @@ namespace framework\SpiralConnecter {
 
         public static function getConnection()
         {
-            if(class_exists('Spiral') && class_exists('SpiralApiRequest'))
+            if(class_exists('Spiral'))
             {
                 global $SPIRAL;
                 return new SpiralConnecter($SPIRAL);
