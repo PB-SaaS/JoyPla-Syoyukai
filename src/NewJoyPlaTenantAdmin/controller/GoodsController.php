@@ -62,6 +62,10 @@ class GoodsController extends Controller
     {
         global $SPIRAL;
         try {
+            $session = $SPIRAL->getSession();
+            $auth = new Auth();
+            $session->put('tenantId', $auth->tenantId);
+
             $content = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/IframeContent', [
                 'title' => '商品情報登録',
                 'width' => '100%',
@@ -281,7 +285,8 @@ class GoodsController extends Controller
  */
 $GoodsController = new GoodsController();
 
-$action = $SPIRAL->getParam('Action'); {
+$action = $SPIRAL->getParam('Action');
+{
     if ($action === "insert") {
         echo $GoodsController->insert()->render();
     } elseif ($action === "allBulkInsert") {
