@@ -154,24 +154,14 @@ class TopPageController extends Controller
 EOM;
 
             $hidden = [
-                "divisionId" => "%val:usr:divisionId%",
-                "userPermission" => "%val:usr:userPermission:id%",
+                "oldLoginId" => "%val:usr:loginId%",
                 "loginId" => "%val:usr:loginId%",
                 "name" => "%val:usr:name%",
                 "nameKana" => "%val:usr:nameKana%",
                 "mailAddress" => "%val:usr:mailAddress%",
                 "remarks" => "%val:usr:remarks%",
-                "id" => "%val:sys:id%",
-                "authKey" => "%val:usr:authKey%",
-                "user_id" => "%val:sys:id%",
-                "user_auth_key" => "%val:usr:authKey%",
+                "SMPFORM" => "%smpform:hpUserSelfChange%"
                 ];
-
-            if ($user_info->isAdmin()) {
-                $hidden["SMPFORM"] = "%smpform:hpUserChange%";
-            } else {
-                $hidden["SMPFORM"] = "%smpform:hpUserCForD%";
-            }
 
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
                 'breadcrumb' => $breadcrumb,
