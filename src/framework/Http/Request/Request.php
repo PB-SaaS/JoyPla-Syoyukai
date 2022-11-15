@@ -13,16 +13,20 @@ use framework\Library\SiValidator;
  */
 class Request
 {
+    private static self $instance ;
     private array $request = [] ;
     private array $server = [] ;
     private ?RequestSession $session = null ;
     private $user;
+
+    private static string $pathkey = '_path';
 
     public function __construct()
     {
         $this->request = $_REQUEST;
         $this->server = $_SERVER;
         $this->session =  new RequestSession();
+        self::$instance = $this;
     }
 
     public function isSsl(): bool
@@ -44,21 +48,25 @@ class Request
     { 
         return $this->user;
     }
+
+    public static function setPathKey(string $pathkey){
+        self::$pathkey = $pathkey;
+    }
     
     public function getRequestUri(): string
     { 
         //return $_SERVER['REQUEST_URI'];
-        if(!isset($this->request['path']))
+        if(!isset($this->request[self::$pathkey]))
         {
             return ""; 
         }
 
-        return ltrim($this->request['path'], '/');
+        return ltrim($this->request[self::$pathkey], '/');
     }
 
     public function setRequestUri(string $path)
     { 
-        $this->set('path' , $path);
+        $this->set(self::$pathkey , $path);
     }
 
     public function getQueryParams(): array
@@ -95,7 +103,7 @@ class Request
 
     public function get($key , $default = '')
     {
-        $value = ($this->request[$key])? $this->request[$key] : $default;
+        $value = (isset($this->request[$key]))? $this->request[$key] : $default;
         return self::requestUrldecode($value);
     }
 
@@ -170,5 +178,15 @@ class Request
     public function session()
     {
         return $this->session;
+    }
+
+    public static function queryBuilder(array $query = [] , array $removeQuery = [])
+    {
+        $query = array_merge(self::$instance->getQueryParams() , $query);
+        foreach($removeQuery as $key)
+        {
+            unset($query[$key]);
+        }
+        return http_build_query($query);
     }
 }

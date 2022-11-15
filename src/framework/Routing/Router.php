@@ -40,6 +40,16 @@ class Router
         return $route->middleware(self::$groupMiddlewares);
     }
 
+    final public static function fetchAlias(string $alias , array $vars = [])
+    {
+        foreach (self::$routes as $route) {
+            if ($route->equalAlias($alias)) {
+                return $route->generatePath($vars);
+            }
+        }
+        return null;
+    }
+
     /**
      * @param Request $request
      *
@@ -49,8 +59,12 @@ class Router
     {
         foreach (self::$routes as $route) {
             if ($route->processable($request , $isMethodCheck)) {
-                $route->middleware($this->middlewares);
-                return $route->process($request , $route->service);
+                try{
+                    $route->middleware($this->middlewares);
+                    return $route->process($request , $route->service);
+                } catch(Exception $e){
+
+                }
             }
         }
 
@@ -60,6 +74,7 @@ class Router
     public static function redirect($uri , Request $request){
         $request->setRequestUri($uri);
         $router = new Router();
+        echo $request->getRequestUri();
         return $router->dispatch($request , false);
     }
 

@@ -20,9 +20,8 @@ class SpiralManager {
     private string $dataformat = '';
     private string $labelsTarget = '';
     private string $selectName = '';
-    private string $dbAsName = '';
-    private array $leftJoin = [];
-    private array $joinDbs = [];
+    //private array $leftJoin = [];
+    private array $join = [];
     private ?Collection $mstData = null;
     
     public function __construct(?SpiralConnecterInterface $connector = null)
@@ -54,6 +53,7 @@ class SpiralManager {
         return $this->request->get('db_title');
     }
 
+    /*
     public function setDbAsName($dbAsName)
     {
         $this->dbAsName = $dbAsName;
@@ -63,7 +63,7 @@ class SpiralManager {
     {
         return $this->dbAsName;
     }
-
+    */
     public function where(string $field , string $value , string $operator = "=")
     {
         $this->searchCondition[] = new SearchCondition($field , $value , $operator);
@@ -105,6 +105,15 @@ class SpiralManager {
         return $this;
     }
 
+    public function orWhereNotIn(string $field , array $values )
+    {
+        foreach($values as $value)
+        {
+            $this->orWhere($field , $value , '!=');
+        }
+        return $this;
+    }
+
     public function whereNull(string $field)
     {
         $this->where($field , '0' , 'ISNULL' );
@@ -120,7 +129,7 @@ class SpiralManager {
     public function orderBy(string $field , string $ascOrDesc)
     {
         $this->orderBy = new OrderBy($field , $ascOrDesc);
-        $this->request->set('sort' , $this->orderBy->getRequestParam());
+        $this->request->set('sort' , [ $this->orderBy->getRequestParam() ]);
         return $this;
     }
 
@@ -150,6 +159,7 @@ class SpiralManager {
         return $values;
     }
 
+    /*
     public function on( string $joinKey , string $joinOperator , string $leftKey )
     {
         $this->leftJoin['joinKey'] = $joinKey;
@@ -252,6 +262,14 @@ class SpiralManager {
         return new Collection($col);
     }
 
+    */
+
+    public function join(SpiralManager $db , string $field , string $op , string $toField ,string $asDbName = '')
+    {
+        $this->join[] = new JoinDb($db , $field , $op , $toField , $asDbName);
+        return $this;
+    }
+
     public function page(int $page)
     {
         if($page < 1)
@@ -270,7 +288,7 @@ class SpiralManager {
         {
             return null;
         }
-        return (new Collection($res))->first();
+        return $res->first();
     }
 
     public function findOrFail( int $id )
@@ -312,15 +330,28 @@ class SpiralManager {
         $res = $this->combine($this->request->get('select_columns') , $request['data'] );
 
         $res = new Collection($res);
-        $res = $this->getLeftJoin($res);
+        //$res = $this->getLeftJoin($res);
+        foreach($this->join as $join)
+        {
+            $join->exec($res);
+            $tmp = $res->all();
+            foreach( $tmp as $key => $r )
+            {
+                $r->set( $join->getDbAsName() , $join->fetch($r));
+                $tmp[$key] = $r;
+            }
+            $res = new Collection($tmp);
+        }
 
         return new Paginator( 
-            ( new Collection($res) ) , 
+            $res , 
             (int)$this->request->get('page'),
             1,
             ceil($request['count'] / $limit ),
             $limit,
-            $request['count']);
+            $request['count'],
+            $this->orderBy
+        );
     }
 
     public function getMulti(array $fields = [])
@@ -393,7 +424,18 @@ class SpiralManager {
 
         $res = $this->combine($this->request->get('select_columns') , $res );
         $res = new Collection($res);
-        $res = $this->getLeftJoin($res);
+        foreach($this->join as $join)
+        {
+            $join->exec($res);
+            $tmp = $res->all();
+            foreach( $tmp as $key => $r )
+            {
+                $r->set( $join->getDbAsName() , $join->fetch($r));
+                $tmp[$key] = $r;
+            }
+            $res = new Collection($tmp);
+        }
+        
         return $res;
     }
 
@@ -459,9 +501,8 @@ class SpiralManager {
         return (int)$res['count'];
     }
 
-    public function upsert($upsert)
+    public function upsert($field , $upsert)
     {
-
         $xSpiralApiHeader = new XSpiralApiHeaderObject('database','upsert');
 
         $data = [];
@@ -470,9 +511,11 @@ class SpiralManager {
             $data[] = [ 'name' => $key , 'value' => $v ];
         }
 
+        $this->request->set('key', $field);
         $this->request->set('data', $data);
+       
         $res = $this->connection->request($xSpiralApiHeader , $this->request);
-
+        
         return (int)$res['count'];
     }
 
@@ -611,5 +654,49 @@ class OrderBy {
     public function getRequestParam()
     {
         return [ 'name' => $this->field , 'order' => $this->ascOrDesc ];
+    }
+}
+
+class JoinDb {
+    public SpiralManager $db ;
+    public string $field = '';
+    public string $op = '';
+    public string $toField = '';
+    public string $asDbName = '';
+    public Collection $result;
+
+    public function __construct(SpiralManager $db ,string $field , string $op , string $toField , string $asDbName = '')
+    {
+        $this->db = $db;
+        $this->field = $field;
+        $this->op = $op;
+        $this->toField = $toField;
+        $this->asDbName = $asDbName;
+    }
+
+    public function getDbAsName()
+    {
+        return (empty($this->asDbName))? $this->db->getTitle() : $this->asDbName;
+    }
+
+    public function getResult()
+    {
+        return $this->result;
+    }
+    
+    public function exec( Collection $collection )
+    {
+        if($this->op === '='){
+            $this->result = $this->db->whereIn( $this->field , $collection->column($this->toField))->get();
+        }
+        $this->result = $this->db->orWhereNotIn( $this->field , $collection->column($this->toField))->get();
+    }
+
+    public function fetch( Collection $collection )
+    {
+        if($this->op === '='){
+            return $this->result->where( $this->field , $collection->{$this->toField} );
+        }
+        return $this->result->whereNot($this->field , $collection->{$this->toField} );
     }
 }
