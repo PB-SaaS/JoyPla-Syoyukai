@@ -32,7 +32,7 @@ class JoyPlaApplication extends Application
 
     public function boot()
     {
-        Request::setPathKey(	/** logger 設定 */
+        Request::setPathKey(
             'path'	
         );
         /** logger 設定 */
