@@ -9,6 +9,7 @@ use App\SpiralDb\Tenant;
 use Auth;
 use framework\Application;
 use framework\Facades\Gate;
+use framework\Http\Request;
 use framework\SpiralConnecter\SpiralConnecter;
 use JoyPla\Application\LoggingObject\Spiralv2LogginObject;
 use JoyPla\Enterprise\CommonModels\GatePermissionModel;
@@ -31,6 +32,9 @@ class JoyPlaApplication extends Application
 
     public function boot()
     {
+        Request::setPathKey(	/** logger 設定 */
+            'path'	
+        );
         /** logger 設定 */
         SpiralConnecter::$logger = new Logger(new Spiralv2LogginObject($this::SPIRALV2_API_KEY, $this::LOGGING_APP_TITLE, $this::SPIRAL_API_LOGGING_DB_TITLE));
         ApiSpiral::$logger = new Logger(new Spiralv2LogginObject($this::SPIRALV2_API_KEY, $this::LOGGING_APP_TITLE, $this::SPIRAL_API_LOGGING_DB_TITLE));
