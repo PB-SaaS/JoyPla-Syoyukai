@@ -276,7 +276,7 @@ class OrderMR
                 remakeArray[k][5] = records[i][5];
                 remakeArray[k][6] = records[i][6];
                 remakeArray[k][7] = records[i][7];
-                remakeArray[k][8] = records[i][8][j];
+                remakeArray[k][8] = records[i][8];
                 remakeArray[k][9] = records[i][9][j];
                 remakeArray[k][10] = records[i][10][j];
                 remakeArray[k][11] = records[i][11][j];
