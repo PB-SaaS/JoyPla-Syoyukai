@@ -24,7 +24,9 @@
             :rules="{ required : true }"
             title="消費部署指定"
             :disabled="values.divisionId != '' && fields.length > 0"
-            :is-only-my-division="<?php var_export(gate('register_of_consumption_slips')->isOnlyMyDivision()) ?>"
+            :is-only-my-division="<?php var_export(
+                gate('register_of_consumption_slips')->isOnlyMyDivision()
+            ); ?>"
             />
           </div>
           <div class="my-4 grid grid-cols-3 gap-4 lg:w-1/3">
@@ -187,7 +189,7 @@ var JoyPlaApp = Vue.createApp({
       
       const { ref, toRef , toRefs , reactive ,onMounted} = Vue;
       const { useFieldArray , useForm } = VeeValidate;
-      const consumptionUnitPriceUseFlag = "<?php echo $consumptionUnitPriceUseFlag ?>";
+      const consumptionUnitPriceUseFlag = "<?php echo $consumptionUnitPriceUseFlag; ?>";
 
       const loading = ref(false);
       const start = () => {
@@ -269,8 +271,8 @@ var JoyPlaApp = Vue.createApp({
 
       const consumeQuantity = (idx) => {
         let num = 0;
-        num += values.consumeItems[idx].consumeQuantity;
-        num += values.consumeItems[idx].quantity * values.consumeItems[idx].consumeUnitQuantity;
+        num += parseInt(values.consumeItems[idx].consumeQuantity);
+        num += parseInt(values.consumeItems[idx].quantity * values.consumeItems[idx].consumeUnitQuantity);
         return num;
       };
 
@@ -401,8 +403,8 @@ var JoyPlaApp = Vue.createApp({
       const additem = (item) =>
       {
         item = JSON.parse(JSON.stringify(item));
-        item.consumeQuantity = ( item.consumeQuantity ) ? item.consumeQuantity : 0 ;
-        item.consumeUnitQuantity = ( item.consumeUnitQuantity ) ? item.consumeUnitQuantity : 0 ;
+        item.consumeQuantity = ( item.consumeQuantity ) ? parseInt(item.consumeQuantity) : 0 ;
+        item.consumeUnitQuantity = ( item.consumeUnitQuantity ) ? parseInt(item.consumeUnitQuantity) : 0 ;
         item.consumeLotNumber = ( item.lotNumber ) ? item.lotNumber : "" ;
         item.consumeLotDate =  ( item.lotDate ) ? item.lotDate : "" ;
         item.cardId = (item.cardId)? item.cardId : "";
@@ -432,7 +434,7 @@ var JoyPlaApp = Vue.createApp({
         if(items.type == "payout")
         {
           items.item.forEach((x , id)=>{
-            items.item[id].consumeQuantity = items.item[id].payoutQuantity;
+            items.item[id].consumeQuantity = parseInt(items.item[id].payoutQuantity);
           });
         }
         if(items.type == "card")
@@ -455,13 +457,13 @@ var JoyPlaApp = Vue.createApp({
           }          
           items.item.forEach((x , id)=>{
             items.item[id].cardId = items.item[id].barcode;
-            items.item[id].consumeQuantity = items.item[id].cardQuantity;
+            items.item[id].consumeQuantity = parseInt(items.item[id].cardQuantity);
           });
         }
         if(items.type == "customlabel")
         {
           items.item.forEach((x , id)=>{
-            items.item[id].consumeQuantity = items.item[id].customQuantity;
+            items.item[id].consumeQuantity = parseInt(items.item[id].customQuantity);
           });
         }
 
