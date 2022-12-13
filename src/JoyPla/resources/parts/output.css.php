@@ -3032,12 +3032,12 @@ input[aria-invalid="true"] {
     width: 66.666667%;
   }
 
-  .md\:w-1\/6 {
-    width: 16.666667%;
-  }
-
   .md\:w-44 {
     width: 11rem;
+  }
+
+  .md\:w-1\/6 {
+    width: 16.666667%;
   }
 
   .md\:grid-cols-4 {
@@ -3117,20 +3117,12 @@ input[aria-invalid="true"] {
     height: auto;
   }
 
-  .lg\:w-1\/6 {
-    width: 16.666667%;
+  .lg\:w-1\/3 {
+    width: 33.333333%;
   }
 
   .lg\:w-3\/4 {
     width: 75%;
-  }
-
-  .lg\:w-4\/5 {
-    width: 80%;
-  }
-
-  .lg\:w-1\/3 {
-    width: 33.333333%;
   }
 
   .lg\:w-1\/4 {
@@ -3139,6 +3131,14 @@ input[aria-invalid="true"] {
 
   .lg\:w-1\/2 {
     width: 50%;
+  }
+
+  .lg\:w-1\/6 {
+    width: 16.666667%;
+  }
+
+  .lg\:w-4\/5 {
+    width: 80%;
   }
 
   .lg\:w-5\/6 {

@@ -25,6 +25,8 @@ use JoyPla\InterfaceAdapters\Controllers\Web\ReceivedController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ReturnController;
 use JoyPla\InterfaceAdapters\Controllers\Web\StocktakingController;
 use JoyPla\InterfaceAdapters\Controllers\Web\TopController;
+use JoyPla\InterfaceAdapters\Controllers\Web\ItemAndPriceAndInHospitalItemRegisterController;
+use JoyPla\InterfaceAdapters\Controllers\Web\PriceAndInHospitalItemRegisterController;
 use JoyPla\InterfaceAdapters\GateWays\Middleware\PersonalInformationConsentMiddleware;
 use JoyPla\InterfaceAdapters\GateWays\Middleware\UnorderDataExistMiddleware;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ConsumptionRepository;
@@ -107,6 +109,8 @@ Router::group(PersonalInformationConsentMiddleware::class, function(){
 
     Router::map('GET', '/consumption/register', [ConsumptionController::class,'register']);
 
+    Router::map('GET', '/consumption/bulkRegister', [ConsumptionController::class,'bulkRegister']);
+
     Router::map('GET', '/consumption/show', [ConsumptionController::class,'show']);
 
     Router::map('GET', '/consumption/:consumptionId', [ConsumptionController::class,'index'])->service(new ConsumptionIndexInteractor(new ConsumptionIndexPresenter() , new ConsumptionRepository()) );
@@ -147,11 +151,15 @@ Router::group(PersonalInformationConsentMiddleware::class, function(){
     Router::map('GET', '/return/show', [ReturnController::class,'show']);
 
     Router::map('GET', '/stocktakingimport', [StocktakingController::class,'import']);
-    
+
+    Router::map('GET', '/product/ItemAndPriceAndInHospitalRegist/input', [ItemAndPriceAndInHospitalItemRegisterController::class,'register']);
+
+    Router::map('GET', '/product/PriceAndInHospitalRegist/input', [PriceAndInHospitalItemRegisterController::class,'register']);
+
     Router::map('GET', '/notification', [NotificationController::class,'show']);
-    
+
     Router::map('GET', '/notification/:notificationId', [NotificationController::class,'index']);
-    
+
 });
 
 $router = new Router();
