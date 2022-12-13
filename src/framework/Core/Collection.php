@@ -1,57 +1,44 @@
 <?php
 class Collection extends stdClass
 {
-
-    private $array = [];
-    
-    public function __construct($ary)
+    public function __construct(array $ary = [])
     {
         $this->setVariable($ary);
     }
 
-    private function setVariable($ary)
+    private function setVariable(array $ary = [])
     {
-        $tmp = [];
-        if(is_array($ary))
+        foreach($ary as $key => $val)
         {
-            foreach($ary as $key => $val)
+            if(is_array($val))
             {
-                if(is_array($val))
-                {
-                    $this->{$key} = new Collection($val);
-                    $tmp[$key] = new Collection($val);
-                } 
-                else 
-                {
-                    $this->{$key} = $val;
-                    $tmp[$key] = $val;
-                }
+                $this->{$key} = new Collection($val);
+            } 
+            else 
+            {
+                $this->{$key} = $val;
             }
-        } else {
-            $tmp = $ary;
         }
-        $this->array = $tmp;
     }
     
     public function set($key , $val)
     {
         $this->{$key} = $val;
-        $this->array[$key] = $val;
     }
     
     public function all()
     {
-        return $this->array;
+        return (array)$this;
     }
 
     public function toArray()
     {
         $tmp = [];
-        foreach($this->array as $key => $val)
+        foreach($this->all() as $key => $val)
         {
             if($val instanceof Collection)
             {
-                $tmp[$key] = $val->all();
+                $tmp[$key] = $val->toArray();
             }
             else
             {
@@ -63,13 +50,13 @@ class Collection extends stdClass
 
     public function count()
     {
-        return count($this->array);
+        return count($this->toArray());
     }
 
     public function sum()
     {
         $sum_tmp = 0;
-        foreach($this->array as $key => $val){
+        foreach($this->all() as $key => $val){
             if(!is_numeric($val)){ throw new Exception('not numeric'); }
             $sum_tmp = $sum_tmp + (float)$val;
         }
@@ -83,29 +70,33 @@ class Collection extends stdClass
 
     public function max()
     {
-        return max($this->array);
+        return max($this->all());
     }
 
     public function min()
     {
-        return min($this->array);
+        return min($this->all());
     }
 
     public function where($key , $val)
     {
         $tmp = [];
-        foreach($this->array as $ary_key => $ary){
-            if(is_object($ary))
+        foreach($this->toArray() as $ary_key => $ary){
+            if(isset($ary[$key]) && $ary[$key] === $val)
             {
-                if(isset($ary->{$key}) && $ary->{$key} === $val)
-                {
-                    $tmp[] = $ary;
-                }
-            }else if(is_array($ary)){
-                if(isset($ary[$key]) && $ary[$key] === $val)
-                {
-                    $tmp[] = $ary;
-                }
+                $tmp[] = $ary;
+            }
+        }
+        return new Collection($tmp);
+    }
+
+    public function whereNot($key , $val)
+    {
+        $tmp = [];
+        foreach($this->toArray() as $ary_key => $ary){
+            if(isset($ary[$key]) && $ary[$key] !== $val)
+            {
+                $tmp[] = $ary;
             }
         }
         return new Collection($tmp);
@@ -114,18 +105,10 @@ class Collection extends stdClass
     public function whereIn($key , $val_in)
     {
         $tmp = [];
-        foreach($this->array as $ary_key => $ary){
-            if(is_object($ary))
+        foreach($this->toArray() as $ary_key => $ary){
+            if(isset($ary[$key]) && in_array($ary[$key], $val_in))
             {
-                if(isset($ary->{$key}) && in_array($ary->{$key} , $val_in))
-                {
-                    $tmp[] = $ary;
-                }
-            }else if(is_array($ary)){
-                if(isset($ary[$key]) && in_array($ary[$key], $val_in))
-                {
-                    $tmp[] = $ary;
-                }
+                $tmp[] = $ary;
             }
         }
         return new Collection($tmp);
@@ -134,18 +117,10 @@ class Collection extends stdClass
     public function whereNotIn($key , $val_in)
     {
         $tmp = [];
-        foreach($this->array as $ary_key => $ary){
-            if(is_object($ary))
+        foreach($this->toArray() as $ary_key => $ary){
+            if(isset($ary[$key]) && !in_array($ary[$key], $val_in))
             {
-                if(isset($ary->{$key}) && !in_array($ary->{$key} , $val_in))
-                {
-                    $tmp[] = $ary;
-                }
-            }else if(is_array($ary)){
-                if(isset($ary[$key]) && !in_array($ary[$key], $val_in))
-                {
-                    $tmp[] = $ary;
-                }
+                $tmp[] = $ary;
             }
         }
         return new Collection($tmp);
@@ -154,7 +129,7 @@ class Collection extends stdClass
     public function filter(callable $filter)
     {
         $tmp = [];
-        foreach($this->array as $key => $val){
+        foreach($this->all() as $key => $val){
             $test = function (callable $filter, $val, $key): bool {
                 return $filter($val, $key);
             };
@@ -169,7 +144,7 @@ class Collection extends stdClass
     public function reject(callable $filter)
     {
         $tmp = [];
-        foreach($this->array as $key => $val){
+        foreach($this->all() as $key => $val){
             $test = function (callable $filter, $val, $key): bool {
                 return $filter($val, $key);
             };
@@ -216,5 +191,14 @@ class Collection extends stdClass
             return $this->all()[$index];
         }
         return null; 
+    }
+
+    public function column($key){
+        $result = [];
+        foreach($this->all() as $a )
+        {
+            $result[] = $a->{$key};
+        }
+        return $result;
     }
 }

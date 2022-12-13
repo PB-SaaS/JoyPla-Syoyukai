@@ -171,7 +171,7 @@ class SiValidator {
 
     public static function errorMessages( array $errorMessages )
     {
-        self::$errorMessages = array_merge(self::$errorMessages , $errorMessages) ;
+        self::$errorMessages = array_replace_recursive(self::$errorMessages , $errorMessages) ;
     }
 
     public static function startsWith($haystack, $needle) {

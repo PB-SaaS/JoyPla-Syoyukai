@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use View;
@@ -22,39 +23,36 @@ class TopPageController extends Controller
     public function __construct()
     {
     }
-    
+
     public function index(): View
     {
         global $SPIRAL;
         try {
-
             $user_info = new UserInfo($SPIRAL);
-            
-            $hospital = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+
+            $hospital = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
             $hospital = $hospital->data->get(0);
-            
-            $tenant = Tenant::where('tenantId',$hospital->tenantId)->get();
+
+            $tenant = Tenant::where('tenantId', $hospital->tenantId)->get();
             $tenant = $tenant->data->get(0);
-            
+
             $content = $this->view('NewJoyPla/view/Distributor/Top', [
                 'hospital' => $hospital,
                 'tenant' => $tenant,
                 'user_info' => $user_info,
                 'url' => '%url/rel:mpgt:oroshiTopPage%'
-                ] , false);
-            
-        } catch ( Exception $ex ) {
+                ], false);
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message'=> $ex->getMessage(),
-                ] , false);
+                ], false);
         } finally {
-            
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
-            
+
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla TOP',
@@ -62,18 +60,17 @@ class TopPageController extends Controller
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
-            ],false);
+            ], false);
         }
     }
-    
-    
+
+
     public function userInfoChange(): View
     {
         global $SPIRAL;
         try {
-            
             $user_info = new UserInfo($SPIRAL);
-            
+
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
             <li><a href="%url/rel:mpg:top%&page=page8">ユーザー管理</a></li>
@@ -86,30 +83,26 @@ EOM;
                 'height'=> '100%',
                 'url' => '/regist/is',
                 'hiddens' => [
-            			"userPermission" => "%val:usr:userPermission:id%",
-            			"loginId" => "%val:usr:loginId%",
-            			"name" => "%val:usr:name%",
-            			"nameKana" => "%val:usr:nameKana%",
-            			"mailAddress" => "%val:usr:mailAddress%",
-            			"remarks" => "%val:usr:remarks%",
-            			"SMPFORM" => "%smpform:oroshiUserChange%",
-            			"id" => "%val:sys:id%",
-            			"authKey" => "%val:usr:authKey%"
+                    "oldLoginId" => "%val:usr:loginId%",
+                    "loginId" => "%val:usr:loginId%",
+                    "name" => "%val:usr:name%",
+                    "nameKana" => "%val:usr:nameKana%",
+                    "mailAddress" => "%val:usr:mailAddress%",
+                    "remarks" => "%val:usr:remarks%",
+                    "SMPFORM" => "%smpform:distrUserSelfCh%"
                     ]
-                ] , false);
-            
-        } catch ( Exception $ex ) {
+                ], false);
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message'=> $ex->getMessage(),
-                ] , false);
+                ], false);
         } finally {
-            
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
-            
+
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla 卸業者ユーザー変更',
@@ -117,17 +110,16 @@ EOM;
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
-            ],false);
+            ], false);
         }
     }
-    
+
     public function contactUs(): View
     {
         global $SPIRAL;
         try {
-            
             $user_info = new UserInfo($SPIRAL);
-            
+
             $breadcrumb = <<<EOM
             <li><a href="%url/rel:mpg:top%">TOP</a></li>
             <li><span>お問合せ</span></li>
@@ -135,7 +127,7 @@ EOM;
             $hidden = [
                 "SMPFORM" => "%smpform:contactUs%"
                 ];
-                
+
             $content = $this->view('NewJoyPla/view/template/parts/IframeContent', [
                 'breadcrumb' => $breadcrumb,
                 'title' => 'お問合せ',
@@ -143,20 +135,18 @@ EOM;
                 'height'=> '100%',
                 'url' => '/regist/is',
                 'hiddens' => $hidden
-                ] , false);
-            
-        } catch ( Exception $ex ) {
+                ], false);
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message'=> $ex->getMessage(),
-                ] , false);
+                ], false);
         } finally {
-            
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
-            
+
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla お問合せ',
@@ -164,18 +154,17 @@ EOM;
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
-            ],false);
+            ], false);
         }
     }
-    
+
     public function accountSelect(): View
     {
         global $SPIRAL;
         try {
-            
             $user_info = new UserInfo($SPIRAL);
-            
-            $distributorAffiliation = DistributorAffiliationView::where('loginId',$user_info->getLoginId())->where('invitingAgree','1')->get();
+
+            $distributorAffiliation = DistributorAffiliationView::where('loginId', $user_info->getLoginId())->where('invitingAgree', '1')->get();
             $distributorAffiliation = $distributorAffiliation->data->all();
             $api_url = "%url/rel:mpg:top%";
             $content = $this->view('NewJoyPla/view/Distributor/AccountSelect', [
@@ -183,20 +172,18 @@ EOM;
                 'affiliation' => $distributorAffiliation,
                     'csrf_token' => Csrf::generate(16),
                 'current_affiliation' => $SPIRAL->getContextByFieldTitle('affiliationId')
-                ] , false);
-            
-        } catch ( Exception $ex ) {
+                ], false);
+        } catch (Exception $ex) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
                 'message'=> $ex->getMessage(),
-                ] , false);
+                ], false);
         } finally {
-            
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
+            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
             $header = $this->view('NewJoyPla/src/Header', [
                 'SPIRAL' => $SPIRAL
             ], false);
-            
+
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
                 'title'     => 'JoyPla アカウント切り替え',
@@ -204,33 +191,32 @@ EOM;
                 'head' => $head->render(),
                 'header' => $header->render(),
                 'baseUrl' => '',
-            ],false);
+            ], false);
         }
     }
-    
+
     public function userAffiliationIdUpdate(): View
     {
         global $SPIRAL;
         try {
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
-            
+            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
+
             $user_info = new UserInfo($SPIRAL);
-            
+
             $affiliationId = $SPIRAL->getParam('affiliationId');
 
-            $result = DistributorUser::where('loginId',$user_info->getLoginId())->update(['affiliationId'=> $affiliationId ]);
-            
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['update']);
-            $content = $content->toJson();
+            $result = DistributorUser::where('loginId', $user_info->getLoginId())->update(['affiliationId'=> $affiliationId ]);
 
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['update']);
+            $content = new ApiResponse($result->data, $result->count, $result->code, $result->message, ['update']);
+            $content = $content->toJson();
+        } catch (Exception $ex) {
+            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['update']);
             $content = $content->toJson();
         } finally {
             return $this->view('NewJoyPla/view/template/ApiResponse', [
                 'content'   => $content,
-            ],false);
+            ], false);
         }
     }
 }
@@ -241,30 +227,20 @@ EOM;
 $TopPageController = new TopPageController();
 $action = $SPIRAL->getParam('Action');
 
-if($autoload_action != '')
-{
+if ($autoload_action != '') {
     $action = $autoload_action; //autoload
 }
 
 {
-    if($action === 'userInfoChange')
-    {
+    if ($action === 'userInfoChange') {
         echo $TopPageController->userInfoChange()->render();
-    } 
-    else if($action === 'contactUs')
-    {
+    } elseif ($action === 'contactUs') {
         echo $TopPageController->contactUs()->render();
-    }
-    else if($action === 'accountSelect')
-    {
+    } elseif ($action === 'accountSelect') {
         echo $TopPageController->accountSelect()->render();
-    }
-    else if($action === 'userAffiliationIdUpdate')
-    {
+    } elseif ($action === 'userAffiliationIdUpdate') {
         echo $TopPageController->userAffiliationIdUpdate()->render();
-    }
-    else 
-    {
+    } else {
         echo $TopPageController->index()->render();
     }
 }

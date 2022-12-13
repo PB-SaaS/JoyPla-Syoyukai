@@ -81,9 +81,10 @@
                                     <tr class="bg-white" v-for="( orderItem ) in orderItemArray">
                                         <td class="border border-slate-600 p-1">{{ orderItem.id  }}</td>
                                         <td class="border border-slate-600 p-1">
-                                            <p class="truncate w-64">
-                                                {{ orderItem.item.itemName }}
-                                                {{ orderItem.item.itemCode }}
+                                            <p class="w-64">
+                                                {{ orderItem.item.makerName }}<br>
+                                                {{ orderItem.item.itemName }}<br>
+                                                {{ orderItem.item.itemCode }}<br>
                                                 {{ orderItem.item.itemStandard }}
                                             </p>
                                         </td>
@@ -129,8 +130,8 @@
 </div>
 
 <script>
-    const order = <?php echo json_encode($order, true) ?>;
-    let orderItems = <?php echo json_encode($orderItems, true) ?>;
+    const order = <?php echo json_encode($order, true); ?>;
+    let orderItems = <?php echo json_encode($orderItems, true); ?>;
     var JoyPlaApp = Vue.createApp({
         components: {},
         setup() {

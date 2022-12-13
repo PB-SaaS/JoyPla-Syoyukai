@@ -7,12 +7,14 @@ use framework\Http\View;
 
 class TopController extends Controller
 {
-    public function index($vars) {
+    public function index($vars)
+    {
         $body = View::forge('html/Common/Top', [], false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
     }
 
-    public function orderpage($vars) {
+    public function orderpage($vars)
+    {
         $body = View::forge('html/Common/OrderPage', [], false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
     }
@@ -22,7 +24,7 @@ class TopController extends Controller
         $body = View::forge('html/Common/ConsumptionPage', [], false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
     }
-    
+
     public function stocktakingpage($vars)
     {
         $body = View::forge('html/Common/StocktakingPage', [], false)->render();
@@ -40,7 +42,7 @@ class TopController extends Controller
         $body = View::forge('html/Common/StockPage', [], false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
     }
-    
+
     public function cardpage($vars)
     {
         $body = View::forge('html/Common/CardPage', [], false)->render();
@@ -88,5 +90,10 @@ class TopController extends Controller
         $body = View::forge('html/Common/OptionPage', [], false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
     }
-}
 
+    public function itemrequestpage($vars)
+    {
+        $body = View::forge('html/Common/ItemRequestPage', [], false)->render();
+        echo view('html/Common/Template', compact('body'), false)->render();
+    }
+}
