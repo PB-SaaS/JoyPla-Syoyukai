@@ -15,7 +15,9 @@
             :rules="{ required : true }"
             title="発注部署指定" 
             :disabled="values.divisionId != '' && fields.length > 0"
-            :is-only-my-division="<?php var_export(gate('register_of_unordered_slips')->isOnlyMyDivision()) ?>"
+            :is-only-my-division="<?php var_export(
+                gate('register_of_unordered_slips')->isOnlyMyDivision()
+            ); ?>"
             />
           </div>
           <div class="my-4 grid grid-cols-3 gap-4 lg:w-1/3 items-center">
@@ -218,7 +220,7 @@ var JoyPlaApp = Vue.createApp({
         items.forEach(function(item, idx){
           if( item.orderUnitQuantity != 0 ){ orderItems.push({
             'inHospitalItemId': item.inHospitalItemId,
-            'orderUnitQuantity': item.orderUnitQuantity,
+            'orderUnitQuantity': parseInt(item.orderUnitQuantity),
             'divisionId' : values.divisionId,
           })}
         });
@@ -226,7 +228,7 @@ var JoyPlaApp = Vue.createApp({
       };
 
       const orderPrice = (idx) => {
-        return values.orderItems[idx].price * values.orderItems[idx].orderUnitQuantity;
+        return values.orderItems[idx].price * parseInt(values.orderItems[idx].orderUnitQuantity);
       };
 
       const totalAmount = () => {
@@ -382,19 +384,19 @@ var JoyPlaApp = Vue.createApp({
         if(items.type == "payout")
         {
           items.item.forEach((x , id)=>{
-            items.item[id].orderUnitQuantity = Math.ceil(items.item[id].payoutQuantity / items.item[id].quantity);
+            items.item[id].orderUnitQuantity = Math.ceil(parseInt(items.item[id].payoutQuantity) / parseInt(items.item[id].quantity));
           });
         }
         if(items.type == "card")
         {
           items.item.forEach((x , id)=>{
-            items.item[id].orderUnitQuantity = Math.ceil(items.item[id].cardQuantity / items.item[id].quantity);
+            items.item[id].orderUnitQuantity = Math.ceil(parseInt(items.item[id].cardQuantity) / parseInt(items.item[id].quantity));
           });
         }
         if(items.type == "customlabel")
         {
           items.item.forEach((x , id)=>{
-            items.item[id].orderUnitQuantity = Math.ceil(items.item[id].customQuantity / items.item[id].quantity);
+            items.item[id].orderUnitQuantity = Math.ceil(parseInt(items.item[id].customQuantity) / parseInt(items.item[id].quantity));
           });
         }
 
