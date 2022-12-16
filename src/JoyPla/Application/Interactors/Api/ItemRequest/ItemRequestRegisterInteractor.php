@@ -1,0 +1,238 @@
+<?php
+
+/***
+ * USECASE
+ */
+
+namespace JoyPla\Application\Interactors\Api\ItemRequest {
+    use App\Model\Division;
+    use App\SpiralDb\StockView;
+    use Exception;
+    use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestRegisterInputPortInterface;
+    use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestRegisterInputData;
+    use JoyPla\Application\OutputPorts\Api\ItemRequest\ItemRequestRegisterOutputData;
+    use JoyPla\Application\OutputPorts\Api\ItemRequest\ItemRequestRegisterOutputPortInterface;
+    use JoyPla\Enterprise\Models\RequestId;
+    use JoyPla\Enterprise\Models\RequestHId;
+    use JoyPla\Enterprise\Models\ItemRequest;
+    use JoyPla\Enterprise\Models\RequestItem;
+    use JoyPla\Enterprise\Models\DateYearMonthDayHourMinutesSecond;
+    use JoyPla\Enterprise\Models\RequestType;
+    use JoyPla\Enterprise\Models\DivisionId;
+    use JoyPla\Enterprise\Models\Hospital;
+    use JoyPla\Enterprise\Models\HospitalId;
+    use JoyPla\Enterprise\Models\HospitalName;
+    use JoyPla\Enterprise\Models\RequestItemCount;
+    use JoyPla\Enterprise\Models\Pref;
+    use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRequestRepositoryInterface;
+    use JoyPla\InterfaceAdapters\GateWays\Repository\RequestItemCountRepositoryInterface;
+
+    /**
+     * Class ItemRequestRegisterInteractor
+     * @package JoyPla\Application\Interactors\ItemRequest\Api
+     */
+    class ItemRequestRegisterInteractor implements ItemRequestRegisterInputPortInterface
+    {
+        /** @var ItemRequestRegisterOutputPortInterface */
+        private ItemRequestRegisterOutputPortInterface $outputPort;
+
+        /** @var ItemRequestRepositoryInterface */
+        private ItemRequestRepositoryInterface $itemRequestRepository;
+
+        /** @var RequestItemCountRepositoryInterface */
+        private RequestItemCountRepositoryInterface $requestItemCountRepository;
+        /**
+         * ItemRequestRegisterInteractor constructor.
+         * @param ItemRequestRegisterOutputPortInterface $outputPort
+         */
+        public function __construct(
+            ItemRequestRegisterOutputPortInterface $outputPort,
+            ItemRequestRepositoryInterface $itemRequestRepository,
+            RequestItemCountRepositoryInterface $requestItemCountRepository
+        ) {
+            $this->outputPort = $outputPort;
+            $this->itemRequestRepository = $itemRequestRepository;
+            $this->requestItemCountRepository = $requestItemCountRepository;
+        }
+
+        /**
+         * @param ItemRequestRegisterInputData $inputData
+         */
+        public function handle(ItemRequestRegisterInputData $inputData)
+        {
+            $hospitalId = new HospitalId($inputData->user->hospitalId);
+            $requestType = new RequestType($inputData->requestType);
+
+            $inputData->requestItems = array_map(function ($v) use ($inputData) {
+                if ($inputData->isOnlyMyDivision && $inputData->user->divisionId !== $v->sourceDivisionId) {
+                    throw new Exception('Illegal request', 403);
+                }
+                return $v;
+            }, $inputData->requestItems);
+
+            $requestItems = $this->ItemRequestRepository->findByInHospitalItem($hospitalId, $inputData->requestItems);
+
+            $ids = [];
+            $result = [];
+
+            foreach ($requestItems as $i) {
+                $exist = false;
+                foreach ($result as $key => $r) {
+                    if ($r->equalDivisions($i->getSourceDivision(), $i->targetDivision())) {
+                        $exist = true;
+                        $result[ $key ] = $r->addItemRequest($i);
+                    }
+                }
+                if ($exist) {
+                    continue;
+                }
+
+                $id = RequestHId::generate();
+                $ids[] = $id->value();
+                //登録時には病院名は必要ないので、いったんhogeでいい
+                $result[] = new ItemRequest(
+                    $id,
+                    ( new DateYearMonthDayHourMinutesSecond("") ),
+                    ( new DateYearMonthDayHourMinutesSecond("") ),
+                    [$i],
+                    new Hospital(
+                        $hospitalId,
+                        ( new HospitalName('hoge') ),
+                        "",
+                        "",
+                        new Pref(""),
+                        ""
+                    ),
+                    $i->getSourceDivision(),
+                    $i->getTargetDivision(),
+                    $requestType,
+                    $inputData->user->name
+                );
+            }
+
+            $this->ItemRequestRepository->saveToArray($result);
+
+            $stockViewInstance = StockView::where('hospitalId', $hospitalId->value());
+            foreach ($result as $itemRequest) {
+                $stockViewInstance->orWhere('divisionId', $itemRequest->getSourceDivision()->getDivisionId()->value());
+                foreach ($itemRequest->getRequestItems() as $requestItem) {
+                    $stockViewInstance->orWhere('inHospitalItemId', $requestItem->getInHospitalItemId()->value());
+                }
+            }
+
+            $stocks = $stockViewInstance->get();
+
+            if ((int)$stocks->count === 0) {
+                throw new Exception("Stocks don't exist.");
+            }
+
+            $requestItemCounts = [];
+            foreach ($result as $itemRequest) {
+                foreach ($itemRequest->getRequestItems() as $item) {
+                    foreach ($stocks->data->all() as $stock) {
+                        if (($itemRequest->getSourceDivision()->getDivisionId()->value() === $stock->divisionId) &&
+                        ($item->getInHospitalItemId()->value() === $stock->inHospitalItemId)) {
+                            $requestItemCounts[] = new RequestItemCount(
+                                $stock->recordId,
+                                $hospitalId,
+                                $itemRequest->getSourceDivision(),
+                                $item->getInHospitalItemId(),
+                                $item->getItem()->getItemId(),
+                                $item->getRequestQuantity()->value()
+                            );
+                        }
+                    }
+                }
+            }
+
+            $this->RequestItemCountRepository->saveToArray($requestItemCounts);
+
+            $this->ItemRequestRepository->sendRegistrationMail($result, $inputData->user);
+
+            $this->outputPort->output(new ItemRequestRegisterOutputData($ids));
+        }
+    }
+}
+
+
+/***
+ * INPUT
+ */
+
+namespace JoyPla\Application\InputPorts\Api\ItemRequest {
+    use Auth;
+    use stdClass;
+
+    /**
+     * Class ItemRequestRegisterInputData
+     * @package JoyPla\Application\InputPorts\ItemRequest\Api
+     */
+    class ItemRequestRegisterInputData
+    {
+        /**
+         * ItemRequestRegisterInputData constructor.
+         */
+        public function __construct(Auth $user, array $requestItems, int $requestType, bool $isOnlyMyDivision)
+        {
+            $this->user = $user;
+            $this->requestItems = array_map(function ($v) {
+                $object = new stdClass();
+                $object->inHospitalItemId = $v['inHospitalItemId'];
+                $object->requestQuantity = $v['requestQuantity'];
+                $object->sourceDivisionId = $v['sourceDivisionId'];
+                $object->targetDivisionId = $v['targetDivisionId'];
+                return $object;
+            }, $requestItems);
+
+            $this->requestType = $requestType;
+            $this->isOnlyMyDivision = $isOnlyMyDivision;
+        }
+    }
+
+    /**
+     * Interface UserCreateInputPortInterface
+     * @package JoyPla\Application\InputPorts\ItemRequest\Api
+    */
+    interface ItemRequestRegisterInputPortInterface
+    {
+        /**
+         * @param ItemRequestRegisterInputData $inputData
+         */
+        public function handle(ItemRequestRegisterInputData $inputData);
+    }
+}
+
+/***
+ * OUTPUT
+ */
+
+namespace JoyPla\Application\OutputPorts\Api\ItemRequest {
+    /**
+     * Class ItemRequestRegisterOutputData
+     * @package JoyPla\Application\OutputPorts\ItemRequest\Api;
+     */
+    class ItemRequestRegisterOutputData
+    {
+        /** @var string */
+
+        /**
+         * ItemRequestRegisterOutputData constructor.
+         */
+        public function __construct(array $ids)
+        {
+            $this->ids = $ids;
+        }
+    }
+
+    /**
+     * Interface ItemRequestRegisterOutputPortInterface
+     * @package JoyPla\Application\OutputPorts\ItemRequest\Api;
+    */
+    interface ItemRequestRegisterOutputPortInterface
+    {
+        /**
+         * @param ItemRequestRegisterOutputData $outputData
+         */
+        public function output(ItemRequestRegisterOutputData $outputData);
+    }
+}
