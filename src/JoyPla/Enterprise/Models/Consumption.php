@@ -93,13 +93,6 @@ class Consumption
         return $this->setConsumptionItems($items);
     }
 
-    public function addConsumptionItemForReference(ConsumptionItemForReference $item)
-    {
-        $items = $this->consumptionItems;
-        $items[] = $item;
-        return $this->setConsumptionItems($items);
-    }
-
     public function setConsumptionItems(array $consumptionItems)
     {
         $consumptionItems = array_map(function (ConsumptionItem $v) {

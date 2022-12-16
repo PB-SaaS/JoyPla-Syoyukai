@@ -12,18 +12,16 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
     use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestRegisterInputData;
     use JoyPla\Application\OutputPorts\Api\ItemRequest\ItemRequestRegisterOutputData;
     use JoyPla\Application\OutputPorts\Api\ItemRequest\ItemRequestRegisterOutputPortInterface;
-    use JoyPla\Enterprise\Models\RequestId;
     use JoyPla\Enterprise\Models\RequestHId;
     use JoyPla\Enterprise\Models\ItemRequest;
-    use JoyPla\Enterprise\Models\RequestItem;
     use JoyPla\Enterprise\Models\DateYearMonthDayHourMinutesSecond;
     use JoyPla\Enterprise\Models\RequestType;
-    use JoyPla\Enterprise\Models\DivisionId;
     use JoyPla\Enterprise\Models\Hospital;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\Enterprise\Models\HospitalName;
     use JoyPla\Enterprise\Models\RequestItemCount;
     use JoyPla\Enterprise\Models\Pref;
+    use JoyPla\Enterprise\Models\TextFieldType64Bytes;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRequestRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\RequestItemCountRepositoryInterface;
 
@@ -41,6 +39,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
 
         /** @var RequestItemCountRepositoryInterface */
         private RequestItemCountRepositoryInterface $requestItemCountRepository;
+        
         /**
          * ItemRequestRegisterInteractor constructor.
          * @param ItemRequestRegisterOutputPortInterface $outputPort
@@ -70,7 +69,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 return $v;
             }, $inputData->requestItems);
 
-            $requestItems = $this->ItemRequestRepository->findByInHospitalItem($hospitalId, $inputData->requestItems);
+            $requestItems = $this-> itemRequestRepository->findByInHospitalItem($hospitalId, $inputData->requestItems);
 
             $ids = [];
             $result = [];
@@ -78,9 +77,9 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
             foreach ($requestItems as $i) {
                 $exist = false;
                 foreach ($result as $key => $r) {
-                    if ($r->equalDivisions($i->getSourceDivision(), $i->targetDivision())) {
+                    if ($r->equalDivisions($i->getSourceDivision(), $i->getTargetDivision())) {
                         $exist = true;
-                        $result[ $key ] = $r->addItemRequest($i);
+                        $result[ $key ] = $r->addRequestItem($i);
                     }
                 }
                 if ($exist) {
@@ -106,11 +105,11 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                     $i->getSourceDivision(),
                     $i->getTargetDivision(),
                     $requestType,
-                    $inputData->user->name
+                    ( new TextFieldType64Bytes($inputData->user->name) )
                 );
             }
 
-            $this->ItemRequestRepository->saveToArray($result);
+            $this->itemRequestRepository->saveToArray($result);
 
             $stockViewInstance = StockView::where('hospitalId', $hospitalId->value());
             foreach ($result as $itemRequest) {
@@ -135,7 +134,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                             $requestItemCounts[] = new RequestItemCount(
                                 $stock->recordId,
                                 $hospitalId,
-                                $itemRequest->getSourceDivision(),
+                                $itemRequest->getSourceDivision()->getDivisionId(),
                                 $item->getInHospitalItemId(),
                                 $item->getItem()->getItemId(),
                                 $item->getRequestQuantity()->value()
@@ -145,9 +144,9 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 }
             }
 
-            $this->RequestItemCountRepository->saveToArray($requestItemCounts);
+            $this->requestItemCountRepository->saveToArray($requestItemCounts);
 
-            $this->ItemRequestRepository->sendRegistrationMail($result, $inputData->user);
+            $this->itemRequestRepository->sendRegistrationMail($result, $inputData->user);
 
             $this->outputPort->output(new ItemRequestRegisterOutputData($ids));
         }
@@ -181,6 +180,7 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
                 $object->requestQuantity = $v['requestQuantity'];
                 $object->sourceDivisionId = $v['sourceDivisionId'];
                 $object->targetDivisionId = $v['targetDivisionId'];
+                $object->requestType = $v['requestType'];
                 return $object;
             }, $requestItems);
 

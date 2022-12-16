@@ -46,6 +46,7 @@ use JoyPla\InterfaceAdapters\Controllers\Api\NotificationController;
 use JoyPla\InterfaceAdapters\Controllers\Api\OrderController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ReceivedController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ReturnController;
+use JoyPla\InterfaceAdapters\Controllers\Api\StocktakingController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ReferenceController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ItemRequestController;
 use JoyPla\InterfaceAdapters\GateWays\Repository\BarcodeRepository;
@@ -155,7 +156,7 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () {
 
     Router::map('GET', '/api/reference/consumption', [ReferenceController::class,'consumption'])->service(new ConsumptionHistoryShowInteractor(new ConsumptionHistoryShowPresenter(), new ConsumptionHistoryRepository()));
 
-    Router::map('GET', '/api/itemrequest/register', [ItemRequestController::class, 'register'])->service(new ItemRequestRegisterInteractor(new ItemRequestRegisterPresenter(), new ItemRequestRepository(), new RequestItemCountRepository()));
+    Router::map('POST', '/api/itemrequest/register', [ItemRequestController::class, 'register'])->service(new ItemRequestRegisterInteractor(new ItemRequestRegisterPresenter(), new ItemRequestRepository(), new RequestItemCountRepository()));
 });
 
 $router = new Router();

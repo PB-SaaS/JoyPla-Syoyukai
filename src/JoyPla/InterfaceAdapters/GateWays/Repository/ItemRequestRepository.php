@@ -25,17 +25,18 @@ use JoyPla\Enterprise\Models\UnitPrice;
 
 class ItemRequestRepository implements ItemRequestRepositoryInterface
 {
+    /*
     public function findByHospitalId(HospitalId $hospitalId)
     {
-        $billingHistory = (SpiralDbItemRequest::where('hospitalId', $hospitalId->value())->get())->data->all();
+        $history = (SpiralDbItemRequest::where('hospitalId', $hospitalId->value())->get())->data->all();
 
-        return $billingHistory;
+        return $history;
     }
-
+*/
     public function findByInHospitalItem(HospitalId $hospitalId, array $requestItems)
     {
         $payoutUnitPriceUseFlag = (Hospital::where('hospitalId', $hospitalId->value())->value('payoutUnitPrice')->get())->data->get(0);
-        var_dump($payoutUnitPriceUseFlag);
+//        var_dump($payoutUnitPriceUseFlag);
         //$division = SpiralDbDivision::where('hospitalId',$hospitalId->value());
 
         $division = SpiralDB::title('NJ_divisionDB')->value([
@@ -108,13 +109,13 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
             return $itemRequest;
         }, $itemRequests);
 
-        $history = [];
+        $histories = [];
         $items = [];
 
         foreach ($itemRequests as $itemRequest) {
             $itemRequestToArray = $itemRequest->toArray();
 
-            $history[] = [
+            $histories[] = [
                 "requestHId" => (string)$itemRequestToArray['requestHId'],
                 "hospitalId" => (string)$itemRequestToArray['hospital']['hospitalId'],
                 "sourceDivisionId" => (string)$itemRequestToArray['sourceDivision']['divisionId'],
@@ -127,26 +128,26 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
                 "requestUserName" => (string)$itemRequestToArray['requestUserName'],
             ];
 
-            foreach ($itemRequestToArray['requestItems'] as $itemRequest) {
+            foreach ($itemRequestToArray['requestItems'] as $requestItem) {
                 $items[] = [
-                    "requestId" => (string)$itemRequestToArray['requestId'],
+                    "requestId" => (string)$requestItem['requestId'],
                     "requestHId" => (string)$itemRequestToArray['requestHId'],
-                    "hospitalId" => (string)$itemRequest['hospitalId'],
-                    "itemId" => (string)$itemRequest['item']['itemId'],
-                    "inHospitalItemId" => (string)$itemRequest['inHospitalItemId'],
-                    "sourceDivisionId" => (string)$itemRequest['sourceDivision']['divisionId'],
-                    "targetDivisionId" => (string)$itemRequest['sourceDivision']['divisionId'],
-                    "requestQuantity" => (string)$itemRequest['requestQuantity'],
-                    "quantity" => (string)$itemRequest['quantity']['quantityNum'],
-                    "quantityUnit" => (string)$itemRequest['quantity']['quantityUnit'],
-                    "itemUnit" => (string)$itemRequest['quantity']['itemUnit'],
-                    "price" => (string)$itemRequest['price'],
-                    "unitPrice" => (string)$itemRequest['unitPrice'],
+                    "hospitalId" => (string)$requestItem['hospitalId'],
+                    "itemId" => (string)$requestItem['item']['itemId'],
+                    "inHospitalItemId" => (string)$requestItem['inHospitalItemId'],
+                    "sourceDivisionId" => (string)$requestItem['sourceDivision']['divisionId'],
+                    "targetDivisionId" => (string)$requestItem['targetDivision']['divisionId'],
+                    "requestQuantity" => (string)$requestItem['requestQuantity'],
+                    "quantity" => (string)$requestItem['quantity']['quantityNum'],
+                    "quantityUnit" => (string)$requestItem['quantity']['quantityUnit'],
+                    "itemUnit" => (string)$requestItem['quantity']['itemUnit'],
+                    "price" => (string)$requestItem['price'],
+                    "unitPrice" => (string)$requestItem['unitPrice'],
                 ];
             }
         }
-
-        SpiralDbItemRequest::insert($history);
+        
+        SpiralDbItemRequest::insert($histories);
         SpiralDbRequestItem::insert($items);
 
         return $itemRequests;
@@ -161,18 +162,18 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
         $registrationMailViewModel = [];
 
         foreach ($itemRequests as $itemRequest) {
-            $itemRequestsToArray = $itemRequest->toArray();
+            $itemRequestToArray = $itemRequest->toArray();
             $registrationMailViewModel[] = [
-                'requestHId' => $itemRequestsToArray['requestHId'],
-                'sourceDivisionName' => $itemRequestsToArray['sourceDivision']['divisionName'],
-                'targetDivisionName' => $itemRequestsToArray['targetDivision']['divisionName'],
-                'itemCount' => number_format_jp($itemRequestsToArray['itemCount']),
+                'requestHId' => $itemRequestToArray['requestHId'],
+                'sourceDivisionName' => $itemRequestToArray['sourceDivision']['divisionName'],
+                'targetDivisionName' => $itemRequestToArray['targetDivision']['divisionName'],
+                'itemCount' => number_format_jp($itemRequestToArray['itemCount']),
             ];
         }
 
         $mailBody = view('mail/ItemRequest/Register', [
             'name' => '%val:usr:name%',
-            'hospitalName' => $itemRequest[0]->getHospital()->getHospitalName()->value(),
+            'hospitalName' => $itemRequests[0]->getHospital()->getHospitalName()->value(),
             'requestUserName' => $user->name,
             'histories' => $registrationMailViewModel,
             'url' => config('url.hospital', ''),
@@ -180,7 +181,7 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
 
         $ids = SpiralDb::title('NJ_HUserDB')->where('hospitalId', $user->hospitalId)->value('id')->whereIn('userPermission', [1,3])->get();
 
-        $mailId = SpiralDb::mail('NJ_HUserDB')->subject('[JoyPla] 未発注書が作成されました')
+        $mailId = SpiralDb::mail('NJ_HUserDB')->subject('[JoyPla] 請求書が作成されました')
             ->standby(false)->reserveDate('now')->bodyText($mailBody)->formAddress(FROM_ADDRESS)->formName(FROM_NAME)->mailField('mailAddress')->regist();
 
         $ids = array_values(array_column($ids->toArray(), 'id'));
@@ -297,7 +298,7 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
 
 interface ItemRequestRepositoryInterface
 {
-    public function findByHospitalId(HospitalId $hospitalId);
+//    public function findByHospitalId(HospitalId $hospitalId);
     public function findByInHospitalItem(HospitalId $hospitalId, array $itemRequests);
     public function saveToArray(array $itemRequests);
     public function sendRegistrationMail(array $itemRequests, Auth $user);

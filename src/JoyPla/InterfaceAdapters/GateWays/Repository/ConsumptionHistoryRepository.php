@@ -7,11 +7,10 @@ use App\SpiralDb\ConsumptionView;
 use App\SpiralDb\InHospitalItemView;
 use Exception;
 use framework\SpiralConnecter\SpiralDB;
-use JoyPla\Enterprise\Models\Consumption;
+use JoyPla\Enterprise\Models\ConsumptionForReference;
 use JoyPla\Enterprise\Models\ConsumptionItemForReference;
 use JoyPla\Enterprise\Models\HospitalId;
-use stdClass;
-
+use Collection;
 class ConsumptionHistoryRepository implements ConsumptionHistoryRepositoryInterface
 {
     public function search(HospitalId $hospitalId, object $search)
@@ -35,13 +34,16 @@ class ConsumptionHistoryRepository implements ConsumptionHistoryRepositoryInterf
 
         $consumptionItemViewInstance = ConsumptionItemView::where('hospitalId', $hospitalId->value());
 
+//        $consumptionItemViewInstance = ConsumptionItemView::getNewInstance()->where('hospitalId',$hospitalId->value())->value('inHospitalItemId');
         foreach ($histories->data->all() as $history) {
             $consumptionItemViewInstance->orWhere('billingNumber', $history->billingNumber);
         }
-
         $itemViewInstance = InHospitalItemView::where('notUsedFlag', '1', '!=')->where('hospitalId', $hospitalId->value());
 
         $consumptionItems = $consumptionItemViewInstance->get();
+        if ((int)$consumptionItems->count === 0) {
+            return [[],0];
+        }
 
         foreach ($consumptionItems->data->all() as $consumptionItem) {
             $itemViewInstance->orWhere('inHospitalItemId', $consumptionItem->inHospitalItemId);
@@ -53,10 +55,11 @@ class ConsumptionHistoryRepository implements ConsumptionHistoryRepositoryInterf
         }
 
         $merging = [];
+        
         foreach ($consumptionItems->data->all() as $consumptionItem) {
             foreach ($items->data->all() as $item) {
                 if ($consumptionItem->inHospitalItemId === $item->inHospitalItemId) {
-                    $tmp = new stdClass();
+                    $tmp = new Collection();
                     $tmp->billingNumber = $consumptionItem->billingNumber;
                     $tmp->inHospitalItemId = $consumptionItem->inHospitalItemId;
                     $tmp->hospitalId = $consumptionItem->hospitalId;
@@ -64,6 +67,7 @@ class ConsumptionHistoryRepository implements ConsumptionHistoryRepositoryInterf
                     $tmp->divisionId = $consumptionItem->divisionId;
                     $tmp->divisionName = $consumptionItem->divisionName;
                     $tmp->inItemImage = $item->inItemImage;
+                    $tmp->quantity = $item->quantity;
                     $tmp->price = $item->price;
                     $tmp->unitPrice = $item->unitPrice;
                     $tmp->quantityNum = $item->quantity;
@@ -84,7 +88,7 @@ class ConsumptionHistoryRepository implements ConsumptionHistoryRepositoryInterf
 
         $consumptions = [];
         foreach ($histories->data->all() as $history) {
-            $consumption = Consumption::create($history);
+            $consumption = ConsumptionForReference::create($history);
 
             foreach ($merging as $item) {
                 if ($consumption->getConsumptionId()->equal($item->billingNumber)) {
@@ -94,7 +98,7 @@ class ConsumptionHistoryRepository implements ConsumptionHistoryRepositoryInterf
 
             $consumptions[] = $consumption;
         }
-
+        
         return [ $consumptions , $histories->count ];
     }
 }

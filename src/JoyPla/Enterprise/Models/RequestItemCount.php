@@ -10,7 +10,7 @@ class RequestItemCount
         DivisionId $divisionId,
         InHospitalItemId $inHospitalItemId,
         ItemId $itemId,
-        int $quantity = 0,
+        int $quantity = 0
     ) {
         $this->recordId = $recordId;
         $this->hospitalId = $hospitalId;

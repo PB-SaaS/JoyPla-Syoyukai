@@ -9,7 +9,7 @@ namespace JoyPla\Application\Interactors\Api\Reference {
     use JoyPla\Application\InputPorts\Api\Reference\ConsumptionHistoryShowInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\Reference\ConsumptionHistoryShowOutputData;
     use JoyPla\Application\OutputPorts\Api\Reference\ConsumptionHistoryShowOutputPortInterface;
-    use JoyPla\Enterprise\Models\Consumption;
+    use JoyPla\Enterprise\Models\ConsumptionForReference;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ConsumptionHistoryRepositoryInterface;
 
@@ -44,6 +44,7 @@ namespace JoyPla\Application\Interactors\Api\Reference {
                 (new HospitalId($inputData->hospitalId)),
                 $inputData->search
             );
+            
             $this->outputPort->output(new ConsumptionHistoryShowOutputData($histories, $count));
         }
     }
@@ -94,7 +95,7 @@ namespace JoyPla\Application\InputPorts\Api\Reference {
  */
 
 namespace JoyPla\Application\OutputPorts\Api\Reference {
-    use JoyPla\Enterprise\Models\Consumption;
+    use JoyPla\Enterprise\Models\ConsumptionForReference;
 
     /**
      * Class ConsumptionHistoryShowOutputData
@@ -112,8 +113,8 @@ namespace JoyPla\Application\OutputPorts\Api\Reference {
         {
             $this->count = $count;
             $this->histories = array_map(
-                function (Consumption $histories) {
-                    return $histories->toArray();
+                function (ConsumptionForReference $history) {
+                    return $history->toArray();
                 },
                 $histories
             );

@@ -30,7 +30,7 @@ class ReferenceController extends Controller
         if ($gate->isOnlyMyDivision()) {
             $search['divisionIds'] = [$this->request->user()->divisionId];
         } else {
-            $search['divisionIds'] = $this->request->get('divisionIds');
+            $search['divisionIds'] = [$this->request->get('divisionIds')];
         }
 
         $inputData = new ConsumptionHistoryShowInputData($this->request->user()->hospitalId, $search);

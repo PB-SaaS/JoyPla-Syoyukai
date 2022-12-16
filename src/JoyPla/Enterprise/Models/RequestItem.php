@@ -31,7 +31,7 @@ class RequestItem
         RequestType $requestType,
         Quantity $quantity,
         Price $price,
-        UnitPrice $unitPrice,
+        UnitPrice $unitPrice
     ) {
         $this->requestId = $requestId;
         $this->requestHId = $requestHId;
@@ -87,8 +87,8 @@ class RequestItem
 
     public function equalDivisions(Division $sourceDivision, Division $targetDivision)
     {
-        return ($this->sourceDivision->getDivisionId()->value() === $sourceDivision->getDivisionId()->value() &&
-        $this->targetDivision->getDivisionId()->value() === $targetDivision->getDivisionId()->value());
+        return (($this->sourceDivision->getDivisionId()->value() === $sourceDivision->getDivisionId()->value()) &&
+        ($this->targetDivision->getDivisionId()->value() === $targetDivision->getDivisionId()->value()));
     }
 
     public function price()

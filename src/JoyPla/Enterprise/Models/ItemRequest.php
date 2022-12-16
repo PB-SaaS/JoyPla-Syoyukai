@@ -7,14 +7,14 @@ use Collection;
 class ItemRequest
 {
     private RequestHId $requestHId;
-    private DateYearMonthDayHourMinutesSecond $registDate;
-    private DateYearMonthDayHourMinutesSecond $orderDate;
+    private DateYearMonthDayHourMinutesSecond $registrationTime;
+    private DateYearMonthDayHourMinutesSecond $updateTime;
     private array $requestItems;
     private Hospital $hospital;
     private Division $sourceDivision;
     private Division $targetDivision;
     private RequestType $requestType;
-    private string $requestUserName;
+    private TextFieldType64Bytes $requestUserName;
 
     public function __construct(
         RequestHId $requestHId,
@@ -25,7 +25,7 @@ class ItemRequest
         Division $sourceDivision,
         Division $targetDivision,
         RequestType $requestType,
-        string $requestUserName = "",
+        TextFieldType64Bytes $requestUserName
     ) {
         $this->requestHId = $requestHId;
         $this->registrationTime = $registrationTime;
@@ -51,9 +51,15 @@ class ItemRequest
             (Division::create($input->sourceDivision)),
             (Division::create($input->targetDivision)),
             (new RequestType($input->requestType) ),
-            $input->requestUserName,
+            (new TextFieldType64Bytes($input->requestUserName) )
         );
     }
+    
+    public function getHospital()
+    {
+        return $this->hospital;
+    }
+    
     public function getRequestHId()
     {
         return $this->requestHId;
@@ -76,8 +82,8 @@ class ItemRequest
 
     public function equalDivisions(Division $sourceDivision, Division $targetDivision)
     {
-        return ($this->sourceDivision->getDivisionId()->value() === $sourceDivision->getDivisionId()->value() &&
-        $this->targetDivision->getDivisionId()->value() === $targetDivision->getDivisionId()->value());
+        return (($this->sourceDivision->getDivisionId()->value() === $sourceDivision->getDivisionId()->value()) &&
+        ($this->targetDivision->getDivisionId()->value() === $targetDivision->getDivisionId()->value()));
     }
 
     public function totalAmount()
@@ -99,7 +105,7 @@ class ItemRequest
         return count(array_unique($array));
     }
 
-    public function addItemRequest(RequestItem $item)
+    public function addRequestItem(RequestItem $item)
     {
         $items = $this->requestItems;
         $items[] = $item;
@@ -141,7 +147,7 @@ class ItemRequest
             'requestTypeToString' => $this->requestType->toString(),
             'totalAmount' => $this->totalAmount(),
             'itemCount' => $this->itemCount(),
-            'requestUserName' => $this->requestUserName,
+            'requestUserName' => $this->requestUserName->value()
         ];
     }
 }

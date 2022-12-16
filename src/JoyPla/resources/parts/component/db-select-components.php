@@ -1379,16 +1379,17 @@ listGet();
 const searchCount = ref(0);
 
 const listGet = () => {
-if (values.sourceDivisionId == "") {
+  console.log(props.sourceDivisionId);
+if (props.sourceDivisionId == "") {
 MicroModal.close("consumptionHistoryModalForItemRequest");
 return false;
 }
 
 //setParams();
-console.log(values);
+//console.log(values);
 let params = new URLSearchParams();
 params.append("path", "/api/reference/consumption");
-params.append("divisionIds", [values.sourceDivisionId]);
+params.append("divisionIds", props.sourceDivisionId);
 params.append("search", JSON.stringify(encodeURIToObject(values)));
 params.append("_csrf", _CSRF);
 
@@ -1400,6 +1401,7 @@ axios
 response.data.data.forEach((item, idx) => {
 response.data.data[idx].open = false;
 });
+console.log(response.data);
 consumptions.value = response.data.data;
 //console.log(consumptions.value);
 totalCount.value = parseInt(response.data.count);

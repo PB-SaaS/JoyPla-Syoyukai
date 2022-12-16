@@ -9,12 +9,12 @@ use Exception;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Routing\Router;
-use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestDeleteInputData;
-use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestDeleteInputPortInterface;
 use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestRegisterInputData;
 use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestRegisterInputPortInterface;
-use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestShowInputData;
-use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestShowInputPortInterface;
+//use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestDeleteInputData;
+//use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestDeleteInputPortInterface;
+//use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestShowInputData;
+//use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestShowInputPortInterface;
 
 class ItemRequestController extends Controller
 {
