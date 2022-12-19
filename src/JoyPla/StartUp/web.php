@@ -166,6 +166,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
 //    Router::map('GET', '/itemrequest/:itemRequestHId', [ItemRequestController::class, 'index'])->service(new ItemRequestIndexInteractor(new ItemRequestIndexPresenter(), new ItemRequestRepository()));
 
     Router::map('GET', '/itemrequest/show', [ItemRequestController::class, 'show']);
+
+    Router::map('GET', '/product/ItemAndPriceAndInHospitalRegist/input', [ItemAndPriceAndInHospitalItemRegisterController::class , 'register']);
+    Router::map('POST', '/product/ItemAndPriceAndInHospitalRegist/confirm', [ItemAndPriceAndInHospitalItemRegisterController::class , 'confirm']);
+    Router::map('POST', '/product/ItemAndPriceAndInHospitalRegist/thanks', [ItemAndPriceAndInHospitalItemRegisterController::class , 'thanks']);
+
 });
 
 $router = new Router();

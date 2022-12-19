@@ -91,17 +91,34 @@ namespace JoyPla\Application\InputPorts\Api\Item {
          */
         public function __construct(string $tenantId, string $hospitalId, array $input)
         {
+            $this->tenantId = $tenantId;
             $this->hospitalId = $hospitalId;
             $this->input = new stdClass();
             $this->input->itemName = $input['itemName'];
-            $this->input->makerName = $input['makerName'];
+            $this->input->category = $input['category'];
+            $this->input->smallCategory = $input['smallCategory'];
             $this->input->itemCode = $input['itemCode'];
             $this->input->itemStandard = $input['itemStandard'];
             $this->input->itemJANCode = $input['itemJANCode'];
+            $this->input->makerName = $input['makerName'];
+            $this->input->catalogNo = $input['catalogNo'];
+            $this->input->serialNo = $input['serialNo'];
+            $this->input->lotManagement = $input['lotManagement'];
+            $this->input->officialFlag = $input['officialFlag'];
+            $this->input->officialprice = $input['officialprice'];
+            $this->input->officialpriceOld = $input['officialpriceOld'];
+            $this->input->quantity = $input['quantity'];
+            $this->input->quantityUnit = $input['quantityUnit'];
+            $this->input->itemUnit = $input['itemUnit'];
+            $this->input->minPrice = $input['minPrice'];
             $this->input->distributorId = $input['distributorId'];
-            $this->input->perPage = $input['perPage'];
-            $this->input->currentPage = $input['currentPage'];
-            $this->input->isNotUse = '0';
+            $this->input->distributorMCode = $input['distributorMCode'];
+            $this->input->price = $input['price'];
+            $this->input->unitPrice = $input['unitPrice'];
+            $this->input->medicineCategory = $input['medicineCategory'];
+            $this->input->homeCategory = $input['homeCategory'];
+            $this->input->measuringInst = $input['measuringInst'];
+            $this->input->notice = $input['notice'];
         }
     }
 

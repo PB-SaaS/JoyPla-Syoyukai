@@ -6,12 +6,6 @@ use App\SpiralDb\HospitalUser;
 use Auth;
 use Csrf;
 use framework\Http\Controller;
-use JoyPla\Application\InputPorts\Api\Item\ItemRegisterInputData;
-use JoyPla\Application\InputPorts\Api\Item\ItemRegisterInputPortInterface;
-use JoyPla\Application\InputPorts\Api\Price\PriceRegisterInputData;
-use JoyPla\Application\InputPorts\Api\Price\PriceRegisterInputPortInterface;
-use JoyPla\Application\InputPorts\Api\InHospitalItem\InHospitalItemRegisterInputData;
-use JoyPla\Application\InputPorts\Api\InHospitalItem\InHospitalItemRegisterInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Item\ItemAndPriceAndInHospitalItemRegisterInputData;
 use JoyPla\Application\InputPorts\Api\Item\ItemAndPriceAndInHospitalItemRegisterInputPortInterface;
 
@@ -29,7 +23,7 @@ class ItemAndPriceAndInHospitalItemController extends Controller
 
         $gate = Gate::getGateInstance('register_of_item_and_price_and_inHospitalItem');
 
-        $item_and_price_and_inHospitalItemItem = $this->request->get('item_and_price_and_inHospitalItemItem');
+        $item_and_price_and_inHospitalItemItem = (array)$this->request;
 
         $user = $this->request->user();
 

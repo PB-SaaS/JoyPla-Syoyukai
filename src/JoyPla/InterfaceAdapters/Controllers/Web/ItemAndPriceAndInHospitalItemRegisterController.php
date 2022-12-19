@@ -7,19 +7,24 @@ use App\SpiralDb\Distributor;
 use App\SpiralDb\Item;
 use Auth;
 use Csrf;
+use Collection;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Http\View;
+use framework\Http\Request;
 use framework\Routing\Router;
+use framework\SpiralConnecter\SpiralDB;
 use framework\Library\SiValidator;
-use framework\Library\SiValidator\SpiralDbUniqueRule;
+use framework\Library\SpiralDbUniqueRule;
 
-SiValidator::defineRule("janTenantUnique", function($value){
+/* 
+SiValidator::defineRule("janTenantUnique", function($value, $param){
     SpiralDbUniqueRule::unique("NJ_itemDB","itemJANCode", function($spiralDb){
         $spiralDb -> where("tenantId", $this->request->user()->tenantId);
         return $spiralDb;    
     });
 });
+ */
 
 class ItemAndPriceAndInHospitalItemRegisterController extends Controller
 {
@@ -51,6 +56,7 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
         "homeCategory",
         "measuringInst",
         "notice",
+        "janTenantId",
     ];
 
     private array $rules = [
@@ -59,7 +65,7 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
         "smallCategory" => ['maxword:128'],
         "itemCode" => ['maxword:128'],
         "itemStandard" => ['maxword:128'],
-        "itemJANCode" => ['required', 'digits:13', 'janTenantUnique'],
+        "itemJANCode" => ['required', 'digits:13',],
         "makerName" => ['maxword:128'],
         "catalogNo" => ['maxword:128'],
         "serialNo" => ['maxword:128'],
@@ -79,6 +85,7 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
         "homeCategory" => ['maxword:512'],
         "measuringInst" => ['maxword:128'],
         "notice" => ['maxword:512'],
+        "janTenantId" => ["spiralDbUnique"],
     ];
 
     private array $labels = [
@@ -107,22 +114,19 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
         "homeCategory" => "保険請求分類（在宅）",
         "measuringInst" => "測定機器名",
         "notice" => "特記事項",
+        "janTenantId" => "JANコード",
     ];
-    
-/* 
+
     public function __construct(Request $request)
     {
         parent::__construct($request);
     }
 
-    function ownTenantId($spiralDb){
-        $spiralDb -> where("tenantId", $this->request->user()->tenantId);
-        return $spiralDb;
-    }
- */
     public function register($vars) {
         $user = ($this->request->user());
         $input = $this->request->only($this->input);
+        $itemJANCode = $input["itemJANCode"];
+        $input["janTenantId"] = $itemJANCode . $this->request->user()->tenantId;
         if($this->request->confirm){
             $validate = SiValidator::make(
                 $input,
@@ -130,18 +134,20 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
                 $this->labels
             );
         }
-        $distributor = Distributor::where('hospitalId', $this->request->user()->hospitalId)
+
+        $distributor = SpiralDB::title("NJ_distributorDB") 
+            ->where('hospitalId', $this->request->user()->hospitalId)
             ->value([
                 'distributorId',
                 'distributorName',
-            ])->get();
+            ])->get()->toArray();
 
         if($user->userPermission == "1" || $user->userPermission == "3")
         {
             $body = view('html/Product/ItemAndPriceAndInHospitalItemRegist/input' , [
                 'distributor' => $distributor,
-                'input' => $input,
-                'errors' => $validate,
+                'input' => $this->request->all(),
+                'validate' => $validate,
                 'csrf' => Csrf::generate(),
             ]);
             echo view('html/Common/Template', compact('body'), false)->render();
@@ -159,6 +165,8 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
         Csrf::validate($this->request->_csrf,true);
 
         $input = $this->request->only($this->input);
+        $itemJANCode = $input["itemJANCode"];
+        $input["janTenantId"] = $itemJANCode . $this->request->user()->tenantId;
         $this->request->session()->put($this->formName, $input);
         
         $validate = SiValidator::make(
@@ -169,21 +177,22 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
 
         if( $validate->isError() ){
             $this->request->set('confirm' , true);
-            Router::redirect('ItemAndPriceAndInHospitalItemRegistForm',$this->request);
+            Router::redirect('/product/ItemAndPriceAndInHospitalRegist/input',$this->request);
             exit;
         }
 
-        $distributor = Distributor::where('hospitalId', $this->request->user()->hospitalId)
+        $distributor = SpiralDB::title("NJ_distributorDB") -> where('hospitalId', $this->request->user()->hospitalId)
             ->where('distributorId', $this->request->get('distributorId'))
             ->value([
                 'distributorName',
-            ])->get();
+            ])->get()->toArray();
 
         if($user->userPermission == "1" || $user->userPermission == "3")
         {
             $body = view('html/Product/ItemAndPriceAndInHospitalItemRegist/confirm' , [
                 'distributor' => $distributor,
                 'input' => $this->request->all(),
+                'validate' => $validate,
                 'csrf' => Csrf::generate()
             ]);
             echo view("html/Common/Template", compact("body"), false);
@@ -210,7 +219,7 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
         
         if( $this->request->formBack || $validate->isError()){
             $this->request->set('confirm' , true);
-            Router::redirect('ItemAndPriceAndInHospitalItemRegistForm',$this->request);
+            Router::redirect('/product/ItemAndPriceAndInHospitalRegist/input',$this->request);
             exit;
         }
 

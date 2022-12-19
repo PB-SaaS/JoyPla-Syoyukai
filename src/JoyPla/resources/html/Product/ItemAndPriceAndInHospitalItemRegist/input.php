@@ -1,292 +1,737 @@
-<div class="uk-width-2-3@m uk-margin-auto uk-margin-remove-top uk-margin-bottom" id="mainPage">
+<?php
+if($validate){
+    $val = $validate->getResults();
+    $is_error = $validate->isError();
+}
+?>
+<div id="top" v-cloak>
+    <v-loading :show="loading"></v-loading>
+    <header-navi></header-navi>
+    <v-breadcrumbs :items="breadcrumbs"></v-breadcrumbs>
+    <div id="content" class="flex h-full px-1">
+        <div class="flex-auto">
+            <div class="index container mx-auto mb-96">
+                <h1 class="text-2xl mb-2">商品情報登録 - 入力</h1>
+                <hr>
+                <div>
 
-    <h1>商品情報登録 - 入力</h1>
+                    <?php if($validate && $is_error): ?>
+                    <p class="header_emesg">入力内容に不備があります。入力された値をご確認ください</p>
+                    <?php endif ?>
+                    <p class="header_rmesg">必要事項をご入力の上、確認ボタンを押してください。</p>
 
-    <?php if($errors && $errors->isError()): ?>
-    <p class="header_emesg">入力内容に不備があります。入力された値をご確認ください</p>
-    <?php endif ?>
-    <p class="header_rmesg">必要事項をご入力の上、確認ボタンを押してください。</p>
+                    <form method="post" :action="_ROOT" name="regForm">
+                        <input type="hidden" name="_method" value="post">
+                        <input type="hidden" name="_csrf" value="<?= $csrf ?>">
+                        <input type="hidden" name="path" value="/product/ItemAndPriceAndInHospitalRegist/confirm">
+                        <div class="smp_tmpl">
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="itemName"
+                                :rules="{ required: true, }"
+                                label="商品名"
+                                title="商品名"
+                                >
+                                </v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    商品名 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="itemName" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['itemName']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['itemName']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['itemName']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-select
+                                name="category"
+                                label="分類"
+                                title="分類"
+                                :options="[
+                                    { value: '1',  label: '医療材料' },
+                                    { value: '2',  label: '薬剤' },
+                                    { value: '3',  label: '試薬' },
+                                    { value: '4',  label: '日用品' },
+                                    { value: '99', label: 'その他' },
+                                ]"
+                                errorMessage="<?= ($is_error)? $val['category']['message'] : '' ?>"
+                                >
+                                </v-select>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    分類
+                                </div>
+                                <div class="relative">
+                                    <select name="category"
+                                    class="appearance-none border w-full py-2 px-3 leading-tight 
+                                    <?= ($is_error && $val['category']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    >
+                                        <option value="">----- 選択してください -----</option>
+                                        <option value="1">医療材料</option>
+                                        <option value="2">薬剤</option>
+                                        <option value="3">試薬</option>
+                                        <option value="4">日用品</option>
+                                        <option value="99">その他</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <span class="text-red-500"><?php echo html($val['category']['message']) ?></span>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="smallCategory"
+                                label="小分類"
+                                title="小分類"
+                                errorMessage="<?= ($is_error)? $val['smallCategory']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    小分類
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="smallCategory" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['smallCategory']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['smallCategory']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['smallCategory']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="itemCode"
+                                label="製品コード"
+                                title="製品コード"
+                                errorMessage="<?= ($is_error)? $val['itemCode']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    製品コード
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="itemCode" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['itemCode']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['itemCode']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['itemCode']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="itemStandard"
+                                label="規格"
+                                title="規格"
+                                errorMessage="<?= ($is_error)? $val['itemStandard']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    規格
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="itemStandard" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['itemStandard']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['itemStandard']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['itemStandard']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="itemJANCode"
+                                label="JANコード"
+                                title="JANコード"
+                                :rules="{ required: true, regex: /^\d{13}$/}"
+                                errorMessage="<?= ($is_error)? $val['itemJANCode']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    JANコード <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="itemJANCode" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['itemJANCode']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['itemJANCode']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['itemJANCode']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="makerName"
+                                label="メーカー名"
+                                title="メーカー名"
+                                errorMessage="<?= ($is_error)? $val['makerName']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    メーカー名
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="makerName" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['makerName']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['makerName']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['makerName']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="catalogNo"
+                                label="カタログNo"
+                                title="カタログNo"
+                                errorMessage="<?= ($is_error)? $val['catalogNo']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    カタログNo
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="catalogNo" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['catalogNo']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['catalogNo']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['catalogNo']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="serialNo"
+                                label="シリアルNo"
+                                title="シリアルNo"
+                                errorMessage="<?= ($is_error)? $val['serialNo']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    シリアルNo
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="serialNo" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['serialNo']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['serialNo']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['serialNo']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-text>
+                                    ロット管理フラグ
+                                </v-text>
+                                <v-checkbox 
+                                value="1" 
+                                name="lotManagement" 
+                                label="ロット管理フラグ" 
+                                title="はい"
+                                ></v-checkbox>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    ロット管理フラグ
+                                </div>
+                                <label>
+                                    <input type="checkbox" class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain mr-2 cursor-pointer" value="1" name="lotManagement"
+                                    <?= ($val['lotManagement']['value']) ? 'checked' : '' ?> >はい
+                                </label><br>
+                                <span class="text-red-500"><?php echo html($val['lotManagement']['message']) ?></span>
 
-    <div>
-        <form method="post" x-bind:action="_ROOT">
-            <input type="hidden" name="_method" value="post">
-            <input type="hidden" name="_csrf" value="<?= $csrf ?>">
-            <input type="hidden" name="path" value="registItemAndPriceAndInHPForm/confirm">
-            <div class="smp_tmpl">
-                <dl class="cf">
-                    <dt class="title">
-                        商品名 <span class="need">必須</span>
-                    </dt><dd class="data ">
-                        <input class="input <?= ($errors && $errors->itemName->message()) ? "error" : "" ?>" type="text" name="itemName" value="<?php echo $input["itemName"]; ?>" maxlength="128" >
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->itemName->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        分類
-                    </dt><dd class="data ">
-                        <select class="<?= ($errors && $errors->category->message()) ? "error" : "" ?>" name="category">
-                            <option value="">----- 選択してください -----</option>
-                            <option value="1"  <?php ($input["category"] === "1")  ? "selected" : "" ; ?>>医療材料</option>
-                            <option value="2"  <?php ($input["category"] === "2")  ? "selected" : "" ; ?>>薬剤</option>
-                            <option value="3"  <?php ($input["category"] === "3")  ? "selected" : "" ; ?>>試薬</option>
-                            <option value="4"  <?php ($input["category"] === "4")  ? "selected" : "" ; ?>>日用品</option>
-                            <option value="99" <?php ($input["category"] === "99") ? "selected" : "" ; ?>>その他</option>
-                        </select>
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->category->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        小分類
-                    </dt><dd class="data ">
-                        <input class="input <?= ($errors && $errors->smallCategory->message()) ? "error" : "" ?>" type="text" name="smallCategory" value="<?php echo $input["smallCategory"]; ?>" maxlength="128" >
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->smallCategory->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        製品コード
-                    </dt><dd class="data ">
-                        <input class="input <?= ($errors && $errors->itemCode->message()) ? "error" : "" ?>" type="text" name="itemCode" value="<?php echo $input["itemCode"]; ?>" maxlength="128" >
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->itemCode->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        規格
-                    </dt><dd class="data ">
-                        <input class="input <?= ($errors && $errors->itemStandard->message()) ? "error" : "" ?>" type="text" name="itemStandard" value="<?php echo $input["itemStandard"]; ?>" maxlength="128" >
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->itemStandard->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        JANコード <span class="need">必須</span>
-                    </dt><dd class="data ">
-                        <input class="input <?= ($errors && $errors->itemJANCode->message()) ? "error" : "" ?>" type="text" name="itemJANCode" value="<?php echo $input["itemJANCode"]; ?>" maxlength="128" >
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->itemJANCode->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        メーカー名
-                    </dt><dd class="data ">
-                        <input class="input <?= ($errors && $errors->makerName->message()) ? "error" : "" ?>" type="text" name="makerName" value="<?php echo $input["makerName"]; ?>" maxlength="128" >
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->makerName->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        カタログNo
-                    </dt><dd class="data ">
-                        <input class="input <?= ($errors && $errors->catalogNo->message()) ? "error" : "" ?>" type="text" name="catalogNo" value="<?php echo $input["catalogNo"]; ?>" maxlength="128" >
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->catalogNo->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        シリアルNo
-                    </dt><dd class="data ">
-                        <input class="input <?= ($errors && $errors->serialNo->message()) ? "error" : "" ?>" type="text" name="serialNo" value="<?php echo $input["serialNo"]; ?>" maxlength="128" >
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->serialNo->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        ロット管理フラグ
-                    </dt><dd class="data multi2">
-                        <ul class="cf">
-                            <li><label><input class="input" type="checkbox" name="lotManagement" value="1" <?php echo $checked["lotManagement"][1] ?>><span>はい</span></label></li>
-                        </ul>
-                        <input type="hidden" value="" name="lotManagement">
-                        <span class="msg"><?= ($errors)? $errors->lotManagement->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        償還価格フラグ
-                    </dt><dd class="data multi2">
-                        <ul class="cf">
-                            <li><label><input class="input" type="checkbox" name="officialFlag" value="1" <?php echo $checked["officialFlag"][1] ?>><span>はい</span></label></li>
-                        </ul>
-                        <input type="hidden" value="" name="officialFlag">
-                        <span class="msg"><?= ($errors)? $errors->officialFlag->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        償還価格
-                    </dt><dd class="data real">
-                        
-                        <input class="input <?= ($errors && $errors->officialprice->message()) ? "error" : "" ?>" type="text" name="officialprice" value="<?php echo $input["officialprice"]; ?>" maxlength="20" style="text-align: right;" >
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->officialprice->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        旧償還価格
-                    </dt><dd class="data real">
-                        <input class="input <?= ($errors && $errors->officialpriceOld->message()) ? "error" : "" ?>" type="text" name="officialpriceOld" value="<?php echo $input["officialpriceOld"]; ?>" maxlength="20" style="text-align: right;" >
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->officialpriceOld->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        入数 <span class="need">必須</span>
-                    </dt><dd class="data integer">
-                        <input class="input <?= ($errors && $errors->quantity->message()) ? "error" : "" ?>" type="number" name="quantity" value="<?php echo $input["quantity"]; ?>" maxlength="10" style="text-align: right;" >
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->quantity->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        入数単位 <span class="need">必須</span>
-                    </dt><dd class="data ">
-                        <input class="input <?= ($errors && $errors->quantityUnit->message()) ? "error" : "" ?>" type="text" name="quantityUnit" value="<?php echo $input["quantityUnit"]; ?>" maxlength="32" >
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->quantityUnit->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        個数単位 <span class="need">必須</span>
-                    </dt><dd class="data ">
-                        <input class="input <?= ($errors && $errors->itemUnit->message()) ? "error" : "" ?>" type="number" name="itemUnit" value="<?php echo $input["itemUnit"]; ?>" maxlength="32" >
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->itemUnit->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        定価
-                    </dt><dd class="data real">
-                        <input class="input <?= ($errors && $errors->minPrice->message()) ? "error" : "" ?>" type="number" name="minPrice" value="<?php echo $input["itemName"]; ?>" maxlength="20" style="text-align: right;" >
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->minPrice->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        卸業者
-                        <span class="need">必須</span>
-                    </dt>
-                    <dd class="data ">
-                        <select name="distributorId" id="distributorId" class="uk-select <?= ($errors && $errors->distributorId->message()) ? "error" : "" ?>">
-                            <option value="">
-                                --- 選択してください ---
-                            </option>
-                            <?php
-                            foreach($distributor as $key){
-                                $selected = ($input["distributorId"] === $key["distributorId"]) ? "selected" : "";
-                                echo "<option value='" . $key["distributorId"] . "' " . $selected . ">" . $key["distributorName"] . "</option>\n";
-                            }
-                            ?>
-                        </select>
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->distributorId->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        卸業者管理コード
-                    </dt>
-                    <dd class="data ">
-                        <input class="input <?= ($errors && $errors->distributorMCode->message()) ? "error" : "" ?>" type="text" name="distributorMCode" value="<?php echo $input["distributorMCode"]; ?>" maxlength="128">
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->distributorMCode->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        購買価格
-                        <span class="need">必須</span>
-                    </dt>
-                    <dd class="data real">
-                        <input class="input <?= ($errors && $errors->price->message()) ? "error" : "" ?>" type="number" name="price" value="<?php echo $input["price"]; ?>" maxlength="20" style="text-align: right;">
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->price->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        単価
-                    </dt>
-                    <dd class="data real">
-                        <input class="input <?= ($errors && $errors->unitPrice->message()) ? "error" : "" ?>" type="number" name="unitPrice" value="<?php echo $input["unitPrice"]; ?>" maxlength="20" style="text-align: right;">
-                        <br>
-                        <button type="button" onclick="getUnitPrice()" class="uk-button uk-button-default" title="購買価格÷入数の値を自動で入力します">単価を自動計算</button>
-                        <script>
-                            function getUnitPrice() {
-                                let price = $('input[name=price]')[0].value;
-                                let quantity = $('input[name=quantity]')[0].value;
+<!-- 
+                                <dt class="title">
+                                    ロット管理フラグ
+                                </dt><dd class="data multi2">
+                                    <ul class="cf">
+                                        <li><label><input class="input" type="checkbox" name="lotManagement" value="1" <?php echo $checked["lotManagement"][1] ?>><span>はい</span></label></li>
+                                    </ul>
+                                    <input type="hidden" value="" name="lotManagement">
+                                    <span class="msg"><?= ($errors)? $errors->lotManagement->message() : "" ?></span>
+                                </dd>
+ -->
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-text>
+                                    償還価格フラグ
+                                </v-text>
+                                <v-checkbox 
+                                value="1" 
+                                name="officialFlag" 
+                                label="償還価格フラグ" 
+                                title="はい"
+                                ></v-checkbox>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    償還価格フラグ
+                                </div>
+                                <label>
+                                    <input type="checkbox" class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain mr-2 cursor-pointer" value="1" name="officialFlag"
+                                    <?= ($val['officialFlag']['value']) ? 'checked' : '' ?> >はい
+                                </label><br>
+                                <span class="text-red-500"><?php echo html($val['officialFlag']['message']) ?></span>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="officialprice"
+                                label="償還価格"
+                                title="償還価格"
+                                errorMessage="<?= ($is_error)? $val['officialprice']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    償還価格
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="officialprice" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['officialprice']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['officialprice']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['officialprice']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="officialpriceOld"
+                                label="旧償還価格"
+                                title="旧償還価格"
+                                errorMessage="<?= ($is_error)? $val['officialpriceOld']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    旧償還価格
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="officialpriceOld" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['officialpriceOld']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['officialpriceOld']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['officialpriceOld']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="quantity"
+                                :rules="{ required: true, }"
+                                label="入数"
+                                title="入数"
+                                errorMessage="<?= ($is_error)? $val['quantity']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    入数 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="quantity" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['quantity']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['quantity']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['quantity']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="quantityUnit"
+                                :rules="{ required: true, }"
+                                label="入数単位"
+                                title="入数単位"
+                                errorMessage="<?= ($is_error)? $val['quantityUnit']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    入数単位 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="quantityUnit" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['quantityUnit']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['quantityUnit']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['quantityUnit']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="itemUnit"
+                                :rules="{ required: true, }"
+                                label="個数単位"
+                                title="個数単位"
+                                errorMessage="<?= ($is_error)? $val['itemUnit']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    個数単位 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="itemUnit" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['itemUnit']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['itemUnit']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['itemUnit']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="minPrice"
+                                label="定価"
+                                title="定価"
+                                errorMessage="<?= ($is_error)? $val['minPrice']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    定価
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="minPrice" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['minPrice']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['minPrice']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['minPrice']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-select
+                                name="distributorId"
+                                :rules="{ required: true, }"
+                                label="卸業者"
+                                title="卸業者"
+                                :options="[
+                                    <?php
+                                    foreach($distributor as $key){
+                                        echo "{ value: '".$key["distributorId"]."',  label: '".$key["distributorName"]."' },\n";
+                                    }
+                                    ?>
+                                ]"
+                                errorMessage="<?= ($is_error)? $val['distributorId']['message'] : '' ?>"
+                                >
+                                </v-select>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    卸業者 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
+                                </div>
+                                <div class="relative">
+                                    <select name="distributorId"
+                                    class="appearance-none border w-full py-2 px-3 leading-tight 
+                                    <?= ($is_error && $val['distributorId']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    >
+                                        <option value="">----- 選択してください -----</option>
+                                        <?php
+                                        foreach($distributor as $key){
+                                            $selected = ($input["distributorId"] === $key["distributorId"]) ? "selected" : "";
+                                            echo "<option value='" . html($key["distributorId"]) . "' " . $selected . ">" . html($key["distributorName"]) . "</option>\n";
+                                        }
+                                        ?>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <span class="text-red-500"><?php echo html($val['distributorId']['message']) ?></span>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="distributorMCode"
+                                label="卸業者管理コード"
+                                title="卸業者管理コード"
+                                errorMessage="<?= ($is_error)? $val['distributorMCode']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    卸業者管理コード
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="distributorMCode" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['distributorMCode']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['distributorMCode']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['distributorMCode']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="price"
+                                :rules="{ required: true, }"
+                                label="購買価格"
+                                title="購買価格"
+                                errorMessage="<?= ($is_error)? $val['price']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    購買価格 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="price" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['price']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['price']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['price']['message']) ?></span>
+                                </div>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-input
+                                type="number"
+                                name="unitPrice"
+                                label="単価"
+                                title="単価"
+                                errorMessage="<?= ($is_error)? $val['unitPrice']['message'] : '' ?>"
+                                ></v-input>
+                                <button type="button" @click.native="getUnitPrice" class="
+                                disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
+                                bg-white hover:border-gray-400 text-gray-700 py-2 px-4 border border-gray-300">
+                                    単価を自動計算
+                                </button>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    単価
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="unitPrice" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['unitPrice']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['unitPrice']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['unitPrice']['message']) ?></span>
+                                    <button type="button" onclick="getUnitPrice()" class="
+                                    disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
+                                    bg-white hover:border-gray-400 text-gray-700 py-2 px-4 border border-gray-300">
+                                        単価を自動計算
+                                    </button>
+                                    <script>
+                                        function getUnitPrice(){
+                                            let price = document.getElementsByName('price')[0].value;
+                                            let quantity = document.getElementsByName('quantity')[0].value;
 
-                                let unitPrice = 0;
-                                if (price == "" || price == 0) {
-                                    unitPrice = 0
-                                }
-                                if (quantity == "" || quantity == 0) {
-                                    unitPrice = 0
-                                }
-                                unitPrice = (price / quantity);
+                                            let unitPrice = 0;
+                                            if (price == "" || price == 0) {
+                                                unitPrice = 0
+                                            }
+                                            if (quantity == "" || quantity == 0) {
+                                                unitPrice = 0
+                                            }
+                                            unitPrice = (price / quantity);
 
-                                $('input[name=unitPrice]')[0].value = unitPrice;
-                            }
-                        </script>
-                        <br>
-                        <span class="msg"><?= ($errors)? $errors->unitPrice->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        保険請求分類（医科）
-                    </dt>
-                    <dd class="data ">
-                        <textarea class="<?= ($errors && $errors->medicineCategory->message()) ? "error" : "" ?>" name="medicineCategory" rows="4" wrap="soft"><?php echo $input["medicineCategory"]; ?></textarea><br>
-                        <span class="msg"><?= ($errors)? $errors->medicineCategory->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        保険請求分類（在宅）
-                    </dt>
-                    <dd class="data ">
-                        <textarea class="<?= ($errors && $errors->homeCategory->message()) ? "error" : "" ?>" name="homeCategory" rows="4" wrap="soft"><?php echo $input["homeCategory"]; ?></textarea><br>
-                        <span class="msg"><?= ($errors)? $errors->homeCategory->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        測定機器名
-                    </dt>
-                    <dd class="data ">
-                        <input class="input <?= ($errors && $errors->measuringInst->message()) ? "error" : "" ?>" type="text" name="measuringInst" value="<?php echo $input["measuringInst"]; ?>" maxlength="128"><br>
-                        <span class="msg"><?= ($errors)? $errors->measuringInst->message() : "" ?></span>
-                    </dd>
-                </dl>
-                <dl class="cf">
-                    <dt class="title">
-                        特記事項
-                    </dt>
-                    <dd class="data ">
-                        <textarea class="<?= ($errors && $errors->notice->message()) ? "error" : "" ?>" name="notice" rows="4" wrap="soft"><?php echo $input["notice"]; ?></textarea><br>
-                        <span class="msg"><?= ($errors)? $errors->notice->message() : "" ?></span>
-                    </dd>
-                </dl>
+                                            document.getElementsByName('unitPrice')[0].value = unitPrice;
+                                        }
+                                    </script>
+                                </div>
+                            </div>
+                            <div class="cf" id="medicineCategory">
+<!-- 
+                                <v-textarea
+                                name="medicineCategory"
+                                label="保険請求分類（医科）"
+                                title="保険請求分類（医科）"
+                                errorMessage="<?= ($is_error)? $val['medicineCategory']['message'] : '' ?>"
+                                ></v-textarea>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    保険請求分類（医科）
+                                </div>
+                                <div class="relative">
+                                    <textarea
+                                        name="medicineCategory"
+                                        class="appearance-none w-full py-2 px-3 leading-tight h-32 text-left flex-initial bg-white border 
+                                        <?= ($is_error && $val['medicineCategory']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                        onkeydown="countText(this, 'mediCat')"
+                                    ><?=$val['medicineCategory']['message'];?></textarea>
+                                    <span class="absolute bottom-4 right-6"><span id="mediCat">0</span>文字</span>
+                                </div>
+                                <span class="text-red-500"><?php echo html($val['medicineCategory']['message']) ?></span>
+                            </div>
+                            <div class="cf">
+<!-- 
+                                <v-textarea
+                                name="homeCategory"
+                                label="保険請求分類（在宅）"
+                                title="保険請求分類（在宅）"
+                                errorMessage="<?= ($is_error)? $val['homeCategory']['message'] : '' ?>"
+                                ></v-textarea>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    保険請求分類（在宅）
+                                </div>
+                                <div class="relative">
+                                    <textarea
+                                        name="homeCategory"
+                                        class="appearance-none w-full py-2 px-3 leading-tight h-32 text-left flex-initial bg-white border 
+                                        <?= ($is_error && $val['homeCategory']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                        onkeydown="countText(this, 'homeCat')"
+                                    ><?=$val['homeCategory']['message'];?></textarea>
+                                    <span class="absolute bottom-4 right-6"><span id="homeCat">0</span>文字</span>
+                                </div>
+                                <span class="text-red-500"><?php echo html($val['homeCategory']['message']) ?></span>
+                            </div>
+                            <dl class="cf">
+<!-- 
+                                <v-input
+                                type="text"
+                                name="measuringInst"
+                                label="測定機器名"
+                                title="測定機器名"
+                                errorMessage="<?= ($is_error)? $val['measuringInst']['message'] : '' ?>"
+                                ></v-input>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    測定機器名
+                                </div>
+                                <div class="flex-auto">
+                                    <input type="text" name="measuringInst" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <?= ($is_error && $val['measuringInst']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html($val['measuringInst']['value']) ?>">
+                                    <span class="text-red-500"><?php echo html($val['measuringInst']['message']) ?></span>
+                                </div>
+
+                            </dl>
+                            <dl class="cf">
+<!-- 
+                                <v-textarea
+                                name="notice"
+                                label="特記事項"
+                                title="特記事項"
+                                errorMessage="<?= ($is_error)? $val['notice']['message'] : '' ?>"
+                                ></v-textarea>
+ -->
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    特記事項
+                                </div>
+                                <div class="relative">
+                                    <textarea
+                                        name="notice"
+                                        class="appearance-none w-full py-2 px-3 leading-tight h-32 text-left flex-initial bg-white border 
+                                        <?= ($is_error && $val['notice']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                        onkeydown="countText(this, 'noticeCount')"
+                                    ><?=$val['notice']['message'];?></textarea>
+                                    <span class="absolute bottom-4 right-6"><span id="noticeCount">0</span>文字</span>
+                                </div>
+                                <span class="text-red-500"><?php echo html($val['notice']['message']) ?></span>
+                            </dl>
+                        </div>
+                        <input class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit" value="確認">
+                    </form>
+                </div>
             </div>
-            <input class="submit" type="submit" name="submit" value="確認">
-        </form>
+        </div>
     </div>
 </div>
+<script>
+    function countText(elm, id){
+        document.getElementById(id).innerHTML = elm.value.length;
+    }
+</script>
+<script>
+var JoyPlaApp = Vue
+    .createApp({
+        setup() {
+            const {ref, onCreated, onMounted} = Vue;
+            const loading = ref(false);
+            const start = () => {
+                loading.value = true;
+            }
+
+            const complete = () => {
+                loading.value = false;
+            }
+
+            const sleepComplate = () => {
+                window.setTimeout(function () {
+                    complete();
+                }, 500);
+            }
+            start();
+
+            onMounted(() => {
+                sleepComplate()
+            });
+
+            const { useForm } = VeeValidate;
+            const { handleSubmit , control, meta , validate , values , isSubmitting  } = useForm({
+                initialValues: {
+                },
+                validateOnMount : false
+            });
+/* 
+            const onSubmit = async (event) => {
+                const { valid, errors } = await validate();
+                if(!valid){
+                    Swal.fire({
+                        icon: 'error',
+                        title: '入力エラー',
+                        text: '入力エラーがございます。ご確認ください',
+                    })
+                    event.preventDefault();
+                }else{
+                    document.getElementsByName("regForm")[0].submit();
+                }
+            };
+ */
+            const breadcrumbs = [
+            {
+                text: '商品メニュー',
+                disabled: false,
+                href: _ROOT + '&path=/product',
+            },
+            {
+                text: '商品・金額・院内商品情報登録',
+                disabled: true, 
+            }
+            ];
+
+/*
+            async () =>{
+                const { valid, errors } = await validate();
+                if(!valid){
+                    Swal.fire({
+                        icon: 'error',
+                        title: '入力エラー',
+                        text: '入力エラーがございます。ご確認ください',
+                    });
+                }
+
+                return handleSubmit((values, actions) => {
+                    // Send data to API
+                    alert(JSON.stringify(values, null, 2));
+                });
+            };*/
+
+            return {
+                loading, 
+                start, 
+                complete , 
+                breadcrumbs, 
+            }
+        },
+        components: {
+            'v-checkbox': vCheckbox,
+            'v-loading': vLoading,
+            'v-text': vText,
+            'v-input' : vInput,
+            'v-textarea' : vTextarea,
+            'v-select': vSelect,
+            'v-checkbox': vCheckbox,
+            'v-button-default' : vButtonDefault,
+            'v-button-primary' : vButtonPrimary,
+            'v-breadcrumbs': vBreadcrumbs,
+            'header-navi': headerNavi
+        }
+    })
+    .mount('#top');
+</script>

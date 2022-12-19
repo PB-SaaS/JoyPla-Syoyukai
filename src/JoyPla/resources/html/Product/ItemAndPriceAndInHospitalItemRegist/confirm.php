@@ -8,7 +8,7 @@
         <form method="post" x-bind:action="_ROOT">
             <input type="hidden" name="_method" value="post">
             <input type="hidden" name="_csrf" value="<?= $csrf ?>">
-            <input type="hidden" name="path" value="registItemAndPriceAndInHPForm/thanks">
+            <input type="hidden" name="path" value="/product/ItemAndPriceAndInHospitalRegist/thanks">
             <div class="smp_tmpl">
                 <dl class="cf">
                     <dt class="title">
