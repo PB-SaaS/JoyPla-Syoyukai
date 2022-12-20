@@ -21,7 +21,8 @@ class Router
      *
      * @param ServiceProvider $container
      */
-    public function __construct() {
+    public function __construct()
+    {
     }
 
     /**
@@ -31,8 +32,11 @@ class Router
      *
      * @return Route
      */
-    final public static function map(string $method, string $pass, $handler): Route
-    {
+    final public static function map(
+        string $method,
+        string $pass,
+        $handler
+    ): Route {
         $route = new Route($method, $pass, $handler);
 
         self::$routes[] = $route;
@@ -40,7 +44,7 @@ class Router
         return $route->middleware(self::$groupMiddlewares);
     }
 
-    final public static function fetchAlias(string $alias , array $vars = [])
+    final public static function fetchAlias(string $alias, array $vars = [])
     {
         foreach (self::$routes as $route) {
             if ($route->equalAlias($alias)) {
@@ -58,40 +62,38 @@ class Router
     final public function dispatch(Request $request, $isMethodCheck = true)
     {
         foreach (self::$routes as $route) {
-            if ($route->processable($request , $isMethodCheck)) {
-                try{
+            if ($route->processable($request, $isMethodCheck)) {
+                try {
                     $route->middleware($this->middlewares);
-                    return $route->process($request , $route->service);
-                } catch(Exception $e){
-
+                    return $route->process($request, $route->service);
+                } catch (Exception $e) {
                 }
             }
         }
 
-        throw new NotFoundException('Not Found.',404);
+        throw new NotFoundException('Not Found.', 404);
     }
 
-    public static function redirect($uri , Request $request){
+    public static function redirect($uri, Request $request)
+    {
         $request->setRequestUri($uri);
         $router = new Router();
-        echo $request->getRequestUri();
-        return $router->dispatch($request , false);
+        return $router->dispatch($request, false);
     }
 
-    public static function abort(int $code , string $message = "")
+    public static function abort(int $code, string $message = '')
     {
-        if($message == ""){
+        if ($message == '') {
             switch ($code) {
                 case 404:
-                    $message = "Not Found";
+                    $message = 'Not Found';
                     break;
                 case 403:
-                    $message = "Forbidden";
+                    $message = 'Forbidden';
                     break;
             }
         }
 
-        throw new Exception($message , $code);
+        throw new Exception($message, $code);
     }
-    
 }
