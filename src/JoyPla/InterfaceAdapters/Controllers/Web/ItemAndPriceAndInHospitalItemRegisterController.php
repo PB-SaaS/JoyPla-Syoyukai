@@ -164,6 +164,7 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
     public function confirm(array $vars){
         Csrf::validate($this->request->_csrf,true);
 
+        $user = ($this->request->user());
         $input = $this->request->only($this->input);
         $itemJANCode = $input["itemJANCode"];
         $input["janTenantId"] = $itemJANCode . $this->request->user()->tenantId;
@@ -186,12 +187,21 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
             ->value([
                 'distributorName',
             ])->get()->toArray();
+        $category = [
+                    1 => "医療材料",
+                    2 => "薬剤",
+                    3 => "試薬",
+                    4 => "日用品",
+                    99 => "その他",
+                    ];
 
         if($user->userPermission == "1" || $user->userPermission == "3")
         {
             $body = view('html/Product/ItemAndPriceAndInHospitalItemRegist/confirm' , [
                 'distributor' => $distributor,
+                'category' -> $category,
                 'input' => $this->request->all(),
+                'session' => $this->request->session()->get($this->formName),
                 'validate' => $validate,
                 'csrf' => Csrf::generate()
             ]);
@@ -224,7 +234,9 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
         }
 
         $this->request->session()->forget($this->formName);
-        echo view("template/base", compact("body"), false);
+
+        $body = view('html/Product/ItemAndPriceAndInHospitalItemRegist/thanks', []);
+        echo view("html/Common/Template", compact("body"), false);
     }
 
 }

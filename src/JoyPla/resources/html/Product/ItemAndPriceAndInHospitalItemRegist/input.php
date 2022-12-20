@@ -40,7 +40,7 @@ if($validate){
                                     商品名 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="itemName" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="itemName" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['itemName']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['itemName']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['itemName']['message']) ?></span>
@@ -100,7 +100,7 @@ if($validate){
                                     小分類
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="smallCategory" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="smallCategory" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['smallCategory']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['smallCategory']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['smallCategory']['message']) ?></span>
@@ -120,7 +120,7 @@ if($validate){
                                     製品コード
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="itemCode" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="itemCode" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['itemCode']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['itemCode']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['itemCode']['message']) ?></span>
@@ -140,7 +140,7 @@ if($validate){
                                     規格
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="itemStandard" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="itemStandard" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['itemStandard']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['itemStandard']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['itemStandard']['message']) ?></span>
@@ -161,7 +161,7 @@ if($validate){
                                     JANコード <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="itemJANCode" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="itemJANCode" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['itemJANCode']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['itemJANCode']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['itemJANCode']['message']) ?></span>
@@ -181,7 +181,7 @@ if($validate){
                                     メーカー名
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="makerName" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="makerName" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['makerName']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['makerName']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['makerName']['message']) ?></span>
@@ -201,7 +201,7 @@ if($validate){
                                     カタログNo
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="catalogNo" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="catalogNo" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['catalogNo']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['catalogNo']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['catalogNo']['message']) ?></span>
@@ -221,7 +221,7 @@ if($validate){
                                     シリアルNo
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="serialNo" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="serialNo" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['serialNo']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['serialNo']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['serialNo']['message']) ?></span>
@@ -295,7 +295,7 @@ if($validate){
                                     償還価格
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="officialprice" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="officialprice" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['officialprice']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['officialprice']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['officialprice']['message']) ?></span>
@@ -315,7 +315,7 @@ if($validate){
                                     旧償還価格
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="officialpriceOld" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="officialpriceOld" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['officialpriceOld']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['officialpriceOld']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['officialpriceOld']['message']) ?></span>
@@ -336,7 +336,7 @@ if($validate){
                                     入数 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="quantity" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="quantity" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['quantity']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['quantity']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['quantity']['message']) ?></span>
@@ -357,7 +357,7 @@ if($validate){
                                     入数単位 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="quantityUnit" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="quantityUnit" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['quantityUnit']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['quantityUnit']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['quantityUnit']['message']) ?></span>
@@ -378,7 +378,7 @@ if($validate){
                                     個数単位 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="itemUnit" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="itemUnit" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['itemUnit']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['itemUnit']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['itemUnit']['message']) ?></span>
@@ -398,7 +398,7 @@ if($validate){
                                     定価
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="minPrice" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="minPrice" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['minPrice']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['minPrice']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['minPrice']['message']) ?></span>
@@ -460,7 +460,7 @@ if($validate){
                                     卸業者管理コード
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="distributorMCode" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="distributorMCode" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['distributorMCode']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['distributorMCode']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['distributorMCode']['message']) ?></span>
@@ -481,7 +481,7 @@ if($validate){
                                     購買価格 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="price" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="price" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['price']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['price']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['price']['message']) ?></span>
@@ -506,7 +506,7 @@ if($validate){
                                     単価
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="unitPrice" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="unitPrice" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['unitPrice']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['unitPrice']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['unitPrice']['message']) ?></span>
@@ -594,7 +594,7 @@ if($validate){
                                     測定機器名
                                 </div>
                                 <div class="flex-auto">
-                                    <input type="text" name="measuringInst" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border 
+                                    <input type="text" name="measuringInst" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
                                     <?= ($is_error && $val['measuringInst']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     value="<?php echo html($val['measuringInst']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['measuringInst']['message']) ?></span>
@@ -625,7 +625,9 @@ if($validate){
                                 <span class="text-red-500"><?php echo html($val['notice']['message']) ?></span>
                             </dl>
                         </div>
-                        <input class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit" value="確認">
+                        <div class="text-center py-1">
+                            <input class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit" value="確認">
+                        </div>
                     </form>
                 </div>
             </div>

@@ -11,6 +11,8 @@ use JoyPla\Application\InputPorts\Api\Item\ItemAndPriceAndInHospitalItemRegister
 
 class ItemAndPriceAndInHospitalItemController extends Controller
 {
+    private $formName = "itemAndPriceAndInHospitalItemRegistForm";
+
     public function register($vars , ItemAndPriceAndInHospitalItemRegisterInputPortInterface $inputPort )
     {
         $token = $this->request->get('_csrf');
@@ -23,7 +25,7 @@ class ItemAndPriceAndInHospitalItemController extends Controller
 
         $gate = Gate::getGateInstance('register_of_item_and_price_and_inHospitalItem');
 
-        $item_and_price_and_inHospitalItemItem = (array)$this->request;
+        $item_and_price_and_inHospitalItemItem = $this->request->session()->get($this->formName);
 
         $user = $this->request->user();
 

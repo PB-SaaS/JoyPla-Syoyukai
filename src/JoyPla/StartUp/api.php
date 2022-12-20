@@ -149,9 +149,9 @@ Router::group(VerifyCsrfTokenMiddleware::class, function(){
     
     Router::map('GET','/api/notification/show',[NotificationController::class,'show'])->service(new NotificationShowInteractor( new NotificationShowPresenter() , new NotificationRepository() ));
 
-/* 
-    Router::map('POST','/api/ItemAndPriceAndInHospitalItem/register',[ItemAndPriceAndInHospitalItemRegisterController::class,'register'])->service(new ItemAndPriceAndInHospitalItemRegisterInteractor(new ItemRegisterPresenter() , new ItemRepository() , new InHospitalItemRepository() , new PriceRepository() , new HospitalRepository() ));
 
+    Router::map('POST','/api/ItemAndPriceAndInHospitalItem/register',[ItemAndPriceAndInHospitalItemRegisterController::class,'register'])->service(new ItemAndPriceAndInHospitalItemRegisterInteractor(new ItemRegisterPresenter() , new ItemRepository() , new InHospitalItemRepository() , new PriceRepository() , new HospitalRepository() ));
+/* 
     Router::map('POST','/api/PriceAndInHospitalItem/register',[PriceAndInHospitalItemRegisterController::class,'register'])->service(new PriceAndInHospitalItemRegisterInteractor(new PriceRegisterPresenter() , new InHospitalItemRepository() , new PriceRepository() , new HospitalRepository() ));
  */
 });
