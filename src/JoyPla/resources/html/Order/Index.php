@@ -9,6 +9,7 @@
         <hr>
         <div class="p-4 text-base bg-gray-100 border border-gray-400 flex flex-col md:flex-row md:gap-6 gap-4 mb-6">
           <v-button-primary type="button" class="md:w-1/6 w-full" :disabled="! isChange" @click.native="onUpdate">内容を訂正</v-button-primary>
+          <v-button-primary type="button" class="md:w-1/6 w-full" @click.native="openReceipt">入荷照合を開く</v-button-primary>
         </div>
         <div class="p-4 text-base bg-gray-100 border border-gray-400">
           <v-text title="登録日" class="flex w-full gap-6">{{ order.registDate }}</v-text>
@@ -155,7 +156,7 @@
 </div>
 <script>
 
-const PHPData = <?php echo json_encode($viewModel, true) ?>;
+const PHPData = <?php echo json_encode($viewModel, true); ?>;
 
 var JoyPlaApp = Vue.createApp({ 
     components: {
@@ -302,6 +303,9 @@ var JoyPlaApp = Vue.createApp({
         }
       };
 
+      const openReceipt = () => {
+        location.href = _ROOT + "&path=/received/order/" + order.orderId;    
+      }
       
       return {
         onUpdate,
@@ -312,7 +316,8 @@ var JoyPlaApp = Vue.createApp({
         breadcrumbs,
         loading, 
         start, 
-        complete
+        complete,
+        openReceipt
       }
   },
   watch: {
