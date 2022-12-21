@@ -125,7 +125,7 @@ namespace monad
 
         function isValidateProcessTriedToSuccess(): bool
         {
-            $result =($this->tryList, function($e) { return $e instanceof ValidateSuccess; });
+            $result = array_filter($this->tryList, function($e) { return $e instanceof ValidateSuccess; });
             return count($result) > 0;
         }
 

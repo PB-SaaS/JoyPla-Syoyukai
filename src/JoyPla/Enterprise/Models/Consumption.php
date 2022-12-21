@@ -3,7 +3,6 @@
 namespace JoyPla\Enterprise\Models;
 
 use Collection;
-
 class Consumption
 {
     private ConsumptionId $consumptionId;
@@ -20,25 +19,27 @@ class Consumption
         Hospital $hospital,
         Division $division,
         ConsumptionStatus $consumptionStatus
-    ) {
+        )
+    {
+        
         $this->consumptionId = $consumptionId;
         $this->consumptionDate = $consumptionDate;
-        $this->consumptionItems = array_map(function (ConsumptionItem $v) {
+        $this->consumptionItems = array_map(function(ConsumptionItem $v){
             return $v;
-        }, $consumptionItems);
+        },$consumptionItems);
         $this->hospital = $hospital;
         $this->division = $division;
         $this->consumptionStatus = $consumptionStatus;
     }
 
-    public static function create(Collection $input)
+    public static function create( Collection $input )
     {
         return new Consumption(
             (new ConsumptionId($input->billingNumber) ),
             (new ConsumptionDate($input->billingDate) ),
             [],
-            (Hospital::create($input)),
-            (Division::create($input)),
+            (Hospital::create($input) ),
+            (Division::create($input) ),
             (new ConsumptionStatus($input->billingStatus) )
         );
     }
@@ -51,7 +52,7 @@ class Consumption
     {
         return $this->consumptionDate;
     }
-
+    
     public function getConsumptionItems()
     {
         return $this->consumptionItems;
@@ -67,20 +68,20 @@ class Consumption
         return $this->division === $division;
     }
 
-    public function totalAmount()
-    {
+    public function totalAmount(){
         $num = 0;
-        foreach ($this->consumptionItems as $item) {
+        foreach($this->consumptionItems as $item)
+        {
             $num += $item->price();
         }
         return $num;
     }
 
-
-    public function itemCount()
-    {
+    
+    public function itemCount(){
         $array = [];
-        foreach ($this->consumptionItems as $item) {
+        foreach($this->consumptionItems as $item)
+        {
             $array[] = $item->getInHospitalItemId()->value();
         }
         return count(array_unique($array));
@@ -95,9 +96,9 @@ class Consumption
 
     public function setConsumptionItems(array $consumptionItems)
     {
-        $consumptionItems = array_map(function (ConsumptionItem $v) {
+        $consumptionItems = array_map(function(ConsumptionItem $v){
             return $v;
-        }, $consumptionItems);
+        },$consumptionItems);
 
         return new Consumption(
             $this->consumptionId,
@@ -114,9 +115,9 @@ class Consumption
         return [
             'consumptionId' => $this->consumptionId->value(),
             'consumptionDate' => $this->consumptionDate->value(),
-            'consumptionItems' =>  array_map(function (ConsumptionItem $v) {
+            'consumptionItems' =>  array_map(function(ConsumptionItem $v){
                 return $v->toArray();
-            }, $this->consumptionItems),
+            },$this->consumptionItems),
             'hospital' => $this->hospital->toArray(),
             'division' => $this->division->toArray(),
             'consumptionStatus' => $this->consumptionStatus->value(),
@@ -124,5 +125,5 @@ class Consumption
             'totalAmount' => $this->totalAmount(),
             'itemCount' => $this->itemCount(),
         ];
-    }
+    } 
 }
