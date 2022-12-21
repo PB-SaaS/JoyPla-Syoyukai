@@ -58,6 +58,7 @@ class ConsumptionHistoryRepository implements ConsumptionHistoryRepositoryInterf
         foreach ($consumptionItems->data->all() as $consumptionItem) {
             foreach ($items->data->all() as $item) {
                 if ($consumptionItem->inHospitalItemId === $item->inHospitalItemId) {
+                    $itemUnitPrice = (is_numeric($item->unitPrice)) ? (float)($item->unitPrice) : 0;
                     $tmp = new Collection();
                     $tmp->billingNumber = $consumptionItem->billingNumber;
                     $tmp->inHospitalItemId = $consumptionItem->inHospitalItemId;
@@ -67,8 +68,8 @@ class ConsumptionHistoryRepository implements ConsumptionHistoryRepositoryInterf
                     $tmp->divisionName = $consumptionItem->divisionName;
                     $tmp->inItemImage = $item->inItemImage;
                     $tmp->quantity = $item->quantity;
-                    $tmp->price = $item->price;
-                    $tmp->unitPrice = $item->unitPrice;
+                    $tmp->price = (float)$item->price;
+                    $tmp->unitPrice = $itemUnitPrice;
                     $tmp->quantityNum = $item->quantity;
                     $tmp->quantityUnit = $item->quantityUnit;
                     $tmp->itemUnit = $item->itemUnit;

@@ -76,6 +76,7 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
             $inHospitalItem_find_key = array_search($item->inHospitalItemId, collect_column($inHospitalItem, 'inHospitalItemId'));
             
             if (($source_division_find_key !== false) && ($target_division_find_key !== false) && ($inHospitalItem_find_key !== false)) {
+
                 $unitprice = 0;
                 if (is_numeric($inHospitalItem[$inHospitalItem_find_key]->unitPrice)) {
                     $unitprice = (float)$inHospitalItem[$inHospitalItem_find_key]->unitPrice;
@@ -98,9 +99,9 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
                     (Division::create($division[$source_division_find_key])),
                     (Division::create($division[$target_division_find_key])),
                     (new RequestQuantity((int)$item->requestQuantity)),
-                    (new RequestType($item->requestType)),
+                    (new RequestType((int)$item->requestType)),
                     (Quantity::create($inHospitalItem[$inHospitalItem_find_key])),
-                    (new Price($inHospitalItem[$inHospitalItem_find_key]->price) ),
+                    (new Price((float)$inHospitalItem[$inHospitalItem_find_key]->price) ),
                     (new UnitPrice($unitprice) )
                 );
             }

@@ -52,7 +52,7 @@ class ConsumptionItemForReference
             (Quantity::create($input)),
             (new Price($input->price) ),
             (new UnitPrice($input->unitPrice) ),
-            (int) $input->billingQuantity,
+            (int)$input->billingQuantity,
             $input->inItemImage
         );
     }
