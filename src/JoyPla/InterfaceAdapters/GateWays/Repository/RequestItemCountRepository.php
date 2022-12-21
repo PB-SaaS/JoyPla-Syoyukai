@@ -9,21 +9,23 @@ class RequestItemCountRepository implements RequestItemCountRepositoryInterface
 {
     public function saveToArray(array $requestItemCounts)
     {
-        $requestItemCountsToArray = array_map(function (RequestItemCount $requestItemCount) {
-            return $requestItemCount->toArray();
+        $requestItemCounts = array_map(function (RequestItemCount $requestItemCount) {
+            return $requestItemCount;
         }, $requestItemCounts);
 
         $insert = [];
 
-        foreach ($requestItemCountsToArray as $requestItemCount) {
+        foreach ($requestItemCounts as $requestItemCount) {
+            $requestItemCountArray = $requestItemCount->toArray();
             $insert[] = [
                 "registrationTime" => 'now',
-                "recordId" => $requestItemCount['recordId'],
-                "hospitalId" => $requestItemCount['hospitalId'],
-                "divisionId" => $requestItemCount['divisionId'],
-                "inHospitalItemId" => $requestItemCount['inHospitalItemId'],
-                "itemId" => $requestItemCount['itemId'],
-                "quantity" => $requestItemCounts['quantity']
+                "recordId" => (string)$requestItemCountArray['recordId'],
+                "hospitalId" => (string)$requestItemCountArray['hospitalId'],
+                "inHospitalItemId" => (string)$requestItemCountArray['inHospitalItemId'],
+                "itemId" => (string)$requestItemCountArray['itemId'],
+                "quantity" => (string)$requestItemCountArray['quantity'],
+                "sourceDivisionId" => (string)$requestItemCountArray['sourceDivisionId'],
+                "targetDivisionId" => (string)$requestItemCountArray['targetDivisionId']
             ];
         }
         RequestItemCountTransaction::insert($insert);

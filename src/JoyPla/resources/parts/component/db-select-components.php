@@ -341,13 +341,16 @@ searchCount.value++;
 })
 .then(() => {
 complete();
+if (document.getElementById('inHospitalItemModal').classList.contains('is-open') == true) {
+  searchCount.value++;
+  console.log(searchCount.value + 'hp');
 if (searchCount.value > 0) {
 Toast.fire({
 icon: 'success',
 title: '検索が完了しました'
 })
 }
-searchCount.value++;
+}
 });
 };
 
@@ -986,6 +989,7 @@ axios
 .post(_APIURL, params)
 .then((response) => {
 complete();
+console.log(response.data.data);
 emit('additem', response.data.data);
 resetForm({
 barcode: ""
@@ -1279,10 +1283,6 @@ default: ""
 }
 },
 setup(props, context) {
-const setParams = () => {
-setFieldValue('divisionIds', [props.sourceDivisionId]);
-}
-
 const {
 ref,
 toRef,
@@ -1322,7 +1322,6 @@ values,
 setFieldValue
 } = useForm({
 initialValues: {
-divisionIds: [],
 perPage: "10",
 currentPage: 1
 }
@@ -1344,6 +1343,7 @@ toast.addEventListener('mouseleave', Swal.resumeTimer)
 
 const showPages = ref(5);
 const totalCount = ref(0);
+const searchCount = ref(0);
 const consumptions = ref([]);
 const currentTab = ref('list');
 const tabs = [{
@@ -1376,17 +1376,17 @@ currentPageEdited.value = 1;
 listGet();
 };
 
-const searchCount = ref(0);
-
 const listGet = () => {
-  console.log(props.sourceDivisionId);
 if (props.sourceDivisionId == "") {
 MicroModal.close("consumptionHistoryModalForItemRequest");
 return false;
 }
 
-//setParams();
-//console.log(values);
+if (document.getElementById('consumptionHistoryModalForItemRequest').classList.contains('is-open') == false) {
+MicroModal.close("consumptionHistoryModalForItemRequest");
+return false;
+}
+
 let params = new URLSearchParams();
 params.append("path", "/api/reference/consumption");
 params.append("divisionIds", props.sourceDivisionId);
@@ -1403,7 +1403,6 @@ response.data.data[idx].open = false;
 });
 console.log(response.data);
 consumptions.value = response.data.data;
-//console.log(consumptions.value);
 totalCount.value = parseInt(response.data.count);
 currentTab.value = 'list';
 })
@@ -1418,16 +1417,30 @@ title: '検索に失敗しました。再度お試しください。'
 }
 searchCount.value++;
 })
-.then(() => {
+.finally(() => {
 complete();
+if (document.getElementById('consumptionHistoryModalForItemRequest').classList.contains('is-open') == true) {
+  searchCount.value++;
+  console.log(searchCount.value +'co');
+if (totalCount.value == 0) {
+  console.log('none');
+Swal.fire({
+  title: '情報がありませんでした',
+  icon: 'warning'
+})
+MicroModal.close("consumptionHistoryModalForItemRequest");
+return false;
+}
+console.log('after none');
 if (searchCount.value > 0) {
 Toast.fire({
 icon: 'success',
 title: '検索が完了しました'
 })
 }
-searchCount.value++;
+}
 });
+
 };
 
 const getCurrentTab = (tab) => {
@@ -1473,7 +1486,6 @@ getCurrentTab,
 changeParPage,
 add,
 numberFormat,
-setParams,
 open
 }
 },
@@ -1524,7 +1536,6 @@ template: `
           parseInt(values.perPage) * values.currentPage ) < totalCount ) ? parseInt(values.perPage) * values.currentPage
             : totalCount }}件 / 全 {{ totalCount }}件 </div>
             <div class="max-h-full overflow-y-auto" id="consumptionsList">
-              <div>
                 <div class="w-full overflow-hidden mb-8 xl:mb-0">
                   <div class="hidden lg:flex w-full sticky top-0 bg-white px-4 py-4 flex-wrap">
                     <div class="w-full lg:w-2/3">

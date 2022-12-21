@@ -34,7 +34,6 @@ class ConsumptionHistoryRepository implements ConsumptionHistoryRepositoryInterf
 
         $consumptionItemViewInstance = ConsumptionItemView::where('hospitalId', $hospitalId->value());
 
-//        $consumptionItemViewInstance = ConsumptionItemView::getNewInstance()->where('hospitalId',$hospitalId->value())->value('inHospitalItemId');
         foreach ($histories->data->all() as $history) {
             $consumptionItemViewInstance->orWhere('billingNumber', $history->billingNumber);
         }

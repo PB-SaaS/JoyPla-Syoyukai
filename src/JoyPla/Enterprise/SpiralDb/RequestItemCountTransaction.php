@@ -17,10 +17,11 @@ class RequestItemCountTransaction extends SpiralORM
         "registrationTime",
         "recordId",
         "hospitalId",
-        "divisionId",
         "inHospitalItemId",
         "itemId",
-        "quantity"
+        "quantity",
+        "sourceDivisionId",
+        "targetDivisionId"
     ];
 
     //デフォルト値

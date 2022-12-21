@@ -7,17 +7,19 @@ class RequestItemCount
     public function __construct(
         string $recordId,
         HospitalId $hospitalId,
-        DivisionId $divisionId,
         InHospitalItemId $inHospitalItemId,
         ItemId $itemId,
-        int $quantity = 0
+        int $quantity,
+        DivisionId $sourceDivisionId,
+        DivisionId $targetDivisionId
     ) {
         $this->recordId = $recordId;
         $this->hospitalId = $hospitalId;
-        $this->divisionId = $divisionId;
         $this->inHospitalItemId = $inHospitalItemId;
         $this->itemId = $itemId;
         $this->quantity = $quantity;
+        $this->sourceDivisionId = $sourceDivisionId;
+        $this->targetDivisionId = $targetDivisionId;
     }
 
     public function toArray()
@@ -25,10 +27,11 @@ class RequestItemCount
         return [
             'recordId' => $this->recordId,
             'hospitalId' => $this->hospitalId->value(),
-            'divisionId' => $this->divisionId->value(),
             'inHospitalItemId' => $this->inHospitalItemId->value(),
             'itemId' => $this->itemId->value(),
-            'quantity' => $this->quantity
+            'quantity' => $this->quantity,
+            'sourceDivisionId' => $this->sourceDivisionId->value(),
+            'targetDivisionId' => $this->targetDivisionId->value()
         ];
     }
 }

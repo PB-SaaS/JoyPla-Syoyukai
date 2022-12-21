@@ -1503,7 +1503,7 @@ namespace JoyPla\Enterprise\Models {
         public const OrdinaryRequest = 1;
         public const ConsumptionRequest = 2;
 
-        public function __construct(string $value)
+        public function __construct(int $value)
         {
             switch($value) {
                 case self::OrdinaryRequest:

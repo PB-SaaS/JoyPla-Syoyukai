@@ -64,13 +64,20 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
 
             $inputData->requestItems = array_map(function ($v) use ($inputData) {
                 if ($inputData->isOnlyMyDivision && $inputData->user->divisionId !== $v->sourceDivisionId) {
-                    throw new Exception('Illegal request', 403);
+                    throw new Exception("Illegal request", 403);
+                }
+                if ($v->sourceDivisionId == $v->targetDivisionId) {
+                    throw new Exception("Invalid request", 999);
                 }
                 return $v;
             }, $inputData->requestItems);
 
             $requestItems = $this-> itemRequestRepository->findByInHospitalItem($hospitalId, $inputData->requestItems);
 
+            if (count($requestItems) === 0) {
+                throw new Exception("Request items don't exist.", 999);
+            }
+            
             $ids = [];
             $result = [];
 
@@ -109,35 +116,36 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 );
             }
 
-            $this->itemRequestRepository->saveToArray($result);
-
             $stockViewInstance = StockView::where('hospitalId', $hospitalId->value());
             foreach ($result as $itemRequest) {
-                $stockViewInstance->orWhere('divisionId', $itemRequest->getSourceDivision()->getDivisionId()->value());
+                $stockViewInstance->orWhere('divisionId', $itemRequest->getTargetDivision()->getDivisionId()->value());
                 foreach ($itemRequest->getRequestItems() as $requestItem) {
                     $stockViewInstance->orWhere('inHospitalItemId', $requestItem->getInHospitalItemId()->value());
                 }
             }
-
+            
             $stocks = $stockViewInstance->get();
-
             if ((int)$stocks->count === 0) {
-                throw new Exception("Stocks don't exist.");
+                throw new Exception("Stocks don't exist.", 999);
             }
+            
+            $this->itemRequestRepository->saveToArray($result);
 
+            $stocks = $stocks->data->all();
             $requestItemCounts = [];
             foreach ($result as $itemRequest) {
                 foreach ($itemRequest->getRequestItems() as $item) {
-                    foreach ($stocks->data->all() as $stock) {
-                        if (($itemRequest->getSourceDivision()->getDivisionId()->value() === $stock->divisionId) &&
+                    foreach ($stocks as $stock) {
+                        if (($itemRequest->getTargetDivision()->getDivisionId()->value() === $stock->divisionId) &&
                         ($item->getInHospitalItemId()->value() === $stock->inHospitalItemId)) {
                             $requestItemCounts[] = new RequestItemCount(
                                 $stock->recordId,
                                 $hospitalId,
-                                $itemRequest->getSourceDivision()->getDivisionId(),
                                 $item->getInHospitalItemId(),
                                 $item->getItem()->getItemId(),
-                                $item->getRequestQuantity()->value()
+                                (int)$item->getRequestQuantity()->value(),
+                                $itemRequest->getSourceDivision()->getDivisionId(),
+                                $itemRequest->getTargetDivision()->getDivisionId()
                             );
                         }
                     }

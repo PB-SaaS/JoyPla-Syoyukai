@@ -36,7 +36,6 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
     public function findByInHospitalItem(HospitalId $hospitalId, array $requestItems)
     {
         $payoutUnitPriceUseFlag = (Hospital::where('hospitalId', $hospitalId->value())->value('payoutUnitPrice')->get())->data->get(0);
-//        var_dump($payoutUnitPriceUseFlag);
         //$division = SpiralDbDivision::where('hospitalId',$hospitalId->value());
 
         $division = SpiralDB::title('NJ_divisionDB')->value([
@@ -60,7 +59,7 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
         $division = $division->get();
         $division = $division->all();
 
-        $inHospitalItem = InHospitalItemView::where('hospitalId', $hospitalId->value());
+        $inHospitalItem = InHospitalItemView::where('hospitalId', $hospitalId->value())->where('notUsedFlag', '1', '!=');
         foreach ($requestItems as $item) {
             $inHospitalItem->orWhere('inHospitalItemId', $item->inHospitalItemId);
         }
@@ -68,37 +67,43 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
 
         $result = [];
         foreach ($requestItems as $item) {
+            if ((int)$item->requestQuantity < 1) {
+                continue;
+            }
+            
             $source_division_find_key = array_search($item->sourceDivisionId, collect_column($division, 'divisionId'));
             $target_division_find_key = array_search($item->targetDivisionId, collect_column($division, 'divisionId'));
             $inHospitalItem_find_key = array_search($item->inHospitalItemId, collect_column($inHospitalItem, 'inHospitalItemId'));
-
-            $unitprice = 0;
-            if (is_numeric($inHospitalItem[$inHospitalItem_find_key]->unitPrice)) {
-                $unitprice = (float)$inHospitalItem[$inHospitalItem_find_key]->unitPrice;
-            }
-
-            if ($payoutUnitPriceUseFlag->payoutUnitPrice !== '1') {
-                if ($inHospitalItem[$inHospitalItem_find_key]->quantity != 0 && $inHospitalItem[$inHospitalItem_find_key]->price != 0) {
-                    $unitprice = ((int)$inHospitalItem[$inHospitalItem_find_key]->price / (int)$inHospitalItem[$inHospitalItem_find_key]->quantity) ;
-                } else {
-                    $unitprice = 0;
+            
+            if (($source_division_find_key !== false) && ($target_division_find_key !== false) && ($inHospitalItem_find_key !== false)) {
+                $unitprice = 0;
+                if (is_numeric($inHospitalItem[$inHospitalItem_find_key]->unitPrice)) {
+                    $unitprice = (float)$inHospitalItem[$inHospitalItem_find_key]->unitPrice;
                 }
+    
+                if ($payoutUnitPriceUseFlag->payoutUnitPrice !== '1') {
+                    if ($inHospitalItem[$inHospitalItem_find_key]->quantity != 0 && $inHospitalItem[$inHospitalItem_find_key]->price != 0) {
+                        $unitprice = ((int)$inHospitalItem[$inHospitalItem_find_key]->price / (int)$inHospitalItem[$inHospitalItem_find_key]->quantity) ;
+                    } else {
+                        $unitprice = 0;
+                    }
+                }
+                
+                $result[] = new RequestItem(
+                    (RequestId::generate()),
+                    (new RequestHId('')),
+                    (new InHospitalItemId($inHospitalItem[$inHospitalItem_find_key]->inHospitalItemId) ),
+                    (Item::create($inHospitalItem[$inHospitalItem_find_key])),
+                    $hospitalId,
+                    (Division::create($division[$source_division_find_key])),
+                    (Division::create($division[$target_division_find_key])),
+                    (new RequestQuantity((int)$item->requestQuantity)),
+                    (new RequestType($item->requestType)),
+                    (Quantity::create($inHospitalItem[$inHospitalItem_find_key])),
+                    (new Price($inHospitalItem[$inHospitalItem_find_key]->price) ),
+                    (new UnitPrice($unitprice) )
+                );
             }
-
-            $result[] = new RequestItem(
-                (RequestId::generate()),
-                (new RequestHId('')),
-                (new InHospitalItemId($inHospitalItem[$inHospitalItem_find_key]->inHospitalItemId) ),
-                (Item::create($inHospitalItem[$inHospitalItem_find_key])),
-                $hospitalId,
-                (Division::create($division[$source_division_find_key])),
-                (Division::create($division[$target_division_find_key])),
-                (new RequestQuantity((int)$item->requestQuantity)),
-                (new RequestType($item->requestType)),
-                (Quantity::create($inHospitalItem[$inHospitalItem_find_key])),
-                (new Price($inHospitalItem[$inHospitalItem_find_key]->price) ),
-                (new UnitPrice($unitprice) )
-            );
         }
         return $result;
     }
@@ -138,6 +143,7 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
                     "sourceDivisionId" => (string)$requestItem['sourceDivision']['divisionId'],
                     "targetDivisionId" => (string)$requestItem['targetDivision']['divisionId'],
                     "requestQuantity" => (string)$requestItem['requestQuantity'],
+                    "requestType" => (string)$requestItem['requestType'],
                     "quantity" => (string)$requestItem['quantity']['quantityNum'],
                     "quantityUnit" => (string)$requestItem['quantity']['quantityUnit'],
                     "itemUnit" => (string)$requestItem['quantity']['itemUnit'],

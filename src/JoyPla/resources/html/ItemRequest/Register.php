@@ -9,10 +9,11 @@
                 <hr>
                 <div>
                     <div class="my-4 mt-4 lg:w-1/3">
-                        <v-select-division name="sourceDivisionId" label="請求元部署" :rules="{ required : true }" title="請求元部署指定" :disabled="values.sourceDivisionId != '' && fields.length > 0" :is-only-my-division="<?php var_export(gate('register_of_item_requests')->isOnlyMyDivision()); ?>" />
+                        <v-select-division name="sourceDivisionId" label="請求元部署" :rules="{ required : true }" title="請求元部署指定" :disabled="(values.sourceDivisionId != '' && fields.length > 0 && values.sourceDivisionId != values.targetDivisionId)"
+                        :is-only-my-division="<?php var_export(gate('register_of_item_requests')->isOnlyMyDivision()); ?>" />
                     </div>
                     <div class="my-4 lg:w-1/3">
-                        <v-select-division name="targetDivisionId" label="請求先部署" :rules="{ required : true }" title="請求先部署指定" :disabled="values.targetDivisionId != '' && fields.length > 0" />
+                        <v-select-division name="targetDivisionId" label="請求先部署" :rules="{ required : true }" title="請求先部署指定" :disabled="(values.targetDivisionId != '' && fields.length > 0 && values.sourceDivisionId != values.targetDivisionId)" />
                     </div>
                     <div class="my-4 lg:w-1/3">
                         <v-select :options="[{ label: '個別請求', value: 1 },{ label: '消費請求', value: 2 }]" name="requestType" :rules="{required: true}" title="請求タイプ" label="請求タイプ"></v-select>
@@ -77,12 +78,12 @@
                                 <div class="lg:flex-1 lg:w-1/4">
                                     <div class="lg:flex gap-6 items-end flex-row-reverse">
                                         <div class="lg:w-1/2">
-                                            <v-input-number :rules="{ between: [0 , 99999] }" :name="`requestItems[${idx}].requestUnitQuantity`" label="請求数（個数）" :min="0" :unit="item.value.itemUnit" :step="1" :title="`請求数（個数）/${item.value.quantity}${ item.value.quantityUnit }入り`"></v-input-number>
+                                            <v-input-number @change="checkUnitQuantity(idx)" :rules="{ between: [0 , 99999] }" :name="`requestItems[${idx}].requestUnitQuantity`" label="請求数（個数）" :min="0" :unit="item.value.itemUnit" :step="1" :title="`請求数（個数）/${item.value.quantity}${ item.value.quantityUnit }入り`"></v-input-number>
                                         </div>
                                     </div>
                                     <div class="lg:flex gap-6 items-end flex-row-reverse">
                                         <div class="lg:w-1/2">
-                                            <v-input-number :rules="{ between: [0 , 99999] }" :name="`requestItems[${idx}].requestQuantity`" label="請求数（入数）" :min="0" :unit="item.value.quantityUnit" :step="1" title="請求数（入数）"></v-input-number>
+                                            <v-input-number @change="checkQuantity(idx)" :rules="{ between: [0 , 99999] }" :name="`requestItems[${idx}].requestQuantity`" label="請求数（入数）" :min="0" :unit="item.value.quantityUnit" :step="1" title="請求数（入数）"></v-input-number>
                                         </div>
                                     </div>
                                 </div>
@@ -145,7 +146,7 @@
                                 </div>
                             </div>
                             <div class="w-full lg:block lg:w-1/6 px-4 py-4">
-                                <v-button-default type="button" class="w-full" v-on:click.native="additem(elem)">反映</v-button-default>
+                                <v-button-default type="button" class="w-full" v-on:click.native="additemFromList(elem)">反映</v-button-default>
                             </div>
                             <div class="py-2 px-4 w-full">
                                 <div class="border-t border-gray-200"></div>
@@ -170,14 +171,16 @@
                 reactive,
                 onMounted
             } = Vue;
+            
             const {
                 useFieldArray,
                 useForm
             } = VeeValidate;
-            const payoutUnitPriceUseFlag =
-                "<?php echo $payoutUnitPriceUseFlag; ?>";
+            
+            const payoutUnitPriceUseFlag = "<?php echo $payoutUnitPriceUseFlag; ?>";
 
             const loading = ref(false);
+            
             const start = () => {
                 loading.value = true;
             }
@@ -191,18 +194,13 @@
                     complete();
                 }, 500);
             }
+            
             start();
 
             onMounted(() => {
                 sleepComplate()
             });
 
-            /*
-                        const date = new Date();
-                        const yyyy = date.getFullYear();
-                        const mm = ("0" + (date.getMonth() + 1)).slice(-2);
-                        const dd = ("0" + date.getDate()).slice(-2);
-            */
             const {
                 handleSubmit,
                 control,
@@ -219,6 +217,7 @@
                 },
                 validateOnMount: false
             });
+            
             const {
                 remove,
                 push,
@@ -264,7 +263,7 @@
                     if (requestQuantity(idx) > 0) {
                         requestItems.push({
                             'inHospitalItemId': item.inHospitalItemId,
-                            'requestQuantity': item.requestQuantity,
+                            'requestQuantity': requestQuantity(idx),
                             'sourceDivisionId': values.sourceDivisionId,
                             'targetDivisionId': values.targetDivisionId,
                             'requestType': values.requestType
@@ -273,16 +272,22 @@
                 });
                 return requestItems;
             };
+            
+            const checkDivisions = () => {
+                if (values.sourceDivisionId == values.targetDivisionId) {
+                    return false;
+                }
+                return true;
+            };
 
             const requestQuantity = (idx) => {
                 let num = 0;
                 if (values.requestItems[idx].requestQuantity) {
-                    num += parseInt(values.requestItems[idx].requestQuantity)
-                };
+                    num += parseInt(values.requestItems[idx].requestQuantity);
+                }
                 if (values.requestItems[idx].requestUnitQuantity) {
-                    num += parseInt(values.requestItems[idx].quantity * parseInt(values.requestItems[idx]
-                        .requestUnitQuantity))
-                };
+                    num += parseInt(values.requestItems[idx].quantity * parseInt(values.requestItems[idx].requestUnitQuantity));
+                }
                 return num;
             };
 
@@ -313,14 +318,23 @@
                 return new Intl.NumberFormat('ja-JP').format(value);
                 //return new Intl.NumberFormat('ja-JP').format(value);
             }
-            /*
-                        const isRequired = (idx) => {
-                            if (fields.value[idx].value.lotManagement == "1") {
-                                return true;
-                            }
-                            return false;
-                        };
-            */
+            
+            const checkUnitQuantity = (idx) => {
+                if (values.requestItems[idx]) {
+                    if (!values.requestItems[idx].requestUnitQuantity || values.requestItems[idx].requestUnitQuantity < 0) {
+                        values.requestItems[idx].requestUnitQuantity = 0;
+                    }
+                }
+            }
+            
+            const checkQuantity = (idx) => {
+                if (values.requestItems[idx]) {
+                    if (!values.requestItems[idx].requestQuantity || values.requestItems[idx].requestQuantity < 0) {
+                        values.requestItems[idx].requestQuantity = 0;
+                    }
+                }
+            }
+
             const alertSetting = toRefs(alertModel);
             const confirmSetting = toRefs(confirmModel);
 
@@ -333,11 +347,19 @@
                     errors
                 } = await validate();
 
+                const validDivisions = checkDivisions();
+                
                 if (!valid) {
                     Swal.fire({
                         icon: 'error',
                         title: '入力エラー',
                         text: '入力エラーがございます。ご確認ください',
+                    })
+                } else if (!validDivisions) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '入力エラー',
+                        text: '請求元部署と請求先部署は別のものを選択してください'
                     })
                 } else {
                     Swal.fire({
@@ -373,8 +395,7 @@
                     params.append("path", "/api/itemrequest/register");
                     params.append("_method", 'post');
                     params.append("_csrf", _CSRF);
-                    params.append("requestItems", JSON.stringify(encodeURIToObject(
-                        itemRequestModels)));
+                    params.append("requestItems", JSON.stringify(encodeURIToObject(itemRequestModels)));
                     params.append("requestType", values.requestType);
                     const res = await axios.post(_APIURL, params);
 
@@ -411,6 +432,27 @@
                 );
             }
 
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                showCloseButton: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+
+            const additemFromList = (item) => {
+                additem(item);
+                Toast.fire({
+                    icon: 'success',
+                    title: '反映しました'
+                })
+            }
+            
             const additem = (item) => {
                 item = JSON.parse(JSON.stringify(item));
                 let checked = false;
@@ -418,16 +460,25 @@
                     values.requestItems.forEach((v, idx) => {
                         if (v.inHospitalItemId === item.inHospitalItemId) {
                             checked = true;
-                            let quantity = (item.requestQuantity) ? parseInt(item.requestQuantity) :
-                                0;
-                            let unitQuantity = (item.requestUnitQuantity) ? parseInt(item.requestUnitQuantity) : 0;
-                            v.requestQuantity += quantity;
-                            v.requestUnitQuantity += unitQuantity;
+                            let itemQuantity = (item.requestQuantity) ? parseInt(item.requestQuantity) : 0;
+                            let itemUnitQuantity = (item.requestUnitQuantity) ? parseInt(item.requestUnitQuantity) : 0;
+                            v.requestQuantity += itemQuantity;
+                            v.requestUnitQuantity += itemUnitQuantity;
                         }
                     });
                 }
 
                 if (!checked) {
+                    let itemPrice = (item.price) ? parseInt(item.price) : 0;
+                    let itemQuantity = (item.quantity) ? parseInt(item.quantity) : 0;
+                    let itemUnitPrice = (item.unitPrice) ? parseInt(item.unitPrice) : 0;
+                    
+                    if (payoutUnitPriceUseFlag === '1') {
+                        item.unitPrice = itemUnitPrice;
+                    }
+                    if (payoutUnitPriceUseFlag === '0') {
+                        item.unitPrice = (itemPrice / itemQuantity);
+                    }
                     item.requestQuantity = (item.requestQuantity) ? parseInt(item.requestQuantity) : 0;
                     item.requestUnitQuantity = (item.requestUnitQuantity) ? parseInt(item.requestUnitQuantity) : 0;
                     item.cardId = (item.cardId) ? item.cardId : "";
@@ -444,8 +495,7 @@
                         values.requestItems.forEach((v, idx) => {
                             if (v.inHospitalItemId === elm.inHospitalItemId) {
                                 exist = true;
-                                let quantity = (elm.consumptionQuantity) ? parseInt(elm
-                                    .consumptionQuantity) : 0;
+                                let quantity = (elm.consumptionQuantity) ? parseInt(elm.consumptionQuantity) : 0;
                                 v.requestQuantity += quantity;
                             }
                         });
@@ -453,21 +503,16 @@
 
                     if (!exist) {
                         let consumption = new Object();
-                        consumption.requestQuantity = (elm.consumptionQuantity) ? parseInt(elm
-                            .consumptionQuantity) : 0;
+                        consumption.requestQuantity = (elm.consumptionQuantity) ? parseInt(elm.consumptionQuantity) : 0;
                         consumption.requestUnitQuantity = 0;
                         consumption.makerName = (elm.item.makerName) ? elm.item.makerName : "";
                         consumption.itemName = (elm.item.itemName) ? elm.item.itemName : "";
                         consumption.itemCode = (elm.item.itemCode) ? elm.item.itemCode : "";
-                        consumption.itemStandard = (elm.item.itemStandard) ? elm.item.itemStandard :
-                            "";
+                        consumption.itemStandard = (elm.item.itemStandard) ? elm.item.itemStandard : "";
                         consumption.itemJANCode = (elm.itemJANCode) ? elm.itemJANCode : "";
-                        consumption.quantity = (elm.quantity.quantityNum) ? parseInt(elm.quantity
-                            .quantityNum) : 0;
+                        consumption.quantity = (elm.quantity.quantityNum) ? parseInt(elm.quantity.quantityNum) : 0;
                         consumption.price = (elm.price) ? parseInt(elm.price) : 0;
-
-                        consumption.quantityUnit = (elm.quantity.quantityUnit) ? elm.quantity
-                            .quantityUnit : "";
+                        consumption.quantityUnit = (elm.quantity.quantityUnit) ? elm.quantity.quantityUnit : "";
 
                         consumption.unitPrice = 0;
 
@@ -482,9 +527,7 @@
                         consumption.itemUnit = (elm.quantity.itemUnit) ? elm.quantity.itemUnit : "";
                         consumption.cardId = (elm.cardId) ? elm.cardId : "";
                         consumption.itemId = (elm.item.itemId) ? elm.item.itemId : "";
-                        consumption.inHospitalItemId = (elm.inHospitalItemId) ? elm
-                            .inHospitalItemId :
-                            "";
+                        consumption.inHospitalItemId = (elm.inHospitalItemId) ? elm.inHospitalItemId : "";
                         consumption.serialNo = (elm.item.serialNo) ? elm.item.serialNo : "";
                         consumption.catalogNo = (elm.item.catalogNo) ? elm.item.catalogNo : "";
                         consumption.inItemImage = (elm.itemImage) ? elm.itemImage : "";
@@ -497,6 +540,7 @@
             const openModal = ref();
             const selectInHospitalItems = ref([]);
             const addItemByBarcode = (items) => {
+                
                 selectInHospitalItems.value = [];
                 if (items.item.length === 0) {
                     Swal.fire({
@@ -514,8 +558,7 @@
 
                 if (items.type == "payout") {
                     items.item.forEach((x, id) => {
-                        items.item[id].requestQuantity = parseInt(items.item[id]
-                            .payoutQuantity);
+                        items.item[id].requestQuantity = parseInt(items.item[id].payoutQuantity);
                     });
                 }
                 if (items.type == "card") {
@@ -535,20 +578,18 @@
                     }
                     items.item.forEach((x, id) => {
                         items.item[id].cardId = items.item[id].barcode;
-                        items.item[id].requestQuantity = parseInt(items.item[id]
-                            .cardQuantity);
+                        items.item[id].requestQuantity = parseInt(items.item[id].cardQuantity);
                     });
                 }
                 if (items.type == "customlabel") {
                     items.item.forEach((x, id) => {
-                        items.item[id].requestQuantity = parseInt(items.item[id]
-                            .customQuantity);
+                        items.item[id].requestQuantity = parseInt(items.item[id].customQuantity);
                     });
                 }
 
                 if (items.item.length === 1) {
                     if (items.item[0].divisionId) {
-                        if (values.divisionId !== items.item[0].divisionId) {
+                        if (values.sourceDivisionId !== items.item[0].divisionId) {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'エラー',
@@ -593,6 +634,10 @@
                 remove,
                 validate,
                 payoutUnitPriceUseFlag,
+                checkQuantity,
+                checkUnitQuantity,
+                checkDivisions,
+                additemFromList
             };
         },
         watch: {
