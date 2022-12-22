@@ -408,6 +408,9 @@ var JoyPlaApp = Vue.createApp({
         item.consumeLotNumber = ( item.lotNumber ) ? item.lotNumber : "" ;
         item.consumeLotDate =  ( item.lotDate ) ? item.lotDate : "" ;
         item.cardId = (item.cardId)? item.cardId : "";
+        if( !values.consumeItems ){
+          values.consumeItems = [];
+        }
         insert(0,item);
       };
 
