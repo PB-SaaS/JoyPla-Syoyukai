@@ -13,7 +13,7 @@ class Paginator extends stdClass
     private int $lastPage = 0;
     private int $limit = 0;
     private int $total = 0;
-    private OrderBy $orderBy;
+    private ?OrderBy $orderBy;
 
     public static array $sortSymbol = ['asc' => '▲', 'desc' => '▼'];
 
