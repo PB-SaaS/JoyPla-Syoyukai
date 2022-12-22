@@ -10,7 +10,9 @@
         <form method="" action="" onsubmit="return false">
           <div class="my-4 grid grid-cols-2 gap-4 lg:w-1/2 items-center">
             <v-button-default type="button" data-micromodal-trigger="orderItemModal">発注済商品検索</v-button-default>
-            <v-order-item-modal v-on:additem="additem" :is-only-my-division="<?php var_export(gate('receipt')->isOnlyMyDivision()) ?>">
+            <v-order-item-modal v-on:additem="additem" :is-only-my-division="<?php var_export(
+                gate('receipt')->isOnlyMyDivision()
+            ); ?>">
             </v-order-item-modal>
           </div>
           <div class="p-2 bg-gray-300">
@@ -242,7 +244,7 @@
       });
       const {
         remove,
-        push,
+        insert,
         fields,
         update,
         replace
@@ -496,7 +498,7 @@
           });
         }
         if (!checked) {
-          push(item);
+          insert(0,item);
         }
       };
 
