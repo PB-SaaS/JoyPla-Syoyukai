@@ -79,6 +79,9 @@ $auth = new App\Lib\Auth();
                 <?php if($auth->Gate('ReceivedHistory')): ?>
                 <li class=" <?php echo $n4_3 ?>"><a href="%url/rel:mpgt:History%&Action=ReceivedHistoryList&table_cache=true">入荷履歴詳細一覧</a></li>
                 <?php endif ?>
+                <?php if($auth->Gate('ItemRequestHistory')): ?>
+                <li class=" <?php echo $n4_13 ?>"><a href="%url/rel:mpgt:History%&Action=ItemRequestHistoryList&table_cache=true">請求履歴詳細一覧</a></li>
+                <?php endif ?>
                 <?php if($auth->Gate('PayoutHistory')): ?>
                 <li class=" <?php echo $n4_5 ?>"><a href="%url/rel:mpgt:History%&Action=PayoutHistoryList&table_cache=true">払出履歴詳細一覧</a></li>
                 <?php endif ?>

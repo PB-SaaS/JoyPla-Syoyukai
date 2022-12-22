@@ -212,7 +212,7 @@ class HistoryController extends Controller
             $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
-                'title'     => 'JoyPla 入荷履歴詳細一覧',
+                'title'     => 'JoyPla 払出履歴詳細一覧',
                 'sidemenu'  => $sidemenu,
                 'content'   => $content,
                 'head' => $head,
@@ -332,7 +332,54 @@ class HistoryController extends Controller
         }
     }
     
-    
+    public function ItemRequestHistoryList()
+    {
+        global $SPIRAL;
+        try {
+            $auth = new Auth();
+            $auth->browseAuthority('ItemRequestHistory');
+            
+            $auth = new Auth();
+            $hospital = Hospital::where('tenantId',$auth->tenantId)->get();
+            $select_hospital = [['text'=> '----- 選択してください -----' ,'value'=> '' ]];
+            foreach($hospital->data->all() as $h)
+            {
+                $select_hospital[] = ['text'=> $h->hospitalName ,'value'=> $h->hospitalName ];
+            }
+            $content = $this->view('NewJoyPlaTenantAdmin/view/History/ItemRequestHistoryList', [
+                ] , false)->render();
+            
+        } catch ( Exception $ex ) {
+            
+            $content = $this->view('NewJoyPlaTenantAdmin/view/Template/Error', [
+                'code' => $ex->getCode(),
+                'message' => $ex->getMessage(),
+            ] , false)->render();
+            
+        } finally {
+            $script = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/TableScript', [
+                'select_hospital'=>$select_hospital,
+                //'select_distributor'=>$select_distributor,
+                ] , false)->render();
+            $style = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss', [] , false)->render();
+            $sidemenu = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/SideMenu', [
+                'n4' => 'uk-active uk-open',
+                'n4_13' => 'uk-active',
+                ] , false)->render();
+            $head = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Head', [] , false)->render();
+            $header = $this->view('NewJoyPlaTenantAdmin/view/Template/Parts/Header', [], false)->render();
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view('NewJoyPlaTenantAdmin/view/Template/Base', [
+                'title' => 'JoyPla 請求履歴詳細一覧',
+                'sidemenu' => $sidemenu,
+                'content' => $content,
+                'head' => $head,
+                'header' => $header,
+                'style' => $style,
+                'before_script' => $script,
+            ],false);
+        }
+    }
 }
 
 /***
@@ -362,6 +409,10 @@ $action = $SPIRAL->getParam('Action');
     else if($action === "PayoutHistoryList")
     {
         echo $HistoryController->PayoutHistoryList()->render();
+    }
+    else if($action === "ItemRequestHistoryList")
+    {
+        echo $HistoryController->ItemRequestHistoryList()->render();
     }
     else
     {
