@@ -121,6 +121,14 @@
           <div class="w-full px-3 my-6 md:mb-0">
             <div class="my-4">
               <v-input
+                name="orderId"
+                type="text"
+                label="発注番号"
+                title="発注番号"
+                ></v-input>
+            </div>
+            <div class="my-4">
+              <v-input
                 name="registerDate"
                 type="month"
                 label="作成年月"
@@ -175,14 +183,14 @@
                 title="JANコード"
                 ></v-input>
             </div>
-            <?php if(! gate('list_of_order_slips' )->isOnlyMyDivision ): ?>
+            <?php if (!gate('list_of_order_slips')->isOnlyMyDivision): ?>
             <div class="my-4">
               <v-multiple-select-division
                 name="divisionIds"
                 title="発注書元部署名"
                 ></v-multiple-select-division>
             </div>
-            <?php endif ?>
+            <?php endif; ?>
             <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
               <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
               <v-button-primary type="button" @click.native="searchExec">絞り込み</v-button-primary>
@@ -261,6 +269,7 @@ var JoyPlaApp = Vue.createApp({
       const setParam = (values) => {
         sessionStorage.setItem(pagetitle,JSON.stringify(values));
         const url = new URL(window.location);
+        url.searchParams.set('orderId',values.orderId);
         url.searchParams.set('itemName',values.itemName);
         url.searchParams.set('makerName',values.makerName);
         url.searchParams.set('itemCode',values.itemCode);
@@ -276,6 +285,7 @@ var JoyPlaApp = Vue.createApp({
 
       const { meta , validate , values , setFieldValue , resetForm} = useForm({
         initialValues: {
+          orderId  : (getParam("orderId")) ? getParam("orderId") : "",
           itemName  : (getParam("itemName")) ? getParam("itemName") : "",
           makerName : (getParam("makerName")) ? getParam("makerName") : "",
           itemCode : (getParam("itemCode")) ? getParam("itemCode") : "",
@@ -397,6 +407,7 @@ var JoyPlaApp = Vue.createApp({
       {
         values.currentPage = 1;
         resetForm({
+          orderId : "",
           itemName  : "",
           makerName : "",
           itemCode : "",

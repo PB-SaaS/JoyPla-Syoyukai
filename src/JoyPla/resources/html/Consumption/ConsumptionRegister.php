@@ -48,7 +48,7 @@
             <v-button-primary type="button" class="w-full" @click.native="onSubmit">消費登録</v-button-primary>
           </div>
           <transition-group tag="div" name="list" appear>
-            <div class="my-2" v-for="(item, idx) in fields" :key="item.key">
+            <div class="my-2" v-for="(item , idx) in fields" :key="item.key">
               <div class="w-full lg:flex mt-3">
                 <div class="lg:flex-1 flex lg:w-3/4">
                   <item-view class="md:h-44 md:w-44 h-32 w-32" :base64="item.value.inItemImage"></item-view>
@@ -225,8 +225,8 @@ var JoyPlaApp = Vue.createApp({
         },
         validateOnMount : false
       });
-      const { remove, push, fields , update , replace } = useFieldArray('consumeItems' , control);
-    
+      const { remove, insert, fields , update , replace } = useFieldArray('consumeItems' , control);
+
       const alertModel = reactive({
         message: "",
         headtext: "",
@@ -408,7 +408,10 @@ var JoyPlaApp = Vue.createApp({
         item.consumeLotNumber = ( item.lotNumber ) ? item.lotNumber : "" ;
         item.consumeLotDate =  ( item.lotDate ) ? item.lotDate : "" ;
         item.cardId = (item.cardId)? item.cardId : "";
-        push(item);
+        if( !values.consumeItems ){
+          values.consumeItems = [];
+        }
+        insert(0,item);
       };
 
       const openModal = ref();
