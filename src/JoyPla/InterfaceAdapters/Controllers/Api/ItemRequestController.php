@@ -1,6 +1,6 @@
 <?php
 
-namespace JoyPla\InterfaceAdapters\Controllers\Api ;
+namespace JoyPla\InterfaceAdapters\Controllers\Api;
 
 use App\SpiralDb\HospitalUser;
 use Auth;
@@ -13,30 +13,29 @@ use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestRegisterInputData;
 use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestRegisterInputPortInterface;
 //use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestDeleteInputData;
 //use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestDeleteInputPortInterface;
-//use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestShowInputData;
-//use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestShowInputPortInterface;
+use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestHistoryInputData;
+use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestHistoryInputPortInterface;
 
 class ItemRequestController extends Controller
 {
-    /*
-    public function show($vars, ItemRequestShowInputPortInterface $inputPort)
+    public function history($vars, ItemRequestHistoryInputPortInterface $inputPort)
     {
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
 
-        if (Gate::denies('list_of_ItemRequest_slips')) {
+        if (Gate::denies('list_of_item_request_history')) {
             Router::abort(403);
         }
 
-        $gate = Gate::getGateInstance('list_of_ItemRequest_slips');
+        $gate = Gate::getGateInstance('list_of_item_request_history');
 
         $search = $this->request->get('search');
 
         if ($gate->isOnlyMyDivision()) {
-            $search['divisionIds'] = [$this->request->user()->divisionId];
+            $search['sourceDivisionIds'] = [$this->request->user()->divisionId];
         }
 
-        $inputData = new ItemRequestShowInputData($this->request->user()->hospitalId, $search);
+        $inputData = new ItemRequestHistoryInputData($this->request->user()->hospitalId, $search);
         $inputPort->handle($inputData);
     }
 
@@ -44,7 +43,7 @@ class ItemRequestController extends Controller
     {
     }
 
-    */
+
     public function register($vars, ItemRequestRegisterInputPortInterface $inputPort)
     {
         $token = $this->request->get('_csrf');
