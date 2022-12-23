@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 namespace framework\Http\Session;
 
 use Closure;
 
-class Session {
-
+class Session
+{
     public static function getId()
-    {   
+    {
         return session_id();
     }
 
@@ -18,7 +18,7 @@ class Session {
 
     public static function regenerate()
     {
-        session_regenerate_id();
+        session_regenerate_id(true);
     }
 
     public static function all()
@@ -26,22 +26,20 @@ class Session {
         return $_SESSION;
     }
 
-    public static function get(string $key , $any = null)
+    public static function get(string $key, $any = null)
     {
-        if(isset($_SESSION[$key]))
-        {
+        if (isset($_SESSION[$key])) {
             return Session::all()[$key];
         }
 
-        if($any instanceof Closure)
-        {
+        if ($any instanceof Closure) {
             return $any();
         }
 
         return $any;
     }
 
-    public static function put(string $key , $value)
+    public static function put(string $key, $value)
     {
         $_SESSION[$key] = $value;
     }
@@ -53,7 +51,7 @@ class Session {
 
     public static function exists(string $key)
     {
-        return array_key_exists($key , self::all());
+        return array_key_exists($key, self::all());
     }
 
     public static function missing(string $key)
@@ -63,15 +61,12 @@ class Session {
 
     public static function forget($key)
     {
-        if(is_string($key))
-        {
+        if (is_string($key)) {
             unset($_SESSION[$key]);
         }
 
-        if(is_array($key))
-        {
-            foreach($key as $k)
-            {
+        if (is_array($key)) {
+            foreach ($key as $k) {
                 self::forget($k);
             }
         }
@@ -83,12 +78,16 @@ class Session {
     }
 }
 
-
-class RequestSession {
-
+class RequestSession
+{
     public function __construct()
     {
         Session::generate();
+    }
+
+    public function getId()
+    {
+        return Session::getId();
     }
 
     public function regenerate()
@@ -101,12 +100,12 @@ class RequestSession {
         return Session::all();
     }
 
-    public function get(string $key , $any = null)
+    public function get(string $key, $any = null)
     {
-        return Session::get($key , $any);
+        return Session::get($key, $any);
     }
 
-    public function put(string $key , $value)
+    public function put(string $key, $value)
     {
         return Session::put($key, $value);
     }

@@ -840,6 +840,11 @@ video {
   margin-right: -2rem;
 }
 
+.mx-6 {
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+}
+
 .mt-\[15px\] {
   margin-top: 15px;
 }
