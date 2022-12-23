@@ -151,6 +151,7 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
         {
             $body = view('html/Product/ItemAndPriceAndInHospitalItemRegist/input' , [
                 'distributor' => $distributor,
+                'duplicate' => $duplicate->toArray(),
                 'input' => $this->request->all(),
                 'validate' => $validate,
                 'csrf' => Csrf::generate(),
@@ -183,7 +184,7 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
 
         $duplicate = SiValidator::validate($input["janTenantId"], "JANコード", [SpiralDbUniqueRule::unique("NJ_itemDB","janTenantId")]);
 
-        if( $validate->isError() ){
+        if( $validate->isError() || !($duplicate -> isValid())){
             $this->request->set('confirm' , true);
             Router::redirect('/product/ItemAndPriceAndInHospitalRegist/input',$this->request);
             exit;
@@ -228,7 +229,7 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
         
         $duplicate = SiValidator::validate($input["janTenantId"], "JANコード", [SpiralDbUniqueRule::unique("NJ_itemDB","janTenantId")]);
 
-        if( $this->request->formBack || $validate->isError()){
+        if( $this->request->formBack || $validate->isError() || !($duplicate -> isValid())){
             $this->request->set('confirm' , true);
             Router::redirect('/product/ItemAndPriceAndInHospitalRegist/input',$this->request);
             exit;

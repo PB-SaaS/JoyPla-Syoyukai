@@ -20,9 +20,11 @@ use JoyPla\Application\Interactors\Web\Received\ReceivedLabelInteractor;
 // use JoyPla\Application\Interactors\Web\ItemRequest\ItemRequestIndexInteractor;
 use JoyPla\InterfaceAdapters\Controllers\Web\AgreeFormController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ConsumptionController;
+use JoyPla\InterfaceAdapters\Controllers\Web\ItemAndPriceAndInHospitalItemRegisterController;
 use JoyPla\InterfaceAdapters\Controllers\Web\NotificationController;
 use JoyPla\InterfaceAdapters\Controllers\Web\OptionController;
 use JoyPla\InterfaceAdapters\Controllers\Web\OrderController;
+use JoyPla\InterfaceAdapters\Controllers\Web\PriceAndInHospitalItemRegisterController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ReceivedController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ReturnController;
 use JoyPla\InterfaceAdapters\Controllers\Web\StocktakingController;
@@ -293,7 +295,20 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
         ItemAndPriceAndInHospitalItemRegisterController::class,
         'thanks'
     ]);
-    
+
+    Router::map('POST', '/product/PriceAndInHospitalRegist/input', [
+        PriceAndInHospitalItemRegisterController::class,
+        'register'
+    ]);
+    Router::map('POST', '/product/PriceAndInHospitalRegist/confirm', [
+        PriceAndInHospitalItemRegisterController::class,
+        'confirm'
+    ]);
+    Router::map('POST', '/product/PriceAndInHospitalRegist/thanks', [
+        PriceAndInHospitalItemRegisterController::class,
+        'thanks'
+    ]);
+
 });
 
 $router = new Router();

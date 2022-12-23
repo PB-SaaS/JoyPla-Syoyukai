@@ -1,6 +1,3 @@
-<?php
-var_dump($result);
-?>
 <div id="top" v-cloak>
     <v-loading :show="loading"></v-loading>
     <header-navi></header-navi>
@@ -12,7 +9,7 @@ var_dump($result);
 
                 <div class="smp_tmpl">
                     <div class="sub_text">
-                        商品情報の登録が完了しました。<br>
+                        商品情報・金額情報・院内商品情報の登録が完了しました。<br>
                     </div>
                 </div>
             </div>

@@ -3,13 +3,25 @@
 namespace JoyPla\InterfaceAdapters\Controllers\Web ;
 
 use App\SpiralDb\HospitalUser;
+use App\SpiralDb\Distributor;
+use App\SpiralDb\Item;
 use Auth;
 use Csrf;
+use Collection;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Http\View;
+use framework\Http\Request;
 use framework\Routing\Router;
+use framework\SpiralConnecter\SpiralDB;
 use framework\Library\SiValidator;
+use framework\Library\SpiralDbUniqueRule;
+use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\ItemAndPriceAndInHospitalItemRepository;
+use JoyPla\InterfaceAdapters\Presenters\Api\Item\ItemRegisterPresenter;
+use JoyPla\Application\InputPorts\Api\Item\ItemAndPriceAndInHospitalItemRegisterInputData;
+use JoyPla\Application\InputPorts\Api\Item\ItemAndPriceAndInHospitalItemRegisterInputPortInterface;
+use JoyPla\Application\Interactors\Api\Item\ItemAndPriceAndInHospitalItemRegisterInteractor;
 
 class PriceAndInHospitalItemRegisterController extends Controller
 {
@@ -89,13 +101,17 @@ class PriceAndInHospitalItemRegisterController extends Controller
                 $this->labels
             );
         }
+        $session = $this->request->session()->get($this->formName , []);
+        $itemId = ($session -> get('itemId')) ? $session -> get('itemId') : $input->get('itemId');
+        $data = SpiralDB:title('NJ_itemDB')->value(['itemId','tenantId'])->where('itemId', $itemId)->get();
+        $item = $data->first();
         $distributor = SpiralDb::title('NJ_distributorDB')->where('hospitalId', $this->request->user()->hospitalId)
             ->value([
                 'distributorId',
                 'distributorName',
             ])->get();
 
-        if($userInfo->isAdmin() || $userInfo->isApprover())
+        if(($userInfo->isAdmin() || $userInfo->isApprover()) && $item['tenantId'] === $this->request->user()->tenantId)
         {
             $body = view('html/Product/PriceAndInHospitalItemRegist/input' , [
                 'distributor' => $distributor,
