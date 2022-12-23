@@ -1,6 +1,7 @@
 <?php
 
 use App\Lib\ApiSpiral;
+use NewJoyPla\lib\Spiralv2LogginObject;
 
 require_once 'LoggingConfig.php';
 require_once 'NewJoyPla/core/Monad.php';
