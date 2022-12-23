@@ -355,7 +355,9 @@ var JoyPlaApp = Vue.createApp({
             }
           });
         }
-
+        if( !values.orderItems ){
+          values.orderItems = [];
+        }
         if( ! checked ){        
           insert(0,item);
         }

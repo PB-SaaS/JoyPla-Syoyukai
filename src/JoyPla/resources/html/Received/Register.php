@@ -497,6 +497,9 @@
             }
           });
         }
+        if( !values.receivedItems ){
+          values.receivedItems = [];
+        }
         if (!checked) {
           insert(0,item);
         }
