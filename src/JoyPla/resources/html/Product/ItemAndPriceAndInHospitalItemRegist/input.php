@@ -72,11 +72,11 @@ if($validate){
                                     <?= ($is_error && $val['category']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                     >
                                         <option value="">----- 選択してください -----</option>
-                                        <option value="1">医療材料</option>
-                                        <option value="2">薬剤</option>
-                                        <option value="3">試薬</option>
-                                        <option value="4">日用品</option>
-                                        <option value="99">その他</option>
+                                        <option value="1"  <?php echo ($val['category']['value'] === "1")  ? "selected" : ""?>>医療材料</option>
+                                        <option value="2"  <?php echo ($val['category']['value'] === "2")  ? "selected" : ""?>>薬剤</option>
+                                        <option value="3"  <?php echo ($val['category']['value'] === "3")  ? "selected" : ""?>>試薬</option>
+                                        <option value="4"  <?php echo ($val['category']['value'] === "4")  ? "selected" : ""?>>日用品</option>
+                                        <option value="99" <?php echo ($val['category']['value'] === "99") ? "selected" : ""?>>その他</option>
                                     </select>
                                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                                         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -552,7 +552,7 @@ if($validate){
                                         class="appearance-none w-full py-2 px-3 leading-tight h-32 text-left flex-initial bg-white border 
                                         <?= ($is_error && $val['medicineCategory']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                         onkeydown="countText(this, 'mediCat')"
-                                    ><?=$val['medicineCategory']['message'];?></textarea>
+                                    ><?=$val['medicineCategory']['value'];?></textarea>
                                     <span class="absolute bottom-4 right-6"><span id="mediCat">0</span>文字</span>
                                 </div>
                                 <span class="text-red-500"><?php echo html($val['medicineCategory']['message']) ?></span>
@@ -575,7 +575,7 @@ if($validate){
                                         class="appearance-none w-full py-2 px-3 leading-tight h-32 text-left flex-initial bg-white border 
                                         <?= ($is_error && $val['homeCategory']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                         onkeydown="countText(this, 'homeCat')"
-                                    ><?=$val['homeCategory']['message'];?></textarea>
+                                    ><?=$val['homeCategory']['value'];?></textarea>
                                     <span class="absolute bottom-4 right-6"><span id="homeCat">0</span>文字</span>
                                 </div>
                                 <span class="text-red-500"><?php echo html($val['homeCategory']['message']) ?></span>
@@ -619,7 +619,7 @@ if($validate){
                                         class="appearance-none w-full py-2 px-3 leading-tight h-32 text-left flex-initial bg-white border 
                                         <?= ($is_error && $val['notice']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
                                         onkeydown="countText(this, 'noticeCount')"
-                                    ><?=$val['notice']['message'];?></textarea>
+                                    ><?=$val['notice']['value'];?></textarea>
                                     <span class="absolute bottom-4 right-6"><span id="noticeCount">0</span>文字</span>
                                 </div>
                                 <span class="text-red-500"><?php echo html($val['notice']['message']) ?></span>

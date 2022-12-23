@@ -25,14 +25,14 @@ class ItemAndPriceAndInHospitalItemController extends Controller
 
         $gate = Gate::getGateInstance('register_of_item_and_price_and_inHospitalItem');
 
-        $item_and_price_and_inHospitalItemItem = $this->request->session()->get($this->formName);
+        $item_and_price_and_inHospitalItem = $this->request->session()->get($this->formName);
 
         $user = $this->request->user();
 
         $inputData = new ItemAndPriceAndInHospitalItemRegisterInputData(
             $user->tenantId,
             $user->hospitalId,
-            $item_and_price_and_inHospitalItemItem, 
+            $item_and_price_and_inHospitalItem, 
         );
         $inputPort->handle($inputData);
     }

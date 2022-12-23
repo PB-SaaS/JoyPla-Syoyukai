@@ -1,3 +1,6 @@
+<?php
+var_dump($result);
+?>
 <div id="top" v-cloak>
     <v-loading :show="loading"></v-loading>
     <header-navi></header-navi>

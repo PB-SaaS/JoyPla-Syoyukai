@@ -16,13 +16,16 @@ use framework\Routing\Router;
 use framework\SpiralConnecter\SpiralDB;
 use framework\Library\SiValidator;
 use framework\Library\SpiralDbUniqueRule;
+use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\ItemAndPriceAndInHospitalItemRepository;
+use JoyPla\InterfaceAdapters\Presenters\Api\Item\ItemRegisterPresenter;
+use JoyPla\Application\InputPorts\Api\Item\ItemAndPriceAndInHospitalItemRegisterInputData;
+use JoyPla\Application\InputPorts\Api\Item\ItemAndPriceAndInHospitalItemRegisterInputPortInterface;
+use JoyPla\Application\Interactors\Api\Item\ItemAndPriceAndInHospitalItemRegisterInteractor;
 
 /* 
-SiValidator::defineRule("janTenantUnique", function($value, $param){
-    SpiralDbUniqueRule::unique("NJ_itemDB","itemJANCode", function($spiralDb){
-        $spiralDb -> where("tenantId", $this->request->user()->tenantId);
-        return $spiralDb;    
-    });
+SiValidator::defineRule("janTenantUnique", function($value){
+    SiValidator::validate($value, "janTenantId", [SpiralDbUniqueRule::unique("NJ_itemDB","janTenantId")]);
 });
  */
 
@@ -85,7 +88,7 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
         "homeCategory" => ['maxword:512'],
         "measuringInst" => ['maxword:128'],
         "notice" => ['maxword:512'],
-        "janTenantId" => ["spiralDbUnique"],
+        "janTenantId" => ["janTenantUnique"],
     ];
 
     private array $labels = [
@@ -135,6 +138,8 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
             );
         }
 
+        $duplicate = SiValidator::validate($input["janTenantId"], "JANコード", [SpiralDbUniqueRule::unique("NJ_itemDB","janTenantId")]);
+
         $distributor = SpiralDB::title("NJ_distributorDB") 
             ->where('hospitalId', $this->request->user()->hospitalId)
             ->value([
@@ -176,6 +181,8 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
             $this->labels
         );
 
+        $duplicate = SiValidator::validate($input["janTenantId"], "JANコード", [SpiralDbUniqueRule::unique("NJ_itemDB","janTenantId")]);
+
         if( $validate->isError() ){
             $this->request->set('confirm' , true);
             Router::redirect('/product/ItemAndPriceAndInHospitalRegist/input',$this->request);
@@ -187,19 +194,11 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
             ->value([
                 'distributorName',
             ])->get()->toArray();
-        $category = [
-                    1 => "医療材料",
-                    2 => "薬剤",
-                    3 => "試薬",
-                    4 => "日用品",
-                    99 => "その他",
-                    ];
 
         if($user->userPermission == "1" || $user->userPermission == "3")
         {
             $body = view('html/Product/ItemAndPriceAndInHospitalItemRegist/confirm' , [
                 'distributor' => $distributor,
-                'category' -> $category,
                 'input' => $this->request->all(),
                 'session' => $this->request->session()->get($this->formName),
                 'validate' => $validate,
@@ -227,15 +226,23 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
             $this->labels
         );
         
+        $duplicate = SiValidator::validate($input["janTenantId"], "JANコード", [SpiralDbUniqueRule::unique("NJ_itemDB","janTenantId")]);
+
         if( $this->request->formBack || $validate->isError()){
             $this->request->set('confirm' , true);
             Router::redirect('/product/ItemAndPriceAndInHospitalRegist/input',$this->request);
             exit;
+        }else{
+            $tenantId = $this->request->user()->tenantId;
+            $hospitalId = $this->request->user()->hospitalId;
+//            $inputData = new ItemAndPriceAndInHospitalItemRegisterInputData($tenantId, $hospitalId, $input);
+            $data = new ItemAndPriceAndInHospitalItemRepository();
+            $result = $data -> saveToArray($tenantId, $hospitalId, $input);
         }
 
         $this->request->session()->forget($this->formName);
 
-        $body = view('html/Product/ItemAndPriceAndInHospitalItemRegist/thanks', []);
+        $body = view('html/Product/ItemAndPriceAndInHospitalItemRegist/thanks', ["result" => $result,]);
         echo view("html/Common/Template", compact("body"), false);
     }
 

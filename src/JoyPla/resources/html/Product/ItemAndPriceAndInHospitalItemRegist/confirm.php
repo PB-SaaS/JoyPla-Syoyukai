@@ -3,8 +3,7 @@ if($validate){
     $val = $validate->getResults();
     $is_error = $validate->isError();
 }
-var_dump($input);
-var_dump($session);
+$category = [1 => "医療材料", 2 => "薬剤", 3 => "試薬", 4 => "日用品", 99 => "その他",];
 ?>
 <div id="top" v-cloak>
     <v-loading :show="loading"></v-loading>
@@ -22,217 +21,217 @@ var_dump($session);
                     </p>
 
                     <div>
-                        <form method="post" x-bind:action="_ROOT">
-                            <input type="hidden" name="_method" value="post">
-                            <input type="hidden" name="_csrf" value="<?= $csrf ?>">
-                            <input type="hidden" name="path" value="/product/ItemAndPriceAndInHospitalRegist/thanks">
-                            <div class="smp_tmpl">
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        商品名
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['itemName']['value']) ?></span>
-                                    </div>
+                        <div class="smp_tmpl">
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    商品名
                                 </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        分類
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($category[$val['category']['value']]) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        小分類
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['smallCategory']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        製品コード
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['itemCode']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        規格
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['itemStandard']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        JANコード 
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['itemJANCode']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        メーカー名
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['makerName']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        カタログNo
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['catalogNo']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        シリアルNo
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['serialNo']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        ロット管理フラグ
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo ($val['lotManagement']['value']) ? "はい" : "" ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        償還価格フラグ
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo ($val['officialFlag']['value']) ? "はい" : "" ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        償還価格
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['officialprice']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        旧償還価格
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['officialpriceOld']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        入数 
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['quantity']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        入数単位 
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['quantityUnit']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        個数単位 
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['itemUnit']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        定価
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['minPrice']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        卸業者
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($distributor[$val['distributorId']['value']]) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        卸業者管理コード
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['distributorMCode']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        購買価格
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['price']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        単価
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['unitPrice']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        保険請求分類（医科）
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo nl2br(html($val['medicineCategory']['value'])) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        保険請求分類（在宅）
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo nl2br(html($val['homeCategory']['value'])) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        測定機器名
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo html($val['measuringInst']['value']) ?></span>
-                                    </div>
-                                </div>
-                                <div class="py-2 border-b border-gray-400 border-solid">
-                                    <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                        特記事項
-                                    </div>
-                                    <div class="flex-auto py-1">
-                                        <span class="text-left text-xl"><?php echo nl2br(html($val['notice']['value'])) ?></span>
-                                    </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['itemName']['value']) ?></span>
                                 </div>
                             </div>
-                            <div class="text-center py-1">
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    分類
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($category[$val['category']['value']]) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    小分類
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['smallCategory']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    製品コード
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['itemCode']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    規格
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['itemStandard']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    JANコード 
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['itemJANCode']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    メーカー名
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['makerName']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    カタログNo
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['catalogNo']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    シリアルNo
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['serialNo']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    ロット管理フラグ
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo ($val['lotManagement']['value']) ? "はい" : "" ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    償還価格フラグ
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo ($val['officialFlag']['value']) ? "はい" : "" ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    償還価格
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['officialprice']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    旧償還価格
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['officialpriceOld']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    入数 
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['quantity']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    入数単位 
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['quantityUnit']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    個数単位 
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['itemUnit']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    定価
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['minPrice']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    卸業者
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($distributor[0]["distributorName"]) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    卸業者管理コード
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['distributorMCode']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    購買価格
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['price']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    単価
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['unitPrice']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    保険請求分類（医科）
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo nl2br(html($val['medicineCategory']['value'])) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    保険請求分類（在宅）
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo nl2br(html($val['homeCategory']['value'])) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    測定機器名
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo html($val['measuringInst']['value']) ?></span>
+                                </div>
+                            </div>
+                            <div class="py-2 border-b border-gray-400 border-solid">
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
+                                    特記事項
+                                </div>
+                                <div class="flex-auto py-1">
+                                    <span class="text-left text-xl"><?php echo nl2br(html($val['notice']['value'])) ?></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center py-1">
+                            <form method="post" x-bind:action="_ROOT">
+                                <input type="hidden" name="_method" value="post">
+                                <input type="hidden" name="_csrf" value="<?= $csrf ?>">
+                                <input type="hidden" name="path" value="/product/ItemAndPriceAndInHospitalRegist/thanks">
                                 <input class="bg-gray-400 hover:bg-gray-200 text-white font-bold py-2 px-4 rounded" type="submit" name="formBack" value="戻る">
-                                <input class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="button" value="登録" onclick="register">
-                            </div>
-                        </form>
+                                <input class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit" value="登録">
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -297,6 +296,7 @@ var JoyPlaApp = Vue
             }
             ];
 
+/* 
             const register = handleSubmit(async (values) => {
                 try {
                     let params = new URLSearchParams();
@@ -333,8 +333,7 @@ var JoyPlaApp = Vue
                 }
                 
             });
-
-
+ */
 
 /*
             async () =>{

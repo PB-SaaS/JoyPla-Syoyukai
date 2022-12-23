@@ -7,10 +7,11 @@ use App\SpiralDb\Item;
 use App\SpiralDb\Price;
 use App\SpiralDb\InHospitalItem;
 use Collection;
+use framework\SpiralConnecter\SpiralDB;
 
 class ItemAndPriceAndInHospitalItemRepository implements ItemAndPriceAndInHospitalItemRepositoryInterface{
 
-    public function saveToArray(TenantId $tenantId, HospitalId $hospitalId, array $input, array $attr = []){
+    public function saveToArray($tenantId, $hospitalId, array $input, array $attr = []){
         $itemCreateArray = [
             "registrationTime" => "now",
             "updateTime" => "now",
@@ -35,11 +36,14 @@ class ItemAndPriceAndInHospitalItemRepository implements ItemAndPriceAndInHospit
             "minPrice" => $input["minPrice"],
         ];
 
-        $itemData = SpiralDb::title("NJ_itemDB") -> create($itemCreateArray);
+        $itemCreateData = SpiralDb::title("NJ_itemDB") -> create($itemCreateArray);
+        $id = $itemCreateData->get("id");
+        $itemData = SpiralDb::title("NJ_itemDB") -> value(["itemId"]) ->find((int)$id);
+        $itemId = $itemData->get("itemId");
 
         $priceCreateArray = [
             "hospitalId" => $hospitalId,
-            "itemId" => $itemData->get("itemId"),
+            "itemId" => $itemId,
             "distributorId" => $input["distributorId"],
             "distributorMCode" => $input["distributorMCode"],
             "quantity" => $input["quantity"],
@@ -50,14 +54,17 @@ class ItemAndPriceAndInHospitalItemRepository implements ItemAndPriceAndInHospit
             "notice" => $input["notice"],
         ];
 
-        $priceData = SpiralDb::title("NJ_PriceDB") -> create($priceCreateArray);
+        $priceCreateData = SpiralDb::title("NJ_PriceDB") -> create($priceCreateArray);
+        $id = $priceCreateData->get("id");
+        $priceData = SpiralDb::title("NJ_PriceDB") -> value(["priceId"]) ->find((int)$id);
+        $priceId = $priceData->get("priceId");
 
         $inHPItemCreateArray = [
             "registrationTime" => "now",
             "updateTime" => "now",
-            "itemId" => $itemData->get("itemId"),
+            "itemId" => $itemId,
             "hospitalId" => $hospitalId,
-            "priceId" => $priceData->get("priceId"),
+            "priceId" => $priceId,
             "distributorId" => $input["distributorId"],
             "distributorMCode" => $input["distributorMCode"],
             "quantity" => $input["quantity"],
@@ -71,7 +78,9 @@ class ItemAndPriceAndInHospitalItemRepository implements ItemAndPriceAndInHospit
             "notice" => $input["notice"],
         ];
 
-        $inHPItemData = SpiralDb::title("NJ_inHPItemDB") -> create($inHPItemCreateArray);
+        $inHPItemCreateData = SpiralDb::title("NJ_inHPItemDB") -> create($inHPItemCreateArray);
+        $id = $inHPItemCreateData->get("id");
+        $inHPItemData = SpiralDb::title("NJ_inHPItemDB") -> value(["inHospitalItemId"]) ->find((int)$id);
 
         return ["item" => $itemData, "price" => $priceData, "inHP" => $inHPItemData];
 
@@ -81,5 +90,5 @@ class ItemAndPriceAndInHospitalItemRepository implements ItemAndPriceAndInHospit
 
 interface ItemAndPriceAndInHospitalItemRepositoryInterface 
 {
-    public function saveToArray( TenantId $tenantId, HospitalId $hospitalId, array $input, array $attr = []);
+    public function saveToArray($tenantId, $hospitalId, array $input, array $attr = []);
 }

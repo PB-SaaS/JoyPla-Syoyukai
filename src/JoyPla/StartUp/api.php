@@ -40,6 +40,7 @@ use JoyPla\InterfaceAdapters\Controllers\Api\ConsumptionController;
 use JoyPla\InterfaceAdapters\Controllers\Api\DistributorController;
 use JoyPla\InterfaceAdapters\Controllers\Api\DivisionController;
 use JoyPla\InterfaceAdapters\Controllers\Api\InHospitalItemController;
+use JoyPla\InterfaceAdapters\Controllers\Api\ItemAndPriceAndInHospitalItemController;
 use JoyPla\InterfaceAdapters\Controllers\Api\NotificationController;
 use JoyPla\InterfaceAdapters\Controllers\Api\OrderController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ReceivedController;
@@ -54,6 +55,7 @@ use JoyPla\InterfaceAdapters\GateWays\Repository\HospitalRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\InHospitalItemRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\ItemAndPriceAndInHospitalItemRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\NotificationRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\PriceRepository;
@@ -149,10 +151,10 @@ Router::group(VerifyCsrfTokenMiddleware::class, function(){
     
     Router::map('GET','/api/notification/show',[NotificationController::class,'show'])->service(new NotificationShowInteractor( new NotificationShowPresenter() , new NotificationRepository() ));
 
-
-    Router::map('POST','/api/ItemAndPriceAndInHospitalItem/register',[ItemAndPriceAndInHospitalItemRegisterController::class,'register'])->service(new ItemAndPriceAndInHospitalItemRegisterInteractor(new ItemRegisterPresenter() , new ItemRepository() , new InHospitalItemRepository() , new PriceRepository() , new HospitalRepository() ));
 /* 
-    Router::map('POST','/api/PriceAndInHospitalItem/register',[PriceAndInHospitalItemRegisterController::class,'register'])->service(new PriceAndInHospitalItemRegisterInteractor(new PriceRegisterPresenter() , new InHospitalItemRepository() , new PriceRepository() , new HospitalRepository() ));
+    Router::map('POST','/api/ItemAndPriceAndInHospitalItem/register',[ItemAndPriceAndInHospitalItemController::class,'register'])->service(new ItemAndPriceAndInHospitalItemRegisterInteractor(new ItemRegisterPresenter() , new ItemAndPriceAndInHospitalItemRepository() ));
+
+    Router::map('POST','/api/PriceAndInHospitalItem/register',[PriceAndInHospitalItemController::class,'register'])->service(new PriceAndInHospitalItemRegisterInteractor(new PriceRegisterPresenter() , new InHospitalItemRepository() , new PriceRepository() , new HospitalRepository() ));
  */
 });
 
