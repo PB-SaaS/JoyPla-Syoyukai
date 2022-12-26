@@ -50,19 +50,24 @@ class RequestItem
     public static function create(Collection $input)
     {
         return new RequestItem(
-            (new RequestId($input->requestId) ),
-            (new RequestHId($input->requestHId) ),
-            (new InHospitalItemId($input->inHospitalItemId) ),
+            (new RequestId($input->requestId)),
+            (new RequestHId($input->requestHId)),
+            (new InHospitalItemId($input->inHospitalItemId)),
             (Item::create($input)),
-            (new HospitalId($input->hospitalId) ),
+            (new HospitalId($input->hospitalId)),
             (Division::create($input->sourceDivision)),
             (Division::create($input->targetDivision)),
             (new RequestQuantity($input->requestQuantity)),
-            (new RequestType($input->requestType) ),
+            (new RequestType($input->requestType)),
             (Quantity::create($input)),
-            (new Price($input->price) ),
-            (new UnitPrice($input->unitPrice) )
+            (new Price($input->price)),
+            (new UnitPrice($input->unitPrice))
         );
+    }
+
+    public function getRequestId()
+    {
+        return $this->requestId;
     }
 
     public function getSourceDivision()
@@ -88,7 +93,7 @@ class RequestItem
     public function equalDivisions(Division $sourceDivision, Division $targetDivision)
     {
         return (($this->sourceDivision->getDivisionId()->value() === $sourceDivision->getDivisionId()->value()) &&
-        ($this->targetDivision->getDivisionId()->value() === $targetDivision->getDivisionId()->value()));
+            ($this->targetDivision->getDivisionId()->value() === $targetDivision->getDivisionId()->value()));
     }
 
     public function price()

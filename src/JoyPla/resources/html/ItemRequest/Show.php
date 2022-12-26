@@ -124,7 +124,7 @@
                 isSubmitting
             } = useForm({
                 initialValues: {
-                    'requestId': itemRequest.requestHId,
+                    'requestHId': itemRequest.requestHId,
                     'requestType': itemRequest.requestType,
                     'requestItems': itemRequest.requestItems.map(x => {
                         x.rowrequestQuantity = parseInt(x.requestQuantity);
@@ -293,18 +293,19 @@
                     if (result.isConfirmed) {
                         start();
                         let params = new URLSearchParams();
-                        params.append("path", "/api/itemrequest/history/" + values.requestHId + "/" + values.requestItems[idx].requestId + "/delete");
+                        params.append("path", "/api/itemrequest/" + values.requestHId + "/" + values.requestItems[idx].requestId + "/delete");
                         params.append("_method", 'delete');
                         params.append("_csrf", _CSRF);
-
+                        console.log(params);
                         const res = await axios.post(_APIURL, params);
+                        console.log(res);
                         complete();
                         if (res.data.code != 200) {
                             throw new Error(res.data.message)
                         }
 
                         let addComment = "";
-                        if (res.data.data.isRequestItemDeleted) {
+                        if (res.data.data.isItemRequestDeleted) {
                             addComment = "\r\n商品情報がなくなりましたので請求履歴も削除しました。";
                         }
 

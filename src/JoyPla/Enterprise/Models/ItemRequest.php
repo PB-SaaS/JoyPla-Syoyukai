@@ -43,23 +43,23 @@ class ItemRequest
     public static function create(Collection $input)
     {
         return new ItemRequest(
-            (new RequestHId($input->requestHId) ),
-            (new DateYearMonthDayHourMinutesSecond($input->registrationTime) ),
-            (new DateYearMonthDayHourMinutesSecond($input->updateTime) ),
+            (new RequestHId($input->requestHId)),
+            (new DateYearMonthDayHourMinutesSecond($input->registrationTime)),
+            (new DateYearMonthDayHourMinutesSecond($input->updateTime)),
             [],
             (Hospital::create($input)),
             (Division::create($input->sourceDivision)),
             (Division::create($input->targetDivision)),
-            (new RequestType($input->requestType) ),
-            (new TextFieldType64Bytes($input->requestUserName) )
+            (new RequestType($input->requestType)),
+            (new TextFieldType64Bytes($input->requestUserName))
         );
     }
-    
+
     public function getHospital()
     {
         return $this->hospital;
     }
-    
+
     public function getRequestHId()
     {
         return $this->requestHId;
@@ -83,7 +83,7 @@ class ItemRequest
     public function equalDivisions(Division $sourceDivision, Division $targetDivision)
     {
         return (($this->sourceDivision->getDivisionId()->value() === $sourceDivision->getDivisionId()->value()) &&
-        ($this->targetDivision->getDivisionId()->value() === $targetDivision->getDivisionId()->value()));
+            ($this->targetDivision->getDivisionId()->value() === $targetDivision->getDivisionId()->value()));
     }
 
     public function totalAmount()
@@ -94,7 +94,6 @@ class ItemRequest
         }
         return $num;
     }
-
 
     public function itemCount()
     {
@@ -129,6 +128,29 @@ class ItemRequest
             $this->requestType,
             $this->requestUserName
         );
+    }
+
+    public function existRequestItem(RequestId $requestId)
+    {
+        foreach ($this->requestItems as $item) {
+            if ($item->getRequestId()->equal($requestId->value())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function deleteItem(RequestId $requestId)
+    {
+        $tmp = $this->requestItems;
+        foreach ($tmp as $key => $requestItem) {
+            if ($requestItem->getRequestId()->equal($requestId->value())) {
+                unset($tmp[$key]);
+                break;
+            }
+        }
+        return $this->setRequestItem(array_values($tmp));
     }
 
     public function toArray()

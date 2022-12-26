@@ -17,13 +17,13 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest {
     }
 
     /**
-     * Class ItemRequest
+     * Class ItemRequestHistoryViewModel
      * @package JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest
      */
     class ItemRequestHistoryViewModel
     {
         /**
-         * ItemRequest constructor.
+         * ItemRequestHistoryViewModel constructor.
          * @param ItemRequestHistoryOutputData $source
          */
         public function __construct(ItemRequestHistoryOutputData $source)
