@@ -33,7 +33,7 @@
                 <div class="p-4 text-lg font-bold">
                     <div class="flex w-full gap-6">
                         <div class="flex-initial lg:w-1/6 w-1/3">合計金額</div>
-                        <div class="flex-auto">&yen; {{ numberFormat( itemRequest.totalAmount) }}</div>
+                        <div class="flex-auto">&yen; {{ numberFormat(totalAmount()) }}</div>
                     </div>
                 </div>
                 <hr>
@@ -54,7 +54,7 @@
                                                 <p class="text-md text-gray-500">{{ item.value.item.itemJANCode }}</p>
                                                 <?php if (gate('update_of_item_request_history')->can()) : ?>
                                                     <p class="text-base text-gray-900 lg:w-1/2">
-                                                        <v-input-number :rules="{ required: true , between: ( (item.value.rowrequestQuantity > 0)? [ 1 , 99999 ] : [ -99999 , -1 ] ) }" :name="`requestItems[${idx}].requestQuantity`" label="請求数（入数）" :unit="item.value.quantity.quantityUnit" :step="1" :title="`請求数（入数）/${item.value.quantity.quantityNum}${ item.value.quantity.quantityUnit }入り`" @change="isChange = true" change-class-name="inputChange"></v-input-number>
+                                                        <v-input-number @change="checkQuantity(idx); isChange = true" change-class-name="inputChange" :rules=" { between: [1 , 99999] }" :name="`requestItems[${idx}].requestQuantity`" label="請求数（入数）" :min="0" :unit="item.value.quantityUnit" :step="1" title="請求数（入数）"></v-input-number>
                                                     </p>
                                                 <?php else : ?>
                                                     <div class="md:flex gap-6 ">
@@ -63,7 +63,7 @@
                                                     </div>
                                                 <?php endif ?>
                                                 <div>
-                                                    <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(item.value.unitPrice * item.value.requestQuantity) }}</span>
+                                                    <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(requestPrice(idx) ) }}</span>
                                                     <span class="text-sm text-gray-900">( &yen; {{ numberFormat(item.value.unitPrice) }} / {{ item.value.quantity.quantityUnit }} )</span>
                                                 </div>
                                             </div>
@@ -107,11 +107,11 @@
                 onCreated,
                 onMounted
             } = Vue;
+
             const {
                 useFieldArray,
                 useForm
             } = VeeValidate;
-
 
             const itemRequest = PHPData.itemRequest;
 
@@ -130,7 +130,8 @@
                         x.rowrequestQuantity = parseInt(x.requestQuantity);
                         x.requestQuantity = parseInt(x.requestQuantity);
                         return x;
-                    })
+                    }),
+                    'totalAmount': itemRequest.totalAmount
                 },
                 validateOnMount: false
             });
@@ -146,6 +147,7 @@
             console.log(fields);
 
             const loading = ref(false);
+
             const start = () => {
                 loading.value = true;
             }
@@ -159,11 +161,13 @@
                     complete();
                 }, 500);
             }
+
             start();
 
             onMounted(() => {
                 sleepComplate()
             });
+
             const breadcrumbs = [{
                     text: '請求メニュー',
                     disabled: false,
@@ -186,7 +190,29 @@
                 }
                 return new Intl.NumberFormat('ja-JP').format(value);
             };
+
             const isChange = ref(false);
+
+
+            const requestPrice = (idx) => {
+                return values.requestItems[idx].unitPrice * values.requestItems[idx].requestQuantity;
+            };
+
+            const totalAmount = () => {
+                let num = 0;
+                values.requestItems.forEach((v, idx) => {
+                    num += requestPrice(idx);
+                });
+                return num;
+            };
+
+            const checkQuantity = (idx) => {
+                if (values.requestItems[idx]) {
+                    if (!values.requestItems[idx].requestQuantity || values.requestItems[idx].requestQuantity < 0) {
+                        values.requestItems[idx].requestQuantity = 1;
+                    }
+                }
+            }
 
             const createUpdateModel = () => {
                 return values.requestItems.map(x => {
@@ -320,12 +346,12 @@
                         start();
 
                         let params = new URLSearchParams();
-                        params.append("path", "/api/itemrequest/history/" + requestHId + "/delete");
+                        params.append("path", "/api/itemrequest/" + requestHId + "/delete");
                         params.append("_method", 'delete');
                         params.append("_csrf", _CSRF);
 
                         const res = await axios.post(_APIURL, params);
-
+                        console.log(res);
                         complete();
                         if (res.data.code != 200) {
                             throw new Error(res.data.message)
@@ -359,9 +385,19 @@
                 breadcrumbs,
                 loading,
                 start,
-                complete
+                complete,
+                totalAmount,
+                requestPrice,
+                checkQuantity
             }
         },
-        watch: {}
+        watch: {
+            values: {
+                async handler(val, oldVal) {
+                    console.log(JSON.stringify(this.values));
+                },
+                deep: true
+            }
+        }
     }).mount('#top');
 </script>

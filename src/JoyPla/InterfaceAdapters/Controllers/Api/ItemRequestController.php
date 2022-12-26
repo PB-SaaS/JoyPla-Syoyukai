@@ -11,8 +11,8 @@ use framework\Http\Controller;
 use framework\Routing\Router;
 use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestRegisterInputData;
 use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestRegisterInputPortInterface;
-//use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestDeleteInputData;
-//use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestDeleteInputPortInterface;
+use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestDeleteInputData;
+use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestDeleteInputPortInterface;
 use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestHistoryInputData;
 use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestHistoryInputPortInterface;
 
@@ -72,20 +72,19 @@ class ItemRequestController extends Controller
     public function update($vars)
     {
     }
-
+*/
     public function delete($vars, ItemRequestDeleteInputPortInterface $inputPort)
     {
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
 
-        if (Gate::denies('cancellation_of_ItemRequest_slips')) {
+        if (Gate::denies('delete_of_item_request_history')) {
             Router::abort(403);
         }
 
-        $gate = Gate::getGateInstance('cancellation_of_ItemRequest_slips');
+        $gate = Gate::getGateInstance('delete_of_item_request_history');
 
-        $inputData = new ItemRequestDeleteInputData($this->request->user(), $vars['ItemRequestId'], $gate->isOnlyMyDivision());
+        $inputData = new ItemRequestDeleteInputData($this->request->user(), $vars['requestHId'], $gate->isOnlyMyDivision());
         $inputPort->handle($inputData);
     }
-    */
 }

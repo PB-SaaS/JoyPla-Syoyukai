@@ -294,11 +294,11 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
             $sourceDivision = new Collection();
             $sourceDivision->hospitalId = $hospitalId->value();
             $sourceDivision->divisionId = $history->sourceDivisionId;
-            $sourceDivision->divisionName = $history->sourceDivision;
+            $sourceDivision->divisionName = htmlspecialchars_decode($history->sourceDivision, ENT_QUOTES);
             $targetDivision = new Collection();
             $targetDivision->hospitalId = $hospitalId->value();
             $targetDivision->divisionId = $history->targetDivisionId;
-            $targetDivision->divisionName = $history->targetDivision;
+            $targetDivision->divisionName = htmlspecialchars_decode($history->targetDivision, ENT_QUOTES);
             $history->set('sourceDivision', $sourceDivision);
             $history->set('targetDivision', $targetDivision);
             $history->set('requestType', (int)$history->requestType);
@@ -358,11 +358,11 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
         $sourceDivision = new Collection();
         $sourceDivision->hospitalId = $hospitalId->value();
         $sourceDivision->divisionId = $history->sourceDivisionId;
-        $sourceDivision->divisionName = $history->sourceDivision;
+        $sourceDivision->divisionName = htmlspecialchars_decode($history->sourceDivision, ENT_QUOTES);
         $targetDivision = new Collection();
         $targetDivision->hospitalId = $hospitalId->value();
         $targetDivision->divisionId = $history->targetDivisionId;
-        $targetDivision->divisionName = $history->targetDivision;
+        $targetDivision->divisionName = htmlspecialchars_decode($history->targetDivision, ENT_QUOTES);
         $history->set('sourceDivision', $sourceDivision);
         $history->set('targetDivision', $targetDivision);
         $history->set('requestType', (int)$history->requestType);
@@ -386,7 +386,8 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
 
     public function delete(HospitalId $hospitalId, RequestHId $requestHId)
     {
-        ItemRequestView::where('hospitalId', $hospitalId->value())->where('requestHId', $requestHId->value())->delete();
+        $result = ItemRequestView::where('hospitalId', $hospitalId->value())->where('requestHId', $requestHId->value())->delete();
+        return $result->count;
     }
 }
 
