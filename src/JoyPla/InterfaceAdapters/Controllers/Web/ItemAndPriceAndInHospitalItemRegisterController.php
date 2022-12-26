@@ -237,8 +237,8 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
             $tenantId = $this->request->user()->tenantId;
             $hospitalId = $this->request->user()->hospitalId;
 //            $inputData = new ItemAndPriceAndInHospitalItemRegisterInputData($tenantId, $hospitalId, $input);
-            $data = new ItemAndPriceAndInHospitalItemRepository();
-            $result = $data -> saveToArray($tenantId, $hospitalId, $input);
+            $repository = new ItemAndPriceAndInHospitalItemRepository();
+            $result = $repository -> saveToArray($tenantId, $hospitalId, $input);
         }
 
         $this->request->session()->forget($this->formName);

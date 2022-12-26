@@ -285,28 +285,28 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
 
     Router::map('GET', '/product/ItemAndPriceAndInHospitalRegist/input', [
         ItemAndPriceAndInHospitalItemRegisterController::class,
-        'register'
+        'register',
     ]);
     Router::map('POST', '/product/ItemAndPriceAndInHospitalRegist/confirm', [
         ItemAndPriceAndInHospitalItemRegisterController::class,
-        'confirm'
+        'confirm',
     ]);
     Router::map('POST', '/product/ItemAndPriceAndInHospitalRegist/thanks', [
         ItemAndPriceAndInHospitalItemRegisterController::class,
-        'thanks'
+        'thanks',
     ]);
 
     Router::map('POST', '/product/PriceAndInHospitalRegist/input', [
         PriceAndInHospitalItemRegisterController::class,
-        'register'
+        'register',
     ]);
     Router::map('POST', '/product/PriceAndInHospitalRegist/confirm', [
         PriceAndInHospitalItemRegisterController::class,
-        'confirm'
+        'confirm',
     ]);
     Router::map('POST', '/product/PriceAndInHospitalRegist/thanks', [
         PriceAndInHospitalItemRegisterController::class,
-        'thanks'
+        'thanks',
     ]);
 
 });

@@ -1,3 +1,8 @@
+<?php
+$itemId = $result["item"]->itemId;
+$priceId = $result["price"]->priceId;
+$inHospitalItemId = $result["inHP"]->inHospitalItemId;
+?>
 <div id="top" v-cloak>
     <v-loading :show="loading"></v-loading>
     <header-navi></header-navi>
@@ -9,7 +14,11 @@
 
                 <div class="smp_tmpl">
                     <div class="sub_text">
+                        <?php if($itemId && $priceId && $inHospitalItemId){ ?>
                         商品情報・金額情報・院内商品情報の登録が完了しました。<br>
+                        <?php }else{ ?>
+                        正しく登録できませんでした。再度登録しなおしてください。<br>
+                        <?php } ?>
                     </div>
                 </div>
             </div>

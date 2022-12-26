@@ -14,6 +14,7 @@ require_once('JoyPla/Application/Interactors/Api/InHospitalItem/InHospitalItemSh
 require_once('JoyPla/Application/Interactors/Api/Item/ItemAndPriceAndInHospitalItemRegisterInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Item/ItemRegisterInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Item/ItemShowInteractor.php');
+require_once('JoyPla/Application/Interactors/Api/Item/PriceAndInHospitalItemRegisterInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Notification/NotificationShowInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Order/FixedQuantityOrderInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Order/OrderRegisterInteractor.php');
@@ -103,6 +104,7 @@ require_once('JoyPla/InterfaceAdapters/GateWays/Repository/ItemRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/ItemRequestRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/NotificationRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/OrderRepository.php');
+require_once('JoyPla/InterfaceAdapters/GateWays/Repository/PriceAndInHospitalItemRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/PriceRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/ReceivedRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/ReturnRepository.php');

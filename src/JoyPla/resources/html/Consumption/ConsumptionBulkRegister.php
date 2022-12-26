@@ -16,6 +16,10 @@
               label="消費日"
               title="消費日指定"
               ></v-input>
+            <p class="text-md font-bold font-heading" v-if="isOnlyMyDivision">
+              読み取れるのは以下の部署で発行されたカード・シールに限定されます。<br>
+              <span v-for="name in divName">{{name}}</span>
+            </p>
           </div>
           <div class="p-2 bg-gray-300">
             <v-barcode-search @additem="addItemByBarcode"></v-barcode-search>
@@ -95,7 +99,9 @@
 var JoyPlaApp = Vue.createApp({
     data(){
       return{
-        div:{}
+        div:{},
+        divName:[],
+        isOnlyMyDivision:<?php var_export(gate('bulkregister_of_consumption_slips')->isOnlyMyDivision()) ?>,
       }
     },
     methods:{
@@ -109,11 +115,14 @@ var JoyPlaApp = Vue.createApp({
           .post(_APIURL, params)
           .then((response) => {
             let div = self.div;
+            let divName = self.divName;
             response.data.data.forEach(function (x, i) {
                 div[x.divisionId] = x.divisionName;
+                divName.push(x.divisionName);
             });
             console.log(response);
             self.div = div;
+            self.divName = divName;
           })
           .catch((error) => {
             console.log(error);

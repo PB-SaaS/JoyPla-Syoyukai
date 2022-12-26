@@ -333,7 +333,7 @@ if($validate){
                                 </div>
                                 <span class="text-red-500"><?php echo html($val['homeCategory']['message']) ?></span>
                             </div>
-                            <dl class="cf">
+                            <div class="cf">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
                                     測定機器名
                                 </div>
@@ -343,9 +343,8 @@ if($validate){
                                     value="<?php echo html($val['measuringInst']['value']) ?>">
                                     <span class="text-red-500"><?php echo html($val['measuringInst']['message']) ?></span>
                                 </div>
-
-                            </dl>
-                            <dl class="cf">
+                            </div>
+                            <div class="cf">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
                                     特記事項
                                 </div>
@@ -359,7 +358,7 @@ if($validate){
                                     <span class="absolute bottom-4 right-6"><span id="noticeCount">0</span>文字</span>
                                 </div>
                                 <span class="text-red-500"><?php echo html($val['notice']['message']) ?></span>
-                            </dl>
+                            </div>
                         </div>
                         <div class="text-center py-1">
                             <input class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit" value="確認">
