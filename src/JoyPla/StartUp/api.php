@@ -161,6 +161,8 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () {
     Router::map('POST', '/api/itemrequest/register', [ItemRequestController::class, 'register'])->service(new ItemRequestRegisterInteractor(new ItemRequestRegisterPresenter(), new ItemRequestRepository(), new RequestItemCountRepository()));
 
     Router::map('GET', '/api/itemrequest/history', [ItemRequestController::class, 'history'])->service(new ItemRequestHistoryInteractor(new ItemRequestHistoryPresenter(), new ItemRequestRepository()));
+
+    //    Router::map('DELETE', '/api/itemrequest/:requestHId/delete', [ItemRequestController::class, 'delete'])->service(new ItemRequestDeleteInteractor(new ItemRequestDeletePresenter(), new ItemRequestRepository(), new RequestItemCountRepository()));
 });
 
 $router = new Router();

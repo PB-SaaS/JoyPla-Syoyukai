@@ -7,6 +7,8 @@ use App\SpiralDb\RequestItem as SpiralDbRequestItem;
 use App\SpiralDb\Hospital;
 use App\SpiralDb\InHospitalItemView;
 use App\SpiralDb\RequestItemView;
+use App\SpiralDb\ItemRequestView;
+
 use Exception;
 use Auth;
 use framework\SpiralConnecter\SpiralDB;
@@ -18,12 +20,18 @@ use JoyPla\Enterprise\Models\RequestQuantity;
 use JoyPla\Enterprise\Models\RequestType;
 use JoyPla\Enterprise\Models\Division;
 use JoyPla\Enterprise\Models\HospitalId;
+use JoyPla\Enterprise\Models\HospitalName;
+use JoyPla\Enterprise\Models\Pref;
 use JoyPla\Enterprise\Models\InHospitalItemId;
 use JoyPla\Enterprise\Models\Item;
 use JoyPla\Enterprise\Models\Price;
 use JoyPla\Enterprise\Models\Quantity;
 use JoyPla\Enterprise\Models\UnitPrice;
 use JoyPla\Enterprise\Models\DateYearMonth;
+use JoyPla\Enterprise\Models\Hospital as hp;
+use JoyPla\Enterprise\Models\TextFieldType64Bytes;
+use JoyPla\Enterprise\Models\DateYearMonthDayHourMinutesSecond;
+use Collection;
 
 class ItemRequestRepository implements ItemRequestRepositoryInterface
 {
@@ -111,6 +119,7 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
         return $result;
     }
 
+
     public function saveToArray(array $itemRequests)
     {
         $itemRequests = array_map(function (ItemRequest $itemRequest) {
@@ -162,6 +171,7 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
         return $itemRequests;
     }
 
+
     public function sendRegistrationMail(array $itemRequests, Auth $user)
     {
         $itemRequests = array_map(function (ItemRequest $itemRequest) {
@@ -198,11 +208,12 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
         SpiralDb::mail('NJ_HUserDB')->ruleId($mailId)->sampling($ids);
     }
 
+
     public function search(HospitalId $hospitalId, object $search)
     {
         $itemSearchFlag = false;
         $itemViewInstance = RequestItemView::where('hospitalId', $hospitalId->value())->value('requestHId')->value('requestId');
-        $historyViewInstance = SpiralDbItemRequest::where('hospitalId', $hospitalId->value());
+        $historyViewInstance = ItemRequestView::where('hospitalId', $hospitalId->value());
 
         if ($search->itemName) {
             $itemViewInstance->orWhere('itemName', "%" . $search->itemName . "%", "LIKE");
@@ -251,16 +262,14 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
 
         if ($search->requestType === 1) {
             $historyViewInstance->orWhere('requestType', "1", "=");
-            $itemSearchFlag = true;
         }
         if ($search->requestType === 2) {
             $historyViewInstance->orWhere('requestType', "2", "=");
-            $itemSearchFlag = true;
         }
 
         if ($search->registrationDate) {
             $registrationDate = new DateYearMonth($search->registrationDate);
-            $nextMonth =  $registrationDate->nextMonth();
+            $nextMonth = $registrationDate->nextMonth();
 
             $historyViewInstance->where('registrationTime', $registrationDate->format('Y-m-01'), '>=');
             $historyViewInstance->where('registrationTime', $nextMonth->format('Y-m-01'), '<');
@@ -282,44 +291,103 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
         $items = $itemViewInstance->get();
         $itemRequests = [];
         foreach ($histories->data->all() as $history) {
+            $sourceDivision = new Collection();
+            $sourceDivision->hospitalId = $hospitalId->value();
+            $sourceDivision->divisionId = $history->sourceDivisionId;
+            $sourceDivision->divisionName = $history->sourceDivision;
+            $targetDivision = new Collection();
+            $targetDivision->hospitalId = $hospitalId->value();
+            $targetDivision->divisionId = $history->targetDivisionId;
+            $targetDivision->divisionName = $history->targetDivision;
+            $history->set('sourceDivision', $sourceDivision);
+            $history->set('targetDivision', $targetDivision);
+            $history->set('requestType', (int)$history->requestType);
+            $history->set('requestUserName', htmlspecialchars_decode($history->requestUserName, ENT_QUOTES));
+            /*
+            $test = new ItemRequest(
+                new RequestHId($history->requestHId),
+                new DateYearMonthDayHourMinutesSecond($history->registrationTime),
+                new DateYearMonthDayHourMinutesSecond($history->updateTime),
+                [],
+                new hp(
+                    $hospitalId,
+                    (new HospitalName('hoge')),
+                    "",
+                    "",
+                    new Pref(""),
+                    ""
+                ),
+                Division::create($sourceDivision),
+                Division::create($targetDivision),
+                new RequestType((int)$history->requestType),
+                (new TextFieldType64Bytes('aa'))
+            );
+            */
             $itemRequest = ItemRequest::create($history);
-
+            //            var_dump($itemRequest);
             foreach ($items->data->all() as $item) {
                 if ($itemRequest->getRequestHId()->equal($item->requestHId)) {
+                    $item->set('sourceDivision', $sourceDivision);
+                    $item->set('targetDivision', $targetDivision);
+                    $item->set('requestType', (int)$item->requestType);
                     $itemRequest = $itemRequest->addRequestItem(RequestItem::create($item));
                 }
+                //                var_dump($itemRequest);
             }
 
             $itemRequests[] = $itemRequest;
         }
-
+        //        var_dump($itemRequests);
         return [$itemRequests, $histories->count];
     }
 
 
-    /*
-    public function index(HospitalId $hospitalId, ItemRequestId $ItemRequestId)
+    public function show(HospitalId $hospitalId, RequestHId $requestHId)
     {
-        $ItemRequestView = ItemRequestView::where('hospitalId', $hospitalId->value())->where('billingNumber', $ItemRequestId->value())->get();
-        if ($ItemRequestView->count <= 0) {
+        $historyViewInstance = ItemRequestView::where('hospitalId', $hospitalId->value())->where('requestHId', $requestHId->value())->get();
+        if ((int)$historyViewInstance->count <= 0) {
             return null;
         }
-        $ItemRequestItemView = ItemRequestItemView::sort('id', 'asc')->where('hospitalId', $hospitalId->value())->where('billingNumber', $ItemRequestId->value())->get();
-
-        $ItemRequest = ItemRequest::create($ItemRequestView->data->get(0));
-
-        foreach ($ItemRequestItemView->data->all() as $item) {
-            $ItemRequest = $ItemRequest->addItemRequestItem(ItemRequestItem::create($item));
+        $itemViewInstance = RequestItemView::sort('id', 'asc')->where('hospitalId', $hospitalId->value())->where('requestHId', $requestHId->value())->get();
+        if ((int)$itemViewInstance->count <= 0) {
+            return null;
         }
 
-        return $ItemRequest;
+        $history = $historyViewInstance->data->get(0);
+        //        var_dump(htmlspecialchars_decode($history->requestUserName, ENT_QUOTES));
+        $sourceDivision = new Collection();
+        $sourceDivision->hospitalId = $hospitalId->value();
+        $sourceDivision->divisionId = $history->sourceDivisionId;
+        $sourceDivision->divisionName = $history->sourceDivision;
+        $targetDivision = new Collection();
+        $targetDivision->hospitalId = $hospitalId->value();
+        $targetDivision->divisionId = $history->targetDivisionId;
+        $targetDivision->divisionName = $history->targetDivision;
+        $history->set('sourceDivision', $sourceDivision);
+        $history->set('targetDivision', $targetDivision);
+        $history->set('requestType', (int)$history->requestType);
+        $history->set('requestUserName', htmlspecialchars_decode($history->requestUserName, ENT_QUOTES));
+
+        $itemRequest = ItemRequest::create($history);
+        //        var_dump($itemRequest);
+
+        foreach ($itemViewInstance->data->all() as $item) {
+            $item->set('sourceDivision', $sourceDivision);
+            $item->set('targetDivision', $targetDivision);
+            $item->set('requestType', (int)$item->requestType);
+            $itemRequest = $itemRequest->addRequestItem(RequestItem::create($item));
+        }
+
+        return $itemRequest;
+
+        //return null;
     }
 
-    public function delete(HospitalId $hospitalId, ItemRequestId $ItemRequestId)
+
+    public function delete(HospitalId $hospitalId, RequestHId $requestHId)
     {
-        ItemRequestView::where('hospitalId', $hospitalId->value())->where('billingNumber', $ItemRequestId->value())->delete();
+        ItemRequestView::where('hospitalId', $hospitalId->value())->where('requestHId', $requestHId->value())->delete();
     }
-    */
 }
 
 interface ItemRequestRepositoryInterface
@@ -329,6 +397,6 @@ interface ItemRequestRepositoryInterface
     public function saveToArray(array $itemRequests);
     public function sendRegistrationMail(array $itemRequests, Auth $user);
     public function search(HospitalId $hospitalId, object $search);
-    //    public function index(HospitalId $hospitalId, ItemRequestId $ItemRequestId);
-    //    public function delete(HospitalId $hospitalId, ItemRequestId $ItemRequestId);
+    public function show(HospitalId $hospitalId, RequestHId $requestHId);
+    public function delete(HospitalId $hospitalId, RequestHId $requestHId);
 }

@@ -29,11 +29,11 @@ require_once('JoyPla/Application/Interactors/Api/ItemRequest/ItemRequestRegister
 require_once('JoyPla/Application/Interactors/Api/ItemRequest/ItemRequestHistoryInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Reference/ConsumptionHistoryShowInteractor.php');
 require_once('JoyPla/Application/Interactors/Web/Consumption/ConsumptionIndexInteractor.php');
-require_once('JoyPla/Application/Interactors/Web/ItemRequest/ItemRequestIndexInteractor.php');
 require_once('JoyPla/Application/Interactors/Web/Order/OrderIndexInteractor.php');
 require_once('JoyPla/Application/Interactors/Web/Received/OrderReceivedSlipIndexInteractor.php');
 require_once('JoyPla/Application/Interactors/Web/Received/ReceivedIndexInteractor.php');
 require_once('JoyPla/Application/Interactors/Web/Received/ReceivedLabelInteractor.php');
+require_once('JoyPla/Application/Interactors/Web/ItemRequest/ItemRequestShowInteractor.php');
 require_once('JoyPla/Application/LoggingObject/Spiralv2LogginObject.php');
 require_once('JoyPla/Enterprise/Traits/ValueObjectTrait.php');
 require_once('JoyPla/Enterprise/Models/Consumption.php');
@@ -97,7 +97,6 @@ require_once('JoyPla/InterfaceAdapters/GateWays/Repository/DivisionRepository.ph
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/HospitalRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/InHospitalItemRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/InventoryCalculationRepository.php');
-require_once('JoyPla/InterfaceAdapters/GateWays/Repository/ItemRequestRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/NotificationRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/OrderRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/ReceivedRepository.php');
@@ -135,7 +134,6 @@ require_once('JoyPla/InterfaceAdapters/Presenters/Api/ItemRequest/ItemRequestHis
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Reference/ConsumptionHistoryShowPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/Consumption/ConsumptionIndexPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/Consumption/ConsumptionPrintPresenter.php');
-require_once('JoyPla/InterfaceAdapters/Presenters/Web/ItemRequest/ItemRequestIndexPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/Order/OrderIndexPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/Order/OrderPrintPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/Order/UnapprovedOrderIndexPresenter.php');
@@ -143,6 +141,7 @@ require_once('JoyPla/InterfaceAdapters/Presenters/Web/Received/OrderReceivedSlip
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/Received/ReceivedIndexPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/Received/ReceivedLabelPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/Received/ReceivedLabelSettingPresenter.php');
+require_once('JoyPla/InterfaceAdapters/Presenters/Web/ItemRequest/ItemRequestShowPresenter.php');
 require_once('JoyPla/Enterprise/SpiralDb/Card.php');
 require_once('JoyPla/Enterprise/SpiralDb/CardView.php');
 require_once('JoyPla/Enterprise/SpiralDb/Consumption.php');
@@ -176,7 +175,9 @@ require_once('JoyPla/Enterprise/SpiralDb/Stock.php');
 require_once('JoyPla/Enterprise/SpiralDb/StockView.php');
 require_once('JoyPla/Enterprise/SpiralDb/Tenant.php');
 require_once('JoyPla/Enterprise/SpiralDb/ItemRequest.php');
+require_once('JoyPla/Enterprise/SpiralDb/ItemRequestView.php');
 require_once('JoyPla/Enterprise/SpiralDb/RequestItem.php');
 require_once('JoyPla/Enterprise/SpiralDb/RequestItemCountTransaction.php');
+require_once('JoyPla/Enterprise/SpiralDb/RequestItemView.php');
 require_once('JoyPla/Exceptions/ApiExceptionHandler.php');
 require_once('JoyPla/Exceptions/WebExceptionHandler.php');

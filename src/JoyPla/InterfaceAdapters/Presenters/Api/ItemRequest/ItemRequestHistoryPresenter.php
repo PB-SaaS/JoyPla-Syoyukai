@@ -28,7 +28,7 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest {
          */
         public function __construct(ItemRequestHistoryOutputData $source)
         {
-            $this->data = $source->ItemRequests;
+            $this->data = $source->itemRequests;
             $this->count = $source->count;
             $this->code = 200;
             $this->message = "success";

@@ -31,16 +31,14 @@ class ItemRequestController extends Controller
 
         $search = $this->request->get('search');
 
+        $user = $this->request->user();
+
         if ($gate->isOnlyMyDivision()) {
-            $search['sourceDivisionIds'] = [$this->request->user()->divisionId];
+            $search['sourceDivisionIds'] = [$user->divisionId];
         }
 
-        $inputData = new ItemRequestHistoryInputData($this->request->user()->hospitalId, $search);
+        $inputData = new ItemRequestHistoryInputData($user, $search);
         $inputPort->handle($inputData);
-    }
-
-    public function index($vars)
-    {
     }
 
 

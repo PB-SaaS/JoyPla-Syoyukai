@@ -26,14 +26,15 @@
                 <div class="pt-2 hover:bg-sushi-50" v-for="(itemRequest) in itemRequests">
                     <div class="border-b-2 border-solid border-gray-100 w-full ">
                         <div class="lg:flex lg:divide-x ">
-                            <div class="lg:w-1/5 p-2">
+                            <div class="lg:w-1/4 p-2">
                                 <p class="text-md font-bold">登録日時<br>{{ itemRequest.registrationTime }}</p>
-                                <p class="text-md">
-                                    請求番号：{{ itemRequest.requestId }}<br>
+                                <p class="text-md break-words">
+                                    請求番号：{{ itemRequest.requestHId }}<br>
                                     請求種別：{{ ( itemRequest.requestType === 1)? "個別請求" : "消費請求" }}<br>
                                     請求元部署：{{ itemRequest.sourceDivision.divisionName }}<br>
                                     請求先部署：{{ itemRequest.targetDivision.divisionName }}<br>
-                                    合計金額：&yen; {{ numberFormat( itemRequest.totalAmount) }}
+                                    合計金額：&yen; {{ numberFormat( itemRequest.totalAmount) }}<br>
+                                    請求担当者：{{ itemRequest.requestUserName }}<br>
                                 </p>
                                 <div class="flex flex-col gap-3">
                                     <v-button-default type="button" class="w-full" @click.native="openSlip( itemRequest.requestHId )">
@@ -46,7 +47,7 @@
                                     <?php endif ?>
                                 </div>
                             </div>
-                            <div class="lg:w-4/5 p-2">
+                            <div class="lg:w-3/4 p-2">
                                 <div class="w-full lg:flex mt-3" v-for="(requestItem) in itemRequest.requestItems">
                                     <div class="lg:flex-1 flex lg:w-3/4">
                                         <item-view class="md:h-44 md:w-44 h-32 w-32" :base64="requestItem.itemImage"></item-view>
@@ -58,7 +59,11 @@
                                                 <p class="text-md text-gray-500">{{ requestItem.item.itemStandard }}</p>
                                                 <p class="text-md text-gray-500">{{ requestItem.item.itemJANCode }}</p>
                                                 <p class="text-base text-gray-900">
-                                                    {{ numberFormat(requestItem.itemRequestQuantity) }} {{ requestItem.quantity.quantityUnit }}
+                                                    {{ numberFormat(requestItem.requestQuantity) }} {{ requestItem.quantity.quantityUnit }}
+                                                </p>
+                                                <p>
+                                                    <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(requestItem.unitPrice * requestItem.requestQuantity) }}</span>
+                                                    <span class="text-sm text-gray-900">( &yen; {{ numberFormat(requestItem.unitPrice) }} / {{ requestItem.quantity.quantityUnit }} )</span>
                                                 </p>
                                             </div>
                                         </div>
@@ -81,6 +86,15 @@
                             <v-input name="yearMonth" type="month" label="請求年月" title="請求年月"></v-input>
                         </div>
                         <div class="my-4">
+                            <fieldset>
+                                <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">請求種別</div>
+                                <div class="flex gap-2">
+                                    <v-checkbox value="1" name="requestType" label="請求種別" title="個別請求"></v-checkbox>
+                                    <v-checkbox value="2" name="requestType" label="請求種別" title="消費請求"></v-checkbox>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="my-4">
                             <v-input name="makerName" type="text" label="メーカー名" title="メーカー名"></v-input>
                         </div>
                         <div class="my-4">
@@ -95,14 +109,22 @@
                         <div class="my-4">
                             <v-input name="itemJANCode" type="text" label="JANコード" title="JANコード"></v-input>
                         </div>
-                        <?php if (!gate('list_of_item_request_history')->isOnlyMyDivision()) : ?>
-                            <div class="my-4">
-                                <v-multiple-select-division name="sourcerDivisionIds" title="請求元部署名"></v-multiple-select-division>
-                            </div>
-                        <?php endif ?>
                         <div class="my-4">
-                            <v-multiple-select-division name="targetDivisionIds" title="請求先部署名"></v-multiple-select-division>
+                            <v-multiple-select-division-v2 id="sourceDivisionIds" name="sourceDivisionIds" title="請求元部署名" :is-only-my-division="<?php var_export(gate('list_of_item_request_history')->isOnlyMyDivision()); ?>" />
+                            </v-multiple-select-division-v2>
                         </div>
+                        <div class="my-4">
+                            <v-multiple-select-division-v2 id="targetDivisionIds" name="targetDivisionIds" title="請求先部署名" />
+                            </v-multiple-select-division-v2>
+                        </div>
+                        <!--
+                        <div class="my-4">
+                            <v-select-division name="sourceDivisionIds" label="請求元部署" title="請求元部署名" :is-only-my-division="<?php var_export(gate('list_of_item_request_history')->isOnlyMyDivision()); ?>" />
+                        </div>
+                        <div class="my-4">
+                            <v-select-division name="targetDivisionIds" label="請求先部署" title="請求先部署名" />
+                        </div>
+                                    -->
                         <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
                             <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
                             <v-button-primary type="button" @click.native="searchExec">絞り込み</v-button-primary>
@@ -128,7 +150,9 @@
             'item-view': itemView,
             'v-pagination': vPagination,
             'v-select': vSelect,
-            'v-multiple-select-division': vMultipleSelectDivision
+            'v-select-division': vSelectDivision,
+            'v-checkbox': vCheckbox,
+            'v-multiple-select-division-v2': vMultipleSelectDivisionV2
         },
         setup() {
             const {
@@ -218,6 +242,7 @@
                     currentPage: (Number.isInteger(parseInt(getParam("currentPage")))) ? parseInt(getParam("currentPage")) : 1,
                     sourceDivisionIds: (getParam("sourceDivisionIds")) ? (Array.isArray(getParam("sourceDivisionIds")) ? getParam("sourceDivisionIds") : (getParam("sourceDivisionIds")).split(',')) : [],
                     targetDivisionIds: (getParam("targetDivisionIds")) ? (Array.isArray(getParam("targetDivisionIds")) ? getParam("targetDivisionIds") : (getParam("targetDivisionIds")).split(',')) : [],
+                    requestType: (getParam("requestType")) ? (Array.isArray(getParam("requestType")) ? getParam("requestType") : (getParam("requestType")).split(',')) : []
                 },
             });
             const breadcrumbs = [{
@@ -288,10 +313,12 @@
 
                 axios.post(_APIURL, params)
                     .then((response) => {
+                        console.log(response);
                         itemRequests.value = response.data.data;
                         totalCount.value = parseInt(response.data.count);
                     })
                     .catch((error) => {
+                        console.log(error);
                         complete();
                         if (searchCount.value > 0) {
                             Toast.fire({
@@ -345,6 +372,7 @@
                     yearMonth: "",
                     sourceDivisionIds: [],
                     targetDivisionIds: [],
+                    requestType: [],
                     currentPage: 1,
                     perPage: values.perPage,
                 });
@@ -354,9 +382,11 @@
             const openSlip = (url) => {
                 location.href = _ROOT + "&path=/itemrequest/" + url;
             }
+            /*
             const openPrint = (url) => {
                 location.href = _ROOT + "&path=/itemrequest/" + url + "/print";
             }
+            */
 
             const deleteSlip = (requestHId) => {
                 Swal.fire({
@@ -405,7 +435,7 @@
                 loading,
                 start,
                 complete,
-                openPrint,
+                //                openPrint,
                 openSlip,
                 searchClear,
                 searchExec,
@@ -426,6 +456,12 @@
             'values.currentPage': function(val) {
                 this.listGet();
                 window.scrollTo(0, 0);
+            },
+            values: {
+                async handler(val, oldVal) {
+                    console.log(JSON.stringify(this.values));
+                },
+                deep: true
             }
         }
     }).mount('#top');

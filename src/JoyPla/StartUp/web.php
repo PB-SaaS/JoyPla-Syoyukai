@@ -17,7 +17,7 @@ use JoyPla\Application\Interactors\Web\Order\OrderIndexInteractor;
 use JoyPla\Application\Interactors\Web\Received\OrderReceivedSlipIndexInteractor;
 use JoyPla\Application\Interactors\Web\Received\ReceivedIndexInteractor;
 use JoyPla\Application\Interactors\Web\Received\ReceivedLabelInteractor;
-// use JoyPla\Application\Interactors\Web\ItemRequest\ItemRequestIndexInteractor;
+use JoyPla\Application\Interactors\Web\ItemRequest\ItemRequestShowInteractor;
 use JoyPla\InterfaceAdapters\Controllers\Web\AgreeFormController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ConsumptionController;
 use JoyPla\InterfaceAdapters\Controllers\Web\NotificationController;
@@ -45,7 +45,7 @@ use JoyPla\InterfaceAdapters\Presenters\Web\Received\OrderReceivedSlipIndexPrese
 use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedIndexPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedLabelPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedLabelSettingPresenter;
-use JoyPla\InterfaceAdapters\Presenters\Web\ItemRequest\ItemRequestIndexPresenter;
+use JoyPla\InterfaceAdapters\Presenters\Web\ItemRequest\ItemRequestShowPresenter;
 use JoyPla\JoyPlaApplication;
 use Test\Exceptions\WebExceptionHandler;
 
@@ -269,12 +269,22 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
         'history',
     ]);
 
-    //    Router::map('GET', '/itemrequest/:itemRequestHId', [ItemRequestController::class, 'index'])->service(new ItemRequestIndexInteractor(new ItemRequestIndexPresenter(), new ItemRequestRepository()));
-
+    //    Router::map('GET', '/itemrequest/:requestHId', [ItemRequestController::class, 'show'])->service(new ItemRequestShowInteractor(new ItemRequestShowPresenter(), new ItemRequestRepository()));
+    /*
     Router::map('GET', '/itemrequest/show', [
         ItemRequestController::class,
         'show',
     ]);
+    */
+    Router::map('GET', '/itemrequest/:requestHId', [
+        ItemRequestController::class,
+        'show',
+    ])->service(
+        new ItemRequestShowInteractor(
+            new ItemRequestShowPresenter(),
+            new ItemRequestRepository()
+        )
+    );
 });
 
 $router = new Router();

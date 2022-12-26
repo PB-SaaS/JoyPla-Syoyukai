@@ -7,38 +7,33 @@
             <div class="index container mx-auto mb-96">
                 <h1 class="text-2xl mb-2">請求内容</h1>
                 <hr>
-                <div class="p-4 text-base bg-gray-100 brequestItem brequestItem-gray-400 flex flex-col md:flex-row md:gap-6 gap-4 mb-6">
+                <div class="p-4 text-base bg-gray-100 border border-gray-400 flex flex-col md:flex-row md:gap-6 gap-4 mb-6">
                     <?php if (gate('update_of_item_request_history')->can()) : ?>
                         <v-button-primary type="button" :disabled="! isChange" class="md:w-1/6 w-full" @click.native="onUpdate">内容を更新</v-button-primary>
                     <?php endif ?>
                     <?php if (gate('delete_of_item_request_history')->can()) : ?>
-                        <v-button-danger type="button" class="md:w-1/6 w-full" @click.native="deleteSlip( requestItem.requestItemId )">
+                        <v-button-danger type="button" class="md:w-1/6 w-full" @click.native="deleteSlip( itemRequest.requestHId )">
                             削除
                         </v-button-danger>
                     <?php endif ?>
                 </div>
-                <div class="p-4 text-base bg-gray-100 brequestItem brequestItem-gray-400">
-                    <v-text title="請求日時" class="lg:flex w-full gap-6">{{ requestItem.registrationTime }}</v-text>
-                    <v-text title="請求番号" class="lg:flex w-full gap-6">{{ requestItem.requestHId }}</v-text>
-                    <v-text title="請求種別" class="lg:flex w-full gap-6">
-                        <span class="bg-red-100 text-red-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded">
-                            {{ requestItem.requestTypeToString}}
-                        </span>
-                    </v-text>
-                    <v-text title="請求元部署" class="lg:flex w-full gap-6">{{ requestItem.sourceDivision.divisionName }}</v-text>
-                    <v-text title="請求先部署" class="lg:flex w-full gap-6">{{ requestItem.targetDivision.divisionName }}</v-text>
-                    <v-text title="請求担当者" class="lg:flex w-full gap-6">{{ requestItem.requestUserName }}</v-text>
+                <div class="p-4 text-base bg-gray-100 border border-gray-400">
+                    <v-text title="請求日時" class="lg:flex w-full gap-6">{{ itemRequest.registrationTime }}</v-text>
+                    <v-text title="請求番号" class="lg:flex w-full gap-6">{{ itemRequest.requestHId }}</v-text>
+                    <v-text title="請求元部署" class="lg:flex w-full gap-6">{{ itemRequest.sourceDivision.divisionName }}</v-text>
+                    <v-text title="請求先部署" class="lg:flex w-full gap-6">{{ itemRequest.targetDivision.divisionName }}</v-text>
+                    <v-text title="請求担当者" class="lg:flex w-full gap-6">{{ itemRequest.requestUserName }}</v-text>
                     <?php if (gate('update_of_item_request_history')->can()) : ?>
                         <v-select class="lg:flex w-full gap-6" @change="isChange = true" change-class-name="inputChange" :options="[{ label: '個別請求', value: 1 },{ label: '消費請求', value: 2 }]" name="requestType" :rules="{required: true}" title="請求種別" label="請求種別"></v-select>
                     <?php else : ?>
-                        <v-text title="請求種別" class="flex w-full gap-6">{{ requestItem.requestTypeToString }}</v-text>
+                        <v-text title="請求種別" class="flex w-full gap-6">{{ itemRequest.requestTypeToString }}</v-text>
                     <?php endif ?>
                 </div>
                 <hr>
                 <div class="p-4 text-lg font-bold">
                     <div class="flex w-full gap-6">
                         <div class="flex-initial lg:w-1/6 w-1/3">合計金額</div>
-                        <div class="flex-auto">&yen; {{ numberFormat( requestItem.totalAmount) }}</div>
+                        <div class="flex-auto">&yen; {{ numberFormat( itemRequest.totalAmount) }}</div>
                     </div>
                 </div>
                 <hr>
@@ -59,7 +54,7 @@
                                                 <p class="text-md text-gray-500">{{ item.value.item.itemJANCode }}</p>
                                                 <?php if (gate('update_of_item_request_history')->can()) : ?>
                                                     <p class="text-base text-gray-900 lg:w-1/2">
-                                                        <v-input-number :rules="{ required: true , between: ( (item.value.rowrequestQuantity > 0)? [ 1 , 99999 ] : [ -99999 , -1 ] ) }" :name="`requestItems[${idx}].requestQuantity`" label="請求数（個数）" :unit="item.value.quantity.quantityUnit" :step="1" :title="`発注数（個数）/${item.value.quantity.quantityNum}${ item.value.quantity.quantityUnit }入り`" @change="isChange = true" change-class-name="inputChange"></v-input-number>
+                                                        <v-input-number :rules="{ required: true , between: ( (item.value.rowrequestQuantity > 0)? [ 1 , 99999 ] : [ -99999 , -1 ] ) }" :name="`requestItems[${idx}].requestQuantity`" label="請求数（入数）" :unit="item.value.quantity.quantityUnit" :step="1" :title="`請求数（入数）/${item.value.quantity.quantityNum}${ item.value.quantity.quantityUnit }入り`" @change="isChange = true" change-class-name="inputChange"></v-input-number>
                                                     </p>
                                                 <?php else : ?>
                                                     <div class="md:flex gap-6 ">
@@ -67,6 +62,10 @@
                                                         <div>{{ numberFormat(item.value.requestQuantity) }} {{ item.value.quantity.quantityUnit }}</div>
                                                     </div>
                                                 <?php endif ?>
+                                                <div>
+                                                    <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(item.value.unitPrice * item.value.requestQuantity) }}</span>
+                                                    <span class="text-sm text-gray-900">( &yen; {{ numberFormat(item.value.unitPrice) }} / {{ item.value.quantity.quantityUnit }} )</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -87,7 +86,7 @@
 </div>
 <script>
     const PHPData = <?php echo json_encode($viewModel, true) ?>;
-
+    console.log(PHPData);
     var JoyPlaApp = Vue.createApp({
         components: {
             'v-text': vText,
@@ -114,7 +113,7 @@
             } = VeeValidate;
 
 
-            const requestItem = PHPData.requestItem;
+            const itemRequest = PHPData.itemRequest;
 
             const {
                 handleSubmit,
@@ -125,11 +124,11 @@
                 isSubmitting
             } = useForm({
                 initialValues: {
-                    'requestId': ItemRequest.requestHId,
-                    'requestType': ItemRequest.requestType,
-                    'requestItems': ItemRequest.requesItems.map(x => {
-                        x.rowrequestItemQuantity = parseInt(x.requestItemQuantity);
-                        x.requestItemQuantity = parseInt(x.requestItemQuantity);
+                    'requestId': itemRequest.requestHId,
+                    'requestType': itemRequest.requestType,
+                    'requestItems': itemRequest.requestItems.map(x => {
+                        x.rowrequestQuantity = parseInt(x.requestQuantity);
+                        x.requestQuantity = parseInt(x.requestQuantity);
                         return x;
                     })
                 },
@@ -173,7 +172,7 @@
                 {
                     text: '請求履歴一覧',
                     disabled: false,
-                    href: _ROOT + '&path=/itemrequest/history/show&isCache=true',
+                    href: _ROOT + '&path=/itemrequest/history&isCache=true',
                 },
                 {
                     text: '請求内容',
@@ -190,10 +189,10 @@
             const isChange = ref(false);
 
             const createUpdateModel = () => {
-                return values.requestItemItems.map(x => {
+                return values.requestItems.map(x => {
                     return {
-                        'requestItemItemId': x.requestItemItemId,
-                        'requestItemQuantity': x.requestItemQuantity,
+                        'requestItemItemId': x.itemId,
+                        'requestQuantity': x.requestQuantity,
                     };
                 });
             }
@@ -279,7 +278,7 @@
                         }
 
                         let addComment = "";
-                        if (res.data.data.isrequestItemDeleted) {
+                        if (res.data.data.isRequestItemDeleted) {
                             addComment = "\r\n商品情報がなくなりましたので請求履歴も削除しました。";
                         }
 
@@ -289,7 +288,7 @@
                             text: addComment,
                         }).then((result) => {
                             if (res.data.data.isrequestItemDeleted) {
-                                location.href = _ROOT + "&path=/itemrequest/history/show&isCache=true"
+                                location.href = _ROOT + "&path=/itemrequest/history&isCache=true"
                             } else {
                                 location.reload();
                             }
@@ -336,7 +335,7 @@
                             icon: 'success',
                             title: '請求履歴の削除が完了しました。',
                         }).then((result) => {
-                            location.href = _ROOT + "&path=/itemrequest/history/show&isCache=true"
+                            location.href = _ROOT + "&path=/itemrequest/history&isCache=true"
                         });
                         return true;
                     }
@@ -355,7 +354,7 @@
                 itemDelete,
                 isChange,
                 numberFormat,
-                requestItem,
+                itemRequest,
                 fields,
                 breadcrumbs,
                 loading,
