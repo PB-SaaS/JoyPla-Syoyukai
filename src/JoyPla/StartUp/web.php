@@ -20,9 +20,11 @@ use JoyPla\Application\Interactors\Web\Received\ReceivedLabelInteractor;
 use JoyPla\Application\Interactors\Web\ItemRequest\ItemRequestShowInteractor;
 use JoyPla\InterfaceAdapters\Controllers\Web\AgreeFormController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ConsumptionController;
+use JoyPla\InterfaceAdapters\Controllers\Web\ItemAndPriceAndInHospitalItemRegisterController;
 use JoyPla\InterfaceAdapters\Controllers\Web\NotificationController;
 use JoyPla\InterfaceAdapters\Controllers\Web\OptionController;
 use JoyPla\InterfaceAdapters\Controllers\Web\OrderController;
+use JoyPla\InterfaceAdapters\Controllers\Web\PriceAndInHospitalItemRegisterController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ReceivedController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ReturnController;
 use JoyPla\InterfaceAdapters\Controllers\Web\StocktakingController;
@@ -87,7 +89,7 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
 
     Router::map('GET', '/consumption', [
         TopController::class,
-        'consumptionpage',
+        'consumptionpage'
     ]);
 
     Router::map('GET', '/stocktaking', [
@@ -129,6 +131,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
     Router::map('GET', '/consumption/register', [
         ConsumptionController::class,
         'register',
+    ]);
+
+    Router::map('GET', '/consumption/bulkRegister', [
+        ConsumptionController::class,
+        'bulkRegister',
     ]);
 
     Router::map('GET', '/consumption/show', [
@@ -259,6 +266,32 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
         'index',
     ]);
 
+    Router::map('GET', '/product/ItemAndPriceAndInHospitalRegist/input', [
+        ItemAndPriceAndInHospitalItemRegisterController::class,
+        'register',
+    ]);
+    Router::map('POST', '/product/ItemAndPriceAndInHospitalRegist/confirm', [
+        ItemAndPriceAndInHospitalItemRegisterController::class,
+        'confirm',
+    ]);
+    Router::map('POST', '/product/ItemAndPriceAndInHospitalRegist/thanks', [
+        ItemAndPriceAndInHospitalItemRegisterController::class,
+        'thanks',
+    ]);
+
+    Router::map('POST', '/product/PriceAndInHospitalRegist/input', [
+        PriceAndInHospitalItemRegisterController::class,
+        'register',
+    ]);
+    Router::map('POST', '/product/PriceAndInHospitalRegist/confirm', [
+        PriceAndInHospitalItemRegisterController::class,
+        'confirm',
+    ]);
+    Router::map('POST', '/product/PriceAndInHospitalRegist/thanks', [
+        PriceAndInHospitalItemRegisterController::class,
+        'thanks',
+    ]);
+
     Router::map('GET', '/itemrequest/register', [
         ItemRequestController::class,
         'register',
@@ -269,13 +302,6 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
         'history',
     ]);
 
-    //    Router::map('GET', '/itemrequest/:requestHId', [ItemRequestController::class, 'show'])->service(new ItemRequestShowInteractor(new ItemRequestShowPresenter(), new ItemRequestRepository()));
-    /*
-    Router::map('GET', '/itemrequest/show', [
-        ItemRequestController::class,
-        'show',
-    ]);
-    */
     Router::map('GET', '/itemrequest/:requestHId', [
         ItemRequestController::class,
         'show',

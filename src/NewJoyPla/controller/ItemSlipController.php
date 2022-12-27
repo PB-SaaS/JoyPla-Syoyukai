@@ -27,6 +27,7 @@ class ItemSlipController extends Controller
             $user_info = new UserInfo($SPIRAL);
 
             $api_url = '%url/card:page_177122%';
+            $root_url = '%url/rel:@mpgt:Root%';
 
             $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
@@ -50,7 +51,8 @@ class ItemSlipController extends Controller
                 'api_url' => $api_url,
                 'userInfo' => $user_info,
                 'csrf_token' => Csrf::generate(16),
-                'tenantKind' => $tenantKind
+                'tenantKind' => $tenantKind,
+                'root_url' => $root_url,
             ], false);
         } catch (Exception $ex) {
             $title = 'JoyPla エラー';
