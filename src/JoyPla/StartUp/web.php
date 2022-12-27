@@ -311,6 +311,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
             new ItemRequestRepository()
         )
     );
+
+    Router::map('GET', '/itemrequest/totalization', [
+        ItemRequestController::class,
+        'totalization',
+    ]);
 });
 
 $router = new Router();

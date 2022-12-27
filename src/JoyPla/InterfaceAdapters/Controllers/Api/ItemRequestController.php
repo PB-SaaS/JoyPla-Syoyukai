@@ -19,6 +19,8 @@ use JoyPla\Application\InputPorts\Api\ItemRequest\RequestItemDeleteInputData;
 use JoyPla\Application\InputPorts\Api\ItemRequest\RequestItemDeleteInputPortInterface;
 use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestUpdateInputData;
 use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestUpdateInputPortInterface;
+use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestTotalizationInputData;
+use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestTotalizationInputPortInterface;
 
 
 class ItemRequestController extends Controller
@@ -132,5 +134,28 @@ class ItemRequestController extends Controller
 
         $inputData = new ItemRequestUpdateInputData($this->request->user(), $itemRequest, $gate->isOnlyMyDivision());
         $inputPort->handle($inputData);
+    }
+
+    public function totalization($vars, ItemRequestTotalizationInputPortInterface $inputPort)
+    {
+        $token = $this->request->get('_csrf');
+        Csrf::validate($token, true);
+
+        if (Gate::denies('totalization_of_item_requests')) {
+            Router::abort(403);
+        }
+
+        $gate = Gate::getGateInstance('totalization_of_item_requests');
+
+        $search = $this->request->get('search');
+
+        $user = $this->request->user();
+
+        if ($gate->isOnlyMyDivision()) {
+            $search['sourceDivisionIds'] = [$user->divisionId];
+        }
+
+        $inputData = new ItemRequestTotalizationInputData($user, $search);
+        //       $inputPort->handle($inputData);
     }
 }

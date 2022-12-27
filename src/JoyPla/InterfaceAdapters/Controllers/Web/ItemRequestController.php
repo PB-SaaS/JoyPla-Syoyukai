@@ -41,20 +41,20 @@ class ItemRequestController extends Controller
         if (Gate::denies('list_of_item_request_history')) {
             Router::abort(403);
         }
+
         $gate = Gate::getGateInstance('list_of_item_request_history');
         $inputData = new ItemRequestShowInputData($this->request->user(), $vars['requestHId'], $gate->isOnlyMyDivision());
         $inputPort->handle($inputData);
     }
 
-    /*
-    public function pickingList($vars, ItemRequestsInputPortInterface $inputPort)
+    public function totalization($vars)
     {
-        if (Gate::denies('list_of_item_requests')) {
+        if (Gate::denies('totalization_of_item_requests')) {
             Router::abort(403);
         }
-        $gate = Gate::getGateInstance('list_of_item_requests');
-        $inputData = new ItemRequestsInputData($this->request->user(), $vars['requestHId'], $gate->isOnlyMyDivision());
-        $inputPort->handle($inputData);
+
+        $gate = Gate::getGateInstance('totalization_of_item_requests');
+        $body = View::forge('html/ItemRequest/Totalization', [], false)->render();
+        echo view('html/Common/Template', compact('body'), false)->render();
     }
-    */
 }

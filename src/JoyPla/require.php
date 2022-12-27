@@ -37,6 +37,7 @@ require_once('JoyPla/Application/Interactors/Api/ItemRequest/ItemRequestHistoryI
 require_once('JoyPla/Application/Interactors/Api/ItemRequest/ItemRequestDeleteInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/ItemRequest/RequestItemDeleteInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/ItemRequest/ItemRequestUpdateInteractor.php');
+require_once('JoyPla/Application/Interactors/Api/ItemRequest/ItemRequestTotalizationInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Reference/ConsumptionHistoryShowInteractor.php');
 require_once('JoyPla/Application/Interactors/Web/Consumption/ConsumptionIndexInteractor.php');
 require_once('JoyPla/Application/Interactors/Web/Order/OrderIndexInteractor.php');
@@ -159,6 +160,7 @@ require_once('JoyPla/InterfaceAdapters/Presenters/Api/ItemRequest/ItemRequestHis
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/ItemRequest/ItemRequestDeletePresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/ItemRequest/RequestItemDeletePresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/ItemRequest/ItemRequestUpdatePresenter.php');
+require_once('JoyPla/InterfaceAdapters/Presenters/Api/ItemRequest/ItemRequestTotalizationPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Reference/ConsumptionHistoryShowPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/Consumption/ConsumptionIndexPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/Consumption/ConsumptionPrintPresenter.php');

@@ -527,7 +527,7 @@ class JoyPlaApplication extends Application
             return new GatePermissionModel(true, false);
         });
 
-        Gate::define('list_of_item_requests', function (Auth $auth) {
+        Gate::define('totalization_of_item_requests', function (Auth $auth) {
             //請求商品一覧
             if ($auth->userPermission == '2') {
                 //担当者

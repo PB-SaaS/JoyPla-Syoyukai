@@ -42,6 +42,7 @@ use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestHistoryInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestDeleteInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\RequestItemDeleteInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestUpdateInteractor;
+use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestTotalizationInteractor;
 use JoyPla\InterfaceAdapters\Controllers\Api\BarcodeController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ConsumptionController;
 use JoyPla\InterfaceAdapters\Controllers\Api\DistributorController;
@@ -106,6 +107,7 @@ use JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest\ItemRequestHistoryPresen
 use JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest\ItemRequestDeletePresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest\RequestItemDeletePresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest\ItemRequestUpdatePresenter;
+use JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest\ItemRequestTotalizationPresenter;
 use JoyPla\JoyPlaApplication;
 use Test\Exceptions\ApiExceptionHandler;
 
@@ -186,6 +188,8 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () {
     Router::map('DELETE', '/api/itemrequest/:requestHId/:requestId/delete', [ItemRequestController::class, 'itemDelete'])->service(new RequestItemDeleteInteractor(new RequestItemDeletePresenter(), new ItemRequestRepository(), new RequestItemCountRepository()));
 
     Router::map('PATCH', '/api/itemrequest/:requestHId/update', [ItemRequestController::class, 'update'])->service(new ItemRequestUpdateInteractor(new ItemRequestUpdatePresenter(), new ItemRequestRepository(), new RequestItemCountRepository()));
+
+    Router::map('GET', '/api/itemrequest/totalization', [ItemRequestController::class, 'totalization'])->service(new ItemRequestTotalizationInteractor(new ItemRequestTotalizationPresenter(), new ItemRequestRepository()));
 });
 
 $router = new Router();
