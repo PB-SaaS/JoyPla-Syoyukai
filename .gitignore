@@ -5,3 +5,4 @@
 .vscode/
 .node_modules/
 node_modules
+/src/JoyPla/LoggingConfig.php

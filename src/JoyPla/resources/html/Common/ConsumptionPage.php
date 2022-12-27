@@ -7,6 +7,13 @@
       <div class="index container mx-auto">
         <div class="bg-cornflower-blue-500 text-cornflower-blue-50 py-1 font-bold col-span-4 px-3">消費</div>
         <div class="md:grid md:grid-cols-4 md:gap-10 gap-4 my-2">
+          <?php if(gate('bulkregister_of_consumption_slips')->can()): ?>
+          <card-button main-color="bg-cornflower-blue-500" text-color="text-cornflower-blue-50" sub-color="bg-cornflower-blue-600" label-text="一括消費" path="/consumption/bulkRegister">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" class="stroke-cornflower-blue-700" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+            </svg>  
+          </card-button>
+          <?php endif ?>
           <?php if(gate('register_of_consumption_slips')->can()): ?>
           <card-button main-color="bg-cornflower-blue-500" text-color="text-cornflower-blue-50" sub-color="bg-cornflower-blue-600" label-text="個別消費" path="/consumption/register">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

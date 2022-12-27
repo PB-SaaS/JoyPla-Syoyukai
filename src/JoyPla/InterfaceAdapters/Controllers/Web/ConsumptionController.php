@@ -24,7 +24,20 @@ class ConsumptionController extends Controller
         $consumptionUnitPriceUseFlag = $consumptionUnitPriceUseFlag->billingUnitPrice;
         $body = View::forge('html/Consumption/ConsumptionRegister', compact('consumptionUnitPriceUseFlag'), false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
-    } 
+    }
+
+    public function bulkRegister($vars ) {
+
+        if(Gate::denies('bulkregister_of_consumption_slips'))
+        {
+            Router::abort(403);
+        }
+
+        $consumptionUnitPriceUseFlag = (Hospital::where('hospitalId', $this->request->user()->hospitalId)->value('billingUnitPrice')->get())->data->get(0);
+        $consumptionUnitPriceUseFlag = $consumptionUnitPriceUseFlag->billingUnitPrice;
+        $body = View::forge('html/Consumption/ConsumptionBulkRegister', compact('consumptionUnitPriceUseFlag'), false)->render();
+        echo view('html/Common/Template', compact('body'), false)->render();
+    }
 
     public function show($vars){
         if(Gate::denies('list_of_consumption_slips'))

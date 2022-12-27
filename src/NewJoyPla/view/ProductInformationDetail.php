@@ -36,6 +36,14 @@
                     <input type="hidden" name="Action" value="inHospitalItemRegist">
                 </form>
                 <?php endif ?>
+                <?php if($tenantKind == "1" && ($userInfo->isAdmin() || $userInfo->isApprover())): ?>
+                <input class="print_hidden uk-button uk-button-primary" type="submit" value="金額情報・院内商品情報登録" onclick="document.priceAndInHPItemsReg.submit()">
+                <form action="<?php echo $root_url ?>" method="post" name="priceAndInHPItemsReg" class="uk-hidden">
+                    <input type="hidden" name="_method" value="post">
+                    <input type="hidden" name="path" value="/product/PriceAndInHospitalRegist/input">
+                    <input type="hidden" name="itemId" value="%val:usr:itemId%">
+                </form>
+                <?php endif ?>
             </div>
 
             <div class="uk-width-1-1" uk-grid>

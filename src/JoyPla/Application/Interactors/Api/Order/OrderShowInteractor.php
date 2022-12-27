@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Order {
-
     use App\Model\Division;
     use JoyPla\Application\InputPorts\Api\Order\OrderShowInputData;
     use JoyPla\Application\InputPorts\Api\Order\OrderShowInputPortInterface;
@@ -30,8 +29,10 @@ namespace JoyPla\Application\Interactors\Api\Order {
          * OrderShowInteractor constructor.
          * @param OrderShowOutputPortInterface $outputPort
          */
-        public function __construct(OrderShowOutputPortInterface $outputPort , OrderRepositoryInterface $orderRepository)
-        {
+        public function __construct(
+            OrderShowOutputPortInterface $outputPort,
+            OrderRepositoryInterface $orderRepository
+        ) {
             $this->outputPort = $outputPort;
             $this->orderRepository = $orderRepository;
         }
@@ -41,21 +42,19 @@ namespace JoyPla\Application\Interactors\Api\Order {
          */
         public function handle(OrderShowInputData $inputData)
         {
-            [ $orders , $count ] = $this->orderRepository->search(
-                (new HospitalId($inputData->user->hospitalId)),
+            [$orders, $count] = $this->orderRepository->search(
+                new HospitalId($inputData->user->hospitalId),
                 $inputData->search
             );
-            $this->outputPort->output(new OrderShowOutputData($orders , $count));
+            $this->outputPort->output(new OrderShowOutputData($orders, $count));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Order {
-
     use Auth;
     use stdClass;
 
@@ -68,10 +67,11 @@ namespace JoyPla\Application\InputPorts\Api\Order {
         /**
          * OrderShowInputData constructor.
          */
-        public function __construct(Auth $user , array $search)
+        public function __construct(Auth $user, array $search)
         {
             $this->user = $user;
             $this->search = new stdClass();
+            $this->search->orderId = $search['orderId'];
             $this->search->itemName = $search['itemName'];
             $this->search->makerName = $search['makerName'];
             $this->search->itemCode = $search['itemCode'];
@@ -81,15 +81,15 @@ namespace JoyPla\Application\InputPorts\Api\Order {
             $this->search->orderDate = $search['orderDate'];
             $this->search->divisionIds = $search['divisionIds'];
             $this->search->orderStatus = $search['orderStatus'];
-            $this->search->perPage= $search['perPage'];
-            $this->search->currentPage= $search['currentPage'];
+            $this->search->perPage = $search['perPage'];
+            $this->search->currentPage = $search['currentPage'];
         }
     }
 
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Order
-    */
+     */
     interface OrderShowInputPortInterface
     {
         /**
@@ -103,7 +103,6 @@ namespace JoyPla\Application\InputPorts\Api\Order {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Order {
-
     use JoyPla\Enterprise\Models\Order;
 
     /**
@@ -117,23 +116,20 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
         /**
          * OrderShowOutputData constructor.
          */
-        
-        public function __construct(array $orders , int $count)
+
+        public function __construct(array $orders, int $count)
         {
             $this->count = $count;
-            $this->orders = array_map(
-                function( Order $order)
-                {
-                    return $order->toArray();
-                },$orders
-            );
+            $this->orders = array_map(function (Order $order) {
+                return $order->toArray();
+            }, $orders);
         }
     }
 
     /**
      * Interface OrderShowOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\Order;
-    */
+     */
     interface OrderShowOutputPortInterface
     {
         /**
@@ -141,4 +137,4 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
          */
         function output(OrderShowOutputData $outputData);
     }
-} 
+}
