@@ -5,6 +5,7 @@
  */
 
 namespace JoyPla\Application\Interactors\Api\ItemRequest {
+
     use App\Model\Division;
     use App\SpiralDb\StockView;
     use Exception;
@@ -39,7 +40,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
 
         /** @var RequestItemCountRepositoryInterface */
         private RequestItemCountRepositoryInterface $requestItemCountRepository;
-        
+
         /**
          * ItemRequestRegisterInteractor constructor.
          * @param ItemRequestRegisterOutputPortInterface $outputPort
@@ -72,12 +73,12 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 return $v;
             }, $inputData->requestItems);
 
-            $requestItems = $this-> itemRequestRepository->findByInHospitalItem($hospitalId, $inputData->requestItems);
+            $requestItems = $this->itemRequestRepository->findByInHospitalItem($hospitalId, $inputData->requestItems);
 
             if (count($requestItems) === 0) {
                 throw new Exception("Request items don't exist.", 999);
             }
-            
+
             $ids = [];
             $result = [];
 
@@ -86,7 +87,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 foreach ($result as $key => $r) {
                     if ($r->equalDivisions($i->getSourceDivision(), $i->getTargetDivision())) {
                         $exist = true;
-                        $result[ $key ] = $r->addRequestItem($i);
+                        $result[$key] = $r->addRequestItem($i);
                     }
                 }
                 if ($exist) {
@@ -98,12 +99,12 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 //登録時には病院名は必要ないので、いったんhogeでいい
                 $result[] = new ItemRequest(
                     $id,
-                    ( new DateYearMonthDayHourMinutesSecond("") ),
-                    ( new DateYearMonthDayHourMinutesSecond("") ),
+                    (new DateYearMonthDayHourMinutesSecond("")),
+                    (new DateYearMonthDayHourMinutesSecond("")),
                     [$i],
                     new Hospital(
                         $hospitalId,
-                        ( new HospitalName('hoge') ),
+                        (new HospitalName('hoge')),
                         "",
                         "",
                         new Pref(""),
@@ -112,7 +113,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                     $i->getSourceDivision(),
                     $i->getTargetDivision(),
                     $requestType,
-                    ( new TextFieldType64Bytes($inputData->user->name) )
+                    (new TextFieldType64Bytes($inputData->user->name))
                 );
             }
 
@@ -123,21 +124,22 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                     $stockViewInstance->orWhere('inHospitalItemId', $requestItem->getInHospitalItemId()->value());
                 }
             }
-            
+
             $stocks = $stockViewInstance->get();
             if ((int)$stocks->count === 0) {
                 throw new Exception("Stocks don't exist.", 999);
             }
-            
-            $this->itemRequestRepository->saveToArray($result);
 
             $stocks = $stocks->data->all();
             $requestItemCounts = [];
             foreach ($result as $itemRequest) {
+                $inHpItem = [];
                 foreach ($itemRequest->getRequestItems() as $item) {
+                    $inHpItem[] = $item->getInHospitalItemId()->value();
                     foreach ($stocks as $stock) {
                         if (($itemRequest->getTargetDivision()->getDivisionId()->value() === $stock->divisionId) &&
-                        ($item->getInHospitalItemId()->value() === $stock->inHospitalItemId)) {
+                            ($item->getInHospitalItemId()->value() === $stock->inHospitalItemId)
+                        ) {
                             $requestItemCounts[] = new RequestItemCount(
                                 $stock->recordId,
                                 $hospitalId,
@@ -151,6 +153,12 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                     }
                 }
             }
+
+            if (count($requestItemCounts) !== count(array_unique($inHpItem))) {
+                throw new Exception("Stocks don't exist.", 999);
+            }
+
+            $this->itemRequestRepository->saveToArray($result);
 
             $this->requestItemCountRepository->saveToArray($requestItemCounts);
 
@@ -167,6 +175,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
  */
 
 namespace JoyPla\Application\InputPorts\Api\ItemRequest {
+
     use Auth;
     use stdClass;
 
@@ -200,7 +209,7 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\ItemRequest\Api
-    */
+     */
     interface ItemRequestRegisterInputPortInterface
     {
         /**
@@ -235,7 +244,7 @@ namespace JoyPla\Application\OutputPorts\Api\ItemRequest {
     /**
      * Interface ItemRequestRegisterOutputPortInterface
      * @package JoyPla\Application\OutputPorts\ItemRequest\Api;
-    */
+     */
     interface ItemRequestRegisterOutputPortInterface
     {
         /**

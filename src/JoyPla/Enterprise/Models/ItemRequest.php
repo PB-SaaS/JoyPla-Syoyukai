@@ -130,6 +130,21 @@ class ItemRequest
         );
     }
 
+    public function setRequestType(RequestType $requestType)
+    {
+        return new ItemRequest(
+            $this->requestHId,
+            $this->registrationTime,
+            $this->updateTime,
+            $this->requestItems,
+            $this->hospital,
+            $this->sourceDivision,
+            $this->targetDivision,
+            $requestType,
+            $this->requestUserName
+        );
+    }
+
     public function existRequestItem(RequestId $requestId)
     {
         foreach ($this->requestItems as $item) {

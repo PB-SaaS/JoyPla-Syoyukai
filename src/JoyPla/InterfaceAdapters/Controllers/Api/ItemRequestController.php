@@ -17,6 +17,8 @@ use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestHistoryInputData;
 use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestHistoryInputPortInterface;
 use JoyPla\Application\InputPorts\Api\ItemRequest\RequestItemDeleteInputData;
 use JoyPla\Application\InputPorts\Api\ItemRequest\RequestItemDeleteInputPortInterface;
+use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestUpdateInputData;
+use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestUpdateInputPortInterface;
 
 
 class ItemRequestController extends Controller
@@ -107,34 +109,28 @@ class ItemRequestController extends Controller
     }
 
 
-    public function update($vars, OrderUnapprovedUpdateInputPortInterface $inputPort)
+    public function update($vars, ItemRequestUpdateInputPortInterface $inputPort)
     {
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
 
-        if (Gate::denies('revision_of_unordered_slips')) {
+        if (Gate::denies('update_of_item_request_history')) {
             Router::abort(403);
         }
 
-        $gate = Gate::getGateInstance('revision_of_unordered_slips');
+        $gate = Gate::getGateInstance('update_of_item_request_history');
 
-        $orderId = $vars['orderId'];
-        $adjustment = $this->request->get('adjustment');
+        $requestHId = $vars['requestHId'];
+        $requestType = $this->request->get('requestType');
         $updateModel = $this->request->get('updateModel');
-        $comment = $this->request->get('comment');
 
-        $order = [
-            'orderId' => $orderId,
-            'adjustment' => $adjustment,
-            'updateModel' => $updateModel,
-            'comment' => $comment,
+        $itemRequest = [
+            'requestHId' => $requestHId,
+            'requestType' => $requestType,
+            'updateModel' => $updateModel
         ];
 
-        $inputData = new OrderUnapprovedUpdateInputData(
-            $this->request->user(),
-            $order,
-            $gate->isOnlyMyDivision()
-        );
+        $inputData = new ItemRequestUpdateInputData($this->request->user(), $itemRequest, $gate->isOnlyMyDivision());
         $inputPort->handle($inputData);
     }
 }

@@ -99,6 +99,10 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 }
             }
 
+            if (count($requestItemCounts) !== count($itemRequest->getRequestItems())) {
+                throw new Exception("Stocks don't exist.", 999);
+            }
+
             $this->requestItemCountRepository->saveToArray($requestItemCounts);
 
             $deleteCount = $this->repository->delete($hospitalId, $requestHId);

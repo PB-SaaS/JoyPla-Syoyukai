@@ -127,7 +127,6 @@
                     'requestHId': itemRequest.requestHId,
                     'requestType': itemRequest.requestType,
                     'requestItems': itemRequest.requestItems.map(x => {
-                        x.rowrequestQuantity = parseInt(x.requestQuantity);
                         x.requestQuantity = parseInt(x.requestQuantity);
                         return x;
                     }),
@@ -217,7 +216,7 @@
             const createUpdateModel = () => {
                 return values.requestItems.map(x => {
                     return {
-                        'requestItemItemId': x.itemId,
+                        'requestId': x.requestId,
                         'requestQuantity': x.requestQuantity,
                     };
                 });
@@ -249,13 +248,15 @@
                             start();
                             let params = new URLSearchParams();
                             const updateModel = createUpdateModel();
-                            params.append("path", "/api/itemrequest/history/" + values.requestHId + "/update");
+                            console.log(updateModel);
+                            params.append("path", "/api/itemrequest/" + values.requestHId + "/update");
                             params.append("requestType", values.requestType);
                             params.append("updateModel", JSON.stringify(encodeURIToObject(updateModel)));
                             params.append("_method", 'patch');
                             params.append("_csrf", _CSRF);
 
                             const res = await axios.post(_APIURL, params);
+                            console.log(res);
                             complete();
                             if (res.data.code != 200) {
                                 throw new Error(res.data.message)
@@ -296,7 +297,7 @@
                         params.append("path", "/api/itemrequest/" + values.requestHId + "/" + values.requestItems[idx].requestId + "/delete");
                         params.append("_method", 'delete');
                         params.append("_csrf", _CSRF);
-                        console.log(params);
+
                         const res = await axios.post(_APIURL, params);
                         console.log(res);
                         complete();
@@ -314,7 +315,7 @@
                             title: '商品の削除が完了しました。',
                             text: addComment,
                         }).then((result) => {
-                            if (res.data.data.isrequestItemDeleted) {
+                            if (res.data.data.isItemRequestDeleted) {
                                 location.href = _ROOT + "&path=/itemrequest/history&isCache=true"
                             } else {
                                 location.reload();
@@ -389,7 +390,8 @@
                 complete,
                 totalAmount,
                 requestPrice,
-                checkQuantity
+                checkQuantity,
+                values
             }
         },
         watch: {

@@ -390,6 +390,7 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
         return $result->count;
     }
 
+
     public function deleteItem(HospitalId $hospitalId, RequestId $requestId, ItemRequest $itemRequest)
     {
         $itemRequestToArray = $itemRequest->toArray();
@@ -410,6 +411,31 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
 
         return false;
     }
+
+
+    public function update(HospitalId $hospitalId, ItemRequest $itemRequest)
+    {
+        $itemRequestToArray = $itemRequest->toArray();
+
+        $history = [];
+        $history[] = [
+            "requestHId" => (string)$itemRequestToArray['requestHId'],
+            "totalAmount" => (string)$itemRequestToArray['totalAmount'],
+            "itemsNumber" => (string)$itemRequestToArray['itemCount'],
+            "requestType" => (string)$itemRequestToArray['requestType']
+        ];
+
+        $items = [];
+        foreach ($itemRequestToArray['requestItems'] as $requestItem) {
+            $items[] = [
+                "requestId" => (string)$requestItem['requestId'],
+                "requestQuantity" => (string)$requestItem['requestQuantity'],
+                "requestType" => (string)$requestItem['requestType']
+            ];
+        }
+        SpiralDbItemRequest::upsert('requestHId', $history);
+        SpiralDbRequestItem::upsert('requestId', $items);
+    }
 }
 
 interface ItemRequestRepositoryInterface
@@ -422,4 +448,5 @@ interface ItemRequestRepositoryInterface
     public function show(HospitalId $hospitalId, RequestHId $requestHId);
     public function delete(HospitalId $hospitalId, RequestHId $requestHId);
     public function deleteItem(HospitalId $hospitalId, RequestId $requestId, ItemRequest $itemRequest);
+    public function update(HospitalId $hospitalId, ItemRequest $itemRequest);
 }

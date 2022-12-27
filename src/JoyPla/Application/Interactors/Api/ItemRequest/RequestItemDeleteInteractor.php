@@ -14,7 +14,6 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
     use JoyPla\Application\InputPorts\Api\ItemRequest\RequestItemDeleteInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\ItemRequest\RequestItemDeleteOutputData;
     use JoyPla\Application\OutputPorts\Api\ItemRequest\RequestItemDeleteOutputPortInterface;
-    use JoyPla\Enterprise\Models\ItemRequest;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\Enterprise\Models\RequestHId;
     use JoyPla\Enterprise\Models\RequestId;
@@ -108,6 +107,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
             $this->requestItemCountRepository->saveToArray($requestItemCounts);
 
             $itemRequest = $itemRequest->deleteItem($requestId);
+
             $isItemRequestDeleted = $this->repository->deleteItem($hospitalId, $requestId, $itemRequest);
 
             $this->outputPort->output(new RequestItemDeleteOutputData($isItemRequestDeleted));

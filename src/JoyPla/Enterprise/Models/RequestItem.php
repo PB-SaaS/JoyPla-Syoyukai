@@ -65,6 +65,42 @@ class RequestItem
         );
     }
 
+    public function setRequestQuantity(RequestQuantity $requestQuantity)
+    {
+        return new RequestItem(
+            $this->requestId,
+            $this->requestHId,
+            $this->inHospitalItemId,
+            $this->item,
+            $this->hospitalId,
+            $this->sourceDivision,
+            $this->targetDivision,
+            $requestQuantity,
+            $this->requestType,
+            $this->quantity,
+            $this->price,
+            $this->unitPrice
+        );
+    }
+
+    public function setRequestType(RequestType $requestType)
+    {
+        return new RequestItem(
+            $this->requestId,
+            $this->requestHId,
+            $this->inHospitalItemId,
+            $this->item,
+            $this->hospitalId,
+            $this->sourceDivision,
+            $this->targetDivision,
+            $this->requestQuantity,
+            $requestType,
+            $this->quantity,
+            $this->price,
+            $this->unitPrice
+        );
+    }
+
     public function getRequestId()
     {
         return $this->requestId;
