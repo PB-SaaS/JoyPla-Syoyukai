@@ -63,11 +63,8 @@ class Router
     {
         foreach (self::$routes as $route) {
             if ($route->processable($request, $isMethodCheck)) {
-                try {
-                    $route->middleware($this->middlewares);
-                    return $route->process($request, $route->service);
-                } catch (Exception $e) {
-                }
+                $route->middleware($this->middlewares);
+                return $route->process($request, $route->service);
             }
         }
 
