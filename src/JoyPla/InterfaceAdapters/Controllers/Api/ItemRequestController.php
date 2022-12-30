@@ -19,8 +19,8 @@ use JoyPla\Application\InputPorts\Api\ItemRequest\RequestItemDeleteInputData;
 use JoyPla\Application\InputPorts\Api\ItemRequest\RequestItemDeleteInputPortInterface;
 use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestUpdateInputData;
 use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestUpdateInputPortInterface;
-use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestTotalizationInputData;
-use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestTotalizationInputPortInterface;
+use JoyPla\Application\InputPorts\Api\ItemRequest\TotalizationInputData;
+use JoyPla\Application\InputPorts\Api\ItemRequest\TotalizationInputPortInterface;
 
 
 class ItemRequestController extends Controller
@@ -136,7 +136,7 @@ class ItemRequestController extends Controller
         $inputPort->handle($inputData);
     }
 
-    public function totalization($vars, ItemRequestTotalizationInputPortInterface $inputPort)
+    public function totalization($vars, TotalizationInputPortInterface $inputPort)
     {
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
@@ -155,7 +155,7 @@ class ItemRequestController extends Controller
             $search['sourceDivisionIds'] = [$user->divisionId];
         }
 
-        $inputData = new ItemRequestTotalizationInputData($user, $search);
-        //       $inputPort->handle($inputData);
+        $inputData = new TotalizationInputData($user, $search);
+        $inputPort->handle($inputData);
     }
 }

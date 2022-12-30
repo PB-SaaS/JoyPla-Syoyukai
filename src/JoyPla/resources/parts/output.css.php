@@ -3234,14 +3234,20 @@ margin-bottom: 0px;
 }
 }
 
-table.count-table {
-counter-reset: rowCount;
+.bg-purple-200 {
+--tw-bg-opacity: 1;
+background-color: rgb(233 213 255 / var(--tw-bg-opacity));
 }
 
-table.count-table > tbody > tr {
-counter-increment: rowCount;
+.text-purple-900 {
+--tw-text-opacity: 1;
+color: rgb(88 28 135 / var(--tw-text-opacity));
 }
 
-table.count-table > tbody > tr > td:first-child::before {
-content: counter(rowCount);
+.min-w-250 {
+min-width: 250px;
+}
+
+.float-none {
+float: none;
 }
