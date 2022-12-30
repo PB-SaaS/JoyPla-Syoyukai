@@ -112,7 +112,9 @@ class PayoutController extends Controller
             $header = $this->view('NewJoyPla/src/HeaderForMypage', [
                 'SPIRAL' => $SPIRAL
             ], false);
-            
+
+            throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+/* 
             if($user_info->isDistributorUser())
             {
                 throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
@@ -142,7 +144,7 @@ class PayoutController extends Controller
                 'useUnitPrice'=> $useUnitPrice,
                 'csrf_token' => Csrf::generate(16)
                 ] , false);
-            
+ */
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
@@ -370,40 +372,40 @@ class PayoutController extends Controller
                 $payout_items = $payout_items->data->all();
             }
             
-	        Stock::where('hospitalId',$user_info->getHospitalId());
-	        
-	        foreach($payout_items as $item)
-	        {
-	            Stock::orWhere('inHospitalItemId',$item->inHospitalItemId);
-	        }
-	        
-	        $stock_items        = Stock::get();
-	        
-	        foreach($payout_items as $key => $item)
-	        {
-	            foreach($stock_items->data->all() as $stock_item)
-	            {
-	                if($stock_item->inHospitalItemId == $item->inHospitalItemId && $stock_item->divisionId == $item->sourceDivisionId)
-	                {
-	                    $payout_items[$key]->sourceRackName = $stock_item->rackName;
-	                    $payout_items[$key]->constantByDiv = $stock_item->constantByDiv;
-	                }
-	                if($stock_item->inHospitalItemId == $item->inHospitalItemId && $stock_item->divisionId == $item->targetDivisionId)
-	                {
-	                    $payout_items[$key]->targetRackName = $stock_item->rackName;
-	                    $payout_items[$key]->constantByDiv = $stock_item->constantByDiv;
-	                }
-	            }
-	            Distributor::orWhere('distributorId' , $item->distributorId);
-	            Division::orWhere('divisionId', $item->targetDivisionId);
-	            Division::orWhere('divisionId', $item->sourceDivisionId);
-	        }
-	        
-	        $distributor = Distributor::get();
-	        $division = Division::get();
+            Stock::where('hospitalId',$user_info->getHospitalId());
+            
+            foreach($payout_items as $item)
+            {
+                Stock::orWhere('inHospitalItemId',$item->inHospitalItemId);
+            }
+            
+            $stock_items        = Stock::get();
+            
             foreach($payout_items as $key => $item)
-	        {
-	            
+            {
+                foreach($stock_items->data->all() as $stock_item)
+                {
+                    if($stock_item->inHospitalItemId == $item->inHospitalItemId && $stock_item->divisionId == $item->sourceDivisionId)
+                    {
+                        $payout_items[$key]->sourceRackName = $stock_item->rackName;
+                        $payout_items[$key]->constantByDiv = $stock_item->constantByDiv;
+                    }
+                    if($stock_item->inHospitalItemId == $item->inHospitalItemId && $stock_item->divisionId == $item->targetDivisionId)
+                    {
+                        $payout_items[$key]->targetRackName = $stock_item->rackName;
+                        $payout_items[$key]->constantByDiv = $stock_item->constantByDiv;
+                    }
+                }
+                Distributor::orWhere('distributorId' , $item->distributorId);
+                Division::orWhere('divisionId', $item->targetDivisionId);
+                Division::orWhere('divisionId', $item->sourceDivisionId);
+            }
+            
+            $distributor = Distributor::get();
+            $division = Division::get();
+            foreach($payout_items as $key => $item)
+            {
+                
                 foreach($division->data->all() as $division_data)
                 {
                     if($item->sourceDivisionId == $division_data->divisionId)
@@ -423,7 +425,7 @@ class PayoutController extends Controller
                         $payout_items[$key]->distributorName = $distributor_data->distributorName;
                     }
                 }
-	        }
+            }
             
             $default_design = $this->defaultDesign();
             
@@ -476,33 +478,33 @@ class PayoutController extends Controller
         }
     }
     
-	private function defaultDesign()
-	{
-	    return <<<EOM
-	<div class='printarea uk-margin-remove'>
-		<div>
-			<b class='font-size-16'>%JoyPla:itemName%</b>
-			<div class='uk-child-width-1-2' uk-grid>
-				<div class=''>
-					<span>%JoyPla:itemMaker%</span><br>
-					<span>%JoyPla:catalogNo% %JoyPla:itemStandard%</span><br>
-					<span>%JoyPla:inHPId%</span><br>
-					<span>%JoyPla:lotNumber%</span><br>
-					<span>%JoyPla:lotDate%</span><br>
-				</div>
-				<div class='uk-text-right uk-padding-remove'>
-					<b>%JoyPla:sourceDivisionName%</b> <span>元棚番:%JoyPla:sourceRackName%</span><br>
-					<b>%JoyPla:divisionName%</b> <span>払出棚番:%JoyPla:rackName%</span><br>
-					<span>定数:%JoyPla:constantByDiv%%JoyPla:quantityUnit%</span><br>
-					<span class='uk-text-bold' style='font-size:1.25em'>入数:%JoyPla:quantity%%JoyPla:quantityUnit%</span><br>
-				</div>
-			</div>
-			<div class='uk-text-center' id='barcode_%JoyPla:num%'>%JoyPla:barcodeId%</div>
-			<div class='uk-text-right'>%JoyPla:distributorName%</div>
-		</div>
-	</div>
+    private function defaultDesign()
+    {
+        return <<<EOM
+    <div class='printarea uk-margin-remove'>
+        <div>
+            <b class='font-size-16'>%JoyPla:itemName%</b>
+            <div class='uk-child-width-1-2' uk-grid>
+                <div class=''>
+                    <span>%JoyPla:itemMaker%</span><br>
+                    <span>%JoyPla:catalogNo% %JoyPla:itemStandard%</span><br>
+                    <span>%JoyPla:inHPId%</span><br>
+                    <span>%JoyPla:lotNumber%</span><br>
+                    <span>%JoyPla:lotDate%</span><br>
+                </div>
+                <div class='uk-text-right uk-padding-remove'>
+                    <b>%JoyPla:sourceDivisionName%</b> <span>元棚番:%JoyPla:sourceRackName%</span><br>
+                    <b>%JoyPla:divisionName%</b> <span>払出棚番:%JoyPla:rackName%</span><br>
+                    <span>定数:%JoyPla:constantByDiv%%JoyPla:quantityUnit%</span><br>
+                    <span class='uk-text-bold' style='font-size:1.25em'>入数:%JoyPla:quantity%%JoyPla:quantityUnit%</span><br>
+                </div>
+            </div>
+            <div class='uk-text-center' id='barcode_%JoyPla:num%'>%JoyPla:barcodeId%</div>
+            <div class='uk-text-right'>%JoyPla:distributorName%</div>
+        </div>
+    </div>
 EOM;
-	}
+    }
     
     public function payoutRegistApi()
     {
@@ -564,8 +566,8 @@ EOM;
                 {
                     throw new Exception('invalid payout count',200);
                 }
-        		$payout[$key]['countNum'] = (int)$record['countNum'] * (int)$record['countLabelNum'] ;
-        		$payout[$key]['payoutCount'] = $record['countNum'];
+                $payout[$key]['countNum'] = (int)$record['countNum'] * (int)$record['countLabelNum'] ;
+                $payout[$key]['payoutCount'] = $record['countNum'];
             }
             
             $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
@@ -579,157 +581,157 @@ EOM;
             $target_division_name = $SPIRAL->getParam('targetDivisionName');
             
             $payout = \App\Lib\requestUrldecode($payout);
-    		$source_division_name = urldecode($source_division_name);
-    		$target_division_name = urldecode($target_division_name);
-    		
-    		$payout_id = $this->makeId('05');
-    		
-    		/* インサートデータ作成 */
-    		$insert_data = [];
-    		$total_amount = 0;
-    		$in_hospital_item_ids = [];
-    		$card_ids = [];
-    		$label_create_flg = false;
-    		foreach($payout as $data)
-    		{
-				if( (int)$data['countNum']  > 0 ){
-				    if (array_search($data['recordId'],$in_hospital_item_ids) === false)
-				    {
-				        $in_hospital_item_ids[] = $data['recordId'];
-				    }
+            $source_division_name = urldecode($source_division_name);
+            $target_division_name = urldecode($target_division_name);
+            
+            $payout_id = $this->makeId('05');
+            
+            /* インサートデータ作成 */
+            $insert_data = [];
+            $total_amount = 0;
+            $in_hospital_item_ids = [];
+            $card_ids = [];
+            $label_create_flg = false;
+            foreach($payout as $data)
+            {
+                if( (int)$data['countNum']  > 0 ){
+                    if (array_search($data['recordId'],$in_hospital_item_ids) === false)
+                    {
+                        $in_hospital_item_ids[] = $data['recordId'];
+                    }
                     $unit_price = $use_unit_price
                         ?(float)(str_replace(',', '', $data['unitPrice']))
                         :(((float)str_replace(',', '', $data['kakaku']) == 0 || (float)$data['irisu'] == 0)
                             ? 0 
                             : (float)(str_replace(',', '', $data['kakaku']) / (float)$data['irisu']));
-					$insert_data[] = [
-					    'registrationTime' => $payout_date,
-						'payoutHistoryId' => $payout_id,
-						'inHospitalItemId' => $data['recordId'],
-						'hospitalId' => $user_info->getHospitalId(),
-						'sourceDivisionId' => $source_division_id,
-						'targetDivisionId' => $target_division_id,
-						'quantity' => $data['irisu'],
-						'quantityUnit' => $data['unit'],
-						'itemUnit' => $data['itemUnit'],
-						'price' => str_replace(',', '', $data['kakaku']),
-						'payoutQuantity' => (int)$data['countNum'],
-						'payoutAmount' => (float)$unit_price * (int)$data['countNum'],
-						'payoutCount' => $data['payoutCount'],
-						'payoutLabelCount' => $data['countLabelNum'],
-						'lotNumber' => $data['lotNumber'],
-						'lotDate' => $data['lotDate'],
-						'unitPrice' => $unit_price,
-						'cardId' => $data['cardNum']
-					];
-					if($data['cardNum'] != "")
-					{
-					    $card_ids[] = $data['cardNum'];
-					}
-					
-					if($data['cardNum'] == "")
-					{
-					    $label_create_flg = true; //一つでもあれば発行する
-					}
-					$total_amount = $total_amount + ((float)$unit_price * (int)$data['countNum']);
-				}
-    		}
-    		
-    		$insert_history_data = [
-    		    [
-				    'registrationTime' => $payout_date,
-    		        'payoutHistoryId' => $payout_id,
-    		        'hospitalId' => $user_info->getHospitalId(),
-    		        'sourceDivisionId' => $source_division_id,
-    		        'sourceDivision' => $source_division_name,
-    		        'targetDivisionId' => $target_division_id,
-    		        'targetDivision' => $target_division_name,
-    		        'itemsNumber' => count($in_hospital_item_ids),
-    		        'totalAmount' => $total_amount,
+                    $insert_data[] = [
+                        'registrationTime' => $payout_date,
+                        'payoutHistoryId' => $payout_id,
+                        'inHospitalItemId' => $data['recordId'],
+                        'hospitalId' => $user_info->getHospitalId(),
+                        'sourceDivisionId' => $source_division_id,
+                        'targetDivisionId' => $target_division_id,
+                        'quantity' => $data['irisu'],
+                        'quantityUnit' => $data['unit'],
+                        'itemUnit' => $data['itemUnit'],
+                        'price' => str_replace(',', '', $data['kakaku']),
+                        'payoutQuantity' => (int)$data['countNum'],
+                        'payoutAmount' => (float)$unit_price * (int)$data['countNum'],
+                        'payoutCount' => $data['payoutCount'],
+                        'payoutLabelCount' => $data['countLabelNum'],
+                        'lotNumber' => $data['lotNumber'],
+                        'lotDate' => $data['lotDate'],
+                        'unitPrice' => $unit_price,
+                        'cardId' => $data['cardNum']
+                    ];
+                    if($data['cardNum'] != "")
+                    {
+                        $card_ids[] = $data['cardNum'];
+                    }
+                    
+                    if($data['cardNum'] == "")
+                    {
+                        $label_create_flg = true; //一つでもあれば発行する
+                    }
+                    $total_amount = $total_amount + ((float)$unit_price * (int)$data['countNum']);
+                }
+            }
+            
+            $insert_history_data = [
+                [
+                    'registrationTime' => $payout_date,
+                    'payoutHistoryId' => $payout_id,
+                    'hospitalId' => $user_info->getHospitalId(),
+                    'sourceDivisionId' => $source_division_id,
+                    'sourceDivision' => $source_division_name,
+                    'targetDivisionId' => $target_division_id,
+                    'targetDivision' => $target_division_name,
+                    'itemsNumber' => count($in_hospital_item_ids),
+                    'totalAmount' => $total_amount,
                 ]
             ];
-    		
-    		$inventory_adjustment_trdata = [];
-    		
-    		
-    		foreach($insert_data as $record)
-    		{
-    		    if($record['lotNumber'] && $record['lotDate'])
-    		    {
-        		    $inventory_adjustment_trdata[] = [
+            
+            $inventory_adjustment_trdata = [];
+            
+            
+            foreach($insert_data as $record)
+            {
+                if($record['lotNumber'] && $record['lotDate'])
+                {
+                    $inventory_adjustment_trdata[] = [
                         'divisionId' => $record['targetDivisionId'],
                         'inHospitalItemId' => $record['inHospitalItemId'],
                         'count' => $record['payoutQuantity'],
                         'pattern' => 5,
                         'hospitalId' => $user_info->getHospitalId(),
-        		        'lotUniqueKey' => $user_info->getHospitalId().$record['targetDivisionId'].$record['inHospitalItemId'].$record['lotNumber'].$record['lotDate'],
-        		        'stockQuantity' => $record['payoutQuantity'],
+                        'lotUniqueKey' => $user_info->getHospitalId().$record['targetDivisionId'].$record['inHospitalItemId'].$record['lotNumber'].$record['lotDate'],
+                        'stockQuantity' => $record['payoutQuantity'],
                         'lotNumber' =>  $record['lotNumber'],
                         'lotDate' =>    $record['lotDate'],
-        		    ];
-        		    $inventory_adjustment_trdata[] = [
+                    ];
+                    $inventory_adjustment_trdata[] = [
                         'divisionId' => $record['sourceDivisionId'],
                         'inHospitalItemId' => $record['inHospitalItemId'],
                         'count' => -$record['payoutQuantity'],
                         'pattern' => 4,
                         'hospitalId' => $user_info->getHospitalId(),
-        		        'lotUniqueKey' => $user_info->getHospitalId().$record['sourceDivisionId'].$record['inHospitalItemId'].$record['lotNumber'].$record['lotDate'],
-        		        'stockQuantity' => -$record['payoutQuantity'],
+                        'lotUniqueKey' => $user_info->getHospitalId().$record['sourceDivisionId'].$record['inHospitalItemId'].$record['lotNumber'].$record['lotDate'],
+                        'stockQuantity' => -$record['payoutQuantity'],
                         'lotNumber' =>  $record['lotNumber'],
                         'lotDate' =>    $record['lotDate'],
-        		    ];
-    		    }
-    		    else
-    		    {
-        		    $inventory_adjustment_trdata[] = [
+                    ];
+                }
+                else
+                {
+                    $inventory_adjustment_trdata[] = [
                         'divisionId' => $record['targetDivisionId'],
                         'inHospitalItemId' => $record['inHospitalItemId'],
                         'pattern' => 5,
                         'count' => $record['payoutQuantity'],
                         'hospitalId' => $user_info->getHospitalId(),
-        		    ];   
-        		    $inventory_adjustment_trdata[] = [
+                    ];   
+                    $inventory_adjustment_trdata[] = [
                         'divisionId' => $record['sourceDivisionId'],
                         'inHospitalItemId' => $record['inHospitalItemId'],
                         'pattern' => 4,
                         'count' => -$record['payoutQuantity'],
                         'hospitalId' => $user_info->getHospitalId(),
-        		    ];   
-    		    }
-    		}
-    		
-    		if( count($insert_data) === 0 )
-    		{
+                    ];   
+                }
+            }
+            
+            if( count($insert_data) === 0 )
+            {
                 throw new Exception('not payout data',200);
-    		}
-    		
-    		$result = PayoutHistory::insert($insert_history_data);
-    		$result = Payout::insert($insert_data);
-    		
-    		$payout = new Payout();
-    		$payout->where('hospitalId',$user_info->getHospitalId())->where('payoutHistoryId', $payout_id);
-    		foreach($card_ids as $id)
-    		{
-    		    $payout->orWhere('cardId',$id);
-    		}
-    		
-    		$payout_data = $payout->get();
-    		$card_update = [];
-    		foreach($payout_data->data->all() as $payout_item)
-    		{
-    		    if($payout_item->cardId != '')
-    		    {
-    		        $card_update[] = [
-    		        'cardId' => $payout_item->cardId,
-    		        'payoutId' => $payout_item->payoutId,
-    		        ];
-    		    }
-    		}
-    		if(count($card_update) > 0)
-    		{
-    		    Card::bulkUpdate('cardId',$card_update);
-    		}
-    		$result = InventoryAdjustmentTransaction::insert($inventory_adjustment_trdata);
+            }
+            
+            $result = PayoutHistory::insert($insert_history_data);
+            $result = Payout::insert($insert_data);
+            
+            $payout = new Payout();
+            $payout->where('hospitalId',$user_info->getHospitalId())->where('payoutHistoryId', $payout_id);
+            foreach($card_ids as $id)
+            {
+                $payout->orWhere('cardId',$id);
+            }
+            
+            $payout_data = $payout->get();
+            $card_update = [];
+            foreach($payout_data->data->all() as $payout_item)
+            {
+                if($payout_item->cardId != '')
+                {
+                    $card_update[] = [
+                    'cardId' => $payout_item->cardId,
+                    'payoutId' => $payout_item->payoutId,
+                    ];
+                }
+            }
+            if(count($card_update) > 0)
+            {
+                Card::bulkUpdate('cardId',$card_update);
+            }
+            $result = InventoryAdjustmentTransaction::insert($inventory_adjustment_trdata);
             
             $content = new ApiResponse(['payoutHistoryId'=>$payout_id,'labelCreateFlg' => $label_create_flg] , $result->count , $result->code, $result->message, ['insert']);
             $content = $content->toJson();
@@ -899,6 +901,9 @@ EOM;
     {
         global $SPIRAL;
         try {
+
+            throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+/* 
             //フルスクラッチでやってみる
             $user_info = new UserInfo($SPIRAL);
             
@@ -907,11 +912,11 @@ EOM;
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             }
 
-            /** キャッシュから取得 */
+            // * キャッシュから取得
             $table_cache = ($SPIRAL->getParam('table_cache') === 'true');
             
             $search = new StdClass;
-            /** デフォルト */
+            // * デフォルト
             $search->sort_title = 'id';
             $search->limit = 10;
             $search->page = 1;
@@ -931,20 +936,20 @@ EOM;
 
             $search->sort_title = ( $SPIRAL->getParam('sortTitle'))? $SPIRAL->getParam('sortTitle') : $search->sort_title; // 初期ソート id asc
             $search->sort_asc = ( $SPIRAL->getParam('sort') === 'asc' || $SPIRAL->getParam('sort') === 'desc' )? $SPIRAL->getParam('sort') : $search->sort_asc;
-            /** 取得条件 */
+            // * 取得条件
             $search->limit = ( ! is_null($SPIRAL->getParam('limit')) && ( $SPIRAL->getParam('limit') >= 1 && $SPIRAL->getParam('limit') <= 1000 ) )? $SPIRAL->getParam('limit') : $search->limit ;
             $search->page = ( ! is_null($SPIRAL->getParam('page')) && ( $SPIRAL->getParam('page') >= 1 ) )?  $SPIRAL->getParam('page')  : $search->page;
 
 
-            /** 値の取得 */
-            /** 払出予定商品 */
+            // * 値の取得
+            // * 払出予定商品
             $pay_schedule_items = PayScheduleItemsView::where('pickingId','','ISNULL')
                                                         ->where('hospitalId',$user_info->getHospitalId())
                                                         ->orWhere('outOfStockStatus','2','!=')
                                                         ->sort($search->sort_title,$search->sort_asc)
                                                         ->page($search->page);
 
-            /** 検索 */
+            // * 検索
             $search->registration_time_start =  ($SPIRAL->getParam('registration_time_start'))? $SPIRAL->getParam('registration_time_start') : $search->registration_time_start;
             $search->registration_time_start = ( 
                 FieldSet::validate(\field\DateYearMonthDay::FIELD_NAME , $search->registration_time_start)->isSuccess()
@@ -1048,11 +1053,11 @@ EOM;
             $count = $pay_schedule_items->count;
             $pay_schedule_items_label = $pay_schedule_items->label->all();
             $pay_schedule_items = $pay_schedule_items->data->all();
-            /** 部署情報 */
+            // * 部署情報
             $division_info = [];
             $division_info = Division::where('hospitalId',$user_info->getHospitalId())->whereDeleted()->get();
             $division_info = $division_info->data->all();
-            /** 実体参照を行い、必要な情報をセット */
+            // * 実体参照を行い、必要な情報をセット
             $source_division_info = [];
             $target_division_info = $division_info;
 
@@ -1112,7 +1117,8 @@ EOM;
                     'category_label' => $pay_schedule_items_label['category']->all(),
                     'out_of_stock_status_label' => $pay_schedule_items_label['outOfStockStatus']->all(),
                     ] , true);
-    
+ */
+
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
@@ -1276,6 +1282,9 @@ EOM;
     {
         global $SPIRAL;
         try {
+
+            throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+/* 
             //フルスクラッチでやってみる
             $user_info = new UserInfo($SPIRAL);
             $cache = $SPIRAL->getCache();
@@ -1285,11 +1294,11 @@ EOM;
                 throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
             }
 
-            /** キャッシュから取得 */
+            // * キャッシュから取得
             $table_cache = ($SPIRAL->getParam('table_cache') === 'true');
             
             $search = new StdClass;
-            /** デフォルト */
+            // * デフォルト
             $search->sort_title = 'id';
             $search->sort_asc = 'desc';
             $search->limit = 10;
@@ -1306,17 +1315,17 @@ EOM;
 
             $search->sort_title = ( $SPIRAL->getParam('sortTitle'))? $SPIRAL->getParam('sortTitle') : $search->sort_title; // 初期ソート id asc
             $search->sort_asc = ( $SPIRAL->getParam('sort') === 'asc' || $SPIRAL->getParam('sort') === 'desc' )? $SPIRAL->getParam('sort') : $search->sort_asc;
-            /** 取得条件 */
+            // * 取得条件
             $search->limit = ( ! is_null($SPIRAL->getParam('limit')) && ( $SPIRAL->getParam('limit') >= 1 && $SPIRAL->getParam('limit') <= 1000 ) )? $SPIRAL->getParam('limit') : $search->limit ;
             $search->page = ( ! is_null($SPIRAL->getParam('page')) && ( $SPIRAL->getParam('page') >= 1 ) )?  $SPIRAL->getParam('page')  : $search->page;
 
-            /** 値の取得 */
-            /** ピッキングリストの取得 */
+            // * 値の取得
+            // * ピッキングリストの取得
             $picking_history = PickingHistory::where('hospitalId',$user_info->getHospitalId())
                                                 ->sort($search->sort_title,$search->sort_asc)
                                                 ->page((int)$search->page);
 
-            /** 検索 */
+            // * 検索
             $search->registration_time_start =  ($SPIRAL->getParam('registration_time_start'))? $SPIRAL->getParam('registration_time_start') : $search->registration_time_start;
             $search->registration_time_start = ( 
                 FieldSet::validate(\field\DateYearMonthDay::FIELD_NAME , $search->registration_time_start)->isSuccess()
@@ -1376,7 +1385,7 @@ EOM;
             $picking_history_label = $picking_history->label->all();
             $picking_history = $picking_history->data->all();
             
-            /** 部署情報 */
+            // * 部署情報
             $division_info = [];
             $division_info = Division::where('hospitalId',$user_info->getHospitalId())->whereDeleted();
             if($user_info->isUser())
@@ -1385,7 +1394,7 @@ EOM;
             }
             $division_info = $division_info->get();
             $division_info = $division_info->data->all();
-            /** 実体参照を行い、必要な情報をセット */
+            // * 実体参照を行い、必要な情報をセット
             foreach($picking_history as &$item)
             {
                 $item->checked = false;
@@ -1412,7 +1421,8 @@ EOM;
                     'picking_status_label' => $picking_history_label['pickingStatus']->all(),
                     'csrf_token' => Csrf::generate(16)
                     ] , true);
-    
+ */
+
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
@@ -1449,6 +1459,9 @@ EOM;
     {
         global $SPIRAL;
         try {
+
+            throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+/* 
             //フルスクラッチでやってみる
             $user_info = new UserInfo($SPIRAL);
             $cache = $SPIRAL->getCache();
@@ -1542,14 +1555,14 @@ EOM;
             }
             $stock_view_model = array_merge($stock , $in_hospital_item_tmp);
 
-            /** 部署情報 */
+            // * 部署情報
             $division_info = [];
             $division_info = Division::where('hospitalId',$user_info->getHospitalId())->whereDeleted()->get();
             $division_info = $division_info->data->all();
             $division = \App\Lib\array_obj_find($division_info,'divisionId',$picking_history->divisionId);
             $division_name = $division->divisionName;
 
-            /** 実体参照を行い、必要な情報をセット */
+            // * 実体参照を行い、必要な情報をセット
             foreach($pay_schedule_items as &$item)
             {
                 $division = \App\Lib\array_obj_find($division_info,'divisionId',$item->sourceDivisionId);
@@ -1575,6 +1588,8 @@ EOM;
                     'pay_schedule_items' => $pay_schedule_items,
                     'csrf_token' => Csrf::generate(16)
                     ] , true);
+ */
+
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
