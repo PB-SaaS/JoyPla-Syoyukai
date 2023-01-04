@@ -19,6 +19,7 @@ use JoyPla\Application\Interactors\Api\Consumption\ConsumptionShowInteractor;
 use JoyPla\Application\Interactors\Api\Distributor\DistributorShowInteractor;
 use JoyPla\Application\Interactors\Api\Division\DivisionShowInteractor;
 use JoyPla\Application\Interactors\Api\InHospitalItem\InHospitalItemShowInteractor;
+use JoyPla\Application\Interactors\Api\Item\ItemAndPriceAndInHospitalItemRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Notification\NotificationShowInteractor;
 use JoyPla\Application\Interactors\Api\ReceivedReturn\ReturnShowInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderRegisterInteractor;
@@ -39,6 +40,7 @@ use JoyPla\InterfaceAdapters\Controllers\Api\ConsumptionController;
 use JoyPla\InterfaceAdapters\Controllers\Api\DistributorController;
 use JoyPla\InterfaceAdapters\Controllers\Api\DivisionController;
 use JoyPla\InterfaceAdapters\Controllers\Api\InHospitalItemController;
+use JoyPla\InterfaceAdapters\Controllers\Api\ItemAndPriceAndInHospitalItemController;
 use JoyPla\InterfaceAdapters\Controllers\Api\NotificationController;
 use JoyPla\InterfaceAdapters\Controllers\Api\OrderController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ReceivedController;
@@ -52,8 +54,11 @@ use JoyPla\InterfaceAdapters\GateWays\Repository\DivisionRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\HospitalRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\InHospitalItemRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\ItemAndPriceAndInHospitalItemRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\NotificationRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\PriceRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ReceivedRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ReturnRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\StockRepository;
@@ -65,6 +70,7 @@ use JoyPla\InterfaceAdapters\Presenters\Api\Consumption\ConsumptionShowPresenter
 use JoyPla\InterfaceAdapters\Presenters\Api\Distributor\DistributorShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Division\DivisionShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\InHospitalItem\InHospitalItemShowPresenter;
+use JoyPla\InterfaceAdapters\Presenters\Api\Item\ItemRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Notification\NotificationShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\ReceivedReturn\ReturnShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderRegisterPresenter;
@@ -77,6 +83,7 @@ use JoyPla\InterfaceAdapters\Presenters\Api\Order\FixedQuantityOrderPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderRevisedPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderUnReceivedShowPresenter;
+use JoyPla\InterfaceAdapters\Presenters\Api\Price\PriceRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedRegisterByOrderSlipPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedReturnRegisterPresenter;
@@ -143,7 +150,12 @@ Router::group(VerifyCsrfTokenMiddleware::class, function(){
     Router::map('GET','/api/stocktaking/inHospitalItem',[StocktakingController::class,'inHospitalItem']);
     
     Router::map('GET','/api/notification/show',[NotificationController::class,'show'])->service(new NotificationShowInteractor( new NotificationShowPresenter() , new NotificationRepository() ));
-    
+
+/* 
+    Router::map('POST','/api/ItemAndPriceAndInHospitalItem/register',[ItemAndPriceAndInHospitalItemController::class,'register'])->service(new ItemAndPriceAndInHospitalItemRegisterInteractor(new ItemRegisterPresenter() , new ItemAndPriceAndInHospitalItemRepository() ));
+
+    Router::map('POST','/api/PriceAndInHospitalItem/register',[PriceAndInHospitalItemController::class,'register'])->service(new PriceAndInHospitalItemRegisterInteractor(new PriceRegisterPresenter() , new InHospitalItemRepository() , new PriceRepository() , new HospitalRepository() ));
+ */
 });
 
 $router = new Router();

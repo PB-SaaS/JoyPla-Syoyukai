@@ -118,6 +118,32 @@ class InHospitalItemRepository implements InHospitalItemRepositoryInterface{
 
         return [$inHospitalItems , $result->count];
     }
+
+    public function saveToArray( HospitalId $hospitalId, ItemId $itemId, PriceId $priceId, array $inHP, array $attr = [] ){
+
+        $createArray = [
+            "registrationTime" => "now",
+            "updateTime" => "now",
+            "itemId" => $itemId,
+            "hospitalId" => $hospitalId,
+            "priceId" => $priceId,
+            "distributorId" => $inHP["distributorId"],
+            "distributorMCode" => $inHP["distributorMCode"],
+            "quantity" => $inHP["quantity"],
+            "quantityUnit" => $inHP["quantityUnit"],
+            "itemUnit" => $inHP["itemUnit"],
+            "price" => $inHP["price"],
+            "unitPrice" => $inHP["unitPrice"],
+            "medicineCategory" => $inHP["medicineCategory"],
+            "homeCategory" => $inHP["homeCategory"],
+            "measuringInst" => $inHP["measuringInst"],
+            "notice" => $inHP["notice"],
+        ];
+
+        return SpiralDb::title("NJ_itemDB") -> create($createArray);
+
+    }
+
 }
 
 interface InHospitalItemRepositoryInterface 
@@ -125,4 +151,5 @@ interface InHospitalItemRepositoryInterface
     public function findByHospitalId( HospitalId $hospitalId );
     public function search( HospitalId $hospitalId , object $search);
     public function searchByJanCode(HospitalId $hospitalId ,  string $jancode);
+    public function saveToArray( HospitalId $hospitalId, ItemId $itemId, PriceId $priceId, array $inHP, array $attr = [] );
 }

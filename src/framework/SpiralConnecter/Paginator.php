@@ -6,16 +6,16 @@ use framework\Http\Request;
 use LogicException;
 use stdClass;
 
-class Paginator extends stdClass{
-
+class Paginator extends stdClass
+{
     private int $currentPage = 1;
     private int $from = 1;
-    private int $lastPage  = 0;
-    private int $limit = 0 ;
+    private int $lastPage = 0;
+    private int $limit = 0;
     private int $total = 0;
-    private OrderBy $orderBy;
+    private ?OrderBy $orderBy;
 
-    public static array $sortSymbol = [ 'asc' => '▲' , 'desc' => '▼' ];
+    public static array $sortSymbol = ['asc' => '▲', 'desc' => '▼'];
 
     public function __construct(
         Collection $data,
@@ -24,12 +24,10 @@ class Paginator extends stdClass{
         int $lastPage,
         int $limit,
         int $total,
-        OrderBy $orderBy
-    )
-    {
+        OrderBy $orderBy = null
+    ) {
         $this->data = $data;
-        foreach($data as $key => $val)
-        {
+        foreach ($data as $key => $val) {
             $this->{$key} = $val;
         }
         $this->currentPage = $currentPage;
@@ -39,8 +37,6 @@ class Paginator extends stdClass{
         $this->total = $total;
         $this->orderBy = $orderBy;
     }
-
-    
 
     public function getData()
     {
@@ -74,8 +70,7 @@ class Paginator extends stdClass{
 
     public function sortSymbol($key)
     {
-        if( $this->orderBy->field === $key)
-        {
+        if ($this->orderBy->field === $key) {
             return self::$sortSymbol[$this->orderBy->ascOrDesc];
         }
         return '';
@@ -84,44 +79,69 @@ class Paginator extends stdClass{
     public function sortLink($key)
     {
         $ascOrDesc = 'asc';
-        if($this->orderBy->field === $key && $this->orderBy->ascOrDesc === 'asc')
-        {
+        if (
+            $this->orderBy->field === $key &&
+            $this->orderBy->ascOrDesc === 'asc'
+        ) {
             $ascOrDesc = 'desc';
         }
-        return '?'.Request::queryBuilder(['sortkey'=>$key , 'sort' => $ascOrDesc]);
+        return '?' .
+            Request::queryBuilder(['sortkey' => $key, 'sort' => $ascOrDesc]);
     }
-    
-    public function limits($limit = [10 , 50 , 100 , 200 , 500 , 1000])
+
+    public function limits($limit = [10, 50, 100, 200, 500, 1000])
     {
         $html = '<div class="limit-wrapper">';
         $html .= '<select id="limit">';
-        foreach( $limit as $l){
-            $selected = ($this->getLimit() === $l )? 'selected' : '';
-            $html .= '<option value="'.$l.'" '.$selected.'>'.$l.'件</option>'.PHP_EOL;
+        foreach ($limit as $l) {
+            $selected = $this->getLimit() === $l ? 'selected' : '';
+            $html .=
+                '<option value="' .
+                $l .
+                '" ' .
+                $selected .
+                '>' .
+                $l .
+                '件</option>' .
+                PHP_EOL;
         }
-        $html .= '</select>'.PHP_EOL;
-        $html .= '<button onClick="location.href=\'?limit=\'+document.querySelector(\'select#limit\').value + \'&'.Request::queryBuilder([],['limit','page']).'\'">表示</button>'.PHP_EOL;
-        $html .= '</div>'.PHP_EOL;
+        $html .= '</select>' . PHP_EOL;
+        $html .=
+            '<button onClick="location.href=\'?limit=\'+document.querySelector(\'select#limit\').value + \'&' .
+            Request::queryBuilder([], ['limit', 'page']) .
+            '\'">表示</button>' .
+            PHP_EOL;
+        $html .= '</div>' . PHP_EOL;
         return $html;
     }
 
     public function links()
     {
-        $html = '<nav aria-label="Page navigation" class="pagination-nav">'.PHP_EOL;
-        $html .= '<ul class="pagination">'.PHP_EOL;
-        foreach($this->rangeWithDots() as $text)
-        {
-            if( is_int($text) )
-            {
-                $html .= '<li class="page-item '.( ( $text === $this->currentPage)? 'current': '') .'"><a href="?'.Request::queryBuilder(['page'=>$text]).'" class="page-link"><span>'.$text.'</span></a></li>'.PHP_EOL;  
-            }
-            else 
-            {
-                $html .= '<li class="page-item"><span class="page-text">'.$text.'</span></li>'.PHP_EOL;   
+        $html =
+            '<nav aria-label="Page navigation" class="pagination-nav">' .
+            PHP_EOL;
+        $html .= '<ul class="pagination">' . PHP_EOL;
+        foreach ($this->rangeWithDots() as $text) {
+            if (is_int($text)) {
+                $html .=
+                    '<li class="page-item ' .
+                    ($text === $this->currentPage ? 'current' : '') .
+                    '"><a href="?' .
+                    Request::queryBuilder(['page' => $text]) .
+                    '" class="page-link"><span>' .
+                    $text .
+                    '</span></a></li>' .
+                    PHP_EOL;
+            } else {
+                $html .=
+                    '<li class="page-item"><span class="page-text">' .
+                    $text .
+                    '</span></li>' .
+                    PHP_EOL;
             }
         }
-        $html .= '</ul>'.PHP_EOL;
-        $html .= '</nav>'.PHP_EOL;
+        $html .= '</ul>' . PHP_EOL;
+        $html .= '</nav>' . PHP_EOL;
         return $html;
     }
 
@@ -137,17 +157,16 @@ class Paginator extends stdClass{
         $l = 0;
 
         for ($i = 1; $i <= $last; $i++) {
-            if ($i == 1 || $i == $last || $i >= $left && $i < $right) {
+            if ($i == 1 || $i == $last || ($i >= $left && $i < $right)) {
                 $range[] = $i;
             }
         }
 
-    
-        foreach ($range as $i ) {
+        foreach ($range as $i) {
             if ($l) {
                 if ($i - $l === 2) {
                     $rangeWithDots[] = $l + 1;
-                } else if ($i - $l !== 1) {
+                } elseif ($i - $l !== 1) {
                     $rangeWithDots[] = '...';
                 }
             }
@@ -157,6 +176,4 @@ class Paginator extends stdClass{
 
         return $rangeWithDots;
     }
-
-
 }

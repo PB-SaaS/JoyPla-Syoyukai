@@ -163,7 +163,7 @@ class BorrowingController extends Controller
 
 
             $content = $this->view('NewJoyPla/view/template/List', [
-                    'title' => '未承認使用伝票一覧',
+                    'title' => '使用申請一覧',
                     'table' => '%sf:usr:search27%',
                     'submenulink' => "%url/rel:mpg:top%&page=page5",
                     'submenu' => '貸出',
@@ -183,7 +183,7 @@ class BorrowingController extends Controller
 
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 未承認使用伝票一覧',
+                'title'     => 'JoyPla 使用申請一覧',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),
@@ -210,7 +210,7 @@ class BorrowingController extends Controller
             }
 
             $content = $this->view('NewJoyPla/view/template/List', [
-                    'title' => '承認済み使用伝票一覧',
+                    'title' => '貸出伝票一覧',
                     'table' => '%sf:usr:search28%',
                     'csrf_token' => Csrf::generate(16),
                     'submenulink' => "%url/rel:mpg:top%&page=page5",
@@ -230,7 +230,7 @@ class BorrowingController extends Controller
 
             // テンプレートにパラメータを渡し、HTMLを生成し返却
             return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 承認済み使用伝票一覧',
+                'title'     => 'JoyPla 貸出伝票一覧',
                 'content'   => $content->render(),
                 'head' => $head->render(),
                 'header' => $header->render(),

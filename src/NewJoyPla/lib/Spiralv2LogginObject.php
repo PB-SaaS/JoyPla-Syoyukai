@@ -1,24 +1,25 @@
-<?php 
+<?php
 
-use Exception;
+namespace NewJoyPla\lib;
+
 use HttpRequest;
 use HttpRequestParameter;
 use LoggingObject;
 
 class Spiralv2LogginObject extends HttpRequest implements LoggingObject
 {
-    private string $baseUrl = "https://api.spiral-platform.com/v1/";
+    private string $baseUrl = 'https://api.spiral-platform.com/v1/';
 
     public int $logLevel = 0;
 
-    public function __construct($apiKey , $appId , $dbId)
+    public function __construct($apiKey, $appId, $dbId)
     {
-        $this->url = $this->baseUrl."apps/{$appId}/dbs/{$dbId}/records/";
+        $this->url = $this->baseUrl . "apps/{$appId}/dbs/{$dbId}/records/";
         $this->httpHeader = [
-            "Authorization:Bearer ".$apiKey,
-            "Content-Type:application/json",
-            "X-Spiral-App-Authority"."manage",
-            "X-Spiral-Api-Version: 1.1"
+            'Authorization:Bearer ' . $apiKey,
+            'Content-Type:application/json',
+            'X-Spiral-App-Authority' . 'manage',
+            'X-Spiral-Api-Version: 1.1',
         ];
     }
 
@@ -26,22 +27,20 @@ class Spiralv2LogginObject extends HttpRequest implements LoggingObject
     {
         $param = new HttpRequestParameter();
 
-        foreach($data as $key => $v)
-        {
-            $param->set($key , $v);
-        } 
+        foreach ($data as $key => $v) {
+            $param->set($key, $v);
+        }
 
         $this->post($param);
     }
-    
+
     public function bulkInsert(array $data)
     {
         $param = new HttpRequestParameter();
 
-        foreach($data as $key => $v)
-        {
-            $param->set($key , $v);
-        } 
+        foreach ($data as $key => $v) {
+            $param->set($key, $v);
+        }
 
         $this->post($param);
     }
