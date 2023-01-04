@@ -343,7 +343,6 @@ searchCount.value++;
 complete();
 if (document.getElementById('inHospitalItemModal').classList.contains('is-open') == true) {
 searchCount.value++;
-console.log(searchCount.value + 'hp');
 if (searchCount.value > 0) {
 Toast.fire({
 icon: 'success',
@@ -985,7 +984,6 @@ axios
 .post(_APIURL, params)
 .then((response) => {
 complete();
-console.log(response.data.data);
 emit('additem', response.data.data);
 resetForm({
 barcode: ""
@@ -1391,7 +1389,6 @@ axios
 response.data.data.forEach((item, idx) => {
 response.data.data[idx].open = false;
 });
-console.log(response.data);
 consumptions.value = response.data.data;
 totalCount.value = parseInt(response.data.count);
 currentTab.value = 'list';
@@ -1411,9 +1408,7 @@ searchCount.value++;
 complete();
 if (document.getElementById('consumptionHistoryModalForItemRequest').classList.contains('is-open') == true) {
 searchCount.value++;
-console.log(searchCount.value +'co');
 if (totalCount.value == 0) {
-console.log('none');
 Swal.fire({
 title: '情報がありませんでした',
 icon: 'warning'
@@ -1421,7 +1416,6 @@ icon: 'warning'
 MicroModal.close("consumptionHistoryModalForItemRequest");
 return false;
 }
-console.log('after none');
 if (searchCount.value > 0) {
 Toast.fire({
 icon: 'success',
@@ -1601,16 +1595,6 @@ template: `
                                             consumptionItem.quantity.quantityUnit }} 入り</p>
                                   </div>
                                   <div class="w-auto">
-                                    <!--
-                                          <div
-                                            class="whitespace-nowrap w-full bg-zinc-100 rounded-lg py-5 px-4 text-gray-500 text-center"
-                                            role="alert">
-                                            <h4 class="inline-block font-bold font-heading text-gray-800">消費数
-                                              <span class="pl-3 font-normal">{{ consumptionItem.consumptionQuantity }}{{
-                                                consumptionItem.quantity.quantityUnit }}</span>
-                                            </h4>
-                                          </div>
-                                              -->
                                     <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-2 rounded dark:bg-blue-200 dark:text-blue-800">
                                       消費数<span class="font-bold text-base px-1">{{
                                               consumptionItem.consumptionQuantity }}</span>{{
@@ -1665,7 +1649,6 @@ params.append("_csrf", _CSRF);
 axios
 .post(_APIURL, params)
 .then((response) => {
-console.log(response);
 response
 .data
 .data
@@ -1677,7 +1660,6 @@ label: x.divisionName,
 value: x.divisionId
 });
 });
-console.log(options);
 })
 .catch((error) => {
 console.log(error);

@@ -169,6 +169,8 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () {
 
     Router::map('GET', '/api/notification/show', [NotificationController::class, 'show'])->service(new NotificationShowInteractor(new NotificationShowPresenter(), new NotificationRepository()));
 
+    Router::map('GET', '/api/stocktaking/inHospitalItem', [StocktakingController::class, 'inHospitalItem']);
+
     /* 
     Router::map('POST','/api/ItemAndPriceAndInHospitalItem/register',[ItemAndPriceAndInHospitalItemController::class,'register'])->service(new ItemAndPriceAndInHospitalItemRegisterInteractor(new ItemRegisterPresenter() , new ItemAndPriceAndInHospitalItemRepository() ));
 

@@ -1,6 +1,7 @@
 <?php
 
 namespace JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest {
+
     use ApiResponse;
     use framework\Http\View;
     use JoyPla\Application\OutputPorts\Api\ItemRequest\ItemRequestRegisterOutputData;
@@ -16,13 +17,13 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest {
     }
 
     /**
-     * Class ItemRequest
+     * Class ItemRequestRegisterViewModel
      * @package JoyPla\InterfaceAdapters\Presenters\ItemRequest\Api
      */
     class ItemRequestRegisterViewModel
     {
         /**
-         * ItemRequest constructor.
+         * ItemRequestRegisterViewModel constructor.
          * @param ItemRequestRegisterOutputData $source
          */
         public function __construct(ItemRequestRegisterOutputData $source)

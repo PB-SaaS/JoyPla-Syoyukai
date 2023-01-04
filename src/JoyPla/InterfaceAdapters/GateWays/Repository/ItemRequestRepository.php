@@ -35,14 +35,6 @@ use Collection;
 
 class ItemRequestRepository implements ItemRequestRepositoryInterface
 {
-    /*
-    public function findByHospitalId(HospitalId $hospitalId)
-    {
-        $history = (SpiralDbItemRequest::where('hospitalId', $hospitalId->value())->get())->data->all();
-
-        return $history;
-    }
-*/
     public function findByInHospitalItem(HospitalId $hospitalId, array $requestItems)
     {
         $payoutUnitPriceUseFlag = (Hospital::where('hospitalId', $hospitalId->value())->value('payoutUnitPrice')->get())->data->get(0);
@@ -440,13 +432,11 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
 
 interface ItemRequestRepositoryInterface
 {
-    //    public function findByHospitalId(HospitalId $hospitalId);
     public function findByInHospitalItem(HospitalId $hospitalId, array $itemRequests);
     public function saveToArray(array $itemRequests);
     public function sendRegistrationMail(array $itemRequests, Auth $user);
-    public function search(HospitalId $hospitalId, object $search);
-    public function show(HospitalId $hospitalId, RequestHId $requestHId);
-    public function delete(HospitalId $hospitalId, RequestHId $requestHId);
-    public function deleteItem(HospitalId $hospitalId, RequestId $requestId, ItemRequest $itemRequest);
-    public function update(HospitalId $hospitalId, ItemRequest $itemRequest);
+
+    //    public function search(HospitalId $hospitalId, object $search);
+    //    public function index(HospitalId $hospitalId, ItemRequestId $ItemRequestId);
+    //    public function delete(HospitalId $hospitalId, ItemRequestId $ItemRequestId);
 }
