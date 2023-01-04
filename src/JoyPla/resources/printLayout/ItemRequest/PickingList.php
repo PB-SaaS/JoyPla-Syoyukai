@@ -138,7 +138,6 @@
             const setList = () => {
                 //const list = sessionStorage.getItem('pickingList');
                 //let totalizations = JSON.parse(list);
-                //sessionStorage.removeItem('list');
             }
 
             //setList();
@@ -177,6 +176,7 @@
                 location.href = _ROOT;
             }
             await this.createBarCode();
+            //sessionStorage.removeItem('pickingList');
         },
         methods: {
             async createBarCode() {
@@ -191,7 +191,7 @@
                             try {
                                 bwipjs.toCanvas(canvas, {
                                     bcid: 'code128', // Barcode type
-                                    text: 'STK' + x.recordId + '+' + x.sourceDivisionId, // Text to encode
+                                    text: 'STK' + x.recordId + ' ' + x.sourceDivisionId, // Text to encode
                                     scale: 3, // 3x scaling factor
                                     height: 5, // Bar height, in millimeters
                                     includetext: true, // Show human-readable text
@@ -200,7 +200,7 @@
                             } catch (e) {
                                 bwipjs.toCanvas(canvas, {
                                     bcid: 'code39', // Barcode type
-                                    text: 'STK' + x.recordId + '+' + x.sourceDivisionId, // Text to encode
+                                    text: 'STK' + x.recordId + ' ' + x.sourceDivisionId, // Text to encode
                                     scale: 3, // 3x scaling factor
                                     height: 5, // Bar height, in millimeters
                                     includetext: true, // Show human-readable text

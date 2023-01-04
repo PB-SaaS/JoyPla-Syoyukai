@@ -37,7 +37,7 @@
                     <div class="p-2 bg-gray-300">
                         <v-barcode-search @additem="addItemByBarcode"></v-barcode-search>
                     </div>
-                    <div class="my-2">
+                    <div class=" my-2">
                         <div class="max-h-full h-full grid place-content-center w-full lg:flex border border-sushi-600 bg-white mt-3">
                             <div class="flex-1 p-4 relative text-center">バーコードを読み取ってください</div>
                         </div>
@@ -134,18 +134,23 @@
                                                         {{ totalization.stockQuantity }} {{ totalization.quantityUnit }}
                                                     </td>
                                                     <td class="px-3 py-4 border text-left">
-                                                        <v-input-number @change="checkPayoutQuantity(idx)" :rules="{ between: [0 , 99999] }" :name="`totalizations[${idx}].payoutQuantity`" :min="0" :unit="totalization.quantityUnit" label="払出数" :step="1"></v-input-number>
+                                                        <v-input-number @change="checkPayoutQuantity(idx)" :rules="{ between: ( (totalization.card !== '')? [ 0 , totalization.payoutQuantity ] : [ 0, 99999 ] ) }" :name="`totalizations[${idx}].payoutQuantity`" :min="0" :unit="totalization.quantityUnit" label="払出数" :step="1"></v-input-number>
                                                     </td>
                                                     <td class="px-3 py-4 border text-left">
                                                         <span v-if="isRequired(idx)" class="mb-2 bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
-                                                        <v-input :name="`values.totalizations[${idx}].lotNumber`" label="ロット番号" :rules="{ lotnumber: true , twoFieldRequired : [ '消費期限', `@values.totalizations[${idx}].lotDate`]}" type="text"></v-input>
+                                                        <v-input :name="`totalizations[${idx}].lotNumber`" label="ロット番号" :rules="{ lotnumber: true , twoFieldRequired : [ '消費期限', `@totalizations[${idx}].lotDate`]}" type="text"></v-input>
                                                     </td>
                                                     <td class="px-3 py-4 border text-left">
                                                         <span v-if="isRequired(idx)" class="mb-2 bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
-                                                        <v-input :name="`values.totalizations[${idx}].lotDate`" label="消費期限" :rules="{ twoFieldRequired : [ 'ロット番号' , `@values.totalizations[${idx}].lotNumber`] }" type="date"></v-input>
+                                                        <v-input :name="`totalizations[${idx}].lotDate`" label="消費期限" :rules="{ twoFieldRequired : [ 'ロット番号' , `@totalizations[${idx}].lotNumber`] }" type="date"></v-input>
                                                     </td>
                                                     <td class="whitespace-nowrap px-3 py-4 border text-left">
-                                                        <v-input :name="`values.totalizations[${idx}].card`" type="text" label="カード情報"></v-input>
+                                                        <!--<v-input :name="`totalizations[${idx}].card`" type="text" label="カード情報" readonly="readonly"></v-input>-->
+                                                        <fieldset>
+                                                            <div class="flex-auto">
+                                                                <input name="totalizations[${idx}].card" readonly="readonly" type="text" autocomplete="off" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border text-gray-700 border-gray-300">
+                                                            </div>
+                                                        </fieldset>
                                                     </td>
                                                     <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="whitespace-nowrap px-3 py-4 border">
                                                         {{ totalization.totalRequestQuantity }} {{ totalization.quantityUnit }}
@@ -204,6 +209,56 @@
                         <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
                             <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
                             <v-button-primary type="button" @click.native="searchExec">絞り込み</v-button-primary>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </v-open-modal>
+    <v-open-modal ref="openSelectModal" headtext="請求商品選択" id="openSelectModal">
+        <div class="flex flex-col" style="max-height: 68vh;">
+            <div class="overflow-y-scroll my-6">
+                <div class="w-full mb-8 xl:mb-0">
+                    <div class="hidden lg:flex w-full sticky top-0 bg-white py-4 flex-wrap">
+                        <div class="w-full lg:w-5/6">
+                            <h4 class="font-bold font-heading text-gray-500 text-center">請求商品情報</h4>
+                        </div>
+                        <div class="w-full lg:w-1/6">
+                            <h4 class="font-bold font-heading text-gray-500 text-center">反映</h4>
+                        </div>
+                    </div>
+                    <div class="lg:pt-0 pt-4">
+                        <div class="flex flex-wrap items-center mb-3" v-for="(elem, index) in selectRequestItems">
+                            <div class="w-full lg:w-5/6 lg:px-4 px-0 mb-6 lg:mb-0">
+                                <div class="flex gap-4">
+                                    <div class="break-words items-start w-1/3">
+                                        <p class="text-md">
+                                            <span class="block text-sm text-gray-500">請求元部署：</span>{{ elem.sourceDivisionName }}<br>
+                                            <span class="block text-sm text-gray-500">請求先部署：</span>{{ elem.targetDivisionName }}<br>
+                                        </p>
+                                    </div>
+                                    <div class="break-words items-center w-1/3 box-border">
+                                        <p class="text-md font-bold">{{ elem.makerName }}</p>
+                                        <p class="text-md font-bold">{{ elem.itemName }}</p>
+                                        <p class="text-md text-gray-500">{{ elem.itemCode }}</p>
+                                        <p class="text-md text-gray-500">{{ elem.itemStandard }}</p>
+                                        <p class="text-md text-gray-500">{{ elem.itemJANCode }}</p>
+                                    </div>
+                                    <div class="break-words items-start w-1/3">
+                                        <p class="text-md">
+                                            <span class="block text-sm text-gray-500">払出数：</span>{{ elem.payoutQuantity }}<br>
+                                            <span class="block text-sm text-gray-500">ロット番号：</span>{{ elem.lotNumber }}<br>
+                                            <span class="block text-sm text-gray-500">使用期限：</span>{{ elem.lotDate }}<br>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-full lg:block lg:w-1/6 px-4 py-4">
+                                <v-button-default type="button" class="w-full" v-on:click.native="reflectSelect(elem)">反映</v-button-default>
+                            </div>
+                            <div class="py-2 px-4 w-full">
+                                <div class="border-t border-gray-200"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -460,7 +515,13 @@
                         item.lotManagement = elm.lotManagement;
                         item.totalRequestQuantity = elm.requestQuantity;
                         item.stockQuantity = elm.stockQuantity;
+                        item.makerName = elm.item.makerName;
+                        item.itemName = elm.item.itemName;
+                        item.itemCode = elm.item.itemCode;
+                        item.itemStandard = elm.item.itemStandard;
+                        item.itemJANCode = elm.item.itemJANCode;
                         item.payoutQuantity = 0;
+                        item.totalRequestQuantity = 0;
                         item.default = true;
                         item.added = 1;
                         item.lotNumber = '';
@@ -470,11 +531,6 @@
                         if (item.firstRow === true) {
                             item.no = index + 1;
                             item.rowspan = elm.countTotalRequests;
-                            item.makerName = elm.item.makerName;
-                            item.itemName = elm.item.itemName;
-                            item.itemCode = elm.item.itemCode;
-                            item.itemStandard = elm.item.itemStandard;
-                            item.itemJANCode = elm.item.itemJANCode;
                         }
                         push(item);
                     });
@@ -486,19 +542,7 @@
                 if (values.totalizations[idx].added > 10) {
                     return;
                 }
-                let item = new Object();
-                item.recordId = values.totalizations[idx].recordId;
-                item.inHospitalItemId = values.totalizations[idx].inHospitalItemId;
-                item.targetDivisionName = values.totalizations[idx].targetDivisionName;
-                item.targetDivisionId = values.totalizations[idx].targetDivisionId;
-                item.sourceDivisionName = values.totalizations[idx].sourceDivisionName;
-                item.sourceDivisionId = values.totalizations[idx].sourceDivisionId;
-                item.requestQuantity = values.totalizations[idx].requestQuantity;
-                item.quantityUnit = values.totalizations[idx].quantityUnit;
-                item.lotManagement = values.totalizations[idx].lotManagement;
-                item.totalRequestQuantity = values.totalizations[idx].totalRequestQuantity;
-                item.stockQuantity = values.totalizations[idx].stockQuantity;
-                item.totalPayoutQuantity = values.totalizations[idx].totalPayoutQuantity;
+                let item = Object.assign({}, values.totalizations[idx]);
                 item.payoutQuantity = 0;
                 item.firstRow = false;
                 item.default = false;
@@ -577,14 +621,6 @@
                         }
                         searchCount.value++;
                     });
-            };
-
-            const add = (elem) => {
-                context.emit('additem', elem);
-                Toast.fire({
-                    icon: 'success',
-                    title: '反映しました'
-                })
             };
 
             onMounted(() => {
@@ -803,7 +839,209 @@
 
             });
 
+            const searchCardId = (cardId) => {
+                return values.totalizations.find((x) =>
+                    (x.cardId === cardId)
+                );
+            }
+
+            const reflectSelect = (elem) => {
+                if (elem.type === 'gs1-128') {
+                    if (values.totalizations[elem.index].lotNumber !== '' || values.totalizations[elem.index].lotDate !== '') {
+                        copyItem(elem.index);
+                        values.totalizations[elem.index + 1].lotNumber = elem.refLotNumber;
+                        values.totalizations[elem.index + 1].lotDate = elem.refLotDate;
+                        MicroModal.close("openSelectModal");
+                        return false;
+                    }
+                    values.totalizations[elem.index].lotNumber = elem.refLotNumber;
+                    values.totalizations[elem.index].lotDate = elem.refLotDate;
+                    MicroModal.close("openSelectModal");
+                    return false;
+                }
+
+                if (elem.type === 'card') {
+                    if ((elem.totalPayoutQuantity + elem.cardQuantity) > elem.totalPayoutQuantity) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: '払出合計数を超過するため反映できません',
+                        });
+                        return false;
+                    }
+                    if (values.totalizations[elem.index].payoutQuantity !== '') {
+                        copyItem(elem.index);
+                        values.totalizations[elem.index + 1].payoutQuantity = elem.cardQuantity;
+                        values.totalizations[elem.index + 1].card = elem.card
+                        MicroModal.close("openSelectModal");
+                        return false;
+                    }
+                    values.totalizations[elem.index].payoutQuantity = elem.cardQuantity;
+                    values.totalizations[elem.index].card = elem.card;
+                    MicroModal.close("openSelectModal");
+                    return false;
+                }
+            }
+            const openSelectModal = ref();
+            const selectRequestItems = ref([]);
+            const addItemByBarcode = (items) => {
+                console.log(items);
+
+                selectRequestItems.value = [];
+                if (items.item.length === 0) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: '商品が見つかりませんでした',
+                    });
+                    return false;
+                }
+
+                if (items.type != "gs1-128" && items.type != "card" && items.type != "pickingList") {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'エラー',
+                        text: 'GS1-128・カード・ピッキングリスト以外のバーコードは読むことができません',
+                    });
+                }
+
+                if (items.type == "pickingList") {
+                    let recordId = '';
+                    let sourceDivisionId = '';
+                    items.item.forEach((x, id) => {
+                        recordId = x.recordId;
+                        sourceDivisionId = x.sourceDivisionId;
+                    });
+
+                    values.totalizations.forEach((v, idx) => {
+                        if ((v.payoutQuantity === 0) && (recordId === v.recordId) && (sourceDivisionId === v.sourceDivisionId)) {
+                            values.totalizations[idx].payoutQuantity = v.requestQuantity;
+                        }
+                    });
+                    return false;
+                }
+
+                if (items.type == "gs1-128") {
+                    let target = [];
+                    let targetRequestItems = [];
+                    let lotNumber = '';
+                    let lotDate = '';
+                    let inHospitalItemId = '';
+                    items.item.forEach((x, id) => {
+                        lotNumber = x.lotNumber;
+                        lotDate = x.lotDate;
+                        inHospitalItemId = x.inHospitalItemId;
+                    });
+
+                    values.totalizations.forEach((v, idx) => {
+                        if (inHospitalItemId === v.inHospitalItemId) {
+                            target.push(idx);
+                            let tmp = Object.assign({}, v);
+                            tmp.index = idx;
+                            tmp.type = items.type;
+                            tmp.refLotNumber = lotNumber;
+                            tmp.refLotDate = lotDate;
+                            targetRequestItems.push(tmp);
+                        }
+                    });
+
+                    if (target.length === 0) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: '商品が見つかりませんでした',
+                        });
+                        return false;
+                    }
+
+                    if (target.length === 1) {
+                        values.totalizations[target[0]].lotNumber = lotNumber;
+                        values.totalizations[target[0]].lotDate = lotDate;
+                    }
+
+                    if (target.length > 1) {
+                        selectRequestItems.value = targetRequestItems;
+                        console.log(targetRequestItems);
+
+                        openSelectModal.value.open();
+                    }
+                }
+
+                if (items.type == "card") {
+                    let exist = false
+                    let target = [];
+                    let targetRequestItems = [];
+                    let card = '';
+                    let cardQuantity = 0;
+                    let divisionId = '';
+                    let inHospitalItemId = '';
+
+                    items.item.forEach((x, id) => {
+                        if (searchCardId(x.barcode) !== undefined) {
+                            exist = true;
+                        }
+                    })
+                    if (exist) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'エラー',
+                            text: 'すでに読み込まれたカードです。',
+                        });
+                        return false;
+                    }
+                    items.item.forEach((x, id) => {
+                        if (x.lotNumber !== '' && x.lotDate !== '') {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'ロット情報が登録済みのカードです。',
+                            });
+                            return false;
+                        }
+                        card = x.barcode;
+                        cardQuantity = parseInt(x.cardQuantity);
+                        divisionId = x.divisionId;
+                        inHospitalItemId = x.inHospitalItemId;
+                    });
+
+                    values.totalizations.forEach((v, idx) => {
+                        if ((inHospitalItemId === v.inHospitalItemId) && (divisionId === v.targetDivisionId)) {
+                            target.push(idx);
+                            let tmp = Object.assign({}, v);
+                            tmp.index = idx;
+                            tmp.type = items.type;
+                            tmp.cardQuantity = cardQuantity;
+                            tmp.card = card;
+                            targetRequestItems.push(tmp);
+                        }
+                    });
+
+                    if (target.length === 0) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: '商品が見つかりませんでした',
+                        });
+                        return false;
+                    }
+
+                    if (target.length === 1) {
+                        if (values.totalizations[target[0]].requestQuantity < cardQuantity) {
+                            return false;
+                        }
+                        values.totalizations[target[0]].card = card;
+                        values.totalizations[target[0]].requestQuantity = cardQuantity;
+                    }
+
+                    if (target.length > 1) {
+                        selectRequestItems.value = targetRequestItems;
+                        openSelectModal.value.open();
+                    }
+
+                }
+
+            }
+
             return {
+                addItemByBarcode,
+                selectRequestItems,
+                openSelectModal,
+                reflectSelect,
                 isSubmitting,
                 onSubmit,
                 loading,
@@ -832,7 +1070,8 @@
                 deleteItem,
                 reflectToPayout,
                 submitPrintForm,
-                changeCheck
+                changeCheck,
+                searchCardId
                 //totalizations
             }
         },
