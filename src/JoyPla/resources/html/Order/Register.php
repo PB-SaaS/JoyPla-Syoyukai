@@ -186,7 +186,7 @@ var JoyPlaApp = Vue.createApp({
         },
         validateOnMount : false
       });
-      const { remove, push, fields , update , replace } = useFieldArray('orderItems' , control);
+      const { remove, insert, fields , update , replace } = useFieldArray('orderItems' , control);
     
       const integrate = ref(localStorage.joypla_unorder_slip_integrate === 'true');
 
@@ -355,9 +355,11 @@ var JoyPlaApp = Vue.createApp({
             }
           });
         }
-
+        if( !values.orderItems ){
+          values.orderItems = [];
+        }
         if( ! checked ){        
-          push(item);
+          insert(0,item);
         }
       };
     

@@ -88,7 +88,7 @@
                                                 {{ orderItem.item.itemStandard }}
                                             </p>
                                         </td>
-                                        <td class="border border-slate-600 p-1">
+                                        <td class="border border-slate-600 py-1 px-3">
                                             <img class="mx-auto" :src="orderItem.janCodeImg" />
                                         </td>
                                         <td class="border border-slate-600 p-1">
