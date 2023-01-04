@@ -9,8 +9,8 @@ $auth = new App\Lib\Auth();
         <span class="uk-text-small"><?php echo $auth->tenantName ?></span><br>
         <span class="uk-text-default"><?php echo $auth->name ?></span>
     </div>
-	<ul class="uk-nav-default uk-nav-divider uk-nav-parent-icon uk-margin" uk-nav>
-		<li class="uk-parent <?php echo $n1 ?>">
+    <ul class="uk-nav-default uk-nav-divider uk-nav-parent-icon uk-margin" uk-nav>
+        <li class="uk-parent <?php echo $n1 ?>">
             <a href="#"><span class="uk-margin-small-right" uk-icon="icon: users"></span> 病院情報管理</a>
             <ul class="uk-nav-sub">
                 <?php if($auth->Gate('FacilityList')): ?>
@@ -21,16 +21,16 @@ $auth = new App\Lib\Auth();
                 <?php endif ?>
             </ul>
         </li>
-		<li class="uk-parent <?php echo $n2 ?>">
+        <li class="uk-parent <?php echo $n2 ?>">
             <a href="#"><span class="uk-margin-small-right" uk-icon="icon: users"></span> 卸業者管理</a>
             <ul class="uk-nav-sub">
-    		    <li class=" <?php echo $n2_1 ?>"><a href="%url/rel:mpgt:Distributor%">卸業者管理</a></li>
+                <li class=" <?php echo $n2_1 ?>"><a href="%url/rel:mpgt:Distributor%">卸業者管理</a></li>
                 <?php if($auth->Gate('DistributorBlukInsert')): ?>
-    		    <li class=" <?php echo $n2_2 ?>"><a href="%url/rel:mpgt:Distributor%&Action=bulkInsert">卸業者一括登録・更新</a></li>
+                <li class=" <?php echo $n2_2 ?>"><a href="%url/rel:mpgt:Distributor%&Action=bulkInsert">卸業者一括登録・更新</a></li>
                 <?php endif ?>
-		    </ul>
-		</li>
-		<li class="uk-parent <?php echo $n3 ?>">
+            </ul>
+        </li>
+        <li class="uk-parent <?php echo $n3 ?>">
             <a href="#"><span class="uk-margin-small-right" uk-icon="icon: album"></span> 商品管理</a>
             <ul class="uk-nav-sub">
                 <li class=" <?php echo $n3_1 ?>"><a href="%url/rel:mpgt:Goods%&table_cache=true">商品管理</a></li>
@@ -52,22 +52,22 @@ $auth = new App\Lib\Auth();
                 <?php endif ?>
             </ul>
         </li>
-		<li class="uk-parent <?php echo $n5 ?>">
+        <li class="uk-parent <?php echo $n5 ?>">
             <a href="#"><span class="uk-margin-small-right" uk-icon="icon:database"></span> 在庫管理</a>
             <ul class="uk-nav-sub">
-    		    <li class=" <?php echo $n5_1 ?>"><a href="%url/rel:mpgt:Stocks%">在庫管理</a></li>
-    		    <li class=" <?php echo $n5_2 ?>"><a href="%url/rel:mpgt:Stocks%&Action=Lots">ロット管理</a></li>
-    		    <li class=" <?php echo $n5_3 ?>"><a href="%url/rel:mpgt:Stocks%&Action=Cards">カード情報管理</a></li>
-    		    <li class=" <?php echo $n5_4 ?>"><a href="%url/rel:mpgt:Stocks%&Action=CardsBulkInsert">カード情報一括登録</a></li>
-		    </ul>
-		</li>
-		<li class="uk-parent <?php echo $n6 ?>">
+                <li class=" <?php echo $n5_1 ?>"><a href="%url/rel:mpgt:Stocks%">在庫管理</a></li>
+                <li class=" <?php echo $n5_2 ?>"><a href="%url/rel:mpgt:Stocks%&Action=Lots">ロット管理</a></li>
+                <li class=" <?php echo $n5_3 ?>"><a href="%url/rel:mpgt:Stocks%&Action=Cards">カード情報管理</a></li>
+                <li class=" <?php echo $n5_4 ?>"><a href="%url/rel:mpgt:Stocks%&Action=CardsBulkInsert">カード情報一括登録</a></li>
+            </ul>
+        </li>
+        <li class="uk-parent <?php echo $n6 ?>">
             <a href="#"><span class="uk-margin-small-right" uk-icon="icon: print"></span> 見積管理</a>
             <ul class="uk-nav-sub">
-    		    <li class=" <?php echo $n6_1 ?>"><a href="%url/rel:mpgt:Request%">見積管理</a></li>
-		    </ul>
-		</li>
-		<li class="uk-parent <?php echo $n4 ?>">
+                <li class=" <?php echo $n6_1 ?>"><a href="%url/rel:mpgt:Request%">見積管理</a></li>
+            </ul>
+        </li>
+        <li class="uk-parent <?php echo $n4 ?>">
             <a href="#"><span class="uk-margin-small-right" uk-icon="icon: file-edit"></span> 実績確認</a>
             <ul class="uk-nav-sub">
                 <?php if($auth->Gate('ConsumedHistory')): ?>
@@ -108,23 +108,29 @@ $auth = new App\Lib\Auth();
                 <?php endif ?>
             </ul>
         </li>
-		<?php
+        <?php
         /*
         <li class="<?php echo $n7 ?>"><a href="%url/rel:mpgt:TopPage%&Action=topics&table_cache=true"><span class="uk-margin-small-right" uk-icon="icon: comments"></span> トピック一覧</a></li>
-		*/
+        */
         ?>
-		<li class="uk-parent <?php echo $n8 ?>">
+        <li class="uk-parent <?php echo $n8 ?>">
             <a href="#"><span class="uk-margin-small-right" uk-icon="icon: info"></span> システム通知</a>
             <ul class="uk-nav-sub">
                 <?php if($auth->Gate('SystemNotification')): ?>
-    		    <li class=" <?php echo $n8_1 ?>"><a href="%url/rel:mpgt:TopPage%&Action=systemNotification&table_cache=true">システム通知</a></li>
+                <li class=" <?php echo $n8_1 ?>"><a href="%url/rel:mpgt:TopPage%&Action=systemNotification&table_cache=true">システム通知</a></li>
                 <?php endif ?>
                 <?php if($auth->Gate('SystemNotificationReg')): ?>
-    		    <li class=" <?php echo $n8_2 ?>"><a href="%url/rel:mpgt:TopPage%&Action=systemNotificationReg&table_cache=true">システム通知登録</a></li>
+                <li class=" <?php echo $n8_2 ?>"><a href="%url/rel:mpgt:TopPage%&Action=systemNotificationReg&table_cache=true">システム通知登録</a></li>
                 <?php endif ?>
-		    </ul>
-		</li>
-	    <li><a href="https://support.joypla.jp/" target="support" title="ヘルプ"><span class="uk-margin-small-right" uk-icon="icon: question"></span> ヘルプ</a></li>
-		<li><a href="%form:act:logout%"><span class="uk-margin-small-right" uk-icon="icon: sign-out"></span> ログアウト</a></li>
-	</ul>
+            </ul>
+        </li>
+        <li class="uk-parent">
+            <a href="#"><span class="uk-margin-small-right" uk-icon="icon: question"></span> ヘルプ</a>
+            <ul class="uk-nav-sub">
+                <li><a href="https://support.joypla.jp/" target="_blank" rel="noopener nofollow noreferrer"> サポートサイト</a></li>
+                <li><a href="https://reg34.smp.ne.jp/regist/is?SMPFORM=meoj-lirdmf-2830358d2ea157fb8a38fdead8ace8c9" target="_blank" rel="noopener nofollow noreferrer"> サポート依頼</a></li>
+            </ul>
+        </li>
+        <li><a href="%form:act:logout%"><span class="uk-margin-small-right" uk-icon="icon: sign-out"></span> ログアウト</a></li>
+    </ul>
 </div>
