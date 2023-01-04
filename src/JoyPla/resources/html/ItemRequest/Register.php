@@ -9,8 +9,7 @@
                 <hr>
                 <div>
                     <div class="my-4 mt-4 lg:w-1/3">
-                        <v-select-division name="sourceDivisionId" label="請求元部署" :rules="{ required : true }" title="請求元部署指定" :disabled="(values.sourceDivisionId != '' && fields.length > 0 && values.sourceDivisionId != values.targetDivisionId)"
-                        :is-only-my-division="<?php var_export(gate('register_of_item_requests')->isOnlyMyDivision()); ?>" />
+                        <v-select-division name="sourceDivisionId" label="請求元部署" :rules="{ required : true }" title="請求元部署指定" :disabled="(values.sourceDivisionId != '' && fields.length > 0 && values.sourceDivisionId != values.targetDivisionId)" :is-only-my-division="<?php var_export(gate('register_of_item_requests')->isOnlyMyDivision()); ?>" />
                     </div>
                     <div class="my-4 lg:w-1/3">
                         <v-select-division name="targetDivisionId" label="請求先部署" :rules="{ required : true }" title="請求先部署指定" :disabled="(values.targetDivisionId != '' && fields.length > 0 && values.sourceDivisionId != values.targetDivisionId)" />
@@ -62,7 +61,8 @@
                                                     <p class="text-gray-500" v-if="item.value.itemJANCode">{{
                                                         item.value.itemJANCode }}</p>
                                                     <p class="text-gray-500" v-if="item.value.quantity && item.value.quantityUnit">
-                                                        {{ item.value.quantity }}/{{item.value.quantityUnit }}入り</p>
+                                                        {{ item.value.quantity }}/{{item.value.quantityUnit }}入り
+                                                    </p>
                                                 </div>
                                                 <div class="w-full text-lg font-bold font-heading flex gap-6">
                                                     <span class="text-xl text-orange-600 font-bold font-heading">&yen;
@@ -171,16 +171,16 @@
                 reactive,
                 onMounted
             } = Vue;
-            
+
             const {
                 useFieldArray,
                 useForm
             } = VeeValidate;
-            
+
             const payoutUnitPriceUseFlag = "<?php echo $payoutUnitPriceUseFlag; ?>";
 
             const loading = ref(false);
-            
+
             const start = () => {
                 loading.value = true;
             }
@@ -194,7 +194,7 @@
                     complete();
                 }, 500);
             }
-            
+
             start();
 
             onMounted(() => {
@@ -217,7 +217,7 @@
                 },
                 validateOnMount: false
             });
-            
+
             const {
                 remove,
                 push,
@@ -272,7 +272,7 @@
                 });
                 return requestItems;
             };
-            
+
             const checkDivisions = () => {
                 if (values.sourceDivisionId == values.targetDivisionId) {
                     return false;
@@ -318,7 +318,7 @@
                 return new Intl.NumberFormat('ja-JP').format(value);
                 //return new Intl.NumberFormat('ja-JP').format(value);
             }
-            
+
             const checkUnitQuantity = (idx) => {
                 if (values.requestItems[idx]) {
                     if (!values.requestItems[idx].requestUnitQuantity || values.requestItems[idx].requestUnitQuantity < 0) {
@@ -326,7 +326,7 @@
                     }
                 }
             }
-            
+
             const checkQuantity = (idx) => {
                 if (values.requestItems[idx]) {
                     if (!values.requestItems[idx].requestQuantity || values.requestItems[idx].requestQuantity < 0) {
@@ -348,7 +348,7 @@
                 } = await validate();
 
                 const validDivisions = checkDivisions();
-                
+
                 if (!valid) {
                     Swal.fire({
                         icon: 'error',
@@ -400,7 +400,11 @@
                     const res = await axios.post(_APIURL, params);
 
                     if (res.data.code != 200) {
-                        throw new Error(res.data.message)
+                        if (res.data.code == 998) {
+                            throw new Error(res.data.code)
+                        } else {
+                            throw new Error(res.data.message)
+                        }
                     }
 
                     Swal.fire({
@@ -411,11 +415,19 @@
                     });
                     return true;
                 } catch (error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'システムエラー',
-                        text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
-                    });
+                    if (error.message == 998) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '登録できませんでした。',
+                            text: '在庫管理されていない商品が含まれています。'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'システムエラー',
+                            text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。'
+                        });
+                    }
                 }
 
             });
@@ -452,7 +464,7 @@
                     title: '反映しました'
                 })
             }
-            
+
             const additem = (item) => {
                 item = JSON.parse(JSON.stringify(item));
                 let checked = false;
@@ -472,7 +484,7 @@
                     let itemPrice = (item.price) ? parseInt(item.price) : 0;
                     let itemQuantity = (item.quantity) ? parseInt(item.quantity) : 0;
                     let itemUnitPrice = (item.unitPrice) ? parseInt(item.unitPrice) : 0;
-                    
+
                     if (payoutUnitPriceUseFlag === '1') {
                         item.unitPrice = itemUnitPrice;
                     }
@@ -540,7 +552,7 @@
             const openModal = ref();
             const selectInHospitalItems = ref([]);
             const addItemByBarcode = (items) => {
-                
+
                 selectInHospitalItems.value = [];
                 if (items.item.length === 0) {
                     Swal.fire({
@@ -647,16 +659,9 @@
             fields: {
                 async handler(val, oldVal) {
                     await this.validate();
-                    console.log(JSON.stringify(this.values));
                 },
                 deep: true
-            },
-            values: {
-                async handler(val, oldVal) {
-                    console.log(JSON.stringify(this.values));
-                },
-                deep: true
-            },
+            }
         },
         components: {
             'v-barcode-search': vBarcodeSearch,

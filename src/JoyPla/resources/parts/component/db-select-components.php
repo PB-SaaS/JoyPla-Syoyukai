@@ -342,8 +342,7 @@ searchCount.value++;
 .then(() => {
 complete();
 if (document.getElementById('inHospitalItemModal').classList.contains('is-open') == true) {
-  searchCount.value++;
-  console.log(searchCount.value + 'hp');
+searchCount.value++;
 if (searchCount.value > 0) {
 Toast.fire({
 icon: 'success',
@@ -479,60 +478,58 @@ template: `
         <div>
           {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ ((
           parseInt(values.perPage) * values.currentPage ) < totalCount ) ? parseInt(values.perPage) * values.currentPage
-            : totalCount }}件 / 全 {{ totalCount }}件 </div>
-            <div class="max-h-full overflow-y-auto" id="inHospitalItemsList">
-              <div>
-                <div class="w-full mb-8 xl:mb-0">
-                  <div class="hidden lg:flex w-full sticky top-0 bg-white py-4 flex-wrap">
-                    <div class="w-full lg:w-5/6">
-                      <h4 class="font-bold font-heading text-gray-500 text-center">商品情報</h4>
-                    </div>
-                    <div class="w-full lg:w-1/6">
-                      <h4 class="font-bold font-heading text-gray-500 text-center">反映</h4>
-                    </div>
-                  </div>
-                  <div class="lg:pt-0 pt-4">
-                    <div class="flex flex-wrap items-center mb-3" v-for="(elem, index) in inHospitalItems">
-                      <div class="w-full lg:w-5/6 lg:px-4 px-0 mb-6 lg:mb-0">
-                        <div class="flex flex-wrap items-center gap-4">
-                          <div class="flex-none">
-                            <item-view class="md:h-44 md:w-44 h-32 w-32" :base64="elem.inItemImage"></item-view>
-                          </div>
-                          <div class="break-words flex-1 box-border w-44">
-                            <h3 class="text-xl font-bold font-heading">{{ elem.makerName }}</h3>
-                            <p class="text-md font-bold font-heading">{{ elem.itemName }}</p>
-                            <p class="text-md font-bold font-heading">{{ elem.itemJANCode }}</p>
-                            <p class="text-gray-500">{{ elem.itemCode }}<br>{{ elem.itemStandard }}</p>
-                            <p class="text-gray-500">{{ elem.quantity }}{{ elem.quantityUnit }} 入り</p>
-                            <p>
-                              <span class="text-xl text-orange-600 font-bold font-heading">&yen; {{
+            : totalCount }}件 / 全 {{ totalCount }}件
+        </div>
+        <div class="max-h-full overflow-y-auto" id="inHospitalItemsList">
+          <div>
+            <div class="w-full mb-8 xl:mb-0">
+              <div class="hidden lg:flex w-full sticky top-0 bg-white py-4 flex-wrap">
+                <div class="w-full lg:w-5/6">
+                  <h4 class="font-bold font-heading text-gray-500 text-center">商品情報</h4>
+                </div>
+                <div class="w-full lg:w-1/6">
+                  <h4 class="font-bold font-heading text-gray-500 text-center">反映</h4>
+                </div>
+              </div>
+              <div class="lg:pt-0 pt-4">
+                <div class="flex flex-wrap items-center mb-3" v-for="(elem, index) in inHospitalItems">
+                  <div class="w-full lg:w-5/6 lg:px-4 px-0 mb-6 lg:mb-0">
+                    <div class="flex flex-wrap items-center gap-4">
+                      <div class="flex-none">
+                        <item-view class="md:h-44 md:w-44 h-32 w-32" :base64="elem.inItemImage"></item-view>
+                      </div>
+                      <div class="break-words flex-1 box-border w-44">
+                        <h3 class="text-xl font-bold font-heading">{{ elem.makerName }}</h3>
+                        <p class="text-md font-bold font-heading">{{ elem.itemName }}</p>
+                        <p class="text-md font-bold font-heading">{{ elem.itemJANCode }}</p>
+                        <p class="text-gray-500">{{ elem.itemCode }}<br>{{ elem.itemStandard }}</p>
+                        <p class="text-gray-500">{{ elem.quantity }}{{ elem.quantityUnit }} 入り</p>
+                        <p>
+                          <span class="text-xl text-orange-600 font-bold font-heading">&yen; {{
                                 numberFormat(elem.price) }}</span>
-                              <span class="text-gray-400"> ( &yen; {{
+                          <span class="text-gray-400"> ( &yen; {{
                                 numberFormat( elem.unitPrice )
                                 }}/{{ elem.quantityUnit }} )</span>
-                              <blowing :message="elem.priceNotice" title="金額管理備考" v-if="elem.priceNotice != ''"
-                                class="mx-4"></blowing>
-                            </p>
-                            <p class="text-gray-800">{{ elem.distributorName }}</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="w-full lg:block lg:w-1/6 px-4 py-4">
-                        <v-button-default type="button" class="w-full"
-                          v-on:click.native="add(elem)">反映</v-button-default>
-                      </div>
-                      <div class="py-2 px-4 w-full">
-                        <div class="border-t border-gray-200"></div>
+                          <blowing :message="elem.priceNotice" title="金額管理備考" v-if="elem.priceNotice != ''" class="mx-4"></blowing>
+                        </p>
+                        <p class="text-gray-800">{{ elem.distributorName }}</p>
                       </div>
                     </div>
+                  </div>
+                  <div class="w-full lg:block lg:w-1/6 px-4 py-4">
+                    <v-button-default type="button" class="w-full" v-on:click.native="add(elem)">反映</v-button-default>
+                  </div>
+                  <div class="py-2 px-4 w-full">
+                    <div class="border-t border-gray-200"></div>
                   </div>
                 </div>
               </div>
             </div>
-            <div>
-              <v-pagination :showPages="showPages" v-model:currentPage="currentPageEdited" :totalCount="totalCount"
-                :perPage="parseInt(values.perPage)"></v-pagination>
-            </div>
+          </div>
+        </div>
+        <div>
+          <v-pagination :showPages="showPages" v-model:currentPage="currentPageEdited" :totalCount="totalCount" :perPage="parseInt(values.perPage)"></v-pagination>
+        </div>
       </template>
       <div class="hidden">
         <v-input type="hidden" name="makerName"></v-input>
@@ -834,81 +831,79 @@ template: `
         <div>
           {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ ((
           parseInt(values.perPage) * values.currentPage ) < totalCount ) ? parseInt(values.perPage) * values.currentPage
-            : totalCount }}件 / 全 {{ totalCount }}件 </div>
-            <div class="max-h-full overflow-y-auto" id="ordersList">
-              <div>
-                <div class="w-full mb-8 xl:mb-0">
-                  <div class="hidden lg:flex w-full sticky top-0 bg-white py-4 flex-wrap">
-                    <div class="w-full lg:w-5/6">
-                      <h4 class="font-bold font-heading text-gray-500 text-center">商品情報</h4>
-                    </div>
-                    <div class="w-full lg:w-1/6">
-                      <h4 class="font-bold font-heading text-gray-500 text-center">反映</h4>
-                    </div>
-                  </div>
-                  <div class="lg:pt-0 pt-4">
-                    <template v-for="(order, index) in orders">
-                      <template v-for="(orderItem , idx ) in order.orderItems">
-                        <div class="p-4 text-base lg:mx-4 mx-0 bg-gray-100 border border-gray-400 my-2">
-                          <div class="flex gap-2">
-                            <div class="flex-none">発注番号</div>
-                            <div class="flex-1">{{ order.orderId }}</div>
-                          </div>
-                          <div class="flex gap-2">
-                            <div class="flex-none">発注日</div>
-                            <div class="flex-1">{{ order.orderDate }}</div>
-                          </div>
-                          <div class="flex gap-2">
-                            <div class="flex-none">発注元部署</div>
-                            <div class="flex-1">{{ order.division.divisionName }}</div>
-                          </div>
-                        </div>
-                        <div class="flex flex-wrap items-center mb-3">
-                          <div class="w-full lg:w-5/6 lg:px-4 px-0 mb-6 lg:mb-0">
-                            <div class="flex flex-wrap items-center gap-4">
-                              <div class="flex-none">
-                                <item-view class="md:h-44 md:w-44 h-32 w-32" :base64="orderItem.itemImage"></item-view>
-                              </div>
-                              <div class="break-words flex-1 box-border w-44">
-                                <h3 class="text-xl font-bold font-heading">{{ orderItem.item.makerName }}</h3>
-                                <p class="text-md font-bold font-heading">{{ orderItem.item.itemName }}</p>
-                                <p class="text-md font-bold font-heading">{{ orderItem.item.itemJANCode }}</p>
-                                <p class="text-gray-500">{{ orderItem.item.itemCode }}<br>{{ orderItem.item.itemStandard
-                                  }}</p>
-                                <p class="text-gray-500">{{ orderItem.quantity.quantityNum }}{{
-                                  orderItem.quantity.quantityUnit }} 入り</p>
-                                <p>
-                                  <span class="text-xl text-orange-600 font-bold font-heading">
-                                    {{ numberFormat( orderItem.orderQuantity ) }}{{ orderItem.quantity.itemUnit }} 発注中
-                                  </span>
-                                  <span class="text-xl text-orange-600 font-bold font-heading"
-                                    v-if="(orderItem.orderQuantity - orderItem.receivedQuantity) != 0">
-                                    {{ numberFormat( ( orderItem.orderQuantity - orderItem.receivedQuantity) ) }}{{
-                                    orderItem.quantity.itemUnit }} 未入荷
-                                  </span>
-                                </p>
-                                <p class="text-gray-800">{{ orderItem.distributor.distributorName }}</p>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="w-full lg:block lg:w-1/6 px-4 py-4">
-                            <v-button-default type="button" class="w-full"
-                              v-on:click.native="add(order , idx)">反映</v-button-default>
-                          </div>
-                          <div class="py-2 px-4 w-full">
-                            <div class="border-t border-gray-200"></div>
-                          </div>
-                        </div>
-                      </template>
-                    </template>
-                  </div>
+            : totalCount }}件 / 全 {{ totalCount }}件
+        </div>
+        <div class="max-h-full overflow-y-auto" id="ordersList">
+          <div>
+            <div class="w-full mb-8 xl:mb-0">
+              <div class="hidden lg:flex w-full sticky top-0 bg-white py-4 flex-wrap">
+                <div class="w-full lg:w-5/6">
+                  <h4 class="font-bold font-heading text-gray-500 text-center">商品情報</h4>
+                </div>
+                <div class="w-full lg:w-1/6">
+                  <h4 class="font-bold font-heading text-gray-500 text-center">反映</h4>
                 </div>
               </div>
+              <div class="lg:pt-0 pt-4">
+                <template v-for="(order, index) in orders">
+                  <template v-for="(orderItem , idx ) in order.orderItems">
+                    <div class="p-4 text-base lg:mx-4 mx-0 bg-gray-100 border border-gray-400 my-2">
+                      <div class="flex gap-2">
+                        <div class="flex-none">発注番号</div>
+                        <div class="flex-1">{{ order.orderId }}</div>
+                      </div>
+                      <div class="flex gap-2">
+                        <div class="flex-none">発注日</div>
+                        <div class="flex-1">{{ order.orderDate }}</div>
+                      </div>
+                      <div class="flex gap-2">
+                        <div class="flex-none">発注元部署</div>
+                        <div class="flex-1">{{ order.division.divisionName }}</div>
+                      </div>
+                    </div>
+                    <div class="flex flex-wrap items-center mb-3">
+                      <div class="w-full lg:w-5/6 lg:px-4 px-0 mb-6 lg:mb-0">
+                        <div class="flex flex-wrap items-center gap-4">
+                          <div class="flex-none">
+                            <item-view class="md:h-44 md:w-44 h-32 w-32" :base64="orderItem.itemImage"></item-view>
+                          </div>
+                          <div class="break-words flex-1 box-border w-44">
+                            <h3 class="text-xl font-bold font-heading">{{ orderItem.item.makerName }}</h3>
+                            <p class="text-md font-bold font-heading">{{ orderItem.item.itemName }}</p>
+                            <p class="text-md font-bold font-heading">{{ orderItem.item.itemJANCode }}</p>
+                            <p class="text-gray-500">{{ orderItem.item.itemCode }}<br>{{ orderItem.item.itemStandard
+                                  }}</p>
+                            <p class="text-gray-500">{{ orderItem.quantity.quantityNum }}{{
+                                  orderItem.quantity.quantityUnit }} 入り</p>
+                            <p>
+                              <span class="text-xl text-orange-600 font-bold font-heading">
+                                {{ numberFormat( orderItem.orderQuantity ) }}{{ orderItem.quantity.itemUnit }} 発注中
+                              </span>
+                              <span class="text-xl text-orange-600 font-bold font-heading" v-if="(orderItem.orderQuantity - orderItem.receivedQuantity) != 0">
+                                {{ numberFormat( ( orderItem.orderQuantity - orderItem.receivedQuantity) ) }}{{
+                                    orderItem.quantity.itemUnit }} 未入荷
+                              </span>
+                            </p>
+                            <p class="text-gray-800">{{ orderItem.distributor.distributorName }}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="w-full lg:block lg:w-1/6 px-4 py-4">
+                        <v-button-default type="button" class="w-full" v-on:click.native="add(order , idx)">反映</v-button-default>
+                      </div>
+                      <div class="py-2 px-4 w-full">
+                        <div class="border-t border-gray-200"></div>
+                      </div>
+                    </div>
+                  </template>
+                </template>
+              </div>
             </div>
-            <div>
-              <v-pagination :showPages="showPages" v-model:currentPage="currentPageEdited" :totalCount="totalCount"
-                :perPage="parseInt(values.perPage)"></v-pagination>
-            </div>
+          </div>
+        </div>
+        <div>
+          <v-pagination :showPages="showPages" v-model:currentPage="currentPageEdited" :totalCount="totalCount" :perPage="parseInt(values.perPage)"></v-pagination>
+        </div>
       </template>
       <div class="hidden">
         <v-input type="hidden" name="makerName"></v-input>
@@ -989,7 +984,6 @@ axios
 .post(_APIURL, params)
 .then((response) => {
 complete();
-console.log(response.data.data);
 emit('additem', response.data.data);
 resetForm({
 barcode: ""
@@ -1029,13 +1023,11 @@ template: `
 <v-loading :show="loading"></v-loading>
 <fieldset class="relative flex gap-2">
   <div class="pointer-events-none flex items-center px-2 text-gray-700 flex-none">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-      stroke-width="2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
       <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
     </svg>
   </div>
-  <v-input name="barcode" label="バーコード" type="text" title="" class="flex-1 w-5/6" autocomplete="false"
-    @keypress.enter.native="onEnter"></v-input>
+  <v-input name="barcode" label="バーコード" type="text" title="" class="flex-1 w-5/6" autocomplete="false" @keypress.enter.native="onEnter"></v-input>
   <v-button-primary type="button" class="flex-none" @click.native="onEnter">検索</v-button-primary>
 </fieldset>
 `
@@ -1145,13 +1137,11 @@ template: `
 <v-loading :show="loading"></v-loading>
 <fieldset class="relative flex gap-2">
   <div class="pointer-events-none flex items-center px-2 text-gray-700 flex-none">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-      stroke-width="2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
       <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
     </svg>
   </div>
-  <v-input name="barcode" label="バーコード" type="text" title="" class="flex-1 w-5/6" autocomplete="false"
-    @keypress.enter.native="onEnter"></v-input>
+  <v-input name="barcode" label="バーコード" type="text" title="" class="flex-1 w-5/6" autocomplete="false" @keypress.enter.native="onEnter"></v-input>
   <v-button-primary type="button" class="flex-none" @click.native="onEnter">検索</v-button-primary>
 </fieldset>
 `
@@ -1262,13 +1252,11 @@ template: `
 <v-loading :show="loading"></v-loading>
 <fieldset class="relative flex gap-2">
   <div class="pointer-events-none flex items-center px-2 text-gray-700 flex-none">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-      stroke-width="2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
       <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
     </svg>
   </div>
-  <v-input name="barcode" label="バーコード" type="text" title="" class="flex-1 w-5/6" autocomplete="false"
-    @keypress.enter.native="onEnter"></v-input>
+  <v-input name="barcode" label="バーコード" type="text" title="" class="flex-1 w-5/6" autocomplete="false" @keypress.enter.native="onEnter"></v-input>
   <v-button-primary type="button" class="flex-none" @click.native="onEnter">検索</v-button-primary>
 </fieldset>
 `
@@ -1401,7 +1389,6 @@ axios
 response.data.data.forEach((item, idx) => {
 response.data.data[idx].open = false;
 });
-console.log(response.data);
 consumptions.value = response.data.data;
 totalCount.value = parseInt(response.data.count);
 currentTab.value = 'list';
@@ -1420,18 +1407,15 @@ searchCount.value++;
 .finally(() => {
 complete();
 if (document.getElementById('consumptionHistoryModalForItemRequest').classList.contains('is-open') == true) {
-  searchCount.value++;
-  console.log(searchCount.value +'co');
+searchCount.value++;
 if (totalCount.value == 0) {
-  console.log('none');
 Swal.fire({
-  title: '情報がありませんでした',
-  icon: 'warning'
+title: '情報がありませんでした',
+icon: 'warning'
 })
 MicroModal.close("consumptionHistoryModalForItemRequest");
 return false;
 }
-console.log('after none');
 if (searchCount.value > 0) {
 Toast.fire({
 icon: 'success',
@@ -1534,88 +1518,84 @@ template: `
         <div>
           {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ ((
           parseInt(values.perPage) * values.currentPage ) < totalCount ) ? parseInt(values.perPage) * values.currentPage
-            : totalCount }}件 / 全 {{ totalCount }}件 </div>
-            <div class="max-h-full overflow-y-auto" id="consumptionsList">
-                <div class="w-full overflow-hidden mb-8 xl:mb-0">
-                  <div class="hidden lg:flex w-full sticky top-0 bg-white px-4 py-4 flex-wrap">
-                    <div class="w-full lg:w-2/3">
-                      <h4 class="font-bold font-heading text-gray-500 text-center">伝票情報</h4>
+            : totalCount }}件 / 全 {{ totalCount }}件
+        </div>
+        <div class="max-h-full overflow-y-auto" id="consumptionsList">
+          <div class="w-full overflow-hidden mb-8 xl:mb-0">
+            <div class="hidden lg:flex w-full sticky top-0 bg-white px-4 py-4 flex-wrap">
+              <div class="w-full lg:w-2/3">
+                <h4 class="font-bold font-heading text-gray-500 text-center">伝票情報</h4>
+              </div>
+              <div class="w-full lg:w-1/3 pr-4">
+                <h4 class="w-1/2 inline-block font-bold font-heading text-gray-500 text-center">反映</h4>
+                <h4 class="w-1/2 inline-block font-bold font-heading text-gray-500 text-center">詳細</h4>
+              </div>
+            </div>
+            <div class="lg:pt-0 pt-4">
+              <template v-for="(consumption, index) in consumptions">
+
+                <div v-if="Object.keys(consumption.consumptionItems).length > 0" class="flex flex-wrap p-4 lg:pr-2 text-base lg:mx-4 mx-0 bg-gray-100 border border-gray-400 my-2">
+                  <div class="lg:w-2/3 ">
+                    <div class="flex gap-2">
+                      <div class="flex-none">消費番号</div>
+                      <div class="flex-1">{{ consumption.consumptionId }}</div>
                     </div>
-                    <div class="w-full lg:w-1/3 pr-4">
-                      <h4 class="w-1/2 inline-block font-bold font-heading text-gray-500 text-center">反映</h4>
-                      <h4 class="w-1/2 inline-block font-bold font-heading text-gray-500 text-center">詳細</h4>
+                    <div class="flex gap-2">
+                      <div class="flex-none">消費日時</div>
+                      <div class="flex-1">{{ consumption.consumptionDate }}</div>
+                    </div>
+                    <div class="flex gap-2">
+                      <div class="flex-none">消費タイプ</div>
+                      <div class="flex-1">{{ (consumption.consumptionStatus === 1)? "通常消費" : "貸出品" }}</div>
+                    </div>
+                    <div class="flex gap-2">
+                      <div class="flex-none">品目数</div>
+                      <div class="flex-1">{{ consumption.itemCount }}</div>
                     </div>
                   </div>
-                  <div class="lg:pt-0 pt-4">
-                    <template v-for="(consumption, index) in consumptions">
-
-                      <div v-if="Object.keys(consumption.consumptionItems).length > 0"
-                        class="flex flex-wrap p-4 lg:pr-2 text-base lg:mx-4 mx-0 bg-gray-100 border border-gray-400 my-2">
-                        <div class="lg:w-2/3 ">
-                          <div class="flex gap-2">
-                            <div class="flex-none">消費番号</div>
-                            <div class="flex-1">{{ consumption.consumptionId }}</div>
-                          </div>
-                          <div class="flex gap-2">
-                            <div class="flex-none">消費日時</div>
-                            <div class="flex-1">{{ consumption.consumptionDate }}</div>
-                          </div>
-                          <div class="flex gap-2">
-                            <div class="flex-none">消費タイプ</div>
-                            <div class="flex-1">{{ (consumption.consumptionStatus === 1)? "通常消費" : "貸出品" }}</div>
-                          </div>
-                          <div class="flex gap-2">
-                            <div class="flex-none">品目数</div>
-                            <div class="flex-1">{{ consumption.itemCount }}</div>
-                          </div>
-                        </div>
-                        <div class="w-full lg:w-1/6 px-2 py-2">
-                          <div class="w-full lg:block">
-                            <v-button-default type="button" class="w-full"
-                              v-on:click.native="add(consumption.consumptionItems)">反映</v-button-default>
-                          </div>
-                        </div>
-                        <div class="w-full lg:w-1/6 px-2 py-2">
-                          <div class=" w-full lg:block">
-                            <v-button-default v-show="consumption.open" type="button" class="w-full"
-                              v-on:click.native="open(index)">
-                              -
-                            </v-button-default>
-                            <v-button-default v-show="!consumption.open" type="button" class="w-full"
-                              v-on:click.native="open(index)">
-                              +
-                            </v-button-default>
-                          </div>
-                        </div>
-                      </div>
-                      <div v-show="consumption.open">
-                        <div class="px-6 sm:-mx-6 lg:-mx-8">
-                          <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
-                            <table class="min-w-full text-left">
-                              <thead class="border-b bg-white">
-                                <tr>
-                                </tr>
-                              </thead class="border-b">
-                              <tbody>
-                                <template v-for="(consumptionItem , idx ) in consumption.consumptionItems"
-                                  :key="consumptionItem.key">
-                                  <tr class="bg-white border-b">
-                                    <td class="text-sm text-gray-900 font-light px-2 py-2">
-                                      <div class="flex items-center w-full sticky top-0 bg-white pr-4 py-4 flex-wrap">
-                                        <div class="w-auto flex-auto mb-2">
-                                          <h3 class="text-xl font-bold font-heading">{{
+                  <div class="w-full lg:w-1/6 px-2 py-2">
+                    <div class="w-full lg:block">
+                      <v-button-default type="button" class="w-full" v-on:click.native="add(consumption.consumptionItems)">反映</v-button-default>
+                    </div>
+                  </div>
+                  <div class="w-full lg:w-1/6 px-2 py-2">
+                    <div class=" w-full lg:block">
+                      <v-button-default v-show="consumption.open" type="button" class="w-full" v-on:click.native="open(index)">
+                        -
+                      </v-button-default>
+                      <v-button-default v-show="!consumption.open" type="button" class="w-full" v-on:click.native="open(index)">
+                        +
+                      </v-button-default>
+                    </div>
+                  </div>
+                </div>
+                <div v-show="consumption.open">
+                  <div class="px-6 sm:-mx-6 lg:-mx-8">
+                    <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
+                      <table class="min-w-full text-left">
+                        <thead class="border-b bg-white">
+                          <tr>
+                          </tr>
+                        </thead class="border-b">
+                        <tbody>
+                          <template v-for="(consumptionItem , idx ) in consumption.consumptionItems" :key="consumptionItem.key">
+                            <tr class="bg-white border-b">
+                              <td class="text-sm text-gray-900 font-light px-2 py-2">
+                                <div class="flex items-center w-full sticky top-0 bg-white pr-4 py-4 flex-wrap">
+                                  <div class="w-auto flex-auto mb-2">
+                                    <h3 class="text-xl font-bold font-heading">{{
                                             consumptionItem.item.makerName }}</h3>
-                                          <p class="text-md font-bold font-heading">{{
+                                    <p class="text-md font-bold font-heading">{{
                                             consumptionItem.item.itemName }}</p>
-                                          <p class="text-md font-bold font-heading">{{
+                                    <p class="text-md font-bold font-heading">{{
                                             consumptionItem.item.itemJANCode }}</p>
-                                          <p class="text-gray-500">{{ consumptionItem.item.itemCode }}<br>{{
+                                    <p class="text-gray-500">{{ consumptionItem.item.itemCode }}<br>{{
                                             consumptionItem.item.itemStandard }}</p>
-                                          <p class="text-gray-500">{{ consumptionItem.quantity.quantityNum }}{{
+                                    <p class="text-gray-500">{{ consumptionItem.quantity.quantityNum }}{{
                                             consumptionItem.quantity.quantityUnit }} 入り</p>
-                                        </div>
-                                        <div class="w-auto">
-                                          <!--
+                                  </div>
+                                  <div class="w-auto">
+                                    <!--
                                           <div
                                             class="whitespace-nowrap w-full bg-zinc-100 rounded-lg py-5 px-4 text-gray-500 text-center"
                                             role="alert">
@@ -1625,36 +1605,34 @@ template: `
                                             </h4>
                                           </div>
                                               -->
-                                          <span
-                                            class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-2 rounded dark:bg-blue-200 dark:text-blue-800">
-                                            消費数<span class="font-bold text-base px-1">{{
+                                    <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-2 rounded dark:bg-blue-200 dark:text-blue-800">
+                                      消費数<span class="font-bold text-base px-1">{{
                                               consumptionItem.consumptionQuantity }}</span>{{
                                             consumptionItem.quantity.quantityUnit }}</span>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr class="bg-white border-b">
-                                </template>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      </div>
-
-                    </template>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr class="bg-white border-b">
+                          </template>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
-              </div>
+
+              </template>
             </div>
-            <div>
-              <v-pagination :showPages="showPages" v-model:currentPage="currentPageEdited" :totalCount="totalCount"
-                :perPage="parseInt(values.perPage)"></v-pagination>
-            </div>
-      </template>
-      <div class="hidden">
-        <v-input type="hidden" name="currentPage"></v-input>
-        <v-input type="hidden" name="perPage"></v-input>
-      </div>
+          </div>
+        </div>
+    </div>
+    <div>
+      <v-pagination :showPages="showPages" v-model:currentPage="currentPageEdited" :totalCount="totalCount" :perPage="parseInt(values.perPage)"></v-pagination>
+    </div>
+    </template>
+    <div class="hidden">
+      <v-input type="hidden" name="currentPage"></v-input>
+      <v-input type="hidden" name="perPage"></v-input>
+    </div>
     </div>
   </v-open-modal>
 </teleport>

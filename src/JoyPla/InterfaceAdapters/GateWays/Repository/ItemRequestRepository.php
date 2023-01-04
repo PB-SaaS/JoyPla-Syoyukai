@@ -25,14 +25,6 @@ use JoyPla\Enterprise\Models\UnitPrice;
 
 class ItemRequestRepository implements ItemRequestRepositoryInterface
 {
-    /*
-    public function findByHospitalId(HospitalId $hospitalId)
-    {
-        $history = (SpiralDbItemRequest::where('hospitalId', $hospitalId->value())->get())->data->all();
-
-        return $history;
-    }
-*/
     public function findByInHospitalItem(HospitalId $hospitalId, array $requestItems)
     {
         $payoutUnitPriceUseFlag = (Hospital::where('hospitalId', $hospitalId->value())->value('payoutUnitPrice')->get())->data->get(0);
@@ -70,30 +62,30 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
             if ((int)$item->requestQuantity < 1) {
                 continue;
             }
-            
+
             $source_division_find_key = array_search($item->sourceDivisionId, collect_column($division, 'divisionId'));
             $target_division_find_key = array_search($item->targetDivisionId, collect_column($division, 'divisionId'));
             $inHospitalItem_find_key = array_search($item->inHospitalItemId, collect_column($inHospitalItem, 'inHospitalItemId'));
-            
+
             if (($source_division_find_key !== false) && ($target_division_find_key !== false) && ($inHospitalItem_find_key !== false)) {
 
                 $unitprice = 0;
                 if (is_numeric($inHospitalItem[$inHospitalItem_find_key]->unitPrice)) {
                     $unitprice = (float)$inHospitalItem[$inHospitalItem_find_key]->unitPrice;
                 }
-    
+
                 if ($payoutUnitPriceUseFlag->payoutUnitPrice !== '1') {
                     if ($inHospitalItem[$inHospitalItem_find_key]->quantity != 0 && $inHospitalItem[$inHospitalItem_find_key]->price != 0) {
-                        $unitprice = ((int)$inHospitalItem[$inHospitalItem_find_key]->price / (int)$inHospitalItem[$inHospitalItem_find_key]->quantity) ;
+                        $unitprice = ((int)$inHospitalItem[$inHospitalItem_find_key]->price / (int)$inHospitalItem[$inHospitalItem_find_key]->quantity);
                     } else {
                         $unitprice = 0;
                     }
                 }
-                
+
                 $result[] = new RequestItem(
                     (RequestId::generate()),
                     (new RequestHId('')),
-                    (new InHospitalItemId($inHospitalItem[$inHospitalItem_find_key]->inHospitalItemId) ),
+                    (new InHospitalItemId($inHospitalItem[$inHospitalItem_find_key]->inHospitalItemId)),
                     (Item::create($inHospitalItem[$inHospitalItem_find_key])),
                     $hospitalId,
                     (Division::create($division[$source_division_find_key])),
@@ -101,8 +93,8 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
                     (new RequestQuantity((int)$item->requestQuantity)),
                     (new RequestType((int)$item->requestType)),
                     (Quantity::create($inHospitalItem[$inHospitalItem_find_key])),
-                    (new Price((float)$inHospitalItem[$inHospitalItem_find_key]->price) ),
-                    (new UnitPrice($unitprice) )
+                    (new Price((float)$inHospitalItem[$inHospitalItem_find_key]->price)),
+                    (new UnitPrice($unitprice))
                 );
             }
         }
@@ -153,7 +145,7 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
                 ];
             }
         }
-        
+
         SpiralDbItemRequest::insert($histories);
         SpiralDbRequestItem::insert($items);
 
@@ -186,7 +178,7 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
             'url' => config('url.hospital', ''),
         ], false)->render();
 
-        $ids = SpiralDb::title('NJ_HUserDB')->where('hospitalId', $user->hospitalId)->value('id')->whereIn('userPermission', [1,3])->get();
+        $ids = SpiralDb::title('NJ_HUserDB')->where('hospitalId', $user->hospitalId)->value('id')->whereIn('userPermission', [1, 3])->get();
 
         $mailId = SpiralDb::mail('NJ_HUserDB')->subject('[JoyPla] 請求書が作成されました')
             ->standby(false)->reserveDate('now')->bodyText($mailBody)->formAddress(FROM_ADDRESS)->formName(FROM_NAME)->mailField('mailAddress')->regist();
@@ -305,12 +297,11 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
 
 interface ItemRequestRepositoryInterface
 {
-//    public function findByHospitalId(HospitalId $hospitalId);
     public function findByInHospitalItem(HospitalId $hospitalId, array $itemRequests);
     public function saveToArray(array $itemRequests);
     public function sendRegistrationMail(array $itemRequests, Auth $user);
 
-//    public function search(HospitalId $hospitalId, object $search);
-//    public function index(HospitalId $hospitalId, ItemRequestId $ItemRequestId);
-//    public function delete(HospitalId $hospitalId, ItemRequestId $ItemRequestId);
+    //    public function search(HospitalId $hospitalId, object $search);
+    //    public function index(HospitalId $hospitalId, ItemRequestId $ItemRequestId);
+    //    public function delete(HospitalId $hospitalId, ItemRequestId $ItemRequestId);
 }
