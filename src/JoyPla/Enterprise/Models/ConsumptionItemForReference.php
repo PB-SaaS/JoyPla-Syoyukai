@@ -16,6 +16,7 @@ class ConsumptionItemForReference
     private UnitPrice $unitPrice;
     private int $consumptionQuantity;
     private string $itemImage;
+    private string $priceNotice;
 
     public function __construct(
         ConsumptionId $consumptionId,
@@ -27,7 +28,8 @@ class ConsumptionItemForReference
         Price $price,
         UnitPrice $unitPrice,
         int $consumptionQuantity,
-        $itemImage = ""
+        $itemImage = "",
+        $priceNotice = ""
     ) {
         $this->consumptionId = $consumptionId;
         $this->inHospitalItemId = $inHospitalItemId;
@@ -39,21 +41,23 @@ class ConsumptionItemForReference
         $this->unitPrice = $unitPrice;
         $this->consumptionQuantity = $consumptionQuantity;
         $this->itemImage = ($itemImage) ? $itemImage : "";
+        $this->priceNotice = ($priceNotice) ? $priceNotice : "";
     }
 
     public static function create(Collection $input)
     {
         return new ConsumptionItemForReference(
-            (new ConsumptionId($input->billingNumber) ),
-            (new InHospitalItemId($input->inHospitalItemId) ),
+            (new ConsumptionId($input->billingNumber)),
+            (new InHospitalItemId($input->inHospitalItemId)),
             (Item::create($input)),
-            (new HospitalId($input->hospitalId) ),
+            (new HospitalId($input->hospitalId)),
             (Division::create($input)),
             (Quantity::create($input)),
-            (new Price($input->price) ),
-            (new UnitPrice($input->unitPrice) ),
+            (new Price($input->price)),
+            (new UnitPrice($input->unitPrice)),
             (int)$input->billingQuantity,
-            $input->inItemImage
+            $input->inItemImage,
+            $input->priceNotice
         );
     }
 
@@ -102,6 +106,7 @@ class ConsumptionItemForReference
             'consumptionQuantity' => $this->consumptionQuantity,
             'consumptionPrice' => $this->price(),
             'itemImage' => $this->itemImage,
+            'priceNotice' => $this->priceNotice
         ];
     }
 }

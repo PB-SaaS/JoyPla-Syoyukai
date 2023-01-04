@@ -139,6 +139,8 @@ class PayoutHistListController extends Controller
         global $SPIRAL;
         try {
 
+            throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+/* 
             $user_info = new UserInfo($SPIRAL);
             
             if ($user_info->isDistributorUser())
@@ -166,7 +168,8 @@ class PayoutHistListController extends Controller
                         'csrf_token' => Csrf::generate(16),
                         ] , false);
             }
-    
+ */
+
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),
@@ -195,6 +198,8 @@ class PayoutHistListController extends Controller
         global $SPIRAL;
         try {
 
+            throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+/* 
             $user_info = new UserInfo($SPIRAL);
             
             if ($user_info->isDistributorUser())
@@ -221,7 +226,8 @@ class PayoutHistListController extends Controller
                     'table' => '%sf:usr:search64:mstfilter%',
                     'csrf_token' => Csrf::generate(16),
                     ] , false);
-    
+ */
+
         } catch ( Exception $ex ) {
             $content = $this->view('NewJoyPla/view/template/Error', [
                 'code' => $ex->getCode(),

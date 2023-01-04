@@ -343,7 +343,6 @@ searchCount.value++;
 complete();
 if (document.getElementById('inHospitalItemModal').classList.contains('is-open') == true) {
 searchCount.value++;
-console.log(searchCount.value + 'hp');
 if (searchCount.value > 0) {
 Toast.fire({
 icon: 'success',
@@ -985,7 +984,6 @@ axios
 .post(_APIURL, params)
 .then((response) => {
 complete();
-console.log(response.data.data);
 emit('additem', response.data.data);
 resetForm({
 barcode: ""
@@ -1391,7 +1389,6 @@ axios
 response.data.data.forEach((item, idx) => {
 response.data.data[idx].open = false;
 });
-console.log(response.data);
 consumptions.value = response.data.data;
 totalCount.value = parseInt(response.data.count);
 currentTab.value = 'list';
@@ -1411,9 +1408,7 @@ searchCount.value++;
 complete();
 if (document.getElementById('consumptionHistoryModalForItemRequest').classList.contains('is-open') == true) {
 searchCount.value++;
-console.log(searchCount.value +'co');
 if (totalCount.value == 0) {
-console.log('none');
 Swal.fire({
 title: '情報がありませんでした',
 icon: 'warning'
@@ -1421,7 +1416,6 @@ icon: 'warning'
 MicroModal.close("consumptionHistoryModalForItemRequest");
 return false;
 }
-console.log('after none');
 if (searchCount.value > 0) {
 Toast.fire({
 icon: 'success',
@@ -1522,9 +1516,7 @@ template: `
           </div>
         </div>
         <div>
-          {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ ((
-          parseInt(values.perPage) * values.currentPage ) < totalCount ) ? parseInt(values.perPage) * values.currentPage
-            : totalCount }}件 / 全 {{ totalCount }}件
+          {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.perPage) * values.currentPage ) < totalCount ) ? parseInt(values.perPage) * values.currentPage : totalCount }}件 / 全 {{ totalCount }}件
         </div>
         <div class="max-h-full overflow-y-auto" id="consumptionsList">
           <div class="w-full overflow-hidden mb-8 xl:mb-0">
@@ -1589,32 +1581,18 @@ template: `
                               <td class="text-sm text-gray-900 font-light px-2 py-2">
                                 <div class="flex items-center w-full sticky top-0 bg-white pr-4 py-4 flex-wrap">
                                   <div class="w-auto flex-auto mb-2">
-                                    <h3 class="text-xl font-bold font-heading">{{
-                                            consumptionItem.item.makerName }}</h3>
-                                    <p class="text-md font-bold font-heading">{{
-                                            consumptionItem.item.itemName }}</p>
-                                    <p class="text-md font-bold font-heading">{{
-                                            consumptionItem.item.itemJANCode }}</p>
-                                    <p class="text-gray-500">{{ consumptionItem.item.itemCode }}<br>{{
-                                            consumptionItem.item.itemStandard }}</p>
-                                    <p class="text-gray-500">{{ consumptionItem.quantity.quantityNum }}{{
-                                            consumptionItem.quantity.quantityUnit }} 入り</p>
+                                    <h3 class="text-xl font-bold font-heading">{{ consumptionItem.item.makerName }}</h3>
+                                    <p class="text-md font-bold font-heading">{{ consumptionItem.item.itemName }}</p>
+                                    <p class="text-md font-bold font-heading">{{ consumptionItem.item.itemJANCode }}</p>
+                                    <p class="text-gray-500">{{ consumptionItem.item.itemCode }}<br>{{ consumptionItem.item.itemStandard }}</p>
+                                    <p class="text-gray-500">{{ consumptionItem.quantity.quantityNum }}{{ consumptionItem.quantity.quantityUnit }} 入り</p>
                                   </div>
                                   <div class="w-auto">
-                                    <!--
-                                          <div
-                                            class="whitespace-nowrap w-full bg-zinc-100 rounded-lg py-5 px-4 text-gray-500 text-center"
-                                            role="alert">
-                                            <h4 class="inline-block font-bold font-heading text-gray-800">消費数
-                                              <span class="pl-3 font-normal">{{ consumptionItem.consumptionQuantity }}{{
-                                                consumptionItem.quantity.quantityUnit }}</span>
-                                            </h4>
-                                          </div>
-                                              -->
                                     <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-2 rounded dark:bg-blue-200 dark:text-blue-800">
-                                      消費数<span class="font-bold text-base px-1">{{
-                                              consumptionItem.consumptionQuantity }}</span>{{
-                                            consumptionItem.quantity.quantityUnit }}</span>
+                                      消費数
+                                      <span class="font-bold text-base px-1">{{ consumptionItem.consumptionQuantity }}</span>
+                                      {{ consumptionItem.quantity.quantityUnit }}
+                                    </span>
                                   </div>
                                 </div>
                               </td>
@@ -1764,7 +1742,6 @@ start();
 axios
 .post(_APIURL, params)
 .then((response) => {
-console.log(response);
 response.data.data.forEach((item, idx) => {
 response.data.data[idx].open = false;
 response.data.data[idx].consumptionItems.forEach((consumptionItem, id) => {
@@ -1772,7 +1749,6 @@ let quantity = ~~(consumptionItem.consumptionQuantity / consumptionItem.quantity
 response.data.data[idx].consumptionItems[id].orderableQuantity = quantity;
 });
 });
-console.log(response.data);
 consumptions.value = response.data.data;
 totalCount.value = parseInt(response.data.count);
 currentTab.value = 'list';
@@ -1792,9 +1768,7 @@ searchCount.value++;
 complete();
 if (document.getElementById('consumptionHistoryModalForOrder').classList.contains('is-open') == true) {
 searchCount.value++;
-console.log(searchCount.value +'co');
 if (totalCount.value == 0) {
-console.log('none');
 Swal.fire({
 title: '情報がありませんでした',
 icon: 'warning'
@@ -1802,7 +1776,6 @@ icon: 'warning'
 MicroModal.close("consumptionHistoryModalForOrder");
 return false;
 }
-console.log('after none');
 if (searchCount.value > 0) {
 Toast.fire({
 icon: 'success',
@@ -1902,9 +1875,7 @@ template: `
           </div>
         </div>
         <div>
-          {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ ((
-          parseInt(values.perPage) * values.currentPage ) < totalCount ) ? parseInt(values.perPage) * values.currentPage
-            : totalCount }}件 / 全 {{ totalCount }}件
+          {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.perPage) * values.currentPage ) < totalCount ) ? parseInt(values.perPage) * values.currentPage : totalCount }}件 / 全 {{ totalCount }}件
         </div>
         <div class="max-h-full overflow-y-auto" id="consumptionsList">
           <div class="w-full overflow-hidden mb-8 xl:mb-0">
@@ -1969,26 +1940,21 @@ template: `
                               <td class="text-sm text-gray-900 font-light px-2 py-2">
                                 <div class="flex items-center w-full sticky top-0 bg-white pr-4 py-4 flex-wrap">
                                   <div class="w-auto flex-auto mb-2">
-                                    <h3 class="text-xl font-bold font-heading">{{
-                                            consumptionItem.item.makerName }}</h3>
-                                    <p class="text-md font-bold font-heading">{{
-                                            consumptionItem.item.itemName }}</p>
-                                    <p class="text-md font-bold font-heading">{{
-                                            consumptionItem.item.itemJANCode }}</p>
-                                    <p class="text-gray-500">{{ consumptionItem.item.itemCode }}<br>{{
-                                            consumptionItem.item.itemStandard }}</p>
-                                    <p class="text-gray-500">{{ consumptionItem.quantity.quantityNum }}{{
-                                            consumptionItem.quantity.quantityUnit }} 入り</p>
+                                    <h3 class="text-xl font-bold font-heading">{{ consumptionItem.item.makerName }}</h3>
+                                    <p class="text-md font-bold font-heading">{{ consumptionItem.item.itemName }}</p>
+                                    <p class="text-md font-bold font-heading">{{ consumptionItem.item.itemJANCode }}</p>
+                                    <p class="text-gray-500">{{ consumptionItem.item.itemCode }}<br>{{ consumptionItem.item.itemStandard }}</p>
+                                    <p class="text-gray-500">{{ consumptionItem.quantity.quantityNum }}{{ consumptionItem.quantity.quantityUnit }} 入り</p>
                                   </div>
                                   <div class="w-auto flex flex-col gap-2">
                                     <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-2 rounded text-center">
-                                      消費数<span class="font-bold text-base px-1">{{
-                                              consumptionItem.consumptionQuantity }}</span>{{
-                                            consumptionItem.quantity.quantityUnit }}</span>
+                                      消費数<span class="font-bold text-base px-1">{{ consumptionItem.consumptionQuantity }}</span>
+                                      {{ consumptionItem.quantity.quantityUnit }}
+                                    </span>
                                     <span class="bg-purple-200 text-purple-900 text-sm font-medium px-3 py-2 rounded text-center">
-                                      発注可能数<span class="font-bold text-base px-1">{{
-                                              consumptionItem.orderableQuantity }}</span>{{
-                                            consumptionItem.quantity.itemUnit }}</span>
+                                      発注可能数<span class="font-bold text-base px-1">{{ consumptionItem.orderableQuantity }}</span>
+                                      {{ consumptionItem.quantity.itemUnit }}
+                                    </span>
                                   </div>
                                 </div>
                               </td>

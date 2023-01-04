@@ -5,18 +5,20 @@ namespace JoyPla\InterfaceAdapters\GateWays\Repository;
 use App\SpiralDb\ConsumptionItemView;
 use App\SpiralDb\ConsumptionView;
 use App\SpiralDb\InHospitalItemView;
+use App\SpiralDb\Price;
 use Exception;
 use framework\SpiralConnecter\SpiralDB;
 use JoyPla\Enterprise\Models\ConsumptionForReference;
 use JoyPla\Enterprise\Models\ConsumptionItemForReference;
 use JoyPla\Enterprise\Models\HospitalId;
 use Collection;
+
 class ConsumptionHistoryRepository implements ConsumptionHistoryRepositoryInterface
 {
     public function search(HospitalId $hospitalId, object $search)
     {
         if (count($search->divisionIds) === 0) {
-            return [[],0];
+            return [[], 0];
         }
 
         $historyViewInstance = ConsumptionView::where('hospitalId', $hospitalId->value());
@@ -29,7 +31,7 @@ class ConsumptionHistoryRepository implements ConsumptionHistoryRepositoryInterf
         $histories = $historyViewInstance->sort('billingDate', 'desc')->page($search->currentPage)->paginate($search->perPage);
 
         if ((int)$histories->count === 0) {
-            return [[],0];
+            return [[], 0];
         }
 
         $consumptionItemViewInstance = ConsumptionItemView::where('hospitalId', $hospitalId->value());
@@ -41,7 +43,7 @@ class ConsumptionHistoryRepository implements ConsumptionHistoryRepositoryInterf
 
         $consumptionItems = $consumptionItemViewInstance->get();
         if ((int)$consumptionItems->count === 0) {
-            return [[],0];
+            return [[], 0];
         }
 
         foreach ($consumptionItems->data->all() as $consumptionItem) {
@@ -50,14 +52,24 @@ class ConsumptionHistoryRepository implements ConsumptionHistoryRepositoryInterf
 
         $items = $itemViewInstance->get();
         if ((int)$items->count === 0) {
-            return [[],0];
+            return [[], 0];
         }
 
+        $priceInstance = Price::where('hospitalId', $hospitalId->value())->value('priceId')->value('notice');
+
+        foreach ($items->data->all() as $item) {
+            $priceInstance->orWhere('priceId', $item->priceId);
+        }
+        $price = ($priceInstance->get())->data->all();
+
         $merging = [];
-        
+
         foreach ($consumptionItems->data->all() as $consumptionItem) {
+
             foreach ($items->data->all() as $item) {
-                if ($consumptionItem->inHospitalItemId === $item->inHospitalItemId) {
+                $price_fkey = array_search($item->priceId, collect_column($price, 'priceId'));
+
+                if ($consumptionItem->inHospitalItemId === $item->inHospitalItemId && ($price_fkey !== false)) {
                     $itemUnitPrice = (is_numeric($item->unitPrice)) ? (float)($item->unitPrice) : 0;
                     $tmp = new Collection();
                     $tmp->billingNumber = $consumptionItem->billingNumber;
@@ -81,6 +93,7 @@ class ConsumptionHistoryRepository implements ConsumptionHistoryRepositoryInterf
                     $tmp->makerName = $item->makerName;
                     $tmp->serialNo = $item->serialNo;
                     $tmp->catalogNo = $item->catalogNo;
+                    $tmp->priceNotice = $price[$price_fkey]->notice;
                     $merging[] = $tmp;
                 }
             }
@@ -98,8 +111,8 @@ class ConsumptionHistoryRepository implements ConsumptionHistoryRepositoryInterf
 
             $consumptions[] = $consumption;
         }
-        
-        return [ $consumptions , $histories->count ];
+
+        return [$consumptions, $histories->count];
     }
 }
 

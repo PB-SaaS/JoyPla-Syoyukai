@@ -957,6 +957,8 @@
 									</div>
 								</div>
 							<?php endif ?>
+<?php 
+/* 
 							<div>
 								<div class="nj_card content-6-1">
 									<div class="menu-content">
@@ -1005,6 +1007,8 @@
 									</div>
 								</div>
 							</div>
+ */
+?>
 							<div>
 								<div class="nj_card content-6-1">
 									<div class="menu-content">

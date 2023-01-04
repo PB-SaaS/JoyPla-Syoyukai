@@ -164,7 +164,6 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () {
     Router::map('GET', '/api/reference/consumption', [ReferenceController::class, 'consumption'])->service(new ConsumptionHistoryShowInteractor(new ConsumptionHistoryShowPresenter(), new ConsumptionHistoryRepository()));
 
     Router::map('POST', '/api/itemrequest/register', [ItemRequestController::class, 'register'])->service(new ItemRequestRegisterInteractor(new ItemRequestRegisterPresenter(), new ItemRequestRepository(), new RequestItemCountRepository()));
-    Router::map('GET', '/api/stocktaking/inHospitalItem', [StocktakingController::class, 'inHospitalItem']);
 
     Router::map('GET', '/api/notification/show', [NotificationController::class, 'show'])->service(new NotificationShowInteractor(new NotificationShowPresenter(), new NotificationRepository()));
 
