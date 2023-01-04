@@ -52,8 +52,8 @@ class TotalizationRepository implements TotalizationRepositoryInterface
 
         $totalzationByDivisionInstance->where('hospitalId', $hospitalId->value());
 */
-        $totalzationByInHPItemInstance = TotalRequestByInHpItemView::where('hospitalId', $hospitalId->value());
-        $totalzationByDivisionInstance = TotalRequestByDivision::getNewInstance()->where('hospitalId', $hospitalId->value());
+        $totalzationByInHPItemInstance = TotalRequestByInHpItemView::where('hospitalId', $hospitalId->value())->where('requestQuantity', 0, '>');
+        $totalzationByDivisionInstance = TotalRequestByDivision::getNewInstance()->where('hospitalId', $hospitalId->value())->where('requestQuantity', 0, '>');
 
         //$test = ($totalzationByDivisionInstance->get())->all();
         //var_dump($test);

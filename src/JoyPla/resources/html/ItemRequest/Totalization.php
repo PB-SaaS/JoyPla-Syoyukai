@@ -26,23 +26,25 @@
 
                 <div class="lg:flex lg:flex-row gap-4">
                     <div class="my-4 w-1/5 lg:w-1/6">
-                        <v-button-default class="w-full" type="button">印刷</v-button-default>
+                        <v-button-default class="w-full" type="button" @click.native="openPrint()">印刷</v-button-default>
                     </div>
-                    <div class="my-4 w-1/5 lg:w-1/6">
-                        <v-button-primary type="button" class="w-full" @click.native="onSubmit">払出登録</v-button-primary>
-                    </div>
-                </div>
-
-                <div class="p-2 bg-gray-300">
-                    <v-barcode-search @additem="addItemByBarcode"></v-barcode-search>
-                </div>
-                <div class="my-2">
-                    <div class="max-h-full h-full grid place-content-center w-full lg:flex border border-sushi-600 bg-white mt-3">
-                        <div class="flex-1 p-4 relative text-center">バーコードを読み取ってください</div>
+                    <div class=" my-4 w-1/5 lg:w-1/6">
+                        <v-button-primary type="button" class="w-full" @click.native="onSubmit" :disabled="(!values.totalizations) || (values.totalizations.length === 0)">払出登録</v-button-primary>
                     </div>
                 </div>
 
-                <div>
+                <div v-if="(values.totalizations) || (values.totalizations.length > 0)">
+                    <div class="p-2 bg-gray-300">
+                        <v-barcode-search @additem="addItemByBarcode"></v-barcode-search>
+                    </div>
+                    <div class="my-2">
+                        <div class="max-h-full h-full grid place-content-center w-full lg:flex border border-sushi-600 bg-white mt-3">
+                            <div class="flex-1 p-4 relative text-center">バーコードを読み取ってください</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-8">
                     <div class="flex flex-col">
                         <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
                             <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
@@ -52,14 +54,14 @@
                                             <tr>
                                                 <th scope="col" class="px-6 py-4" colspan="7"></th>
                                                 <th scope="col" class="text-sm font-medium text-gray-900 px-2 py-4 text-center">
-                                                    <v-button-default class="w-auto px-2" type="button">請求数を反映</v-button-default>
+                                                    <v-button-default class="w-auto px-2" type="button" @click.native="reflectToPayout">請求数を反映</v-button-default>
                                                 </th>
                                                 <th scope="col" class="px-6 py-4" colspan="6"></th>
                                             </tr>
                                         </thead>
                                         <thead class="bg-gray-50 whitespace-nowrap text-sm font-medium text-gray-700 text-center border">
                                             <tr>
-                                                <th scope="col" class="px-6 py-4 border">
+                                                <th scope="col" class="px-4 py-4 border w-10 ">
                                                     No
                                                 </th>
                                                 <th scope="col" class="px-6 py-4 border">
@@ -104,53 +106,58 @@
                                             </tr>
                                         </thead>
                                         <tbody class="text-sm text-gray-900 font-light">
-                                            <template v-for="(totalization, idx) in fields" :key="totalization.key">
+                                            <template v-for="(totalization, idx) in values.totalizations" :key="totalization.key">
                                                 <tr class="border-b">
-                                                    <td v-if="totalization.value.firstRow === true" :rowspan="totalization.value.rowspan" class="whitespace-nowrap font-medium px-3 py-4 border">
-                                                        {{ totalization.value.no }}
+                                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="whitespace-nowrap font-medium px-3 py-4 border">
+                                                        {{ totalization.no }}
                                                     </td>
-                                                    <td v-if="totalization.value.firstRow === true" :rowspan="totalization.value.rowspan" class="break-words text-left px-3 py-4 border">
-                                                        {{ totalization.value.targetDivisionName }}
+                                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="break-words text-left px-3 py-4 border">
+                                                        {{ totalization.targetDivisionName }}
                                                     </td>
-                                                    <td v-if="totalization.value.firstRow === true" :rowspan="totalization.value.rowspan" class="break-words text-left px-3 py-4 border">
-                                                        <p class="text-md font-bold">{{ totalization.value.makerName }}</p>
-                                                        <p class="text-md font-bold">{{ totalization.value.itemName }}</p>
-                                                        <p class="text-md text-gray-500">{{ totalization.value.itemCode }}</p>
-                                                        <p class="text-md text-gray-500">{{ totalization.value.itemStandard }}</p>
-                                                        <p class="text-md text-gray-500">{{ totalization.value.itemJANCode }}</p>
+                                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="break-words text-left px-3 py-4 border">
+                                                        <p class="text-md font-bold">{{ totalization.makerName }}</p>
+                                                        <p class="text-md font-bold">{{ totalization.itemName }}</p>
+                                                        <p class="text-md text-gray-500">{{ totalization.itemCode }}</p>
+                                                        <p class="text-md text-gray-500">{{ totalization.itemStandard }}</p>
+                                                        <p class="text-md text-gray-500">{{ totalization.itemJANCode }}</p>
                                                     </td>
                                                     <td class="whitespace-nowrap px-3 py-4 border">
-                                                        <input class="float-none form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 my-1 align-top bg-no-repeat bg-center bg-contain cursor-pointer" type="checkbox" value="">
+                                                        <input class="float-none form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 my-1 align-top bg-no-repeat bg-center bg-contain cursor-pointer" type="checkbox" :name="`values.totalizations[${idx}].payoutCheck`" :checked="totalization.payoutCheck" @change="changeCheck(idx)">
                                                     </td>
                                                     <td class="break-words text-left px-3 py-4 border">
-                                                        {{ totalization.value.sourceDivisionName }}
+                                                        {{ totalization.sourceDivisionName }}
                                                     </td>
-                                                    <td class="whitespace-nowrap px-3 py-4 border">
-                                                        {{ totalization.value.requestQuantity }} {{ totalization.value.quantityUnit }}
+                                                    <td v-if="totalization.default === true" :rowspan="totalization.added" class="whitespace-nowrap px-3 py-4 border">
+                                                        {{ totalization.requestQuantity }} {{ totalization.quantityUnit }}
                                                     </td>
-                                                    <td v-if="totalization.value.firstRow === true" :rowspan="totalization.value.rowspan" class="whitespace-nowrap px-3 py-4 border">
-                                                        {{ totalization.value.stockQuantity }} {{ totalization.value.quantityUnit }}
-                                                    </td>
-                                                    <td class="px-3 py-4 border text-left">
-                                                        <v-input-number @change="checkPayoutQuantity(idx)" :rules="{ between: [0 , 99999] }" :name="`totalizations[${idx}].payoutQuantity`" :min="0" :unit="totalization.value.quantityUnit" label="払出数" :step="1"></v-input-number>
+                                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="whitespace-nowrap px-3 py-4 border">
+                                                        {{ totalization.stockQuantity }} {{ totalization.quantityUnit }}
                                                     </td>
                                                     <td class="px-3 py-4 border text-left">
-                                                        <v-input :name="`totalization[${idx}].lotNumber`" label="ロット番号" :rules="{ required : isRequired(idx) ,lotnumber: true , twoFieldRequired : [ '消費期限', `@totalizations[${idx}].lotDate`]}" type="text"></v-input>
+                                                        <v-input-number @change="checkPayoutQuantity(idx)" :rules="{ between: [0 , 99999] }" :name="`totalizations[${idx}].payoutQuantity`" :min="0" :unit="totalization.quantityUnit" label="払出数" :step="1"></v-input-number>
                                                     </td>
                                                     <td class="px-3 py-4 border text-left">
-                                                        <v-input :name="`totalization[${idx}].lotDate`" label="消費期限" :rules="{ required : isRequired(idx) , twoFieldRequired : [ 'ロット番号' , `@totalizations[${idx}].lotNumber`] }" type="date"></v-input>
+                                                        <span v-if="isRequired(idx)" class="mb-2 bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
+                                                        <v-input :name="`values.totalizations[${idx}].lotNumber`" label="ロット番号" :rules="{ lotnumber: true , twoFieldRequired : [ '消費期限', `@values.totalizations[${idx}].lotDate`]}" type="text"></v-input>
+                                                    </td>
+                                                    <td class="px-3 py-4 border text-left">
+                                                        <span v-if="isRequired(idx)" class="mb-2 bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
+                                                        <v-input :name="`values.totalizations[${idx}].lotDate`" label="消費期限" :rules="{ twoFieldRequired : [ 'ロット番号' , `@values.totalizations[${idx}].lotNumber`] }" type="date"></v-input>
                                                     </td>
                                                     <td class="whitespace-nowrap px-3 py-4 border text-left">
-                                                        <v-input name="`totalization[${idx}].card`" type="text" label="カード情報"></v-input>
+                                                        <v-input :name="`values.totalizations[${idx}].card`" type="text" label="カード情報"></v-input>
                                                     </td>
-                                                    <td v-if="totalization.value.firstRow === true" :rowspan="totalization.value.rowspan" class="whitespace-nowrap px-3 py-4 border">
-                                                        {{ totalization.value.totalRequestQuantity }} {{ totalization.value.quantityUnit }}
+                                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="whitespace-nowrap px-3 py-4 border">
+                                                        {{ totalization.totalRequestQuantity }} {{ totalization.quantityUnit }}
                                                     </td>
-                                                    <td v-if="totalization.value.firstRow === true" :rowspan="totalization.value.rowspan" class="whitespace-nowrap px-3 py-4 border">
-                                                        {{ totalPayoutQuantity(idx) }} {{ totalization.value.quantityUnit }}
+                                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="whitespace-nowrap px-3 py-4 border">
+                                                        {{ totalPayoutQuantity(idx) }} {{ totalization.quantityUnit }}
                                                     </td>
-                                                    <td class="whitespace-nowrap px-3 py-4 border">
-                                                        <v-button-primary type="button" @click.native="onSubmit">追加</v-button-primary>
+                                                    <td v-if="totalization.default === true" class="whitespace-nowrap px-3 py-4 border">
+                                                        <v-button-primary type="button" @click.native="copyItem(idx)">追加</v-button-primary>
+                                                    </td>
+                                                    <td v-if="totalization.default === false" class="whitespace-nowrap px-3 py-4 border">
+                                                        <v-button-danger type="button" @click.native="deleteItem(idx)">削除</v-button-danger>
                                                     </td>
                                                 </tr>
                                             </template>
@@ -187,11 +194,11 @@
                             <v-input name="itemJANCode" type="text" label="JANコード" title="JANコード"></v-input>
                         </div>
                         <div class="my-4">
-                            <v-multiple-select-division-v2 id="sourceDivisionIds" name="sourceDivisionIds" title="請求元部署名" :is-only-my-division="<?php var_export(gate('list_of_item_request_history')->isOnlyMyDivision()); ?>" />
+                            <v-multiple-select-division-v2 id="targetDivisionIds" name="targetDivisionIds" title="請求先部署名" />
                             </v-multiple-select-division-v2>
                         </div>
                         <div class="my-4">
-                            <v-multiple-select-division-v2 id="targetDivisionIds" name="targetDivisionIds" title="請求先部署名" />
+                            <v-multiple-select-division-v2 id="sourceDivisionIds" name="sourceDivisionIds" title="請求元部署名" :is-only-my-division="<?php var_export(gate('list_of_item_request_history')->isOnlyMyDivision()); ?>" />
                             </v-multiple-select-division-v2>
                         </div>
                         <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
@@ -228,6 +235,8 @@
         setup() {
             const {
                 ref,
+                toRef,
+                toRefs,
                 onMounted,
                 reactive
             } = Vue;
@@ -238,6 +247,7 @@
             } = VeeValidate;
 
             const loading = ref(false);
+
             const start = () => {
                 loading.value = true;
             }
@@ -258,7 +268,7 @@
                 return decodeURIComponent(results[2].replace(/\+/g, " "));
             }
 
-            const pagetitle = "itemrequesthistory";
+            const pagetitle = "totalization";
 
             const getParam = (name) => {
                 let url = window.location.href;
@@ -358,6 +368,11 @@
                         num += parseInt(v.payoutQuantity);
                     }
                 });
+                values.totalizations.forEach((v, id) => {
+                    if (v.recordId === values.totalizations[idx].recordId) {
+                        v.totalPayoutQuantity = num;
+                    }
+                });
                 return num;
             };
 
@@ -366,7 +381,17 @@
                     if (!values.totalizations[idx].payoutQuantity || values.totalizations[idx].payoutQuantity < 0) {
                         values.totalizations[idx].payoutQuantity = 0;
                     }
+                    if (values.totalizations[idx].payoutQuantity > 0) {
+                        values.totalizations[idx].payoutCheck = true;
+                    } else {
+                        values.totalizations[idx].payoutCheck = false;
+                    }
                 }
+            }
+
+            const changeCheck = (idx) => {
+                const item = values.totalizations[idx];
+                item.payoutCheck = !item.payoutCheck;
             }
 
             const onOpenModal = () => {
@@ -390,8 +415,6 @@
 
             const totalCount = ref(0);
 
-            //const totalizations = ref([]);
-
             const perPageOptions = [{
                 label: "10件表示",
                 value: "10"
@@ -406,9 +429,20 @@
 
             const searchCount = ref(0);
 
+            const reflectToPayout = () => {
+                if (values.totalizations.length === 0) {
+                    return;
+                }
+
+                values.totalizations.forEach((v, idx) => {
+                    if (v.payoutQuantity === 0) {
+                        values.totalizations[idx].payoutQuantity = v.requestQuantity;
+                    }
+                });
+            }
+
             const makeItems = (data) => {
                 data.forEach((elm, index) => {
-                    let total = elm.countTotalRequests;
                     elm.totalRequests.forEach((v, idx) => {
                         let item = new Object();
                         item.firstRow = false;
@@ -423,38 +457,103 @@
                         item.sourceDivisionId = v.sourceDivision.divisionId;
                         item.requestQuantity = v.requestQuantity;
                         item.quantityUnit = elm.quantity.quantityUnit;
+                        item.lotManagement = elm.lotManagement;
+                        item.totalRequestQuantity = elm.requestQuantity;
+                        item.stockQuantity = elm.stockQuantity;
                         item.payoutQuantity = 0;
+                        item.default = true;
+                        item.added = 1;
+                        item.lotNumber = '';
+                        item.lotDate = '';
+                        item.card = '';
+                        item.payoutCheck = false;
                         if (item.firstRow === true) {
                             item.no = index + 1;
-                            item.rowspan = total;
-                            item.totalRequestQuantity = elm.requestQuantity;
-                            item.stockQuantity = elm.stockQuantity;
-                            item.makerName = elm.makerName;
-                            item.itemName = elm.itemName;
-                            item.itemCode = elm.itemCode;
-                            item.itemStandard = elm.itemStandard;
-                            item.itemJANCode = elm.itemJANCode;
-                            item.lotManagement = elm.lotManagement;
+                            item.rowspan = elm.countTotalRequests;
+                            item.makerName = elm.item.makerName;
+                            item.itemName = elm.item.itemName;
+                            item.itemCode = elm.item.itemCode;
+                            item.itemStandard = elm.item.itemStandard;
+                            item.itemJANCode = elm.item.itemJANCode;
                         }
                         push(item);
                     });
                 });
             };
 
+            const copyItem = (idx) => {
+                console.log(values.totalizations[idx].added);
+                if (values.totalizations[idx].added > 10) {
+                    return;
+                }
+                let item = new Object();
+                item.recordId = values.totalizations[idx].recordId;
+                item.inHospitalItemId = values.totalizations[idx].inHospitalItemId;
+                item.targetDivisionName = values.totalizations[idx].targetDivisionName;
+                item.targetDivisionId = values.totalizations[idx].targetDivisionId;
+                item.sourceDivisionName = values.totalizations[idx].sourceDivisionName;
+                item.sourceDivisionId = values.totalizations[idx].sourceDivisionId;
+                item.requestQuantity = values.totalizations[idx].requestQuantity;
+                item.quantityUnit = values.totalizations[idx].quantityUnit;
+                item.lotManagement = values.totalizations[idx].lotManagement;
+                item.totalRequestQuantity = values.totalizations[idx].totalRequestQuantity;
+                item.stockQuantity = values.totalizations[idx].stockQuantity;
+                item.totalPayoutQuantity = values.totalizations[idx].totalPayoutQuantity;
+                item.payoutQuantity = 0;
+                item.firstRow = false;
+                item.default = false;
+                item.lotNumber = '';
+                item.lotDate = '';
+                item.card = '';
+                item.payoutCheck = false;
+                values.totalizations.forEach((elm, index) => {
+                    if (elm.recordId === item.recordId &&
+                        elm.firstRow === true) {
+                        elm.rowspan += 1;
+                    }
+                });
+                console.log(item);
+                values.totalizations[idx].added = values.totalizations[idx].added + 1;
+                values.totalizations.splice(idx + 1, 0, item);
+            };
+
+            const deleteItem = (idx) => {
+                if (values.totalizations[idx].default === true) {
+                    return;
+                }
+
+                values.totalizations.forEach((elm, index) => {
+                    if (elm.recordId === values.totalizations[idx].recordId &&
+                        elm.firstRow === true) {
+                        elm.rowspan -= 1;
+                    }
+                    if (elm.recordId === values.totalizations[idx].recordId &&
+                        elm.sourceDivisionId === values.totalizations[idx].sourceDivisionId &&
+                        elm.default === true) {
+                        elm.added = elm.added -= 1;
+                    }
+                });
+
+                values.totalizations.splice(idx, 1);
+            };
+
             const listGet = () => {
+                const search = Object.assign({}, values);
+                delete search.totalizations;
+
                 let params = new URLSearchParams();
                 params.append("path", "/api/itemrequest/totalization");
-                params.append("search", JSON.stringify(encodeURIToObject(values)));
+                params.append("search", JSON.stringify(encodeURIToObject(search)));
                 params.append("_csrf", _CSRF);
 
                 setParam(values);
 
                 start();
-
                 axios.post(_APIURL, params)
                     .then((response) => {
                         console.log(response);
                         makeItems(response.data.data);
+                        console.log(values);
                         totalCount.value = parseInt(response.data.count);
                     })
                     .catch((error) => {
@@ -480,11 +579,6 @@
                     });
             };
 
-            const changeParPage = () => {
-                values.currentPage = 1;
-                listGet();
-            };
-
             const add = (elem) => {
                 context.emit('additem', elem);
                 Toast.fire({
@@ -497,13 +591,25 @@
                 listGet();
             });
 
-            const searchExec = () => {
+            const changeParPage = () => {
                 values.currentPage = 1;
+                values.totalizations.splice(0);
                 listGet();
             };
+
+            const searchExec = () => {
+                values.currentPage = 1;
+                values.totalizations.splice(0);
+                listGet();
+            };
+
             const searchClear = () => {
                 values.currentPage = 1;
+                values.totalizations = [];
+                /*
+                resetFormを使うと意図しない挙動になる
                 resetForm({
+                    totalizations: [],
                     itemName: "",
                     makerName: "",
                     itemCode: "",
@@ -514,13 +620,99 @@
                     currentPage: 1,
                     perPage: values.perPage,
                 });
+                */
+                values.itemName = '';
+                values.makerName = '';
+                values.itemCode = '';
+                values.itemStandard = '';
+                values.itemJANCode = '';
+                values.sourceDivisionIds = [];
+                values.targetDivisionIds = [];
                 listGet();
             };
 
+            const submitPrintForm = (params) => {
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = _ROOT;
+
+                for (const key in params) {
+                    if (params.hasOwnProperty(key)) {
+                        const hiddenField = document.createElement('input');
+                        hiddenField.type = 'hidden';
+                        hiddenField.name = key;
+                        hiddenField.value = params[key];
+
+                        form.appendChild(hiddenField);
+                    }
+                }
+
+                document.body.appendChild(form);
+                //                form.submit();
+            }
 
             const openPrint = (url) => {
-                location.href = _ROOT + "&path=/itemrequest/totalization/" + url + "/print";
+                sessionStorage.setItem('pickingList', JSON.stringify(values.totalizations));
+                location.href = _ROOT + "&path=/itemrequest/pickingList";
+                /*
+                let search = Object.assign({}, values);
+                delete search.totalizations;
+                const params = new Object();
+                params.search = JSON.stringify(encodeURIToObject(search));
+                params.path = '/itemrequest/pickingList';
+                params._csrf = _CSRF;
+                submitPrintForm(params);
+                */
             }
+
+            const checkLot = () => {
+                const check = true;
+                values.totalizations.forEach(function(item, idx) {
+                    if (item.payoutCheck === true && item.payoutQuantity > 0) {
+                        if (item.lotManagement === true) {
+                            if (item.lotDate === '' || item.lotNumber === '') {
+                                check = false;
+                            }
+                        }
+                    }
+                });
+                return check;
+            }
+
+            const checkPayout = () => {
+                const check = true;
+                values.totalizations.forEach(function(item, idx) {
+                    if (item.payoutCheck === true && item.payoutQuantity > 0) {
+                        if (item.totalPayoutQuantity > item.totalRequestQuantity) {
+                            check = false;
+                        }
+                        if (item.totalPayoutQuantity > item.stockQuantity) {
+                            check = false;
+                        }
+                    }
+                });
+                return check;
+            }
+
+            const createPayoutModel = (values) => {
+                let items = values.totalizations;
+                let payouts = [];
+                items.forEach(function(item, idx) {
+                    if (item.payoutCheck === true && item.payoutQuantity > 0) {
+                        payouts.push({
+                            'recordId': item.recordId,
+                            'inHospitalItemId': item.inHospitalItemId,
+                            'targetDivisionId': item.targetDivisionId,
+                            'sourceDivisionId': item.sourceDivisionId,
+                            'payoutQuantity': item.payoutQuantity,
+                            'lotNumber': item.lotNumber,
+                            'lotDate': item.lotDate,
+                            'card': item.card
+                        });
+                    }
+                });
+                return payouts;
+            };
 
             const onSubmit = async () => {
                 const {
@@ -528,11 +720,26 @@
                     errors
                 } = await validate();
 
+                const validLot = checkLot();
+                const validPayout = checkPayout();
+
                 if (!valid) {
                     Swal.fire({
                         icon: 'error',
                         title: '入力エラー',
                         text: '入力エラーがございます。ご確認ください',
+                    })
+                } else if (!validLot) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '入力エラー',
+                        text: 'ロット情報を正しく入力してください'
+                    })
+                } else if (!validPayout) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '入力エラー',
+                        text: '払出数を正しく入力してください'
                     })
                 } else {
                     Swal.fire({
@@ -555,7 +762,7 @@
             const register = handleSubmit(async (values) => {
                 try {
                     const payoutModels = createPayoutModel(values);
-                    if (consumptionModels.length === 0) {
+                    if (payoutModels.length === 0) {
                         Swal.fire({
                             icon: 'error',
                             title: '登録する商品がありませんでした。',
@@ -564,6 +771,9 @@
                         return false;
                     }
 
+                    console.log(payoutModels);
+                    return;
+
                     let params = new URLSearchParams();
                     params.append("path", "/api/payout/register");
                     params.append("_method", 'post');
@@ -571,7 +781,7 @@
                     params.append("payoutItems", JSON.stringify(encodeURIToObject(payoutModels)));
 
                     const res = await axios.post(_APIURL, params);
-
+                    console.log(res);
                     if (res.data.code != 200) {
                         throw new Error(res.data.message)
                     }
@@ -613,10 +823,17 @@
                 breadcrumbs,
                 numberFormat,
                 fields,
+                validate,
                 makeItems,
                 isRequired,
                 totalPayoutQuantity,
-                checkPayoutQuantity
+                checkPayoutQuantity,
+                copyItem,
+                deleteItem,
+                reflectToPayout,
+                submitPrintForm,
+                changeCheck
+                //totalizations
             }
         },
         watch: {
@@ -625,7 +842,8 @@
             },
             fields: {
                 async handler(val, oldVal) {
-                    //await this.validate();
+                    await this.validate();
+                    console.log(JSON.stringify(this.values));
                 },
                 deep: true
             },
@@ -633,12 +851,14 @@
                 this.listGet();
                 window.scrollTo(0, 0);
             },
+            /*
             values: {
                 async handler(val, oldVal) {
                     console.log(JSON.stringify(this.values));
                 },
                 deep: true
             }
+            */
         }
     }).mount('#top');
 </script>

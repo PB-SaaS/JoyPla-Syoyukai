@@ -13,6 +13,7 @@ class TotalRequestItem
     private Quantity $quantity;
     private bool $lotManagement;
     private int $stockQunatity;
+    private string $rackName;
     private RequestQuantity $requestQuantity;
     private array $totalRequests;
 
@@ -24,6 +25,7 @@ class TotalRequestItem
         Quantity $quantity,
         bool $lotManagement,
         int $stockQunatity,
+        string $rackName,
         RequestQuantity $requestQuantity,
         array $totalRequests
     ) {
@@ -34,6 +36,7 @@ class TotalRequestItem
         $this->quantity = $quantity;
         $this->lotManagement = $lotManagement;
         $this->stockQuantity = $stockQunatity;
+        $this->rackName = $rackName;
         $this->requestQuantity = $requestQuantity;
         $this->totalRequests = array_map(function (TotalRequest $v) {
             return $v;
@@ -48,8 +51,9 @@ class TotalRequestItem
             (new InHospitalItemId($input->inHospitalItemId)),
             (Item::create($input)),
             (Quantity::create($input)),
-            (($input->lotManagement === 1)),
+            (($input->lotManagement === "1")),
             (int)$input->stockQuantity,
+            ((string) $input->rackName),
             (new RequestQuantity($input->requestQuantity)),
             []
         );
@@ -111,6 +115,7 @@ class TotalRequestItem
             $this->quantity,
             $this->lotManagement,
             $this->stockQuantity,
+            $this->rackName,
             $this->requestQuantity,
             $totalRequests
         );
@@ -124,8 +129,9 @@ class TotalRequestItem
             'inHospitalItemId' => $this->inHospitalItemId->value(),
             'item' => $this->item->toArray(),
             'quantity' => $this->quantity->toArray(),
-            'stockQuantity' => $this->stockQuantity,
             'lotManagement' => (bool)$this->lotManagement,
+            'stockQuantity' => $this->stockQuantity,
+            'rackName' => $this->rackName,
             'requestQuantity' => (int)$this->requestQuantity->value(),
             'totalRequests' => array_map(function (TotalRequest $v) {
                 return $v->toArray();

@@ -4,34 +4,34 @@
  * USECASE
  */
 
-namespace JoyPla\Application\Interactors\Api\ItemRequest {
+namespace JoyPla\Application\Interactors\Web\ItemRequest {
 
-    use JoyPla\Application\InputPorts\Api\ItemRequest\TotalizationInputData;
-    use JoyPla\Application\InputPorts\Api\ItemRequest\TotalizationInputPortInterface;
-    use JoyPla\Application\OutputPorts\Api\ItemRequest\TotalizationOutputData;
-    use JoyPla\Application\OutputPorts\Api\ItemRequest\TotalizationOutputPortInterface;
+    use JoyPla\Application\InputPorts\Web\ItemRequest\PickingListInputData;
+    use JoyPla\Application\InputPorts\Web\ItemRequest\PickingListInputPortInterface;
+    use JoyPla\Application\OutputPorts\Web\ItemRequest\PickingListOutputData;
+    use JoyPla\Application\OutputPorts\Web\ItemRequest\PickingListOutputPortInterface;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\Enterprise\Models\TotalRequestItem;
     use JoyPla\InterfaceAdapters\GateWays\Repository\TotalizationRepositoryInterface;
 
     /**
-     * Class TotalizationInteractor
-     * @package JoyPla\Application\Interactors\Api\ItemRequest
+     * Class PickingListInteractor
+     * @package JoyPla\Application\Interactors\Web\ItemRequest
      */
-    class TotalizationInteractor implements TotalizationInputPortInterface
+    class PickingListInteractor implements PickingListInputPortInterface
     {
-        /** @var TotalizationOutputPortInterface */
-        private TotalizationOutputPortInterface $outputPort;
+        /** @var PickingListOutputPortInterface */
+        private PickingListOutputPortInterface $outputPort;
 
         /** @var TotalizationRepositoryInterface */
         private TotalizationRepositoryInterface $repository;
 
         /**
-         * TotalizationInteractor constructor.
-         * @param TotalizationOutputPortInterface $outputPort
+         * PickingListInteractor constructor.
+         * @param PickingListOutputPortInterface $outputPort
          */
         public function __construct(
-            TotalizationOutputPortInterface $outputPort,
+            PickingListOutputPortInterface $outputPort,
             TotalizationRepositoryInterface $repository
         ) {
             $this->outputPort = $outputPort;
@@ -39,15 +39,15 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
         }
 
         /**
-         * @param TotalizationInputData $inputData
+         * @param PickingListInputData $inputData
          */
-        public function handle(TotalizationInputData $inputData)
+        public function handle(PickingListInputData $inputData)
         {
             [$totalRequestItems, $count] = $this->repository->search(
                 (new HospitalId($inputData->user->hospitalId)),
                 $inputData->search
             );
-            $this->outputPort->output(new TotalizationOutputData($totalRequestItems, $count));
+            $this->outputPort->output(new PickingListOutputData($totalRequestItems, $count));
         }
     }
 }
@@ -57,19 +57,19 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
  * INPUT
  */
 
-namespace JoyPla\Application\InputPorts\Api\ItemRequest {
+namespace JoyPla\Application\InputPorts\Web\ItemRequest {
 
     use Auth;
     use stdClass;
 
     /**
-     * Class TotalizationInputData
-     * @package JoyPla\Application\InputPorts\Api\ItemRequest
+     * Class PickingListInputData
+     * @package JoyPla\Application\InputPorts\Web\ItemRequest
      */
-    class TotalizationInputData
+    class PickingListInputData
     {
         /**
-         * TotalizationInputData constructor.
+         * PickingListInputData constructor.
          */
         public function __construct(Auth $user, array $search)
         {
@@ -88,15 +88,15 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
     }
 
     /**
-     * Interface TotalizationInputPortInterface
-     * @package JoyPla\Application\InputPorts\Api\ItemRequest
+     * Interface PickingListInputPortInterface
+     * @package JoyPla\Application\InputPorts\Web\ItemRequest
      */
-    interface TotalizationInputPortInterface
+    interface PickingListInputPortInterface
     {
         /**
-         * @param TotalizationInputData $inputData
+         * @param PickingListInputData $inputData
          */
-        function handle(TotalizationInputData $inputData);
+        function handle(PickingListInputData $inputData);
     }
 }
 
@@ -104,19 +104,19 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
  * OUTPUT
  */
 
-namespace JoyPla\Application\OutputPorts\Api\ItemRequest {
+namespace JoyPla\Application\OutputPorts\Web\ItemRequest {
 
     use Collection;
     use JoyPla\Enterprise\Models\TotalRequestItem;
 
     /**
-     * Class TotalizationOutputData
-     * @package JoyPla\Application\OutputPorts\Api\ItemRequest;
+     * Class PickingListOutputData
+     * @package JoyPla\Application\OutputPorts\Web\ItemRequest;
      */
-    class TotalizationOutputData
+    class PickingListOutputData
     {
         /**
-         * TotalizationOutputData constructor.
+         * PickingListOutputData constructor.
          */
         public function __construct(array $totalRequestItems, int $count)
         {
@@ -128,14 +128,14 @@ namespace JoyPla\Application\OutputPorts\Api\ItemRequest {
     }
 
     /**
-     * Interface TotalizationOutputPortInterface
-     * @package JoyPla\Application\OutputPorts\Api\ItemRequest;
+     * Interface PickingListOutputPortInterface
+     * @package JoyPla\Application\OutputPorts\Web\ItemRequest;
      */
-    interface TotalizationOutputPortInterface
+    interface PickingListOutputPortInterface
     {
         /**
-         * @param TotalizationOutputData $outputData
+         * @param PickingListOutputData $outputData
          */
-        function output(TotalizationOutputData $outputData);
+        function output(PickingListOutputData $outputData);
     }
 }
