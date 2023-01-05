@@ -130,7 +130,14 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                     [ $orders , $count ] = $this->barcodeRepository->orderSearchByJanCode((new HospitalId($inputData->user->hospitalId)) , (string)$gtin13 , $divisionId);
                     
                     $lotNumber = $gs1128Data['identifiers']['10']['content'];
-                    $lotDate = ( $gs1128Data['identifiers']['17']['content'] )? $gs1128Data['identifiers']['17']['content']->format('Y-m-d') : "";
+                    if($gs1128Data['identifiers']['17']['content']){
+                        $lotDate = $gs1128Data['identifiers']['17']['content']->format('Y-m-d');
+                    }elseif($lotDate = $gs1128Data['identifiers']['7003']['content']->format('Y-m-d')){
+                        $lotDate = $gs1128Data['identifiers']['7003']['content']->format('Y-m-d');
+                    }else{
+                        $lotDate = "";
+                    }
+                    //$lotDate = ( $gs1128Data['identifiers']['17']['content'] )? $gs1128Data['identifiers']['17']['content']->format('Y-m-d') : "";
                     
                     $result = [];
                     foreach($orders as $key => $order)
