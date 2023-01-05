@@ -1516,9 +1516,7 @@ template: `
           </div>
         </div>
         <div>
-          {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ ((
-          parseInt(values.perPage) * values.currentPage ) < totalCount ) ? parseInt(values.perPage) * values.currentPage
-            : totalCount }}件 / 全 {{ totalCount }}件
+          {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.perPage) * values.currentPage ) < totalCount ) ? parseInt(values.perPage) * values.currentPage : totalCount }}件 / 全 {{ totalCount }}件
         </div>
         <div class="max-h-full overflow-y-auto" id="consumptionsList">
           <div class="w-full overflow-hidden mb-8 xl:mb-0">
@@ -1583,22 +1581,380 @@ template: `
                               <td class="text-sm text-gray-900 font-light px-2 py-2">
                                 <div class="flex items-center w-full sticky top-0 bg-white pr-4 py-4 flex-wrap">
                                   <div class="w-auto flex-auto mb-2">
-                                    <h3 class="text-xl font-bold font-heading">{{
-                                            consumptionItem.item.makerName }}</h3>
-                                    <p class="text-md font-bold font-heading">{{
-                                            consumptionItem.item.itemName }}</p>
-                                    <p class="text-md font-bold font-heading">{{
-                                            consumptionItem.item.itemJANCode }}</p>
-                                    <p class="text-gray-500">{{ consumptionItem.item.itemCode }}<br>{{
-                                            consumptionItem.item.itemStandard }}</p>
-                                    <p class="text-gray-500">{{ consumptionItem.quantity.quantityNum }}{{
-                                            consumptionItem.quantity.quantityUnit }} 入り</p>
+                                    <h3 class="text-xl font-bold font-heading">{{ consumptionItem.item.makerName }}</h3>
+                                    <p class="text-md font-bold font-heading">{{ consumptionItem.item.itemName }}</p>
+                                    <p class="text-md font-bold font-heading">{{ consumptionItem.item.itemJANCode }}</p>
+                                    <p class="text-gray-500">{{ consumptionItem.item.itemCode }}<br>{{ consumptionItem.item.itemStandard }}</p>
+                                    <p class="text-gray-500">{{ consumptionItem.quantity.quantityNum }}{{ consumptionItem.quantity.quantityUnit }} 入り</p>
                                   </div>
                                   <div class="w-auto">
                                     <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-2 rounded dark:bg-blue-200 dark:text-blue-800">
-                                      消費数<span class="font-bold text-base px-1">{{
-                                              consumptionItem.consumptionQuantity }}</span>{{
-                                            consumptionItem.quantity.quantityUnit }}</span>
+                                      消費数
+                                      <span class="font-bold text-base px-1">{{ consumptionItem.consumptionQuantity }}</span>
+                                      {{ consumptionItem.quantity.quantityUnit }}
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr class="bg-white border-b">
+                          </template>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+              </template>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div>
+      <v-pagination :showPages="showPages" v-model:currentPage="currentPageEdited" :totalCount="totalCount" :perPage="parseInt(values.perPage)"></v-pagination>
+    </div>
+    </template>
+    <div class="hidden">
+      <v-input type="hidden" name="currentPage"></v-input>
+      <v-input type="hidden" name="perPage"></v-input>
+    </div>
+    </div>
+  </v-open-modal>
+</teleport>
+`
+};
+
+const vConsumptionHistoryModalForOrder = {
+props: {
+divisionId: {
+type: String,
+required: true,
+default: ""
+}
+},
+setup(props, context) {
+const {
+ref,
+toRef,
+toRefs,
+reactive,
+onMounted
+} = Vue;
+const {
+useForm
+} = VeeValidate;
+
+const loading = ref(false);
+const start = () => {
+loading.value = true;
+}
+
+const complete = () => {
+loading.value = false;
+}
+
+const sleepComplate = () => {
+window.setTimeout(function() {
+complete();
+}, 500);
+}
+start();
+
+onMounted(() => {
+sleepComplate()
+listGet();
+});
+
+const {
+meta,
+validate,
+values,
+setFieldValue
+} = useForm({
+initialValues: {
+perPage: "10",
+currentPage: 1
+}
+});
+
+
+const Toast = Swal.mixin({
+toast: true,
+position: 'top-end',
+showConfirmButton: false,
+timer: 3000,
+timerProgressBar: true,
+showCloseButton: true,
+didOpen: (toast) => {
+toast.addEventListener('mouseenter', Swal.stopTimer)
+toast.addEventListener('mouseleave', Swal.resumeTimer)
+}
+});
+
+const showPages = ref(5);
+const totalCount = ref(0);
+const searchCount = ref(0);
+const consumptions = ref([]);
+const currentTab = ref('list');
+const tabs = [{
+label: '消費',
+value: 'list',
+disabled: false
+}];
+const perPageOptions = [{
+label: "10件表示",
+value: "10"
+}, {
+label: "50件表示",
+value: "50"
+}, {
+label: "100件表示",
+value: "100"
+}];
+
+const numberFormat = (value) => {
+if (!value) {
+return 0;
+}
+return value
+.toString()
+.replace(/([0-9]+?)(?=(?:[0-9]{3})+$)/g, '$1,');
+};
+
+const listGet = () => {
+if (props.sourceDivisionId == "") {
+MicroModal.close("consumptionHistoryModalForOrder");
+return false;
+}
+
+if (document.getElementById('consumptionHistoryModalForOrder').classList.contains('is-open') == false) {
+MicroModal.close("consumptionHistoryModalForOrder");
+return false;
+}
+
+let params = new URLSearchParams();
+params.append("path", "/api/reference/consumption");
+params.append("divisionIds", props.divisionId);
+params.append("search", JSON.stringify(encodeURIToObject(values)));
+params.append("_csrf", _CSRF);
+
+start();
+
+axios
+.post(_APIURL, params)
+.then((response) => {
+response.data.data.forEach((item, idx) => {
+response.data.data[idx].open = false;
+response.data.data[idx].consumptionItems.forEach((consumptionItem, id) => {
+let quantity = ~~(consumptionItem.consumptionQuantity / consumptionItem.quantity.quantityNum);
+response.data.data[idx].consumptionItems[id].orderableQuantity = quantity;
+});
+});
+consumptions.value = response.data.data;
+totalCount.value = parseInt(response.data.count);
+currentTab.value = 'list';
+})
+.catch((error) => {
+console.log(error);
+complete();
+if (searchCount.value > 0) {
+Toast.fire({
+icon: 'error',
+title: '検索に失敗しました。再度お試しください。'
+})
+}
+searchCount.value++;
+})
+.finally(() => {
+complete();
+if (document.getElementById('consumptionHistoryModalForOrder').classList.contains('is-open') == true) {
+searchCount.value++;
+if (totalCount.value == 0) {
+Swal.fire({
+title: '情報がありませんでした',
+icon: 'warning'
+})
+MicroModal.close("consumptionHistoryModalForOrder");
+return false;
+}
+if (searchCount.value > 0) {
+Toast.fire({
+icon: 'success',
+title: '検索が完了しました'
+})
+}
+}
+});
+
+};
+
+const getCurrentTab = (tab) => {
+currentTab.value = tab;
+};
+
+const currentPageEdited = ref(1);
+
+const changeParPage = () => {
+currentPageEdited.value = 1;
+listGet();
+};
+
+const add = (items) => {
+context.emit('addconsumptions', items);
+Toast.fire({
+icon: 'success',
+title: '反映しました'
+})
+};
+
+const open = (index) => {
+const consumption = consumptions.value[index];
+consumption.open = !consumption.open;
+};
+
+
+return {
+loading,
+start,
+complete,
+currentPageEdited,
+values,
+showPages,
+totalCount,
+consumptions,
+currentTab,
+tabs,
+perPageOptions,
+listGet,
+getCurrentTab,
+changeParPage,
+add,
+numberFormat,
+open
+}
+},
+emits: ['addconsumptions'],
+components: {
+'v-loading': vLoading,
+'v-tab': vTab,
+'v-input': vInput,
+'v-select': vSelect,
+'v-select-division': vSelectDivision,
+'v-multiple-select-distributor': vMultipleSelectDistributor,
+'v-multiple-select-division': vMultipleSelectDivision,
+'v-pagination': vPagination,
+'v-open-modal': vOpenModal,
+'v-button-default': vButtonDefault,
+'v-button-primary': vButtonPrimary,
+'v-input-number': vInputNumber,
+'item-view': itemView,
+'blowing': blowing,
+'v-text': vText,
+},
+watch: {
+currentPageEdited() {
+this.values.currentPage = this.currentPageEdited;
+this.listGet();
+document
+.getElementById('consumptionsList')
+.scrollTop = 0;
+}
+},
+methods: {},
+template: `
+<v-loading :show="loading"></v-loading>
+<teleport to="body">
+  <v-open-modal id="consumptionHistoryModalForOrder" headtext="伝票検索" @show="listGet">
+    <div class="flex flex-col" style="max-height: 68vh;">
+      <div>
+        <v-tab ref="tab" :tabs="tabs" v-model:currentTab="currentTab" @currentTab="getCurrentTab"></v-tab>
+      </div>
+      <template v-if="currentTab === 'list'">
+        <div class="flex">
+          <div class="flex-none lg:w-1/4 w-full my-2">
+            <v-select name="perPage" :options="perPageOptions" @change="changeParPage"></v-select>
+          </div>
+        </div>
+        <div>
+          {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.perPage) * values.currentPage ) < totalCount ) ? parseInt(values.perPage) * values.currentPage : totalCount }}件 / 全 {{ totalCount }}件
+        </div>
+        <div class="max-h-full overflow-y-auto" id="consumptionsList">
+          <div class="w-full overflow-hidden mb-8 xl:mb-0">
+            <div class="hidden lg:flex w-full sticky top-0 bg-white px-4 py-4 flex-wrap">
+              <div class="w-full lg:w-2/3">
+                <h4 class="font-bold font-heading text-gray-500 text-center">伝票情報</h4>
+              </div>
+              <div class="w-full lg:w-1/3 pr-4">
+                <h4 class="w-1/2 inline-block font-bold font-heading text-gray-500 text-center">反映</h4>
+                <h4 class="w-1/2 inline-block font-bold font-heading text-gray-500 text-center">詳細</h4>
+              </div>
+            </div>
+            <div class="lg:pt-0 pt-4">
+              <template v-for="(consumption, index) in consumptions">
+
+                <div v-if="Object.keys(consumption.consumptionItems).length > 0" class="flex flex-wrap p-4 lg:pr-2 text-base lg:mx-4 mx-0 bg-gray-100 border border-gray-400 my-2">
+                  <div class="lg:w-2/3 ">
+                    <div class="flex gap-2">
+                      <div class="flex-none">消費番号</div>
+                      <div class="flex-1">{{ consumption.consumptionId }}</div>
+                    </div>
+                    <div class="flex gap-2">
+                      <div class="flex-none">消費日時</div>
+                      <div class="flex-1">{{ consumption.consumptionDate }}</div>
+                    </div>
+                    <div class="flex gap-2">
+                      <div class="flex-none">消費タイプ</div>
+                      <div class="flex-1">{{ (consumption.consumptionStatus === 1)? "通常消費" : "貸出品" }}</div>
+                    </div>
+                    <div class="flex gap-2">
+                      <div class="flex-none">品目数</div>
+                      <div class="flex-1">{{ consumption.itemCount }}</div>
+                    </div>
+                  </div>
+                  <div class="w-full lg:w-1/6 px-2 py-2">
+                    <div class="w-full lg:block">
+                      <v-button-default type="button" class="w-full" v-on:click.native="add(consumption.consumptionItems)">反映</v-button-default>
+                    </div>
+                  </div>
+                  <div class="w-full lg:w-1/6 px-2 py-2">
+                    <div class=" w-full lg:block">
+                      <v-button-default v-show="consumption.open" type="button" class="w-full" v-on:click.native="open(index)">
+                        -
+                      </v-button-default>
+                      <v-button-default v-show="!consumption.open" type="button" class="w-full" v-on:click.native="open(index)">
+                        +
+                      </v-button-default>
+                    </div>
+                  </div>
+                </div>
+                <div v-show="consumption.open">
+                  <div class="px-6 sm:-mx-6 lg:-mx-8">
+                    <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
+                      <table class="min-w-full text-left">
+                        <thead class="border-b bg-white">
+                          <tr>
+                          </tr>
+                        </thead class="border-b">
+                        <tbody>
+                          <template v-for="(consumptionItem , idx ) in consumption.consumptionItems" :key="consumptionItem.key">
+                            <tr class="bg-white border-b">
+                              <td class="text-sm text-gray-900 font-light px-2 py-2">
+                                <div class="flex items-center w-full sticky top-0 bg-white pr-4 py-4 flex-wrap">
+                                  <div class="w-auto flex-auto mb-2">
+                                    <h3 class="text-xl font-bold font-heading">{{ consumptionItem.item.makerName }}</h3>
+                                    <p class="text-md font-bold font-heading">{{ consumptionItem.item.itemName }}</p>
+                                    <p class="text-md font-bold font-heading">{{ consumptionItem.item.itemJANCode }}</p>
+                                    <p class="text-gray-500">{{ consumptionItem.item.itemCode }}<br>{{ consumptionItem.item.itemStandard }}</p>
+                                    <p class="text-gray-500">{{ consumptionItem.quantity.quantityNum }}{{ consumptionItem.quantity.quantityUnit }} 入り</p>
+                                  </div>
+                                  <div class="w-auto flex flex-col gap-2">
+                                    <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-2 rounded text-center">
+                                      消費数<span class="font-bold text-base px-1">{{ consumptionItem.consumptionQuantity }}</span>
+                                      {{ consumptionItem.quantity.quantityUnit }}
+                                    </span>
+                                    <span class="bg-purple-200 text-purple-900 text-sm font-medium px-3 py-2 rounded text-center">
+                                      発注可能数<span class="font-bold text-base px-1">{{ consumptionItem.orderableQuantity }}</span>
+                                      {{ consumptionItem.quantity.itemUnit }}
+                                    </span>
                                   </div>
                                 </div>
                               </td>
