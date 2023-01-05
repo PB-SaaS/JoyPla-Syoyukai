@@ -127,11 +127,12 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
 
             $stocks = $stockViewInstance->get();
             if ((int)$stocks->count === 0) {
-                throw new Exception("Stocks don't exist.", 999);
+                throw new Exception("Stocks don't exist.", 998);
             }
 
             $stocks = $stocks->data->all();
             $requestItemCounts = [];
+            $inHpItem = [];
             foreach ($result as $itemRequest) {
                 $inHpItem = [];
                 foreach ($itemRequest->getRequestItems() as $item) {
@@ -155,12 +156,12 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
             }
 
             if (count($requestItemCounts) !== count(array_unique($inHpItem))) {
-                throw new Exception("Stocks don't exist.", 999);
+                throw new Exception("Stocks don't exist.", 998);
             }
 
-            $this->itemRequestRepository->saveToArray($result);
-
             $this->requestItemCountRepository->saveToArray($requestItemCounts);
+
+            $this->itemRequestRepository->saveToArray($result);
 
             $this->itemRequestRepository->sendRegistrationMail($result, $inputData->user);
 

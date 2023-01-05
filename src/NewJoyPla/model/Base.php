@@ -685,13 +685,19 @@ class Payout extends Model
         "lotDate",
         "unitPrice",
         "cardId",
-        "itemId"
+        "itemId",
+        "payoutType"
     ];
 
     //デフォルト値
     public static $attributes = [];
 
-    public static $select = [];
+    public static $select = [
+        "payoutType" => [
+            1 => "個別払出",
+            2 => "請求払出"
+        ]
+    ];
 }
 
 class PayoutHistory extends Model

@@ -35,14 +35,6 @@ use Collection;
 
 class ItemRequestRepository implements ItemRequestRepositoryInterface
 {
-    /*
-    public function findByHospitalId(HospitalId $hospitalId)
-    {
-        $history = (SpiralDbItemRequest::where('hospitalId', $hospitalId->value())->get())->data->all();
-
-        return $history;
-    }
-*/
     public function findByInHospitalItem(HospitalId $hospitalId, array $requestItems)
     {
         $payoutUnitPriceUseFlag = (Hospital::where('hospitalId', $hospitalId->value())->value('payoutUnitPrice')->get())->data->get(0);
@@ -260,11 +252,10 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
             }
         }
 
-        if ($search->requestType === 1) {
-            $historyViewInstance->orWhere('requestType', "1", "=");
-        }
-        if ($search->requestType === 2) {
-            $historyViewInstance->orWhere('requestType', "2", "=");
+        if (is_array($search->requestType) && count($search->requestType) > 0) {
+            foreach ($search->requestType as $value) {
+                $historyViewInstance->orWhere('requestType', $value);
+            }
         }
 
         if ($search->registrationDate) {
@@ -303,28 +294,9 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
             $history->set('targetDivision', $targetDivision);
             $history->set('requestType', (int)$history->requestType);
             $history->set('requestUserName', htmlspecialchars_decode($history->requestUserName, ENT_QUOTES));
-            /*
-            $test = new ItemRequest(
-                new RequestHId($history->requestHId),
-                new DateYearMonthDayHourMinutesSecond($history->registrationTime),
-                new DateYearMonthDayHourMinutesSecond($history->updateTime),
-                [],
-                new hp(
-                    $hospitalId,
-                    (new HospitalName('hoge')),
-                    "",
-                    "",
-                    new Pref(""),
-                    ""
-                ),
-                Division::create($sourceDivision),
-                Division::create($targetDivision),
-                new RequestType((int)$history->requestType),
-                (new TextFieldType64Bytes('aa'))
-            );
-            */
+
             $itemRequest = ItemRequest::create($history);
-            //            var_dump($itemRequest);
+
             foreach ($items->data->all() as $item) {
                 if ($itemRequest->getRequestHId()->equal($item->requestHId)) {
                     $item->set('sourceDivision', $sourceDivision);
@@ -332,12 +304,11 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
                     $item->set('requestType', (int)$item->requestType);
                     $itemRequest = $itemRequest->addRequestItem(RequestItem::create($item));
                 }
-                //                var_dump($itemRequest);
             }
 
             $itemRequests[] = $itemRequest;
         }
-        //        var_dump($itemRequests);
+
         return [$itemRequests, $histories->count];
     }
 
@@ -354,7 +325,7 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
         }
 
         $history = $historyViewInstance->data->get(0);
-        //        var_dump(htmlspecialchars_decode($history->requestUserName, ENT_QUOTES));
+
         $sourceDivision = new Collection();
         $sourceDivision->hospitalId = $hospitalId->value();
         $sourceDivision->divisionId = $history->sourceDivisionId;
@@ -369,7 +340,6 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
         $history->set('requestUserName', htmlspecialchars_decode($history->requestUserName, ENT_QUOTES));
 
         $itemRequest = ItemRequest::create($history);
-        //        var_dump($itemRequest);
 
         foreach ($itemViewInstance->data->all() as $item) {
             $item->set('sourceDivision', $sourceDivision);
@@ -379,8 +349,6 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
         }
 
         return $itemRequest;
-
-        //return null;
     }
 
 
@@ -401,11 +369,11 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
 
         $history = [];
         $history[] = [
-            "requestHId" => (string)$itemRequestToArray[0]['requestHId'],
-            "totalAmount" => (string)$itemRequestToArray[0]['totalAmount'],
-            "itemsNumber" => (string)$itemRequestToArray[0]['itemCount']
+            "requestHId" => (string)$itemRequestToArray['requestHId'],
+            "totalAmount" => (string)$itemRequestToArray['totalAmount'],
+            "itemsNumber" => (string)$itemRequestToArray['itemCount']
         ];
-        var_dump($history);
+
         SpiralDbRequestItem::where('hospitalId', $hospitalId->value())->where('requestId', $requestId->value())->delete();
         SpiralDbItemRequest::upsert('requestHId', $history);
 
@@ -440,7 +408,6 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
 
 interface ItemRequestRepositoryInterface
 {
-    //    public function findByHospitalId(HospitalId $hospitalId);
     public function findByInHospitalItem(HospitalId $hospitalId, array $itemRequests);
     public function saveToArray(array $itemRequests);
     public function sendRegistrationMail(array $itemRequests, Auth $user);

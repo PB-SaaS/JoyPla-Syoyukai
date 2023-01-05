@@ -117,14 +117,6 @@
                             <v-multiple-select-division-v2 id="targetDivisionIds" name="targetDivisionIds" title="請求先部署名" />
                             </v-multiple-select-division-v2>
                         </div>
-                        <!--
-                        <div class="my-4">
-                            <v-select-division name="sourceDivisionIds" label="請求元部署" title="請求元部署名" :is-only-my-division="<?php var_export(gate('list_of_item_request_history')->isOnlyMyDivision()); ?>" />
-                        </div>
-                        <div class="my-4">
-                            <v-select-division name="targetDivisionIds" label="請求先部署" title="請求先部署名" />
-                        </div>
-                                    -->
                         <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
                             <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
                             <v-button-primary type="button" @click.native="searchExec">絞り込み</v-button-primary>
@@ -313,12 +305,10 @@
 
                 axios.post(_APIURL, params)
                     .then((response) => {
-                        console.log(response);
                         itemRequests.value = response.data.data;
                         totalCount.value = parseInt(response.data.count);
                     })
                     .catch((error) => {
-                        console.log(error);
                         complete();
                         if (searchCount.value > 0) {
                             Toast.fire({
@@ -376,17 +366,16 @@
                     currentPage: 1,
                     perPage: values.perPage,
                 });
+                let targets = document.querySelectorAll(`input[type='checkbox'][name='requestType']`);
+                for (const i of targets) {
+                    i.checked = false;
+                }
                 listGet();
             };
 
             const openSlip = (url) => {
                 location.href = _ROOT + "&path=/itemrequest/" + url;
             }
-            /*
-            const openPrint = (url) => {
-                location.href = _ROOT + "&path=/itemrequest/" + url + "/print";
-            }
-            */
 
             const deleteSlip = (requestHId) => {
                 Swal.fire({
@@ -406,13 +395,17 @@
                         params.append("path", "/api/itemrequest/" + requestHId + "/delete");
                         params.append("_method", 'delete');
                         params.append("_csrf", _CSRF);
-
                         const res = await axios.post(_APIURL, params);
-                        console.log(res);
                         complete();
+
                         if (res.data.code != 200) {
-                            throw new Error(res.data.message)
+                            if (res.data.code == 998) {
+                                throw new Error(res.data.code)
+                            } else {
+                                throw new Error(res.data.message)
+                            }
                         }
+
                         Swal.fire({
                             icon: 'success',
                             title: '請求内容の削除が完了しました。',
@@ -422,11 +415,19 @@
                         return true;
                     }
                 }).catch((error) => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'システムエラー',
-                        text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
-                    });
+                    if (error.message == 998) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '削除できませんでした。',
+                            text: '在庫管理されていない商品が含まれています。'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'システムエラー',
+                            text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。'
+                        });
+                    }
                 });
             }
 
@@ -435,7 +436,6 @@
                 loading,
                 start,
                 complete,
-                //                openPrint,
                 openSlip,
                 searchClear,
                 searchExec,
@@ -456,12 +456,6 @@
             'values.currentPage': function(val) {
                 this.listGet();
                 window.scrollTo(0, 0);
-            },
-            values: {
-                async handler(val, oldVal) {
-                    console.log(JSON.stringify(this.values));
-                },
-                deep: true
             }
         }
     }).mount('#top');

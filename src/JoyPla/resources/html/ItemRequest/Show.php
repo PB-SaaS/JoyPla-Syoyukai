@@ -54,7 +54,7 @@
                                                 <p class="text-md text-gray-500">{{ item.value.item.itemJANCode }}</p>
                                                 <?php if (gate('update_of_item_request_history')->can()) : ?>
                                                     <p class="text-base text-gray-900 lg:w-1/2">
-                                                        <v-input-number @change="checkQuantity(idx); isChange = true" change-class-name="inputChange" :rules=" { between: [1 , 99999] }" :name="`requestItems[${idx}].requestQuantity`" label="請求数（入数）" :min="0" :unit="item.value.quantityUnit" :step="1" title="請求数（入数）"></v-input-number>
+                                                        <v-input-number @change="checkQuantity(idx); isChange = true" change-class-name="inputChange" :rules=" { between: [1 , 99999] }" :name="`requestItems[${idx}].requestQuantity`" label="請求数（入数）" :min="0" :unit="item.value.quantity.quantityUnit" :step="1" title="請求数（入数）"></v-input-number>
                                                     </p>
                                                 <?php else : ?>
                                                     <div class="md:flex gap-6 ">
@@ -86,7 +86,7 @@
 </div>
 <script>
     const PHPData = <?php echo json_encode($viewModel, true) ?>;
-    console.log(PHPData);
+
     var JoyPlaApp = Vue.createApp({
         components: {
             'v-text': vText,
@@ -143,8 +143,6 @@
                 replace
             } = useFieldArray('requestItems', control);
 
-            console.log(fields);
-
             const loading = ref(false);
 
             const start = () => {
@@ -191,7 +189,6 @@
             };
 
             const isChange = ref(false);
-
 
             const requestPrice = (idx) => {
                 return values.requestItems[idx].unitPrice * values.requestItems[idx].requestQuantity;
@@ -248,18 +245,20 @@
                             start();
                             let params = new URLSearchParams();
                             const updateModel = createUpdateModel();
-                            console.log(updateModel);
                             params.append("path", "/api/itemrequest/" + values.requestHId + "/update");
                             params.append("requestType", values.requestType);
                             params.append("updateModel", JSON.stringify(encodeURIToObject(updateModel)));
                             params.append("_method", 'patch');
                             params.append("_csrf", _CSRF);
-
                             const res = await axios.post(_APIURL, params);
-                            console.log(res);
+
                             complete();
                             if (res.data.code != 200) {
-                                throw new Error(res.data.message)
+                                if (res.data.code == 998) {
+                                    throw new Error(res.data.code)
+                                } else {
+                                    throw new Error(res.data.message)
+                                }
                             }
 
                             Swal.fire({
@@ -271,11 +270,19 @@
                             return true;
                         }
                     }).catch((error) => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'システムエラー',
-                            text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
-                        });
+                        if (error.message == 998) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: '更新できませんでした。',
+                                text: '在庫管理されていない商品が含まれています。'
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'システムエラー',
+                                text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。'
+                            });
+                        }
                     });
                 };
             };
@@ -297,14 +304,16 @@
                         params.append("path", "/api/itemrequest/" + values.requestHId + "/" + values.requestItems[idx].requestId + "/delete");
                         params.append("_method", 'delete');
                         params.append("_csrf", _CSRF);
-
                         const res = await axios.post(_APIURL, params);
-                        console.log(res);
+
                         complete();
                         if (res.data.code != 200) {
-                            throw new Error(res.data.message)
+                            if (res.data.code == 998) {
+                                throw new Error(res.data.code)
+                            } else {
+                                throw new Error(res.data.message)
+                            }
                         }
-
                         let addComment = "";
                         if (res.data.data.isItemRequestDeleted) {
                             addComment = "\r\n商品情報がなくなりましたので請求履歴も削除しました。";
@@ -325,11 +334,19 @@
                         return true;
                     }
                 }).catch((error) => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'システムエラー',
-                        text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
-                    });
+                    if (error.message == 998) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '削除できませんでした。',
+                            text: '在庫管理されていない商品が含まれています。'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'システムエラー',
+                            text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。'
+                        });
+                    }
                 });
             }
 
@@ -346,17 +363,19 @@
                 }).then(async (result) => {
                     if (result.isConfirmed) {
                         start();
-
                         let params = new URLSearchParams();
                         params.append("path", "/api/itemrequest/" + requestHId + "/delete");
                         params.append("_method", 'delete');
                         params.append("_csrf", _CSRF);
-
                         const res = await axios.post(_APIURL, params);
-                        console.log(res);
+
                         complete();
                         if (res.data.code != 200) {
-                            throw new Error(res.data.message)
+                            if (res.data.code == 998) {
+                                throw new Error(res.data.code)
+                            } else {
+                                throw new Error(res.data.message)
+                            }
                         }
 
                         Swal.fire({
@@ -368,11 +387,19 @@
                         return true;
                     }
                 }).catch((error) => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'システムエラー',
-                        text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
-                    });
+                    if (error.message == 998) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '削除できませんでした。',
+                            text: '在庫管理されていない商品が含まれています。'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'システムエラー',
+                            text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。'
+                        });
+                    }
                 });
             }
 
@@ -394,13 +421,6 @@
                 values
             }
         },
-        watch: {
-            values: {
-                async handler(val, oldVal) {
-                    console.log(JSON.stringify(this.values));
-                },
-                deep: true
-            }
-        }
+        watch: {}
     }).mount('#top');
 </script>

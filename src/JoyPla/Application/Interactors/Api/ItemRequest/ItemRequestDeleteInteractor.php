@@ -76,7 +76,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
 
             $stocks = $stockViewInstance->get();
             if ((int)$stocks->count === 0) {
-                throw new Exception("Stocks don't exist.", 999);
+                throw new Exception("Stocks don't exist.", 998);
             }
 
             $stocks = $stocks->data->all();
@@ -100,7 +100,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
             }
 
             if (count($requestItemCounts) !== count($itemRequest->getRequestItems())) {
-                throw new Exception("Stocks don't exist.", 999);
+                throw new Exception("Stocks don't exist.", 998);
             }
 
             $this->requestItemCountRepository->saveToArray($requestItemCounts);
@@ -158,8 +158,6 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
  */
 
 namespace JoyPla\Application\OutputPorts\Api\ItemRequest {
-
-    use JoyPla\Enterprise\Models\ItemRequest;
 
     /**
      * Class ItemRequestDeleteOutputData

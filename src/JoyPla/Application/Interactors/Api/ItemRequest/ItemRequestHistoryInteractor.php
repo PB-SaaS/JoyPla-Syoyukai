@@ -72,7 +72,7 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
         {
             $this->user = $user;
             $this->search = new stdClass();
-            $this->search->registrationDate = $search['registrationDate'];
+            $this->search->registrationDate = $search['yearMonth'];
             $this->search->itemName = $search['itemName'];
             $this->search->makerName = $search['makerName'];
             $this->search->itemCode = $search['itemCode'];
@@ -87,7 +87,7 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
     }
 
     /**
-     * Interface UserCreateInputPortInterface
+     * Interface ItemRequestHistoryInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\ItemRequest
      */
     interface ItemRequestHistoryInputPortInterface
