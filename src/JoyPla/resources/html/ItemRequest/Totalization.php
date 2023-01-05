@@ -26,7 +26,13 @@
 
                 <div class="lg:flex lg:flex-row gap-4">
                     <div class="my-4 w-1/5 lg:w-1/6">
-                        <v-button-default class="w-full" type="button" @click.native="openPrint()" :disabled="(!values.totalizations) || (values.totalizations.length === 0)">印刷</v-button-default>
+                        <form :action="_ROOT" method="POST" name="print" @submit="onPrintSubmit" target="_blank">
+                            <input type="hidden" :value="_CSRF" name="_token">
+                            <input type="hidden" value="post" name="_method">
+                            <input type="hidden" value="/itemrequest/pickingList" name="path">
+                            <input type="hidden" name="search" :value="pickingListSearch">
+                            <v-button-default class="w-full" type="submit" :disabled="(!values.totalizations) || (values.totalizations.length === 0)">印刷</v-button-default>
+                        </form>
                     </div>
                     <div class=" my-4 w-1/5 lg:w-1/6">
                         <v-button-primary type="button" class="w-full" @click.native="onSubmit" :disabled="(!values.totalizations) || (values.totalizations.length === 0)">払出登録</v-button-primary>
@@ -111,7 +117,7 @@
                                                     <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="whitespace-nowrap font-medium px-3 py-4 border">
                                                         {{ totalization.no }}
                                                     </td>
-                                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="break-words text-left px-3 py-4 border">
+                                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="break-all text-left px-3 py-4 border">
                                                         {{ totalization.targetDivisionName }}
                                                     </td>
                                                     <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="break-words text-left px-3 py-4 border">
@@ -124,7 +130,7 @@
                                                     <td class="whitespace-nowrap px-3 py-4 border">
                                                         <input class="float-none form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 my-1 align-top bg-no-repeat bg-center bg-contain cursor-pointer" type="checkbox" :name="`values.totalizations[${idx}].payoutCheck`" :checked="totalization.payoutCheck" @change="changeCheck(idx)">
                                                     </td>
-                                                    <td class="break-words text-left px-3 py-4 border">
+                                                    <td class="break-all text-left px-3 py-4 border">
                                                         {{ totalization.sourceDivisionName }}
                                                     </td>
                                                     <td v-if="totalization.default === true" :rowspan="totalization.added" class="whitespace-nowrap px-3 py-4 border">
@@ -520,6 +526,7 @@
                         item.itemCode = elm.item.itemCode;
                         item.itemStandard = elm.item.itemStandard;
                         item.itemJANCode = elm.item.itemJANCode;
+                        item.rackName = elm.rackName;
                         item.payoutQuantity = 0;
                         item.totalRequestQuantity = 0;
                         item.default = true;
@@ -584,11 +591,13 @@
             const listGet = () => {
                 const search = Object.assign({}, values);
                 delete search.totalizations;
-
+                console.log(search);
+                console.log(values);
                 let params = new URLSearchParams();
                 params.append("path", "/api/itemrequest/totalization");
                 params.append("search", JSON.stringify(encodeURIToObject(search)));
                 params.append("_csrf", _CSRF);
+                console.log(params);
 
                 setParam(values);
 
@@ -596,6 +605,7 @@
                 axios.post(_APIURL, params)
                     .then((response) => {
                         console.log(response);
+                        values.totalizations.splice(0);
                         makeItems(response.data.data);
                         console.log(values);
                         totalCount.value = parseInt(response.data.count);
@@ -667,39 +677,12 @@
                 listGet();
             };
 
-            const submitPrintForm = (params) => {
-                const form = document.createElement('form');
-                form.method = 'post';
-                form.action = _ROOT;
-
-                for (const key in params) {
-                    if (params.hasOwnProperty(key)) {
-                        const hiddenField = document.createElement('input');
-                        hiddenField.type = 'hidden';
-                        hiddenField.name = key;
-                        hiddenField.value = params[key];
-
-                        form.appendChild(hiddenField);
-                    }
-                }
-
-                document.body.appendChild(form);
-                //                form.submit();
-            }
-
-            const openPrint = (url) => {
-                sessionStorage.setItem('pickingList', JSON.stringify(values.totalizations));
-                location.href = _ROOT + "&path=/itemrequest/pickingList";
-                /*
-                let search = Object.assign({}, values);
+            const pickingListSearch = ref([]);
+            const onPrintSubmit = () => {
+                const search = Object.assign({}, values);
                 delete search.totalizations;
-                const params = new Object();
-                params.search = JSON.stringify(encodeURIToObject(search));
-                params.path = '/itemrequest/pickingList';
-                params._csrf = _CSRF;
-                submitPrintForm(params);
-                */
-            }
+                pickingListSearch.value = JSON.stringify(encodeURIToObject(search));
+            };
 
             const checkLot = () => {
                 const check = true;
@@ -1041,13 +1024,15 @@
                 addItemByBarcode,
                 selectRequestItems,
                 openSelectModal,
+                onPrintSubmit,
+                pickingListSearch,
                 reflectSelect,
                 isSubmitting,
                 onSubmit,
                 loading,
                 start,
                 complete,
-                openPrint,
+                //openPrint,
                 searchClear,
                 searchExec,
                 changeParPage,
@@ -1069,7 +1054,6 @@
                 copyItem,
                 deleteItem,
                 reflectToPayout,
-                submitPrintForm,
                 changeCheck,
                 searchCardId
                 //totalizations

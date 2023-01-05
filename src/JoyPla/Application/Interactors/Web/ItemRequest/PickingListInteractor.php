@@ -47,6 +47,7 @@ namespace JoyPla\Application\Interactors\Web\ItemRequest {
                 (new HospitalId($inputData->user->hospitalId)),
                 $inputData->search
             );
+
             $this->outputPort->output(new PickingListOutputData($totalRequestItems, $count));
         }
     }

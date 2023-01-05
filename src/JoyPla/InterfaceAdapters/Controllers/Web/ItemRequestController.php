@@ -4,14 +4,15 @@ namespace JoyPla\InterfaceAdapters\Controllers\Web;
 
 use App\SpiralDb\Hospital;
 use Auth;
+use Csrf;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Http\View;
 use framework\Routing\Router;
 use JoyPla\Application\InputPorts\Web\ItemRequest\ItemRequestShowInputData;
 use JoyPla\Application\InputPorts\Web\ItemRequest\ItemRequestShowInputPortInterface;
-//use JoyPla\Application\InputPorts\Web\ItemRequest\PickingListInputData;
-//use JoyPla\Application\InputPorts\Web\ItemRequest\PickingListInputPortInterface;
+use JoyPla\Application\InputPorts\Web\ItemRequest\PickingListInputData;
+use JoyPla\Application\InputPorts\Web\ItemRequest\PickingListInputPortInterface;
 
 class ItemRequestController extends Controller
 {
@@ -59,9 +60,12 @@ class ItemRequestController extends Controller
         $body = View::forge('html/ItemRequest/Totalization', [], false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
     }
-    /*
+
     public function pickingList($vars, PickingListInputPortInterface $inputPort)
     {
+        $token = $this->request->get('_token');
+        Csrf::validate($token, true);
+
         if (Gate::denies('totalization_of_item_requests')) {
             Router::abort(403);
         }
@@ -78,16 +82,5 @@ class ItemRequestController extends Controller
 
         $inputData = new PickingListInputData($this->request->user(), $search, $gate->isOnlyMyDivision());
         $inputPort->handle($inputData);
-    }
-*/
-
-    public function pickingList($vars)
-    {
-        if (Gate::denies('totalization_of_item_requests')) {
-            Router::abort(403);
-        }
-
-        $body = View::forge('printLayout/ItemRequest/PickingList', [], false)->render();
-        echo view('printLayout/Common/Template', compact('body'), false)->render();
     }
 }

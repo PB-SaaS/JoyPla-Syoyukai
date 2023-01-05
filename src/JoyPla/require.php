@@ -46,6 +46,7 @@ require_once('JoyPla/Application/Interactors/Web/Received/OrderReceivedSlipIndex
 require_once('JoyPla/Application/Interactors/Web/Received/ReceivedIndexInteractor.php');
 require_once('JoyPla/Application/Interactors/Web/Received/ReceivedLabelInteractor.php');
 require_once('JoyPla/Application/Interactors/Web/ItemRequest/ItemRequestShowInteractor.php');
+require_once('JoyPla/Application/Interactors/Web/ItemRequest/PickingListInteractor.php');
 require_once('JoyPla/Application/LoggingObject/Spiralv2LogginObject.php');
 require_once('JoyPla/Enterprise/Traits/ValueObjectTrait.php');
 require_once('JoyPla/Enterprise/Models/Consumption.php');
@@ -181,6 +182,7 @@ require_once('JoyPla/InterfaceAdapters/Presenters/Web/Received/ReceivedIndexPres
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/Received/ReceivedLabelPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/Received/ReceivedLabelSettingPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Web/ItemRequest/ItemRequestShowPresenter.php');
+require_once('JoyPla/InterfaceAdapters/Presenters/Web/ItemRequest/PickingListPresenter.php');
 require_once('JoyPla/Enterprise/SpiralDb/Card.php');
 require_once('JoyPla/Enterprise/SpiralDb/CardView.php');
 require_once('JoyPla/Enterprise/SpiralDb/Consumption.php');

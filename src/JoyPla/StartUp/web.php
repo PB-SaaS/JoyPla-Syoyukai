@@ -18,7 +18,7 @@ use JoyPla\Application\Interactors\Web\Received\OrderReceivedSlipIndexInteractor
 use JoyPla\Application\Interactors\Web\Received\ReceivedIndexInteractor;
 use JoyPla\Application\Interactors\Web\Received\ReceivedLabelInteractor;
 use JoyPla\Application\Interactors\Web\ItemRequest\ItemRequestShowInteractor;
-//use JoyPla\Application\Interactors\Web\ItemRequest\PickingListInteractor;
+use JoyPla\Application\Interactors\Web\ItemRequest\PickingListInteractor;
 use JoyPla\InterfaceAdapters\Controllers\Web\AgreeFormController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ConsumptionController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ItemAndPriceAndInHospitalItemRegisterController;
@@ -39,7 +39,7 @@ use JoyPla\InterfaceAdapters\GateWays\Repository\HospitalRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ReceivedRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRequestRepository;
-//use JoyPla\InterfaceAdapters\GateWays\Repository\TotalizationRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\TotalizationRepository;
 use JoyPla\InterfaceAdapters\Presenters\Web\Consumption\ConsumptionIndexPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\Consumption\ConsumptionPrintPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\Order\OrderIndexPresenter;
@@ -50,7 +50,7 @@ use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedIndexPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedLabelPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedLabelSettingPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\ItemRequest\ItemRequestShowPresenter;
-//use JoyPla\InterfaceAdapters\Presenters\Web\ItemRequest\PickingListPresenter;
+use JoyPla\InterfaceAdapters\Presenters\Web\ItemRequest\PickingListPresenter;
 use JoyPla\JoyPlaApplication;
 use Test\Exceptions\WebExceptionHandler;
 
@@ -309,7 +309,7 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
         ItemRequestController::class,
         'totalization',
     ]);
-    /*
+
     Router::map('POST', '/itemrequest/pickingList', [
         ItemRequestController::class,
         'pickingList',
@@ -319,11 +319,6 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
             new TotalizationRepository()
         )
     );
-*/
-    Router::map('GET', '/itemrequest/pickingList', [
-        ItemRequestController::class,
-        'pickingList'
-    ]);
 
     Router::map('GET', '/itemrequest/:requestHId', [
         ItemRequestController::class,
