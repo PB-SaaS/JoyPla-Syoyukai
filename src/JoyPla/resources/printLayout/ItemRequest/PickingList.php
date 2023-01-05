@@ -58,7 +58,7 @@
                             </thead>
                             <tbody class="text-xxs text-gray-900 font-light">
                                 <tr class="border-b bg-white" v-for="(totalization, idx) in dtotalizations" :key="totalization.key">
-                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="whitespace-nowrap border border-slate-600 p-1">
+                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="whitespace-nowrap border border-slate-600 p-1 text-center">
                                         {{ totalization.no }}
                                     </td>
                                     <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="border border-slate-600 p-1 break-all">

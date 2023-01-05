@@ -26,7 +26,7 @@
 
                 <div class="lg:flex lg:flex-row gap-4">
                     <div class="my-4 w-1/5 lg:w-1/6">
-                        <v-button-default class="w-full" type="button" @click.native="openPrint()">印刷</v-button-default>
+                        <v-button-default class="w-full" type="button" @click.native="openPrint()" :disabled="(!values.totalizations) || (values.totalizations.length === 0)">印刷</v-button-default>
                     </div>
                     <div class=" my-4 w-1/5 lg:w-1/6">
                         <v-button-primary type="button" class="w-full" @click.native="onSubmit" :disabled="(!values.totalizations) || (values.totalizations.length === 0)">払出登録</v-button-primary>
