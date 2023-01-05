@@ -1644,7 +1644,7 @@ const load = () => {
 let self = this;
 let params = new URLSearchParams();
 params.append("path", "/api/division/show");
-params.append("isOnlyMyDivision", this.isOnlyMyDivision);
+params.append("isOnlyMyDivision", props.isOnlyMyDivision);
 params.append("_csrf", _CSRF);
 axios
 .post(_APIURL, params)

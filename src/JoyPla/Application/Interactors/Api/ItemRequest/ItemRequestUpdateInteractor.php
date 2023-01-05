@@ -81,7 +81,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                     continue;
                 }
                 $requestQuantity = $inputData->updateModel[$fkey]['requestQuantity'];
-                $item->setRequestType($requestType);
+                $item = $item->setRequestType($requestType);
                 $requestItems[$key] = $item->setRequestQuantity((new RequestQuantity((int)$requestQuantity)));
             }
 
@@ -96,7 +96,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
 
             $stocks = $stockViewInstance->get();
             if ((int)$stocks->count === 0) {
-                throw new Exception("Stocks don't exist.", 999);
+                throw new Exception("Stocks don't exist.", 998);
             }
 
             $oldRequestItemsToArray = array_map(function (RequestItem $v) {
@@ -114,15 +114,13 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                         $quantity = 0;
                         $updateQuantity = (int)$item->getRequestQuantity()->value();
                         $oldQuantity = (int)$oldRequestItemsToArray[$oldValueKey]['requestQuantity'];
-                        //var_dump($updateQuantity);
-                        //var_dump($oldQuantity);
+
                         if ($updateQuantity > $oldQuantity) {
                             $quantity = $updateQuantity - $oldQuantity;
                         }
                         if ($updateQuantity < $oldQuantity) {
                             $quantity = ($oldQuantity - $updateQuantity) * -1;
                         }
-                        //var_dump($quantity);
                         $requestItemCounts[] = new RequestItemCount(
                             $stock->recordId,
                             $hospitalId,
@@ -135,9 +133,9 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                     }
                 }
             }
-            //var_dump($requestItemCounts);
+
             if (count($requestItemCounts) !== count($itemRequest->getRequestItems())) {
-                throw new Exception("Stocks don't exist.", 999);
+                throw new Exception("Stocks don't exist.", 998);
             }
 
             $this->requestItemCountRepository->saveToArray($requestItemCounts);
