@@ -280,7 +280,7 @@ function check_gs1128(code){
 	try {
 		console.log(parseBarcode(code));
 		let answer = parseBarcode(code);
-		gs1128_object = {'01':'','17':'','10':'','21':'','30':''};
+		gs1128_object = {'01':'','17':'','10':'','21':'','30':'','7003':'',};
 		
 		answer.parsedCodeItems.forEach((element) => {
 			if(element.ai == "17")
@@ -289,6 +289,19 @@ function check_gs1128(code){
 			var m = ("00" + (element.data.getMonth()+1)).slice(-2);
 			var d = ("00" + element.data.getDate()).slice(-2);
 			element.data = y + m + d;
+			}
+			if(element.ai == "7003" && element.data.match(/^(\d{10})$/) !== null)
+			{
+				let ymd = "20" + element.data.substring(0,2) + "-" + element.data.substring(2,4) + "-" + element.data.substring(4,6);
+				let dt = new Date(ymd);
+				if(Number.isNaN(dt.getTime()) === false){ //入力形式判定
+					var y = dt.getFullYear();
+					var m = ("00" + (dt.getMonth()+1)).slice(-2);
+					var d = ("00" + dt.getDate()).slice(-2);
+					element.data = y + m + d;
+				}else{
+					element.data = "";
+				}
 			}
 			gs1128_object[element.ai] = element.data;
 		})
