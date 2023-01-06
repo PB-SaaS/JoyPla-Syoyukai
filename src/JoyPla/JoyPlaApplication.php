@@ -495,7 +495,7 @@ class JoyPlaApplication extends Application
             //個別請求登録
             if ($auth->userPermission == '2') {
                 //担当者
-                return new GatePermissionModel(false, false);
+                return new GatePermissionModel(true, true);
             }
             return new GatePermissionModel(true, false);
         });
@@ -504,7 +504,25 @@ class JoyPlaApplication extends Application
             //請求履歴一覧
             if ($auth->userPermission == '2') {
                 //担当者
-                return new GatePermissionModel(false, false);
+                return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
+        Gate::define('delete_of_item_request_history', function (Auth $auth) {
+            //請求履歴削除
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
+        Gate::define('update_of_item_request_history', function (Auth $auth) {
+            //請求内容更新
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
             }
             return new GatePermissionModel(true, false);
         });
@@ -513,7 +531,7 @@ class JoyPlaApplication extends Application
             //請求商品一覧
             if ($auth->userPermission == '2') {
                 //担当者
-                return new GatePermissionModel(false, false);
+                return new GatePermissionModel(true, true);
             }
             return new GatePermissionModel(true, false);
         });

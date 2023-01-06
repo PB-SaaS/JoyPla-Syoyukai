@@ -47,6 +47,7 @@ class InHospitalItemView extends SpiralORM
         "distributorMCode",
         "inItemImage",
         "labelId",
+        "notUsedFlag"
     ];
 
     //デフォルト値
