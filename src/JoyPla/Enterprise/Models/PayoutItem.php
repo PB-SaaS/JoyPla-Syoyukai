@@ -17,8 +17,10 @@ class PayoutItem
     private Quantity $quantity;
     private Price $price;
     private UnitPrice $unitPrice;
-    private PayoutQuantity $PayoutQuantity;
+    private PayoutQuantity $payoutQuantity;
     private Lot $lot;
+    private bool $lotManagement;
+    private CardId $card;
 
     public function __construct(
         PayoutHId $payoutHId,
@@ -31,8 +33,10 @@ class PayoutItem
         Quantity $quantity,
         Price $price,
         UnitPrice $unitPrice,
-        PayoutQuantity $PayoutQuantity,
-        Lot $lot
+        PayoutQuantity $payoutQuantity,
+        Lot $lot,
+        bool $lotManagement,
+        CardId $card
     ) {
         $this->payoutHId = $payoutHId;
         $this->payoutId = $payoutId;
@@ -44,8 +48,10 @@ class PayoutItem
         $this->quantity = $quantity;
         $this->price = $price;
         $this->unitPrice = $unitPrice;
-        $this->payoutQuantity = $PayoutQuantity;
+        $this->payoutQuantity = $payoutQuantity;
         $this->lot = $lot;
+        $this->lotManagement = $lotManagement;
+        $this->card = $card;
     }
 
     public static function create(Collection $input)
@@ -62,7 +68,9 @@ class PayoutItem
             (new Price($input->price)),
             (new UnitPrice($input->unitPrice)),
             (new PayoutQuantity((int)$input->payoutQuantity)),
-            (Lot::create($input))
+            (Lot::create($input)),
+            (int)$input->lotManagement,
+            (new CardId((string)$input->card))
         );
     }
 
@@ -120,9 +128,11 @@ class PayoutItem
             $this->targetDivision,
             $this->quantity,
             $this->price,
-            $this->unitPprice,
+            $this->unitPrice,
             $this->payoutQuantity,
-            $this->lot
+            $this->lot,
+            $this->lotManagement,
+            $this->card
         );
     }
 
@@ -139,9 +149,23 @@ class PayoutItem
 
     public function getPayoutQuantity()
     {
-        return $this->PayoutQuantity;
+        return $this->payoutQuantity;
     }
 
+    public function getLot()
+    {
+        return $this->lot;
+    }
+
+    public function getLotManagement(): bool
+    {
+        return (bool)$this->lotManagement;
+    }
+
+    public function getCard()
+    {
+        return $this->card;
+    }
 
     public function setPayoutQuantity(PayoutQuantity $payoutQuantity)
     {
@@ -155,32 +179,38 @@ class PayoutItem
             $this->targetDivision,
             $this->quantity,
             $this->price,
-            $this->unitPprice,
+            $this->unitPrice,
             $payoutQuantity,
-            $this->lot
+            $this->lot,
+            $this->lotManagement,
+            $this->card
         );
     }
 
     public function addPayoutQuantity(PayoutQuantity $quantity)
     {
-        return $this->setPayoutQuantity($this->payoutQuantity->add((int)$quantity->value()));
+        return $this->setPayoutQuantity($this->payoutQuantity->add($quantity));
     }
 
 
     public function toArray()
     {
         return [
-            'PayoutId' => $this->PayoutId->value(),
-            'PayoutItemId' => $this->PayoutItemId->value(),
+            'payoutHId' => $this->payoutHId->value(),
+            'payoutId' => $this->payoutId,
             'inHospitalItemId' => $this->inHospitalItemId->value(),
             'item' => $this->item->toArray(),
             'hospitalId' => $this->hospitalId->value(),
-            'division' => $this->division->toArray(),
-            'distributor' => $this->distributor->toArray(),
+            'sourceDivision' => $this->sourceDivision->toArray(),
+            'targetDivision' => $this->targetDivision->toArray(),
             'quantity' => $this->quantity->toArray(),
             'price' => $this->price->value(),
-            'PayoutQuantity' => $this->PayoutQuantity->value(),
-            'PayoutPrice' => $this->price(),
+            'unitPrice' => $this->unitPrice->value(),
+            'payoutQuantity' => $this->payoutQuantity->value(),
+            'payoutAmount' => $this->price(),
+            'lot' => $this->lot->toArray(),
+            'lotManagement' => $this->lotManagement,
+            'card' => $this->card->value()
         ];
     }
 }

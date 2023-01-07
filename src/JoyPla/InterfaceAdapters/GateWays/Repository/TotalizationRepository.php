@@ -5,16 +5,11 @@ namespace JoyPla\InterfaceAdapters\GateWays\Repository;
 use framework\SpiralConnecter\SpiralDB;
 use App\SpiralDb\TotalRequestByInHpItemView;
 use App\SpiralDb\TotalRequestByDivision;
-use App\SpiralDb\RequestItem as SpiralDbRequestItem;
 use Auth;
 use Collection;
 use JoyPla\Enterprise\Models\HospitalId;
-use JoyPla\Enterprise\Models\InHospitalItemId;
 use JoyPla\Enterprise\Models\TotalRequestItem;
 use JoyPla\Enterprise\Models\TotalRequest;
-use JoyPla\Enterprise\Models\Division;
-use JoyPla\Enterprise\Models\Item;
-use JoyPla\Enterprise\Models\Quantity;
 
 
 class TotalizationRepository implements TotalizationRepositoryInterface
@@ -35,28 +30,10 @@ class TotalizationRepository implements TotalizationRepositoryInterface
         ]);
 
         $division->where('hospitalId', $hospitalId->value());
-        /*
-        $totalzationByDivisionInstance = SpiralDB::title('NJ_divRequestDB')->value([
-            "registrationTime",
-            "updateTime",
-            "authKey",
-            "recordId",
-            "hospitalId",
-            "inHospitalItemId",
-            "itemId",
-            "requestQuantity",
-            "sourceDivisionId",
-            "targetDivisionId",
-            "requestUniqueKey"
-        ]);
 
-        $totalzationByDivisionInstance->where('hospitalId', $hospitalId->value());
-*/
         $totalzationByInHPItemInstance = TotalRequestByInHpItemView::where('hospitalId', $hospitalId->value())->where('requestQuantity', 0, '>');
         $totalzationByDivisionInstance = TotalRequestByDivision::getNewInstance()->where('hospitalId', $hospitalId->value())->where('requestQuantity', 0, '>');
 
-        //$test = ($totalzationByDivisionInstance->get())->all();
-        //var_dump($test);
 
         if (is_array($search->sourceDivisionIds) && count($search->sourceDivisionIds) > 0) {
             foreach ($search->sourceDivisionIds as $sourceDivisionId) {
@@ -107,7 +84,6 @@ class TotalizationRepository implements TotalizationRepositoryInterface
         if ((int)$totalzationByInHPItems->count === 0) {
             return [[], 0];
         }
-        //        var_dump($totalzationByInHPItems);
 
         foreach ($totalzationByInHPItems->data->all() as $totalzationByInHPItem) {
             $division->orWhere('divisionId', $totalzationByInHPItem->targetDivisionId);
@@ -122,7 +98,7 @@ class TotalizationRepository implements TotalizationRepositoryInterface
             foreach ($totalzationByInHPItems->data->all() as $totalzationByInHPItem) {
                 $target_division_find_key = array_search($totalzationByInHPItem->targetDivisionId, collect_column($division, 'divisionId'));
                 $totalzationByInHPItem->set('divisionId', $totalzationByInHPItem->targetDivisionId);
-                $totalzationByInHPItem->set('divisionName', htmlspecialchars_decode($division[$target_division_find_key]['divisionName'], ENT_QUOTES));
+                $totalzationByInHPItem->set('divisionName', htmlspecialchars_decode($division[$target_division_find_key]->divisionName, ENT_QUOTES));
 
                 $totalRequestItem = TotalRequestItem::create($totalzationByInHPItem);
 
@@ -133,11 +109,11 @@ class TotalizationRepository implements TotalizationRepositoryInterface
                         $sourceDivision = new Collection();
                         $sourceDivision->hospitalId = $hospitalId->value();
                         $sourceDivision->divisionId = $totalzationByDivision->sourceDivisionId;
-                        $sourceDivision->divisionName = htmlspecialchars_decode($division[$source_division_find_key]['divisionName'], ENT_QUOTES);
+                        $sourceDivision->divisionName = htmlspecialchars_decode($division[$source_division_find_key]->divisionName, ENT_QUOTES);
                         $targetDivision = new Collection();
                         $targetDivision->hospitalId = $hospitalId->value();
                         $targetDivision->divisionId = $totalzationByDivision->targetDivisionId;
-                        $targetDivision->divisionName = htmlspecialchars_decode($division[$target_division_find_key]['divisionName'], ENT_QUOTES);
+                        $targetDivision->divisionName = htmlspecialchars_decode($division[$target_division_find_key]->divisionName, ENT_QUOTES);
                         $totalzationByDivision->set('sourceDivision', $sourceDivision);
                         $totalzationByDivision->set('targetDivision', $targetDivision);
 
@@ -146,7 +122,8 @@ class TotalizationRepository implements TotalizationRepositoryInterface
                 }
                 $totalRequestItems[] = $totalRequestItem;
             }
-            return [$totalRequestItems, count($totalRequestItems)];
+
+            return [$totalRequestItems, (int)$totalzationByInHPItems->count];
         }
 
         /*  請求元指定なし  */
@@ -159,7 +136,6 @@ class TotalizationRepository implements TotalizationRepositoryInterface
             return [[], 0];
         }
 
-        //var_dump($totalzationByDivisions->data->all());
         foreach ($totalzationByDivisions->data->all() as $totalzationByDivision) {
             $division->orWhere('divisionId', $totalzationByDivision->sourceDivisionId);
             $division->orWhere('divisionId', $totalzationByDivision->targetDivisionId);
@@ -167,8 +143,7 @@ class TotalizationRepository implements TotalizationRepositoryInterface
 
         $division = $division->get();
         $division = $division->all();
-        //var_dump($division);
-        //        return [[], 0];
+
         foreach ($totalzationByInHPItems->data->all() as $totalzationByInHPItem) {
             $target_division_find_key = array_search($totalzationByInHPItem->targetDivisionId, collect_column($division, 'divisionId'));
             $totalzationByInHPItem->set('divisionId', $totalzationByInHPItem->targetDivisionId);
@@ -198,7 +173,8 @@ class TotalizationRepository implements TotalizationRepositoryInterface
             }
             $totalRequestItems[] = $totalRequestItem;
         }
-        return [$totalRequestItems, count($totalRequestItems)];
+
+        return [$totalRequestItems, (int)$totalzationByInHPItems->count];
     }
 }
 

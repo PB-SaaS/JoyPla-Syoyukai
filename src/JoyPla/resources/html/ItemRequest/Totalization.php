@@ -21,7 +21,7 @@
                     </div>
                 </div>
                 <div>
-                    {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.perPage) * values.currentPage )  < totalCount ) ?  parseInt(values.perPage) * values.currentPage : totalCount  }}件 / 全 {{ totalCount }}件
+                    {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.perPage) * values.currentPage ) < totalCount ) ? parseInt(values.perPage) * values.currentPage : totalCount }}件 / 全 {{ totalCount }}件
                 </div>
 
                 <div class="lg:flex lg:flex-row gap-4">
@@ -31,15 +31,15 @@
                             <input type="hidden" value="post" name="_method">
                             <input type="hidden" value="/itemrequest/pickingList" name="path">
                             <input type="hidden" name="search" :value="pickingListSearch">
-                            <v-button-default class="w-full" type="submit" :disabled="(!values.totalizations) || (values.totalizations.length === 0)">印刷</v-button-default>
+                            <v-button-default class="w-full" type="submit" :disabled="(totalCount === 0)">印刷</v-button-default>
                         </form>
                     </div>
                     <div class=" my-4 w-1/5 lg:w-1/6">
-                        <v-button-primary type="button" class="w-full" @click.native="onSubmit" :disabled="(!values.totalizations) || (values.totalizations.length === 0)">払出登録</v-button-primary>
+                        <v-button-primary type="button" class="w-full" @click.native="onSubmit" :disabled="(totalCount === 0)">払出登録</v-button-primary>
                     </div>
                 </div>
 
-                <div v-if="(values.totalizations) || (values.totalizations.length > 0)">
+                <div v-if="(totalCount !== 0)">
                     <div class="p-2 bg-gray-300">
                         <v-barcode-search @additem="addItemByBarcode"></v-barcode-search>
                     </div>
@@ -67,13 +67,13 @@
                                         </thead>
                                         <thead class="bg-gray-50 whitespace-nowrap text-sm font-medium text-gray-700 text-center border">
                                             <tr>
-                                                <th scope="col" class="px-4 py-4 border w-10 ">
+                                                <th scope="col" class="px-2 py-4 border w-10 ">
                                                     No
                                                 </th>
                                                 <th scope="col" class="px-6 py-4 border">
                                                     請求先部署名
                                                 </th>
-                                                <th scope="col" class="min-w-250 px-6 py-4 border">
+                                                <th scope="col" class="min-w-225 px-6 py-4 border">
                                                     商品情報
                                                 </th>
                                                 <th scope="col" class="px-6 py-4 border">
@@ -88,16 +88,16 @@
                                                 <th scope="col" class="px-6 py-4 border">
                                                     在庫数
                                                 </th>
-                                                <th scope="col" class="min-w-250 px-6 py-4 border">
+                                                <th scope="col" class="min-w-225 px-6 py-4 border">
                                                     払出数
                                                 </th>
-                                                <th scope="col" class="min-w-250 px-6 py-4 border">
+                                                <th scope="col" class="min-w-225 px-6 py-4 border">
                                                     ロット番号
                                                 </th>
-                                                <th scope="col" class="min-w-250 px-6 py-4 border">
+                                                <th scope="col" class="min-w-225 px-6 py-4 border">
                                                     使用期限
                                                 </th>
-                                                <th scope="col" class="min-w-250 px-6 py-4 border">
+                                                <th scope="col" class="min-w-225 px-6 py-4 border">
                                                     カード情報
                                                 </th>
                                                 <th scope="col" class="px-6 py-4 border">
@@ -111,8 +111,8 @@
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody class="text-sm text-gray-900 font-light">
-                                            <template v-for="(totalization, idx) in values.totalizations" :key="totalization.key">
+                                        <tbody class="text-sm text-gray-900 font-light" v-if="(totalCount !== 0)">
+                                            <template v-for=" (totalization, idx) in values.totalizations" :key="totalization.key">
                                                 <tr class="border-b">
                                                     <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="whitespace-nowrap font-medium px-3 py-4 border">
                                                         {{ totalization.no }}
@@ -140,7 +140,7 @@
                                                         {{ totalization.stockQuantity }} {{ totalization.quantityUnit }}
                                                     </td>
                                                     <td class="px-3 py-4 border text-left">
-                                                        <v-input-number @change="checkPayoutQuantity(idx)" :rules="{ between: ( (totalization.card !== '')? [ 0 , totalization.payoutQuantity ] : [ 0, 99999 ] ) }" :name="`totalizations[${idx}].payoutQuantity`" :min="0" :unit="totalization.quantityUnit" label="払出数" :step="1"></v-input-number>
+                                                        <v-input-number @change="checkPayoutQuantity(idx)" :rules="{ between: [0 , 99999] }" :name="`totalizations[${idx}].payoutQuantity`" :min="0" :unit="totalization.quantityUnit" label="払出数" :step="1"></v-input-number>
                                                     </td>
                                                     <td class="px-3 py-4 border text-left">
                                                         <span v-if="isRequired(idx)" class="mb-2 bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
@@ -151,12 +151,7 @@
                                                         <v-input :name="`totalizations[${idx}].lotDate`" label="消費期限" :rules="{ twoFieldRequired : [ 'ロット番号' , `@totalizations[${idx}].lotNumber`] }" type="date"></v-input>
                                                     </td>
                                                     <td class="whitespace-nowrap px-3 py-4 border text-left">
-                                                        <!--<v-input :name="`totalizations[${idx}].card`" type="text" label="カード情報" readonly="readonly"></v-input>-->
-                                                        <fieldset>
-                                                            <div class="flex-auto">
-                                                                <input name="totalizations[${idx}].card" readonly="readonly" type="text" autocomplete="off" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border text-gray-700 border-gray-300">
-                                                            </div>
-                                                        </fieldset>
+                                                        <v-input-v2 :name="`totalizations[${idx}].card`" type="text" label="カード情報" :readonly="true"></v-input>
                                                     </td>
                                                     <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="whitespace-nowrap px-3 py-4 border">
                                                         {{ totalization.totalRequestQuantity }} {{ totalization.quantityUnit }}
@@ -205,11 +200,11 @@
                             <v-input name="itemJANCode" type="text" label="JANコード" title="JANコード"></v-input>
                         </div>
                         <div class="my-4">
-                            <v-multiple-select-division-v2 id="targetDivisionIds" name="targetDivisionIds" title="請求先部署名" />
+                            <v-multiple-select-division-v2 id="sourceDivisionIds" name="sourceDivisionIds" title="請求元部署名" :is-only-my-division="<?php var_export(gate('list_of_item_request_history')->isOnlyMyDivision()); ?>" />
                             </v-multiple-select-division-v2>
                         </div>
                         <div class="my-4">
-                            <v-multiple-select-division-v2 id="sourceDivisionIds" name="sourceDivisionIds" title="請求元部署名" :is-only-my-division="<?php var_export(gate('list_of_item_request_history')->isOnlyMyDivision()); ?>" />
+                            <v-multiple-select-division-v2 id="targetDivisionIds" name="targetDivisionIds" title="請求先部署名" />
                             </v-multiple-select-division-v2>
                         </div>
                         <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
@@ -237,13 +232,7 @@
                         <div class="flex flex-wrap items-center mb-3" v-for="(elem, index) in selectRequestItems">
                             <div class="w-full lg:w-5/6 lg:px-4 px-0 mb-6 lg:mb-0">
                                 <div class="flex gap-4">
-                                    <div class="break-words items-start w-1/3">
-                                        <p class="text-md">
-                                            <span class="block text-sm text-gray-500">請求元部署：</span>{{ elem.sourceDivisionName }}<br>
-                                            <span class="block text-sm text-gray-500">請求先部署：</span>{{ elem.targetDivisionName }}<br>
-                                        </p>
-                                    </div>
-                                    <div class="break-words items-center w-1/3 box-border">
+                                    <div class="break-words items-center w-2/3 box-border">
                                         <p class="text-md font-bold">{{ elem.makerName }}</p>
                                         <p class="text-md font-bold">{{ elem.itemName }}</p>
                                         <p class="text-md text-gray-500">{{ elem.itemCode }}</p>
@@ -251,12 +240,22 @@
                                         <p class="text-md text-gray-500">{{ elem.itemJANCode }}</p>
                                     </div>
                                     <div class="break-words items-start w-1/3">
+                                        <p class="text-md pb-2">
+                                            <span class="block text-sm text-gray-500">ロット番号：</span>{{ elem.lotNumber }}
+                                        </p>
+                                        <p class="text-md pb-2">
+                                            <span class=" block text-sm text-gray-500">使用期限：</span>{{ elem.lotDate }}
+                                        </p>
                                         <p class="text-md">
-                                            <span class="block text-sm text-gray-500">払出数：</span>{{ elem.payoutQuantity }}<br>
-                                            <span class="block text-sm text-gray-500">ロット番号：</span>{{ elem.lotNumber }}<br>
-                                            <span class="block text-sm text-gray-500">使用期限：</span>{{ elem.lotDate }}<br>
+                                            <span class=" block text-sm text-gray-500">カード情報：</span>{{ elem.card }}
                                         </p>
                                     </div>
+                                </div>
+                                <div class="break-words w-full pt-2">
+                                    <p class="text-md">
+                                        <span class="text-sm font-bold">請求元部署：</span>{{ elem.sourceDivisionName }}<br>
+                                        <span class="text-sm font-bold">請求先部署：</span>{{ elem.targetDivisionName }}<br>
+                                    </p>
                                 </div>
                             </div>
                             <div class="w-full lg:block lg:w-1/6 px-4 py-4">
@@ -284,6 +283,7 @@
             'header-navi': headerNavi,
             'v-open-modal': vOpenModal,
             'v-input': vInput,
+            'v-input-v2': vInputv2,
             'item-view': itemView,
             'v-pagination': vPagination,
             'v-select': vSelect,
@@ -447,6 +447,9 @@
                     } else {
                         values.totalizations[idx].payoutCheck = false;
                     }
+                    if (values.totalizations[idx].card !== '') {
+                        values.totalizations[idx].payoutQuantity = values.totalizations[idx].cardQuantity;
+                    }
                 }
             }
 
@@ -503,6 +506,7 @@
             }
 
             const makeItems = (data) => {
+                values.totalizations = [];
                 data.forEach((elm, index) => {
                     elm.totalRequests.forEach((v, idx) => {
                         let item = new Object();
@@ -516,19 +520,18 @@
                         item.targetDivisionId = v.targetDivision.divisionId;
                         item.sourceDivisionName = v.sourceDivision.divisionName;
                         item.sourceDivisionId = v.sourceDivision.divisionId;
-                        item.requestQuantity = v.requestQuantity;
+                        item.requestQuantity = parseInt(v.requestQuantity);
                         item.quantityUnit = elm.quantity.quantityUnit;
                         item.lotManagement = elm.lotManagement;
-                        item.totalRequestQuantity = elm.requestQuantity;
-                        item.stockQuantity = elm.stockQuantity;
+                        item.totalRequestQuantity = parseInt(elm.requestQuantity);
+                        item.stockQuantity = parseInt(elm.stockQuantity);
                         item.makerName = elm.item.makerName;
                         item.itemName = elm.item.itemName;
                         item.itemCode = elm.item.itemCode;
                         item.itemStandard = elm.item.itemStandard;
                         item.itemJANCode = elm.item.itemJANCode;
-                        item.rackName = elm.rackName;
+                        item.cardQuantity = 0;
                         item.payoutQuantity = 0;
-                        item.totalRequestQuantity = 0;
                         item.default = true;
                         item.added = 1;
                         item.lotNumber = '';
@@ -545,10 +548,14 @@
             };
 
             const copyItem = (idx) => {
-                console.log(values.totalizations[idx].added);
-                if (values.totalizations[idx].added > 10) {
+                if (values.totalizations[idx].added > 9) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: '追加可能件数を超えています。',
+                    });
                     return;
                 }
+
                 let item = Object.assign({}, values.totalizations[idx]);
                 item.payoutQuantity = 0;
                 item.firstRow = false;
@@ -562,9 +569,12 @@
                         elm.firstRow === true) {
                         elm.rowspan += 1;
                     }
+                    if (elm.recordId === item.recordId &&
+                        elm.sourceDivisionId === item.sourceDivisionId &&
+                        elm.default === true) {
+                        elm.added += 1;
+                    }
                 });
-                console.log(item);
-                values.totalizations[idx].added = values.totalizations[idx].added + 1;
                 values.totalizations.splice(idx + 1, 0, item);
             };
 
@@ -591,27 +601,22 @@
             const listGet = () => {
                 const search = Object.assign({}, values);
                 delete search.totalizations;
-                console.log(search);
-                console.log(values);
                 let params = new URLSearchParams();
                 params.append("path", "/api/itemrequest/totalization");
                 params.append("search", JSON.stringify(encodeURIToObject(search)));
                 params.append("_csrf", _CSRF);
-                console.log(params);
 
                 setParam(values);
 
                 start();
                 axios.post(_APIURL, params)
                     .then((response) => {
-                        console.log(response);
-                        values.totalizations.splice(0);
-                        makeItems(response.data.data);
-                        console.log(values);
+                        if (response.data.count > 0) {
+                            makeItems(response.data.data);
+                        }
                         totalCount.value = parseInt(response.data.count);
                     })
                     .catch((error) => {
-                        console.log(error);
                         complete();
                         if (searchCount.value > 0) {
                             Toast.fire({
@@ -626,7 +631,7 @@
                         if (searchCount.value > 0) {
                             Toast.fire({
                                 icon: 'success',
-                                title: '検索が完了しました'
+                                title: '検索が完了しました。'
                             })
                         }
                         searchCount.value++;
@@ -639,34 +644,19 @@
 
             const changeParPage = () => {
                 values.currentPage = 1;
-                values.totalizations.splice(0);
+                values.totalizations = [];
                 listGet();
             };
 
             const searchExec = () => {
                 values.currentPage = 1;
-                values.totalizations.splice(0);
+                values.totalizations = [];
                 listGet();
             };
 
             const searchClear = () => {
                 values.currentPage = 1;
                 values.totalizations = [];
-                /*
-                resetFormを使うと意図しない挙動になる
-                resetForm({
-                    totalizations: [],
-                    itemName: "",
-                    makerName: "",
-                    itemCode: "",
-                    itemStandard: "",
-                    itemJANCode: "",
-                    sourceDivisionIds: [],
-                    targetDivisionIds: [],
-                    currentPage: 1,
-                    perPage: values.perPage,
-                });
-                */
                 values.itemName = '';
                 values.makerName = '';
                 values.itemCode = '';
@@ -685,7 +675,7 @@
             };
 
             const checkLot = () => {
-                const check = true;
+                let check = true;
                 values.totalizations.forEach(function(item, idx) {
                     if (item.payoutCheck === true && item.payoutQuantity > 0) {
                         if (item.lotManagement === true) {
@@ -699,7 +689,7 @@
             }
 
             const checkPayout = () => {
-                const check = true;
+                let check = true;
                 values.totalizations.forEach(function(item, idx) {
                     if (item.payoutCheck === true && item.payoutQuantity > 0) {
                         if (item.totalPayoutQuantity > item.totalRequestQuantity) {
@@ -746,19 +736,19 @@
                     Swal.fire({
                         icon: 'error',
                         title: '入力エラー',
-                        text: '入力エラーがございます。ご確認ください',
+                        text: '入力エラーがございます。ご確認ください。',
                     })
                 } else if (!validLot) {
                     Swal.fire({
                         icon: 'error',
                         title: '入力エラー',
-                        text: 'ロット情報を正しく入力してください'
+                        text: 'ロット情報を正しく入力してください。'
                     })
                 } else if (!validPayout) {
                     Swal.fire({
                         icon: 'error',
                         title: '入力エラー',
-                        text: '払出数を正しく入力してください'
+                        text: '請求数・在庫数をご確認の上、払出数を正しく入力してください。'
                     })
                 } else {
                     Swal.fire({
@@ -790,43 +780,44 @@
                         return false;
                     }
 
-                    console.log(payoutModels);
-                    return;
-
                     let params = new URLSearchParams();
                     params.append("path", "/api/payout/register");
                     params.append("_method", 'post');
                     params.append("_csrf", _CSRF);
                     params.append("payoutItems", JSON.stringify(encodeURIToObject(payoutModels)));
-
                     const res = await axios.post(_APIURL, params);
-                    console.log(res);
-                    if (res.data.code != 200) {
-                        throw new Error(res.data.message)
-                    }
 
+                    if (res.data.code != 200) {
+                        if (res.data.code == 998) {
+                            throw new Error(res.data.code)
+                        } else {
+                            throw new Error(res.data.message)
+                        }
+                    }
                     Swal.fire({
                         icon: 'success',
                         title: '登録が完了しました。',
                     }).then((result) => {
-                        replace([]);
+                        location.reload();
                     });
                     return true;
                 } catch (error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'システムエラー',
-                        text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
-                    });
+                    if (error.message == 998) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '登録できませんでした。',
+                            text: '在庫管理されていない商品が含まれています。'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'システムエラー',
+                            text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。'
+                        });
+                    }
                 }
 
             });
-
-            const searchCardId = (cardId) => {
-                return values.totalizations.find((x) =>
-                    (x.cardId === cardId)
-                );
-            }
 
             const reflectSelect = (elem) => {
                 if (elem.type === 'gs1-128') {
@@ -844,22 +835,26 @@
                 }
 
                 if (elem.type === 'card') {
-                    if ((elem.totalPayoutQuantity + elem.cardQuantity) > elem.totalPayoutQuantity) {
+                    if ((elem.totalPayoutQuantity + elem.cardQuantity) > elem.totalRequestQuantity) {
                         Swal.fire({
                             icon: 'info',
-                            title: '払出合計数を超過するため反映できません',
+                            title: '請求必要数を超過するため反映できません。',
                         });
                         return false;
                     }
-                    if (values.totalizations[elem.index].payoutQuantity !== '') {
+                    if (values.totalizations[elem.index].payoutQuantity > 0) {
                         copyItem(elem.index);
                         values.totalizations[elem.index + 1].payoutQuantity = elem.cardQuantity;
-                        values.totalizations[elem.index + 1].card = elem.card
+                        values.totalizations[elem.index + 1].cardQuantity = elem.cardQuantity;
+                        values.totalizations[elem.index + 1].card = elem.refCard;
+                        values.totalizations[elem.index + 1].lotNumber = values.totalizations[elem.index].lotNumber;
+                        values.totalizations[elem.index + 1].lotDate = values.totalizations[elem.index].lotDate;
                         MicroModal.close("openSelectModal");
                         return false;
                     }
                     values.totalizations[elem.index].payoutQuantity = elem.cardQuantity;
-                    values.totalizations[elem.index].card = elem.card;
+                    values.totalizations[elem.index].cardQuantity = elem.cardQuantity;
+                    values.totalizations[elem.index].card = elem.refCard;
                     MicroModal.close("openSelectModal");
                     return false;
                 }
@@ -867,8 +862,6 @@
             const openSelectModal = ref();
             const selectRequestItems = ref([]);
             const addItemByBarcode = (items) => {
-                console.log(items);
-
                 selectRequestItems.value = [];
                 if (items.item.length === 0) {
                     Swal.fire({
@@ -882,7 +875,7 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'エラー',
-                        text: 'GS1-128・カード・ピッキングリスト以外のバーコードは読むことができません',
+                        text: 'GS1-128・カード・ピッキングリスト以外の\r\nバーコードは読むことができません',
                     });
                 }
 
@@ -894,11 +887,22 @@
                         sourceDivisionId = x.sourceDivisionId;
                     });
 
+                    let hit = 0;
                     values.totalizations.forEach((v, idx) => {
+                        if ((recordId === v.recordId) && (sourceDivisionId === v.sourceDivisionId)) {
+                            hit++;
+                        }
                         if ((v.payoutQuantity === 0) && (recordId === v.recordId) && (sourceDivisionId === v.sourceDivisionId)) {
                             values.totalizations[idx].payoutQuantity = v.requestQuantity;
                         }
                     });
+                    if (hit === 0) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: '商品が見つかりませんでした。',
+                        });
+                        return false;
+                    }
                     return false;
                 }
 
@@ -929,20 +933,24 @@
                     if (target.length === 0) {
                         Swal.fire({
                             icon: 'info',
-                            title: '商品が見つかりませんでした',
+                            title: '商品が見つかりませんでした。',
                         });
                         return false;
                     }
 
                     if (target.length === 1) {
+                        if (values.totalizations[target[0]].lotNumber !== '' || values.totalizations[target[0]].lotDate !== '') {
+                            copyItem(target[0]);
+                            values.totalizations[target[0] + 1].lotNumber = lotNumber;
+                            values.totalizations[target[0] + 1].lotDate = lotDate;
+                            return;
+                        }
                         values.totalizations[target[0]].lotNumber = lotNumber;
                         values.totalizations[target[0]].lotDate = lotDate;
                     }
 
                     if (target.length > 1) {
                         selectRequestItems.value = targetRequestItems;
-                        console.log(targetRequestItems);
-
                         openSelectModal.value.open();
                     }
                 }
@@ -957,9 +965,11 @@
                     let inHospitalItemId = '';
 
                     items.item.forEach((x, id) => {
-                        if (searchCardId(x.barcode) !== undefined) {
-                            exist = true;
-                        }
+                        values.totalizations.forEach((item, idx) => {
+                            if ((x.barcode) === item.card) {
+                                exist = true;
+                            }
+                        });
                     })
                     if (exist) {
                         Swal.fire({
@@ -970,6 +980,7 @@
                         return false;
                     }
                     items.item.forEach((x, id) => {
+                        /*
                         if (x.lotNumber !== '' && x.lotDate !== '') {
                             Swal.fire({
                                 icon: 'info',
@@ -977,6 +988,7 @@
                             });
                             return false;
                         }
+                        */
                         card = x.barcode;
                         cardQuantity = parseInt(x.cardQuantity);
                         divisionId = x.divisionId;
@@ -990,7 +1002,7 @@
                             tmp.index = idx;
                             tmp.type = items.type;
                             tmp.cardQuantity = cardQuantity;
-                            tmp.card = card;
+                            tmp.refCard = card;
                             targetRequestItems.push(tmp);
                         }
                     });
@@ -998,17 +1010,30 @@
                     if (target.length === 0) {
                         Swal.fire({
                             icon: 'info',
-                            title: '商品が見つかりませんでした',
+                            title: '商品が見つかりませんでした。',
                         });
                         return false;
                     }
 
                     if (target.length === 1) {
                         if (values.totalizations[target[0]].requestQuantity < cardQuantity) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'エラー',
+                                text: '請求数を超過するカードは使用できません。',
+                            });
                             return false;
                         }
+                        if (values.totalizations[target[0]].payoutQuantity > 0) {
+                            copyItem(target[0]);
+                            values.totalizations[target[0] + 1].card = card;
+                            values.totalizations[target[0] + 1].payoutQuantity = cardQuantity;
+                            values.totalizations[target[0] + 1].cardQuantity = cardQuantity;
+                            return;
+                        }
                         values.totalizations[target[0]].card = card;
-                        values.totalizations[target[0]].requestQuantity = cardQuantity;
+                        values.totalizations[target[0]].payoutQuantity = cardQuantity;
+                        values.totalizations[target[0]].cardQuantity = cardQuantity;
                     }
 
                     if (target.length > 1) {
@@ -1032,7 +1057,6 @@
                 loading,
                 start,
                 complete,
-                //openPrint,
                 searchClear,
                 searchExec,
                 changeParPage,
@@ -1054,9 +1078,7 @@
                 copyItem,
                 deleteItem,
                 reflectToPayout,
-                changeCheck,
-                searchCardId
-                //totalizations
+                changeCheck
             }
         },
         watch: {
@@ -1066,22 +1088,14 @@
             fields: {
                 async handler(val, oldVal) {
                     await this.validate();
-                    console.log(JSON.stringify(this.values));
                 },
                 deep: true
             },
             'values.currentPage': function(val) {
+                this.values.totalizations = [];
                 this.listGet();
                 window.scrollTo(0, 0);
-            },
-            /*
-            values: {
-                async handler(val, oldVal) {
-                    console.log(JSON.stringify(this.values));
-                },
-                deep: true
             }
-            */
         }
     }).mount('#top');
 </script>

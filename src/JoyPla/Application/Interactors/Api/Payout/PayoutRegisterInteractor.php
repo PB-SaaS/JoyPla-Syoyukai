@@ -71,11 +71,11 @@ namespace JoyPla\Application\Interactors\Api\Payout {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
 
             $inputData->payoutItems = array_map(function ($v) use ($inputData) {
-                if ($inputData->isOnlyMyDivision && $inputData->user->divisionId !== $v->sourceDivisionId) {
+                if ($inputData->isOnlyMyDivision && $inputData->user->divisionId !== $v->payoutSourceDivisionId) {
                     throw new Exception("Illegal request", 403);
                 }
-                if ($v->sourceDivisionId == $v->targetDivisionId) {
-                    throw new Exception("Invalid request", 998);
+                if ($v->payoutSourceDivisionId == $v->payoutTargetDivisionId) {
+                    throw new Exception("Invalid request", 999);
                 }
                 return $v;
             }, $inputData->payoutItems);
@@ -90,7 +90,13 @@ namespace JoyPla\Application\Interactors\Api\Payout {
             $payoutItems = $this->repository->findByInHospitalItem($hospitalId, $inputData->payoutItems);
 
             if (count($payoutItems) === 0) {
-                throw new Exception("payout items don't exist.", 997);
+                throw new Exception("payout items don't exist.", 999);
+            }
+
+            foreach ($payoutItems as $i) {
+                if ($i->getLotManagement() && $i->getLot()->isEmpty()) {
+                    throw new Exception("invalid lot.", 100);
+                }
             }
 
             $ids = [];
@@ -130,15 +136,16 @@ namespace JoyPla\Application\Interactors\Api\Payout {
 
             $stockViewInstance = StockView::where('hospitalId', $hospitalId->value());
             foreach ($result as $payout) {
-                $stockViewInstance->orWhere('divisionId', $payout->getTargetDivision()->getDivisionId()->value());
-                foreach ($payout->getpayoutItems() as $payoutItem) {
+                $stockViewInstance->orWhere('divisionId', $payout->getSourceDivision()->getDivisionId()->value());
+                foreach ($payout->getPayoutItems() as $payoutItem) {
                     $stockViewInstance->orWhere('inHospitalItemId', $payoutItem->getInHospitalItemId()->value());
                 }
             }
 
             $stocks = $stockViewInstance->get();
+
             if ((int)$stocks->count === 0) {
-                throw new Exception("Stocks don't exist.", 999);
+                throw new Exception("Stocks don't exist.", 998);
             }
 
             $stocks = $stocks->data->all();
@@ -148,7 +155,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                 foreach ($payout->getPayoutItems() as $item) {
                     $payoutItemCounts[] = $item->getInHospitalItemId()->value() . $payout->getSourceDivision()->getDivisionId()->value() . $payout->getTargetDivision()->getDivisionId()->value();
                     foreach ($stocks as $stock) {
-                        if (($payout->getTargetDivision()->getDivisionId()->value() === $stock->divisionId) &&
+                        if (($payout->getSourceDivision()->getDivisionId()->value() === $stock->divisionId) &&
                             ($item->getInHospitalItemId()->value() === $stock->inHospitalItemId)
                         ) {
                             $requestItemCounts[] = new RequestItemCount(
@@ -156,17 +163,17 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                                 $hospitalId,
                                 $item->getInHospitalItemId(),
                                 $item->getItem()->getItemId(),
-                                (int)$item->getPayoutQuantity()->value(),
-                                $payout->getSourceDivision()->getDivisionId(),
-                                $payout->getTargetDivision()->getDivisionId()
+                                (int)$item->getPayoutQuantity()->value() * -1,
+                                $payout->getTargetDivision()->getDivisionId(),
+                                $payout->getSourceDivision()->getDivisionId()
                             );
                         }
                     }
                 }
             }
 
-            if (count($requestItemCounts) !== count(array_unique($payoutItemCounts))) {
-                throw new Exception("Stocks don't exist.", 999);
+            if (count($requestItemCounts) !== count($payoutItemCounts)) {
+                throw new Exception("Stocks don't exist.", 998);
             }
 
             $inventoryCalculations = [];
@@ -179,7 +186,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                         0,
                         4,
                         $item->getLot(),
-                        $item->getPayoutQuantity() * -1
+                        $item->getPayoutQuantity()->value() * -1
                     );
                     $inventoryCalculations[] = new InventoryCalculation(
                         $item->getHospitalId(),
@@ -188,18 +195,27 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                         0,
                         5,
                         $item->getLot(),
-                        $item->getPayoutQuantity()
+                        $item->getPayoutQuantity()->value()
                     );
                 }
             }
 
+            $this->requestItemCountRepository->saveToArray($requestItemCounts);
+
+            $this->repository->saveToArray($result);
+
+            $this->inventoryCalculationRepository->saveToArray($inventoryCalculations);
+
+
             if (count($cardIds) > 0) {
+
                 $payoutItemInstance = SpiralDbPayoutItem::where('hospitalId', $hospitalId->value());
+
                 foreach ($result as $r) {
                     $payoutItemInstance->orWhere('payoutHistoryId', $r->getPayoutHId()->value());
                 }
                 foreach ($cardIds as $id) {
-                    $payoutItemInstance->orWhere('cardId', $id);
+                    $payoutItemInstance->orWhere('cardId', $id->value());
                 }
                 $payoutItems = $payoutItemInstance->get();
 
@@ -209,6 +225,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                         $cardUpdates[] = [
                             'cardId' => $payoutItem->cardId,
                             'payoutId' => $payoutItem->payoutId,
+                            'updateTime' => 'now'
                         ];
                     }
                 }
@@ -216,13 +233,6 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                     Card::upsert('cardId', $cardUpdates);
                 }
             }
-
-
-            $this->requestItemCountRepository->saveToArray($requestItemCounts);
-
-            $this->repository->saveToArray($result);
-
-            $this->inventoryCalculationRepository->saveToArray($inventoryCalculations);
 
             $this->outputPort->output(new PayoutRegisterOutputData($ids));
         }
@@ -255,8 +265,8 @@ namespace JoyPla\Application\InputPorts\Api\Payout {
                 $object = new stdClass();
                 $object->recordId = $v['recordId'];
                 $object->inHospitalItemId = $v['inHospitalItemId'];
-                $object->sourceDivisionId = $v['sourceDivisionId'];
-                $object->targetDivisionId = $v['targetDivisionId'];
+                $object->payoutSourceDivisionId = $v['targetDivisionId'];
+                $object->payoutTargetDivisionId = $v['sourceDivisionId'];
                 $object->payoutQuantity = $v['payoutQuantity'];
                 $object->lotNumber = $v['lotNumber'];
                 $object->lotDate = $v['lotDate'];

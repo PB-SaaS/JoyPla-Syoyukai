@@ -1,116 +1,116 @@
 <div id="top" v-cloak>
-    <template v-if="pickingList.length > 0">
-        <div class="paper A4 ">
-            <!-- here -->
-            <div class="p-6 px-3 relative">
+    <div class="paper A4 ">
+        <!-- here -->
+        <div class="p-6 px-3 relative">
 
-                <header class="text-center text-2xl">ピッキングリスト</header>
-                <main class="mt-6">
-                    <div class="flex">
-                        <div class="flex-auto w-full">
-                            <div>
-                                <img class="ml-auto h-6" src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png" />
-                            </div>
+            <header class="text-center text-2xl">ピッキングリスト</header>
+            <main class="mt-6">
+                <div class="flex">
+                    <div class="flex-auto w-full">
+                        <div>
+                            <img class="ml-auto h-6" src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png" />
                         </div>
                     </div>
-                    <div>
-                        <div class="flex font-bold">
-                            <div class="my-2 w-full text-right">
-                                <p class="text-xs">発行日 {{ pickingDate }}
-                            </div>
+                </div>
+                <div>
+                    <div class="flex font-bold">
+                        <div class="my-2 w-full text-right">
+                            <p class="text-xs">発行日 {{ pickingDate }}
                         </div>
                     </div>
-                    <div class="mt-4">
-                        <table class="border-collapse border border-slate-500 w-full">
-                            <thead class="whitespace-nowrap font-medium text-gray-700 text-center border text-xs">
-                                <tr class="bg-gray-100">
-                                    <th scope="col" class="border border-slate-600 w-10 p-1">
-                                        No
-                                    </th>
-                                    <th scope="col" class="border border-slate-600 w-20 p-1">
-                                        請求先部署名
-                                    </th>
-                                    <th scope="col" class="border border-slate-600 w-20 p-1">
-                                        請求元部署名
-                                    </th>
-                                    <th scope="col" class="border border-slate-600 w-36 p-1">
-                                        商品情報
-                                    </th>
-                                    <th scope="col" class="border border-slate-600 w-10 p-1">
-                                        棚名
-                                    </th>
-                                    <th scope="col" class="border border-slate-600 w-14 p-1">
-                                        請求数
-                                    </th>
-                                    <th scope="col" class="border border-slate-600 w-64 p-1">
-                                        バーコード
-                                    </th>
-                                    <th scope="col" class="border border-slate-600 w-14 p-1">
-                                        在庫数
-                                    </th>
-                                    <th scope="col" class="border border-slate-600 w-14 p-1">
-                                        必要数
-                                    </th>
-                                    <th scope="col" class="border border-slate-600 w-10 p-1">
+                </div>
+                <div class="mt-4">
+                    <table class="border-collapse border border-slate-500 w-full">
+                        <thead class="whitespace-nowrap font-medium text-gray-700 text-center border text-xs">
+                            <tr class="bg-gray-100">
+                                <th scope="col" class="border border-slate-600 w-10 p-1">
+                                    No
+                                </th>
+                                <th scope="col" class="border border-slate-600 w-20 p-1">
+                                    請求先部署名
+                                </th>
+                                <th scope="col" class="border border-slate-600 w-20 p-1">
+                                    請求元部署名
+                                </th>
+                                <th scope="col" class="border border-slate-600 w-36 p-1">
+                                    商品情報
+                                </th>
+                                <th scope="col" class="border border-slate-600 w-10 p-1">
+                                    棚名
+                                </th>
+                                <th scope="col" class="border border-slate-600 w-14 p-1">
+                                    請求数
+                                </th>
+                                <th scope="col" class="border border-slate-600 w-64 p-1">
+                                    バーコード
+                                </th>
+                                <th scope="col" class="border border-slate-600 w-14 p-1">
+                                    在庫数
+                                </th>
+                                <th scope="col" class="border border-slate-600 w-14 p-1">
+                                    必要数
+                                </th>
+                                <th scope="col" class="border border-slate-600 w-10 p-1">
 
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-xxs text-gray-900 font-light">
-                                <tr class="border-b bg-white" v-for="(totalization, idx) in pickingList" :key="totalization.key">
-                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="whitespace-nowrap border border-slate-600 p-1 text-center">
-                                        {{ totalization.no }}
-                                    </td>
-                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="border border-slate-600 p-1 break-all">
-                                        {{ totalization.targetDivisionName }}
-                                    </td>
-                                    <td class="break-all border border-slate-600 p-1">
-                                        {{ totalization.sourceDivisionName }}
-                                    </td>
-                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="break-words border border-slate-600 p-1">
-                                        <p class="text-md font-bold">{{ totalization.makerName }}</p>
-                                        <p class="text-md font-bold">{{ totalization.itemName }}</p>
-                                        <p class="text-md text-gray-500">{{ totalization.itemCode }}</p>
-                                        <p class="text-md text-gray-500">{{ totalization.itemStandard }}</p>
-                                        <p class="text-md text-gray-500">{{ totalization.itemJANCode }}</p>
-                                    </td>
-                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="break-words border border-slate-600 p-1">
-                                        {{ totalization.rackName }}
-                                    </td>
-                                    <td class="border border-slate-600 p-1">
-                                        {{ totalization.requestQuantity }} {{ totalization.quantityUnit }}
-                                    </td>
-                                    <td class="border border-slate-600 p-1">
-                                        <div class="productsLabel mt-6">
-                                            <img class="mx-auto" :src="totalization.barcode" />
-                                        </div>
-                                    </td>
-                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="border border-slate-600 p-1">
-                                        {{ totalization.stockQuantity }} {{ totalization.quantityUnit }}
-                                    </td>
-                                    <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="border border-slate-600 p-1">
-                                        {{ totalization.totalRequestQuantity }} {{ totalization.quantityUnit }}
-                                    </td>
-                                    <td class="border border-slate-600 p-1 text-center">
-                                        <input class="float-none form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 my-1 align-top bg-no-repeat bg-center bg-contain cursor-pointer" type="checkbox" value="">
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </main>
-            </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-xxs text-gray-900 font-light" v-if="total > 0">
+                            <tr class="border-b bg-white" v-for="(totalization, idx) in pickingList" :key="totalization.key">
+                                <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="whitespace-nowrap border border-slate-600 p-1 text-center">
+                                    {{ totalization.no }}
+                                </td>
+                                <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="border border-slate-600 p-1 break-all">
+                                    {{ totalization.targetDivisionName }}
+                                </td>
+                                <td class="break-all border border-slate-600 p-1">
+                                    {{ totalization.sourceDivisionName }}
+                                </td>
+                                <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="break-words border border-slate-600 p-1">
+                                    <p class="text-md font-bold">{{ totalization.makerName }}</p>
+                                    <p class="text-md font-bold">{{ totalization.itemName }}</p>
+                                    <p class="text-md text-gray-500">{{ totalization.itemCode }}</p>
+                                    <p class="text-md text-gray-500">{{ totalization.itemStandard }}</p>
+                                    <p class="text-md text-gray-500">{{ totalization.itemJANCode }}</p>
+                                </td>
+                                <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="break-words border border-slate-600 p-1">
+                                    {{ totalization.rackName }}
+                                </td>
+                                <td class="border border-slate-600 p-1">
+                                    {{ totalization.requestQuantity }} {{ totalization.quantityUnit }}
+                                </td>
+                                <td class="border border-slate-600 p-1">
+                                    <div class="productsLabel mt-6">
+                                        <img class="mx-auto" :src="totalization.barcode" />
+                                    </div>
+                                </td>
+                                <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="border border-slate-600 p-1">
+                                    {{ totalization.stockQuantity }} {{ totalization.quantityUnit }}
+                                </td>
+                                <td v-if="totalization.firstRow === true" :rowspan="totalization.rowspan" class="border border-slate-600 p-1">
+                                    {{ totalization.totalRequestQuantity }} {{ totalization.quantityUnit }}
+                                </td>
+                                <td class="border border-slate-600 p-1 text-center">
+                                    <input class="float-none form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 my-1 align-top bg-no-repeat bg-center bg-contain cursor-pointer" type="checkbox" value="">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
         </div>
-    </template>
+    </div>
 </div>
 
 <script>
     const data = <?php echo json_encode($totalization, true) ?>;
+    const count = <?php echo json_encode($count, true) ?>;
 
     var JoyPlaApp = Vue.createApp({
         components: {},
         setup() {
 
+            const total = count;
             const date = new Date();
             const yyyy = date.getFullYear();
             const mm = ("0" + (date.getMonth() + 1)).slice(-2);
@@ -164,7 +164,8 @@
             return {
                 numberFormat,
                 pickingDate,
-                totalizations
+                totalizations,
+                total
             }
 
         },

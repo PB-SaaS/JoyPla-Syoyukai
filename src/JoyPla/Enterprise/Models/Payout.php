@@ -22,7 +22,6 @@ class Payout
         Division $sourceDivision,
         Division $targetDivision
     ) {
-
         $this->payoutHId = $payoutHId;
         $this->registrationTime = $registrationTime;
         $this->payoutItems = array_map(function (PayoutItem $v) {
@@ -36,7 +35,7 @@ class Payout
     public static function create(Collection $input)
     {
         return new Payout(
-            (new PayoutHId($input->payoutNumber)),
+            (new PayoutHId($input->payoutHId)),
             (new DateYearMonthDayHourMinutesSecond($input->registrationTime)),
             [],
             (Hospital::create($input)),
@@ -92,6 +91,12 @@ class Payout
         return $this->targetDivision;
     }
 
+    public function equalDivisions(Division $sourceDivision, Division $targetDivision)
+    {
+        return (($this->sourceDivision->getDivisionId()->value() === $sourceDivision->getDivisionId()->value()) &&
+            ($this->targetDivision->getDivisionId()->value() === $targetDivision->getDivisionId()->value()));
+    }
+
     public function totalAmount()
     {
         $num = 0;
@@ -124,15 +129,28 @@ class Payout
 
     public function addPayoutItem(PayoutItem $item)
     {
+        $itemLot = $item->getLot()->toArray();
+        $itemLotNumber = $itemLot['lotNumber'];
+        $itemLotDate = $itemLot['lotDate'];
         $items = $this->payoutItems;
         $flag = false;
+
         foreach ($items as $key => $payoutItem) {
-            if ($payoutItem->getInHospitalItemId()->equal($item->getInHospitalItemId()->value())) {
-                $flag = true;
-                $items[$key] = $payoutItem->addPayoutQuantity($item->getPayoutQuantity());
-                break;
+            $lot = $payoutItem->getLot()->toArray();
+            $lotNumber = $lot['lotNumber'];
+            $lotDate = $lot['lotDate'];
+            $card = $payoutItem->getCard()->value();
+            if (!$card) {
+                if (($payoutItem->getInHospitalItemId()->equal($item->getInHospitalItemId()->value())) &&
+                    ($itemLotNumber === $lotNumber) && ($itemLotDate === $lotDate)
+                ) {
+                    $flag = true;
+                    $items[$key] = $payoutItem->addPayoutQuantity($item->getPayoutQuantity());
+                    break;
+                }
             }
         }
+
         if (!$flag) {
             $items[] = $item;
         }
@@ -172,7 +190,7 @@ class Payout
     {
         return [
             'payoutHId' => $this->payoutHId->value(),
-            'registrationTime' => $this->registDate->value(),
+            'registrationTime' => $this->registrationTime->value(),
             'payoutItems' => array_map(function (PayoutItem $v) {
                 return $v->toArray();
             }, $this->payoutItems),

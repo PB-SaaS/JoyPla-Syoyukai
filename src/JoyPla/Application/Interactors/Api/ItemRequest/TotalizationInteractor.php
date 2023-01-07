@@ -43,6 +43,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
          */
         public function handle(TotalizationInputData $inputData)
         {
+
             [$totalRequestItems, $count] = $this->repository->search(
                 (new HospitalId($inputData->user->hospitalId)),
                 $inputData->search

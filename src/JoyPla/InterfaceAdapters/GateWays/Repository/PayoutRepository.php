@@ -16,8 +16,6 @@ use JoyPla\Enterprise\Models\PayoutHId;
 use JoyPla\Enterprise\Models\PayoutQuantity;
 use JoyPla\Enterprise\Models\Division;
 use JoyPla\Enterprise\Models\HospitalId;
-use JoyPla\Enterprise\Models\HospitalName;
-use JoyPla\Enterprise\Models\Pref;
 use JoyPla\Enterprise\Models\InHospitalItemId;
 use JoyPla\Enterprise\Models\Item;
 use JoyPla\Enterprise\Models\Price;
@@ -26,9 +24,7 @@ use JoyPla\Enterprise\Models\UnitPrice;
 use JoyPla\Enterprise\Models\Lot;
 use JoyPla\Enterprise\Models\LotDate;
 use JoyPla\Enterprise\Models\LotNumber;
-use JoyPla\Enterprise\Models\DateYearMonth;
-use JoyPla\Enterprise\Models\DateYearMonthDayHourMinutesSecond;
-use Collection;
+use JoyPla\Enterprise\Models\CardId;
 
 class PayoutRepository implements PayoutRepositoryInterface
 {
@@ -50,19 +46,16 @@ class PayoutRepository implements PayoutRepositoryInterface
 
         $division->where('hospitalId', $hospitalId->value());
 
-        foreach ($payoutItems as $item) {
-            $division->orWhere('divisionId', $item->sourceDivisionId);
-            $division->orWhere('divisionId', $item->targetDivisionId);
-        }
-
-        $division = $division->get();
-        $division = $division->all();
-
         $inHospitalItem = InHospitalItemView::where('hospitalId', $hospitalId->value())->where('notUsedFlag', '1', '!=');
+
         foreach ($payoutItems as $item) {
             $inHospitalItem->orWhere('inHospitalItemId', $item->inHospitalItemId);
+            $division->orWhere('divisionId', $item->payoutSourceDivisionId);
+            $division->orWhere('divisionId', $item->payoutTargetDivisionId);
         }
         $inHospitalItem = ($inHospitalItem->get())->data->all();
+        $division = $division->get();
+        $division = $division->all();
 
         $result = [];
         foreach ($payoutItems as $item) {
@@ -70,8 +63,8 @@ class PayoutRepository implements PayoutRepositoryInterface
                 continue;
             }
 
-            $source_division_find_key = array_search($item->sourceDivisionId, collect_column($division, 'divisionId'));
-            $target_division_find_key = array_search($item->targetDivisionId, collect_column($division, 'divisionId'));
+            $source_division_find_key = array_search($item->payoutSourceDivisionId, collect_column($division, 'divisionId'));
+            $target_division_find_key = array_search($item->payoutTargetDivisionId, collect_column($division, 'divisionId'));
             $inHospitalItem_find_key = array_search($item->inHospitalItemId, collect_column($inHospitalItem, 'inHospitalItemId'));
 
             if (($source_division_find_key !== false) && ($target_division_find_key !== false) && ($inHospitalItem_find_key !== false)) {
@@ -101,10 +94,13 @@ class PayoutRepository implements PayoutRepositoryInterface
                     (new Price((float)$inHospitalItem[$inHospitalItem_find_key]->price)),
                     (new UnitPrice($unitprice)),
                     (new PayoutQuantity((int)$item->payoutQuantity)),
-                    (new Lot(new LotNumber($item->lotNumber), new LotDate($item->lotDate)))
+                    (new Lot(new LotNumber($item->lotNumber), new LotDate($item->lotDate))),
+                    (int)$inHospitalItem[$inHospitalItem_find_key]->lotManagement,
+                    (new CardId((string)$item->card))
                 );
             }
         }
+
         return $result;
     }
 
@@ -149,7 +145,8 @@ class PayoutRepository implements PayoutRepositoryInterface
                     "lotNumber" => (string)$payoutItem['lot']['lotNumber'],
                     "lotDate" => (string)$payoutItem['lot']['lotDate'],
                     "cardId" => (string)$payoutItem['card'],
-                    "payoutType" => "2"
+                    "payoutType" => "2",
+                    "payoutAmount" => (string)$payoutItem['payoutAmount']
                 ];
             }
         }
@@ -163,7 +160,6 @@ class PayoutRepository implements PayoutRepositoryInterface
 
 interface PayoutRepositoryInterface
 {
-    //    public function findByHospitalId(HospitalId $hospitalId);
     public function findByInHospitalItem(HospitalId $hospitalId, array $Payouts);
     public function saveToArray(array $Payouts);
 }

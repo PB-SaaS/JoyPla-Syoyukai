@@ -1280,3 +1280,87 @@ const vSwitch =
   `
 
 };
+
+      const vInputv2 = {
+      components: {
+      'v-text' : vText
+      },
+      setup(props) {
+      // a simple `name` field with basic required validator
+      const { ref } = Vue;
+      const { value, errorMessage , meta , validate } = VeeValidate.useField(
+      Vue.toRef(props, 'name'),
+      Vue.toRef(props, 'rules') ,
+      {label : props.label });
+
+      const valid = meta.valid;
+      const validated = meta.validated;
+
+      const isRequired = () => {
+      return props.rules.required;
+      }
+
+      const changeClass = ref({});
+      return {
+      changeClass,
+      isRequired,
+      value,
+      meta,
+      successClassName: ['text-gray-700', 'border-gray-300'],
+      errorClassName: ['text-red-500', 'border-red-500'],
+      errorMessage,
+      };
+      },
+      props: {
+      label: {
+      type: String,
+      required: false,
+      default: "",
+      },
+      type: {
+      type: String,
+      required: true
+      },
+      name: {
+      type: String,
+      required: true
+      },
+      placeholder: {
+      type: String,
+      required: false
+      },
+      rules: {
+      type: Object,
+      required: false,
+      default: {}
+      },
+      title: {
+      type: String,
+      required: false,
+      default : ""
+      },
+      changeClassName: {
+      type: String,
+      required: false,
+      default : ""
+      },
+      readonly: {
+      type: Boolean,
+      required: false,
+      default: false,
+      }
+      },
+      watch: {
+      value(){
+      this.changeClass = {
+      [this.changeClassName] : true
+      };
+      }
+      },
+      template: `
+      <v-text :title="title" :isRequired="isRequired()">
+        <input :readonly="readonly" :type=" type" :placeholder="placeholder" v-model="value" autocomplete="off" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border" :class="[ ( ! meta.valid && meta.validated == true) ? errorClassName : successClassName , changeClass]" />
+        <span class="text-red-500">{{ errorMessage }}</span>
+      </v-text>
+      `
+      };

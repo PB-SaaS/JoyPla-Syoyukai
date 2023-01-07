@@ -13,8 +13,9 @@ namespace JoyPla\InterfaceAdapters\Presenters\Web\ItemRequest {
 
             $viewModel = new PickingListViewModel($outputData);
             $totalization = $viewModel->totalization;
+            $count = $viewModel->count;
 
-            $body = View::forge('printLayout/ItemRequest/PickingList', compact('totalization'), false)->render();
+            $body = View::forge('printLayout/ItemRequest/PickingList', compact('totalization', 'count'), false)->render();
             echo view('printLayout/Common/Template', compact('body'), false)->render();
         }
     }

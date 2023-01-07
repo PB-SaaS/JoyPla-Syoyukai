@@ -3244,8 +3244,8 @@ background-color: rgb(233 213 255 / var(--tw-bg-opacity));
 color: rgb(88 28 135 / var(--tw-text-opacity));
 }
 
-.min-w-250 {
-min-width: 250px;
+.min-w-225 {
+min-width: 225px;
 }
 
 .float-none {
