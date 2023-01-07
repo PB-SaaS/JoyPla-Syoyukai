@@ -767,6 +767,9 @@ var gs1_128 = new Vue({
             
             let objLotNumber = (obj["10"] === void 0) ? "" : obj["10"]; //lotNumber
             let objLotDate = (obj["17"] === void 0) ? "" : this.changeDate(obj["17"]); //lotDate
+            if(objLotDate === ""){
+                objLotDate = (obj["7003"] === void 0) ? "" : this.changeDate(obj["7003"]); //lotDate
+            }
             let existflg = false;
             let changeObject = null;
             

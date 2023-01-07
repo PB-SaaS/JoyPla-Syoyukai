@@ -18,6 +18,7 @@ require_once('Library/gs1128-decoder/Identifiers/CompanyInternalInformationIdent
 require_once('Library/gs1128-decoder/Identifiers/ContentIdentifier.php');
 require_once('Library/gs1128-decoder/Identifiers/DueDateIdentifier.php');
 require_once('Library/gs1128-decoder/Identifiers/ExpirationDateIdentifier.php');
+require_once('Library/gs1128-decoder/Identifiers/ExpirationDateAndTimeIdentifier.php');
 require_once('Library/gs1128-decoder/Identifiers/GTINIdentifier.php');
 require_once('Library/gs1128-decoder/Identifiers/NetWeightKgIdentifier.php');
 require_once('Library/gs1128-decoder/Identifiers/OriginIdentifier.php');

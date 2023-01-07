@@ -122,7 +122,6 @@ require_once('JoyPla/InterfaceAdapters/GateWays/Repository/InHospitalItemReposit
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/InventoryCalculationRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/ItemAndPriceAndInHospitalItemRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/ItemRepository.php');
-require_once('JoyPla/InterfaceAdapters/GateWays/Repository/ItemRequestRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/NotificationRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/OrderRepository.php');
 require_once('JoyPla/InterfaceAdapters/GateWays/Repository/PriceAndInHospitalItemRepository.php');

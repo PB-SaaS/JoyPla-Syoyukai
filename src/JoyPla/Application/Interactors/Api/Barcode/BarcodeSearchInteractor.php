@@ -223,7 +223,14 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                     [$inHospitalItems, $count] = $this->barcodeRepository->searchByJanCode((new HospitalId($inputData->user->hospitalId)), (string)$gtin13);
 
                     $lotNumber = $gs1128Data['identifiers']['10']['content'];
-                    $lotDate = ($gs1128Data['identifiers']['17']['content']) ? $gs1128Data['identifiers']['17']['content']->format('Y-m-d') : "";
+                    if ($gs1128Data['identifiers']['17']['content']) {
+                        $lotDate = $gs1128Data['identifiers']['17']['content']->format('Y-m-d');
+                    } elseif ($gs1128Data['identifiers']['7003']['content']) {
+                        $lotDate = $gs1128Data['identifiers']['7003']['content']->format('Y-m-d');
+                    } else {
+                        $lotDate = "";
+                    }
+                    //$lotDate = ( $gs1128Data['identifiers']['17']['content'] )? $gs1128Data['identifiers']['17']['content']->format('Y-m-d') : "";
 
                     foreach ($inHospitalItems as $key => $val) {
                         $inHospitalItems[$key]->set('lotNumber', $lotNumber);

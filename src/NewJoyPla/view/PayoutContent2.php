@@ -1,4 +1,4 @@
-    <style>
+	<style>
 		
 		a.top-to-icon {
 			zoom : 1.4;
@@ -84,133 +84,133 @@
 			content: counter(rowCount);
 		}
 		
-    </style>
-    <div id="app" class="animsition" uk-height-viewport="expand: true">
+	</style>
+	<div id="app" class="animsition" uk-height-viewport="expand: true">
 	  	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
-		    <div class="uk-container uk-container-expand">
-		    	<ul class="uk-breadcrumb">
-				    <li><a href="%url/rel:mpg:top%">TOP</a></li>
-                	<li><a href="%url/rel:mpg:top%&path=payout">払出メニュー</a></li>
-				    <li><span>払出内容入力</span></li>
+			<div class="uk-container uk-container-expand">
+				<ul class="uk-breadcrumb">
+					<li><a href="%url/rel:mpg:top%">TOP</a></li>
+					<li><a href="%url/rel:mpg:top%&path=payout">払出メニュー</a></li>
+					<li><span>払出内容入力</span></li>
 				</ul>
-		    	<h2 class="page_title">払出内容入力</h2>
-		    	<hr>
-	    		<div class="uk-width-auto uk-text-right">
-	    			<div class="uk-form-controls">
-			            <input type="date" value="" class="uk-input uk-width-1-3@m" name="payoutDate">
-		            </div>
-	    			<label class="uk-form-label" >払出日指定</label>
-		            <span class="uk-text-danger">※入力なしで現在時刻を取得します</span>
-		        </div>
-		    	<div class="shouhin-table uk-width-expand">
-		    		<div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky" class="uk-padding-top uk-background-muted uk-padding-small">
-		    			<div uk-grid>
-			    			<div class="uk-width-1-2">
-			    				<label class="uk-form-label">払出元部署</label>
-				    			<div class="uk-form-controls">
-						            <select class="uk-width-4-5 uk-select uk-inline" v-model="sourceDivision" name="sourceDivision" v-bind:disabled="lists.length > 0">
-						                <option value="">----- 部署選択 -----</option>
-				                        <?php
-				                        foreach($source_division->data as $data)
-				                        {
-				                            if($data->divisionType === '1')
-				                            {
-				                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
-				                                echo '<option value="" disabled>--------------------</option>';
-				                            }
-				                        }
-				                        foreach($source_division->data as $data)
-				                        {
-				                            if($data->divisionType === '2')
-				                            {
-				                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
-				                            }
-				                        }
-				                        ?>
-						            </select>
-						        </div>
-					            <form action='#' method="post" onsubmit="app.barcodeSearch($('input[name=barcode]').val() , '' ,'' ,true);$('input[name=barcode]').val('') ; $('input[name=barcode]').focus();return false;">
-			    					<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力...(GS1-128も可能)" autofocus="true" name="barcode" autocomplete="off">  
-					    			<button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
+				<h2 class="page_title">払出内容入力</h2>
+				<hr>
+				<div class="uk-width-auto uk-text-right">
+					<div class="uk-form-controls">
+						<input type="date" value="" class="uk-input uk-width-1-3@m" name="payoutDate">
+					</div>
+					<label class="uk-form-label" >払出日指定</label>
+					<span class="uk-text-danger">※入力なしで現在時刻を取得します</span>
+				</div>
+				<div class="shouhin-table uk-width-expand">
+					<div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky" class="uk-padding-top uk-background-muted uk-padding-small">
+						<div uk-grid>
+							<div class="uk-width-1-2">
+								<label class="uk-form-label">払出元部署</label>
+								<div class="uk-form-controls">
+									<select class="uk-width-4-5 uk-select uk-inline" v-model="sourceDivision" name="sourceDivision" v-bind:disabled="lists.length > 0">
+										<option value="">----- 部署選択 -----</option>
+										<?php
+										foreach($source_division->data as $data)
+										{
+											if($data->divisionType === '1')
+											{
+												echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
+												echo '<option value="" disabled>--------------------</option>';
+											}
+										}
+										foreach($source_division->data as $data)
+										{
+											if($data->divisionType === '2')
+											{
+												echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
+											}
+										}
+										?>
+									</select>
+								</div>
+								<form action='#' method="post" onsubmit="app.barcodeSearch($('input[name=barcode]').val() , '' ,'' ,true);$('input[name=barcode]').val('') ; $('input[name=barcode]').focus();return false;">
+									<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力...(GS1-128も可能)" autofocus="true" name="barcode" autocomplete="off">  
+									<button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
 								</form>
-			    			</div>
-			    			<div class="uk-width-1-2">
-				    			<label class="uk-form-label" >払出先部署</label>
-				    			<div class="uk-form-controls">
-			    				   <select class="uk-select uk-width-4-5" v-model="targetDivision" name="targetDivision" v-bind:disabled="lists.length > 0">
-						                <option value="">----- 部署選択 -----</option>
-				                        <?php
-				                        foreach($target_division->data as $data)
-				                        {
-				                            if($data->divisionType === '1')
-				                            {
-				                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
-				                                echo '<option value="" disabled>--------------------</option>';
-				                            }
-				                        }
-				                        foreach($target_division->data as $data)
-				                        {
-				                            if($data->divisionType === '2')
-				                            {
-				                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
-				                            }
-				                        }
-				                        ?>
-						            </select>	
-						        </div>
-					            <form action='#' method="post" onsubmit="app.cardSearch($('input[name=barcode2]').val()); $('input[name=barcode2]').val('') ; $('input[name=barcode2]').focus(); return false;">
-			    					<input type="text" class="uk-input uk-width-4-5" placeholder="カードまたは払出ラベルのバーコード入力..." autofocus="true" name="barcode2" autocomplete="off">  
-					    			<button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
+							</div>
+							<div class="uk-width-1-2">
+								<label class="uk-form-label" >払出先部署</label>
+								<div class="uk-form-controls">
+								   <select class="uk-select uk-width-4-5" v-model="targetDivision" name="targetDivision" v-bind:disabled="lists.length > 0">
+										<option value="">----- 部署選択 -----</option>
+										<?php
+										foreach($target_division->data as $data)
+										{
+											if($data->divisionType === '1')
+											{
+												echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
+												echo '<option value="" disabled>--------------------</option>';
+											}
+										}
+										foreach($target_division->data as $data)
+										{
+											if($data->divisionType === '2')
+											{
+												echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
+											}
+										}
+										?>
+									</select>	
+								</div>
+								<form action='#' method="post" onsubmit="app.cardSearch($('input[name=barcode2]').val()); $('input[name=barcode2]').val('') ; $('input[name=barcode2]').focus(); return false;">
+									<input type="text" class="uk-input uk-width-4-5" placeholder="カードまたは払出ラベルのバーコード入力..." autofocus="true" name="barcode2" autocomplete="off">  
+									<button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
 								</form>
 								<span class="uk-text-danger uk-text-small">カードを紐づける場合は払出数を0、枚数を1にしてください</span>
-			    			</div>
-		    			</div>
-    				</div>
-    				<div class="uk-margin">
-			    		<div uk-margin>
-				    		<button class="uk-button uk-button-default" v-on:click="sanshouClick">商品マスタを開く</button>
-				    		<button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
-				    		<button class="uk-button uk-button-primary uk-margin-small-top" v-on:click="sendPayout">払出実行</button>
-			    		</div>
-    				</div>
-    				<div class=" uk-width-expand uk-overflow-auto">
-			    		<table class="uk-table uk-table-striped">
-			    			<thead>
-			    				<tr>
-			    					<th colspan="9" class="uk-width-1-2">
-			    						払出元情報
-			    					</th>
-			    					<th colspan="6" class="uk-width-1-2">
-			    						払出先情報
-		    						</th>
-			    				</tr>
-		    				</thead>
-		    				<thead>
-			    				<tr>
-			    					<th class="uk-text-nowrap">id</th>
-			    					<th class="uk-table-expand">メーカー</th>
-			    					<th class="uk-table-expand">商品名</th>
-			    					<th class="uk-table-expand">製品コード</th>
-			    					<th class="uk-table-expand">規格</th>
-			    					<th class="uk-table-expand">JANコード</th>
-			    					<th class="uk-text-nowrap">入数</th>
-	                            	<th class="uk-text-nowrap">価格</th>
-	                            	<th class="uk-text-nowrap">単価</th>
-			    					<th class="uk-text-nowrap">ロット管理</th>
-			    					<th class="uk-table-expand">ロット番号</th>
-			    					<th class="uk-table-expand">使用期限</th>
-			    					<th class="uk-text-nowrap" style="padding-right: 5px;">払出数</th>
-			    					<th class="uk-text-nowrap" style="padding-left: 0px;">
-			    						<input type="button" class="uk-button uk-button-default uk-button-small" v-on:click="countToIrisu" value="入数を反映" >
-			    					</th>
-			    					<th class="uk-text-nowrap">個数（ラベル枚数）</th>
-			    					<th class="uk-text-nowrap">合計払出数</th>
-			    					<th class="uk-text-nowrap">カード番号</th>
-			    					<th></th>
-			    					<th></th>
-			    				</tr>
-			    			</thead>
-			    			<tbody>
+							</div>
+						</div>
+					</div>
+					<div class="uk-margin">
+						<div uk-margin>
+							<button class="uk-button uk-button-default" v-on:click="sanshouClick">商品マスタを開く</button>
+							<button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
+							<button class="uk-button uk-button-primary uk-margin-small-top" v-on:click="sendPayout">払出実行</button>
+						</div>
+					</div>
+					<div class=" uk-width-expand uk-overflow-auto">
+						<table class="uk-table uk-table-striped">
+							<thead>
+								<tr>
+									<th colspan="9" class="uk-width-1-2">
+										払出元情報
+									</th>
+									<th colspan="6" class="uk-width-1-2">
+										払出先情報
+									</th>
+								</tr>
+							</thead>
+							<thead>
+								<tr>
+									<th class="uk-text-nowrap">id</th>
+									<th class="uk-table-expand">メーカー</th>
+									<th class="uk-table-expand">商品名</th>
+									<th class="uk-table-expand">製品コード</th>
+									<th class="uk-table-expand">規格</th>
+									<th class="uk-table-expand">JANコード</th>
+									<th class="uk-text-nowrap">入数</th>
+									<th class="uk-text-nowrap">価格</th>
+									<th class="uk-text-nowrap">単価</th>
+									<th class="uk-text-nowrap">ロット管理</th>
+									<th class="uk-table-expand">ロット番号</th>
+									<th class="uk-table-expand">使用期限</th>
+									<th class="uk-text-nowrap" style="padding-right: 5px;">払出数</th>
+									<th class="uk-text-nowrap" style="padding-left: 0px;">
+										<input type="button" class="uk-button uk-button-default uk-button-small" v-on:click="countToIrisu" value="入数を反映" >
+									</th>
+									<th class="uk-text-nowrap">個数（ラベル枚数）</th>
+									<th class="uk-text-nowrap">合計払出数</th>
+									<th class="uk-text-nowrap">カード番号</th>
+									<th></th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
 								<tr v-for="(list, key) in lists" :id="'tr_' + key" v-bind:class="list.class">
 									<td>{{list.text}}</td>
 									<td>{{list.maker}}</td>
@@ -221,8 +221,8 @@
 									<td class="uk-text-nowrap">{{list.irisu}}{{list.unit}}</td>
 									<td class="uk-text-nowrap">￥{{list.kakaku | number_format}}</td>
 									<td class="uk-text-nowrap">
-									    ￥<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
-									    <span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
+										￥<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
+										<span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
 									</td>
 									<td class="uk-text-center">
 										<span v-if="list.lotFlagBool == 1" class="uk-text-danger">必須</span>
@@ -253,22 +253,22 @@
 										<input type="button" class="uk-button uk-button-default uk-button-small" value="払出元情報複製" v-on:click="copyList(key)">
 									</td>
 								</tr>
-			    			</tbody>
-			    	        <tfoot>
-                                <tr>
-                                    <td colspan="19">&emsp;</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="19">&emsp;</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="19">&emsp;</td>
-                                </tr>
-                            </tfoot>
-			    		</table>
-			    	</div>
-		    	</div>
-		    </div>
+							</tbody>
+							<tfoot>
+								<tr>
+									<td colspan="19">&emsp;</td>
+								</tr>
+								<tr>
+									<td colspan="19">&emsp;</td>
+								</tr>
+								<tr>
+									<td colspan="19">&emsp;</td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 	
@@ -279,13 +279,13 @@
 	
 	
 	<div id="modal-sections" class="uk-modal-container" uk-modal>
-	    <div class="uk-modal-dialog">
-	        <button class="uk-modal-close-default" type="button" uk-close></button>
-	        <div class="uk-modal-header">
-	            <h2 class="uk-modal-title">商品選択</h2>
-	        </div>
-	        <div class="uk-modal-body uk-width-expand uk-overflow-auto">
-	         	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-table-divider">
+		<div class="uk-modal-dialog">
+			<button class="uk-modal-close-default" type="button" uk-close></button>
+			<div class="uk-modal-header">
+				<h2 class="uk-modal-title">商品選択</h2>
+			</div>
+			<div class="uk-modal-body uk-width-expand uk-overflow-auto">
+			 	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-table-divider">
 					<thead>
 						<tr>
 							<th class="uk-text-nowrap">id</th>
@@ -316,16 +316,16 @@
 							</td>
 							<td class="uk-text-middle">￥{{list.kakaku}}</td>
 							<td class="uk-text-nowrap">
-							    ￥<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
-							    <span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
+								￥<span v-if="useUnitPrice == 1">{{list.unitPrice | number_format}}</span>
+								<span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
 							</td>
 							<td class="uk-text-middle">{{list.oroshi}}</td>
 							<td class="uk-text-middle">{{list.lotFlag}}</td>
 						</tr>
 					</tbody>
 				</table>   
-	        </div>
-	    </div>
+			</div>
+		</div>
 	</div>
 <script>
 
@@ -335,29 +335,29 @@ var app = new Vue({
 		lists: [],
 		sourceDivision: "<?php echo ($user_info->isUser())? $user_info->getDivisionId() : "" ; ?>",
 		targetDivision: '',
-        useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
+		useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
 	},
 	filters: {
-        number_format: function(value) {
-            if (! value ) { return 0; }
-            return new Intl.NumberFormat('ja-JP').format(value);
-        },
-    },
-    watch: {
-        lists: function() {
-            this.$nextTick(function() {
-                if($('.target').length > 0){
-                     $(window).scrollTop($('.target').offset().top - 100);
-                     app.lists.forEach(function(elem, index) {
-        				let changeObject = null;
-    				    changeObject = app.lists[index];
-    					changeObject.class.target = false;
-    					app.$set(app.lists, index, changeObject);
-        			});
-                }
-          })
-        }
-    },
+		number_format: function(value) {
+			if (! value ) { return 0; }
+			return new Intl.NumberFormat('ja-JP').format(value);
+		},
+	},
+	watch: {
+		lists: function() {
+			this.$nextTick(function() {
+				if($('.target').length > 0){
+					 $(window).scrollTop($('.target').offset().top - 100);
+					 app.lists.forEach(function(elem, index) {
+						let changeObject = null;
+						changeObject = app.lists[index];
+						changeObject.class.target = false;
+						app.$set(app.lists, index, changeObject);
+					});
+				}
+		  })
+		}
+	},
 	methods: {
 		addList: function(object) {
 			object.class = ((object.class == null)? {'target' : true} : object.class);
@@ -433,33 +433,33 @@ var app = new Vue({
 					return false;
 				}
 				
-	            loading();
+				loading();
 				$.ajax({
 					async: false,
-	                url: "<?php echo $api_url ?>",
-	                type:'POST',
-	                data:{
-	                    _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-	                    payoutDate : $('input[name=payoutDate]').val(),
-	                	Action : 'payoutRegistApi',
-	                	payout : JSON.stringify( objectValueToURIencode(app.lists) ),
-	                	sourceDivisionId : app.sourceDivision,
-	                	sourceDivisionName : encodeURI($('select[name="sourceDivision"] option:selected').text()),
-	                	targetDivisionId : app.targetDivision,
-	                	targetDivisionName : encodeURI($('select[name="targetDivision"] option:selected').text()),
-	                },
-	                dataType: 'json'
-	            })
-	            // Ajaxリクエストが成功した時発動
-	            .done( (data) => {
-	                if(data.code != '0'){
-	            		UIkit.modal.alert("払出に失敗しました").then(function(){
+					url: "<?php echo $api_url ?>",
+					type:'POST',
+					data:{
+						_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+						payoutDate : $('input[name=payoutDate]').val(),
+						Action : 'payoutRegistApi',
+						payout : JSON.stringify( objectValueToURIencode(app.lists) ),
+						sourceDivisionId : app.sourceDivision,
+						sourceDivisionName : encodeURI($('select[name="sourceDivision"] option:selected').text()),
+						targetDivisionId : app.targetDivision,
+						targetDivisionName : encodeURI($('select[name="targetDivision"] option:selected').text()),
+					},
+					dataType: 'json'
+				})
+				// Ajaxリクエストが成功した時発動
+				.done( (data) => {
+					if(data.code != '0'){
+						UIkit.modal.alert("払出に失敗しました").then(function(){
 						});
-	            		return false;
-	                }
-	                UIkit.modal.alert("払出が完了しました").then(function(){
-	                	if(data.data.labelCreateFlg)
-	                	{
+						return false;
+					}
+					UIkit.modal.alert("払出が完了しました").then(function(){
+						if(data.data.labelCreateFlg)
+						{
 							UIkit.modal.confirm("ラベルを発行しますか<br>※履歴から発行も可能です").then(function () {
 								$('input[name=payoutHistoryId]').val(data.data.payoutHistoryId);
 								$('form[name=LabelCreate]').submit();
@@ -467,21 +467,21 @@ var app = new Vue({
 							}, function() {
 								app.lists.splice(0, app.lists.length);
 							});
-	                	} else 
-	                	{
+						} else 
+						{
 							app.lists.splice(0, app.lists.length);
-	                	}
+						}
 					});
-	            })
-	            // Ajaxリクエストが失敗した時発動
-	            .fail( (data) => {
-	                UIkit.modal.alert("払出に失敗しました").then(function(){
+				})
+				// Ajaxリクエストが失敗した時発動
+				.fail( (data) => {
+					UIkit.modal.alert("払出に失敗しました").then(function(){
 					});
-	            })
-	            // Ajaxリクエストが成功・失敗どちらでも発動
-	            .always( (data) => {
+				})
+				// Ajaxリクエストが成功・失敗どちらでも発動
+				.always( (data) => {
 					loading_remove();
-	            });
+				});
 			},function(){
 				UIkit.modal.alert("中止しました");
 			});
@@ -586,7 +586,7 @@ var app = new Vue({
 						changeObject.lotNumberStyle.border = 'red 2px solid';
 						changeObject.lotDateStyle.border = 'red 2px solid';
 						app.$set(app.lists, index, changeObject);
-				    	chkLot = false;
+						chkLot = false;
 					}
 				}
 			});
@@ -604,13 +604,13 @@ var app = new Vue({
 						let changeObject = app.lists[index];
 						changeObject.lotNumberStyle.border = 'red 2px solid';
 						app.$set(app.lists, index, changeObject);
-			    		chkLot = false;
+						chkLot = false;
 					}
 					else if(app.lists[index].lotNumber && !app.lists[index].lotDate) {
 						let changeObject = app.lists[index];
 						changeObject.lotDateStyle.border = 'red 2px solid';
 						app.$set(app.lists, index, changeObject);
-			    		chkLot = false;
+						chkLot = false;
 					}
 				}
 			});
@@ -630,7 +630,7 @@ var app = new Vue({
 						let changeObject = app.lists[index];
 						changeObject.lotNumberStyle.border = 'red 2px solid';
 						app.$set(app.lists, index, changeObject);
-			    		chkLot = false;
+						chkLot = false;
 					}
 				}
 			});
@@ -676,7 +676,7 @@ var app = new Vue({
 						changeObject = app.lists[index];
 						changeObject.countNum = changeObject.irisu;
 						app.$set(app.lists, index, changeObject);
-	            		app.addCountStyle(index);
+						app.addCountStyle(index);
 					}
 				});
 			}, function() {
@@ -719,24 +719,24 @@ var app = new Vue({
 			}
 			$.ajax({
 				async: false,
-                url:'%url/rel:mpgt:labelBarcodeSAPI%',
-                type:'POST',
-                data:{
+				url:'%url/rel:mpgt:labelBarcodeSAPI%',
+				type:'POST',
+				data:{
 					_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-                	divisionId : app.targetDivision,
-                	barcode : barcode,
-                },
-                dataType: 'json'
-            })
-            // Ajaxリクエストが成功した時発動
-            .done( (data) => {
-            	if(data.count > 0)
-            	{
-            		if(data.data.divisionId != app.targetDivision)
-            		{
-	                	UIkit.modal.alert("払出先のカードではありません");
-	                	return false;
-            		}
+					divisionId : app.targetDivision,
+					barcode : barcode,
+				},
+				dataType: 'json'
+			})
+			// Ajaxリクエストが成功した時発動
+			.done( (data) => {
+				if(data.count > 0)
+				{
+					if(data.data.divisionId != app.targetDivision)
+					{
+						UIkit.modal.alert("払出先のカードではありません");
+						return false;
+					}
 					if(is_card)
 					{
 						let checked = false;
@@ -777,19 +777,19 @@ var app = new Vue({
 						data.lotNumber = '';
 						app.addList(data);
 					}
-            	} else {
-                	UIkit.modal.alert("情報が取得できませんでした。払出先部署が一致しているか確認してください。");
-                	return false;
-            	}
-            })
-            // Ajaxリクエストが失敗した時発動
-            .fail( (data) => {
-                UIkit.modal.alert("カード情報が取得できませんでした。カード情報と払出先部署が一致しているか確認してください。");
-            })
-            // Ajaxリクエストが成功・失敗どちらでも発動
-            .always( (data) => {
+				} else {
+					UIkit.modal.alert("情報が取得できませんでした。払出先部署が一致しているか確認してください。");
+					return false;
+				}
+			})
+			// Ajaxリクエストが失敗した時発動
+			.fail( (data) => {
+				UIkit.modal.alert("カード情報が取得できませんでした。カード情報と払出先部署が一致しているか確認してください。");
+			})
+			// Ajaxリクエストが成功・失敗どちらでも発動
+			.always( (data) => {
 				loading_remove();
-            });
+			});
 			
 		},
 		barcodeSearch: function(barcode , lotNumber , lotDate , gs1_128_search_flg) {
@@ -798,68 +798,68 @@ var app = new Vue({
 			}
 			$.ajax({
 				async: false,
-                url:'%url/rel:mpgt:labelBarcodeSAPI%',
-                type:'POST',
-                data:{
+				url:'%url/rel:mpgt:labelBarcodeSAPI%',
+				type:'POST',
+				data:{
 					_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-                	divisionId : app.sourceDivision,
-                	barcode : barcode,
-                },
-                dataType: 'json'
-            })
-            // Ajaxリクエストが成功した時発動
-            .done( (data) => {
-            	let value = 0;
-                if(data.code != 0 || data.data.length == 0){
-                	if(gs1_128_search_flg)
-                	{
+					divisionId : app.sourceDivision,
+					barcode : barcode,
+				},
+				dataType: 'json'
+			})
+			// Ajaxリクエストが成功した時発動
+			.done( (data) => {
+				let value = 0;
+				if(data.code != 0 || data.data.length == 0){
+					if(gs1_128_search_flg)
+					{
 						gs1_128.check_gs1_128(barcode);
-                	} else {
-            			UIkit.modal.alert("商品が見つかりませんでした");
-                	}
-            		return false;
-                }
-	            	app.source_division_disabled = true;
-                if(data.count == 1)
-                {
-                	data = data.data;
-                	
-                	if(data.divisionId != "" && app.sourceDivision != data.divisionId )
-                	{
-	            		UIkit.modal.alert("読み込んだバーコードの部署が払出元の部署と一致しません");
-	            		return false;
-                	}
-                	if(lotNumber != ''){
-                		data.lotNumber = lotNumber;
-                	}
-                	if(lotDate != ''){
-                		data.lotDate = lotDate;
-                	}
-                	app.addList(data);
-	                
-	                $('input[name="barcode"]').val('');
-                } else {
-                	data = data.data;
-                	modal_sections.clear();
-                	for(let num = 0 ; num < data.length ; num++)
-                	{
-	                	data[num].lotNumber = lotNumber;
-	                	data[num].lotDate = lotDate;
-                		modal_sections.addList(data[num]);
-                	}
-            		UIkit.modal.alert("複数の商品が見つかりました").then(function(){
-            			modal_sections.openModal();
-            		});
-                }
-            })
-            // Ajaxリクエストが失敗した時発動
-            .fail( (data) => {
-                UIkit.modal.alert("商品が見つかりませんでした");
-            })
-            // Ajaxリクエストが成功・失敗どちらでも発動
-            .always( (data) => {
+					} else {
+						UIkit.modal.alert("商品が見つかりませんでした");
+					}
+					return false;
+				}
+					app.source_division_disabled = true;
+				if(data.count == 1)
+				{
+					data = data.data;
+					
+					if(data.divisionId != "" && app.sourceDivision != data.divisionId )
+					{
+						UIkit.modal.alert("読み込んだバーコードの部署が払出元の部署と一致しません");
+						return false;
+					}
+					if(lotNumber != ''){
+						data.lotNumber = lotNumber;
+					}
+					if(lotDate != ''){
+						data.lotDate = lotDate;
+					}
+					app.addList(data);
+					
+					$('input[name="barcode"]').val('');
+				} else {
+					data = data.data;
+					modal_sections.clear();
+					for(let num = 0 ; num < data.length ; num++)
+					{
+						data[num].lotNumber = lotNumber;
+						data[num].lotDate = lotDate;
+						modal_sections.addList(data[num]);
+					}
+					UIkit.modal.alert("複数の商品が見つかりました").then(function(){
+						modal_sections.openModal();
+					});
+				}
+			})
+			// Ajaxリクエストが失敗した時発動
+			.fail( (data) => {
+				UIkit.modal.alert("商品が見つかりませんでした");
+			})
+			// Ajaxリクエストが成功・失敗どちらでも発動
+			.always( (data) => {
 				loading_remove();
-            });
+			});
 		}
 	}
 });
@@ -868,14 +868,14 @@ var modal_sections = new Vue({
 	el:	'#modal-sections',
 	data: {
 		select_items: [],
-        useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
+		useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
 	},
 	filters: {
-        number_format: function(value) {
-            if (! value ) { return 0; }
-            return new Intl.NumberFormat('ja-JP').format(value);
-        },
-    },
+		number_format: function(value) {
+			if (! value ) { return 0; }
+			return new Intl.NumberFormat('ja-JP').format(value);
+		},
+	},
 	methods: {
 		clear: function(){
 			let original = JSON.parse(JSON.stringify(this.select_items));
@@ -888,7 +888,7 @@ var modal_sections = new Vue({
 			app.addList(JSON.parse(JSON.stringify(this.select_items[index])));
 		},
 		openModal: function(){
-        	UIkit.modal('#modal-sections').show();
+			UIkit.modal('#modal-sections').show();
 		}
 	}
 });
@@ -934,6 +934,9 @@ var gs1_128 = new Vue({
 			
 			let objLotNumber = (obj["10"] === void 0) ? "" : obj["10"]; //lotNumber
 			let objLotDate = (obj["17"] === void 0) ? "" : this.changeDate(obj["17"]); //lotDate
+			if(objLotDate === ""){
+				objLotDate = (obj["7003"] === void 0) ? "" : this.changeDate(obj["7003"]); //lotDate
+			}
 			let existflg = false;
 			let changeObject = null;
 			
