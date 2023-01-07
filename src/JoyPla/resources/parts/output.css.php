@@ -1879,11 +1879,6 @@ background-color: rgb(31 41 55 / var(--tw-bg-opacity));
 background-color: rgb(59 130 246 / var(--tw-bg-opacity));
 }
 
-.bg-purple-200 {
---tw-bg-opacity: 1;
-background-color: rgb(233 213 255 / var(--tw-bg-opacity));
-}
-
 .bg-\[\#1e87f0\] {
 --tw-bg-opacity: 1;
 background-color: rgb(30 135 240 / var(--tw-bg-opacity));
@@ -2478,11 +2473,6 @@ color: rgb(127 29 29 / var(--tw-text-opacity));
 .text-red-700 {
 --tw-text-opacity: 1;
 color: rgb(185 28 28 / var(--tw-text-opacity));
-}
-
-.text-purple-900 {
---tw-text-opacity: 1;
-color: rgb(88 28 135 / var(--tw-text-opacity));
 }
 
 .text-\[\#333333\] {
