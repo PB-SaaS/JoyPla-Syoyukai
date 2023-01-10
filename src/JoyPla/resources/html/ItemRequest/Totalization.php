@@ -73,7 +73,7 @@
                                                 <th scope="col" class="px-6 py-4 border">
                                                     請求先部署名
                                                 </th>
-                                                <th scope="col" class="min-w-225 px-6 py-4 border">
+                                                <th scope="col" class="min-w-[255px] px-6 py-4 border">
                                                     商品情報
                                                 </th>
                                                 <th scope="col" class="px-6 py-4 border">
@@ -88,16 +88,16 @@
                                                 <th scope="col" class="px-6 py-4 border">
                                                     在庫数
                                                 </th>
-                                                <th scope="col" class="min-w-225 px-6 py-4 border">
+                                                <th scope="col" class="min-w-[255px] px-6 py-4 border">
                                                     払出数
                                                 </th>
-                                                <th scope="col" class="min-w-225 px-6 py-4 border">
+                                                <th scope="col" class="min-w-[255px] px-6 py-4 border">
                                                     ロット番号
                                                 </th>
-                                                <th scope="col" class="min-w-225 px-6 py-4 border">
+                                                <th scope="col" class="min-w-[255px] px-6 py-4 border">
                                                     使用期限
                                                 </th>
-                                                <th scope="col" class="min-w-225 px-6 py-4 border">
+                                                <th scope="col" class="min-w-[255px] px-6 py-4 border">
                                                     カード情報
                                                 </th>
                                                 <th scope="col" class="px-6 py-4 border">
@@ -200,7 +200,11 @@
                             <v-input name="itemJANCode" type="text" label="JANコード" title="JANコード"></v-input>
                         </div>
                         <div class="my-4">
-                            <v-multiple-select-division-v2 id="sourceDivisionIds" name="sourceDivisionIds" title="請求元部署名" :is-only-my-division="<?php var_export(gate('list_of_item_request_history')->isOnlyMyDivision()); ?>" />
+                            <v-multiple-select-division-v2 id="sourceDivisionIds" name="sourceDivisionIds" title="請求元部署名" :is-only-my-division="<?php var_export(
+                                gate(
+                                    'list_of_item_request_history'
+                                )->isOnlyMyDivision()
+                            ); ?>" />
                             </v-multiple-select-division-v2>
                         </div>
                         <div class="my-4">
