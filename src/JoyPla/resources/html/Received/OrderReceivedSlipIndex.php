@@ -9,6 +9,7 @@
                 <hr>
                 <div class="py-5">
                     <v-button-primary type="button" :disabled="! isChange" @click.native="onRegister">入荷照合確定</v-button-primary>
+                    <v-button-primary type="button" @click.native="reflect">入荷可能数を反映</v-button-primary>
                 </div>
                 <div class="p-4 text-base bg-gray-100 border border-gray-400">
                     <v-text title="登録日" class="flex w-full gap-6">{{ order.registDate }}</v-text>
@@ -547,6 +548,19 @@
                         result : [];
                 };
 
+                const reflect = () => {
+                    for(val of fields.value){
+                        if(val.value.receiveds && val.value.receiveds.length > 0){ //入力済みは対象外
+                            continue;
+                        }
+                        if (val.value.lotManagement == "1") { //ロット管理必須のものは対象外
+                            continue;
+                        }
+                        val.value.receiveds = [{"receivedQuantity": val.value.orderQuantity - val.value.receivedQuantity, "lotNumber": "", "lotDate": "",}];
+                        val.value.sumReceivedQuantity = val.value.sumReceivedQuantity + val.value.orderQuantity - val.value.receivedQuantity;
+                    }
+                }
+
                 return {
                     selectInHospitalItems,
                     openModal,
@@ -564,7 +578,8 @@
                     breadcrumbs,
                     loading,
                     start,
-                    complete
+                    complete,
+                    reflect,
                 }
             },
             watch: {}
