@@ -1,6 +1,7 @@
 <?php
 
 namespace JoyPla\Enterprise\Models {
+
     use DateTime;
     use JoyPla\Enterprise\Traits\ValueObjectTrait;
     use Exception;
@@ -38,7 +39,8 @@ namespace JoyPla\Enterprise\Models {
             }
             if (
                 preg_match('/^[a-zA-Z0-9!-\/:-@¥[-`{-~]+/', $value) &&
-                mb_strlen($value) <= 20) {
+                mb_strlen($value) <= 20
+            ) {
                 return true;
             }
 
@@ -76,9 +78,11 @@ namespace JoyPla\Enterprise\Models {
             if ($value === "" || $value === null) {
                 return true;
             }
-            if (preg_match(self::FORMAT_DELIMITER_SLASH, $value) ||
+            if (
+                preg_match(self::FORMAT_DELIMITER_SLASH, $value) ||
                 preg_match(self::FORMAT_DELIMITER_HYPHEN, $value) ||
-                preg_match(self::FORMAT_DELIMITER_JAPANESE_CHARACTER, $value)) {
+                preg_match(self::FORMAT_DELIMITER_JAPANESE_CHARACTER, $value)
+            ) {
                 return true;
             }
             return false;
@@ -295,18 +299,18 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        public const Unordered = 1;//未発注
-        public const Ordered = 2;//発注
-        public const ReceivedOrder = 3;//受注
-        public const DeliveryDateReported = 4;//受注
-        public const PartialReceivingComplete = 5;//受注
-        public const ReceivingComplete = 6;//受注
-        public const DeliveryReset = 7;//受注
-        public const Rental = 8;//受注
+        public const Unordered = 1; //未発注
+        public const Ordered = 2; //発注
+        public const ReceivedOrder = 3; //受注
+        public const DeliveryDateReported = 4; //受注
+        public const PartialReceivingComplete = 5; //受注
+        public const ReceivingComplete = 6; //受注
+        public const DeliveryReset = 7; //受注
+        public const Rental = 8; //受注
 
         public function __construct(string $value)
         {
-            switch($value) {
+            switch ($value) {
                 case self::Unordered:
                     $this->value = self::Unordered;
                     break;
@@ -339,7 +343,7 @@ namespace JoyPla\Enterprise\Models {
                     $this->value = self::Rental;
                     break;
                 default:
-                    throw new Exception(self::class." Is Not Value", 422);
+                    throw new Exception(self::class . " Is Not Value", 422);
             }
         }
     }
@@ -495,7 +499,7 @@ namespace JoyPla\Enterprise\Models {
 
         public function __construct(string $value)
         {
-            $this->siDateTime = new SiDateTime($value) ;
+            $this->siDateTime = new SiDateTime($value);
         }
 
         public function isToday()
@@ -719,11 +723,11 @@ namespace JoyPla\Enterprise\Models {
         use ValueObjectTrait;
 
         public const FixedQuantityOrder = 1;
-        public const IndividualOrder = 2;//発注
+        public const IndividualOrder = 2; //発注
 
         public function __construct(string $value)
         {
-            switch($value) {
+            switch ($value) {
                 case self::FixedQuantityOrder:
                     $this->value = self::FixedQuantityOrder;
                     break;
@@ -739,7 +743,7 @@ namespace JoyPla\Enterprise\Models {
 
         public function toString()
         {
-            switch($this->value) {
+            switch ($this->value) {
                 case self::FixedQuantityOrder:
                     return "定数発注";
                     break;
@@ -800,9 +804,11 @@ namespace JoyPla\Enterprise\Models {
             if ($value === "now") {
                 return true;
             }
-            if (preg_match(self::FORMAT_DELIMITER_SLASH, $value) ||
+            if (
+                preg_match(self::FORMAT_DELIMITER_SLASH, $value) ||
                 preg_match(self::FORMAT_DELIMITER_HYPHEN, $value) ||
-                preg_match(self::FORMAT_DELIMITER_JAPANESE_CHARACTER, $value)) {
+                preg_match(self::FORMAT_DELIMITER_JAPANESE_CHARACTER, $value)
+            ) {
                 return true;
             }
             return false;
@@ -869,9 +875,11 @@ namespace JoyPla\Enterprise\Models {
             if ($value === "now") {
                 return true;
             }
-            if (preg_match(self::FORMAT_DELIMITER_SLASH, $value) ||
+            if (
+                preg_match(self::FORMAT_DELIMITER_SLASH, $value) ||
                 preg_match(self::FORMAT_DELIMITER_HYPHEN, $value) ||
-                preg_match(self::FORMAT_DELIMITER_JAPANESE_CHARACTER, $value)) {
+                preg_match(self::FORMAT_DELIMITER_JAPANESE_CHARACTER, $value)
+            ) {
                 return true;
             }
             return false;
@@ -1140,7 +1148,7 @@ namespace JoyPla\Enterprise\Models {
 
         public function __construct($value)
         {
-            if (! self::isValid($value)) {
+            if (!self::isValid($value)) {
                 throw new Exception(self::class . " is valid error.", 422);
             }
 
@@ -1168,9 +1176,11 @@ namespace JoyPla\Enterprise\Models {
             if ($value === "now") {
                 return true;
             }
-            if (preg_match(self::FORMAT_DELIMITER_SLASH, $value) ||
+            if (
+                preg_match(self::FORMAT_DELIMITER_SLASH, $value) ||
                 preg_match(self::FORMAT_DELIMITER_HYPHEN, $value) ||
-                preg_match(self::FORMAT_DELIMITER_JAPANESE_CHARACTER, $value)) {
+                preg_match(self::FORMAT_DELIMITER_JAPANESE_CHARACTER, $value)
+            ) {
                 return true;
             }
             return false;
@@ -1193,12 +1203,12 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        public const Consumption = 1;//通常消費
-        public const Borrowing = 2;//貸出品
+        public const Consumption = 1; //通常消費
+        public const Borrowing = 2; //貸出品
 
         public function __construct(string $value = self::Consumption)
         {
-            switch($value) {
+            switch ($value) {
                 case self::Consumption:
                     $this->value = self::Consumption;
                     break;
@@ -1214,7 +1224,7 @@ namespace JoyPla\Enterprise\Models {
 
         public function toString()
         {
-            switch($this->value) {
+            switch ($this->value) {
                 case self::Consumption:
                     return "通常消費";
                     break;
@@ -1234,12 +1244,12 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        public const Received = 1;//通常消費
-        public const Borrowing = 2;//貸出品
+        public const Received = 1; //通常消費
+        public const Borrowing = 2; //貸出品
 
         public function __construct(string $value = self::Received)
         {
-            switch($value) {
+            switch ($value) {
                 case self::Received:
                     $this->value = self::Received;
                     break;
@@ -1255,7 +1265,7 @@ namespace JoyPla\Enterprise\Models {
 
         public function toString()
         {
-            switch($this->value) {
+            switch ($this->value) {
                 case self::Received:
                     return "通常入庫";
                     break;
@@ -1284,18 +1294,18 @@ namespace JoyPla\Enterprise\Models {
          * 8	貸出品
          */
 
-        public const UnOrdered = 1;//未発注
-        public const OrderCompletion = 2;//発注完了
-        public const OrderFinished = 3;//受注完了
-        public const DeliveryDateReported = 4;//納期報告済
-        public const PartOfTheCollectionIsIn = 5;//一部入庫完了
-        public const ReceivingIsComplete = 6;//入庫完了
-        public const DeliveryIsCanceled = 7;//納品取消
-        public const Borrowing = 8;//貸出品
+        public const UnOrdered = 1; //未発注
+        public const OrderCompletion = 2; //発注完了
+        public const OrderFinished = 3; //受注完了
+        public const DeliveryDateReported = 4; //納期報告済
+        public const PartOfTheCollectionIsIn = 5; //一部入庫完了
+        public const ReceivingIsComplete = 6; //入庫完了
+        public const DeliveryIsCanceled = 7; //納品取消
+        public const Borrowing = 8; //貸出品
 
         public function __construct($value = self::UnOrdered)
         {
-            switch($value) {
+            switch ($value) {
                 case self::UnOrdered:
                     $this->value = self::UnOrdered;
                     break;
@@ -1329,7 +1339,7 @@ namespace JoyPla\Enterprise\Models {
 
         public function toString()
         {
-            switch($this->value) {
+            switch ($this->value) {
                 case self::UnOrdered:
                     return "未発注";
                     break;
@@ -1380,13 +1390,13 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        public const NotInStock = 1;//未入庫
-        public const PartOfTheCollectionIsIn = 2;//一部入庫完了
-        public const ReceivingIsComplete = 3;//入庫完了
+        public const NotInStock = 1; //未入庫
+        public const PartOfTheCollectionIsIn = 2; //一部入庫完了
+        public const ReceivingIsComplete = 3; //入庫完了
 
         public function __construct($value = self::NotInStock)
         {
-            switch($value) {
+            switch ($value) {
                 case self::NotInStock:
                     $this->value = self::NotInStock;
                     break;
@@ -1405,7 +1415,7 @@ namespace JoyPla\Enterprise\Models {
 
         public function toString()
         {
-            switch($this->value) {
+            switch ($this->value) {
                 case self::NotInStock:
                     return "未入庫";
                     break;
@@ -1505,7 +1515,7 @@ namespace JoyPla\Enterprise\Models {
 
         public function __construct(int $value)
         {
-            switch($value) {
+            switch ($value) {
                 case self::OrdinaryRequest:
                     $this->value = self::OrdinaryRequest;
                     break;
@@ -1520,7 +1530,7 @@ namespace JoyPla\Enterprise\Models {
 
         public function toString()
         {
-            switch($this->value) {
+            switch ($this->value) {
                 case self::OrdinaryRequest:
                     return "個別請求";
                     break;
@@ -1554,6 +1564,52 @@ namespace JoyPla\Enterprise\Models {
         {
         }
     }
+
+    class PayoutHId
+    {
+        use ValueObjectTrait;
+
+        private string $value = "";
+        private static array $values = [];
+        private static int $count = 0;
+        public function __construct(string $value)
+        {
+            $this->value = $value;
+        }
+
+        public static function generate()
+        {
+            $id = uniqid('05');
+            if (in_array($id, self::$values, true)) {
+                return self::generate();
+            }
+            self::$values[] = $id;
+
+            usleep(1000);
+            return new self($id);
+        }
+    }
+
+    class PayoutQuantity
+    {
+        use ValueObjectTrait;
+
+        private string $value = "";
+        public function __construct(int $value)
+        {
+            $this->value = $value;
+        }
+
+        public function add(PayoutQuantity $value)
+        {
+            return new PayoutQuantity(($this->value + $value->value()));
+        }
+
+        public static function isValid(int $value)
+        {
+        }
+    }
+
     /**
      * 都道府県
      */

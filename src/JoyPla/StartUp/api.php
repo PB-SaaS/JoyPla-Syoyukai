@@ -42,6 +42,8 @@ use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestHistoryInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestDeleteInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\RequestItemDeleteInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestUpdateInteractor;
+use JoyPla\Application\Interactors\Api\ItemRequest\TotalizationInteractor;
+use JoyPla\Application\Interactors\Api\Payout\PayoutRegisterInteractor;
 use JoyPla\InterfaceAdapters\Controllers\Api\BarcodeController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ConsumptionController;
 use JoyPla\InterfaceAdapters\Controllers\Api\DistributorController;
@@ -55,6 +57,7 @@ use JoyPla\InterfaceAdapters\Controllers\Api\ReturnController;
 use JoyPla\InterfaceAdapters\Controllers\Api\StocktakingController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ReferenceController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ItemRequestController;
+use JoyPla\InterfaceAdapters\Controllers\Api\PayoutController;
 use JoyPla\InterfaceAdapters\GateWays\Repository\BarcodeRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\CardRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ConsumptionRepository;
@@ -74,6 +77,8 @@ use JoyPla\InterfaceAdapters\GateWays\Repository\StockRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ConsumptionHistoryRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRequestRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\RequestItemCountRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\TotalizationRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\PayoutRepository;
 use JoyPla\InterfaceAdapters\Presenters\Api\Barcode\BarcodeOrderSearchPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Barcode\BarcodeSearchPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Consumption\ConsumptionDeletePresenter;
@@ -106,6 +111,8 @@ use JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest\ItemRequestHistoryPresen
 use JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest\ItemRequestDeletePresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest\RequestItemDeletePresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest\ItemRequestUpdatePresenter;
+use JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest\TotalizationPresenter;
+use JoyPla\InterfaceAdapters\Presenters\Api\Payout\PayoutRegisterPresenter;
 use JoyPla\JoyPlaApplication;
 use Test\Exceptions\ApiExceptionHandler;
 
@@ -186,6 +193,10 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () {
     Router::map('DELETE', '/api/itemrequest/:requestHId/:requestId/delete', [ItemRequestController::class, 'itemDelete'])->service(new RequestItemDeleteInteractor(new RequestItemDeletePresenter(), new ItemRequestRepository(), new RequestItemCountRepository()));
 
     Router::map('PATCH', '/api/itemrequest/:requestHId/update', [ItemRequestController::class, 'update'])->service(new ItemRequestUpdateInteractor(new ItemRequestUpdatePresenter(), new ItemRequestRepository(), new RequestItemCountRepository()));
+
+    Router::map('GET', '/api/itemrequest/totalization', [ItemRequestController::class, 'totalization'])->service(new TotalizationInteractor(new TotalizationPresenter(), new TotalizationRepository()));
+
+    Router::map('POST', '/api/payout/register', [PayoutController::class, 'register'])->service(new PayoutRegisterInteractor(new PayoutRegisterPresenter(), new PayoutRepository(), new RequestItemCountRepository(), new InventoryCalculationRepository()));
 });
 
 $router = new Router();

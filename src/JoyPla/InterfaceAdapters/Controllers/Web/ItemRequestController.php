@@ -4,12 +4,15 @@ namespace JoyPla\InterfaceAdapters\Controllers\Web;
 
 use App\SpiralDb\Hospital;
 use Auth;
+use Csrf;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Http\View;
 use framework\Routing\Router;
 use JoyPla\Application\InputPorts\Web\ItemRequest\ItemRequestShowInputData;
 use JoyPla\Application\InputPorts\Web\ItemRequest\ItemRequestShowInputPortInterface;
+use JoyPla\Application\InputPorts\Web\ItemRequest\PickingListInputData;
+use JoyPla\Application\InputPorts\Web\ItemRequest\PickingListInputPortInterface;
 
 class ItemRequestController extends Controller
 {
@@ -41,20 +44,43 @@ class ItemRequestController extends Controller
         if (Gate::denies('list_of_item_request_history')) {
             Router::abort(403);
         }
+
         $gate = Gate::getGateInstance('list_of_item_request_history');
         $inputData = new ItemRequestShowInputData($this->request->user(), $vars['requestHId'], $gate->isOnlyMyDivision());
         $inputPort->handle($inputData);
     }
 
-    /*
-    public function pickingList($vars, ItemRequestsInputPortInterface $inputPort)
+    public function totalization($vars)
     {
-        if (Gate::denies('list_of_item_requests')) {
+        if (Gate::denies('totalization_of_item_requests')) {
             Router::abort(403);
         }
-        $gate = Gate::getGateInstance('list_of_item_requests');
-        $inputData = new ItemRequestsInputData($this->request->user(), $vars['requestHId'], $gate->isOnlyMyDivision());
+
+        $gate = Gate::getGateInstance('totalization_of_item_requests');
+        $body = View::forge('html/ItemRequest/Totalization', [], false)->render();
+        echo view('html/Common/Template', compact('body'), false)->render();
+    }
+
+    public function pickingList($vars, PickingListInputPortInterface $inputPort)
+    {
+        $token = $this->request->get('_token');
+        Csrf::validate($token, true);
+
+        if (Gate::denies('totalization_of_item_requests')) {
+            Router::abort(403);
+        }
+
+        $gate = Gate::getGateInstance('totalization_of_item_requests');
+
+        $search = $this->request->get('search');
+
+        $user = $this->request->user();
+
+        if ($gate->isOnlyMyDivision()) {
+            $search['sourceDivisionIds'] = [$user->divisionId];
+        }
+
+        $inputData = new PickingListInputData($this->request->user(), $search, $gate->isOnlyMyDivision());
         $inputPort->handle($inputData);
     }
-    */
 }
