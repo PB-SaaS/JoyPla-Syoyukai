@@ -73,7 +73,7 @@
                                                 <th scope="col" class="px-6 py-4 border">
                                                     請求先部署名
                                                 </th>
-                                                <th scope="col" class="min-w-[255px] px-6 py-4 border">
+                                                <th scope="col" class="min-w-[225px] px-6 py-4 border">
                                                     商品情報
                                                 </th>
                                                 <th scope="col" class="px-6 py-4 border">
@@ -88,16 +88,16 @@
                                                 <th scope="col" class="px-6 py-4 border">
                                                     在庫数
                                                 </th>
-                                                <th scope="col" class="min-w-[255px] px-6 py-4 border">
+                                                <th scope="col" class="min-w-[225px] px-6 py-4 border">
                                                     払出数
                                                 </th>
-                                                <th scope="col" class="min-w-[255px] px-6 py-4 border">
+                                                <th scope="col" class="min-w-[225px] px-6 py-4 border">
                                                     ロット番号
                                                 </th>
-                                                <th scope="col" class="min-w-[255px] px-6 py-4 border">
+                                                <th scope="col" class="min-w-[225px] px-6 py-4 border">
                                                     使用期限
                                                 </th>
-                                                <th scope="col" class="min-w-[255px] px-6 py-4 border">
+                                                <th scope="col" class="min-w-[225px] px-6 py-4 border">
                                                     カード情報
                                                 </th>
                                                 <th scope="col" class="px-6 py-4 border">
@@ -200,15 +200,11 @@
                             <v-input name="itemJANCode" type="text" label="JANコード" title="JANコード"></v-input>
                         </div>
                         <div class="my-4">
-                            <v-multiple-select-division-v2 id="sourceDivisionIds" name="sourceDivisionIds" title="請求元部署名" :is-only-my-division="<?php var_export(
-                                gate(
-                                    'list_of_item_request_history'
-                                )->isOnlyMyDivision()
-                            ); ?>" />
+                            <v-multiple-select-division-v2 id="sourceDivisionIds" name="sourceDivisionIds" title="請求元部署名" />
                             </v-multiple-select-division-v2>
                         </div>
                         <div class="my-4">
-                            <v-multiple-select-division-v2 id="targetDivisionIds" name="targetDivisionIds" title="請求先部署名" />
+                            <v-multiple-select-division-v2 id="targetDivisionIds" name="targetDivisionIds" title="請求先部署名" :is-only-my-division="<?php var_export(gate('list_of_item_request_history')->isOnlyMyDivision()); ?>" />
                             </v-multiple-select-division-v2>
                         </div>
                         <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
@@ -1025,6 +1021,13 @@
                                 icon: 'error',
                                 title: 'エラー',
                                 text: '請求数を超過するカードは使用できません。',
+                            });
+                            return false;
+                        }
+                        if ((values.totalizations[target[0]].totalPayoutQuantity + cardQuantity) > values.totalizations[target[0]].totalRequestQuantity) {
+                            Swal.fire({
+                                icon: 'info',
+                                title: '請求必要数を超過するため反映できません。',
                             });
                             return false;
                         }

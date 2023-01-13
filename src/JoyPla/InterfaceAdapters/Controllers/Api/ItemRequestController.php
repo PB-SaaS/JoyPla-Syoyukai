@@ -152,7 +152,7 @@ class ItemRequestController extends Controller
         $user = $this->request->user();
 
         if ($gate->isOnlyMyDivision()) {
-            $search['sourceDivisionIds'] = [$user->divisionId];
+            $search['targetDivisionIds'] = [$user->divisionId];
         }
 
         $inputData = new TotalizationInputData($user, $search);
