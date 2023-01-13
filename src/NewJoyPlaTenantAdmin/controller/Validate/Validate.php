@@ -58,7 +58,7 @@ abstract class FieldTypeValidate
             $row = $rowData[$rowNumber]['data'];
             $index = $rowData[$rowNumber]['index'];
             foreach (array_map(null, $fieldInfoList, $row) as [$info, $column]) {
-                $signingColumn = (isValueEmpty($column)) ? "" : htmlSanitize($column);
+                $signingColumn = (isValueEmpty($column)) ? "" : ($column);
                 /* 2021/11追加ここから */
                 /*
                 文字列型の場合は文頭・文末の空白文字を削除
@@ -97,7 +97,7 @@ abstract class FieldTypeValidate
 
     private function trim($column)
     {
-        $column = urldecode($column);
+        $column = rawurldecode(rawurldecode(urlencode($column)));
         return $column = (is_string($column)) ? preg_replace('/\A[\p{Cc}\p{Cf}\p{Z}]++|[\p{Cc}\p{Cf}\p{Z}]++\z/u', '', $column) : $column;
     }
 
@@ -111,7 +111,7 @@ abstract class FieldTypeValidate
             //$row = explode("\t", $_POST["rowData[" . $rowNumber . "]"]);
             $row = $rowData[$rowNumber]['data'];
             foreach ($row as $key => $column) {
-                $signingColumn = (isValueEmpty($column)) ? "" : htmlSanitize($column);
+                $signingColumn = (isValueEmpty($column)) ? "" : $column;
                 $rowData[$rowNumber]['data'][$key] = $this->trim($signingColumn);
             }
         }
