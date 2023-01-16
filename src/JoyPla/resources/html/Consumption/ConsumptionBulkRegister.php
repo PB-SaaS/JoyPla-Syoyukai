@@ -215,8 +215,8 @@ var JoyPlaApp = Vue.createApp({
 
       const consumeQuantity = (idx) => {
         let num = 0;
-        num += values.consumeItems[idx].consumeQuantity;
-        num += values.consumeItems[idx].quantity * values.consumeItems[idx].consumeUnitQuantity;
+        num += parseInt(values.consumeItems[idx].consumeQuantity);
+        num += parseInt(values.consumeItems[idx].quantity * values.consumeItems[idx].consumeUnitQuantity);
         return num;
       };
 
