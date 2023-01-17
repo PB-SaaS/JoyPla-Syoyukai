@@ -402,6 +402,83 @@ class GoodsController extends Controller
             false
         );
     }
+
+    public function allInsertForm()
+    {
+        global $SPIRAL;
+        try {
+            $session = $SPIRAL->getSession();
+            $auth = new Auth();
+            $session->put('tenantId', $auth->tenantId);
+
+            $content = $this->view(
+                'NewJoyPlaTenantAdmin/view/Template/Parts/IframeContent',
+                [
+                    'title' => '商品・金額・院内商品情報登録',
+                    'width' => '100%',
+                    'height' => '100%',
+                    'url' => '/regist/is',
+                    'hiddens' => [
+                        'SMPFORM' => '%smpform:itemInsertForm%',
+                        'tenantId' => '%val:usr:tenantId%',
+                    ],
+                ],
+                false
+            )->render();
+        } catch (Exception $ex) {
+            $content = $this->view(
+                'NewJoyPlaTenantAdmin/view/Template/Error',
+                [
+                    'code' => $ex->getCode(),
+                    'message' => $ex->getMessage(),
+                ],
+                false
+            )->render();
+        } finally {
+            $script = $this->view(
+                'NewJoyPlaTenantAdmin/view/Template/Parts/TableScript',
+                [],
+                false
+            )->render();
+            $style = $this->view(
+                'NewJoyPlaTenantAdmin/view/Template/Parts/StyleCss',
+                [],
+                false
+            )->render();
+            $sidemenu = $this->view(
+                'NewJoyPlaTenantAdmin/view/Template/Parts/SideMenu',
+                [
+                    'n3' => 'uk-active uk-open',
+                    'n3_10' => 'uk-active',
+                ],
+                false
+            )->render();
+            $head = $this->view(
+                'NewJoyPlaTenantAdmin/view/Template/Parts/Head',
+                [],
+                false
+            )->render();
+            $header = $this->view(
+                'NewJoyPlaTenantAdmin/view/Template/Parts/Header',
+                [],
+                false
+            )->render();
+            // テンプレートにパラメータを渡し、HTMLを生成し返却
+            return $this->view(
+                'NewJoyPlaTenantAdmin/view/Template/Base',
+                [
+                    'title' => 'JoyPla 商品・金額・院内商品情報登録',
+                    'sidemenu' => $sidemenu,
+                    'content' => $content,
+                    'head' => $head,
+                    'header' => $header,
+                    'style' => $style,
+                    'before_script' => $script,
+                ],
+                false
+            );
+        }
+    }
 }
 
 /***
@@ -420,6 +497,8 @@ if ($action === 'insert') {
     echo $GoodsController->bulkInsertValidateCheck2Api()->render();
 } elseif ($action === 'bulkInsertApi') {
     echo $GoodsController->bulkInsertApi()->render();
+} elseif ($action === 'allInsertForm') {
+    echo $GoodsController->allInsertForm()->render();
 } else {
     echo $GoodsController->index()->render();
 }

@@ -5,22 +5,23 @@
                 <h1>商品情報詳細</h1>
             </div>
             <div class="uk-width-1-2@m uk-text-right">
-                <form action="<?php echo $form_url ?>" method="post" uk-margin>
+                <form action="<?php echo $form_url; ?>" method="post" uk-margin>
                     <button class="uk-button uk-button-primary" type="submit" value="itemUpdate" name="Action">商品情報変更</button>
                     <button class="uk-button uk-button-primary" type="submit" value="priceReg" name="Action">金額情報登録</button>
+                    <button class="uk-button uk-button-primary" type="submit" value="priceAndInHospitalItemReg" name="Action">金額・院内商品情報登録</button>
                     <button class="uk-button uk-button-primary" type="submit" value="inHospitalItemReg" name="Action">院内商品登録</button>
                 </form>
             </div>
         </div>
         <div>
             <ul class="uk-child-width-expand uk-tab" >
-                <li class="<?php echo $switch_1 ?>"><a href="#" onclick="location.href='<?php echo $base_url ?>&table_cache=true'">基本情報</a></li>
-                <li class="<?php echo $switch_2 ?>"><a href="#" onclick="location.href='<?php echo $base_url ?>&Switcher=logs'">登録変更履歴</a></li>
-                <li class="<?php echo $switch_3 ?>"><a href="#" onclick="location.href='<?php echo $base_url ?>&Switcher=priceList'">金額情報一覧</a></li>
-                <li class="<?php echo $switch_4 ?>"><a href="#" onclick="location.href='<?php echo $base_url ?>&Switcher=InHospitalItems'">院内商品情報</a></li>
+                <li class="<?php echo $switch_1; ?>"><a href="#" onclick="location.href='<?php echo $base_url; ?>&table_cache=true'">基本情報</a></li>
+                <li class="<?php echo $switch_2; ?>"><a href="#" onclick="location.href='<?php echo $base_url; ?>&Switcher=logs'">登録変更履歴</a></li>
+                <li class="<?php echo $switch_3; ?>"><a href="#" onclick="location.href='<?php echo $base_url; ?>&Switcher=priceList'">金額情報一覧</a></li>
+                <li class="<?php echo $switch_4; ?>"><a href="#" onclick="location.href='<?php echo $base_url; ?>&Switcher=InHospitalItems'">院内商品情報</a></li>
             </ul>
         </div>
-        <?php if($switch_1 != ""): ?>
+        <?php if ($switch_1 != ''): ?>
         <table class="uk-table uk-table-divider">
             <tbody>
             <tr>
@@ -180,11 +181,11 @@
                 <tr></tr>
             </tfoot>
         </table>
-        <?php elseif($switch_2 != ""): ?>
+        <?php elseif ($switch_2 != ''): ?>
 		<div class="uk-margin spiral_table_area" style="display:none">
 			%sf:usr:search21:table:mstfilter%
 		</div>
-        <?php elseif($switch_3 != ""): ?>
+        <?php elseif ($switch_3 != ''): ?>
 		<div class="uk-margin spiral_table_area" style="display:none">
             <div>
                 <button class="uk-button uk-button-primary" type="button" name="Action" uk-toggle="target: #price-select-bulk-update">選択した情報を一括更新する</button>
@@ -246,10 +247,10 @@
                         loading();
                         $.ajax({
                             async: false,
-                            url: "<?php echo $price_api_url ?>",
+                            url: "<?php echo $price_api_url; ?>",
                             type:'POST',
                             data:{
-                                _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+                                _csrf: "<?php echo $csrf_token; ?>",  // CSRFトークンを送信
                                 Action : "bulkPriceUpdate",
                                 ids : JSON.stringify(ids),
                                 unitPrice : $('input[name="unitPrice"]')[0].value,
@@ -282,11 +283,11 @@
             </script>
 			%sf:usr:search29:table:mstfilter%
 		</div>
-        <?php elseif($switch_4 !== ""): ?>
+        <?php elseif ($switch_4 !== ''): ?>
     	<div class="uk-margin spiral_table_area" style="display:none">
     		%sf:usr:search47:table:mstfilter%
     	</div>
-        <?php endif ?>
+        <?php endif; ?>
         <script>
             let elem = $('table tbody a');
             let param = "ItemSlip";
