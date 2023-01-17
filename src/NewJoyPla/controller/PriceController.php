@@ -9,6 +9,7 @@ use Csrf;
 
 use App\Lib\UserInfo;
 use App\Model\Distributor;
+use App\Model\Tenant;
 use ApiErrorCode\FactoryApiErrorCode;
 
 use stdClass;
@@ -44,6 +45,14 @@ class PriceController extends Controller
                     $val->distributorName,
                     $val->distributorId
                 ];
+            }
+
+            $tenantKind = '';
+            $tenantId = $user_info->getTenantId();
+            if ($tenantId) {
+                $tenant = Tenant::where('tenantId', $tenantId)->get();
+                $tenant = $tenant->data->all()[0];
+                $tenantKind = $tenant->tenantKind;
             }
 
             $content = $this->view('NewJoyPla/view/template/List', [
