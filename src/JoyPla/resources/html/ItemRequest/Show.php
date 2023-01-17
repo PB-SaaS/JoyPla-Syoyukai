@@ -54,7 +54,7 @@
                                                 <p class="text-md text-gray-500">{{ item.value.item.itemJANCode }}</p>
                                                 <?php if (gate('update_of_item_request_history')->can()) : ?>
                                                     <p class="text-base text-gray-900 lg:w-1/2">
-                                                        <v-input-number @change="checkQuantity(idx); isChange = true" change-class-name="inputChange" :rules=" { between: [1 , 99999] }" :name="`requestItems[${idx}].requestQuantity`" label="請求数（入数）" :min="0" :unit="item.value.quantity.quantityUnit" :step="1" title="請求数（入数）"></v-input-number>
+                                                        <v-input-number @change="checkQuantity(idx); isChange = true" change-class-name="inputChange" :rules=" {required: true, between: [1 , 99999] }" :name="`requestItems[${idx}].requestQuantity`" label="請求数（入数）" :min="0" :unit="item.value.quantity.quantityUnit" :step="1" title="請求数（入数）"></v-input-number>
                                                     </p>
                                                 <?php else : ?>
                                                     <div class="md:flex gap-6 ">
@@ -205,7 +205,7 @@
             const checkQuantity = (idx) => {
                 if (values.requestItems[idx]) {
                     if (!values.requestItems[idx].requestQuantity || values.requestItems[idx].requestQuantity < 0) {
-                        values.requestItems[idx].requestQuantity = 1;
+                        values.requestItems[idx].requestQuantity = 0;
                     }
                 }
             }
