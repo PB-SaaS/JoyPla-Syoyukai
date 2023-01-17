@@ -37,7 +37,7 @@
                 </form>
                 <?php endif ?>
                 <?php if($tenantKind == "1" && ($userInfo->isAdmin() || $userInfo->isApprover())): ?>
-                <input class="print_hidden uk-button uk-button-primary" type="submit" value="金額情報・院内商品情報登録" onclick="document.priceAndInHPItemsReg.submit()">
+                <input class="print_hidden uk-button uk-button-primary" type="submit" value="金額情報・院内商品情報登録" onclick="inHPItemAndPriceRegConfirm()">
                 <form action="<?php echo $root_url ?>" method="post" name="priceAndInHPItemsReg" class="uk-hidden">
                     <input type="hidden" name="_method" value="post">
                     <input type="hidden" name="path" value="/product/PriceAndInHospitalRegist/input">
@@ -350,6 +350,20 @@ function inHPItemsRegConfirm()
         is_inHPItemsRegChecked = true;
     }else{
         document.inHPItemsReg.submit()
+    }
+}
+function inHPItemAndPriceRegConfirm()
+{
+    if($("#inHP .smp-row-data").length > 0){
+        UIkit.modal.confirm('院内商品情報は登録済みです。追加で登録しますか？').then(function(){
+            console.log("登録する");
+            document.inHPItemsReg.submit();
+        }, function(){
+            console.log("登録しない");
+        });
+        is_inHPItemsRegChecked = true;
+    }else{
+        document.priceAndInHPItemsReg.submit();
     }
 }
 </script>
