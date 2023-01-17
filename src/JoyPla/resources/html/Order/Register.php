@@ -74,7 +74,7 @@
               </div>
               <div class="pt-4 pb-2 w-full">
                 <div class="border-t border-gray-200"></div>
-              </div>
+              </div> 
             </div>
           </transition-group>
         </div>
@@ -134,10 +134,10 @@
   </v-open-modal>
 </div>
 
-<script>
+<script> 
   var JoyPlaApp = Vue.createApp({
     setup() {
-
+      
       const {
         ref,
         toRef,
@@ -165,7 +165,7 @@
         }, 500);
       }
       start();
-
+      
       onMounted(() => {
         sleepComplate()
       });
@@ -199,7 +199,7 @@
         update,
         replace
       } = useFieldArray('orderItems', control);
-
+    
       const integrate = ref(localStorage.joypla_unorder_slip_integrate === 'true');
 
       const alertModel = reactive({
@@ -312,7 +312,7 @@
 
       const orderRegister = handleSubmit(async (values) => {
         try {
-
+              
           const orderModels = createOrderModel(values);
           if (orderModels.length === 0) {
             Swal.fire({
@@ -322,7 +322,7 @@
             })
             return false;
           }
-
+          
           let params = new URLSearchParams();
           params.append("path", "/api/order/register");
           params.append("_method", 'post');
@@ -427,7 +427,7 @@
           }
         });
       };
-
+    
       const openModal = ref();
       const selectInHospitalItems = ref([]);
       const addItemByBarcode = (items) => {
@@ -445,7 +445,7 @@
             items.item[id].orderUnitQuantity = 1;
           });
         }
-
+        
         if (items.type == "payout") {
           items.item.forEach((x, id) => {
             items.item[id].orderUnitQuantity = Math.ceil(parseInt(items.item[id].payoutQuantity) / parseInt(items.item[id].quantity));
@@ -488,8 +488,8 @@
         selectInHospitalItems,
         addItemByBarcode,
         integrate,
-        loading,
-        start,
+        loading, 
+        start, 
         complete,
         itemCount,
         isSubmitting,
@@ -550,4 +550,4 @@
       'v-consumption-history-modal-for-order': vConsumptionHistoryModalForOrder
     },
   }).mount('#top');
-</script>
+</script> 
