@@ -62,7 +62,7 @@
                         <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
                             <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
                                 <div class="overflow-x-auto">
-                                    <table class="min-w-full text-center overflow-x-scroll">
+                                    <table class="min-w-full text-center">
                                         <thead class="whitespace-nowrap">
                                             <tr>
                                                 <th scope="col" class="px-6 py-4" colspan="7"></th>
