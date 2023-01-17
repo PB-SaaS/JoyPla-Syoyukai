@@ -1003,7 +1003,7 @@
                     });
 
                     values.totalizations.forEach((v, idx) => {
-                        if ((inHospitalItemId === v.inHospitalItemId) && (divisionId === v.targetDivisionId)) {
+                        if ((inHospitalItemId === v.inHospitalItemId) && (divisionId === v.sourceDivisionId)) {
                             target.push(idx);
                             let tmp = Object.assign({}, v);
                             tmp.index = idx;
