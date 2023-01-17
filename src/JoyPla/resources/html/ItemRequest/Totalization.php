@@ -1,3 +1,10 @@
+<link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla_developer/340/scroll-hint.css">
+<script src="https://i02.smp.ne.jp/u/joypla_developer/340/scroll-hint.min.js"></script>
+<style>
+    .scroll-hint-icon {
+        top: 8%;
+    }
+</style>
 <div id="top" v-cloak>
     <v-loading :show="loading"></v-loading>
     <header-navi></header-navi>
@@ -51,11 +58,11 @@
                 </div>
 
                 <div class="mb-8">
-                    <div class="flex flex-col">
+                    <div id="totalizationTable" class="flex flex-col">
                         <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
                             <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
                                 <div class="overflow-x-auto">
-                                    <table class="min-w-full text-center">
+                                    <table class="min-w-full text-center overflow-x-scroll">
                                         <thead class="whitespace-nowrap">
                                             <tr>
                                                 <th scope="col" class="px-6 py-4" colspan="7"></th>
@@ -1105,4 +1112,15 @@
             }
         }
     }).mount('#top');
+</script>
+<script>
+    window.addEventListener('DOMContentLoaded', function() {
+        new ScrollHint('#totalizationTable', {
+            scrollHintIconAppendClass: 'scroll-hint-icon-white', // white-icon will appear
+            applyToParents: true,
+            i18n: {
+                scrollable: 'スクロールできます'
+            }
+        });
+    });
 </script>
