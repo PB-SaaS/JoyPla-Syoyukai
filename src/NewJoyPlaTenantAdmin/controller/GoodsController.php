@@ -414,7 +414,7 @@ class GoodsController extends Controller
             $content = $this->view(
                 'NewJoyPlaTenantAdmin/view/Template/Parts/IframeContent',
                 [
-                    'title' => '商品・金額・院内商品情報登録',
+                    'title' => '商品・金額・院内商品登録',
                     'width' => '100%',
                     'height' => '100%',
                     'url' => '/regist/is',

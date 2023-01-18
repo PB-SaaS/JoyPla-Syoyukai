@@ -34,7 +34,8 @@ $auth = new App\Lib\Auth(); ?>
             <ul class="uk-nav-sub">
                 <li class=" <?php echo $n3_1; ?>"><a href="%url/rel:mpgt:Goods%&table_cache=true">商品管理</a></li>
                 <li class=" <?php echo $n3_8; ?>"><a href="%url/rel:mpgt:Goods%&Action=insert">商品登録</a></li>
-                <?php if ($auth->Gate('DistributorBlukInsert')): ?>
+                <li class=" <?php echo $n3_10; ?>"><a href="%url/rel:mpgt:Goods%&Action=allInsertForm">商品・金額・院内商品登録</a></li>
+                <?php if ($auth->Gate('ItemBulkUpsert')): ?>
                 <li class=" <?php echo $n3_2; ?>"><a href="%url/rel:mpgt:BulkItem%">商品一括登録・更新</a></li>
                 <?php endif; ?>
                 <li class=" <?php echo $n3_3; ?>"><a href="%url/rel:mpgt:BulkItem%&Action=logsList">商品登録更新履歴</a></li>
@@ -49,7 +50,6 @@ $auth = new App\Lib\Auth(); ?>
                 <?php if ($auth->Gate('NewFacilityItemsBulkInsert')): ?>
                 <li class=" <?php echo $n3_9; ?>"><a href="%url/rel:mpgt:Goods%&Action=allBulkInsert">新規導入用一括登録</a></li>
                 <?php endif; ?>
-                <li class=" <?php echo $n3_10; ?>"><a href="%url/rel:mpgt:Goods%&Action=allInsertForm">新規商品・金額・院内商品登録</a></li>
             </ul>
         </li>
         <li class="uk-parent <?php echo $n5; ?>">
