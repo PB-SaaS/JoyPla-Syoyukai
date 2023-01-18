@@ -212,10 +212,10 @@
                         </div>
                         <div class="my-4">
                             <v-multiple-select-division-v2 id="targetDivisionIds" name="targetDivisionIds" title="請求先部署名" :is-only-my-division="<?php var_export(
-                                gate(
-                                    'list_of_item_request_history'
-                                )->isOnlyMyDivision()
-                            ); ?>" />
+                                                                                                                                                    gate(
+                                                                                                                                                        'list_of_item_request_history'
+                                                                                                                                                    )->isOnlyMyDivision()
+                                                                                                                                                ); ?>" />
                             </v-multiple-select-division-v2>
                         </div>
                         <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
@@ -660,13 +660,13 @@
 
             const changeParPage = () => {
                 values.currentPage = 1;
-                values.totalizations = []
+                values.totalizations = [];
                 listGet();
             };
 
             const searchExec = () => {
                 values.currentPage = 1;
-                values.totalizations = []
+                values.totalizations = [];
                 listGet();
             };
 
