@@ -59,7 +59,7 @@
 
                 <div class="mb-8">
                     <div id="totalizationTable" class="flex flex-col">
-                        <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
+                        <div class="sm:-mx-6 lg:-mx-8">
                             <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
                                 <div class="overflow-x-auto">
                                     <table class="min-w-full text-center">
@@ -211,7 +211,11 @@
                             </v-multiple-select-division-v2>
                         </div>
                         <div class="my-4">
-                            <v-multiple-select-division-v2 id="targetDivisionIds" name="targetDivisionIds" title="請求先部署名" :is-only-my-division="<?php var_export(gate('list_of_item_request_history')->isOnlyMyDivision()); ?>" />
+                            <v-multiple-select-division-v2 id="targetDivisionIds" name="targetDivisionIds" title="請求先部署名" :is-only-my-division="<?php var_export(
+                                gate(
+                                    'list_of_item_request_history'
+                                )->isOnlyMyDivision()
+                            ); ?>" />
                             </v-multiple-select-division-v2>
                         </div>
                         <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">

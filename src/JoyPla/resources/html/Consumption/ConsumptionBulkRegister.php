@@ -404,20 +404,26 @@ var JoyPlaApp = Vue.createApp({
             items.item[id].consumeQuantity = items.item[id].cardQuantity;
           });
         }
-/* 
-        if(items.type == "customlabel") //在庫表等で発行されたラベル=対象外
+
+        if(items.type == "customlabel")
         {
-          items.item.forEach((x , id)=>{
-            items.item[id].consumeQuantity = items.item[id].customQuantity;
-          });
+            items.item.forEach((x , id)=>{
+              let bar = items.item[id].barcode;
+              items.isLabel = false;
+              if(bar.match(/^01/) && bar.length === 14) //01から始めるバーコードのみ対象
+              {
+                items.item[id].consumeQuantity = items.item[id].customQuantity;
+                items.isLabel = true;
+              }
+            });
         }
- */
-        if(items.type !== "received" && items.type !== "payout" && items.type !== "card") //読み込み対象外のバーコード
+
+        if(items.type !== "received" && items.type !== "payout" && items.type !== "card" && !(items.type == "customlabel" && items.isLabel)) //読み込み対象外のバーコード
         {
           Swal.fire({
             icon: 'error',
             title: 'エラー',
-            html: 'このバーコードは読み込めません。<br><span class="font-bold">読み込み対象のバーコード</span><p class="text-sm font-bold">20から始めるバーコード</p><p class="text-sm font-bold">30から始めるバーコード</p><p class="text-sm font-bold">90から始めるバーコード</p>',
+            html: 'このバーコードは読み込めません。<br><span class="font-bold">読み込み対象のバーコード</span><p class="text-sm font-bold">01から始めるバーコード</p><p class="text-sm font-bold">20から始めるバーコード</p><p class="text-sm font-bold">30から始めるバーコード</p><p class="text-sm font-bold">90から始めるバーコード</p>',
           });
           return false;
         }
