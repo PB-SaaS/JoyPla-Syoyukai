@@ -175,7 +175,7 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                 $type = 'pickingList';
 
                 $array = explode(' ', $inputData->barcode);
-                if (preg_match('/^div_/', $array[1]) === 0) {
+                if (count($array) !== 2) {
                     throw new Exception('Not PickingList Barcode');
                 }
                 $tmp = new Collection();
