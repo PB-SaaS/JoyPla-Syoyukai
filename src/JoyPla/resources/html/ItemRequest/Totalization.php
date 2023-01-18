@@ -647,10 +647,10 @@
 
             onMounted(() => {
                 listGet();
-                Swal.fire({
-                    title: '確認',
-                    text: "表示内容を変更する際にご入力内容は保持されません。",
-                    icon: 'warning'
+                Toast.fire({
+                    icon: 'warning',
+                    html: '表示内容を変更する際に\r\nご入力内容は保持されません。',
+                    width: '380px'
                 })
             });
 
@@ -849,7 +849,7 @@
                 if (elem.type === 'card') {
                     if ((elem.totalPayoutQuantity + elem.cardQuantity) > elem.totalRequestQuantity) {
                         Swal.fire({
-                            icon: 'info',
+                            icon: 'error',
                             title: '請求必要数を超過するため反映できません。',
                         });
                         return false;
@@ -1038,7 +1038,7 @@
                         }
                         if ((values.totalizations[target[0]].totalPayoutQuantity + cardQuantity) > values.totalizations[target[0]].totalRequestQuantity) {
                             Swal.fire({
-                                icon: 'info',
+                                icon: 'error',
                                 title: '請求必要数を超過するため反映できません。',
                             });
                             return false;
