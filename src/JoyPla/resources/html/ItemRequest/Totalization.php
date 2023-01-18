@@ -389,7 +389,7 @@
                     itemCode: (getParam("itemCode")) ? getParam("itemCode") : "",
                     itemStandard: (getParam("itemStandard")) ? getParam("itemStandard") : "",
                     itemJANCode: (getParam("itemJANCode")) ? getParam("itemJANCode") : "",
-                    perPage: (Number.isInteger(getParam("perPage"))) ? getParam("perPage") : "10",
+                    perPage: (Number.isInteger(getParam("perPage"))) ? getParam("perPage") : "100",
                     currentPage: (Number.isInteger(parseInt(getParam("currentPage")))) ? parseInt(getParam("currentPage")) : 1,
                     sourceDivisionIds: (getParam("sourceDivisionIds")) ? (Array.isArray(getParam("sourceDivisionIds")) ? getParam("sourceDivisionIds") : (getParam("sourceDivisionIds")).split(',')) : [],
                     targetDivisionIds: (getParam("targetDivisionIds")) ? (Array.isArray(getParam("targetDivisionIds")) ? getParam("targetDivisionIds") : (getParam("targetDivisionIds")).split(',')) : []
@@ -647,17 +647,22 @@
 
             onMounted(() => {
                 listGet();
+                Swal.fire({
+                    title: '確認',
+                    text: "表示内容を変更する際にご入力内容は保持されません。",
+                    icon: 'warning'
+                })
             });
 
             const changeParPage = () => {
                 values.currentPage = 1;
-                values.totalizations = [];
+                values.totalizations = []
                 listGet();
             };
 
             const searchExec = () => {
                 values.currentPage = 1;
-                values.totalizations = [];
+                values.totalizations = []
                 listGet();
             };
 
