@@ -57,7 +57,7 @@ class PriceAndInHospitalItemRegisterController extends Controller
         "distributorId" => ['required'],
         "distributorMCode" => ['maxword:128'],
         "price" => ['required', 'min:0'],
-        "unitPrice" => ['min:0'],
+        "unitPrice" => ['required', 'min:0'],
         "medicineCategory" => ['maxword:512'],
         "homeCategory" => ['maxword:512'],
         "measuringInst" => ['maxword:128'],

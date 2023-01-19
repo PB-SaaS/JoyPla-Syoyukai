@@ -160,7 +160,7 @@ if($validate){
                             </div>
                             <div class="cf">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
-                                    単価
+                                    単価 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
                                 </div>
                                 <div class="flex-auto">
                                     <input type="text" name="unitPrice" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
