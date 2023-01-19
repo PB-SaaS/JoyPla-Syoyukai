@@ -228,8 +228,8 @@ $category = [1 => "医療材料", 2 => "薬剤", 3 => "試薬", 4 => "日用品"
                                 <input type="hidden" name="_method" value="post">
                                 <input type="hidden" name="_csrf" value="<?= $csrf ?>">
                                 <input type="hidden" name="path" value="/product/ItemAndPriceAndInHospitalRegist/thanks">
-                                <input class="bg-gray-400 hover:bg-gray-200 text-white font-bold py-2 px-4 rounded" type="submit" name="formBack" value="戻る">
-                                <input class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit" value="登録">
+                                <input class="bg-gray-400 hover:bg-gray-200 text-white font-bold py-2 px-4 rounded mx-8" type="submit" name="formBack" value="戻る">
+                                <input class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-8" type="submit" value="登録">
                             </form>
                         </div>
                     </div>

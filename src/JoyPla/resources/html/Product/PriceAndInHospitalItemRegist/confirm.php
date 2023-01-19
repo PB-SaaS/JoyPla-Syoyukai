@@ -171,8 +171,8 @@ if($validate){
                                 <input type="hidden" name="_method" value="post">
                                 <input type="hidden" name="_csrf" value="<?= $csrf ?>">
                                 <input type="hidden" name="path" value="/product/PriceAndInHospitalRegist/thanks">
-                                <input class="bg-gray-400 hover:bg-gray-200 text-white font-bold py-2 px-4 rounded" type="submit" name="formBack" value="戻る">
-                                <input class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit" value="登録">
+                                <input class="bg-gray-400 hover:bg-gray-200 text-white font-bold py-2 px-4 rounded mx-8" type="submit" name="formBack" value="戻る">
+                                <input class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-8" type="submit" value="登録">
                             </form>
                         </div>
                     </div>
