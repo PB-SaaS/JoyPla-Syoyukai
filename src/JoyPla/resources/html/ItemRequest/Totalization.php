@@ -653,8 +653,8 @@
                 listGet();
                 Toast.fire({
                     icon: 'warning',
-                    html: '表示内容を変更する際に\r\nご入力内容は保持されません。',
-                    width: '380px'
+                    title: '表示内容を変更する際に、\r\nご入力内容は保持されません。',
+                    width: '400px'
                 })
             });
 
