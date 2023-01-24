@@ -419,7 +419,7 @@ var JoyPlaApp = Vue.createApp({
       const addItemByBarcode = (items) => 
       {
         selectInHospitalItems.value = [];
-        if (items.item.length === 0) {
+        if (!items.item || items.item.length === 0) {
             Swal.fire({
                 icon: 'info',
                 title: '商品が見つかりませんでした',

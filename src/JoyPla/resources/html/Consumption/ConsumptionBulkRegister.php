@@ -101,7 +101,9 @@ var JoyPlaApp = Vue.createApp({
       return{
         div:{},
         divName:[],
-        isOnlyMyDivision:<?php var_export(gate('bulkregister_of_consumption_slips')->isOnlyMyDivision()) ?>,
+        isOnlyMyDivision:<?php var_export(
+            gate('bulkregister_of_consumption_slips')->isOnlyMyDivision()
+        ); ?>,
       }
     },
     methods:{
@@ -109,7 +111,9 @@ var JoyPlaApp = Vue.createApp({
         let self = this;
         let params = new URLSearchParams();
         params.append("path", "/api/division/show");
-        params.append("isOnlyMyDivision", <?php var_export(gate('bulkregister_of_consumption_slips')->isOnlyMyDivision()) ?>);
+        params.append("isOnlyMyDivision", <?php var_export(
+            gate('bulkregister_of_consumption_slips')->isOnlyMyDivision()
+        ); ?>);
         params.append("_csrf", _CSRF);
         axios
           .post(_APIURL, params)
@@ -133,7 +137,7 @@ var JoyPlaApp = Vue.createApp({
       
       const { ref, toRef , toRefs , reactive ,onMounted} = Vue;
       const { useFieldArray , useForm } = VeeValidate;
-      const consumptionUnitPriceUseFlag = "<?php echo $consumptionUnitPriceUseFlag ?>";
+      const consumptionUnitPriceUseFlag = "<?php echo $consumptionUnitPriceUseFlag; ?>";
 
       const loading = ref(false);
       const start = () => {
@@ -360,7 +364,7 @@ var JoyPlaApp = Vue.createApp({
       const addItemByBarcode = (items) => 
       {
         selectInHospitalItems.value = [];
-        if (items.item.length === 0) {
+        if (!items.item || items.item.length === 0) {
             Swal.fire({
                 icon: 'info',
                 title: '商品が見つかりませんでした',

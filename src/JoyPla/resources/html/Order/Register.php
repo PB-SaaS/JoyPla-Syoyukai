@@ -9,7 +9,9 @@
         <hr>
         <div>
           <div class="mb-2 lg:w-1/3">
-            <v-select-division name="divisionId" label="発注部署" :rules="{ required : true }" title="発注部署指定" :disabled="values.divisionId != '' && fields.length > 0" :is-only-my-division="<?php var_export(gate('register_of_unordered_slips')->isOnlyMyDivision()); ?>" />
+            <v-select-division name="divisionId" label="発注部署" :rules="{ required : true }" title="発注部署指定" :disabled="values.divisionId != '' && fields.length > 0" :is-only-my-division="<?php var_export(
+                gate('register_of_unordered_slips')->isOnlyMyDivision()
+            ); ?>" />
           </div>
           <div class="lg:flex lg:flex-row gap-4">
             <div class="my-4 w-1/3 lg:w-1/6">
@@ -378,6 +380,7 @@
           values.orderItems = [];
         }
         if (!checked) {
+          item.priceNotice = (item.priceNotice) ? item.priceNotice : "";
           insert(0, item);
         }
       };
@@ -432,7 +435,7 @@
       const selectInHospitalItems = ref([]);
       const addItemByBarcode = (items) => {
         selectInHospitalItems.value = [];
-        if (items.item.length === 0) {
+        if (!items.item || items.item.length === 0) {
           Swal.fire({
             icon: 'info',
             title: '商品が見つかりませんでした',

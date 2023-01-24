@@ -9,7 +9,11 @@
                 <hr>
                 <div>
                     <div class="my-4 mt-4 lg:w-1/3">
-                        <v-select-division name="sourceDivisionId" label="請求元部署" :rules="{ required : true }" title="請求元部署指定" :disabled="(values.sourceDivisionId != '' && fields.length > 0 && values.sourceDivisionId != values.targetDivisionId)" :is-only-my-division="<?php var_export(gate('register_of_item_requests')->isOnlyMyDivision()); ?>" />
+                        <v-select-division name="sourceDivisionId" label="請求元部署" :rules="{ required : true }" title="請求元部署指定" :disabled="(values.sourceDivisionId != '' && fields.length > 0 && values.sourceDivisionId != values.targetDivisionId)" :is-only-my-division="<?php var_export(
+                            gate(
+                                'register_of_item_requests'
+                            )->isOnlyMyDivision()
+                        ); ?>" />
                     </div>
                     <div class="my-4 lg:w-1/3">
                         <v-select-division name="targetDivisionId" label="請求先部署" :rules="{ required : true }" title="請求先部署指定" :disabled="(values.targetDivisionId != '' && fields.length > 0 && values.sourceDivisionId != values.targetDivisionId)" />
@@ -554,7 +558,7 @@
             const addItemByBarcode = (items) => {
 
                 selectInHospitalItems.value = [];
-                if (items.item.length === 0) {
+                if (!items.item || items.item.length === 0) {
                     Swal.fire({
                         icon: 'info',
                         title: '商品が見つかりませんでした',
