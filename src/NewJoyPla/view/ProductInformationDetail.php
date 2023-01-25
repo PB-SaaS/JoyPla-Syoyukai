@@ -17,33 +17,40 @@
                 <input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
 
 
-                <?php if ($tenantKind == "1" && $userInfo->isAdmin()): ?>
+                <?php if ($tenantKind == '1' && $userInfo->isAdmin()): ?>
                 <input class="print_hidden uk-button uk-button-primary" type="submit" value="商品情報変更" onclick="document.itemsChange.submit()">
-                <form action="<?php echo $api_url ?>" method="post" name="itemsChange" class="uk-hidden">
+                <form action="<?php echo $api_url; ?>" method="post" name="itemsChange" class="uk-hidden">
                     <input type="hidden" value="itemChangeForm" name="Action">
                 </form>
-                <?php endif ?>
-                <?php if($tenantKind == "1" && ($userInfo->isAdmin() || $userInfo->isApprover())): ?>
+                <?php endif; ?>
+                <?php if (
+                    $tenantKind == '1' &&
+                    ($userInfo->isAdmin() || $userInfo->isApprover())
+                ): ?>
                 <input class="print_hidden uk-button uk-button-primary" type="submit" value="金額情報登録" onclick="document.priceReg.submit()">
-                <form action="<?php echo $api_url ?>" method="post" name="priceReg" class="uk-hidden">
+                <form action="<?php echo $api_url; ?>" method="post" name="priceReg" class="uk-hidden">
                     <input type="hidden" value="priceRegist" name="Action">
                 </form>
-                <?php endif ?>
-                <?php if($userInfo->isAdmin() || $userInfo->isApprover()): ?>
+                <?php endif; ?>
+                <?php if ($userInfo->isAdmin() || $userInfo->isApprover()): ?>
 
                 <input class="print_hidden uk-button uk-button-primary" type="submit" value="院内商品として追加" onclick="inHPItemsRegConfirm()">
-                <form action="<?php echo $api_url ?>"  method="post" name="inHPItemsReg" class="uk-hidden">
+                <form action="<?php echo $api_url; ?>"  method="post" name="inHPItemsReg" class="uk-hidden">
                     <input type="hidden" name="Action" value="inHospitalItemRegist">
                 </form>
-                <?php endif ?>
-                <?php if($tenantKind == "1" && ($userInfo->isAdmin() || $userInfo->isApprover())): ?>
+                <?php endif; ?>
+                <?php if (
+                    $tenantKind == '1' &&
+                    ($userInfo->isAdmin() || $userInfo->isApprover())
+                ): ?>
                 <input class="print_hidden uk-button uk-button-primary" type="submit" value="金額情報・院内商品情報登録" onclick="inHPItemAndPriceRegConfirm()">
-                <form action="<?php echo $root_url ?>" method="post" name="priceAndInHPItemsReg" class="uk-hidden">
+                <form action="<?php echo $root_url; ?>" method="post" name="priceAndInHPItemsReg" class="uk-hidden">
                     <input type="hidden" name="_method" value="post">
+                    <input type="hidden" name="tablecardUrl" value="<?php echo $api_url; ?>">
                     <input type="hidden" name="path" value="/product/PriceAndInHospitalRegist/input">
                     <input type="hidden" name="itemId" value="%val:usr:itemId%">
                 </form>
-                <?php endif ?>
+                <?php endif; ?>
             </div>
 
             <div class="uk-width-1-1" uk-grid>

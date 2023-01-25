@@ -1,9 +1,8 @@
 <?php
-if($validate){
+if ($validate) {
     $val = $validate->getResults();
     $is_error = $validate->isError();
-}
-?>
+} ?>
 <div id="top" v-cloak>
     <v-loading :show="loading"></v-loading>
     <header-navi></header-navi>
@@ -11,13 +10,13 @@ if($validate){
     <div id="content" class="flex h-full px-1">
         <div class="flex-auto">
             <div class="index container mx-auto mb-96">
-                <h1 class="text-2xl mb-2">金額情報登録 - 入力</h1>
+                <h1 class="text-2xl mb-2">金額情報・院内商品情報登録 - 入力</h1>
                 <hr>
                 <div>
 
-                    <?php if($validate && $is_error): ?>
+                    <?php if ($validate && $is_error): ?>
                     <p class="header_emesg">入力内容に不備があります。入力された値をご確認ください</p>
-                    <?php endif ?>
+                    <?php endif; ?>
                     <p class="header_rmesg">必要事項をご入力の上、確認ボタンを押してください。</p>
 
                     <form method="post" :action="_ROOT" name="regForm">
@@ -30,7 +29,9 @@ if($validate){
                                     メーカー名
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($item['makerName']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['makerName']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -38,7 +39,9 @@ if($validate){
                                     商品名
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($item['itemName']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['itemName']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -46,7 +49,9 @@ if($validate){
                                     製品コード
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($item['itemCode']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['itemCode']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -54,7 +59,9 @@ if($validate){
                                     規格
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($item['itemStandard']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['itemStandard']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -62,7 +69,9 @@ if($validate){
                                     JANコード 
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($item['itemJANCode']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['itemJANCode']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -70,7 +79,9 @@ if($validate){
                                     カタログNo
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($item['catalogNo']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['catalogNo']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -78,7 +89,9 @@ if($validate){
                                     シリアルNo
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($item['serialNo']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['serialNo']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="cf">
@@ -88,15 +101,26 @@ if($validate){
                                 <div class="relative">
                                     <select name="distributorId"
                                     class="appearance-none border w-full py-2 px-3 leading-tight 
-                                    <?= ($is_error && $val['distributorId']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                    <?= $is_error &&
+                                    $val['distributorId']['message']
+                                        ? 'text-red-500 border-red-500'
+                                        : 'text-gray-700 border-gray-300' ?>" 
                                     >
                                         <option value="">----- 選択してください -----</option>
-                                        <?php
-                                        foreach($distributor as $key){
-                                            $selected = ($input["distributorId"] === $key["distributorId"]) ? "selected" : "";
-                                            echo "<option value='" . html($key["distributorId"]) . "' " . $selected . ">" . html($key["distributorName"]) . "</option>\n";
-                                        }
-                                        ?>
+                                        <?php foreach ($distributor as $key) {
+                                            $selected =
+                                                $input['distributorId'] ===
+                                                $key['distributorId']
+                                                    ? 'selected'
+                                                    : '';
+                                            echo "<option value='" .
+                                                html($key['distributorId']) .
+                                                "' " .
+                                                $selected .
+                                                '>' .
+                                                html($key['distributorName']) .
+                                                "</option>\n";
+                                        } ?>
                                     </select>
                                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                                         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -104,7 +128,9 @@ if($validate){
                                         </svg>
                                     </div>
                                 </div>
-                                <span class="text-red-500"><?php echo html($val['distributorId']['message']) ?></span>
+                                <span class="text-red-500"><?php echo html(
+                                    $val['distributorId']['message']
+                                ); ?></span>
                             </div>
                             <div class="cf">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
@@ -112,9 +138,16 @@ if($validate){
                                 </div>
                                 <div class="flex-auto">
                                     <input type="text" name="distributorMCode" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
-                                    <?= ($is_error && $val['distributorMCode']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
-                                    value="<?php echo html($val['distributorMCode']['value']) ?>">
-                                    <span class="text-red-500"><?php echo html($val['distributorMCode']['message']) ?></span>
+                                    <?= $is_error &&
+                                    $val['distributorMCode']['message']
+                                        ? 'text-red-500 border-red-500'
+                                        : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html(
+                                        $val['distributorMCode']['value']
+                                    ); ?>">
+                                    <span class="text-red-500"><?php echo html(
+                                        $val['distributorMCode']['message']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="cf">
@@ -123,9 +156,15 @@ if($validate){
                                 </div>
                                 <div class="flex-auto">
                                     <input type="text" name="quantity" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
-                                    <?= ($is_error && $val['quantity']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
-                                    value="<?php echo html($val['quantity']['value']) ?>">
-                                    <span class="text-red-500"><?php echo html($val['quantity']['message']) ?></span>
+                                    <?= $is_error && $val['quantity']['message']
+                                        ? 'text-red-500 border-red-500'
+                                        : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html(
+                                        $val['quantity']['value']
+                                    ); ?>">
+                                    <span class="text-red-500"><?php echo html(
+                                        $val['quantity']['message']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="cf">
@@ -133,7 +172,9 @@ if($validate){
                                     入数単位
                                 </div>
                                 <div class="flex-auto">
-                                    <span class="text-left text-xl"><?php echo html($item['quantityUnit']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['quantityUnit']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="cf">
@@ -142,9 +183,15 @@ if($validate){
                                 </div>
                                 <div class="flex-auto">
                                     <input type="text" name="itemUnit" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
-                                    <?= ($is_error && $val['itemUnit']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
-                                    value="<?php echo html($val['itemUnit']['value']) ?>">
-                                    <span class="text-red-500"><?php echo html($val['itemUnit']['message']) ?></span>
+                                    <?= $is_error && $val['itemUnit']['message']
+                                        ? 'text-red-500 border-red-500'
+                                        : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html(
+                                        $val['itemUnit']['value']
+                                    ); ?>">
+                                    <span class="text-red-500"><?php echo html(
+                                        $val['itemUnit']['message']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="cf">
@@ -153,9 +200,15 @@ if($validate){
                                 </div>
                                 <div class="flex-auto">
                                     <input type="text" name="price" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
-                                    <?= ($is_error && $val['price']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
-                                    value="<?php echo html($val['price']['value']) ?>">
-                                    <span class="text-red-500"><?php echo html($val['price']['message']) ?></span>
+                                    <?= $is_error && $val['price']['message']
+                                        ? 'text-red-500 border-red-500'
+                                        : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html(
+                                        $val['price']['value']
+                                    ); ?>">
+                                    <span class="text-red-500"><?php echo html(
+                                        $val['price']['message']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="cf">
@@ -164,9 +217,16 @@ if($validate){
                                 </div>
                                 <div class="flex-auto">
                                     <input type="text" name="unitPrice" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
-                                    <?= ($is_error && $val['unitPrice']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
-                                    value="<?php echo html($val['unitPrice']['value']) ?>">
-                                    <span class="text-red-500"><?php echo html($val['unitPrice']['message']) ?></span>
+                                    <?= $is_error &&
+                                    $val['unitPrice']['message']
+                                        ? 'text-red-500 border-red-500'
+                                        : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html(
+                                        $val['unitPrice']['value']
+                                    ); ?>">
+                                    <span class="text-red-500"><?php echo html(
+                                        $val['unitPrice']['message']
+                                    ); ?></span>
                                     <button type="button" onclick="getUnitPrice()" class="
                                     disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
                                     bg-white hover:border-gray-400 text-gray-700 py-2 px-4 border border-gray-300">
@@ -199,12 +259,19 @@ if($validate){
                                     <textarea
                                         name="medicineCategory"
                                         class="appearance-none w-full py-2 px-3 leading-tight h-32 text-left flex-initial bg-white border 
-                                        <?= ($is_error && $val['medicineCategory']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                        <?= $is_error &&
+                                        $val['medicineCategory']['message']
+                                            ? 'text-red-500 border-red-500'
+                                            : 'text-gray-700 border-gray-300' ?>" 
                                         onkeydown="countText(this, 'mediCat')"
-                                    ><?=$val['medicineCategory']['value'];?></textarea>
+                                    ><?= $val['medicineCategory'][
+                                        'value'
+                                    ] ?></textarea>
                                     <span class="absolute bottom-4 right-6"><span id="mediCat">0</span>文字</span>
                                 </div>
-                                <span class="text-red-500"><?php echo html($val['medicineCategory']['message']) ?></span>
+                                <span class="text-red-500"><?php echo html(
+                                    $val['medicineCategory']['message']
+                                ); ?></span>
                             </div>
                             <div class="cf">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
@@ -214,12 +281,19 @@ if($validate){
                                     <textarea
                                         name="homeCategory"
                                         class="appearance-none w-full py-2 px-3 leading-tight h-32 text-left flex-initial bg-white border 
-                                        <?= ($is_error && $val['homeCategory']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                        <?= $is_error &&
+                                        $val['homeCategory']['message']
+                                            ? 'text-red-500 border-red-500'
+                                            : 'text-gray-700 border-gray-300' ?>" 
                                         onkeydown="countText(this, 'homeCat')"
-                                    ><?=$val['homeCategory']['value'];?></textarea>
+                                    ><?= $val['homeCategory'][
+                                        'value'
+                                    ] ?></textarea>
                                     <span class="absolute bottom-4 right-6"><span id="homeCat">0</span>文字</span>
                                 </div>
-                                <span class="text-red-500"><?php echo html($val['homeCategory']['message']) ?></span>
+                                <span class="text-red-500"><?php echo html(
+                                    $val['homeCategory']['message']
+                                ); ?></span>
                             </div>
                             <div class="cf">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
@@ -227,9 +301,16 @@ if($validate){
                                 </div>
                                 <div class="flex-auto">
                                     <input type="text" name="measuringInst" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border 
-                                    <?= ($is_error && $val['measuringInst']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
-                                    value="<?php echo html($val['measuringInst']['value']) ?>">
-                                    <span class="text-red-500"><?php echo html($val['measuringInst']['message']) ?></span>
+                                    <?= $is_error &&
+                                    $val['measuringInst']['message']
+                                        ? 'text-red-500 border-red-500'
+                                        : 'text-gray-700 border-gray-300' ?>" 
+                                    value="<?php echo html(
+                                        $val['measuringInst']['value']
+                                    ); ?>">
+                                    <span class="text-red-500"><?php echo html(
+                                        $val['measuringInst']['message']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="cf">
@@ -240,12 +321,17 @@ if($validate){
                                     <textarea
                                         name="notice"
                                         class="appearance-none w-full py-2 px-3 leading-tight h-32 text-left flex-initial bg-white border 
-                                        <?= ($is_error && $val['notice']['message']) ? 'text-red-500 border-red-500' : 'text-gray-700 border-gray-300' ?>" 
+                                        <?= $is_error &&
+                                        $val['notice']['message']
+                                            ? 'text-red-500 border-red-500'
+                                            : 'text-gray-700 border-gray-300' ?>" 
                                         onkeydown="countText(this, 'noticeCount')"
-                                    ><?=$val['notice']['value'];?></textarea>
+                                    ><?= $val['notice']['value'] ?></textarea>
                                     <span class="absolute bottom-4 right-6"><span id="noticeCount">0</span>文字</span>
                                 </div>
-                                <span class="text-red-500"><?php echo html($val['notice']['message']) ?></span>
+                                <span class="text-red-500"><?php echo html(
+                                    $val['notice']['message']
+                                ); ?></span>
                             </div>
                         </div>
                         <div class="text-center py-1">
@@ -313,6 +399,16 @@ const breadcrumbs = [
         text: '商品メニュー',
         disabled: false,
         href: _ROOT + '&path=/product',
+    },
+    {
+        text: '商品一覧',
+        disabled: false,
+        href: '%url/rel:mpgt:Product%&Action=Item&table_cache=true'
+    },
+    {
+        text: '商品情報詳細',
+        disabled: false,
+        href: "<?php echo $tablecardUrl; ?>"
     },
     {
         text: '金額・院内商品情報登録',

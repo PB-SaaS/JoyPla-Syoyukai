@@ -1,6 +1,6 @@
 <?php
-$priceId = $result["price"]->priceId;
-$inHospitalItemId = $result["inHP"]->inHospitalItemId;
+$priceId = $result['price']->priceId;
+$inHospitalItemId = $result['inHP']->inHospitalItemId;
 ?>
 <div id="top" v-cloak>
     <v-loading :show="loading"></v-loading>
@@ -13,9 +13,9 @@ $inHospitalItemId = $result["inHP"]->inHospitalItemId;
 
                 <div class="smp_tmpl">
                     <div class="sub_text">
-                        <?php if($priceId && $inHospitalItemId){ ?>
+                        <?php if ($priceId && $inHospitalItemId) { ?>
                         金額情報・院内商品情報の登録が完了しました。<br>
-                        <?php }else{ ?>
+                        <?php } else { ?>
                         正しく登録できませんでした。再度登録しなおしてください。<br>
                         <?php } ?>
                     </div>
@@ -75,6 +75,16 @@ var JoyPlaApp = Vue
                 text: '商品メニュー',
                 disabled: false,
                 href: _ROOT + '&path=/product',
+            },
+            {
+                text: '商品一覧',
+                disabled: false,
+                href: '%url/rel:mpgt:Product%&Action=Item&table_cache=true'
+            },
+            {
+                text: '商品情報詳細',
+                disabled: false,
+                href: "<?php echo $tablecardUrl; ?>"
             },
             {
                 text: '金額・院内商品情報登録',

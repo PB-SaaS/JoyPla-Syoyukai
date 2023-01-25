@@ -1,9 +1,8 @@
 <?php
-if($validate){
+if ($validate) {
     $val = $validate->getResults();
     $is_error = $validate->isError();
-}
-?>
+} ?>
 <div id="top" v-cloak>
     <v-loading :show="loading"></v-loading>
     <header-navi></header-navi>
@@ -26,7 +25,9 @@ if($validate){
                                     メーカー
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($item['makerName']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['makerName']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -34,7 +35,9 @@ if($validate){
                                     商品名
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($item['itemName']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['itemName']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -42,7 +45,9 @@ if($validate){
                                     製品コード
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($item['itemCode']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['itemCode']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -50,7 +55,9 @@ if($validate){
                                     規格
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($item['itemStandard']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['itemStandard']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -58,7 +65,9 @@ if($validate){
                                     JANコード 
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($item['itemJANCode']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['itemJANCode']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -66,7 +75,9 @@ if($validate){
                                     カタログNo
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($item['catalogNo']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['catalogNo']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -74,7 +85,9 @@ if($validate){
                                     シリアルNo
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($item['serialNo']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['serialNo']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -82,7 +95,9 @@ if($validate){
                                     卸業者
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($distributor[0]["distributorName"]) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $distributor[0]['distributorName']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -90,7 +105,9 @@ if($validate){
                                     卸業者管理コード
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($val['distributorMCode']['value']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $val['distributorMCode']['value']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -98,7 +115,9 @@ if($validate){
                                     入数 
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($val['quantity']['value']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $val['quantity']['value']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -106,7 +125,9 @@ if($validate){
                                     入数単位 
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($item['quantityUnit']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $item['quantityUnit']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -114,7 +135,9 @@ if($validate){
                                     個数単位 
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($val['itemUnit']['value']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $val['itemUnit']['value']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -122,7 +145,9 @@ if($validate){
                                     購買価格
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($val['price']['value']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $val['price']['value']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -130,7 +155,9 @@ if($validate){
                                     単価
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($val['unitPrice']['value']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $val['unitPrice']['value']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -138,7 +165,9 @@ if($validate){
                                     保険請求分類（医科）
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo nl2br(html($val['medicineCategory']['value'])) ?></span>
+                                    <span class="text-left text-xl"><?php echo nl2br(
+                                        html($val['medicineCategory']['value'])
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -146,7 +175,9 @@ if($validate){
                                     保険請求分類（在宅）
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo nl2br(html($val['homeCategory']['value'])) ?></span>
+                                    <span class="text-left text-xl"><?php echo nl2br(
+                                        html($val['homeCategory']['value'])
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -154,7 +185,9 @@ if($validate){
                                     測定機器名
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo html($val['measuringInst']['value']) ?></span>
+                                    <span class="text-left text-xl"><?php echo html(
+                                        $val['measuringInst']['value']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="py-2 border-b border-gray-400 border-solid">
@@ -162,7 +195,9 @@ if($validate){
                                     特記事項
                                 </div>
                                 <div class="flex-auto py-1">
-                                    <span class="text-left text-xl"><?php echo nl2br(html($val['notice']['value'])) ?></span>
+                                    <span class="text-left text-xl"><?php echo nl2br(
+                                        html($val['notice']['value'])
+                                    ); ?></span>
                                 </div>
                             </div>
                         </div>
@@ -232,6 +267,16 @@ if($validate){
                     text: '商品メニュー',
                     disabled: false,
                     href: _ROOT + '&path=/product',
+                },
+                {
+                    text: '商品一覧',
+                    disabled: false,
+                    href: '%url/rel:mpgt:Product%&Action=Item&table_cache=true'
+                },
+                {
+                    text: '商品情報詳細',
+                    disabled: false,
+                    href: "<?php echo $tablecardUrl; ?>"
                 },
                 {
                     text: '金額・院内商品情報登録',
