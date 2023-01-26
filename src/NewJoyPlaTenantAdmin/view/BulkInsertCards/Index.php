@@ -13,12 +13,14 @@
             <div>
                 <select v-model="hospitalId" class="uk-select uk-margin-bottom uk-width-1-2@m" @change="result = false">
                     <option value="">----- 登録先病院を選択してください -----</option>
-                    <?php
-                        foreach($hospital as $h)
-                        {
-                            echo "<option value='".$h->hospitalId."'>".$h->hospitalName."</option>".PHP_EOL;
-                        }
-                    ?>
+                    <?php foreach ($hospital as $h) {
+                        echo "<option value='" .
+                            $h->hospitalId .
+                            "'>" .
+                            $h->hospitalName .
+                            '</option>' .
+                            PHP_EOL;
+                    } ?>
                 </select>
             </div>
             <input type="button" v-on:click="validateCheck" value="バリデーションチェック" class="uk-button uk-button-primary" v-bind:disabled="lists.length == 0">
@@ -88,6 +90,11 @@ var app = new Vue({
             vm.message = [];
             vm.success_message = "";
             let file = e.target.files[0];
+            if(!file)
+            {
+                vm.filename = "";
+                return ;
+            }
             
             vm.filename = file.name;
             let extension = vm.filename.split('.').pop();
@@ -215,95 +222,74 @@ var app = new Vue({
             let chunk = vm.arrayChunk(vm.lists,1000);
             let i = 0 ;
             let ajaxCount = 0 ;
+            let promises = [];
             for(i ; i < chunk.length ; i++ )
             {
                 let forCount = i;
                 let startRowNumber = JSON.parse(JSON.stringify(chunk[i]));
                 startRowNumber = startRowNumber.shift()['index'];
-                
-                (function(i){
-                    $.ajax({
-                        async: true,
-                        url: "<?php echo $api_url ?>",
-                        type:'POST',
-                        data:{
-                            startRowNumber : startRowNumber,
-                            hospitalId: vm.hospitalId,
-                            rowData : JSON.stringify( vm.objectValueToURIencode(chunk[i]) ),
-                            _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-                            Action : "bulkInsertValidateCheckApi",
-                        },
-        				dataType: "json"
-        			})
-        			// Ajaxリクエストが成功した時発動
-        			.done( (data) => {
-        			    if(vm.message.length < 1000){
-            			    for(let j = 0 ; j < data.length ; j++)
-            			    {
-            			        vm.message.push(data[j]);
-            			    }
-        			    }
-        			})
-        			// Ajaxリクエストが失敗した時発動
-        			.fail( (data) => {
-        			    vm.message.push("処理に失敗しました");
-        			})
-        			// Ajaxリクエストが成功・失敗どちらでも発動
-        			.always( (data) => {
-        			    let percent = 100;
-        			    if((chunk.length - 1) > 0){
-        			        percent = (1 / ( chunk.length - 1) ) * 100;
-        			    }
-        			    let val = Math.ceil(progress_bar.getVal() + percent);
-                        progress_bar.progress(val, '進捗：'+val+'%');
-        			});
-        		})(forCount);
-        		
-                (function(i){
-                    $.ajax({
-                        async: true,
-                        url: "<?php echo $api_url ?>",
-                        type:'POST',
-                        data:{
-                            startRowNumber : startRowNumber,
-                            hospitalId: vm.hospitalId,
-                            rowData : JSON.stringify( vm.objectValueToURIencode(chunk[i]) ),
-                            _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-                            Action : "bulkInsertValidateCheck2Api",
-                        },
-        				dataType: "json"
-        			})
-        			// Ajaxリクエストが成功した時発動
-        			.done( (data) => {
-        			    if(vm.message.length < 1000){
-            			    for(let j = 0 ; j < data.length ; j++)
-            			    {
-            			        vm.message.push(data[j]);
-            			    }
-        			    }
-        			})
-        			// Ajaxリクエストが失敗した時発動
-        			.fail( (data) => {
-        			    vm.message.push("処理に失敗しました");
-        			})
-        			// Ajaxリクエストが成功・失敗どちらでも発動
-        			.always( (data) => {
-        			    let percent = 100;
-        			    if((chunk.length - 1) > 0){
-        			        percent = (1 / ( chunk.length - 1) ) * 100;
-        			    }
-        			    let val = Math.ceil(progress_bar.getVal() + percent);
-                        progress_bar.progress(val, '進捗：'+val+'%');
-        			});
-        		})(forCount);
+                promises.push($.ajax({
+                    async: true,
+                    url: "<?php echo $api_url; ?>",
+                    type:'POST',
+                    data:{
+                        startRowNumber : startRowNumber,
+                        hospitalId: vm.hospitalId,
+                        rowData : JSON.stringify( vm.objectValueToURIencode(chunk[i]) ),
+                        _csrf: "<?php echo $csrf_token; ?>",  // CSRFトークンを送信
+                        Action : "bulkInsertValidateCheckApi",
+                    },
+                    dataType: "json"
+                }).always( (data) => {
+                    let percent = 100;
+                    if((chunk.length - 1) > 0){
+                        percent = (1 / ( chunk.length - 1) ) * 100;
+                    }
+                    let val = Math.ceil(progress_bar.getVal() + percent);
+                    progress_bar.progress(val, '進捗：'+val+'%');
+                }));
+
+                promises.push($.ajax({
+                    async: true,
+                    url: "<?php echo $api_url; ?>",
+                    type:'POST',
+                    data:{
+                        startRowNumber : startRowNumber,
+                        hospitalId: vm.hospitalId,
+                        rowData : JSON.stringify( vm.objectValueToURIencode(chunk[i]) ),
+                        _csrf: "<?php echo $csrf_token; ?>",  // CSRFトークンを送信
+                        Action : "bulkInsertValidateCheck2Api",
+                    },
+                    dataType: "json"
+                }).always( (data) => {
+                    let percent = 100;
+                    if((chunk.length - 1) > 0){
+                        percent = (1 / ( chunk.length - 1) ) * 100;
+                    }
+                    let val = Math.ceil(progress_bar.getVal() + percent);
+                    progress_bar.progress(val, '進捗：'+val+'%');
+                }));
             }
-            $(document).ajaxStop(function() {
+            Promise.all(promises).then((res)=>{
+                for(let i = 0 ; i < promises.length ; i++){
+                    if(vm.message.length < 1000 && !!res[i]){
+                        for(let j = 0 ; j < res[i].length ; j++)
+                        {
+                            vm.message.push(res[i][j]);
+                        }
+                    }
+                }
                 if(vm.message.length == 0 )
                 {
                     vm.success_message = "チェックが完了しました";
                     vm.result = true;
                 }
-            });
+            }).catch((err)=>{
+                vm.message.push('チェックに失敗しました');
+            })
+            .finally(()=>{
+                progress_bar.progress(100, '進捗：100%');
+            })
         },
         regist: function() {
             let vm = this;
@@ -326,56 +312,54 @@ var app = new Vue({
                 let chunk = vm.arrayChunk(vm.lists,5000);
                 let i = 0 ;
                 let ajaxCount = 0 ;
+                let promises = [];
                 for(i ; i < chunk.length ; i++ )
                 {
                     let forCount = i;
                     let startRowNumber = JSON.parse(JSON.stringify(chunk[i]));
                     startRowNumber = startRowNumber.shift()['index'];
-                    
-                    (function(i){
-                        $.ajax({
-                            async: true,
-                            url: "<?php echo $api_url ?>",
-                            type:'POST',
-                            data:{
-                                hospitalId: vm.hospitalId,
-                                startRowNumber : startRowNumber,
-                                rowData : JSON.stringify( vm.objectValueToURIencode(chunk[i]) ),
-                                _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-                                Action : "bulkInsertApi",
-                            },
-            				dataType: "json"
-            			})
-            			// Ajaxリクエストが成功した時発動
-            			.done( (data) => {
-            			    if(data.code !== "0")
-            			    {
-            			        vm.message.push('登録に失敗しました');
-            			    }
-            			})
-            			// Ajaxリクエストが失敗した時発動
-            			.fail( (data) => {
-        			        vm.message.push('登録に失敗しました');
-            			})
-            			// Ajaxリクエストが成功・失敗どちらでも発動
-            			.always( (data) => {
-            			    let percent = 100;
-            			    if((chunk.length - 1) > 0){
-            			        percent = (1 / ( chunk.length - 1) ) * 100;
-            			    }
-            			    let val = Math.ceil(progress_bar.getVal() + percent);
-                            progress_bar.progress(val, '進捗：'+val+'%');
-            			});
-            		})(forCount);
+                    promises.push($.ajax({
+                        async: true,
+                        url: "<?php echo $api_url; ?>",
+                        type:'POST',
+                        data:{
+                            hospitalId: vm.hospitalId,
+                            startRowNumber : startRowNumber,
+                            rowData : JSON.stringify( vm.objectValueToURIencode(chunk[i]) ),
+                            _csrf: "<?php echo $csrf_token; ?>",  // CSRFトークンを送信
+                            Action : "bulkInsertApi",
+                        },
+                        dataType: "json"
+                    }).always( (data) => {
+                        let percent = 100;
+                        if((chunk.length - 1) > 0){
+                            percent = (1 / ( chunk.length - 1) ) * 100;
+                        }
+                        let val = Math.ceil(progress_bar.getVal() + percent);
+                        progress_bar.progress(val, '進捗：'+val+'%');
+                    }));
                 }
-                $(document).ajaxStop(function() {
-                    if(vm.message.length == 0 && vm.result === true)
+                Promise.all(promises).then((res)=>{
+                    for(let i = 0 ; i < promises.length ; i++){
+                        if(res[i].code !== "0" && vm.message.length == 0)
+                        {
+                            vm.message.push('登録に失敗しました');
+                        }
+                    }
+                    if(vm.message.length == 0 )
                     {
+                        document.getElementById('file').value = "";
+                        vm.filename = "";
                         vm.success_message = "登録が完了しました";
                         vm.result = false;
-					    vm.lists.splice(0, vm.lists.length);
+                        vm.lists.splice(0, vm.lists.length);
                     }
-                });
+                }).catch((err)=>{
+                    vm.message.push('登録に失敗しました');
+                })
+                .finally(()=>{
+                    progress_bar.progress(100, '進捗：100%');
+                })
             });
         },
         objectValueToURIencode: function(object){
