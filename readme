@@ -1,22 +1,35 @@
-     |              _ \  |       
-     |  _ \  |   | |   | |  _` | 
- \   | (   | |   | ___/  | (   | 
-\___/ \___/ \__, |_|    _|\__,_| 
-            ____/     
+     |              _ \  |
+     |  _ \  |   | |   | |  _` |
 
+\ | ( | | | **\_/ | ( |
+\_**/ \_**/ \__, |_| \_|\__,_|
+\_\_**/
 
 JoyPla
- - mock ・・・PHPUnitに使用するモック
- - src ・・・カスタムモジュールに設置するプログラム
- - sslServer ・・・SSL画像サーバーに設置するファイル群
- - test ・・・PHPUnit
+
+- mock ・・・PHPUnit に使用するモック
+- src ・・・カスタムモジュールに設置するプログラム
+- sslServer ・・・SSL 画像サーバーに設置するファイル群
+
+開発環境設定
+
+- VSCode
+  - 拡張機能 https://marketplace.visualstudio.com/items?itemName=DEVSENSE.phptools-vscode
 
 Deploy 方法
 
-cd .deploy
+JoyPla/.env.php を作る
 
-joypla2_dev に反映
+```php
+<?php
+return [
+    'deploy' => [
+        'dev' => [
+            'token' => '',
+            'secret' => '',
+        ],
+    ],
+];
+```
 
-sh deploy.sh
-
-npx tailwindcss -i ./src/JoyPla/resources/parts/input.css.php -o ./src/JoyPla/resources/parts/output.css.php --watch
+php spiralframe app:deploy
