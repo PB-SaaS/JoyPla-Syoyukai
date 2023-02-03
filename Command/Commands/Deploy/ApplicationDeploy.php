@@ -162,6 +162,23 @@ class ApplicationDeploy extends Command
                 '差分を取得するコミットIDがある場合は入力してください : ',
                 false
             );
+            $output = null;
+            exec(
+                "git add -N .; git diff --name-only --relative=src/ $commitId",
+                $output
+            );
+
+            $this->line($output);
+
+            $isDeploy = $this->ask(
+                'これらのファイルがデプロイされます。よろしいですか？ [yes or no]: ',
+                false
+            );
+
+            if ($isDeploy !== 'yes') {
+                $this->line('中止します');
+                exit();
+            }
 
             exec(
                 "git add -N .; git diff --name-only --relative=src/ $commitId | xargs -I % cp -r --parents ./src/% .tmp/$environment"
