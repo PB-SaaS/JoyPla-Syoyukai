@@ -5,7 +5,6 @@
  */
 
 namespace JoyPla\Application\Interactors\Api\Payout {
-    use App\Model\Division;
     use App\SpiralDb\StockView;
     use App\SpiralDb\PayoutItem as SpiralDbPayoutItem;
     use App\SpiralDb\Card;
@@ -13,7 +12,6 @@ namespace JoyPla\Application\Interactors\Api\Payout {
     use JoyPla\Application\InputPorts\Api\Payout\PayoutRegisterInputPortInterface;
     use JoyPla\Application\InputPorts\Api\Payout\PayoutRegisterInputData;
     use JoyPla\Application\OutputPorts\Api\Payout\PayoutRegisterOutputData;
-    use JoyPla\Application\OutputPorts\Api\Payout\PayoutRegisterOutputPortInterface;
     use JoyPla\Enterprise\Models\PayoutHId;
     use JoyPla\Enterprise\Models\Payout;
     use JoyPla\Enterprise\Models\DateYearMonthDayHourMinutesSecond;
@@ -24,10 +22,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
     use JoyPla\Enterprise\Models\Pref;
     use JoyPla\Enterprise\Models\CardId;
     use JoyPla\Enterprise\Models\InventoryCalculation;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\PayoutRepositoryInterface;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\RequestItemCountRepositoryInterface;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepositoryInterface;
-    use JoyPla\Service\Presenter\PresenterProvider;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
     use JoyPla\Service\Repository\RepositoryProvider;
 
     /**

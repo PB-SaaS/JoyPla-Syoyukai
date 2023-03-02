@@ -64,7 +64,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -79,7 +79,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -94,7 +94,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -109,7 +109,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -124,7 +124,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -139,7 +139,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -154,7 +154,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -169,7 +169,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -184,7 +184,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -199,7 +199,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -214,7 +214,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -229,7 +229,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -244,7 +244,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -259,7 +259,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -274,7 +274,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -289,7 +289,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -304,7 +304,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -319,7 +319,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -334,7 +334,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -349,7 +349,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -364,7 +364,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -379,7 +379,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -394,7 +394,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -409,7 +409,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -424,7 +424,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -439,7 +439,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -454,7 +454,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -469,7 +469,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -484,7 +484,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -499,7 +499,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -514,7 +514,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }
@@ -529,7 +529,7 @@ class UseCaseProvider
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
             ) {
-                parent::__construct($repositoryProvider, $presenterProvider);
+                parent::__construct($presenterProvider, $repositoryProvider);
             }
         };
     }

@@ -36,6 +36,7 @@ namespace JoyPla\Application\Interactors\Web\Consumption {
             ConsumptionRepositoryInterface $consumptionRepository
         ) {
             $this->outputPort = $outputPort;
+
             $this->consumptionRepository = $consumptionRepository;
         }
 

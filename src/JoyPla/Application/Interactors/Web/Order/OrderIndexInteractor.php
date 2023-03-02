@@ -41,7 +41,7 @@ namespace JoyPla\Application\Interactors\Web\Order {
         ) {
             $this->outputPort = $outputPort;
             $this->orderRepository = $orderRepository;
-            $this->repositoryProvider->getDivisionRepository() = $divisionRepository;
+            $this->divisionRepository = $divisionRepository;
         }
 
         /**
@@ -93,9 +93,9 @@ namespace JoyPla\Application\Interactors\Web\Order {
                     $order['division']['divisionName'];
             }
             if ($order['receivedTarget'] == '1') {
-                $receivedDivision = $this->repositoryProvider
-                    ->getDivisionRepository()
-                    ->getStorehouse($hospitalId);
+                $receivedDivision = $this->divisionRepository->getStorehouse(
+                    $hospitalId
+                );
                 $order[
                     'receivedDivisionName'
                 ] = $receivedDivision->getDivisionName()->value();
