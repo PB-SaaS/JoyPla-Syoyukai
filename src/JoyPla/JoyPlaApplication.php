@@ -116,19 +116,20 @@ class JoyPlaApplication extends Application
             return new GatePermissionModel(true, false);
         });
 
-
-        Gate::define('bulkregister_of_consumption_slips', function (Auth $auth) {
+        Gate::define('bulkregister_of_consumption_slips', function (
+            Auth $auth
+        ) {
             //消費伝票一括登録
-            if ($auth->userPermission  == '1') //管理者
-            {
+            if ($auth->userPermission == '1') {
+                //管理者
                 return new GatePermissionModel(true, false);
             }
-            if ($auth->userPermission  == '2') //担当者
-            {
+            if ($auth->userPermission == '2') {
+                //担当者
                 return new GatePermissionModel(true, true);
             }
-            if ($auth->userPermission == '3') //承認者
-            {
+            if ($auth->userPermission == '3') {
+                //承認者
                 return new GatePermissionModel(false, false);
             }
             return new GatePermissionModel(false, false);
@@ -404,38 +405,42 @@ class JoyPlaApplication extends Application
             return new GatePermissionModel(true, false);
         });
 
-        Gate::define('register_of_item_and_price_and_inHospitalItem', function (Auth $auth) {
+        Gate::define('register_of_item_and_price_and_inHospitalItem', function (
+            Auth $auth
+        ) {
             //商品・金額・院内商品登録
             if ($auth->tenantKind != '1') {
                 return new GatePermissionModel(false, false);
             }
 
-            if ($auth->userPermission  == '2') //担当者
-            {
+            if ($auth->userPermission == '2') {
+                //担当者
                 return new GatePermissionModel(false, false);
             }
 
-            if ($auth->userPermission == '3') //承認者
-            {
+            if ($auth->userPermission == '3') {
+                //承認者
                 return new GatePermissionModel(false, false);
             }
 
             return new GatePermissionModel(true, false);
         });
 
-        Gate::define('register_of_price_and_inHospitalItem', function (Auth $auth) {
+        Gate::define('register_of_price_and_inHospitalItem', function (
+            Auth $auth
+        ) {
             //金額・院内商品登録
-            if ($auth->tenantKind != "1") {
+            if ($auth->tenantKind != '1') {
                 return new GatePermissionModel(false, false);
             }
 
-            if ($auth->userPermission  == '2') //担当者
-            {
+            if ($auth->userPermission == '2') {
+                //担当者
                 return new GatePermissionModel(false, false);
             }
 
-            if ($auth->userPermission == '3') //承認者
-            {
+            if ($auth->userPermission == '3') {
+                //承認者
                 return new GatePermissionModel(false, false);
             }
 

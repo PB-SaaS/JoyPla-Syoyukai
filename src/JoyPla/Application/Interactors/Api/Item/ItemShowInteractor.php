@@ -4,13 +4,14 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Item {
-
     use JoyPla\Application\InputPorts\Api\Item\ItemShowInputData;
     use JoyPla\Application\InputPorts\Api\Item\ItemShowInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\Item\ItemShowOutputData;
     use JoyPla\Application\OutputPorts\Api\Item\ItemShowOutputPortInterface;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ItemShowInteractor
@@ -18,20 +19,15 @@ namespace JoyPla\Application\Interactors\Api\Item {
      */
     class ItemShowInteractor implements ItemShowInputPortInterface
     {
-        /** @var ItemShowOutputPortInterface */
-        private ItemShowOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var ItemRepositoryInterface */
-        private ItemRepositoryInterface $ItemRepository;
-
-        /**
-         * ItemShowInteractor constructor.
-         * @param ItemShowOutputPortInterface $outputPort
-         */
-        public function __construct(ItemShowOutputPortInterface $outputPort , ItemRepositoryInterface $ItemRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->ItemRepository = $ItemRepository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -39,21 +35,26 @@ namespace JoyPla\Application\Interactors\Api\Item {
          */
         public function handle(ItemShowInputData $inputData)
         {
-            [ $Item , $count ] = $this->ItemRepository->search(
-                (new HospitalId($inputData->hospitalId)) ,
-                $inputData->search
-            );
-            $this->outputPort->output(new ItemShowOutputData($Item, $count));
+            [
+                $Item,
+                $count,
+            ] = $this->repositoryProvider
+                ->getItemRepository()
+                ->search(
+                    new HospitalId($inputData->hospitalId),
+                    $inputData->search
+                );
+            $this->presenterProvider
+                ->getItemShowPresenter()
+                ->output(new ItemShowOutputData($Item, $count));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Item {
-
     use stdClass;
 
     /**
@@ -62,9 +63,8 @@ namespace JoyPla\Application\InputPorts\Api\Item {
      */
     class ItemShowInputData
     {
-        /**
-         * ItemShowInputData constructor.
-         */
+        public string $hospitalId;
+        public stdClass $search;
         public function __construct(string $hospitalId, array $search)
         {
             $this->hospitalId = $hospitalId;
@@ -75,8 +75,8 @@ namespace JoyPla\Application\InputPorts\Api\Item {
             $this->search->itemStandard = $search['itemStandard'];
             $this->search->itemJANCode = $search['itemJANCode'];
             $this->search->distributorIds = $search['distributorIds'];
-            $this->search->perPage= $search['perPage'];
-            $this->search->currentPage= $search['currentPage'];
+            $this->search->perPage = $search['perPage'];
+            $this->search->currentPage = $search['currentPage'];
             $this->search->isNotUse = '0';
         }
     }
@@ -84,7 +84,7 @@ namespace JoyPla\Application\InputPorts\Api\Item {
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Item
-    */
+     */
     interface ItemShowInputPortInterface
     {
         /**
@@ -98,7 +98,6 @@ namespace JoyPla\Application\InputPorts\Api\Item {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Item {
-
     use Collection;
     use JoyPla\Enterprise\Models\Item;
 
@@ -108,10 +107,10 @@ namespace JoyPla\Application\OutputPorts\Api\Item {
      */
     class ItemShowOutputData
     {
-        /**
-         * ItemShowOutputData constructor.
-         */
-        public function __construct(array $result , int $count)
+        public array $Items;
+        public int $count;
+
+        public function __construct(array $result, int $count)
         {
             $this->Items = $result;
             $this->count = $count;
@@ -121,7 +120,7 @@ namespace JoyPla\Application\OutputPorts\Api\Item {
     /**
      * Interface ItemShowOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\Item;
-    */
+     */
     interface ItemShowOutputPortInterface
     {
         /**

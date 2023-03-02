@@ -12,27 +12,25 @@ namespace JoyPla\Application\Interactors\Api\Reference {
     use JoyPla\Enterprise\Models\ConsumptionForReference;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ConsumptionHistoryRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ReferenceHistoryShowInteractor
      * @package JoyPla\Application\Interactors\Reference\Api
      */
-    class ConsumptionHistoryShowInteractor implements ConsumptionHistoryShowInputPortInterface
+    class ConsumptionHistoryShowInteractor implements
+        ConsumptionHistoryShowInputPortInterface
     {
-        /** @var ConsumptionHistoryShowOutputPortInterface */
-        private ConsumptionHistoryShowOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var ConsumptionHistoryRepositoryInterface */
-        private ConsumptionHistoryRepositoryInterface $repository;
-
-        /**
-         * ConsumptionHistoryShowInteractor constructor.
-         * @param ConsumptionHistoryShowOutputPortInterface $outputPort
-         */
-        public function __construct(ConsumptionHistoryShowOutputPortInterface $outputPort, ConsumptionHistoryRepositoryInterface $repository)
-        {
-            $this->outputPort = $outputPort;
-            $this->repository = $repository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -40,16 +38,19 @@ namespace JoyPla\Application\Interactors\Api\Reference {
          */
         public function handle(ConsumptionHistoryShowInputData $inputData)
         {
-            [ $histories , $count ] = $this->repository->search(
-                (new HospitalId($inputData->hospitalId)),
+            [$histories, $count] = $this->repository->search(
+                new HospitalId($inputData->hospitalId),
                 $inputData->search
             );
-            
-            $this->outputPort->output(new ConsumptionHistoryShowOutputData($histories, $count));
+
+            $this->presenterProvider
+                ->getConsumptionHistoryShowPresenter()
+                ->output(
+                    new ConsumptionHistoryShowOutputData($histories, $count)
+                );
         }
     }
 }
-
 
 /***
  * INPUT
@@ -64,23 +65,23 @@ namespace JoyPla\Application\InputPorts\Api\Reference {
      */
     class ConsumptionHistoryShowInputData
     {
-        /**
-         * ConsumptionHistoryShowInputData constructor.
-         */
+        public string $hospitalId;
+        public stdClass $search;
+
         public function __construct(string $hospitalId, array $search)
         {
             $this->hospitalId = $hospitalId;
             $this->search = new stdClass();
             $this->search->divisionIds = $search['divisionIds'];
-            $this->search->perPage= $search['perPage'];
-            $this->search->currentPage= $search['currentPage'];
+            $this->search->perPage = $search['perPage'];
+            $this->search->currentPage = $search['currentPage'];
         }
     }
 
     /**
      * Interface ConsumptionHistoryShowInputPortInterface
      * @package JoyPla\Application\InputPorts\Reference\Api
-    */
+     */
     interface ConsumptionHistoryShowInputPortInterface
     {
         /**
@@ -103,28 +104,25 @@ namespace JoyPla\Application\OutputPorts\Api\Reference {
      */
     class ConsumptionHistoryShowOutputData
     {
-        /** @var string */
-
-        /**
-         * ConsumptionHistoryShowOutputData constructor.
-         */
+        public int $count;
+        public array $histories;
 
         public function __construct(array $histories, int $count)
         {
             $this->count = $count;
-            $this->histories = array_map(
-                function (ConsumptionForReference $history) {
-                    return $history->toArray();
-                },
-                $histories
-            );
+            $this->histories = array_map(function (
+                ConsumptionForReference $history
+            ) {
+                return $history->toArray();
+            },
+            $histories);
         }
     }
 
     /**
      * Interface ConsumptionHistoryShowOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Reference\Api;
-    */
+     */
     interface ConsumptionHistoryShowOutputPortInterface
     {
         /**

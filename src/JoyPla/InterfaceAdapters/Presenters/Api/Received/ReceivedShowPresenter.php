@@ -1,7 +1,6 @@
 <?php
 
 namespace JoyPla\InterfaceAdapters\Presenters\Api\Received {
-
     use ApiResponse;
     use App\SpiralDb\HospitalUser;
     use framework\Http\View;
@@ -12,28 +11,34 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\Received {
     {
         public function output(ReceivedShowOutputData $outputData)
         {
-            
             $viewModel = new ReceivedShowViewModel($outputData);
-            echo (new ApiResponse( $viewModel->data, $viewModel->count , $viewModel->code, $viewModel->message, ['ReceivedShowPresenter']))->toJson();
+            echo (new ApiResponse(
+                $viewModel->data,
+                $viewModel->count,
+                $viewModel->code,
+                $viewModel->message,
+                ['ReceivedShowPresenter']
+            ))->toJson();
         }
     }
-    
+
     /**
      * Class Distributor
      * @package JoyPla\InterfaceAdapters\Presenters\Api\Received
      */
     class ReceivedShowViewModel
     {
-        /**
-         * Distributor constructor.
-         * @param ReceivedShowOutputData $source
-         */
+        public array $data = [];
+        public int $count = 0;
+        public int $code = 0;
+        public string $message = '';
+
         public function __construct(ReceivedShowOutputData $source)
         {
             $this->data = $source->receiveds;
             $this->count = $source->count;
-            $this->code = 200; 
-            $this->message = "success";
+            $this->code = 200;
+            $this->message = 'success';
         }
     }
 }

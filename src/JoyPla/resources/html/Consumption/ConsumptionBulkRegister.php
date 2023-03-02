@@ -110,7 +110,7 @@ var JoyPlaApp = Vue.createApp({
       getDivision(){
         let self = this;
         let params = new URLSearchParams();
-        params.append("path", "/api/division/show");
+        params.append("path", "/api/division/index");
         params.append("isOnlyMyDivision", <?php var_export(
             gate('bulkregister_of_consumption_slips')->isOnlyMyDivision()
         ); ?>);

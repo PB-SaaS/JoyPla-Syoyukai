@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Order {
-
     use ApiErrorCode\AccessFrequencyLimitExceededScopeIs;
     use App\Model\Division;
     use Exception;
@@ -28,41 +27,26 @@ namespace JoyPla\Application\Interactors\Api\Order {
     use JoyPla\InterfaceAdapters\GateWays\Repository\DivisionRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class OrderUnapprovedApprovalInteractor
      * @package JoyPla\Application\Interactors\Api\Order
      */
-    class OrderUnapprovedApprovalInteractor implements OrderUnapprovedApprovalInputPortInterface
+    class OrderUnapprovedApprovalInteractor implements
+        OrderUnapprovedApprovalInputPortInterface
     {
-        /** @var OrderUnapprovedApprovalOutputPortInterface */
-        private OrderUnapprovedApprovalOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var OrderRepositoryInterface */
-        private OrderRepositoryInterface $orderRepository;
-        
-        /** @var DivisionRepositoryInterface */
-        private DivisionRepositoryInterface $divisionRepository;
-        
-        /** @var InventoryCalculationRepositoryInterface */
-        private InventoryCalculationRepositoryInterface $inventoryCalculationRepository;
-
-        /**
-         * OrderUnapprovedApprovalInteractor constructor.
-         * @param OrderUnapprovedApprovalOutputPortInterface $outputPort
-         */
         public function __construct(
-            OrderUnapprovedApprovalOutputPortInterface $outputPort , 
-            OrderRepositoryInterface $orderRepository , 
-            DivisionRepositoryInterface $divisionRepository,
-            InventoryCalculationRepositoryInterface $inventoryCalculationRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->orderRepository = $orderRepository;
-            $this->divisionRepository = $divisionRepository;
-            $this->inventoryCalculationRepository = $inventoryCalculationRepository;
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
-
         /**
          * @param OrderUnapprovedApprovalInputData $inputData
          */
@@ -70,76 +54,85 @@ namespace JoyPla\Application\Interactors\Api\Order {
         {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
             $orderId = new OrderId($inputData->orderId);
-            $order = $this->orderRepository->index(
-                $hospitalId,
-                $orderId,
-                [
-                    OrderStatus::UnOrdered,
-                ]
-            );
+            $order = $this->repositoryProvider
+                ->getOrderRepository()
+                ->index($hospitalId, $orderId, [OrderStatus::UnOrdered]);
 
-            if( $order === null ){
-                throw new NotFoundException("Not Found.",404);
+            if ($order === null) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
-            if($inputData->isOnlyMyDivision && ! $order->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
-            {
-                throw new NotFoundException("Not Found.",404);
+            if (
+                $inputData->isOnlyMyDivision &&
+                !$order
+                    ->getDivision()
+                    ->getDivisionId()
+                    ->equal($inputData->user->divisionId)
+            ) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
             $order = $order->approval();
-            
-            $this->orderRepository->saveToArray($hospitalId , [$order]);
-            
+
+            $this->repositoryProvider
+                ->getOrderRepository()
+                ->saveToArray($hospitalId, [$order]);
+
             $inventoryCalculations = [];
 
-
-            if ($order->getReceivedTarget() === 1) { // 大倉庫
-                $division = $this->divisionRepository->getStorehouse($hospitalId);
-                foreach($order->getOrderItems() as $item)
-                {
+            if ($order->getReceivedTarget() === 1) {
+                // 大倉庫
+                $division = $this->repositoryProvider
+                    ->getDivisionRepository()
+                    ->getStorehouse($hospitalId);
+                foreach ($order->getOrderItems() as $item) {
                     $inventoryCalculations[] = new InventoryCalculation(
                         $item->getHospitalId(),
                         $division->getDivisionId(),
                         $item->getInHospitalItemId(),
-                        $item->getOrderQuantity()->value() * $item->getQuantity()->getQuantityNum(),
+                        $item->getOrderQuantity()->value() *
+                            $item->getQuantity()->getQuantityNum(),
                         2,
-                        (new Lot(  new LotNumber('') ,new LotDate('')  )),
+                        new Lot(new LotNumber(''), new LotDate('')),
                         0
                     );
                 }
             }
-            if ($order->getReceivedTarget() === 2) { // 部署
-                foreach($order->getOrderItems() as $item)
-                {
+            if ($order->getReceivedTarget() === 2) {
+                // 部署
+                foreach ($order->getOrderItems() as $item) {
                     $inventoryCalculations[] = new InventoryCalculation(
                         $item->getHospitalId(),
                         $item->getDivision()->getDivisionId(),
                         $item->getInHospitalItemId(),
-                        $item->getOrderQuantity()->value() * $item->getQuantity()->getQuantityNum(),
+                        $item->getOrderQuantity()->value() *
+                            $item->getQuantity()->getQuantityNum(),
                         2,
-                        (new Lot(  new LotNumber('') ,new LotDate('')  )),
+                        new Lot(new LotNumber(''), new LotDate('')),
                         0
                     );
                 }
             }
 
-            $this->orderRepository->sendApprovalOrderMail($order , $inputData->user);
+            $this->repositoryProvider
+                ->getOrderRepository()
+                ->sendApprovalOrderMail($order, $inputData->user);
 
-            $this->inventoryCalculationRepository->saveToArray($inventoryCalculations);
-            
-            $this->outputPort->output(new OrderUnapprovedApprovalOutputData($order));
+            $this->repositoryProvider
+                ->getInventoryCalculationRepository()
+                ->saveToArray($inventoryCalculations);
+
+            $this->presenterProvider
+                ->getOrderUnapprovedApprovalPresenter()
+                ->output(new OrderUnapprovedApprovalOutputData($order));
         }
     }
 }
-
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Order {
-
     use Auth;
     use stdClass;
 
@@ -149,11 +142,15 @@ namespace JoyPla\Application\InputPorts\Api\Order {
      */
     class OrderUnapprovedApprovalInputData
     {
-        /**
-         * OrderUnapprovedApprovalInputData constructor.
-         */
-        public function __construct(Auth $user , string $orderId , bool $isOnlyMyDivision)
-        {
+        public Auth $user;
+        public string $orderId;
+        public bool $isOnlyMyDivision;
+
+        public function __construct(
+            Auth $user,
+            string $orderId,
+            bool $isOnlyMyDivision
+        ) {
             $this->user = $user;
             $this->orderId = $orderId;
             $this->isOnlyMyDivision = $isOnlyMyDivision;
@@ -163,7 +160,7 @@ namespace JoyPla\Application\InputPorts\Api\Order {
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Order
-    */
+     */
     interface OrderUnapprovedApprovalInputPortInterface
     {
         /**
@@ -177,7 +174,6 @@ namespace JoyPla\Application\InputPorts\Api\Order {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Order {
-
     use JoyPla\Enterprise\Models\Order;
 
     /**
@@ -186,12 +182,9 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
      */
     class OrderUnapprovedApprovalOutputData
     {
-        /** @var string */
+        public array $data;
+        public int $count;
 
-        /**
-         * OrderUnapprovedApprovalOutputData constructor.
-         */
-        
         public function __construct(Order $order)
         {
             $this->data = $order->toArray();
@@ -202,7 +195,7 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
     /**
      * Interface OrderUnapprovedApprovalOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\Order;
-    */
+     */
     interface OrderUnapprovedApprovalOutputPortInterface
     {
         /**
@@ -210,4 +203,4 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
          */
         function output(OrderUnapprovedApprovalOutputData $outputData);
     }
-} 
+}

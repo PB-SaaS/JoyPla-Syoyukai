@@ -12,6 +12,8 @@ namespace JoyPla\Application\Interactors\Api\Order {
     use JoyPla\Enterprise\Models\Order;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class OrderShowInteractor
@@ -19,22 +21,15 @@ namespace JoyPla\Application\Interactors\Api\Order {
      */
     class OrderShowInteractor implements OrderShowInputPortInterface
     {
-        /** @var OrderShowOutputPortInterface */
-        private OrderShowOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var OrderRepositoryInterface */
-        private OrderRepositoryInterface $orderRepository;
-
-        /**
-         * OrderShowInteractor constructor.
-         * @param OrderShowOutputPortInterface $outputPort
-         */
         public function __construct(
-            OrderShowOutputPortInterface $outputPort,
-            OrderRepositoryInterface $orderRepository
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
         ) {
-            $this->outputPort = $outputPort;
-            $this->orderRepository = $orderRepository;
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -42,11 +37,18 @@ namespace JoyPla\Application\Interactors\Api\Order {
          */
         public function handle(OrderShowInputData $inputData)
         {
-            [$orders, $count] = $this->orderRepository->search(
-                new HospitalId($inputData->user->hospitalId),
-                $inputData->search
-            );
-            $this->outputPort->output(new OrderShowOutputData($orders, $count));
+            [
+                $orders,
+                $count,
+            ] = $this->repositoryProvider
+                ->getOrderRepository()
+                ->search(
+                    new HospitalId($inputData->user->hospitalId),
+                    $inputData->search
+                );
+            $this->presenterProvider
+                ->getOrderShowPresenter()
+                ->output(new OrderShowOutputData($orders, $count));
         }
     }
 }
@@ -64,9 +66,9 @@ namespace JoyPla\Application\InputPorts\Api\Order {
      */
     class OrderShowInputData
     {
-        /**
-         * OrderShowInputData constructor.
-         */
+        public Auth $user;
+        public stdClass $search;
+
         public function __construct(Auth $user, array $search)
         {
             $this->user = $user;
@@ -111,11 +113,8 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
      */
     class OrderShowOutputData
     {
-        /** @var string */
-
-        /**
-         * OrderShowOutputData constructor.
-         */
+        public int $count;
+        public array $orders;
 
         public function __construct(array $orders, int $count)
         {

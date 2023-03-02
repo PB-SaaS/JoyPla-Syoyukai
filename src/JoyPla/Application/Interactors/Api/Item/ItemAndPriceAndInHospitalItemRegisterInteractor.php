@@ -3,8 +3,7 @@
 /***
  * USECASE
  */
-namespace JoyPla\Application\Interactors\Api\Item{
-
+namespace JoyPla\Application\Interactors\Api\Item {
     use JoyPla\Application\InputPorts\Api\Item\ItemRegisterInputData;
     use JoyPla\Application\InputPorts\Api\Item\ItemRegisterInputPortInterface;
     use JoyPla\Application\InputPorts\Api\Price\PriceRegisterInputData;
@@ -25,59 +24,62 @@ namespace JoyPla\Application\Interactors\Api\Item{
     use JoyPla\Enterprise\Models\Item;
     use JoyPla\Enterprise\Models\ItemPrice;
     use JoyPla\Enterprise\Models\InHospitalItem;
+    use JoyPla\Enterprise\Models\TenantId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\HospitalRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\DistributorRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\PriceRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\InHospitalItemRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ItemAndPriceAndInHospitalItemRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ItemAndPriceAndInHospitalItemRegisterInteractor
      * @package JoyPla\Application\Interactors\Api\ItemAndPriceAndInHospitalItem
      */
-    class ItemAndPriceAndInHospitalItemRegisterInteractor implements ItemAndPriceAndInHospitalItemRegisterInputPortInterface
+    class ItemAndPriceAndInHospitalItemRegisterInteractor implements
+        ItemAndPriceAndInHospitalItemRegisterInputPortInterface
     {
-        /** @var ItemAndPriceAndInHospitalItemRegisterOutputPortInterface */
-        private ItemAndPriceAndInHospitalItemRegisterOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var ItemAndPriceAndInHospitalItemRepositoryInterface */
-        private ItemAndPriceAndInHospitalItemRepositoryInterface $ItemAndPriceAndInHospitalItemRepository;
-
-        /**
-         * ItemAndPriceAndInHospitalItemRegisterInteractor constructor.
-         * @param ItemAndPriceAndInHospitalItemRegisterOutputPortInterface $outputPort
-         */
         public function __construct(
-            ItemAndPriceAndInHospitalItemRegisterOutputPortInterface $outputPort ,
-            ItemAndPriceAndInHospitalItemRepositoryInterface $ItemAndPriceAndInHospitalItemRepository
-        )
-        {
-            $this->outputPort = $outputPort;
-            $this->ItemAndPriceAndInHospitalItemRepository = $ItemAndPriceAndInHospitalItemRepository;
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
          * @param ItemAndPriceAndInHospitalItemRegisterInputData $inputData
          */
-        public function handle(ItemAndPriceAndInHospitalItemRegisterInputData $inputData)
-        {
-            $ItemAndPriceAndInHospitalItem = $this->ItemAndPriceAndInHospitalItemRepository->saveToArray(
-                (new TenantId($inputData->tenantId)) ,
-                (new HospitalId($inputData->hospitalId)) ,
-                (array)$inputData->input
+        public function handle(
+            ItemAndPriceAndInHospitalItemRegisterInputData $inputData
+        ) {
+            $ItemAndPriceAndInHospitalItem = $this->repositoryProvider
+                ->getItemAndPriceAndInHospitalItemRepository()
+                ->saveToArray(
+                    new TenantId($inputData->tenantId),
+                    new HospitalId($inputData->hospitalId),
+                    (array) $inputData->input
+                );
+            /*
+            $this->outputPort->output(
+                new ItemAndPriceAndInHospitalItemRegisterOutputData(
+                    $ItemAndPriceAndInHospitalItem
+                )
             );
-            $this->outputPort->output(new ItemAndPriceAndInHospitalItemRegisterOutputData($ItemAndPriceAndInHospitalItem));
+            */
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Item {
-
     use stdClass;
 
     /**
@@ -86,11 +88,14 @@ namespace JoyPla\Application\InputPorts\Api\Item {
      */
     class ItemAndPriceAndInHospitalItemRegisterInputData
     {
-        /**
-         * ItemAndPriceAndInHospitalItemRegisterInputData constructor.
-         */
-        public function __construct(string $tenantId, string $hospitalId, array $input)
-        {
+        public string $tenantId;
+        public string $hospitalId;
+        public stdClass $input;
+        public function __construct(
+            string $tenantId,
+            string $hospitalId,
+            array $input
+        ) {
             $this->tenantId = $tenantId;
             $this->hospitalId = $hospitalId;
             $this->input = new stdClass();
@@ -125,13 +130,15 @@ namespace JoyPla\Application\InputPorts\Api\Item {
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Item
-    */
+     */
     interface ItemAndPriceAndInHospitalItemRegisterInputPortInterface
     {
         /**
          * @param ItemAndPriceAndInHospitalItemRegisterInputData $inputData
          */
-        function handle(ItemAndPriceAndInHospitalItemRegisterInputData $inputData);
+        function handle(
+            ItemAndPriceAndInHospitalItemRegisterInputData $inputData
+        );
     }
 }
 
@@ -139,7 +146,6 @@ namespace JoyPla\Application\InputPorts\Api\Item {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Item {
-
     use Collection;
     use JoyPla\Enterprise\Models\Item;
 
@@ -149,9 +155,8 @@ namespace JoyPla\Application\OutputPorts\Api\Item {
      */
     class ItemAndPriceAndInHospitalItemRegisterOutputData
     {
-        /**
-         * ItemAndPriceAndInHospitalItemRegisterOutputData constructor.
-         */
+        public object $ItemAndPriceAndInHospitalItems;
+
         public function __construct(object $result)
         {
             $this->ItemAndPriceAndInHospitalItems = $result;
@@ -161,12 +166,14 @@ namespace JoyPla\Application\OutputPorts\Api\Item {
     /**
      * Interface ItemAndPriceAndInHospitalItemRegisterOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\ItemAndPriceAndInHospitalItem;
-    */
+     */
     interface ItemAndPriceAndInHospitalItemRegisterOutputPortInterface
     {
         /**
          * @param ItemAndPriceAndInHospitalItemRegisterOutputData $outputData
          */
-        function output(ItemAndPriceAndInHospitalItemRegisterOutputData $outputData);
+        function output(
+            ItemAndPriceAndInHospitalItemRegisterOutputData $outputData
+        );
     }
 }

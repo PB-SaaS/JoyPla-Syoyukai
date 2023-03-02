@@ -4,34 +4,33 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\InHospitalItem {
-
     use JoyPla\Application\InputPorts\Api\InHospitalItem\InHospitalItemRegisterInputData;
     use JoyPla\Application\InputPorts\Api\InHospitalItem\InHospitalItemRegisterInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\InHospitalItem\InHospitalItemRegisterOutputData;
     use JoyPla\Application\OutputPorts\Api\InHospitalItem\InHospitalItemRegisterOutputPortInterface;
     use JoyPla\Enterprise\Models\HospitalId;
+    use JoyPla\Enterprise\Models\ItemId;
+    use JoyPla\Enterprise\Models\PriceId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\InHospitalItemRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class InHospitalItemRegisterInteractor
      * @package JoyPla\Application\Interactors\Api\InHospitalItem
      */
-    class InHospitalItemRegisterInteractor implements InHospitalItemRegisterInputPortInterface
+    class InHospitalItemRegisterInteractor implements
+        InHospitalItemRegisterInputPortInterface
     {
-        /** @var InHospitalItemRegisterOutputPortInterface */
-        private InHospitalItemRegisterOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var InHospitalItemRepositoryInterface */
-        private InHospitalItemRepositoryInterface $InHospitalItemRepository;
-
-        /**
-         * InHospitalItemRegisterInteractor constructor.
-         * @param InHospitalItemRegisterOutputPortInterface $outputPort
-         */
-        public function __construct(InHospitalItemRegisterOutputPortInterface $outputPort , InHospitalItemRepositoryInterface $InHospitalItemRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->InHospitalItemRepository = $InHospitalItemRepository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -39,23 +38,25 @@ namespace JoyPla\Application\Interactors\Api\InHospitalItem {
          */
         public function handle(InHospitalItemRegisterInputData $inputData)
         {
-            $InHospitalItem = $this->InHospitalItemRepository->saveToArray(
-                (new HospitalId($inputData->hospitalId)) ,
-                (new ItemId($inputData->itemId)) ,
-                (new PriceId($inputData->priceId)) ,
-                $inputData->input
-            );
-            $this->outputPort->output(new InHospitalItemRegisterOutputData($InHospitalItem));
+            $inHospitalItem = $this->repositoryProvider
+                ->getInHospitalItemRepository()
+                ->saveToArray(
+                    new HospitalId($inputData->hospitalId),
+                    new ItemId($inputData->input->itemId),
+                    new PriceId($inputData->input->priceId),
+                    $inputData->input
+                );
+            $this->presenterProvider
+                ->getInHospitalItemRegisterPresenter()
+                ->output(new InHospitalItemRegisterOutputData($inHospitalItem));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\InHospitalItem {
-
     use stdClass;
 
     /**
@@ -64,9 +65,9 @@ namespace JoyPla\Application\InputPorts\Api\InHospitalItem {
      */
     class InHospitalItemRegisterInputData
     {
-        /**
-         * InHospitalItemRegisterInputData constructor.
-         */
+        public string $hospitalId;
+        public stdClass $input;
+
         public function __construct(string $hospitalId, array $input)
         {
             $this->hospitalId = $hospitalId;
@@ -77,7 +78,7 @@ namespace JoyPla\Application\InputPorts\Api\InHospitalItem {
             $this->input->itemStandard = $input['itemStandard'];
             $this->input->itemJANCode = $input['itemJANCode'];
             $this->input->distributorId = $input['distributorId'];
-            $this->input->perPage= $input['perPage'];
+            $this->input->perPage = $input['perPage'];
             $this->input->currentPage = $input['currentPage'];
             $this->input->isNotUse = '0';
         }
@@ -86,7 +87,7 @@ namespace JoyPla\Application\InputPorts\Api\InHospitalItem {
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\InHospitalItem
-    */
+     */
     interface InHospitalItemRegisterInputPortInterface
     {
         /**
@@ -100,20 +101,16 @@ namespace JoyPla\Application\InputPorts\Api\InHospitalItem {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\InHospitalItem {
-
-    use Collection;
-    use JoyPla\Enterprise\Models\InHospitalItem;
-
     /**
      * Class InHospitalItemRegisterOutputData
      * @package JoyPla\Application\OutputPorts\Api\InHospitalItem;
      */
     class InHospitalItemRegisterOutputData
     {
-        /**
-         * InHospitalItemRegisterOutputData constructor.
-         */
-        public function __construct(array $result , int $count)
+        public array $InHospitalItems;
+        public int $count;
+
+        public function __construct(array $result, int $count)
         {
             $this->InHospitalItems = $result;
             $this->count = $count;
@@ -123,7 +120,7 @@ namespace JoyPla\Application\OutputPorts\Api\InHospitalItem {
     /**
      * Interface InHospitalItemRegisterOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\InHospitalItem;
-    */
+     */
     interface InHospitalItemRegisterOutputPortInterface
     {
         /**

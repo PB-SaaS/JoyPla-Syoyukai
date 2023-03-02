@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Order {
-
     use App\Model\Division;
     use framework\Exception\NotFoundException;
     use JoyPla\Application\InputPorts\Api\Order\FixedQuantityOrderInputData;
@@ -15,27 +14,25 @@ namespace JoyPla\Application\Interactors\Api\Order {
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\Enterprise\Models\Order;
     use JoyPla\InterfaceAdapters\GateWays\Repository\stockRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class FixedQuantityOrderInteractor
      * @package JoyPla\Application\Interactors\Api\Order
      */
-    class FixedQuantityOrderInteractor implements FixedQuantityOrderInputPortInterface
+    class FixedQuantityOrderInteractor implements
+        FixedQuantityOrderInputPortInterface
     {
-        /** @var FixedQuantityOrderOutputPortInterface */
-        private FixedQuantityOrderOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var StockRepositoryInterface */
-        private StockRepositoryInterface $stockRepository;
-
-        /**
-         * FixedQuantityOrderInteractor constructor.
-         * @param FixedQuantityOrderOutputPortInterface $outputPort
-         */
-        public function __construct(FixedQuantityOrderOutputPortInterface $outputPort , StockRepositoryInterface $stockRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->stockRepository = $stockRepository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -43,18 +40,23 @@ namespace JoyPla\Application\Interactors\Api\Order {
          */
         public function handle(FixedQuantityOrderInputData $inputData)
         {
-            [$stocks , $count] = $this->stockRepository->search($inputData->auth , $inputData->search);
-            $this->outputPort->output(new FixedQuantityOrderOutputData($stocks , $count));
+            [
+                $stocks,
+                $count,
+            ] = $this->repositoryProvider
+                ->getStockRepository()
+                ->search($inputData->auth, $inputData->search);
+            $this->presenterProvider
+                ->getFixedQuantityOrderPresenter()
+                ->output(new FixedQuantityOrderOutputData($stocks, $count));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Order {
-
     use Auth;
     use stdClass;
 
@@ -64,10 +66,10 @@ namespace JoyPla\Application\InputPorts\Api\Order {
      */
     class FixedQuantityOrderInputData
     {
-        /**
-         * FixedQuantityOrderInputData constructor.
-         */
-        public function __construct(Auth $auth , array $search )
+        public Auth $auth;
+        public array $search;
+
+        public function __construct(Auth $auth, array $search)
         {
             $this->auth = $auth;
             $this->search = new stdClass();
@@ -78,15 +80,15 @@ namespace JoyPla\Application\InputPorts\Api\Order {
             $this->search->itemJANCode = $search['itemJANCode'];
             $this->search->yearMonth = $search['yearMonth'];
             $this->search->divisionIds = $search['divisionIds'];
-            $this->search->perPage= $search['perPage'];
-            $this->search->currentPage= $search['currentPage'];
+            $this->search->perPage = $search['perPage'];
+            $this->search->currentPage = $search['currentPage'];
         }
     }
 
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Order
-    */
+     */
     interface FixedQuantityOrderInputPortInterface
     {
         /**
@@ -100,21 +102,12 @@ namespace JoyPla\Application\InputPorts\Api\Order {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Order {
-
-    use JoyPla\Enterprise\Models\Stock;
-
-    /**
-     * Class FixedQuantityOrderOutputData
-     * @package JoyPla\Application\OutputPorts\Api\Order;
-     */
     class FixedQuantityOrderOutputData
     {
-        /** @var string */
+        public array $stocks;
+        public int $count;
 
-        /**
-         * FixedQuantityOrderOutputData constructor.
-         */
-        public function __construct(array $stocks , int $count)
+        public function __construct(array $stocks, int $count)
         {
             $this->stocks = $stocks;
             $this->count = $count;
@@ -124,7 +117,7 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
     /**
      * Interface FixedQuantityOrderOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\Order;
-    */
+     */
     interface FixedQuantityOrderOutputPortInterface
     {
         /**
@@ -132,4 +125,4 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
          */
         function output(FixedQuantityOrderOutputData $outputData);
     }
-} 
+}

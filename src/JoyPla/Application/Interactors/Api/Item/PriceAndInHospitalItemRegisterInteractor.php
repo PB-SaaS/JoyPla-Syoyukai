@@ -3,8 +3,7 @@
 /***
  * USECASE
  */
-namespace JoyPla\Application\Interactors\Api\Item{
-
+namespace JoyPla\Application\Interactors\Api\Item {
     use JoyPla\Application\InputPorts\Api\Item\ItemRegisterInputData;
     use JoyPla\Application\InputPorts\Api\Item\ItemRegisterInputPortInterface;
     use JoyPla\Application\InputPorts\Api\Price\PriceRegisterInputData;
@@ -25,59 +24,61 @@ namespace JoyPla\Application\Interactors\Api\Item{
     use JoyPla\Enterprise\Models\Item;
     use JoyPla\Enterprise\Models\ItemPrice;
     use JoyPla\Enterprise\Models\InHospitalItem;
+    use JoyPla\Enterprise\Models\ItemId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\HospitalRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\DistributorRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\PriceRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\InHospitalItemRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\PriceAndInHospitalItemRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class PriceAndInHospitalItemRegisterInteractor
      * @package JoyPla\Application\Interactors\Api\PriceAndInHospitalItem
      */
-    class PriceAndInHospitalItemRegisterInteractor implements PriceAndInHospitalItemRegisterInputPortInterface
+    class PriceAndInHospitalItemRegisterInteractor implements
+        PriceAndInHospitalItemRegisterInputPortInterface
     {
-        /** @var PriceAndInHospitalItemRegisterOutputPortInterface */
-        private PriceAndInHospitalItemRegisterOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var PriceAndInHospitalItemRepositoryInterface */
-        private PriceAndInHospitalItemRepositoryInterface $PriceAndInHospitalItemRepository;
-
-        /**
-         * PriceAndInHospitalItemRegisterInteractor constructor.
-         * @param PriceAndInHospitalItemRegisterOutputPortInterface $outputPort
-         */
         public function __construct(
-            PriceAndInHospitalItemRegisterOutputPortInterface $outputPort ,
-            PriceAndInHospitalItemRepositoryInterface $PriceAndInHospitalItemRepository
-        )
-        {
-            $this->outputPort = $outputPort;
-            $this->PriceAndInHospitalItemRepository = $PriceAndInHospitalItemRepository;
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
-
         /**
          * @param PriceAndInHospitalItemRegisterInputData $inputData
          */
-        public function handle(PriceAndInHospitalItemRegisterInputData $inputData)
-        {
-            $PriceAndInHospitalItem = $this->PriceAndInHospitalItemRepository->saveToArray(
-                (new HospitalId($inputData->hospitalId)) ,
-                (new ItemId($inputData->itemId)) ,
-                (array)$inputData->input
-            );
-            $this->outputPort->output(new PriceAndInHospitalItemRegisterOutputData($PriceAndInHospitalItem));
+        public function handle(
+            PriceAndInHospitalItemRegisterInputData $inputData
+        ) {
+            $PriceAndInHospitalItem = $this->repositoryProvider
+                ->getPriceAndInHospitalItemRepository()
+                ->saveToArray(
+                    new HospitalId($inputData->hospitalId),
+                    new ItemId($inputData->itemId),
+                    (array) $inputData->input
+                );
+            $this->presenterProvider
+                ->getPriceAndInHospitalItemPresenter()
+                ->output(
+                    new PriceAndInHospitalItemRegisterOutputData(
+                        $PriceAndInHospitalItem
+                    )
+                );
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Item {
-
     use stdClass;
 
     /**
@@ -86,11 +87,15 @@ namespace JoyPla\Application\InputPorts\Api\Item {
      */
     class PriceAndInHospitalItemRegisterInputData
     {
-        /**
-         * PriceAndInHospitalItemRegisterInputData constructor.
-         */
-        public function __construct(string $hospitalId, string $itemId, array $input)
-        {
+        public string $itemId;
+        public string $hospitalId;
+        public stdClass $input;
+
+        public function __construct(
+            string $hospitalId,
+            string $itemId,
+            array $input
+        ) {
             $this->itemId = $itemId;
             $this->hospitalId = $hospitalId;
             $this->input = new stdClass();
@@ -125,7 +130,7 @@ namespace JoyPla\Application\InputPorts\Api\Item {
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Item
-    */
+     */
     interface PriceAndInHospitalItemRegisterInputPortInterface
     {
         /**
@@ -139,7 +144,6 @@ namespace JoyPla\Application\InputPorts\Api\Item {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Item {
-
     use Collection;
     use JoyPla\Enterprise\Models\Item;
 
@@ -149,9 +153,8 @@ namespace JoyPla\Application\OutputPorts\Api\Item {
      */
     class PriceAndInHospitalItemRegisterOutputData
     {
-        /**
-         * PriceAndInHospitalItemRegisterOutputData constructor.
-         */
+        public object $PriceAndInHospitalItems;
+
         public function __construct(object $result)
         {
             $this->PriceAndInHospitalItems = $result;
@@ -161,7 +164,7 @@ namespace JoyPla\Application\OutputPorts\Api\Item {
     /**
      * Interface PriceAndInHospitalItemRegisterOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\PriceAndInHospitalItem;
-    */
+     */
     interface PriceAndInHospitalItemRegisterOutputPortInterface
     {
         /**

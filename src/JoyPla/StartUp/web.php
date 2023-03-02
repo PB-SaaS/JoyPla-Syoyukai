@@ -13,6 +13,7 @@ use framework\Http\Request;
 use framework\Http\View;
 use framework\Routing\Router;
 use JoyPla\Application\Interactors\Web\Consumption\ConsumptionIndexInteractor;
+use JoyPla\Application\Interactors\Web\Consumption\ConsumptionShowInteractor;
 use JoyPla\Application\Interactors\Web\Order\OrderIndexInteractor;
 use JoyPla\Application\Interactors\Web\Received\OrderReceivedSlipIndexInteractor;
 use JoyPla\Application\Interactors\Web\Received\ReceivedIndexInteractor;
@@ -42,6 +43,7 @@ use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRequestRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\TotalizationRepository;
 use JoyPla\InterfaceAdapters\Presenters\Web\Consumption\ConsumptionIndexPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\Consumption\ConsumptionPrintPresenter;
+use JoyPla\InterfaceAdapters\Presenters\Web\Consumption\ConsumptionShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\Order\OrderIndexPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\Order\OrderPrintPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\Order\UnapprovedOrderIndexPresenter;
@@ -92,7 +94,7 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
 
     Router::map('GET', '/consumption', [
         TopController::class,
-        'consumptionpage'
+        'consumptionpage',
     ]);
 
     Router::map('GET', '/stocktaking', [
@@ -141,17 +143,17 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
         'bulkRegister',
     ]);
 
-    Router::map('GET', '/consumption/show', [
+    Router::map('GET', '/consumption/index', [
         ConsumptionController::class,
-        'show',
+        'index',
     ]);
 
     Router::map('GET', '/consumption/:consumptionId', [
         ConsumptionController::class,
-        'index',
+        'show',
     ])->service(
-        new ConsumptionIndexInteractor(
-            new ConsumptionIndexPresenter(),
+        new ConsumptionShowInteractor(
+            new ConsumptionShowPresenter(),
             new ConsumptionRepository()
         )
     );
@@ -160,7 +162,7 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
         ConsumptionController::class,
         'print',
     ])->service(
-        new ConsumptionIndexInteractor(
+        new ConsumptionShowInteractor(
             new ConsumptionPrintPresenter(),
             new ConsumptionRepository()
         )

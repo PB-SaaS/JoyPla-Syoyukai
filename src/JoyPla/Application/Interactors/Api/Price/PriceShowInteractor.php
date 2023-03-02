@@ -4,13 +4,14 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Price {
-
     use JoyPla\Application\InputPorts\Api\Price\PriceShowInputData;
     use JoyPla\Application\InputPorts\Api\Price\PriceShowInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\Price\PriceShowOutputData;
     use JoyPla\Application\OutputPorts\Api\Price\PriceShowOutputPortInterface;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\PriceRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class PriceShowInteractor
@@ -18,20 +19,15 @@ namespace JoyPla\Application\Interactors\Api\Price {
      */
     class PriceShowInteractor implements PriceShowInputPortInterface
     {
-        /** @var PriceShowOutputPortInterface */
-        private PriceShowOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var PriceRepositoryInterface */
-        private PriceRepositoryInterface $PriceRepository;
-
-        /**
-         * PriceShowInteractor constructor.
-         * @param PriceShowOutputPortInterface $outputPort
-         */
-        public function __construct(PriceShowOutputPortInterface $outputPort , PriceRepositoryInterface $PriceRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->PriceRepository = $PriceRepository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -39,21 +35,26 @@ namespace JoyPla\Application\Interactors\Api\Price {
          */
         public function handle(PriceShowInputData $inputData)
         {
-            [ $Price , $count ] = $this->PriceRepository->search(
-                (new HospitalId($inputData->hospitalId)) ,
-                $inputData->search
-            );
-            $this->outputPort->output(new PriceShowOutputData($Price, $count));
+            [
+                $Price,
+                $count,
+            ] = $this->repositoryProvider
+                ->getPriceRepository()
+                ->search(
+                    new HospitalId($inputData->hospitalId),
+                    $inputData->search
+                );
+            $this->presenterProvider
+                ->getPriceShowPresenter()
+                ->output(new PriceShowOutputData($Price, $count));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Price {
-
     use stdClass;
 
     /**
@@ -62,9 +63,8 @@ namespace JoyPla\Application\InputPorts\Api\Price {
      */
     class PriceShowInputData
     {
-        /**
-         * PriceShowInputData constructor.
-         */
+        public string $hospitalId;
+        public stdClass $search;
         public function __construct(string $hospitalId, array $search)
         {
             $this->hospitalId = $hospitalId;
@@ -84,7 +84,7 @@ namespace JoyPla\Application\InputPorts\Api\Price {
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Price
-    */
+     */
     interface PriceShowInputPortInterface
     {
         /**
@@ -98,7 +98,6 @@ namespace JoyPla\Application\InputPorts\Api\Price {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Price {
-
     use Collection;
     use JoyPla\Enterprise\Models\Price;
 
@@ -108,10 +107,9 @@ namespace JoyPla\Application\OutputPorts\Api\Price {
      */
     class PriceShowOutputData
     {
-        /**
-         * PriceShowOutputData constructor.
-         */
-        public function __construct(array $result , int $count)
+        public array $Price;
+        public int $count;
+        public function __construct(array $result, int $count)
         {
             $this->Prices = $result;
             $this->count = $count;
@@ -121,7 +119,7 @@ namespace JoyPla\Application\OutputPorts\Api\Price {
     /**
      * Interface PriceShowOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\Price;
-    */
+     */
     interface PriceShowOutputPortInterface
     {
         /**

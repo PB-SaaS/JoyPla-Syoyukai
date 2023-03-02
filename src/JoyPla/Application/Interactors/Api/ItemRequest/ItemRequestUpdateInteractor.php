@@ -5,7 +5,6 @@
  */
 
 namespace JoyPla\Application\Interactors\Api\ItemRequest {
-
     use ApiErrorCode\AccessFrequencyLimitExceededScopeIs;
     use App\SpiralDb\StockView;
     use Exception;
@@ -23,36 +22,26 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
     use JoyPla\Enterprise\Models\RequestItemCount;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRequestRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\RequestItemCountRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ItemRequestUpdateInteractor
      * @package JoyPla\Application\Interactors\Api\ItemRequest
      */
-    class ItemRequestUpdateInteractor implements ItemRequestUpdateInputPortInterface
+    class ItemRequestUpdateInteractor implements
+        ItemRequestUpdateInputPortInterface
     {
-        /** @var ItemRequestUpdateOutputPortInterface */
-        private ItemRequestUpdateOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var ItemRequestRepositoryInterface */
-        private ItemRequestRepositoryInterface $repository;
-
-        /** @var RequestItemCountRepositoryInterface */
-        private RequestItemCountRepositoryInterface $requestItemCountRepository;
-
-        /**
-         * ItemRequestUpdateInteractor constructor.
-         * @param ItemRequestUpdateOutputPortInterface $outputPort
-         */
         public function __construct(
-            ItemRequestUpdateOutputPortInterface $outputPort,
-            ItemRequestRepositoryInterface $repository,
-            RequestItemCountRepositoryInterface $requestItemCountRepository
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
         ) {
-            $this->outputPort = $outputPort;
-            $this->repository = $repository;
-            $this->requestItemCountRepository = $requestItemCountRepository;
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
-
         /**
          * @param ItemRequestUpdateInputData $inputData
          */
@@ -60,42 +49,66 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
         {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
             $requestHId = new RequestHId($inputData->requestHId);
-            $requestType = new RequestType((int)$inputData->requestType);
+            $requestType = new RequestType((int) $inputData->requestType);
 
             $itemRequest = $this->repository->show($hospitalId, $requestHId);
 
             if ($itemRequest === null) {
-                throw new NotFoundException("Not Found.", 404);
+                throw new NotFoundException('Not Found.', 404);
             }
 
-            if ($inputData->isOnlyMyDivision && !$itemRequest->getSourceDivision()->getDivisionId()->equal($inputData->user->divisionId)) {
-                throw new NotFoundException("Not Found.", 404);
+            if (
+                $inputData->isOnlyMyDivision &&
+                !$itemRequest
+                    ->getSourceDivision()
+                    ->getDivisionId()
+                    ->equal($inputData->user->divisionId)
+            ) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
             $requestItems = $itemRequest->getRequestItems();
             $oldRequestItems = $itemRequest->getRequestItems();
 
             foreach ($requestItems as $key => $item) {
-                $fkey = array_search($item->getRequestId()->value(), array_column($inputData->updateModel, 'requestId'));
+                $fkey = array_search(
+                    $item->getRequestId()->value(),
+                    array_column($inputData->updateModel, 'requestId')
+                );
                 if ($fkey === null) {
                     continue;
                 }
-                $requestQuantity = $inputData->updateModel[$fkey]['requestQuantity'];
+                $requestQuantity =
+                    $inputData->updateModel[$fkey]['requestQuantity'];
                 $item = $item->setRequestType($requestType);
-                $requestItems[$key] = $item->setRequestQuantity((new RequestQuantity((int)$requestQuantity)));
+                $requestItems[$key] = $item->setRequestQuantity(
+                    new RequestQuantity((int) $requestQuantity)
+                );
             }
 
             $itemRequest = $itemRequest->setRequestItem($requestItems);
             $itemRequest = $itemRequest->setRequestType($requestType);
 
-            $stockViewInstance = StockView::where('hospitalId', $hospitalId->value());
-            $stockViewInstance->Where('divisionId', $itemRequest->getTargetDivision()->getDivisionId()->value());
+            $stockViewInstance = StockView::where(
+                'hospitalId',
+                $hospitalId->value()
+            );
+            $stockViewInstance->Where(
+                'divisionId',
+                $itemRequest
+                    ->getTargetDivision()
+                    ->getDivisionId()
+                    ->value()
+            );
             foreach ($itemRequest->getRequestItems() as $requestItem) {
-                $stockViewInstance->orWhere('inHospitalItemId', $requestItem->getInHospitalItemId()->value());
+                $stockViewInstance->orWhere(
+                    'inHospitalItemId',
+                    $requestItem->getInHospitalItemId()->value()
+                );
             }
 
             $stocks = $stockViewInstance->get();
-            if ((int)$stocks->count === 0) {
+            if ((int) $stocks->count === 0) {
                 throw new Exception("Stocks don't exist.", 998);
             }
 
@@ -107,13 +120,26 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
             $requestItemCounts = [];
             foreach ($itemRequest->getRequestItems() as $item) {
                 foreach ($stocks as $stock) {
-                    if (($itemRequest->getTargetDivision()->getDivisionId()->value() === $stock->divisionId) &&
-                        ($item->getInHospitalItemId()->value() === $stock->inHospitalItemId)
+                    if (
+                        $itemRequest
+                            ->getTargetDivision()
+                            ->getDivisionId()
+                            ->value() === $stock->divisionId &&
+                        $item->getInHospitalItemId()->value() ===
+                            $stock->inHospitalItemId
                     ) {
-                        $oldValueKey = array_search($item->getRequestId()->value(), array_column($oldRequestItemsToArray, 'requestId'));
+                        $oldValueKey = array_search(
+                            $item->getRequestId()->value(),
+                            array_column($oldRequestItemsToArray, 'requestId')
+                        );
                         $quantity = 0;
-                        $updateQuantity = (int)$item->getRequestQuantity()->value();
-                        $oldQuantity = (int)$oldRequestItemsToArray[$oldValueKey]['requestQuantity'];
+                        $updateQuantity = (int) $item
+                            ->getRequestQuantity()
+                            ->value();
+                        $oldQuantity =
+                            (int) $oldRequestItemsToArray[$oldValueKey][
+                                'requestQuantity'
+                            ];
 
                         if ($updateQuantity > $oldQuantity) {
                             $quantity = $updateQuantity - $oldQuantity;
@@ -134,27 +160,31 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 }
             }
 
-            if (count($requestItemCounts) !== count($itemRequest->getRequestItems())) {
+            if (
+                count($requestItemCounts) !==
+                count($itemRequest->getRequestItems())
+            ) {
                 throw new Exception("Stocks don't exist.", 998);
             }
 
-            $this->requestItemCountRepository->saveToArray($requestItemCounts);
+            $this->repositoryProvider
+                ->getRequestItemCountRepository()
+                ->saveToArray($requestItemCounts);
 
             $this->repository->update($hospitalId, $itemRequest);
 
-            $this->outputPort->output(new ItemRequestUpdateOutputData($itemRequest));
+            $this->presenterProvider
+                ->getItemRequestUpdatePresenter()
+                ->output(new ItemRequestUpdateOutputData($itemRequest));
         }
     }
 }
-
-
 
 /***
  * INPUT
  */
 
 namespace JoyPla\Application\InputPorts\Api\ItemRequest {
-
     use Auth;
     use stdClass;
 
@@ -164,18 +194,24 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
      */
     class ItemRequestUpdateInputData
     {
-        /**
-         * ItemRequestUpdateInputData constructor.
-         */
-        public function __construct(Auth $user, array $itemRequest, bool $isOnlyMyDivision)
-        {
+        public Auth $user;
+        public string $requestHId;
+        public string $requestType;
+        public array $updateModel;
+        public int $isOnlyMyDivision;
+
+        public function __construct(
+            Auth $user,
+            array $itemRequest,
+            bool $isOnlyMyDivision
+        ) {
             $this->user = $user;
             $this->requestHId = $itemRequest['requestHId'];
             $this->requestType = $itemRequest['requestType'];
             $this->updateModel = array_map(function (array $model) {
                 return [
                     'requestId' => $model['requestId'],
-                    'requestQuantity' => $model['requestQuantity']
+                    'requestQuantity' => $model['requestQuantity'],
                 ];
             }, $itemRequest['updateModel']);
 
@@ -201,7 +237,6 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
  */
 
 namespace JoyPla\Application\OutputPorts\Api\ItemRequest {
-
     use JoyPla\Enterprise\Models\ItemRequest;
 
     /**
@@ -210,11 +245,8 @@ namespace JoyPla\Application\OutputPorts\Api\ItemRequest {
      */
     class ItemRequestUpdateOutputData
     {
-        /** @var string */
-
-        /**
-         * ItemRequestUpdateOutputData constructor.
-         */
+        public array $data;
+        public int $count;
 
         public function __construct(ItemRequest $itemRequest)
         {

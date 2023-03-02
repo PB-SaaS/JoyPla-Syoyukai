@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Order {
-
     use ApiErrorCode\AccessFrequencyLimitExceededScopeIs;
     use App\Model\Division;
     use Exception;
@@ -21,27 +20,25 @@ namespace JoyPla\Application\Interactors\Api\Order {
     use JoyPla\Enterprise\Models\OrderQuantity;
     use JoyPla\Enterprise\Models\OrderStatus;
     use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class OrderUnapprovedDeleteInteractor
      * @package JoyPla\Application\Interactors\Api\Order
      */
-    class OrderUnapprovedDeleteInteractor implements OrderUnapprovedDeleteInputPortInterface
+    class OrderUnapprovedDeleteInteractor implements
+        OrderUnapprovedDeleteInputPortInterface
     {
-        /** @var OrderUnapprovedDeleteOutputPortInterface */
-        private OrderUnapprovedDeleteOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var OrderRepositoryInterface */
-        private OrderRepositoryInterface $orderRepository;
-
-        /**
-         * OrderUnapprovedDeleteInteractor constructor.
-         * @param OrderUnapprovedDeleteOutputPortInterface $outputPort
-         */
-        public function __construct(OrderUnapprovedDeleteOutputPortInterface $outputPort , OrderRepositoryInterface $orderRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->orderRepository = $orderRepository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -51,32 +48,40 @@ namespace JoyPla\Application\Interactors\Api\Order {
         {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
             $orderId = new OrderId($inputData->orderId);
-            
-            $order = $this->orderRepository->index($hospitalId , $orderId , [ OrderStatus::UnOrdered ]);
 
-            if( $order === null ){
-                throw new NotFoundException("Not Found.",404);
+            $order = $this->repositoryProvider
+                ->getOrderRepository()
+                ->index($hospitalId, $orderId, [OrderStatus::UnOrdered]);
+
+            if ($order === null) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
-            if($inputData->isOnlyMyDivision && ! $order->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
-            {
-                throw new NotFoundException("Not Found.",404);
+            if (
+                $inputData->isOnlyMyDivision &&
+                !$order
+                    ->getDivision()
+                    ->getDivisionId()
+                    ->equal($inputData->user->divisionId)
+            ) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
-            $deleteCount = $this->orderRepository->delete($hospitalId , $orderId);
-            
-            $this->outputPort->output(new OrderUnapprovedDeleteOutputData($deleteCount));
+            $deleteCount = $this->repositoryProvider
+                ->getOrderRepository()
+                ->delete($hospitalId, $orderId);
+
+            $this->presenterProvider
+                ->getOrderUnapprovedDeletePresenter()
+                ->output(new OrderUnapprovedDeleteOutputData($deleteCount));
         }
     }
 }
-
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Order {
-
     use Auth;
     use stdClass;
 
@@ -86,11 +91,15 @@ namespace JoyPla\Application\InputPorts\Api\Order {
      */
     class OrderUnapprovedDeleteInputData
     {
-        /**
-         * OrderUnapprovedDeleteInputData constructor.
-         */
-        public function __construct(Auth $user , string $orderId , bool $isOnlyMyDivision)
-        {
+        public Auth $user;
+        public string $orderId;
+        public bool $isOnlyMyDivision;
+
+        public function __construct(
+            Auth $user,
+            string $orderId,
+            bool $isOnlyMyDivision
+        ) {
             $this->user = $user;
             $this->orderId = $orderId;
             $this->isOnlyMyDivision = $isOnlyMyDivision;
@@ -100,7 +109,7 @@ namespace JoyPla\Application\InputPorts\Api\Order {
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Order
-    */
+     */
     interface OrderUnapprovedDeleteInputPortInterface
     {
         /**
@@ -114,7 +123,6 @@ namespace JoyPla\Application\InputPorts\Api\Order {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Order {
-
     use JoyPla\Enterprise\Models\Order;
 
     /**
@@ -123,12 +131,8 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
      */
     class OrderUnapprovedDeleteOutputData
     {
-        /** @var string */
+        public int $count;
 
-        /**
-         * OrderUnapprovedDeleteOutputData constructor.
-         */
-        
         public function __construct(int $deleteCount)
         {
             $this->count = $deleteCount;
@@ -138,7 +142,7 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
     /**
      * Interface OrderUnapprovedDeleteOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\Order;
-    */
+     */
     interface OrderUnapprovedDeleteOutputPortInterface
     {
         /**
@@ -146,4 +150,4 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
          */
         function output(OrderUnapprovedDeleteOutputData $outputData);
     }
-} 
+}

@@ -12,6 +12,11 @@ function view(string $template, array $param = array() , bool $filter = true): V
     return new View($template , $param , $filter);
 }
 
+function bladeView(string $template, array $param = [], bool $filter = true): View
+{
+    return new BladeLikeView($template, $param, $filter);
+}
+
 function html($string = '') {
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 }
