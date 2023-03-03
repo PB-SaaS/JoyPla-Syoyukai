@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Web\Received {
-
     use App\Model\Division;
     use framework\Exception\NotFoundException;
     use JoyPla\Application\InputPorts\Web\Received\OrderReceivedSlipIndexInputData;
@@ -16,27 +15,25 @@ namespace JoyPla\Application\Interactors\Web\Received {
     use JoyPla\Enterprise\Models\Order;
     use JoyPla\Enterprise\Models\OrderStatus;
     use JoyPla\InterfaceAdapters\GateWays\Repository\orderRepositoryInterface;
+    use JoyPla\Service\Presenter\Web\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class OrderReceivedSlipIndexInteractor
      * @package JoyPla\Application\Interactors\Web\Received
      */
-    class OrderReceivedSlipIndexInteractor implements OrderReceivedSlipIndexInputPortInterface
+    class OrderReceivedSlipIndexInteractor implements
+        OrderReceivedSlipIndexInputPortInterface
     {
-        /** @var OrderReceivedSlipIndexOutputPortInterface */
-        private OrderReceivedSlipIndexOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var OrderRepositoryInterface */
-        private OrderRepositoryInterface $orderRepository;
-
-        /**
-         * OrderReceivedSlipIndexInteractor constructor.
-         * @param OrderReceivedSlipIndexOutputPortInterface $outputPort
-         */
-        public function __construct(OrderReceivedSlipIndexOutputPortInterface $outputPort , OrderRepositoryInterface $orderRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->orderRepository = $orderRepository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -44,13 +41,12 @@ namespace JoyPla\Application\Interactors\Web\Received {
          */
         public function handle(OrderReceivedSlipIndexInputData $inputData)
         {
-
             $hospitalId = new HospitalId($inputData->user->hospitalId);
             $orderId = new OrderId($inputData->orderId);
 
-            $order = $this->orderRepository->index($hospitalId,
-                $orderId , 
-                [
+            $order = $this->repositoryProvider
+                ->getOrderRepository()
+                ->index($hospitalId, $orderId, [
                     OrderStatus::OrderCompletion,
                     OrderStatus::OrderFinished,
                     OrderStatus::DeliveryDateReported,
@@ -60,27 +56,31 @@ namespace JoyPla\Application\Interactors\Web\Received {
                     OrderStatus::Borrowing,
                 ]);
 
-            if( $order === null )
-            {
-                throw new NotFoundException("Not Found.",404);
+            if ($order === null) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
-            if($inputData->isOnlyMyDivision && ! $order->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
-            {
-                throw new NotFoundException("Not Found.",404);
+            if (
+                $inputData->isOnlyMyDivision &&
+                !$order
+                    ->getDivision()
+                    ->getDivisionId()
+                    ->equal($inputData->user->divisionId)
+            ) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
-            $this->outputPort->output(new OrderReceivedSlipIndexOutputData($order));
+            $this->presenterProvider
+                ->getOrderReceivedSlipIndexPresenter()
+                ->output(new OrderReceivedSlipIndexOutputData($order));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Web\Received {
-
     use Auth;
     use stdClass;
 
@@ -90,21 +90,25 @@ namespace JoyPla\Application\InputPorts\Web\Received {
      */
     class OrderReceivedSlipIndexInputData
     {
-        /**
-         * OrderReceivedSlipIndexInputData constructor.
-         */
-        public function __construct(Auth $user , string $orderId , bool $isOnlyMyDivision)
-        {
+        public Auth $user;
+        public string $orderId;
+        public bool $isOnlyMyDivision;
+
+        public function __construct(
+            Auth $user,
+            string $orderId,
+            bool $isOnlyMyDivision
+        ) {
             $this->user = $user;
-            $this->orderId= $orderId;
-            $this->isOnlyMyDivision= $isOnlyMyDivision;
+            $this->orderId = $orderId;
+            $this->isOnlyMyDivision = $isOnlyMyDivision;
         }
     }
 
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Web\Received
-    */
+     */
     interface OrderReceivedSlipIndexInputPortInterface
     {
         /**
@@ -118,7 +122,6 @@ namespace JoyPla\Application\InputPorts\Web\Received {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Web\Received {
-
     use JoyPla\Enterprise\Models\Order;
 
     /**
@@ -127,11 +130,8 @@ namespace JoyPla\Application\OutputPorts\Web\Received {
      */
     class OrderReceivedSlipIndexOutputData
     {
-        /** @var string */
+        public array $order;
 
-        /**
-         * OrderReceivedSlipIndexOutputData constructor.
-         */
         public function __construct(Order $order)
         {
             $this->order = $order->toArray();
@@ -141,7 +141,7 @@ namespace JoyPla\Application\OutputPorts\Web\Received {
     /**
      * Interface OrderReceivedSlipIndexOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Web\Received;
-    */
+     */
     interface OrderReceivedSlipIndexOutputPortInterface
     {
         /**
@@ -149,4 +149,4 @@ namespace JoyPla\Application\OutputPorts\Web\Received {
          */
         function output(OrderReceivedSlipIndexOutputData $outputData);
     }
-} 
+}

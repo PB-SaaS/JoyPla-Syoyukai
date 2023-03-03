@@ -33,10 +33,8 @@ namespace JoyPla\InterfaceAdapters\Presenters\Web\Order {
      */
     class OrderPrintViewModel
     {
-        /**
-         * Distributor constructor.
-         * @param OrderIndexOutputData $source
-         */
+        public array $order;
+        public array $orderItems;
         public function __construct(OrderIndexOutputData $source)
         {
             $this->order = $source->order;

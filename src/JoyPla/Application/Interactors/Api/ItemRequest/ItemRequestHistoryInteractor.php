@@ -36,10 +36,15 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
          */
         public function handle(ItemRequestHistoryInputData $inputData)
         {
-            [$itemRequests, $count] = $this->repository->search(
-                new HospitalId($inputData->user->hospitalId),
-                $inputData->search
-            );
+            [
+                $itemRequests,
+                $count,
+            ] = $this->repositoryProvider
+                ->getItemRequestRepository()
+                ->search(
+                    new HospitalId($inputData->user->hospitalId),
+                    $inputData->search
+                );
             $this->presenterProvider
                 ->getItemRequestHistoryPresenter()
                 ->output(

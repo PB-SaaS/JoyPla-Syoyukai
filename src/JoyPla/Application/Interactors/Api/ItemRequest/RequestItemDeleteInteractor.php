@@ -49,7 +49,9 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
             $requestHId = new RequestHId($inputData->requestHId);
             $requestId = new RequestId($inputData->requestId);
 
-            $itemRequest = $this->repository->show($hospitalId, $requestHId);
+            $itemRequest = $this->repositoryProvider
+                ->getItemRequestRepository()
+                ->show($hospitalId, $requestHId);
 
             if ($itemRequest === null) {
                 throw new Exception('Invalid value.', 422);
@@ -123,11 +125,9 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
 
             $itemRequest = $itemRequest->deleteItem($requestId);
 
-            $isItemRequestDeleted = $this->repository->deleteItem(
-                $hospitalId,
-                $requestId,
-                $itemRequest
-            );
+            $isItemRequestDeleted = $this->repositoryProvider
+                ->getItemRequestRepository()
+                ->deleteItem($hospitalId, $requestId, $itemRequest);
 
             $this->presenterProvider
                 ->getRequestItemDeletePresenter()

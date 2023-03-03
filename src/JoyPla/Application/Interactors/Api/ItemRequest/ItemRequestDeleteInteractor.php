@@ -48,7 +48,9 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
             $requestHId = new RequestHId($inputData->requestHId);
 
-            $itemRequest = $this->repository->show($hospitalId, $requestHId);
+            $itemRequest = $this->repositoryProvider
+                ->getItemRequestRepository()
+                ->show($hospitalId, $requestHId);
 
             if ($itemRequest === null) {
                 throw new NotFoundException('Not Found.', 404);
@@ -123,7 +125,9 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 ->getRequestItemCountRepository()
                 ->saveToArray($requestItemCounts);
 
-            $deleteCount = $this->repository->delete($hospitalId, $requestHId);
+            $deleteCount = $this->repositoryProvider
+                ->getItemRequestRepository()
+                ->delete($hospitalId, $requestHId);
 
             $this->presenterProvider
                 ->getItemRequestDeletePresenter()

@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Web\Received {
-
     use App\Model\Division;
     use framework\Exception\NotFoundException;
     use JoyPla\Application\InputPorts\Web\Received\ReceivedIndexInputData;
@@ -16,6 +15,8 @@ namespace JoyPla\Application\Interactors\Web\Received {
     use JoyPla\Enterprise\Models\Received;
     use JoyPla\Enterprise\Models\ReceivedStatus;
     use JoyPla\InterfaceAdapters\GateWays\Repository\receivedRepositoryInterface;
+    use JoyPla\Service\Presenter\Web\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ReceivedIndexInteractor
@@ -23,20 +24,15 @@ namespace JoyPla\Application\Interactors\Web\Received {
      */
     class ReceivedIndexInteractor implements ReceivedIndexInputPortInterface
     {
-        /** @var ReceivedIndexOutputPortInterface */
-        private ReceivedIndexOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var ReceivedRepositoryInterface */
-        private ReceivedRepositoryInterface $receivedRepository;
-
-        /**
-         * ReceivedIndexInteractor constructor.
-         * @param ReceivedIndexOutputPortInterface $outputPort
-         */
-        public function __construct(ReceivedIndexOutputPortInterface $outputPort , ReceivedRepositoryInterface $receivedRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->receivedRepository = $receivedRepository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -44,49 +40,53 @@ namespace JoyPla\Application\Interactors\Web\Received {
          */
         public function handle(ReceivedIndexInputData $inputData)
         {
-
             $hospitalId = new HospitalId($inputData->user->hospitalId);
             $receivedId = new ReceivedId($inputData->receivedId);
 
-            $received = $this->receivedRepository->index($hospitalId,$receivedId);
+            $received = $this->repositoryProvider
+                ->getReceivedRepository()
+                ->index($hospitalId, $receivedId);
 
-            if( $received === null )
-            {
-                throw new NotFoundException("Not Found.",404);
+            if ($received === null) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
-            if($inputData->isOnlyMyDivision && ! $received->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
-            {
-                throw new NotFoundException("Not Found.",404);
+            if (
+                $inputData->isOnlyMyDivision &&
+                !$received
+                    ->getDivision()
+                    ->getDivisionId()
+                    ->equal($inputData->user->divisionId)
+            ) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
-            $this->outputPort->output(new ReceivedIndexOutputData($received));
+            $this->presenterProvider
+                ->getReceivedIndexPresenter()
+                ->output(new ReceivedIndexOutputData($received));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Web\Received {
-
     use Auth;
-    use stdClass;
 
-    /**
-     * Class ReceivedIndexInputData
-     * @package JoyPla\Application\InputPorts\Web\Received
-     */
     class ReceivedIndexInputData
     {
-        /**
-         * ReceivedIndexInputData constructor.
-         */
-        public function __construct(Auth $user , string $receivedId , bool $isOnlyMyDivision)
-        {
+        public Auth $user;
+        public string $receivedId;
+        public bool $isOnlyMyDivision;
+
+        public function __construct(
+            Auth $user,
+            string $receivedId,
+            bool $isOnlyMyDivision
+        ) {
             $this->user = $user;
-            $this->receivedId= $receivedId;
+            $this->receivedId = $receivedId;
             $this->isOnlyMyDivision = $isOnlyMyDivision;
         }
     }
@@ -94,7 +94,7 @@ namespace JoyPla\Application\InputPorts\Web\Received {
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Web\Received
-    */
+     */
     interface ReceivedIndexInputPortInterface
     {
         /**
@@ -108,7 +108,6 @@ namespace JoyPla\Application\InputPorts\Web\Received {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Web\Received {
-
     use JoyPla\Enterprise\Models\Received;
 
     /**
@@ -117,11 +116,8 @@ namespace JoyPla\Application\OutputPorts\Web\Received {
      */
     class ReceivedIndexOutputData
     {
-        /** @var string */
+        public array $received;
 
-        /**
-         * ReceivedIndexOutputData constructor.
-         */
         public function __construct(Received $received)
         {
             $this->received = $received->toArray();
@@ -131,7 +127,7 @@ namespace JoyPla\Application\OutputPorts\Web\Received {
     /**
      * Interface ReceivedIndexOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Web\Received;
-    */
+     */
     interface ReceivedIndexOutputPortInterface
     {
         /**
@@ -139,4 +135,4 @@ namespace JoyPla\Application\OutputPorts\Web\Received {
          */
         function output(ReceivedIndexOutputData $outputData);
     }
-} 
+}

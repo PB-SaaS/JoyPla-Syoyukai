@@ -69,10 +69,9 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                 }
             }
 
-            $payoutItems = $this->repository->findByInHospitalItem(
-                $hospitalId,
-                $inputData->payoutItems
-            );
+            $payoutItems = $this->repositoryProvider
+                ->getPayoutRepository()
+                ->findByInHospitalItem($hospitalId, $inputData->payoutItems);
 
             if (count($payoutItems) === 0) {
                 throw new Exception("payout items don't exist.", 999);
@@ -220,7 +219,9 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                 ->getRequestItemCountRepository()
                 ->saveToArray($requestItemCounts);
 
-            $this->repository->saveToArray($result);
+            $this->repositoryProvider
+                ->getPayoutRepository()
+                ->saveToArray($result);
 
             $this->repositoryProvider
                 ->getInventoryCalculationRepository()

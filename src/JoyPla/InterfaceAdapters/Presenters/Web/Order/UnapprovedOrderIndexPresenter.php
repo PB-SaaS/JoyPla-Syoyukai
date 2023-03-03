@@ -1,7 +1,6 @@
 <?php
 
 namespace JoyPla\InterfaceAdapters\Presenters\Web\Order {
-
     use App\SpiralDb\HospitalUser;
     use framework\Http\View;
     use JoyPla\Application\OutputPorts\Web\Order\OrderIndexOutputData;
@@ -11,23 +10,23 @@ namespace JoyPla\InterfaceAdapters\Presenters\Web\Order {
     {
         public function output(OrderIndexOutputData $outputData)
         {
-            
             $viewModel = new UnapprovedOrderIndexViewModel($outputData);
-            $body = View::forge('html/Order/UnapprovedIndex', compact('viewModel'), false)->render();
+            $body = View::forge(
+                'html/Order/UnapprovedIndex',
+                compact('viewModel'),
+                false
+            )->render();
             echo view('html/Common/Template', compact('body'), false)->render();
         }
     }
-    
+
     /**
      * Class Distributor
      * @package JoyPla\InterfaceAdapters\Presenters\Web\Order
      */
     class UnapprovedOrderIndexViewModel
     {
-        /**
-         * Distributor constructor.
-         * @param OrderIndexOutputData $source
-         */
+        public array $order;
         public function __construct(OrderIndexOutputData $source)
         {
             $this->order = $source->order;

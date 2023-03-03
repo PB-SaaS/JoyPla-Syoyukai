@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Web\Received {
-
     use App\Model\Division;
     use framework\Exception\NotFoundException;
     use JoyPla\Application\InputPorts\Web\Received\ReceivedLabelInputData;
@@ -18,6 +17,8 @@ namespace JoyPla\Application\Interactors\Web\Received {
     use JoyPla\Enterprise\Models\ReceivedStatus;
     use JoyPla\InterfaceAdapters\GateWays\Repository\HospitalRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\receivedRepositoryInterface;
+    use JoyPla\Service\Presenter\Web\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ReceivedLabelInteractor
@@ -25,62 +26,56 @@ namespace JoyPla\Application\Interactors\Web\Received {
      */
     class ReceivedLabelInteractor implements ReceivedLabelInputPortInterface
     {
-        /** @var ReceivedLabelOutputPortInterface */
-        private ReceivedLabelOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var ReceivedRepositoryInterface */
-        private ReceivedRepositoryInterface $receivedRepository;
-
-        /**
-         * ReceivedLabelInteractor constructor.
-         * @param ReceivedLabelOutputPortInterface $outputPort
-         */
         public function __construct(
-            ReceivedLabelOutputPortInterface $outputPort , 
-            ReceivedRepositoryInterface $receivedRepository,
-            HospitalRepositoryInterface $hospitalRepository
-            )
-        {
-            $this->outputPort = $outputPort;
-            $this->receivedRepository = $receivedRepository;
-            $this->hospitalRepository = $hospitalRepository;
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
-
         /**
          * @param ReceivedLabelInputData $inputData
          */
         public function handle(ReceivedLabelInputData $inputData)
         {
-
             $hospitalId = new HospitalId($inputData->hospitalId);
             $receivedId = new ReceivedId($inputData->receivedId);
 
-            $hospital = $this->hospitalRepository->index($hospitalId);
+            $hospital = $this->repositoryProvider
+                ->getHospitalRepository()
+                ->index($hospitalId);
 
-            $received = $this->receivedRepository->index($hospitalId,$receivedId);
+            $received = $this->repositoryProvider
+                ->getReceivedRepository()
+                ->index($hospitalId, $receivedId);
 
-            if( $received === null )
-            {
-                throw new NotFoundException("Not Found.",404);
+            if ($received === null) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
             $print = [];
-            foreach($received->getReceivedItems() as $receivedItem)
-            {
-                $print[] = (new ReceivedLabelModel($receivedItem , 1 , $hospital->labelDesign1));
+            foreach ($received->getReceivedItems() as $receivedItem) {
+                $print[] = new ReceivedLabelModel(
+                    $receivedItem,
+                    1,
+                    $hospital->labelDesign1
+                );
             }
 
-            $this->outputPort->output(new ReceivedLabelOutputData($print));
+            $this->presenterProvider
+                ->getReceivedLabelPresenter()
+                ->output(new ReceivedLabelOutputData($print));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Web\Received {
-
     use stdClass;
 
     /**
@@ -89,20 +84,20 @@ namespace JoyPla\Application\InputPorts\Web\Received {
      */
     class ReceivedLabelInputData
     {
-        /**
-         * ReceivedLabelInputData constructor.
-         */
-        public function __construct(string $hospitalId , string $receivedId)
+        public string $hospitalId;
+        public string $receivedId;
+
+        public function __construct(string $hospitalId, string $receivedId)
         {
             $this->hospitalId = $hospitalId;
-            $this->receivedId= $receivedId;
+            $this->receivedId = $receivedId;
         }
     }
 
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Web\Received
-    */
+     */
     interface ReceivedLabelInputPortInterface
     {
         /**
@@ -116,16 +111,13 @@ namespace JoyPla\Application\InputPorts\Web\Received {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Web\Received {
-
-    use JoyPla\Enterprise\Models\Received;
-
     /**
      * Class ReceivedLabelOutputData
      * @package JoyPla\Application\OutputPorts\Web\Received;
      */
     class ReceivedLabelOutputData
     {
-        /** @var string */
+        public array $print;
 
         /**
          * ReceivedLabelOutputData constructor.
@@ -139,7 +131,7 @@ namespace JoyPla\Application\OutputPorts\Web\Received {
     /**
      * Interface ReceivedLabelOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Web\Received;
-    */
+     */
     interface ReceivedLabelOutputPortInterface
     {
         /**
@@ -147,4 +139,4 @@ namespace JoyPla\Application\OutputPorts\Web\Received {
          */
         function output(ReceivedLabelOutputData $outputData);
     }
-} 
+}

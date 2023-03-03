@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Web\Consumption {
-    use App\Model\Division;
     use Exception;
     use framework\Exception\NotFoundException;
     use JoyPla\Application\InputPorts\Web\Consumption\ConsumptionShowInputData;
@@ -13,31 +12,25 @@ namespace JoyPla\Application\Interactors\Web\Consumption {
     use JoyPla\Application\OutputPorts\Web\Consumption\ConsumptionShowOutputPortInterface;
     use JoyPla\Enterprise\Models\ConsumptionId;
     use JoyPla\Enterprise\Models\HospitalId;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\consumptionRepositoryInterface;
+    use JoyPla\Service\Presenter\Web\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ConsumptionShowInteractor
      * @package JoyPla\Application\Interactors\Web\Consumption
      */
-    class ConsumptionShowInteractor implements ConsumptionShowInputPortInterface
+    abstract class ConsumptionShowInteractor implements
+        ConsumptionShowInputPortInterface
     {
-        /** @var ConsumptionShowOutputPortInterface */
-        private ConsumptionShowOutputPortInterface $outputPort;
+        private RepositoryProvider $repositoryProvider;
+        private ConsumptionShowOutputPortInterface $presenter;
 
-        /** @var ConsumptionRepositoryInterface */
-        private ConsumptionRepositoryInterface $consumptionRepository;
-
-        /**
-         * ConsumptionShowInteractor constructor.
-         * @param ConsumptionShowOutputPortInterface $outputPort
-         */
         public function __construct(
-            ConsumptionShowOutputPortInterface $outputPort,
-            ConsumptionRepositoryInterface $consumptionRepository
+            ConsumptionShowOutputPortInterface $presenter,
+            RepositoryProvider $repositoryProvider
         ) {
-            $this->outputPort = $outputPort;
-
-            $this->consumptionRepository = $consumptionRepository;
+            $this->presenter = $presenter;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -48,10 +41,9 @@ namespace JoyPla\Application\Interactors\Web\Consumption {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
             $consumptionId = new ConsumptionId($inputData->consumptionId);
 
-            $consumption = $this->consumptionRepository->find(
-                $hospitalId,
-                $consumptionId
-            );
+            $consumption = $this->repositoryProvider
+                ->getConsumptionRepository()
+                ->find($hospitalId, $consumptionId);
 
             if (empty($consumption)) {
                 throw new NotFoundException('not found.', 404);
@@ -67,7 +59,7 @@ namespace JoyPla\Application\Interactors\Web\Consumption {
                 throw new Exception('Illegal request', 403);
             }
 
-            $this->outputPort->output(
+            $this->presenter->output(
                 new ConsumptionShowOutputData($consumption)
             );
         }
