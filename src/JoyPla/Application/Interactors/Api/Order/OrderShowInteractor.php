@@ -124,6 +124,7 @@ namespace JoyPla\Application\InputPorts\Api\Order {
             $this->search->registerDate = $search['registerDate'];
             $this->search->orderDate = $search['orderDate'];
             $this->search->divisionIds = $search['divisionIds'];
+            $this->search->distributorIds = $search['distributorIds'];
             $this->search->orderStatus = $search['orderStatus'];
             $this->search->perPage = $search['perPage'];
             $this->search->currentPage = $search['currentPage'];
@@ -147,8 +148,6 @@ namespace JoyPla\Application\InputPorts\Api\Order {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Order {
-    use JoyPla\Enterprise\Models\Order;
-
     /**
      * Class OrderShowOutputData
      * @package JoyPla\Application\OutputPorts\Api\Order;

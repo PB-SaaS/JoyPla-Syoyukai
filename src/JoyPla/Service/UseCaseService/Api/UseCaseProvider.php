@@ -7,6 +7,7 @@ use JoyPla\Application\Interactors\Api\Barcode\BarcodeSearchInteractor;
 use JoyPla\Application\Interactors\Api\Consumption\ConsumptionDeleteInteractor;
 use JoyPla\Application\Interactors\Api\Consumption\ConsumptionIndexInteractor;
 use JoyPla\Application\Interactors\Api\Consumption\ConsumptionRegisterInteractor;
+use JoyPla\Application\Interactors\Api\Distributor\DistributorIndexInteractor;
 use JoyPla\Application\Interactors\Api\Division\DivisionIndexInteractor;
 use JoyPla\Application\Interactors\Api\InHospitalItem\InHospitalItemIndexInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestDeleteInteractor;
@@ -60,6 +61,21 @@ class UseCaseProvider
             $this->repositoryProvider,
             $this->presenterProvider
         ) extends DivisionIndexInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getDistributorIndexInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends DistributorIndexInteractor {
             public function __construct(
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider

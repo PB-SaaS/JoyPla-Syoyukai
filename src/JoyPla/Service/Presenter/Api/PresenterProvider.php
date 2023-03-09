@@ -2,13 +2,12 @@
 
 namespace JoyPla\Service\Presenter\Api;
 
-use JoyPla\Application\Interactors\Api\Payout\PayoutRegisterInteractor;
 use JoyPla\InterfaceAdapters\Presenters\Api\Barcode\BarcodeOrderSearchPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Barcode\BarcodeSearchPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Consumption\ConsumptionDeletePresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Consumption\ConsumptionIndexPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Consumption\ConsumptionRegisterPresenter;
-use JoyPla\InterfaceAdapters\Presenters\Api\Distributor\DistributorShowPresenter;
+use JoyPla\InterfaceAdapters\Presenters\Api\Distributor\DistributorIndexPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Division\DivisionIndexPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\InHospitalItem\InHospitalItemIndexPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\InHospitalItem\InHospitalItemRegisterPresenter;
@@ -33,7 +32,6 @@ use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderUnapprovedUpdatePresenter
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderUnReceivedShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Payout\PayoutRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Price\PriceRegisterPresenter;
-use JoyPla\InterfaceAdapters\Presenters\Api\Price\PriceShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedRegisterByOrderSlipPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedReturnRegisterPresenter;
@@ -153,9 +151,9 @@ class PresenterProvider
         return new BarcodeSearchPresenter();
     }
 
-    public function getDistributorShowPresenter()
+    public function getDistributorIndexPresenter()
     {
-        return new DistributorShowPresenter();
+        return new DistributorIndexPresenter();
     }
 
     public function getInHospitalItemRegisterPresenter()

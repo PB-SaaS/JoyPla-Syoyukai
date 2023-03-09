@@ -3,12 +3,13 @@
 namespace JoyPla\InterfaceAdapters\Presenters\Api\Distributor {
     use ApiResponse;
     use framework\Http\View;
-    use JoyPla\Application\OutputPorts\Api\Distributor\DistributorShowOutputData;
-    use JoyPla\Application\OutputPorts\Api\Distributor\DistributorShowOutputPortInterface;
+    use JoyPla\Application\OutputPorts\Api\Distributor\DistributorIndexOutputData;
+    use JoyPla\Application\OutputPorts\Api\Distributor\DistributorIndexOutputPortInterface;
 
-    class DistributorShowPresenter implements DistributorShowOutputPortInterface
+    class DistributorIndexPresenter implements
+        DistributorIndexOutputPortInterface
     {
-        public function output(DistributorShowOutputData $outputData)
+        public function output(DistributorIndexOutputData $outputData)
         {
             $viewModel = new DistributorViewModel($outputData);
             echo (new ApiResponse(
@@ -16,7 +17,7 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\Distributor {
                 $viewModel->count,
                 $viewModel->code,
                 $viewModel->message,
-                ['DistributorShowPresenter']
+                ['DistributorIndexPresenter']
             ))->toJson();
         }
     }
@@ -32,7 +33,7 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\Distributor {
         public int $code = 0;
         public string $message = '';
 
-        public function __construct(DistributorShowOutputData $source)
+        public function __construct(DistributorIndexOutputData $source)
         {
             $this->data = $source->distributors;
             $this->count = count($source->distributors);

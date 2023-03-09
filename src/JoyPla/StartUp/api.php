@@ -11,6 +11,7 @@ use framework\Http\Request;
 use framework\Routing\Router;
 use JoyPla\InterfaceAdapters\Controllers\Api\BarcodeController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ConsumptionController;
+use JoyPla\InterfaceAdapters\Controllers\Api\DistributorController;
 use JoyPla\InterfaceAdapters\Controllers\Api\DivisionController;
 use JoyPla\InterfaceAdapters\Controllers\Api\InHospitalItemController;
 use JoyPla\InterfaceAdapters\Controllers\Api\NotificationController;
@@ -47,6 +48,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         DivisionController::class,
         'index',
     ])->service($useCaseProvider->getDivisionIndexInteractor());
+
+    Router::map('GET', '/api/distributor/index', [
+        DistributorController::class,
+        'index',
+    ])->service($useCaseProvider->getDistributorIndexInteractor());
 
     Router::map('GET', '/api/inHospitalItem/index', [
         InHospitalItemController::class,
