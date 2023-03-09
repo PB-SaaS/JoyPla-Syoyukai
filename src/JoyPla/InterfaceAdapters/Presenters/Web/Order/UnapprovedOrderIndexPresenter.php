@@ -1,7 +1,6 @@
 <?php
 
 namespace JoyPla\InterfaceAdapters\Presenters\Web\Order {
-    use App\SpiralDb\HospitalUser;
     use framework\Http\View;
     use JoyPla\Application\OutputPorts\Web\Order\OrderIndexOutputData;
     use JoyPla\Application\OutputPorts\Web\Order\OrderIndexOutputPortInterface;

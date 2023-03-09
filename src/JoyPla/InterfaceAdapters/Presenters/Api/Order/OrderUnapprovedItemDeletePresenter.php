@@ -36,7 +36,7 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\Order {
         public function __construct(OrderUnapprovedItemDeleteOutputData $source)
         {
             $this->data = $source->data;
-            $this->count = $source->count;
+            $this->count = 1;
             $this->code = 200;
             $this->message = 'success';
         }

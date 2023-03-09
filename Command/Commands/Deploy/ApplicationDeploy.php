@@ -135,9 +135,12 @@ class ApplicationDeploy extends Command
 
     private function createZip($environment)
     {
-        if (!file_exists('.tmp')) {
-            mkdir('.tmp');
+        if (file_exists('.tmp')) {
+            exec('rm -rf .tmp');
         }
+
+        mkdir('.tmp');
+
         if (!file_exists(".tmp/$environment")) {
             mkdir(".tmp/$environment");
         }
@@ -200,8 +203,6 @@ class ApplicationDeploy extends Command
         }
 
         exec("cd .tmp/$environment ; zip -r ../$environment.zip * ; cd -");
-
-        $this->rmdir_recursively(".tmp/$environment");
 
         return ['filename' => ".tmp/$environment.zip"];
     }

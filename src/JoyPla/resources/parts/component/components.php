@@ -140,23 +140,25 @@ const sidebar = {
 };
 
 <?php
+use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 
-use App\SpiralDb\Hospital;
+global $SPIRAL;
 
-  global $SPIRAL;
+$hospital = ModelRepository::getHospitalInstance()
+    ->where('hospitalId', $SPIRAL->getContextByFieldTitle('hospitalId'))
+    ->get();
+$hospital = $hospital->first();
+$top_api_url = '%url/rel:mpgt:page_262241%';
+$api_url = '%url/rel:mpgt:Notification%';
 
-  $hospital = Hospital::getNewInstance()->where('hospitalId',$SPIRAL->getContextByFieldTitle('hospitalId'))->get();
-  $hospital = $hospital->data->get(0);
-  $top_api_url = "%url/rel:mpgt:page_262241%";
-  $api_url = "%url/rel:mpgt:Notification%";
-
-  $permission = [
+$permission = [
     1 => '管理者',
     2 => '担当者',
-    3 => '承認者'
-  ];
+    3 => '承認者',
+];
 
-  $permissionText = $permission[$SPIRAL->getContextByFieldTitle("userPermission")];
+$permissionText =
+    $permission[$SPIRAL->getContextByFieldTitle('userPermission')];
 ?>
 
 const headerNavi = {
@@ -168,7 +170,7 @@ const headerNavi = {
         const innerWidth = ref(window.innerWidth);
         const show = ref(false);
 
-        const hospitalName = "<?php echo html($hospital->hospitalName) ?>";
+        const hospitalName = "<?php echo html($hospital->hospitalName); ?>";
         const userName = "%val:usr:name%";
         const notificationView = ref(false);
         const userModalView = ref(false);
@@ -182,7 +184,7 @@ const headerNavi = {
             let params = new URLSearchParams();
             params.append("_csrf", _CSRF);
 
-            const res = await axios.post('<?php echo $api_url ?>',params);
+            const res = await axios.post('<?php echo $api_url; ?>',params);
             //if(res.data.code != 200) {
             if(res.data.code != 0) {
               throw new Error(res.data.message)
@@ -368,7 +370,7 @@ const headerNavi = {
 				                <h3 class="mb-0 text-[1.5rem]" style="line-height: 1.4">
                         {{ hospitalName }}<br>
                         </h3>
-                        <span class="text-white py-0 p-[15px] inline-block px-[10px] text-[0.875rem] align-middle whitespace-nowrap rounded-sm tra" style="line-height: 1.5; background-color: #7AAE36;  text-transform: uppercase"><?php echo  $permissionText ?></span>
+                        <span class="text-white py-0 p-[15px] inline-block px-[10px] text-[0.875rem] align-middle whitespace-nowrap rounded-sm tra" style="line-height: 1.5; background-color: #7AAE36;  text-transform: uppercase"><?php echo $permissionText; ?></span>
                         <p class="mt-[20px]" >{{ userName }} 様</p>
 				            </div>
 				        </div>

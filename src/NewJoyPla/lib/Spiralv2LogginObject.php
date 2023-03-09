@@ -12,7 +12,7 @@ class Spiralv2LogginObject extends HttpRequest implements LoggingObject
 
     public int $logLevel = 0;
 
-    public function __construct($apiKey, $appId, $dbId)
+    public function __construct($apiKey, $appId, $dbId, $logLevel)
     {
         $this->url = $this->baseUrl . "apps/{$appId}/dbs/{$dbId}/records/";
         $this->httpHeader = [
@@ -21,6 +21,7 @@ class Spiralv2LogginObject extends HttpRequest implements LoggingObject
             'X-Spiral-App-Authority' . 'manage',
             'X-Spiral-Api-Version: 1.1',
         ];
+        $this->logLevel = $logLevel;
     }
 
     public function insert(array $data)

@@ -4,8 +4,8 @@ namespace JoyPla\Enterprise\Models;
 
 use Collection;
 
-class InHospitalItem {
-
+class InHospitalItem
+{
     private InHospitalItemId $inHospitalItemId;
     private Item $item;
     private HospitalId $hospitalId;
@@ -16,7 +16,6 @@ class InHospitalItem {
     private PriceId $priceId;
     private bool $lotManagement;
     private string $itemImage;
-    
 
     public function __construct(
         InHospitalItemId $inHospitalItemId,
@@ -28,9 +27,8 @@ class InHospitalItem {
         Price $price,
         PriceId $priceId,
         bool $lotManagement,
-        string $itemImage = ""
-        )
-    {
+        string $itemImage = ''
+    ) {
         $this->inHospitalItemId = $inHospitalItemId;
         $this->item = $item;
         $this->hospitalId = $hospitalId;
@@ -43,20 +41,20 @@ class InHospitalItem {
         $this->itemImage = $itemImage;
     }
 
-    public static function create( Collection $input )
+    public static function create(Collection $input)
     {
-       return new InHospitalItem(
-            ( new InHospitalItemId($input->inHospitalItemId) ),
-            ( Item::create($input) ),
-            ( new HospitalId($input->hospitalId) ),
-            ( new DistributorId($input->distributorId) ),
-            ( Quantity::create($input) ),
-            ( new UnitPrice($input->unitPrice) ),
-            ( new Price($input->price) ),
-            ( new PriceId($input->priceId) ),
-            ( ($input->lotManagement === 1) ),
-            ( $input->inItemImage ),
-       );
+        return new InHospitalItem(
+            new InHospitalItemId($input->inHospitalItemId),
+            Item::create($input),
+            new HospitalId($input->hospitalId),
+            new DistributorId($input->distributorId),
+            Quantity::create($input),
+            new UnitPrice((float) $input->unitPrice),
+            new Price((float) $input->price),
+            new PriceId($input->priceId),
+            $input->lotManagement === 1,
+            $input->inItemImage
+        );
     }
 
     public function getInHospitalItemId()
@@ -83,24 +81,23 @@ class InHospitalItem {
     {
         return $this->quantity;
     }
-    
+
     public function getUnitPrice()
     {
         return $this->unitPrice;
     }
-    
+
     public function getPrice()
     {
         return $this->price;
     }
-    
+
     public function getPriceId()
     {
         return $this->priceId;
     }
 
-
-    public function isLotManagement() : bool
+    public function isLotManagement(): bool
     {
         return $this->lotManagement;
     }

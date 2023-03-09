@@ -81,6 +81,7 @@ namespace JoyPla\Application\Interactors\Web\Order {
             if ($order['receivedTarget'] == '2') {
                 $order['receivedDivisionName'] =
                     $order['division']['divisionName'];
+                $order['receivedDivisionId'] = $order['division']['divisionId'];
             }
             if ($order['receivedTarget'] == '1') {
                 $receivedDivision = $this->repositoryProvider
@@ -89,6 +90,9 @@ namespace JoyPla\Application\Interactors\Web\Order {
                 $order[
                     'receivedDivisionName'
                 ] = $receivedDivision->getDivisionName()->value();
+                $order[
+                    'receivedDivisionId'
+                ] = $receivedDivision->getDivisionId()->value();
             }
 
             $this->presenter->output(new OrderIndexOutputData($order));

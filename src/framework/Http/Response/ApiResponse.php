@@ -2,19 +2,24 @@
 
 // use App\Lib\LoggingSpiralv2;
 
-class ApiResponse {
+class ApiResponse
+{
     public $data = null;
     public $count = 0;
     public $code = 0;
     public $message = null;
-    public $header = array();
+    public $header = [];
     public $result = false;
 
-	public static ?Logger $logger = null ;
+    public static ?Logger $logger = null;
 
-
-    public function __construct( $data = null ,  $count = 0 ,  $code = 0 , $message = null , $header = array())
-    {
+    public function __construct(
+        $data = null,
+        $count = 0,
+        $code = 0,
+        $message = null,
+        $header = []
+    ) {
         $this->data = $data;
         $this->count = $count;
         $this->code = $code;
@@ -24,14 +29,23 @@ class ApiResponse {
 
     public function toJson(): string
     {
-        $response = json_encode(array("data"=> $this->data ,"count"=> $this->count ,"code"=> $this->code ,"message"=> $this->message ,"header"=> $this->header),JSON_UNESCAPED_SLASHES);
+        $response = json_encode(
+            [
+                'data' => $this->data,
+                'count' => $this->count,
+                'code' => $this->code,
+                'message' => $this->message,
+                'header' => $this->header,
+            ],
+            JSON_UNESCAPED_SLASHES
+        );
         $this->logging();
         return $response;
     }
 
     public function logging()
     {
-        global $SPIRAL; 
+        global $SPIRAL;
         /*
         if( ! class_exists(LogConfig::class) ) { return ""; }
         if(! LogConfig::EXPORT_TO_SPIRALV2){ return ""; }
@@ -41,27 +55,40 @@ class ApiResponse {
         $logger = new Logger($spiralv2);
 
         */
-        if($this::$logger){
-            if($this->code != 200)
-            {
+        if ($this::$logger) {
+            if ($this->code != 200) {
                 $body = [
                     'execTime' => Logger::getTime(),
                     'AccountId' => $SPIRAL->getAccountId(),
                     'status' => 'ERROR',
-                    'message' => json_encode(array("count"=> $this->count ,"code"=> $this->code ,"message"=> $this->message ,"header"=> $this->header),JSON_UNESCAPED_SLASHES),
+                    'message' => json_encode(
+                        [
+                            'count' => $this->count,
+                            'code' => $this->code,
+                            'message' => $this->message,
+                            'header' => $this->header,
+                        ],
+                        JSON_UNESCAPED_SLASHES
+                    ),
                 ];
                 $this::$logger->out($body);
-            }else if($this::$logger->LOG_LEVEL >= 3)
-            {
+            } elseif ($this::$logger->getLevel() >= 3) {
                 $body = [
                     'execTime' => Logger::getTime(),
                     'AccountId' => $SPIRAL->getAccountId(),
                     'status' => 'DEBUG',
-                    'message' => json_encode(array("count"=> $this->count ,"code"=> $this->code ,"message"=> $this->message ,"header"=> $this->header),JSON_UNESCAPED_SLASHES),
+                    'message' => json_encode(
+                        [
+                            'count' => $this->count,
+                            'code' => $this->code,
+                            'message' => $this->message,
+                            'header' => $this->header,
+                        ],
+                        JSON_UNESCAPED_SLASHES
+                    ),
                 ];
                 $this::$logger->out($body);
             }
-
         }
     }
-}  
+}

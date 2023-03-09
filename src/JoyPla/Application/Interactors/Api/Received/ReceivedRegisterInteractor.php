@@ -68,9 +68,6 @@ namespace JoyPla\Application\Interactors\Api\Received {
                     $hospitalId,
                     array_column($inputData->receivedItems, 'orderItemId')
                 );
-            $storehouse = $this->repositoryProvider
-                ->getDivisionRepository()
-                ->getStorehouse($hospitalId);
 
             if ($inputData->isOnlyMyDivision) {
                 foreach ($orders as $order) {
@@ -125,7 +122,7 @@ namespace JoyPla\Application\Interactors\Api\Received {
                                     $order->getHospital()->getHospitalId(),
                                     $order->getDivision(),
                                     $order->getDistributor(),
-                                    $item->getQantity(),
+                                    $item->getQuantity(),
                                     $item->getPrice(),
                                     0,
                                     $receivedQuantity,
@@ -142,6 +139,10 @@ namespace JoyPla\Application\Interactors\Api\Received {
 
                                 if ($order->getReceivedTarget() === 1) {
                                     //大倉庫
+                                    $storehouse = $this->repositoryProvider
+                                        ->getDivisionRepository()
+                                        ->getStorehouse($hospitalId);
+
                                     $inventoryCalculations[] = new InventoryCalculation(
                                         $receivedItem->getHospitalId(),
                                         $storehouse->getDivisionId(),

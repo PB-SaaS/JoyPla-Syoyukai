@@ -67,7 +67,7 @@ namespace JoyPla\Application\InputPorts\Api\Order {
     class FixedQuantityOrderInputData
     {
         public Auth $auth;
-        public array $search;
+        public stdClass $search;
 
         public function __construct(Auth $auth, array $search)
         {

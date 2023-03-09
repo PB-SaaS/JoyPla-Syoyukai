@@ -9,7 +9,7 @@
     <v-loading :show="loading"></v-loading>
     <header-navi></header-navi>
     <v-breadcrumbs :items="breadcrumbs"></v-breadcrumbs>
-    <div id="content" class="flex h-full px-1">
+    <div id="content" class="h-full px-1">
         <div class="flex-auto">
             <div class="index container mx-auto">
                 <h1 class="text-2xl mb-2">請求商品一覧</h1>

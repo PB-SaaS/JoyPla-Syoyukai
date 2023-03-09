@@ -1,7 +1,6 @@
 <?php
 
 namespace JoyPla\InterfaceAdapters\Presenters\Web\Received {
-    use App\SpiralDb\HospitalUser;
     use framework\Http\View;
     use JoyPla\Application\OutputPorts\Web\Received\OrderReceivedSlipIndexOutputData;
     use JoyPla\Application\OutputPorts\Web\Received\OrderReceivedSlipIndexOutputPortInterface;

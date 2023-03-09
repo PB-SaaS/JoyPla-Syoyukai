@@ -1,9 +1,7 @@
 <?php
 
-namespace JoyPla\InterfaceAdapters\Controllers\Api ;
+namespace JoyPla\InterfaceAdapters\Controllers\Api;
 
-use App\SpiralDb\HospitalUser;
-use Auth;
 use Csrf;
 use framework\Facades\Gate;
 use framework\Http\Controller;
@@ -19,25 +17,22 @@ use JoyPla\Application\InputPorts\Api\Received\ReceivedReturnRegisterInputPortIn
 use JoyPla\Application\InputPorts\Api\Received\ReceivedShowInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Received\ReceivedShowInputData;
 use JoyPla\Enterprise\Models\OrderStatus;
-use JoyPla\Enterprise\Models\ReceivedStatus;
 
 class ReceivedController extends Controller
 {
-    public function orderList($vars , OrderShowInputPortInterface $inputPort )
+    public function orderList($vars, OrderShowInputPortInterface $inputPort)
     {
         $token = $this->request->get('_csrf');
-        Csrf::validate($token,true);
+        Csrf::validate($token, true);
         $search = $this->request->get('search');
 
-        if(Gate::denies('receipt'))
-        {
-            Router::abort(403); 
+        if (Gate::denies('receipt')) {
+            Router::abort(403);
         }
 
         $gate = Gate::getGateInstance('receipt');
-        
-        if( !$search['orderStatus'] || count($search['orderStatus']) === 0 )
-        {
+
+        if (!$search['orderStatus'] || count($search['orderStatus']) === 0) {
             $search['orderStatus'] = [
                 OrderStatus::OrderCompletion,
                 OrderStatus::OrderFinished,
@@ -46,64 +41,72 @@ class ReceivedController extends Controller
             ];
         }
         $user = $this->request->user();
-        if($gate->isOnlyMyDivision())
-        {
-            $search['divisionIds'] = [ $user->divisionId ];
+        if ($gate->isOnlyMyDivision()) {
+            $search['divisionIds'] = [$user->divisionId];
         }
 
         $inputData = new OrderShowInputData($user, $search);
         $inputPort->handle($inputData);
     }
 
-    public function orderRegister($vars , ReceivedRegisterByOrderSlipInputPortInterface $inputPort )
-    {
+    public function orderRegister(
+        $vars,
+        ReceivedRegisterByOrderSlipInputPortInterface $inputPort
+    ) {
         $token = $this->request->get('_csrf');
-        Csrf::validate($token,true);
+        Csrf::validate($token, true);
 
-        if(Gate::denies('receipt'))
-        {
-            Router::abort(403); 
+        if (Gate::denies('receipt')) {
+            Router::abort(403);
         }
 
         $gate = Gate::getGateInstance('receipt');
 
         $registerModel = $this->request->get('registerModel');
-        $inputData = new ReceivedRegisterByOrderSlipInputData($this->request->user(), $vars['orderId'], $registerModel ,$gate->isOnlyMyDivision());
+        $inputData = new ReceivedRegisterByOrderSlipInputData(
+            $this->request->user(),
+            $vars['orderId'],
+            $registerModel,
+            $gate->isOnlyMyDivision()
+        );
         $inputPort->handle($inputData);
     }
 
-    public function register($vars , ReceivedRegisterInputPortInterface $inputPort )
-    {
+    public function register(
+        $vars,
+        ReceivedRegisterInputPortInterface $inputPort
+    ) {
         $token = $this->request->get('_csrf');
-        Csrf::validate($token,true);
-        
-        if(Gate::denies('receipt'))
-        {
-            Router::abort(403); 
+        Csrf::validate($token, true);
+
+        if (Gate::denies('receipt')) {
+            Router::abort(403);
         }
 
         $gate = Gate::getGateInstance('receipt');
 
         $receivedItems = $this->request->get('receivedItems');
-        $inputData = new ReceivedRegisterInputData($this->request->user(), $receivedItems, $gate->isOnlyMyDivision());
+        $inputData = new ReceivedRegisterInputData(
+            $this->request->user(),
+            $receivedItems,
+            $gate->isOnlyMyDivision()
+        );
         $inputPort->handle($inputData);
     }
 
-    public function show($vars , ReceivedShowInputPortInterface $inputPort )
+    public function show($vars, ReceivedShowInputPortInterface $inputPort)
     {
         $token = $this->request->get('_csrf');
-        Csrf::validate($token,true);
+        Csrf::validate($token, true);
         $user = $this->request->user();
         $search = $this->request->get('search');
-        if(Gate::denies('list_of_acceptance_inspection_slips'))
-        {
-            Router::abort(403); 
+        if (Gate::denies('list_of_acceptance_inspection_slips')) {
+            Router::abort(403);
         }
 
         $gate = Gate::getGateInstance('list_of_acceptance_inspection_slips');
 
-        if($gate->isOnlyMyDivision())
-        {
+        if ($gate->isOnlyMyDivision()) {
             $search['divisionIds'] = [$user->divisionId];
         }
 
@@ -111,23 +114,27 @@ class ReceivedController extends Controller
         $inputPort->handle($inputData);
     }
 
-    public function returnRegister($vars , ReceivedReturnRegisterInputPortInterface $inputPort)
-    {
+    public function returnRegister(
+        $vars,
+        ReceivedReturnRegisterInputPortInterface $inputPort
+    ) {
         $token = $this->request->get('_csrf');
-        Csrf::validate($token,true);
+        Csrf::validate($token, true);
 
-        if(Gate::denies('register_return_slips'))
-        {
-            Router::abort(403); 
+        if (Gate::denies('register_return_slips')) {
+            Router::abort(403);
         }
 
         $gate = Gate::getGateInstance('register_return_slips');
 
         $returnItems = $this->request->get('returnItems');
 
-        $inputData = new ReceivedReturnRegisterInputData($this->request->user(), $vars['receivedId'] , $returnItems , $gate->isOnlyMyDivision());
+        $inputData = new ReceivedReturnRegisterInputData(
+            $this->request->user(),
+            $vars['receivedId'],
+            $returnItems,
+            $gate->isOnlyMyDivision()
+        );
         $inputPort->handle($inputData);
     }
 }
-
- 

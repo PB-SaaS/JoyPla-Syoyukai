@@ -2,22 +2,66 @@
 
 namespace JoyPla\InterfaceAdapters\GateWays\Repository;
 
-use App\Model\InHospitalItem;
-use App\SpiralDb\InHospitalItemView;
-use App\SpiralDb\Price;
-use App\SpiralDb\StockView;
 use Auth;
 use Collection;
+use JoyPla\Enterprise\Models\DateYearMonthDayHourMinutesSecond;
+use JoyPla\Enterprise\Models\Distributor;
+use JoyPla\Enterprise\Models\DistributorId;
+use JoyPla\Enterprise\Models\Division;
+use JoyPla\Enterprise\Models\DivisionId;
 use JoyPla\Enterprise\Models\HospitalId;
+use JoyPla\Enterprise\Models\InHospitalItemId;
+use JoyPla\Enterprise\Models\Item;
+use JoyPla\Enterprise\Models\Price;
+use JoyPla\Enterprise\Models\Quantity;
 use JoyPla\Enterprise\Models\Stock;
+use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 
 class StockRepository implements StockRepositoryInterface
 {
+    public function getByDivisionId(
+        HospitalId $hospitalId,
+        DivisionId $divisionId
+    ) {
+        $stocks = ModelRepository::getStockViewInstance()
+            ->where('hospitalId', $hospitalId->value())
+            ->where('divisionId', $divisionId->value())
+            ->get();
+
+        $result = [];
+
+        foreach ($stocks as $key => $stock) {
+            $result[] = new Stock(
+                $stock->id,
+                new DateYearMonthDayHourMinutesSecond($stock->registrationTime),
+                new DateYearMonthDayHourMinutesSecond($stock->updateTime),
+                new InHospitalItemId($stock->inHospitalItemId),
+                Item::create($stock),
+                new Price($stock->price),
+                Quantity::create($stock),
+                Division::create($stock),
+                new Distributor(
+                    $hospitalId,
+                    new DistributorId($stock->distributorId),
+                    ''
+                ),
+                $stock->rackName,
+                new DateYearMonthDayHourMinutesSecond($stock->invFinishTime),
+                (int) $stock->stockQuantity,
+                (int) $stock->orderWithinCount,
+                (int) $stock->constantByDiv,
+                $stock->inItemImage
+            );
+        }
+
+        var_dump($result);
+    }
+
     public function search(Auth $auth, object $search)
     {
-        $inHospitalItemIds = InHospitalItemView::where('notUsedFlag', '1', '!=')
-            ->where('hospitalId', $auth->hospitalId)
-            ->value('inHospitalItemId');
+        $inHospitalItemIds = ModelRepository::getInHospitalItemViewInstance()
+            ->where('notUsedFlag', '1', '!=')
+            ->where('hospitalId', $auth->hospitalId);
 
         if ($search->itemName !== '') {
             $inHospitalItemIds->orWhere(
@@ -57,11 +101,14 @@ class StockRepository implements StockRepositoryInterface
 
         $inHospitalItemIds = $inHospitalItemIds->get();
 
-        if ((int) $inHospitalItemIds->count === 0) {
-            return [[], (int) $inHospitalItemIds->count, 0];
+        if ((int) $inHospitalItemIds->count() === 0) {
+            return [[], (int) $inHospitalItemIds->count(), 0];
         }
 
-        $stocks = StockView::where('hospitalId', $auth->hospitalId);
+        $stocks = ModelRepository::getStockViewInstance()->where(
+            'hospitalId',
+            $auth->hospitalId
+        );
 
         if (is_array($search->divisionIds) && count($search->divisionIds) > 0) {
             foreach ($search->divisionIds as $divisionId) {
@@ -69,7 +116,7 @@ class StockRepository implements StockRepositoryInterface
             }
         }
 
-        foreach ($inHospitalItemIds->data->all() as $inHospitalItemid) {
+        foreach ($inHospitalItemIds->all() as $inHospitalItemid) {
             $stocks->orWhere(
                 'inHospitalItemId',
                 $inHospitalItemid->inHospitalItemId
@@ -77,33 +124,34 @@ class StockRepository implements StockRepositoryInterface
         }
 
         $stocks = $stocks
-            ->sort('requiredOrderNum', 'desc')
+            ->orderBy('requiredOrderNum', 'desc')
             ->page($search->currentPage)
             ->paginate($search->perPage);
 
-        if ((int) $stocks->count === 0) {
-            return [[], (int) $stocks->count, 0];
+        if ((int) $stocks->getData()->count() === 0) {
+            return [[], (int) $stocks->getData()->count(), 0];
         }
 
-        $inHospitalItem = InHospitalItemView::getNewInstance()->where(
+        $inHospitalItem = ModelRepository::getInHospitalItemViewInstance()->where(
             'hospitalId',
             $auth->hospitalId
         );
-        foreach ($stocks->data->all() as $i) {
+        foreach ($stocks->getData()->all() as $i) {
             $inHospitalItem->orWhere('inHospitalItemId', $i->inHospitalItemId);
         }
 
-        $inHospitalItem = $inHospitalItem->get()->data->all();
+        $inHospitalItem = $inHospitalItem->get()->all();
 
-        $price = Price::where('hospitalId', $auth->hospitalId)
-            ->value('priceId')
-            ->value('notice');
+        $price = ModelRepository::getPriceInstance()->where(
+            'hospitalId',
+            $auth->hospitalId
+        );
 
         foreach ($inHospitalItem as $item) {
             $price->orWhere('priceId', $item->priceId);
         }
 
-        $price = $price->get()->data->all();
+        $price = $price->get()->all();
 
         foreach ($inHospitalItem as $key => $item) {
             $price_fkey = array_search(
@@ -117,9 +165,9 @@ class StockRepository implements StockRepositoryInterface
         }
 
         $result = [];
-        $maxcount = $stocks->count;
+        $maxcount = $stocks->getData()->count();
 
-        foreach ($stocks->data->all() as $i) {
+        foreach ($stocks->getData()->all() as $i) {
             $fkey = array_search(
                 $i->inHospitalItemId,
                 collect_column($inHospitalItem, 'inHospitalItemId')

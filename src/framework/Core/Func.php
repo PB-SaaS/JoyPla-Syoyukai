@@ -7,34 +7,38 @@ use framework\Http\View;
 use framework\Routing\Router;
 use Library\BladeLikeEngine\BladeLikeView;
 
-function view(string $template, array $param = array() , bool $filter = true): View
+function view(string $template, array $param = [], bool $filter = true): View
 {
-    return new View($template , $param , $filter);
+    return new View($template, $param, $filter);
 }
 
-function bladeView(string $template, array $param = [], bool $filter = true): View
-{
+function bladeView(
+    string $template,
+    array $param = [],
+    bool $filter = true
+): View {
     return new BladeLikeView($template, $param, $filter);
 }
 
-function html($string = '') {
+function html($string = '')
+{
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 }
 
-function gate(string $pass , ...$instances)
+function gate(string $pass, ...$instances)
 {
-    return Gate::getGateInstance($pass , ...$instances);
+    return Gate::getGateInstance($pass, ...$instances);
 }
 
-function collect(array $ary){
+function collect(array $ary)
+{
     return new Collection($ary);
 }
 
 function collect_column($array, $key)
 {
-    $result = []; 
-    foreach($array as $a )
-    {
+    $result = [];
+    foreach ($array as $a) {
         $result[] = $a->{$key};
     }
     return $result;
@@ -42,13 +46,15 @@ function collect_column($array, $key)
 
 function number_format_jp($num)
 {
-    if(empty($num)) { return 0; }
-    return preg_replace("/\.?0+$/","",number_format($num,2));
+    if (empty($num)) {
+        return 0;
+    }
+    return preg_replace('/\.?0+$/', '', number_format($num, 2));
 }
 
-function config($key , $default = '')
+function config($key, $default = '')
 {
-    return (new Config())->get($key , $default);
+    return (new Config())->get($key, $default);
 }
 
 function config_path($path)
@@ -58,19 +64,31 @@ function config_path($path)
 
 function shiftjis_strlen($value)
 {
-    return strlen( mb_convert_encoding($value, 'SJIS', 'UTF-8') );
+    return strlen(mb_convert_encoding($value, 'SJIS', 'UTF-8'));
 }
 
-function queryBuilder(array $query = [] , array $removeQuery = [])
+function queryBuilder(array $query = [], array $removeQuery = [])
 {
-    return Request::queryBuilder($query , $removeQuery);
+    return Request::queryBuilder($query, $removeQuery);
 }
 
-function csrf_token($length = 16){
+function csrf_token($length = 16)
+{
     return Csrf::generate($length);
 }
 
-function route(string $alias , array $vars = []){
-    $url = Router::fetchAlias($alias , $vars);
-    return ($url)? $url : '';
+function route(string $alias, array $vars = [])
+{
+    $url = Router::fetchAlias($alias, $vars);
+    return $url ? $url : '';
+}
+
+function array_find($array, $callback)
+{
+    foreach ($array as $key => $value) {
+        if ($callback($value, $key, $array)) {
+            return $value;
+        }
+    }
+    return null;
 }

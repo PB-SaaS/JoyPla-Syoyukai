@@ -2,22 +2,23 @@
 
 namespace JoyPla\InterfaceAdapters\GateWays\Repository;
 
-use App\SpiralDb\Distributor;
-use App\SpiralDb\Price;
+use App\Model\Price;
 use Collection;
 use framework\SpiralConnecter\SpiralDB;
 use JoyPla\Enterprise\Models\ItemPrice;
 use JoyPla\Enterprise\Models\HospitalId;
 use JoyPla\Enterprise\Models\ItemId;
 use JoyPla\Enterprise\Models\PriceId;
+use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 
 class PriceRepository implements PriceRepositoryInterface
 {
     public function findByPriceId(PriceId $priceId)
     {
-        $prices = Price::Where('priceId', $priceId->value())
+        $prices = ModelRepository::getPriceInstance()
+            ->Where('priceId', $priceId->value())
             ->get()
-            ->data->all();
+            ->all();
 
         $result = [];
         foreach ($prices as $d) {
@@ -46,7 +47,7 @@ class PriceRepository implements PriceRepositoryInterface
             'notice' => $price['notice'],
         ];
 
-        return SpiralDB::title('NJ_PriceDB')->create($createArray);
+        return ModelRepository::getPriceInstance()->create($createArray);
     }
 }
 

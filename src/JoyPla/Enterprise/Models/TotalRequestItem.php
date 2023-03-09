@@ -12,7 +12,7 @@ class TotalRequestItem
     private Item $item;
     private Quantity $quantity;
     private bool $lotManagement;
-    private int $stockQunatity;
+    private int $stockQuantity;
     private string $rackName;
     private RequestQuantity $requestQuantity;
     private array $totalRequests;
@@ -24,7 +24,7 @@ class TotalRequestItem
         Item $item,
         Quantity $quantity,
         bool $lotManagement,
-        int $stockQunatity,
+        int $stockQuantity,
         string $rackName,
         RequestQuantity $requestQuantity,
         array $totalRequests
@@ -35,7 +35,7 @@ class TotalRequestItem
         $this->item = $item;
         $this->quantity = $quantity;
         $this->lotManagement = $lotManagement;
-        $this->stockQuantity = $stockQunatity;
+        $this->stockQuantity = $stockQuantity;
         $this->rackName = $rackName;
         $this->requestQuantity = $requestQuantity;
         $this->totalRequests = array_map(function (TotalRequest $v) {
@@ -47,14 +47,14 @@ class TotalRequestItem
     {
         return new TotalRequestItem(
             ((string) $input->recordId),
-            (Division::create($input)),
-            (new InHospitalItemId($input->inHospitalItemId)),
-            (Item::create($input)),
-            (Quantity::create($input)),
-            (($input->lotManagement === "1")),
-            (int)$input->stockQuantity,
+            Division::create($input),
+            new InHospitalItemId($input->inHospitalItemId),
+            Item::create($input),
+            Quantity::create($input),
+            $input->lotManagement === '1',
+            (int) $input->stockQuantity,
             ((string) $input->rackName),
-            (new RequestQuantity($input->requestQuantity)),
+            new RequestQuantity($input->requestQuantity),
             []
         );
     }
@@ -74,9 +74,9 @@ class TotalRequestItem
         return $this->inHospitalItemId;
     }
 
-    public function getStockQunatity()
+    public function getStockQuantity()
     {
-        return $this->stockQunatity;
+        return $this->stockQuantity;
     }
 
     public function getRequestQuantity()
@@ -129,14 +129,14 @@ class TotalRequestItem
             'inHospitalItemId' => $this->inHospitalItemId->value(),
             'item' => $this->item->toArray(),
             'quantity' => $this->quantity->toArray(),
-            'lotManagement' => (bool)$this->lotManagement,
+            'lotManagement' => (bool) $this->lotManagement,
             'stockQuantity' => $this->stockQuantity,
             'rackName' => $this->rackName,
-            'requestQuantity' => (int)$this->requestQuantity->value(),
+            'requestQuantity' => (int) $this->requestQuantity->value(),
             'totalRequests' => array_map(function (TotalRequest $v) {
                 return $v->toArray();
             }, $this->totalRequests),
-            'countTotalRequests' => $this->countTotalRequests()
+            'countTotalRequests' => $this->countTotalRequests(),
         ];
     }
 }

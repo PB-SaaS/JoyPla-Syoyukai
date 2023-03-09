@@ -2,26 +2,12 @@
 
 namespace JoyPla\InterfaceAdapters\Controllers\Web;
 
-use App\SpiralDb\HospitalUser;
-use App\SpiralDb\Distributor;
-use App\SpiralDb\Item;
-use Auth;
 use Csrf;
-use Collection;
-use framework\Facades\Gate;
 use framework\Http\Controller;
-use framework\Http\View;
-use framework\Http\Request;
 use framework\Routing\Router;
 use framework\SpiralConnecter\SpiralDB;
 use framework\Library\SiValidator;
-use framework\Library\SpiralDbUniqueRule;
-use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\PriceAndInHospitalItemRepository;
-use JoyPla\InterfaceAdapters\Presenters\Api\Item\ItemRegisterPresenter;
-use JoyPla\Application\InputPorts\Api\Item\PriceAndInHospitalItemRegisterInputData;
-use JoyPla\Application\InputPorts\Api\Item\PriceAndInHospitalItemRegisterInputPortInterface;
-use JoyPla\Application\Interactors\Api\Item\PriceAndInHospitalItemRegisterInteractor;
 
 class PriceAndInHospitalItemRegisterController extends Controller
 {

@@ -9,8 +9,8 @@ use framework\Exception\NotFoundException;
 use HttpRequestParameter;
 use LogicException;
 
-class SpiralManager {
-
+class SpiralManager
+{
     private $connection;
     private ?HttpRequestParameter $request = null;
     private array $searchCondition = [];
@@ -23,15 +23,14 @@ class SpiralManager {
     //private array $leftJoin = [];
     private array $join = [];
     private ?Collection $mstData = null;
-    
+
     public function __construct(?SpiralConnecterInterface $connector = null)
     {
-        if(is_null($connector))
-        {
+        if (is_null($connector)) {
             $this->connection = SpiralDB::getConnection();
         } else {
             $this->connection = $connector;
-        } 
+        }
         $this->request = new HttpRequestParameter();
         $this->page(1);
     }
@@ -44,7 +43,7 @@ class SpiralManager {
 
     public function setTitle($title)
     {
-        $this->request->set('db_title' , $title);
+        $this->request->set('db_title', $title);
         return $this;
     }
 
@@ -64,96 +63,110 @@ class SpiralManager {
         return $this->dbAsName;
     }
     */
-    public function where(string $field , string $value , string $operator = "=")
+    public function where(string $field, string $value, string $operator = '=')
     {
-        $this->searchCondition[] = new SearchCondition($field , $value , $operator);
+        $this->searchCondition[] = new SearchCondition(
+            $field,
+            $value,
+            $operator
+        );
 
-        $this->request->set('search_condition' , array_map(function(SearchCondition $searchCondition){
-            return $searchCondition->getRequestParam();
-        },$this->searchCondition));
+        $this->request->set(
+            'search_condition',
+            array_map(function (SearchCondition $searchCondition) {
+                return $searchCondition->getRequestParam();
+            }, $this->searchCondition)
+        );
 
         return $this;
     }
 
-    public function orWhere(string $field ,string $value ,string $operator = "=")
-    {
-        
-        $this->searchCondition[] = new SearchCondition($field , $value , $operator , false);
+    public function orWhere(
+        string $field,
+        string $value,
+        string $operator = '='
+    ) {
+        $this->searchCondition[] = new SearchCondition(
+            $field,
+            $value,
+            $operator,
+            false
+        );
 
-        $this->request->set('search_condition' , array_map(function(SearchCondition $searchCondition){
-            return $searchCondition->getRequestParam();
-        },$this->searchCondition));
+        $this->request->set(
+            'search_condition',
+            array_map(function (SearchCondition $searchCondition) {
+                return $searchCondition->getRequestParam();
+            }, $this->searchCondition)
+        );
 
         return $this;
     }
 
-    public function whereIn(string $field , array $values )
+    public function whereIn(string $field, array $values)
     {
-        foreach($values as $value)
-        {
-            $this->orWhere($field , $value , '=');
+        foreach ($values as $value) {
+            $this->orWhere($field, $value, '=');
         }
         return $this;
     }
 
-    public function whereNotIn(string $field , array $values )
+    public function whereNotIn(string $field, array $values)
     {
-        foreach($values as $value)
-        {
-            $this->where($field , $value , '!=');
+        foreach ($values as $value) {
+            $this->where($field, $value, '!=');
         }
         return $this;
     }
 
-    public function orWhereNotIn(string $field , array $values )
+    public function orWhereNotIn(string $field, array $values)
     {
-        foreach($values as $value)
-        {
-            $this->orWhere($field , $value , '!=');
+        foreach ($values as $value) {
+            $this->orWhere($field, $value, '!=');
         }
         return $this;
     }
 
     public function whereNull(string $field)
     {
-        $this->where($field , '0' , 'ISNULL' );
+        $this->where($field, '0', 'ISNULL');
         return $this;
     }
 
     public function whereNotNull(string $field)
     {
-        $this->where($field , '0' , 'ISNOTNULL' );
+        $this->where($field, '0', 'ISNOTNULL');
         return $this;
     }
 
-    public function orderBy(string $field , string $ascOrDesc)
+    public function orderBy(string $field, string $ascOrDesc)
     {
-        $this->orderBy = new OrderBy($field , $ascOrDesc);
-        $this->request->set('sort' , [ $this->orderBy->getRequestParam() ]);
+        $this->orderBy = new OrderBy($field, $ascOrDesc);
+        $this->request->set('sort', [$this->orderBy->getRequestParam()]);
         return $this;
     }
 
-    public function value( $value )
+    public function value($value)
     {
-        if(is_array($value))
-        {
-            $this->fields = array_merge($this->fields , $value);
+        if (is_array($value)) {
+            $this->fields = array_merge($this->fields, $value);
         }
-        
-        if(is_string($value))
-        {
+
+        if (is_string($value)) {
             $this->fields[] = $value;
         }
 
-        $this->request->set('select_columns' , $this->fields);
+        $this->request->set('select_columns', $this->fields);
 
         return $this;
     }
 
-    private function combine($keys , $values)
+    private function combine($keys, $values)
     {
-        foreach($values as &$val)
-        {
+        foreach ($values as &$val) {
+            foreach ($val as $k => $v) {
+                $val[$k] = $v ?? '';
+            }
             $val = array_combine($keys, $val);
         }
         return $values;
@@ -264,39 +277,44 @@ class SpiralManager {
 
     */
 
-    public function join(SpiralManager $db , string $field , string $op , string $toField ,string $asDbName = '')
-    {
-        $this->join[] = new JoinDb($db , $field , $op , $toField , $asDbName);
+    public function join(
+        SpiralManager $db,
+        string $field,
+        string $op,
+        string $toField,
+        string $asDbName = ''
+    ) {
+        $this->join[] = new JoinDb($db, $field, $op, $toField, $asDbName);
         return $this;
     }
 
     public function page(int $page)
     {
-        if($page < 1)
-        {
-            throw new LogicException('page must be greater than or equal to 1', 501);
+        if ($page < 1) {
+            throw new LogicException(
+                'page must be greater than or equal to 1',
+                501
+            );
         }
-        $this->request->set('page' , $page);
+        $this->request->set('page', $page);
         return $this;
     }
 
-    public function find( int $id )
+    public function find(int $id)
     {
-        $this->where('id',$id,'=');
+        $this->where('id', $id, '=');
         $res = $this->get();
-        if(count($res->toArray()) === 0 )
-        {
+        if (count($res->toArray()) === 0) {
             return null;
         }
         return $res->first();
     }
 
-    public function findOrFail( int $id )
+    public function findOrFail(int $id)
     {
         $res = $this->find($id);
-        if(is_null($res))
-        {
-            throw new NotFoundException('Not Found' , 404);
+        if (is_null($res)) {
+            throw new NotFoundException('Not Found', 404);
         }
 
         return $res;
@@ -304,50 +322,52 @@ class SpiralManager {
 
     public function paginate(int $limit = 1000)
     {
-        if($limit > 1000 || $limit < 1)
-        {
-            throw new LogicException('limit must be greater than or equal to 1 and less than or equal to 1000 ', 501);
+        if ($limit > 1000 || $limit < 1) {
+            throw new LogicException(
+                'limit must be greater than or equal to 1 and less than or equal to 1000 ',
+                501
+            );
         }
 
-        if(is_null($this->request->get('select_columns')))
-        {
-            if( count($this->defaultFields) > 0)
-            {
+        if (is_null($this->request->get('select_columns'))) {
+            if (count($this->defaultFields) > 0) {
                 $this->value($this->defaultFields);
-            }
-            else
-            {
+            } else {
                 $this->value('id');
             }
         }
 
-        $xSpiralApiHeader = new XSpiralApiHeaderObject('database','select');
+        $xSpiralApiHeader = new XSpiralApiHeaderObject('database', 'select');
 
-        $this->request->set('lines_per_page' , $limit);
+        $this->request->set('lines_per_page', $limit);
 
-        $request = $this->connection->request($xSpiralApiHeader , $this->request);
+        $request = $this->connection->request(
+            $xSpiralApiHeader,
+            $this->request
+        );
 
-        $res = $this->combine($this->request->get('select_columns') , $request['data'] );
+        $res = $this->combine(
+            $this->request->get('select_columns'),
+            $request['data']
+        );
 
         $res = new Collection($res);
         //$res = $this->getLeftJoin($res);
-        foreach($this->join as $join)
-        {
+        foreach ($this->join as $join) {
             $join->exec($res);
             $tmp = $res->all();
-            foreach( $tmp as $key => $r )
-            {
-                $r->set( $join->getDbAsName() , $join->fetch($r));
+            foreach ($tmp as $key => $r) {
+                $r->set($join->getDbAsName(), $join->fetch($r));
                 $tmp[$key] = $r;
             }
             $res = new Collection($tmp);
         }
 
-        return new Paginator( 
-            $res , 
-            (int)$this->request->get('page'),
+        return new Paginator(
+            $res,
+            (int) $this->request->get('page'),
             1,
-            ceil($request['count'] / $limit ),
+            ceil($request['count'] / $limit),
             $limit,
             $request['count'],
             $this->orderBy
@@ -356,22 +376,17 @@ class SpiralManager {
 
     public function getMulti(array $fields = [])
     {
-        
         $count = 1; // 1件以上ある想定
         $res = [];
-        if(is_null($this->request->get('select_columns')))
-        {
-            if( count($this->defaultFields) > 0)
-            {
+        if (is_null($this->request->get('select_columns'))) {
+            if (count($this->defaultFields) > 0) {
                 $this->value($this->defaultFields);
-            }
-            else
-            {
+            } else {
                 $this->value('id');
             }
         }
 
-        $xSpiralApiHeader = new XSpiralApiHeaderObject('database','select');
+        $xSpiralApiHeader = new XSpiralApiHeaderObject('database', 'select');
         $this->value($fields);
 
         $result = $this->paginate(1);
@@ -380,78 +395,72 @@ class SpiralManager {
 
         $requests = [];
 
-        $this->request->set('lines_per_page' , 1000);
+        $this->request->set('lines_per_page', 1000);
 
-        for($page = 1; $page <= ceil($count / 1000 ); $page++) {
+        for ($page = 1; $page <= ceil($count / 1000); $page++) {
             $request = $this->request->remake();
-            $request->set('page' , $page);
+            $request->set('page', $page);
             $requests[] = $request;
         }
-        $res = $this->connection->bulkRequest($xSpiralApiHeader , $requests);
+        $res = $this->connection->bulkRequest($xSpiralApiHeader, $requests);
 
-        $res = $this->combine($this->request->get('select_columns') , $res );
+        $res = $this->combine($this->request->get('select_columns'), $res);
         return new Collection($res);
     }
 
-    public function get( array $fields = [] )
+    public function get(array $fields = [])
     {
         $count = 1; // 1件以上ある想定
         $res = [];
-        if(is_null($this->request->get('select_columns')))
-        {
-            if( count($this->defaultFields) > 0)
-            {
+        if (is_null($this->request->get('select_columns'))) {
+            if (count($this->defaultFields) > 0) {
                 $this->value($this->defaultFields);
-            }
-            else
-            {
+            } else {
                 $this->value('id');
             }
         }
 
-        $xSpiralApiHeader = new XSpiralApiHeaderObject('database','select');
+        $xSpiralApiHeader = new XSpiralApiHeaderObject('database', 'select');
         $this->value($fields);
 
-        $this->request->set('lines_per_page' , 1000);
-        $this->request->set('page' , 1);
+        $this->request->set('lines_per_page', 1000);
+        $this->request->set('page', 1);
 
-        for($page = 1; $page <= ceil($count / 1000 ); $page++) {
-            $this->request->set('page' , $page);
-            $response = $this->connection->request($xSpiralApiHeader , $this->request);
-            $count = (int)$response['count'];
+        for ($page = 1; $page <= ceil($count / 1000); $page++) {
+            $this->request->set('page', $page);
+            $response = $this->connection->request(
+                $xSpiralApiHeader,
+                $this->request
+            );
+            $count = (int) $response['count'];
             $res = array_merge($res, $response['data']);
         }
-
-        $res = $this->combine($this->request->get('select_columns') , $res );
+        $res = $this->combine($this->request->get('select_columns'), $res);
         $res = new Collection($res);
-        foreach($this->join as $join)
-        {
+        foreach ($this->join as $join) {
             $join->exec($res);
             $tmp = $res->all();
-            foreach( $tmp as $key => $r )
-            {
-                $r->set( $join->getDbAsName() , $join->fetch($r));
+            foreach ($tmp as $key => $r) {
+                $r->set($join->getDbAsName(), $join->fetch($r));
                 $tmp[$key] = $r;
             }
             $res = new Collection($tmp);
         }
-        
+
         return $res;
     }
 
-
     public function create(array $create)
     {
-        $xSpiralApiHeader = new XSpiralApiHeaderObject('database','insert');
+        $xSpiralApiHeader = new XSpiralApiHeaderObject('database', 'insert');
 
         $data = [];
-        foreach($create as $key => $v)
-        {
-            $data[] = [ 'name' => $key , 'value' => $v ];
+        foreach ($create as $key => $v) {
+            $data[] = ['name' => $key, 'value' => $v];
         }
 
         $this->request->set('data', $data);
-        $res = $this->connection->request($xSpiralApiHeader , $this->request);
+        $res = $this->connection->request($xSpiralApiHeader, $this->request);
 
         $create['id'] = $res['id'];
 
@@ -460,26 +469,26 @@ class SpiralManager {
 
     public function insert($insert)
     {
-        $xSpiralApiHeader = new XSpiralApiHeaderObject('database','bulk_insert');
+        $xSpiralApiHeader = new XSpiralApiHeaderObject(
+            'database',
+            'bulk_insert'
+        );
 
         $fields = [];
-        foreach($insert[0] as $key => $v)
-        {
+        foreach ($insert[0] as $key => $v) {
             $fields[] = $key;
         }
-        
+
         $data = [];
-        foreach($insert as $i)
-        {
+        foreach ($insert as $i) {
             $data[] = array_values($i);
         }
 
         $this->request->set('columns', $fields);
 
-		foreach(array_chunk($data , 1000) as $d)
-		{
+        foreach (array_chunk($data, 1000) as $d) {
             $this->request->set('data', $d);
-            $this->connection->request($xSpiralApiHeader , $this->request);
+            $this->connection->request($xSpiralApiHeader, $this->request);
         }
 
         return true;
@@ -487,65 +496,63 @@ class SpiralManager {
 
     public function update($update)
     {
-        $xSpiralApiHeader = new XSpiralApiHeaderObject('database','update');
+        $xSpiralApiHeader = new XSpiralApiHeaderObject('database', 'update');
 
         $data = [];
-        foreach($update as $key => $v)
-        {
-            $data[] = [ 'name' => $key , 'value' => $v ];
+        foreach ($update as $key => $v) {
+            $data[] = ['name' => $key, 'value' => $v];
         }
 
         $this->request->set('data', $data);
-        $res = $this->connection->request($xSpiralApiHeader , $this->request);
+        $res = $this->connection->request($xSpiralApiHeader, $this->request);
 
-        return (int)$res['count'];
+        return (int) $res['count'];
     }
 
-    public function upsert($field , $upsert)
+    public function upsert($field, $upsert)
     {
-        $xSpiralApiHeader = new XSpiralApiHeaderObject('database','upsert');
+        $xSpiralApiHeader = new XSpiralApiHeaderObject('database', 'upsert');
 
         $data = [];
-        foreach($upsert as $key => $v)
-        {
-            $data[] = [ 'name' => $key , 'value' => $v ];
+        foreach ($upsert as $key => $v) {
+            $data[] = ['name' => $key, 'value' => $v];
         }
 
         $this->request->set('key', $field);
         $this->request->set('data', $data);
-       
-        $res = $this->connection->request($xSpiralApiHeader , $this->request);
-        
-        return (int)$res['count'];
+        $res = $this->connection->request($xSpiralApiHeader, $this->request);
+
+        return (int) $res['count'];
     }
 
     public function delete()
     {
-        $xSpiralApiHeader = new XSpiralApiHeaderObject('database','delete');
-        $res = $this->connection->request($xSpiralApiHeader , $this->request);
-        return (int)$res['count'];
+        $xSpiralApiHeader = new XSpiralApiHeaderObject('database', 'delete');
+        $res = $this->connection->request($xSpiralApiHeader, $this->request);
+        return (int) $res['count'];
     }
 
     public function destroy($id)
     {
-        $xSpiralApiHeader = new XSpiralApiHeaderObject('database','delete');
-        $this->where('id',$id,'=');
-        $this->connection->request($xSpiralApiHeader , $this->request);
+        $xSpiralApiHeader = new XSpiralApiHeaderObject('database', 'delete');
+        $this->where('id', $id, '=');
+        $this->connection->request($xSpiralApiHeader, $this->request);
     }
 
-    public function updateBulk($key , $update)
+    public function updateBulk($key, $update)
     {
-        $xSpiralApiHeader = new XSpiralApiHeaderObject('database','bulk_update');
+        $xSpiralApiHeader = new XSpiralApiHeaderObject(
+            'database',
+            'bulk_update'
+        );
 
         $fields = [];
-        foreach($update[0] as $key => $v)
-        {
-            $fields[] = $key;
+        foreach ($update[0] as $k => $v) {
+            $fields[] = $k;
         }
-        
+
         $data = [];
-        foreach($update as $i)
-        {
+        foreach ($update as $i) {
             $data[] = array_values($i);
         }
 
@@ -554,29 +561,32 @@ class SpiralManager {
 
         $count = 0;
 
-		foreach(array_chunk($data , 1000) as $d)
-		{
+        foreach (array_chunk($data, 1000) as $d) {
             $this->request->set('data', $d);
-            $res = $this->connection->request($xSpiralApiHeader , $this->request);
+            $res = $this->connection->request(
+                $xSpiralApiHeader,
+                $this->request
+            );
             $count = $count + count($res['results']);
         }
 
         return $count;
     }
 
-    public function upsertBulk($key , $upsert)
+    public function upsertBulk($key, $upsert)
     {
-        $xSpiralApiHeader = new XSpiralApiHeaderObject('database','bulk_upsert');
+        $xSpiralApiHeader = new XSpiralApiHeaderObject(
+            'database',
+            'bulk_upsert'
+        );
 
         $fields = [];
-        foreach($upsert[0] as $key => $v)
-        {
-            $fields[] = $key;
+        foreach ($upsert[0] as $k => $v) {
+            $fields[] = $k;
         }
-        
+
         $data = [];
-        foreach($upsert as $i)
-        {
+        foreach ($upsert as $i) {
             $data[] = array_values($i);
         }
 
@@ -585,10 +595,12 @@ class SpiralManager {
 
         $count = 0;
 
-		foreach(array_chunk($data , 1000) as $d)
-		{
+        foreach (array_chunk($data, 1000) as $d) {
             $this->request->set('data', $d);
-            $res = $this->connection->request($xSpiralApiHeader , $this->request);
+            $res = $this->connection->request(
+                $xSpiralApiHeader,
+                $this->request
+            );
             $count = $count + count($res['results']);
         }
 
@@ -597,8 +609,11 @@ class SpiralManager {
 
     public function schema()
     {
-        $xSpiralApiHeader = new XSpiralApiHeaderObject('database','get');
-        $response = $this->connection->request($xSpiralApiHeader , $this->request);
+        $xSpiralApiHeader = new XSpiralApiHeaderObject('database', 'get');
+        $response = $this->connection->request(
+            $xSpiralApiHeader,
+            $this->request
+        );
         return new Collection($response['schema']);
     }
 
@@ -610,19 +625,25 @@ class SpiralManager {
 
     public function reInstance()
     {
-        return (new self($this->connection))->setTitle($this->request->get('db_title'));
+        return (new self($this->connection))->setTitle(
+            $this->request->get('db_title')
+        );
     }
 }
 
-class SearchCondition {
-
+class SearchCondition
+{
     public string $field;
     public string $value;
     public string $operator;
     public bool $isAnd;
 
-    public function __construct( string $field , string $value , string $operator = '=' , bool $isAnd = true)
-    {
+    public function __construct(
+        string $field,
+        string $value,
+        string $operator = '=',
+        bool $isAnd = true
+    ) {
         $this->field = $field;
         $this->value = $value;
         $this->operator = $operator;
@@ -631,21 +652,25 @@ class SearchCondition {
 
     public function getRequestParam()
     {
-        return [ 'name' => $this->field , 'value' => $this->value  , 'operator' => $this->operator, 'logical_connection' => ( $this->isAnd )? 'and' : 'or' ];
+        return [
+            'name' => $this->field,
+            'value' => $this->value,
+            'operator' => $this->operator,
+            'logical_connection' => $this->isAnd ? 'and' : 'or',
+        ];
     }
 }
 
-class OrderBy {
-    
+class OrderBy
+{
     public string $field;
     public string $ascOrDesc;
 
-    public function __construct( string $field , string $ascOrDesc)
+    public function __construct(string $field, string $ascOrDesc)
     {
         $this->field = $field;
 
-        if($ascOrDesc !== 'asc' && $ascOrDesc !== 'desc')
-        {
+        if ($ascOrDesc !== 'asc' && $ascOrDesc !== 'desc') {
             throw new LogicException('Please specify asc or desc');
         }
         $this->ascOrDesc = $ascOrDesc;
@@ -653,20 +678,26 @@ class OrderBy {
 
     public function getRequestParam()
     {
-        return [ 'name' => $this->field , 'order' => $this->ascOrDesc ];
+        return ['name' => $this->field, 'order' => $this->ascOrDesc];
     }
 }
 
-class JoinDb {
-    public SpiralManager $db ;
+class JoinDb
+{
+    public SpiralManager $db;
     public string $field = '';
     public string $op = '';
     public string $toField = '';
     public string $asDbName = '';
     public Collection $result;
 
-    public function __construct(SpiralManager $db ,string $field , string $op , string $toField , string $asDbName = '')
-    {
+    public function __construct(
+        SpiralManager $db,
+        string $field,
+        string $op,
+        string $toField,
+        string $asDbName = ''
+    ) {
         $this->db = $db;
         $this->field = $field;
         $this->op = $op;
@@ -676,27 +707,37 @@ class JoinDb {
 
     public function getDbAsName()
     {
-        return (empty($this->asDbName))? $this->db->getTitle() : $this->asDbName;
+        return empty($this->asDbName) ? $this->db->getTitle() : $this->asDbName;
     }
 
     public function getResult()
     {
         return $this->result;
     }
-    
-    public function exec( Collection $collection )
+
+    public function exec(Collection $collection)
     {
-        if($this->op === '='){
-            $this->result = $this->db->whereIn( $this->field , $collection->column($this->toField))->get();
+        if ($this->op === '=') {
+            $this->result = $this->db
+                ->whereIn($this->field, $collection->column($this->toField))
+                ->get();
         }
-        $this->result = $this->db->orWhereNotIn( $this->field , $collection->column($this->toField))->get();
+        $this->result = $this->db
+            ->orWhereNotIn($this->field, $collection->column($this->toField))
+            ->get();
     }
 
-    public function fetch( Collection $collection )
+    public function fetch(Collection $collection)
     {
-        if($this->op === '='){
-            return $this->result->where( $this->field , $collection->{$this->toField} );
+        if ($this->op === '=') {
+            return $this->result->where(
+                $this->field,
+                $collection->{$this->toField}
+            );
         }
-        return $this->result->whereNot($this->field , $collection->{$this->toField} );
+        return $this->result->whereNot(
+            $this->field,
+            $collection->{$this->toField}
+        );
     }
 }

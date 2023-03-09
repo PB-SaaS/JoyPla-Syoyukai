@@ -2,8 +2,6 @@
 
 namespace JoyPla\InterfaceAdapters\Presenters\Api\ReceivedReturn {
     use ApiResponse;
-    use App\SpiralDb\HospitalUser;
-    use framework\Http\View;
     use JoyPla\Application\OutputPorts\Api\ReceivedReturn\ReturnShowOutputData;
     use JoyPla\Application\OutputPorts\Api\ReceivedReturn\ReturnShowOutputPortInterface;
 

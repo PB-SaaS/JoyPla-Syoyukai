@@ -2,23 +2,28 @@
 
 namespace JoyPla\InterfaceAdapters\GateWays\Repository;
 
-use App\SpiralDb\Notification as SpiralDbNotification;
 use Collection;
-use JoyPla\Enterprise\CommonModels\Notification;
+use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 use stdClass;
 
-class NotificationRepository implements NotificationRepositoryInterface{
-
+class NotificationRepository implements NotificationRepositoryInterface
+{
     public function search(stdClass $search)
     {
-        $notification = ( SpiralDbNotification::sort('registrationTime','desc')->page($search->page)->paginate($search->limit) )->data->all();
-        return [ array_map(function(Collection $n){
-            return $n;
-        },$notification) , count($notification) ];
+        $notification = ModelRepository::getNotificationInstance()
+            ->orderBy('registrationTime', 'desc')
+            ->page($search->page)
+            ->paginate($search->limit);
+        return [
+            array_map(function (Collection $n) {
+                return $n;
+            }, $notification->getData()->all()),
+            count($notification->getData()->all()),
+        ];
     }
 }
 
-interface NotificationRepositoryInterface 
+interface NotificationRepositoryInterface
 {
     public function search(stdClass $search);
 }

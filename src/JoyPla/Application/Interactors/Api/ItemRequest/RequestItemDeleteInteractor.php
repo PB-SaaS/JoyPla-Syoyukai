@@ -5,20 +5,16 @@
  */
 
 namespace JoyPla\Application\Interactors\Api\ItemRequest {
-    use ApiErrorCode\AccessFrequencyLimitExceededScopeIs;
-    use App\SpiralDb\StockView;
     use Exception;
     use framework\Exception\NotFoundException;
     use JoyPla\Application\InputPorts\Api\ItemRequest\RequestItemDeleteInputData;
     use JoyPla\Application\InputPorts\Api\ItemRequest\RequestItemDeleteInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\ItemRequest\RequestItemDeleteOutputData;
-    use JoyPla\Application\OutputPorts\Api\ItemRequest\RequestItemDeleteOutputPortInterface;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\Enterprise\Models\RequestHId;
     use JoyPla\Enterprise\Models\RequestId;
     use JoyPla\Enterprise\Models\RequestItemCount;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRequestRepositoryInterface;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\RequestItemCountRepositoryInterface;
+    use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
     use JoyPla\Service\Presenter\Api\PresenterProvider;
     use JoyPla\Service\Repository\RepositoryProvider;
 
@@ -71,7 +67,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 throw new Exception('Invalid value.', 422);
             }
 
-            $stockViewInstance = StockView::where(
+            $stockViewInstance = ModelRepository::getStockViewInstance()->where(
                 'hospitalId',
                 $hospitalId->value()
             );
@@ -92,11 +88,11 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
             }
 
             $stocks = $stockViewInstance->get();
-            if ((int) $stocks->count === 0) {
+            if ((int) $stocks->count() === 0) {
                 throw new Exception("Stocks don't exist.", 998);
             }
 
-            $stock = $stocks->data->get(0);
+            $stock = $stocks->first();
             $requestItemCounts = [];
             foreach ($itemRequest->getRequestItems() as $item) {
                 if (

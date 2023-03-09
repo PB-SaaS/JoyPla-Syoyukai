@@ -70,6 +70,25 @@ namespace JoyPla\Application\Interactors\Web\Received {
                 throw new NotFoundException('Not Found.', 404);
             }
 
+            $order = $order->toArray();
+
+            if ($order['receivedTarget'] == '2') {
+                $order['receivedDivisionName'] =
+                    $order['division']['divisionName'];
+                $order['receivedDivisionId'] = $order['division']['divisionId'];
+            }
+            if ($order['receivedTarget'] == '1') {
+                $receivedDivision = $this->repositoryProvider
+                    ->getDivisionRepository()
+                    ->getStorehouse($hospitalId);
+                $order[
+                    'receivedDivisionName'
+                ] = $receivedDivision->getDivisionName()->value();
+                $order[
+                    'receivedDivisionId'
+                ] = $receivedDivision->getDivisionId()->value();
+            }
+
             $this->presenterProvider
                 ->getOrderReceivedSlipIndexPresenter()
                 ->output(new OrderReceivedSlipIndexOutputData($order));
@@ -132,9 +151,9 @@ namespace JoyPla\Application\OutputPorts\Web\Received {
     {
         public array $order;
 
-        public function __construct(Order $order)
+        public function __construct(array $order)
         {
-            $this->order = $order->toArray();
+            $this->order = $order;
         }
     }
 

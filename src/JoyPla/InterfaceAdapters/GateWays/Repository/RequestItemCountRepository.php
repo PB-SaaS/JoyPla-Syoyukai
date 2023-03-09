@@ -2,33 +2,41 @@
 
 namespace JoyPla\InterfaceAdapters\GateWays\Repository;
 
-use App\SpiralDb\RequestItemCountTransaction;
 use JoyPla\Enterprise\Models\RequestItemCount;
+use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 
 class RequestItemCountRepository implements RequestItemCountRepositoryInterface
 {
     public function saveToArray(array $requestItemCounts)
     {
-        $requestItemCounts = array_map(function (RequestItemCount $requestItemCount) {
+        $requestItemCounts = array_map(function (
+            RequestItemCount $requestItemCount
+        ) {
             return $requestItemCount;
-        }, $requestItemCounts);
+        },
+        $requestItemCounts);
 
         $insert = [];
 
         foreach ($requestItemCounts as $requestItemCount) {
             $requestItemCountArray = $requestItemCount->toArray();
             $insert[] = [
-                "registrationTime" => 'now',
-                "recordId" => (string)$requestItemCountArray['recordId'],
-                "hospitalId" => (string)$requestItemCountArray['hospitalId'],
-                "inHospitalItemId" => (string)$requestItemCountArray['inHospitalItemId'],
-                "itemId" => (string)$requestItemCountArray['itemId'],
-                "quantity" => (string)$requestItemCountArray['quantity'],
-                "sourceDivisionId" => (string)$requestItemCountArray['sourceDivisionId'],
-                "targetDivisionId" => (string)$requestItemCountArray['targetDivisionId']
+                'registrationTime' => 'now',
+                'recordId' => (string) $requestItemCountArray['recordId'],
+                'hospitalId' => (string) $requestItemCountArray['hospitalId'],
+                'inHospitalItemId' =>
+                    (string) $requestItemCountArray['inHospitalItemId'],
+                'itemId' => (string) $requestItemCountArray['itemId'],
+                'quantity' => (string) $requestItemCountArray['quantity'],
+                'sourceDivisionId' =>
+                    (string) $requestItemCountArray['sourceDivisionId'],
+                'targetDivisionId' =>
+                    (string) $requestItemCountArray['targetDivisionId'],
             ];
         }
-        RequestItemCountTransaction::insert($insert);
+        ModelRepository::getItemRequestItemCountTransactionInstance()->insert(
+            $insert
+        );
 
         return $requestItemCounts;
     }

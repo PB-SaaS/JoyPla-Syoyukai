@@ -1,155 +1,227 @@
 <?php
 
 namespace JoyPla\InterfaceAdapters\GateWays\Repository;
-
-use App\SpiralDb\Distributor;
-use App\SpiralDb\InHospitalItemView;
-use App\SpiralDb\Price;
-use Collection;
 use JoyPla\Enterprise\Models\InHospitalItem;
 use JoyPla\Enterprise\Models\HospitalId;
+use JoyPla\Enterprise\Models\InHospitalItemId;
+use JoyPla\Enterprise\Models\ItemId;
+use JoyPla\Enterprise\Models\PriceId;
+use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 
-class InHospitalItemRepository implements InHospitalItemRepositoryInterface{
-
-    public function findByHospitalId( HospitalId $hospitalId )
+class InHospitalItemRepository implements InHospitalItemRepositoryInterface
+{
+    public function findByHospitalId(HospitalId $hospitalId)
     {
-        $inHospitalItems = (InHospitalItemView::where('hospitalId',$hospitalId->value())->get())->data->all();
+        $inHospitalItems = ModelRepository::getInHospitalItemViewInstance()
+            ->where('hospitalId', $hospitalId->value())
+            ->get()
+            ->all();
 
         $result = [];
-        foreach($inHospitalItems as $d)
-        {
+        foreach ($inHospitalItems as $d) {
             $result[] = InHospitalItem::create($d);
         }
- 
+
         return $result;
     }
 
-    public function searchByJanCode(HospitalId $hospitalId ,  string $jancode)
-    {        
-        $instance = InHospitalItemView::where('hospitalId',$hospitalId->value());
-        $instance->where('itemJANCode',$jancode);
-        $result = $instance->get();
-        $inHospitalItems = $result->data->all();
+    public function getByInHospitalItemIds(
+        HospitalId $hospitalId,
+        array $inHospitalItemIds
+    ) {
+        $inHospitalItemIds = array_map(function (
+            InHospitalItemId $inHospitalItemId
+        ) {
+            return $inHospitalItemId;
+        },
+        $inHospitalItemIds);
 
-        $price = Price::where('hospitalId' , $hospitalId->value())->value('priceId')->value('notice');
+        $inHospitalItems = ModelRepository::getInHospitalItemViewInstance()->where(
+            'hospitalId',
+            $hospitalId->value()
+        );
 
-        foreach($inHospitalItems as $item)
-        {
-            $price->orWhere('priceId',$item->priceId);
+        foreach ($inHospitalItemIds as $inHospitalItemId) {
+            $inHospitalItems->orWhere(
+                'inHospitalItemId',
+                $inHospitalItemId->value()
+            );
         }
 
-        $price = ($price->get())->data->all();
-
-        foreach($inHospitalItems as $key => $item)
-        {
-            $price_fkey = array_search($item->priceId, collect_column($price, 'priceId'));
-            $inHospitalItems[$key]->set('priceNotice',$price[$price_fkey]->notice);
+        $result = [];
+        foreach ($inHospitalItems->get()->all() as $d) {
+            $result[] = InHospitalItem::create($d);
         }
 
-        return [$inHospitalItems , $result->count];
+        return $result;
     }
 
-    public function search( HospitalId $hospitalId ,  object $search)
+    public function searchByJanCode(HospitalId $hospitalId, string $jancode)
     {
-        $instance = InHospitalItemView::where('hospitalId',$hospitalId->value());
-        if($search->itemName !== "")
-        {
-            $instance->orWhere('itemName',"%".$search->itemName."%","LIKE");
-        }
-        if($search->makerName !== "")
-        {
-            $instance->orWhere('makerName',"%".$search->makerName."%","LIKE");
-        }
-        if($search->itemCode !== "")
-        {
-            $instance->orWhere('itemCode',"%".$search->itemCode."%","LIKE");
-        }
-        if($search->itemStandard !== "")
-        {
-            $instance->orWhere('itemStandard',"%".$search->itemStandard."%","LIKE");
-        }
-        if($search->itemJANCode !== "")
-        {
-            $instance->orWhere('itemJANCode',"%".$search->itemJANCode."%","LIKE");
-        }
-        if(count($search->distributorIds) > 0)
-        {
-            foreach( $search->distributorIds as $distributorId)
-            {
-                $instance->orWhere('distributorId',$distributorId);
-            }
+        $instance = ModelRepository::getInHospitalItemViewInstance()->where(
+            'hospitalId',
+            $hospitalId->value()
+        );
+        $instance->where('itemJANCode', $jancode);
+        $inHospitalItems = $instance->get()->all();
+
+        $price = ModelRepository::getPriceInstance()->where(
+            'hospitalId',
+            $hospitalId->value()
+        );
+
+        foreach ($inHospitalItems as $item) {
+            $price->orWhere('priceId', $item->priceId);
         }
 
-        if($search->isNotUse == '1')
-        {
-            $instance->where('notUsedFlag','1');
-        } else if($search->isNotUse == '0')
-        {
-            $instance->where('notUsedFlag','1','!=');
+        $price = $price->get()->all();
+
+        foreach ($inHospitalItems as $key => $item) {
+            $price_fkey = array_search(
+                $item->priceId,
+                collect_column($price, 'priceId')
+            );
+            $inHospitalItems[$key]->set(
+                'priceNotice',
+                $price[$price_fkey]->notice
+            );
         }
 
-        $result = $instance->sort('id','asc')->page($search->currentPage)->paginate($search->perPage);
-
-        $inHospitalItems = $result->data->all();
-
-        if($result->count == 0)
-        {
-            foreach($inHospitalItems as $key => $item)
-            {
-                $inHospitalItems[$key]->set('priceNotice',"");
-            }
-            return [$inHospitalItems , $result->count];
-        }
-
-        $price = Price::where('hospitalId' , $hospitalId->value())->value('priceId')->value('notice');
-
-        foreach($inHospitalItems as $item)
-        {
-            $price->orWhere('priceId',$item->priceId);
-        }
-
-        $price = ($price->get())->data->all();
-
-        foreach($inHospitalItems as $key => $item)
-        {
-            $price_fkey = array_search($item->priceId, collect_column($price, 'priceId'));
-            $inHospitalItems[$key]->set('priceNotice',$price[$price_fkey]->notice);
-        }
-
-        return [$inHospitalItems , $result->count];
+        return [$inHospitalItems, count($inHospitalItems)];
     }
 
-    public function saveToArray( HospitalId $hospitalId, ItemId $itemId, PriceId $priceId, array $inHP, array $attr = [] ){
+    public function search(HospitalId $hospitalId, object $search)
+    {
+        $instance = ModelRepository::getInHospitalItemViewInstance()->where(
+            'hospitalId',
+            $hospitalId->value()
+        );
+        if ($search->itemName !== '') {
+            $instance->orWhere(
+                'itemName',
+                '%' . $search->itemName . '%',
+                'LIKE'
+            );
+        }
+        if ($search->makerName !== '') {
+            $instance->orWhere(
+                'makerName',
+                '%' . $search->makerName . '%',
+                'LIKE'
+            );
+        }
+        if ($search->itemCode !== '') {
+            $instance->orWhere(
+                'itemCode',
+                '%' . $search->itemCode . '%',
+                'LIKE'
+            );
+        }
+        if ($search->itemStandard !== '') {
+            $instance->orWhere(
+                'itemStandard',
+                '%' . $search->itemStandard . '%',
+                'LIKE'
+            );
+        }
+        if ($search->itemJANCode !== '') {
+            $instance->orWhere(
+                'itemJANCode',
+                '%' . $search->itemJANCode . '%',
+                'LIKE'
+            );
+        }
+        if (count($search->distributorIds) > 0) {
+            foreach ($search->distributorIds as $distributorId) {
+                $instance->orWhere('distributorId', $distributorId);
+            }
+        }
 
+        if ($search->isNotUse == '1') {
+            $instance->where('notUsedFlag', '1');
+        } elseif ($search->isNotUse == '0') {
+            $instance->where('notUsedFlag', '1', '!=');
+        }
+
+        $result = $instance
+            ->orderBy('id', 'asc')
+            ->page($search->currentPage)
+            ->paginate($search->perPage);
+
+        $inHospitalItems = $result->getData()->all();
+
+        if (count($inHospitalItems) == 0) {
+            foreach ($inHospitalItems as $key => $item) {
+                $inHospitalItems[$key]->set('priceNotice', '');
+            }
+            return [$inHospitalItems, $result->getData()->count()];
+        }
+
+        $price = ModelRepository::getPriceInstance()->where(
+            'hospitalId',
+            $hospitalId->value()
+        );
+
+        foreach ($inHospitalItems as $item) {
+            $price->orWhere('priceId', $item->priceId);
+        }
+
+        $price = $price->get()->all();
+
+        foreach ($inHospitalItems as $key => $item) {
+            $price_fkey = array_search(
+                $item->priceId,
+                collect_column($price, 'priceId')
+            );
+            $inHospitalItems[$key]->set(
+                'priceNotice',
+                $price[$price_fkey]->notice
+            );
+        }
+
+        return [$inHospitalItems, $result->getData()->count()];
+    }
+
+    public function saveToArray(
+        HospitalId $hospitalId,
+        ItemId $itemId,
+        PriceId $priceId,
+        array $inHP,
+        array $attr = []
+    ) {
         $createArray = [
-            "registrationTime" => "now",
-            "updateTime" => "now",
-            "itemId" => $itemId,
-            "hospitalId" => $hospitalId,
-            "priceId" => $priceId,
-            "distributorId" => $inHP["distributorId"],
-            "distributorMCode" => $inHP["distributorMCode"],
-            "quantity" => $inHP["quantity"],
-            "quantityUnit" => $inHP["quantityUnit"],
-            "itemUnit" => $inHP["itemUnit"],
-            "price" => $inHP["price"],
-            "unitPrice" => $inHP["unitPrice"],
-            "medicineCategory" => $inHP["medicineCategory"],
-            "homeCategory" => $inHP["homeCategory"],
-            "measuringInst" => $inHP["measuringInst"],
-            "notice" => $inHP["notice"],
+            'registrationTime' => 'now',
+            'updateTime' => 'now',
+            'itemId' => $itemId,
+            'hospitalId' => $hospitalId,
+            'priceId' => $priceId,
+            'distributorId' => $inHP['distributorId'],
+            'distributorMCode' => $inHP['distributorMCode'],
+            'quantity' => $inHP['quantity'],
+            'quantityUnit' => $inHP['quantityUnit'],
+            'itemUnit' => $inHP['itemUnit'],
+            'price' => $inHP['price'],
+            'unitPrice' => $inHP['unitPrice'],
+            'medicineCategory' => $inHP['medicineCategory'],
+            'homeCategory' => $inHP['homeCategory'],
+            'measuringInst' => $inHP['measuringInst'],
+            'notice' => $inHP['notice'],
         ];
 
-        return SpiralDb::title("NJ_itemDB") -> create($createArray);
-
+        return ModelRepository::getItemInstance()->create($createArray);
     }
-
 }
 
-interface InHospitalItemRepositoryInterface 
+interface InHospitalItemRepositoryInterface
 {
-    public function findByHospitalId( HospitalId $hospitalId );
-    public function search( HospitalId $hospitalId , object $search);
-    public function searchByJanCode(HospitalId $hospitalId ,  string $jancode);
-    public function saveToArray( HospitalId $hospitalId, ItemId $itemId, PriceId $priceId, array $inHP, array $attr = [] );
+    public function findByHospitalId(HospitalId $hospitalId);
+    public function search(HospitalId $hospitalId, object $search);
+    public function searchByJanCode(HospitalId $hospitalId, string $jancode);
+    public function saveToArray(
+        HospitalId $hospitalId,
+        ItemId $itemId,
+        PriceId $priceId,
+        array $inHP,
+        array $attr = []
+    );
 }
