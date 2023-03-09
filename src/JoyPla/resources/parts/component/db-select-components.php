@@ -148,7 +148,7 @@ const options = ref([]);
 const load = () => {
 let self = this;
 let params = new URLSearchParams();
-params.append("path", "/api/distributor/show");
+params.append("path", "/api/distributor/index");
 params.append("_csrf", _CSRF);
 axios
 .post(_APIURL, params)

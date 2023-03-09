@@ -4,20 +4,21 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Distributor {
-    use JoyPla\Application\InputPorts\Api\Distributor\DistributorShowInputData;
-    use JoyPla\Application\InputPorts\Api\Distributor\DistributorShowInputPortInterface;
-    use JoyPla\Application\OutputPorts\Api\Distributor\DistributorShowOutputData;
-    use JoyPla\Application\OutputPorts\Api\Distributor\DistributorShowOutputPortInterface;
+    use JoyPla\Application\InputPorts\Api\Distributor\DistributorIndexInputData;
+    use JoyPla\Application\InputPorts\Api\Distributor\DistributorIndexInputPortInterface;
+    use JoyPla\Application\OutputPorts\Api\Distributor\DistributorIndexOutputData;
+    use JoyPla\Application\OutputPorts\Api\Distributor\DistributorIndexOutputPortInterface;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\DistributorRepositoryInterface;
     use JoyPla\Service\Presenter\Api\PresenterProvider;
     use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
-     * Class DistributorShowInteractor
+     * Class DistributorIndexInteractor
      * @package JoyPla\Application\Interactors\Distributor\Api
      */
-    class DistributorShowInteractor implements DistributorShowInputPortInterface
+    class DistributorIndexInteractor implements
+        DistributorIndexInputPortInterface
     {
         private PresenterProvider $presenterProvider;
         private RepositoryProvider $repositoryProvider;
@@ -30,16 +31,16 @@ namespace JoyPla\Application\Interactors\Api\Distributor {
             $this->repositoryProvider = $repositoryProvider;
         }
         /**
-         * @param DistributorShowInputData $inputData
+         * @param DistributorIndexInputData $inputData
          */
-        public function handle(DistributorShowInputData $inputData)
+        public function handle(DistributorIndexInputData $inputData)
         {
             $Distributor = $this->repositoryProvider
                 ->getDistributorRepository()
                 ->findByHospitalId(new HospitalId($inputData->hospitalId));
             $this->presenterProvider
-                ->getDistributorShowPresenter()
-                ->output(new DistributorShowOutputData($Distributor));
+                ->getDistributorIndexPresenter()
+                ->output(new DistributorIndexOutputData($Distributor));
         }
     }
 }
@@ -49,10 +50,10 @@ namespace JoyPla\Application\Interactors\Api\Distributor {
  */
 namespace JoyPla\Application\InputPorts\Api\Distributor {
     /**
-     * Class DistributorShowInputData
+     * Class DistributorIndexInputData
      * @package JoyPla\Application\InputPorts\Distributor\Api
      */
-    class DistributorShowInputData
+    class DistributorIndexInputData
     {
         public string $hospitalId;
 
@@ -66,12 +67,12 @@ namespace JoyPla\Application\InputPorts\Api\Distributor {
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Distributor\Api
      */
-    interface DistributorShowInputPortInterface
+    interface DistributorIndexInputPortInterface
     {
         /**
-         * @param DistributorShowInputData $inputData
+         * @param DistributorIndexInputData $inputData
          */
-        function handle(DistributorShowInputData $inputData);
+        function handle(DistributorIndexInputData $inputData);
     }
 }
 
@@ -82,10 +83,10 @@ namespace JoyPla\Application\OutputPorts\Api\Distributor {
     use JoyPla\Enterprise\Models\Distributor;
 
     /**
-     * Class DistributorShowOutputData
+     * Class DistributorIndexOutputData
      * @package JoyPla\Application\OutputPorts\Api\Distributor;
      */
-    class DistributorShowOutputData
+    class DistributorIndexOutputData
     {
         public array $distributors;
 
@@ -96,14 +97,14 @@ namespace JoyPla\Application\OutputPorts\Api\Distributor {
     }
 
     /**
-     * Interface DistributorShowOutputPortInterface
+     * Interface DistributorIndexOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\Distributor;
      */
-    interface DistributorShowOutputPortInterface
+    interface DistributorIndexOutputPortInterface
     {
         /**
-         * @param DistributorShowOutputData $outputData
+         * @param DistributorIndexOutputData $outputData
          */
-        function output(DistributorShowOutputData $outputData);
+        function output(DistributorIndexOutputData $outputData);
     }
 }

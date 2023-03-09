@@ -7,7 +7,7 @@ require_once('JoyPla/Application/Interactors/Api/Barcode/BarcodeSearchInteractor
 require_once('JoyPla/Application/Interactors/Api/Consumption/ConsumptionDeleteInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Consumption/ConsumptionIndexInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Consumption/ConsumptionRegisterInteractor.php');
-require_once('JoyPla/Application/Interactors/Api/Distributor/DistributorShowInteractor.php');
+require_once('JoyPla/Application/Interactors/Api/Distributor/DistributorIndexInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Division/DivisionIndexInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/InHospitalItem/InHospitalItemIndexInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/InHospitalItem/InHospitalItemRegisterInteractor.php');
@@ -146,7 +146,7 @@ require_once('JoyPla/InterfaceAdapters/Presenters/Api/Barcode/BarcodeSearchPrese
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Consumption/ConsumptionDeletePresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Consumption/ConsumptionIndexPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Consumption/ConsumptionRegisterPresenter.php');
-require_once('JoyPla/InterfaceAdapters/Presenters/Api/Distributor/DistributorShowPresenter.php');
+require_once('JoyPla/InterfaceAdapters/Presenters/Api/Distributor/DistributorIndexPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Division/DivisionIndexPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/InHospitalItem/InHospitalItemIndexPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/InHospitalItem/InHospitalItemRegisterPresenter.php');

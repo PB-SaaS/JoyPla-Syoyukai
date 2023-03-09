@@ -358,6 +358,7 @@ class OrderRepository extends ModelRepository implements
                 $registerDate->format('Y-m-01'),
                 '>='
             );
+
             $historyViewInstance->where(
                 'registrationTime',
                 $nextMonth->format('Y-m-01'),
