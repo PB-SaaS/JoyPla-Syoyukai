@@ -5,7 +5,6 @@
  */
 
 namespace JoyPla\Application\Interactors\Api\ItemRequest {
-
     use App\Model\Division;
     use App\SpiralDb\StockView;
     use Exception;
@@ -25,36 +24,26 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
     use JoyPla\Enterprise\Models\TextFieldType64Bytes;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRequestRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\RequestItemCountRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ItemRequestRegisterInteractor
      * @package JoyPla\Application\Interactors\ItemRequest\Api
      */
-    class ItemRequestRegisterInteractor implements ItemRequestRegisterInputPortInterface
+    class ItemRequestRegisterInteractor implements
+        ItemRequestRegisterInputPortInterface
     {
-        /** @var ItemRequestRegisterOutputPortInterface */
-        private ItemRequestRegisterOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var ItemRequestRepositoryInterface */
-        private ItemRequestRepositoryInterface $itemRequestRepository;
-
-        /** @var RequestItemCountRepositoryInterface */
-        private RequestItemCountRepositoryInterface $requestItemCountRepository;
-
-        /**
-         * ItemRequestRegisterInteractor constructor.
-         * @param ItemRequestRegisterOutputPortInterface $outputPort
-         */
         public function __construct(
-            ItemRequestRegisterOutputPortInterface $outputPort,
-            ItemRequestRepositoryInterface $itemRequestRepository,
-            RequestItemCountRepositoryInterface $requestItemCountRepository
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
         ) {
-            $this->outputPort = $outputPort;
-            $this->itemRequestRepository = $itemRequestRepository;
-            $this->requestItemCountRepository = $requestItemCountRepository;
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
-
         /**
          * @param ItemRequestRegisterInputData $inputData
          */
@@ -63,17 +52,25 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
             $requestType = new RequestType($inputData->requestType);
 
-            $inputData->requestItems = array_map(function ($v) use ($inputData) {
-                if ($inputData->isOnlyMyDivision && $inputData->user->divisionId !== $v->sourceDivisionId) {
-                    throw new Exception("Illegal request", 403);
+            $inputData->requestItems = array_map(function ($v) use (
+                $inputData
+            ) {
+                if (
+                    $inputData->isOnlyMyDivision &&
+                    $inputData->user->divisionId !== $v->sourceDivisionId
+                ) {
+                    throw new Exception('Illegal request', 403);
                 }
                 if ($v->sourceDivisionId == $v->targetDivisionId) {
-                    throw new Exception("Invalid request", 999);
+                    throw new Exception('Invalid request', 999);
                 }
                 return $v;
-            }, $inputData->requestItems);
+            },
+            $inputData->requestItems);
 
-            $requestItems = $this->itemRequestRepository->findByInHospitalItem($hospitalId, $inputData->requestItems);
+            $requestItems = $this->repositoryProvider
+                ->getItemRequestRepository()
+                ->findByInHospitalItem($hospitalId, $inputData->requestItems);
 
             if (count($requestItems) === 0) {
                 throw new Exception("Request items don't exist.", 999);
@@ -85,7 +82,12 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
             foreach ($requestItems as $i) {
                 $exist = false;
                 foreach ($result as $key => $r) {
-                    if ($r->equalDivisions($i->getSourceDivision(), $i->getTargetDivision())) {
+                    if (
+                        $r->equalDivisions(
+                            $i->getSourceDivision(),
+                            $i->getTargetDivision()
+                        )
+                    ) {
                         $exist = true;
                         $result[$key] = $r->addRequestItem($i);
                     }
@@ -99,34 +101,46 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 //登録時には病院名は必要ないので、いったんhogeでいい
                 $result[] = new ItemRequest(
                     $id,
-                    (new DateYearMonthDayHourMinutesSecond("")),
-                    (new DateYearMonthDayHourMinutesSecond("")),
+                    new DateYearMonthDayHourMinutesSecond(''),
+                    new DateYearMonthDayHourMinutesSecond(''),
                     [$i],
                     new Hospital(
                         $hospitalId,
-                        (new HospitalName('hoge')),
-                        "",
-                        "",
-                        new Pref(""),
-                        ""
+                        new HospitalName('hoge'),
+                        '',
+                        '',
+                        new Pref(''),
+                        ''
                     ),
                     $i->getSourceDivision(),
                     $i->getTargetDivision(),
                     $requestType,
-                    (new TextFieldType64Bytes($inputData->user->name))
+                    new TextFieldType64Bytes($inputData->user->name)
                 );
             }
 
-            $stockViewInstance = StockView::where('hospitalId', $hospitalId->value());
+            $stockViewInstance = StockView::where(
+                'hospitalId',
+                $hospitalId->value()
+            );
             foreach ($result as $itemRequest) {
-                $stockViewInstance->orWhere('divisionId', $itemRequest->getTargetDivision()->getDivisionId()->value());
+                $stockViewInstance->orWhere(
+                    'divisionId',
+                    $itemRequest
+                        ->getTargetDivision()
+                        ->getDivisionId()
+                        ->value()
+                );
                 foreach ($itemRequest->getRequestItems() as $requestItem) {
-                    $stockViewInstance->orWhere('inHospitalItemId', $requestItem->getInHospitalItemId()->value());
+                    $stockViewInstance->orWhere(
+                        'inHospitalItemId',
+                        $requestItem->getInHospitalItemId()->value()
+                    );
                 }
             }
 
             $stocks = $stockViewInstance->get();
-            if ((int)$stocks->count === 0) {
+            if ((int) $stocks->count === 0) {
                 throw new Exception("Stocks don't exist.", 998);
             }
 
@@ -138,17 +152,26 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 foreach ($itemRequest->getRequestItems() as $item) {
                     $inHpItem[] = $item->getInHospitalItemId()->value();
                     foreach ($stocks as $stock) {
-                        if (($itemRequest->getTargetDivision()->getDivisionId()->value() === $stock->divisionId) &&
-                            ($item->getInHospitalItemId()->value() === $stock->inHospitalItemId)
+                        if (
+                            $itemRequest
+                                ->getTargetDivision()
+                                ->getDivisionId()
+                                ->value() === $stock->divisionId &&
+                            $item->getInHospitalItemId()->value() ===
+                                $stock->inHospitalItemId
                         ) {
                             $requestItemCounts[] = new RequestItemCount(
                                 $stock->recordId,
                                 $hospitalId,
                                 $item->getInHospitalItemId(),
                                 $item->getItem()->getItemId(),
-                                (int)$item->getRequestQuantity()->value(),
-                                $itemRequest->getSourceDivision()->getDivisionId(),
-                                $itemRequest->getTargetDivision()->getDivisionId()
+                                (int) $item->getRequestQuantity()->value(),
+                                $itemRequest
+                                    ->getSourceDivision()
+                                    ->getDivisionId(),
+                                $itemRequest
+                                    ->getTargetDivision()
+                                    ->getDivisionId()
                             );
                         }
                     }
@@ -159,24 +182,30 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 throw new Exception("Stocks don't exist.", 998);
             }
 
-            $this->requestItemCountRepository->saveToArray($requestItemCounts);
+            $this->repositoryProvider
+                ->getRequestItemCountRepository()
+                ->saveToArray($requestItemCounts);
 
-            $this->itemRequestRepository->saveToArray($result);
+            $this->repositoryProvider
+                ->getItemRequestRepository()
+                ->saveToArray($result);
 
-            $this->itemRequestRepository->sendRegistrationMail($result, $inputData->user);
+            $this->repositoryProvider
+                ->getItemRequestRepository()
+                ->sendRegistrationMail($result, $inputData->user);
 
-            $this->outputPort->output(new ItemRequestRegisterOutputData($ids));
+            $this->presenterProvider
+                ->getItemRequestRegisterPresenter()
+                ->output(new ItemRequestRegisterOutputData($ids));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 
 namespace JoyPla\Application\InputPorts\Api\ItemRequest {
-
     use Auth;
     use stdClass;
 
@@ -186,11 +215,17 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
      */
     class ItemRequestRegisterInputData
     {
-        /**
-         * ItemRequestRegisterInputData constructor.
-         */
-        public function __construct(Auth $user, array $requestItems, int $requestType, bool $isOnlyMyDivision)
-        {
+        public Auth $user;
+        public array $requestItems;
+        public int $requestType;
+        public bool $isOnlyMyDivision;
+
+        public function __construct(
+            Auth $user,
+            array $requestItems,
+            int $requestType,
+            bool $isOnlyMyDivision
+        ) {
             $this->user = $user;
             $this->requestItems = array_map(function ($v) {
                 $object = new stdClass();
@@ -231,11 +266,7 @@ namespace JoyPla\Application\OutputPorts\Api\ItemRequest {
      */
     class ItemRequestRegisterOutputData
     {
-        /** @var string */
-
-        /**
-         * ItemRequestRegisterOutputData constructor.
-         */
+        public array $ids;
         public function __construct(array $ids)
         {
             $this->ids = $ids;

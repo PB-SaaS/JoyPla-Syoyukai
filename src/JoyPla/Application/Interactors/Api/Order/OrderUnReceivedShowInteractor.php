@@ -4,34 +4,31 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Order {
-
     use JoyPla\Application\InputPorts\Api\Order\OrderUnReceivedShowInputData;
     use JoyPla\Application\InputPorts\Api\Order\OrderUnReceivedShowInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\Order\OrderUnReceivedShowOutputData;
     use JoyPla\Application\OutputPorts\Api\Order\OrderUnReceivedShowOutputPortInterface;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class OrderUnReceivedShowInteractor
      * @package JoyPla\Application\Interactors\Api\Order
      */
-    class OrderUnReceivedShowInteractor implements OrderUnReceivedShowInputPortInterface
+    class OrderUnReceivedShowInteractor implements
+        OrderUnReceivedShowInputPortInterface
     {
-        /** @var OrderUnReceivedShowOutputPortInterface */
-        private OrderUnReceivedShowOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var OrderRepositoryInterface */
-        private OrderRepositoryInterface $orderRepository;
-
-        /**
-         * OrderUnReceivedShowInteractor constructor.
-         * @param OrderUnReceivedShowOutputPortInterface $outputPort
-         */
-        public function __construct(OrderUnReceivedShowOutputPortInterface $outputPort , OrderRepositoryInterface $orderRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->orderRepository = $orderRepository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -39,21 +36,26 @@ namespace JoyPla\Application\Interactors\Api\Order {
          */
         public function handle(OrderUnReceivedShowInputData $inputData)
         {
-            [ $orders , $count ] = $this->orderRepository->search(
-                (new HospitalId($inputData->user->hospitalId)) ,
-                $inputData->search
-            );
-            $this->outputPort->output(new OrderUnReceivedShowOutputData($orders, $count));
+            [
+                $orders,
+                $count,
+            ] = $this->repositoryProvider
+                ->getOrderRepository()
+                ->search(
+                    new HospitalId($inputData->user->hospitalId),
+                    $inputData->search
+                );
+            $this->presenterProvider
+                ->getOrderUnapprovedShowPresenter()
+                ->output(new OrderUnReceivedShowOutputData($orders, $count));
         }
-    } 
+    }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Order {
-
     use Auth;
     use JoyPla\Enterprise\Models\OrderStatus;
     use stdClass;
@@ -64,9 +66,9 @@ namespace JoyPla\Application\InputPorts\Api\Order {
      */
     class OrderUnReceivedShowInputData
     {
-        /**
-         * OrderUnReceivedShowInputData constructor.
-         */
+        public Auth $user;
+        public array $search;
+
         public function __construct(Auth $user, array $search)
         {
             $this->user = $user;
@@ -78,10 +80,10 @@ namespace JoyPla\Application\InputPorts\Api\Order {
             $this->search->itemCode = $search['itemCode'];
             $this->search->itemStandard = $search['itemStandard'];
             $this->search->itemJANCode = $search['itemJANCode'];
-            $this->search->distributorIds= $search['distributorIds'];
+            $this->search->distributorIds = $search['distributorIds'];
             $this->search->divisionIds = $search['divisionIds'];
-            $this->search->perPage= $search['perPage'];
-            $this->search->currentPage= $search['currentPage'];
+            $this->search->perPage = $search['perPage'];
+            $this->search->currentPage = $search['currentPage'];
             $this->search->receivedFlag = 0; // null("") is not search
             $this->search->orderStatus = [
                 OrderStatus::OrderCompletion,
@@ -95,7 +97,7 @@ namespace JoyPla\Application\InputPorts\Api\Order {
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Order
-    */
+     */
     interface OrderUnReceivedShowInputPortInterface
     {
         /**
@@ -109,7 +111,6 @@ namespace JoyPla\Application\InputPorts\Api\Order {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Order {
-
     use Collection;
     use JoyPla\Enterprise\Models\Order;
     use JoyPla\Enterprise\Models\OrderUnReceived;
@@ -120,14 +121,14 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
      */
     class OrderUnReceivedShowOutputData
     {
-        /**
-         * OrderUnReceivedShowOutputData constructor.
-         */
-        public function __construct(array $orders , int $count)
+        public array $orders;
+        public int $count;
+
+        public function __construct(array $orders, int $count)
         {
-            $this->orders = array_map(function(Order $order){
+            $this->orders = array_map(function (Order $order) {
                 return $order->toArray();
-            },$orders);
+            }, $orders);
             $this->count = $count;
         }
     }
@@ -135,7 +136,7 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
     /**
      * Interface OrderUnReceivedShowOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\Order;
-    */
+     */
     interface OrderUnReceivedShowOutputPortInterface
     {
         /**

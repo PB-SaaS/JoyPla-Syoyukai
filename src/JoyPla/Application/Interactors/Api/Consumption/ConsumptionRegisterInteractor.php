@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Consumption {
-
     use App\Model\Division;
     use Exception;
     use JoyPla\Application\InputPorts\Api\Consumption\ConsumptionRegisterInputPortInterface;
@@ -26,33 +25,25 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
     use JoyPla\InterfaceAdapters\GateWays\Repository\CardRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\consumptionRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ConsumptionRegisterInteractor
      * @package JoyPla\Application\Interactors\Consumption\Api
      */
-    class ConsumptionRegisterInteractor implements ConsumptionRegisterInputPortInterface
+    class ConsumptionRegisterInteractor implements
+        ConsumptionRegisterInputPortInterface
     {
-        /** @var ConsumptionRegisterOutputPortInterface */
-        private ConsumptionRegisterOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var ConsumptionRepositoryInterface */
-        private ConsumptionRepositoryInterface $consumptionRepository;
-
-        /**
-         * ConsumptionRegisterInteractor constructor.
-         * @param ConsumptionRegisterOutputPortInterface $outputPort
-         */
         public function __construct(
-            ConsumptionRegisterOutputPortInterface $outputPort , 
-            ConsumptionRepositoryInterface $consumptionRepository , 
-            InventoryCalculationRepositoryInterface $inventoryCalculationRepository,
-            CardRepositoryInterface $cardRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->consumptionRepository = $consumptionRepository;
-            $this->inventoryCalculationRepository = $inventoryCalculationRepository;
-            $this->cardRepository = $cardRepository;
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -62,70 +53,91 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
         {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
 
-            $inputData->consumptionItems = array_map(function($v) use ($inputData){
-                if($inputData->isOnlyMyDivision && $inputData->user->divisionId !== $v->divisionId)
-                {
-                    throw new Exception('Illegal request',403);
+            $inputData->consumptionItems = array_map(function ($v) use (
+                $inputData
+            ) {
+                if (
+                    $inputData->isOnlyMyDivision &&
+                    $inputData->user->divisionId !== $v->divisionId
+                ) {
+                    throw new Exception('Illegal request', 403);
                 }
                 return $v;
-            },$inputData->consumptionItems);
+            },
+            $inputData->consumptionItems);
 
             $cardIds = [];
-            foreach($inputData->consumptionItems as $i)
-            {
-                if($i->cardId){
+            foreach ($inputData->consumptionItems as $i) {
+                if ($i->cardId) {
                     $cardIds[] = new CardId($i->cardId);
                 }
             }
 
-            $consumptionItems = $this->consumptionRepository->findByInHospitalItem( $hospitalId , $inputData->consumptionItems );
+            $consumptionItems = $this->repositoryProvider
+                ->getConsumptionRepository()
+                ->findByInHospitalItem(
+                    $hospitalId,
+                    $inputData->consumptionItems
+                );
 
             $ids = [];
             $result = [];
 
-            foreach($consumptionItems as $i)
-            {
+            foreach ($consumptionItems as $i) {
                 $exist = false;
-                foreach($result as $key => $r)
-                {
-                    if( $r->getDivision()->getDivisionId()->equal($i->getDivision()->getDivisionId()->value()) )
-                    { 
+                foreach ($result as $key => $r) {
+                    if (
+                        $r
+                            ->getDivision()
+                            ->getDivisionId()
+                            ->equal(
+                                $i
+                                    ->getDivision()
+                                    ->getDivisionId()
+                                    ->value()
+                            )
+                    ) {
                         $exist = true;
-                        $result[ $key ] = $r->addConsumptionItem($i);
+                        $result[$key] = $r->addConsumptionItem($i);
                     }
                 }
-                if($exist){ continue; }
+                if ($exist) {
+                    continue;
+                }
                 $id = ConsumptionId::generate();
                 $ids[] = $id->value();
                 //登録時には病院名は必要ないので、いったんhogeでいい
-                $result[] = new Consumption( 
-                    $id , 
-                    ( new ConsumptionDate($inputData->consumeDate) ), 
-                    [$i] , 
+                $result[] = new Consumption(
+                    $id,
+                    new ConsumptionDate($inputData->consumeDate),
+                    [$i],
                     new Hospital(
-                        $hospitalId, 
-                        ( new HospitalName('hoge') ) ,
-                        "",
-                        "",
-                        new Pref(""),
-                        ""
-                    ) , 
-                    $i->getDivision() , 
-                    ( new ConsumptionStatus(ConsumptionStatus::Consumption) ) 
+                        $hospitalId,
+                        new HospitalName('hoge'),
+                        '',
+                        '',
+                        new Pref(''),
+                        ''
+                    ),
+                    $i->getDivision(),
+                    new ConsumptionStatus(ConsumptionStatus::Consumption)
                 );
-
             }
 
-            $this->consumptionRepository->saveToArray($result);
+            $this->repositoryProvider
+                ->getConsumptionRepository()
+                ->saveToArray($result);
 
-            $cardIds = $this->cardRepository->get($hospitalId , $cardIds);
-            $this->cardRepository->reset($hospitalId, $cardIds);
+            $cardIds = $this->repositoryProvider
+                ->getCardRepository()
+                ->get($hospitalId, $cardIds);
+            $this->repositoryProvider
+                ->getCardRepository()
+                ->reset($hospitalId, $cardIds);
 
             $inventoryCalculations = [];
-            foreach($result as $r)
-            {
-                foreach($r->getConsumptionItems() as $item)
-                {
+            foreach ($result as $r) {
+                foreach ($r->getConsumptionItems() as $item) {
                     $inventoryCalculations[] = new InventoryCalculation(
                         $item->getHospitalId(),
                         $item->getDivision()->getDivisionId(),
@@ -133,25 +145,26 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
                         0,
                         1,
                         $item->getLot(),
-                        $item->getConsumptionQuantity() * -1,
+                        $item->getConsumptionQuantity() * -1
                     );
                 }
             }
 
+            $this->repositoryProvider
+                ->getInventoryCalculationRepository()
+                ->saveToArray($inventoryCalculations);
 
-            $this->inventoryCalculationRepository->saveToArray($inventoryCalculations);
-
-            $this->outputPort->output(new ConsumptionRegisterOutputData($ids));
+            $this->presenterProvider
+                ->getConsumptionRegisterPresenter()
+                ->output(new ConsumptionRegisterOutputData($ids));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Consumption {
-
     use Auth;
     use stdClass;
 
@@ -161,14 +174,23 @@ namespace JoyPla\Application\InputPorts\Api\Consumption {
      */
     class ConsumptionRegisterInputData
     {
-        /**
-         * ConsumptionRegisterInputData constructor.
-         */
-        public function __construct(Auth $user , string $consumeDate, array $consumptionItems , bool $isOnlyMyDivision)
-        {
+        public Auth $user;
+        public string $consumeDate;
+        public array $consumptionItems;
+        public bool $isOnlyMyDivision;
+
+        public function __construct(
+            Auth $user,
+            string $consumeDate,
+            array $consumptionItems,
+            bool $isOnlyMyDivision
+        ) {
             $this->user = $user;
-            $this->consumeDate= $consumeDate;
-            $this->consumptionItems = array_map(function($v) use ($isOnlyMyDivision , $user){
+            $this->consumeDate = $consumeDate;
+            $this->consumptionItems = array_map(function ($v) use (
+                $isOnlyMyDivision,
+                $user
+            ) {
                 $object = new stdClass();
                 $object->inHospitalItemId = $v['inHospitalItemId'];
                 $object->consumeLotDate = $v['consumeLotDate'];
@@ -178,7 +200,8 @@ namespace JoyPla\Application\InputPorts\Api\Consumption {
                 $object->divisionId = $v['divisionId'];
                 $object->cardId = $v['cardId'];
                 return $object;
-            },$consumptionItems);
+            },
+            $consumptionItems);
 
             $this->isOnlyMyDivision = $isOnlyMyDivision;
         }
@@ -187,7 +210,7 @@ namespace JoyPla\Application\InputPorts\Api\Consumption {
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Consumption\Api
-    */
+     */
     interface ConsumptionRegisterInputPortInterface
     {
         /**
@@ -201,18 +224,14 @@ namespace JoyPla\Application\InputPorts\Api\Consumption {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Consumption {
-
     /**
      * Class ConsumptionRegisterOutputData
      * @package JoyPla\Application\OutputPorts\Consumption\Api;
      */
     class ConsumptionRegisterOutputData
     {
-        /** @var string */
+        public array $ids;
 
-        /**
-         * ConsumptionRegisterOutputData constructor.
-         */
         public function __construct(array $ids)
         {
             $this->ids = $ids;
@@ -222,7 +241,7 @@ namespace JoyPla\Application\OutputPorts\Api\Consumption {
     /**
      * Interface ConsumptionRegisterOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Consumption\Api;
-    */
+     */
     interface ConsumptionRegisterOutputPortInterface
     {
         /**
@@ -230,4 +249,4 @@ namespace JoyPla\Application\OutputPorts\Api\Consumption {
          */
         function output(ConsumptionRegisterOutputData $outputData);
     }
-} 
+}

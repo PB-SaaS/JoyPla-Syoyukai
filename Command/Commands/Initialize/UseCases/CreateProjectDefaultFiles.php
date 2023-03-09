@@ -9,7 +9,7 @@ class CreateProjectDefaultFiles {
 
     public static function execute($inputdata)
     {
-        $dir = ['Application' , 'Enterprise' , 'InterfaceAdapters'];
+        $dir = ['Application' , 'Enterprise' , 'InterfaceAdapters' ,'Exceptions' ];
         $projectName = $inputdata->projectName;
         $text = View::forge('Command/Samples/makeAutoload',compact('projectName','dir'));
         file_put_contents("src/{$projectName}/makeAutoload.php", $text);

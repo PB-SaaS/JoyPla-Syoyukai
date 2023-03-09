@@ -45,11 +45,13 @@
                   <v-button-default type="button" class="w-full" @click.native="openPrint( consumption.consumptionId )">
                     消費伝票を印刷
                   </v-button-default>
-                  <?php if( gate('cancellation_of_consumption_slips')->can() ): ?>
+                  <?php if (
+                      gate('cancellation_of_consumption_slips')->can()
+                  ): ?>
                   <v-button-danger type="button" class="w-full" @click.native="deleteSlip( consumption.consumptionId )">
                     消費伝票を削除
                   </v-button-danger>
-                  <?php endif ?>
+                  <?php endif; ?>
                 </div>
               </div>
               <div class="lg:w-4/5 p-2">
@@ -143,14 +145,16 @@
                 title="JANコード"
                 ></v-input>
             </div>
-            <?php if( ! gate('list_of_consumption_slips')->isOnlyMyDivision() ): ?>
+            <?php if (
+                !gate('list_of_consumption_slips')->isOnlyMyDivision()
+            ): ?>
             <div class="my-4">
               <v-multiple-select-division
                 name="divisionIds"
                 title="部署名"
                 ></v-multiple-select-division>
             </div>
-            <?php endif ?>
+            <?php endif; ?>
             <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
               <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
               <v-button-primary type="button" @click.native="searchExec">絞り込み</v-button-primary>
@@ -213,7 +217,7 @@ var JoyPlaApp = Vue.createApp({
           return decodeURIComponent(results[2].replace(/\+/g, " "));
       }
 
-      const pagetitle = "consumptionShow";
+      const pagetitle = "ConsumptionIndex";
 
       const getParam = (name) => {
           let url = window.location.href;
@@ -310,7 +314,7 @@ var JoyPlaApp = Vue.createApp({
       
       const listGet = () => {
         let params = new URLSearchParams();
-        params.append("path", "/api/consumption/show");
+        params.append("path", "/api/consumption/index");
         params.append("search", JSON.stringify(encodeURIToObject(values)));
         params.append("_csrf", _CSRF);
 

@@ -5,7 +5,6 @@
  */
 
 namespace JoyPla\Application\Interactors\Api\ItemRequest {
-
     use ApiErrorCode\AccessFrequencyLimitExceededScopeIs;
     use App\SpiralDb\StockView;
     use Exception;
@@ -20,34 +19,25 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
     use JoyPla\Enterprise\Models\RequestItemCount;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRequestRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\RequestItemCountRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class RequestItemDeleteInteractor
      * @package JoyPla\Application\Interactors\Api\ItemRequest
      */
-    class RequestItemDeleteInteractor implements RequestItemDeleteInputPortInterface
+    class RequestItemDeleteInteractor implements
+        RequestItemDeleteInputPortInterface
     {
-        /** @var RequestItemDeleteOutputPortInterface */
-        private RequestItemDeleteOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var ItemRequestRepositoryInterface */
-        private ItemRequestRepositoryInterface $repository;
-
-        /** @var RequestItemCountRepositoryInterface */
-        private RequestItemCountRepositoryInterface $requestItemCountRepository;
-
-        /**
-         * RequestItemDeleteInteractor constructor.
-         * @param RequestItemDeleteOutputPortInterface $outputPort
-         */
         public function __construct(
-            RequestItemDeleteOutputPortInterface $outputPort,
-            ItemRequestRepositoryInterface $repository,
-            RequestItemCountRepositoryInterface $requestItemCountRepository
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
         ) {
-            $this->outputPort = $outputPort;
-            $this->repository = $repository;
-            $this->requestItemCountRepository = $requestItemCountRepository;
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -62,66 +52,97 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
             $itemRequest = $this->repository->show($hospitalId, $requestHId);
 
             if ($itemRequest === null) {
-                throw new Exception("Invalid value.", 422);
+                throw new Exception('Invalid value.', 422);
             }
 
-            if ($inputData->isOnlyMyDivision && !$itemRequest->getSourceDivision()->getDivisionId()->equal($inputData->user->divisionId)) {
-                throw new NotFoundException("Not Found.", 404);
+            if (
+                $inputData->isOnlyMyDivision &&
+                !$itemRequest
+                    ->getSourceDivision()
+                    ->getDivisionId()
+                    ->equal($inputData->user->divisionId)
+            ) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
             if (!$itemRequest->existRequestItem($requestId)) {
-                throw new Exception("Invalid value.", 422);
+                throw new Exception('Invalid value.', 422);
             }
 
-            $stockViewInstance = StockView::where('hospitalId', $hospitalId->value());
-            $stockViewInstance->Where('divisionId', $itemRequest->getTargetDivision()->getDivisionId()->value());
+            $stockViewInstance = StockView::where(
+                'hospitalId',
+                $hospitalId->value()
+            );
+            $stockViewInstance->Where(
+                'divisionId',
+                $itemRequest
+                    ->getTargetDivision()
+                    ->getDivisionId()
+                    ->value()
+            );
             foreach ($itemRequest->getRequestItems() as $requestItem) {
                 if ($requestItem->getRequestId()->equal($requestId->value())) {
-                    $stockViewInstance->Where('inHospitalItemId', $requestItem->getInHospitalItemId()->value());
+                    $stockViewInstance->Where(
+                        'inHospitalItemId',
+                        $requestItem->getInHospitalItemId()->value()
+                    );
                 }
             }
 
             $stocks = $stockViewInstance->get();
-            if ((int)$stocks->count === 0) {
+            if ((int) $stocks->count === 0) {
                 throw new Exception("Stocks don't exist.", 998);
             }
 
             $stock = $stocks->data->get(0);
             $requestItemCounts = [];
             foreach ($itemRequest->getRequestItems() as $item) {
-                if (($itemRequest->getTargetDivision()->getDivisionId()->value() === $stock->divisionId) &&
-                    ($item->getInHospitalItemId()->value() === $stock->inHospitalItemId)
+                if (
+                    $itemRequest
+                        ->getTargetDivision()
+                        ->getDivisionId()
+                        ->value() === $stock->divisionId &&
+                    $item->getInHospitalItemId()->value() ===
+                        $stock->inHospitalItemId
                 ) {
                     $requestItemCounts[] = new RequestItemCount(
                         $stock->recordId,
                         $hospitalId,
                         $item->getInHospitalItemId(),
                         $item->getItem()->getItemId(),
-                        ((int)$item->getRequestQuantity()->value()) * -1,
+                        ((int) $item->getRequestQuantity()->value()) * -1,
                         $itemRequest->getSourceDivision()->getDivisionId(),
                         $itemRequest->getTargetDivision()->getDivisionId()
                     );
                 }
             }
 
-            $this->requestItemCountRepository->saveToArray($requestItemCounts);
+            $this->repositoryProvider
+                ->getRequestItemCountRepository()
+                ->saveToArray($requestItemCounts);
 
             $itemRequest = $itemRequest->deleteItem($requestId);
 
-            $isItemRequestDeleted = $this->repository->deleteItem($hospitalId, $requestId, $itemRequest);
+            $isItemRequestDeleted = $this->repository->deleteItem(
+                $hospitalId,
+                $requestId,
+                $itemRequest
+            );
 
-            $this->outputPort->output(new RequestItemDeleteOutputData($isItemRequestDeleted));
+            $this->presenterProvider
+                ->getRequestItemDeletePresenter()
+                ->output(
+                    new RequestItemDeleteOutputData($isItemRequestDeleted)
+                );
         }
     }
 }
-
 
 /***
  * INPUT
  */
 
 namespace JoyPla\Application\InputPorts\Api\ItemRequest {
-
     use Auth;
 
     /**
@@ -130,11 +151,17 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
      */
     class RequestItemDeleteInputData
     {
-        /**
-         * RequestItemDeleteInputData constructor.
-         */
-        public function __construct(Auth $user, string $requestHId, string $requestId, bool $isOnlyMyDivision)
-        {
+        public Auth $user;
+        public string $requestHId;
+        public string $requestId;
+        public bool $isOnlyMyDivision;
+
+        public function __construct(
+            Auth $user,
+            string $requestHId,
+            string $requestId,
+            bool $isOnlyMyDivision
+        ) {
             $this->user = $user;
             $this->requestHId = $requestHId;
             $this->requestId = $requestId;
@@ -160,19 +187,13 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
  */
 
 namespace JoyPla\Application\OutputPorts\Api\ItemRequest {
-
     /**
      * Class RequestItemDeleteOutputData
      * @package JoyPla\Application\OutputPorts\Api\ItemRequest;
      */
     class RequestItemDeleteOutputData
     {
-        /** @var bool */
-
-        /**
-         * RequestItemDeleteOutputData constructor.
-         */
-
+        public array $data;
         public function __construct(bool $isItemRequestDeleted)
         {
             $this->data = [

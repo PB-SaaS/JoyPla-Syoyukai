@@ -35,6 +35,8 @@ namespace JoyPla\Application\Interactors\Api\Received {
     use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ReceivedRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\stockRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ReceivedRegisterInteractor
@@ -43,31 +45,16 @@ namespace JoyPla\Application\Interactors\Api\Received {
     class ReceivedRegisterInteractor implements
         ReceivedRegisterInputPortInterface
     {
-        /** @var ReceivedRegisterOutputPortInterface */
-        private ReceivedRegisterOutputPortInterface $outputPort;
 
-        /** @var OrderRepositoryInterface */
-        private OrderRepositoryInterface $orderRepository;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var ReceivedRepositoryInterface */
-        private ReceivedRepositoryInterface $receivedRepository;
-
-        /**
-         * ReceivedRegisterInteractor constructor.
-         * @param ReceivedRegisterOutputPortInterface $outputPort
-         */
         public function __construct(
-            ReceivedRegisterOutputPortInterface $outputPort,
-            OrderRepositoryInterface $orderRepository,
-            ReceivedRepositoryInterface $receivedRepository,
-            DivisionRepositoryInterface $divisionRepository,
-            InventoryCalculationRepositoryInterface $inventoryCalculationRepository
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
         ) {
-            $this->outputPort = $outputPort;
-            $this->orderRepository = $orderRepository;
-            $this->receivedRepository = $receivedRepository;
-            $this->divisionRepository = $divisionRepository;
-            $this->inventoryCalculationRepository = $inventoryCalculationRepository;
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -76,10 +63,13 @@ namespace JoyPla\Application\Interactors\Api\Received {
         public function handle(ReceivedRegisterInputData $inputData)
         {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
-            $orders = $this->orderRepository->getOrderByOrderItemId(
-                $hospitalId,
-                array_column($inputData->receivedItems, 'orderItemId')
-            );
+
+            $orders = $this->repositoryProvider
+                ->getOrderRepository()
+                ->getOrderByOrderItemId(
+                    $hospitalId,
+                    array_column($inputData->receivedItems, 'orderItemId')
+                );
 
             if ($inputData->isOnlyMyDivision) {
                 foreach ($orders as $order) {
@@ -220,17 +210,20 @@ namespace JoyPla\Application\Interactors\Api\Received {
                 $receiveds[] = $received->setReceivedItems($receivedItems);
             }
 
-            $this->orderRepository->saveToArray($hospitalId, $orders, [
-                'isReceived' => true,
-            ]);
-            $this->receivedRepository->saveToArray($hospitalId, $receiveds);
-            $this->outputPort->output(
-                new ReceivedRegisterOutputData($receiveds)
-            );
-
-            $this->inventoryCalculationRepository->saveToArray(
-                $inventoryCalculations
-            );
+            $this->repositoryProvider
+                ->getOrderRepository()
+                ->saveToArray($hospitalId, $orders, [
+                    'isReceived' => true,
+                ]);
+            $this->repositoryProvider
+                ->getReceivedRepository()
+                ->saveToArray($hospitalId, $receiveds);
+            $this->repositoryProvider
+                ->getInventoryCalculationRepository()
+                ->saveToArray($inventoryCalculations);
+            $this->presenterProvider
+                ->getReceivedRegisterPresenter()
+                ->output(new ReceivedRegisterOutputData($receiveds));
         }
     }
 }
@@ -248,9 +241,6 @@ namespace JoyPla\Application\InputPorts\Api\Received {
      */
     class ReceivedRegisterInputData
     {
-        /**
-         * ReceivedRegisterInputData constructor.
-         */
         public function __construct(
             Auth $user,
             array $receivedItems,
@@ -299,11 +289,8 @@ namespace JoyPla\Application\OutputPorts\Api\Received {
      */
     class ReceivedRegisterOutputData
     {
-        /** @var string */
+        public array $receiveds;
 
-        /**
-         * ReceivedRegisterOutputData constructor.
-         */
         public function __construct(array $receiveds)
         {
             $this->receiveds = $receiveds;

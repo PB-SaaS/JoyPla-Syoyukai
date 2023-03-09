@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Order {
-
     use ApiErrorCode\AccessFrequencyLimitExceededScopeIs;
     use App\Model\Division;
     use Exception;
@@ -22,27 +21,25 @@ namespace JoyPla\Application\Interactors\Api\Order {
     use JoyPla\Enterprise\Models\OrderStatus;
     use JoyPla\Enterprise\Models\TextArea512Bytes;
     use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class OrderUnapprovedUpdateInteractor
      * @package JoyPla\Application\Interactors\Api\Order
      */
-    class OrderUnapprovedUpdateInteractor implements OrderUnapprovedUpdateInputPortInterface
+    class OrderUnapprovedUpdateInteractor implements
+        OrderUnapprovedUpdateInputPortInterface
     {
-        /** @var OrderUnapprovedUpdateOutputPortInterface */
-        private OrderUnapprovedUpdateOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var OrderRepositoryInterface */
-        private OrderRepositoryInterface $orderRepository;
-
-        /**
-         * OrderUnapprovedUpdateInteractor constructor.
-         * @param OrderUnapprovedUpdateOutputPortInterface $outputPort
-         */
-        public function __construct(OrderUnapprovedUpdateOutputPortInterface $outputPort , OrderRepositoryInterface $orderRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->orderRepository = $orderRepository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -52,49 +49,63 @@ namespace JoyPla\Application\Interactors\Api\Order {
         {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
             $orderId = new OrderId($inputData->orderId);
-            $order = $this->orderRepository->index(
-                $hospitalId,
-                $orderId,
-                [
-                    OrderStatus::UnOrdered,
-                ]
-            );
-            
-            if( $order === null ){
-                throw new NotFoundException("Not Found.",404);
+            $order = $this->repositoryProvider
+                ->getOrderRepository()
+                ->index($hospitalId, $orderId, [OrderStatus::UnOrdered]);
+
+            if ($order === null) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
-            if($inputData->isOnlyMyDivision && ! $order->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
-            {
-                throw new NotFoundException("Not Found.",404);
+            if (
+                $inputData->isOnlyMyDivision &&
+                !$order
+                    ->getDivision()
+                    ->getDivisionId()
+                    ->equal($inputData->user->divisionId)
+            ) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
             $orderItems = $order->getOrderItems();
-            foreach($orderItems as $key => $item){
-                $fkey = array_search( $item->getOrderItemId()->value() , array_column($inputData->updateModel, 'orderItemId'));
-                if($fkey === null ){ continue; }
-                $orderQuantity = $inputData->updateModel[$fkey]['orderQuantity'];
-                $orderItems[$key] = $item->setOrderQuantity((new OrderQuantity($orderQuantity)));
+            foreach ($orderItems as $key => $item) {
+                $fkey = array_search(
+                    $item->getOrderItemId()->value(),
+                    array_column($inputData->updateModel, 'orderItemId')
+                );
+                if ($fkey === null) {
+                    continue;
+                }
+                $orderQuantity =
+                    $inputData->updateModel[$fkey]['orderQuantity'];
+                $orderItems[$key] = $item->setOrderQuantity(
+                    new OrderQuantity($orderQuantity)
+                );
             }
 
             $order = $order->setOrderItems($orderItems);
-            $order = $order->setOrderComment(new TextArea512Bytes($inputData->comment));
-            $order = $order->setAdjustment( (new OrderAdjustment($inputData->adjustment)) );
+            $order = $order->setOrderComment(
+                new TextArea512Bytes($inputData->comment)
+            );
+            $order = $order->setAdjustment(
+                new OrderAdjustment($inputData->adjustment)
+            );
 
-            $this->orderRepository->saveToArray($hospitalId , [$order]);
-            
-            $this->outputPort->output(new OrderUnapprovedUpdateOutputData($order));
+            $this->repositoryProvider
+                ->getOrderRepository()
+                ->saveToArray($hospitalId, [$order]);
+
+            $this->presenterProvider
+                ->getOrderUnapprovedUpdatePresenter()
+                ->output(new OrderUnapprovedUpdateOutputData($order));
         }
     }
 }
-
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Order {
-
     use Auth;
     use stdClass;
 
@@ -104,22 +115,28 @@ namespace JoyPla\Application\InputPorts\Api\Order {
      */
     class OrderUnapprovedUpdateInputData
     {
-        /**
-         * OrderUnapprovedUpdateInputData constructor.
-         */
-        public function __construct(Auth $user , array $order , bool $isOnlyMyDivision)
-        {
+        public Auth $user;
+        public string $orderId;
+        public string $adjustment;
+        public string $comment;
+        public array $updateModel;
+        public bool $isOnlyMyDivision;
+
+        public function __construct(
+            Auth $user,
+            array $order,
+            bool $isOnlyMyDivision
+        ) {
             $this->user = $user;
             $this->orderId = $order['orderId'];
             $this->adjustment = $order['adjustment'];
             $this->comment = $order['comment'];
-            $this->updateModel = array_map(function(array $model)
-            {
+            $this->updateModel = array_map(function (array $model) {
                 return [
                     'orderItemId' => $model['orderItemId'],
                     'orderQuantity' => $model['orderQuantity'],
                 ];
-            },$order['updateModel']);
+            }, $order['updateModel']);
 
             $this->isOnlyMyDivision = $isOnlyMyDivision;
         }
@@ -128,7 +145,7 @@ namespace JoyPla\Application\InputPorts\Api\Order {
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Order
-    */
+     */
     interface OrderUnapprovedUpdateInputPortInterface
     {
         /**
@@ -142,7 +159,6 @@ namespace JoyPla\Application\InputPorts\Api\Order {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Order {
-
     use JoyPla\Enterprise\Models\Order;
 
     /**
@@ -151,12 +167,9 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
      */
     class OrderUnapprovedUpdateOutputData
     {
-        /** @var string */
+        public array $data;
+        public int $count;
 
-        /**
-         * OrderUnapprovedUpdateOutputData constructor.
-         */
-        
         public function __construct(Order $order)
         {
             $this->data = $order->toArray();
@@ -167,7 +180,7 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
     /**
      * Interface OrderUnapprovedUpdateOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\Order;
-    */
+     */
     interface OrderUnapprovedUpdateOutputPortInterface
     {
         /**
@@ -175,4 +188,4 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
          */
         function output(OrderUnapprovedUpdateOutputData $outputData);
     }
-} 
+}

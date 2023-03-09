@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Received {
-
     use App\Model\Division;
     use Exception;
     use framework\Exception\NotFoundException;
@@ -40,40 +39,25 @@ namespace JoyPla\Application\Interactors\Api\Received {
     use JoyPla\InterfaceAdapters\GateWays\Repository\ReceivedRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ReturnRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\stockRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ReceivedReturnRegisterInteractor
      * @package JoyPla\Application\Interactors\Api\Received
      */
-    class ReceivedReturnRegisterInteractor implements ReceivedReturnRegisterInputPortInterface
+    class ReceivedReturnRegisterInteractor implements
+        ReceivedReturnRegisterInputPortInterface
     {
-        /** @var ReceivedReturnRegisterOutputPortInterface */
-        private ReceivedReturnRegisterOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var OrderRepositoryInterface */
-        private OrderRepositoryInterface $orderRepository;
-        
-        /** @var ReceivedRepositoryInterface */
-        private ReceivedRepositoryInterface $receivedRepository;
-
-        /**
-         * ReceivedReturnRegisterInteractor constructor.
-         * @param ReceivedReturnRegisterOutputPortInterface $outputPort
-         */
         public function __construct(
-            ReceivedReturnRegisterOutputPortInterface $outputPort ,
-            ReceivedRepositoryInterface $receivedRepository , 
-            ReturnRepositoryInterface $returnRepository,
-            HospitalRepositoryInterface $hospitalRepository,
-            DivisionRepositoryInterface $divisionRepository,
-            InventoryCalculationRepositoryInterface $inventoryCalculationRepository)
-        { 
-            $this->outputPort = $outputPort;
-            $this->receivedRepository = $receivedRepository;
-            $this->returnRepository = $returnRepository;
-            $this->hospitalRepository = $hospitalRepository;
-            $this->divisionRepository = $divisionRepository;
-            $this->inventoryCalculationRepository = $inventoryCalculationRepository;
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -83,37 +67,44 @@ namespace JoyPla\Application\Interactors\Api\Received {
         {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
 
-            $received = $this->receivedRepository->index($hospitalId , new ReceivedId($inputData->receivedId) );
+            $received = $this->repositoryProvider
+                ->getReceivedRepository()
+                ->index($hospitalId, new ReceivedId($inputData->receivedId));
 
-            if( $received === null ){
-                throw new NotFoundException("Not Found.",404);
+            if ($received === null) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
-            if($inputData->isOnlyMyDivision && ! $received->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
-            {
-                throw new NotFoundException("Not Found.",404);
+            if (
+                $inputData->isOnlyMyDivision &&
+                !$received
+                    ->getDivision()
+                    ->getDivisionId()
+                    ->equal($inputData->user->divisionId)
+            ) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
-            $hospital = $this->hospitalRepository->find($hospitalId); 
+            $hospital = $this->repositoryProvider
+                ->getHospitalRepository()
+                ->find($hospitalId);
 
             $storehouse = $received->getDivision();
 
-            if($hospital->receivingTarget === "1")
-            {
-                $storehouse = $this->divisionRepository->getStorehouse($hospitalId);
+            if ($hospital->receivingTarget === '1') {
+                $storehouse = $this->repositoryProvider
+                    ->getDivisionRepository()
+                    ->getStorehouse($hospitalId);
             }
             $returnItemExist = false;
-            foreach($inputData->returnItems as $returnItem)
-            {
-                if($returnItem->returnQuantity != 0)
-                {
+            foreach ($inputData->returnItems as $returnItem) {
+                if ($returnItem->returnQuantity != 0) {
                     $returnItemExist = true;
                 }
             }
 
-            if( ! $returnItemExist )
-            {
-                throw new NotFoundException("not return Items",403);
+            if (!$returnItemExist) {
+                throw new NotFoundException('not return Items', 403);
             }
 
             $items = $received->getReceivedItems();
@@ -121,30 +112,33 @@ namespace JoyPla\Application\Interactors\Api\Received {
             $return = new ReturnData(
                 $received->getOrderId(),
                 $received->getReceivedId(),
-                (ReturnId::generate()),
-                (new DateYearMonthDayHourMinutesSecond('now')),
+                ReturnId::generate(),
+                new DateYearMonthDayHourMinutesSecond('now'),
                 [],
                 $received->getHospital(),
                 $received->getDivision(),
-                $received->getDistributor(),
+                $received->getDistributor()
             );
             $returnItems = [];
             $inventoryCalculations = [];
-            foreach($items as $key => $item){
-                foreach($inputData->returnItems as $returnItem)
-                {
-                    if($returnItem->returnQuantity === 0)
-                    {
+            foreach ($items as $key => $item) {
+                foreach ($inputData->returnItems as $returnItem) {
+                    if ($returnItem->returnQuantity === 0) {
                         continue;
                     }
-                    if($item->getReceivedItemId()->equal($returnItem->receivedItemId))
-                    {
-                        $items[$key] = $item->addReturnQuantity( new ReturnQuantity($returnItem->returnQuantity) );
+                    if (
+                        $item
+                            ->getReceivedItemId()
+                            ->equal($returnItem->receivedItemId)
+                    ) {
+                        $items[$key] = $item->addReturnQuantity(
+                            new ReturnQuantity($returnItem->returnQuantity)
+                        );
                         $returnItem = new ReturnItem(
                             $return->getReturnId(),
                             $item->getOrderItemId(),
                             $item->getReceivedItemId(),
-                            (ReturnItemId::generate()),
+                            ReturnItemId::generate(),
                             $item->getInHospitalItemId(),
                             $item->getItem(),
                             $hospitalId,
@@ -152,9 +146,9 @@ namespace JoyPla\Application\Interactors\Api\Received {
                             $item->getDistributor(),
                             $item->getQuantity(),
                             $item->getPrice(),
-                            (new ReturnQuantity($returnItem->returnQuantity)),
+                            new ReturnQuantity($returnItem->returnQuantity),
                             $item->getLot(),
-                            $item->getItemImage(),
+                            $item->getItemImage()
                         );
 
                         $inventoryCalculations[] = new InventoryCalculation(
@@ -164,7 +158,9 @@ namespace JoyPla\Application\Interactors\Api\Received {
                             0,
                             6,
                             $returnItem->getLot(),
-                            $returnItem->getReturnQuantity()->value() * $returnItem->getQuantity()->getQuantityNum() * -1,
+                            $returnItem->getReturnQuantity()->value() *
+                                $returnItem->getQuantity()->getQuantityNum() *
+                                -1
                         );
 
                         $returnItems[] = $returnItem;
@@ -175,21 +171,28 @@ namespace JoyPla\Application\Interactors\Api\Received {
             $received = $received->setReceivedItems($items);
             $return = $return->setReturnItems($returnItems);
 
-            $this->returnRepository->saveToArray($hospitalId , [ $return ] );
-            $receiveds = $this->receivedRepository->saveToArray($hospitalId , [ $received ] );
+            $this->repositoryProvider
+                ->getReturnRepository()
+                ->saveToArray($hospitalId, [$return]);
+            $receiveds = $this->repositoryProvider
+                ->getReceivedRepository()
+                ->saveToArray($hospitalId, [$received]);
 
-            $this->inventoryCalculationRepository->saveToArray($inventoryCalculations);
-            $this->outputPort->output(new ReceivedReturnRegisterOutputData($receiveds));
+            $this->repositoryProvider
+                ->getInventoryCalculationRepository()
+                ->saveToArray($inventoryCalculations);
+
+            $this->presenterProvider
+                ->getReceivedReturnRegisterPresenter()
+                ->output(new ReceivedReturnRegisterOutputData($receiveds));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Received {
-
     use Auth;
     use stdClass;
 
@@ -199,28 +202,34 @@ namespace JoyPla\Application\InputPorts\Api\Received {
      */
     class ReceivedReturnRegisterInputData
     {
-        /**
-         * ReceivedReturnRegisterInputData constructor.
-         */
-        public function __construct(Auth $user ,string $receivedId , array $returnItems , bool $isOnlyMyDivision )
-        {
+        public Auth $user;
+        public string $receivedId;
+        public array $returnItems;
+        public bool $isOnlyMyDivision;
+
+        public function __construct(
+            Auth $user,
+            string $receivedId,
+            array $returnItems,
+            bool $isOnlyMyDivision
+        ) {
             $this->user = $user;
             $this->receivedId = $receivedId;
-            $this->returnItems = array_map(function($item){
+            $this->returnItems = array_map(function ($item) {
                 $x = new stdClass();
                 $x->receivedItemId = $item['receivedItemId'];
                 $x->returnQuantity = $item['returnQuantity'];
                 return $x;
-            },$returnItems);
+            }, $returnItems);
 
-            $this->isOnlyMyDivision = $isOnlyMyDivision ;
+            $this->isOnlyMyDivision = $isOnlyMyDivision;
         }
     }
 
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Received
-    */
+     */
     interface ReceivedReturnRegisterInputPortInterface
     {
         /**
@@ -234,7 +243,6 @@ namespace JoyPla\Application\InputPorts\Api\Received {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Received {
-
     use JoyPla\Enterprise\Models\Received;
     use JoyPla\Enterprise\Models\Stock;
 
@@ -244,23 +252,20 @@ namespace JoyPla\Application\OutputPorts\Api\Received {
      */
     class ReceivedReturnRegisterOutputData
     {
-        /** @var string */
+        public array $returns;
 
-        /**
-         * ReceivedReturnRegisterOutputData constructor.
-         */
         public function __construct(array $returns)
         {
-            $this->returns = array_map(function($return){
+            $this->returns = array_map(function ($return) {
                 return $return->toArray();
-            },$returns);
+            }, $returns);
         }
     }
 
     /**
      * Interface ReceivedReturnRegisterOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\Received;
-    */
+     */
     interface ReceivedReturnRegisterOutputPortInterface
     {
         /**
@@ -268,4 +273,4 @@ namespace JoyPla\Application\OutputPorts\Api\Received {
          */
         function output(ReceivedReturnRegisterOutputData $outputData);
     }
-} 
+}

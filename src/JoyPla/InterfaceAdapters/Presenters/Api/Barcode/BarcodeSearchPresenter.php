@@ -1,7 +1,6 @@
 <?php
 
 namespace JoyPla\InterfaceAdapters\Presenters\Api\Barcode {
-
     use ApiResponse;
     use framework\Http\View;
     use JoyPla\Application\OutputPorts\Api\Barcode\BarcodeSearchOutputData;
@@ -12,20 +11,27 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\Barcode {
         public function output(BarcodeSearchOutputData $outputData)
         {
             $viewModel = new BarcodeSearchViewModel($outputData);
-            echo (new ApiResponse( $viewModel->data, $viewModel->count , $viewModel->code, $viewModel->message , ['BarcodeSearchPresenter']))->toJson();
+            echo (new ApiResponse(
+                $viewModel->data,
+                $viewModel->count,
+                $viewModel->code,
+                $viewModel->message,
+                ['BarcodeSearchPresenter']
+            ))->toJson();
         }
     }
-    
+
     /**
      * Class Distributor
      * @package JoyPla\InterfaceAdapters\Presenters\Hospital\Api
      */
     class BarcodeSearchViewModel
     {
-        /**
-         * Distributor constructor.
-         * @param BarcodeSearchOutputData $source
-         */
+        public array $data = [];
+        public int $count = 0;
+        public int $code = 0;
+        public string $message = '';
+
         public function __construct(BarcodeSearchOutputData $source)
         {
             $this->data = [
@@ -33,8 +39,8 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\Barcode {
                 'type' => $source->type,
             ];
             $this->count = $source->count;
-            $this->code = 200; 
-            $this->message = "success";
+            $this->code = 200;
+            $this->message = 'success';
         }
     }
 }

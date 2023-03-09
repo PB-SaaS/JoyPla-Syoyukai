@@ -13,7 +13,6 @@ $commander = Commander::init();
 $commander->add(new ApplicationInitalize(new CreateProjectInteractor()));
 $commander->add(new ApplicationDeploy());
 
-
 $kernel = new Kernel($commander);
 $commandArgv = new CommandArgv($argv);
 $kernel->handle($commandArgv);

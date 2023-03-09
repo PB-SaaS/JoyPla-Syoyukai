@@ -1,7 +1,6 @@
 <?php
 
 namespace JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest {
-
     use ApiResponse;
     use framework\Http\View;
     use JoyPla\Application\OutputPorts\Api\ItemRequest\TotalizationOutputData;
@@ -12,7 +11,13 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest {
         public function output(TotalizationOutputData $outputData)
         {
             $viewModel = new TotalizationViewModel($outputData);
-            echo (new ApiResponse($viewModel->data, $viewModel->count, $viewModel->code, $viewModel->message, ['TotalizationPresenter']))->toJson();
+            echo (new ApiResponse(
+                $viewModel->data,
+                $viewModel->count,
+                $viewModel->code,
+                $viewModel->message,
+                ['TotalizationPresenter']
+            ))->toJson();
         }
     }
 
@@ -22,16 +27,17 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest {
      */
     class TotalizationViewModel
     {
-        /**
-         * TotalizationViewModel constructor.
-         * @param TotalizationOutputData $source
-         */
+        public array $data = [];
+        public int $count = 0;
+        public int $code = 0;
+        public string $message = '';
+
         public function __construct(TotalizationOutputData $source)
         {
             $this->data = $source->totalRequestItems;
             $this->count = $source->count;
             $this->code = 200;
-            $this->message = "success";
+            $this->message = 'success';
         }
     }
 }

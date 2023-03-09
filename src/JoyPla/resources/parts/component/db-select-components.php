@@ -45,7 +45,7 @@ methods: {
 load() {
 let self = this;
 let params = new URLSearchParams();
-params.append("path", "/api/division/show");
+params.append("path", "/api/division/index");
 params.append("isOnlyMyDivision", this.isOnlyMyDivision);
 params.append("_csrf", _CSRF);
 axios
@@ -87,7 +87,7 @@ const options = ref([]);
 const load = () => {
 let self = this;
 let params = new URLSearchParams();
-params.append("path", "/api/division/show");
+params.append("path", "/api/division/index");
 params.append("_csrf", _CSRF);
 axios
 .post(_APIURL, params)
@@ -311,7 +311,7 @@ const searchCount = ref(0);
 
 const listGet = () => {
 let params = new URLSearchParams();
-params.append("path", "/api/inHospitalItem/show");
+params.append("path", "/api/inHospitalItem/index");
 params.append("search", JSON.stringify(encodeURIToObject(values)));
 params.append("_csrf", _CSRF);
 
@@ -1999,7 +1999,7 @@ const options = ref([]);
 const load = () => {
 let self = this;
 let params = new URLSearchParams();
-params.append("path", "/api/division/show");
+params.append("path", "/api/division/index");
 params.append("isOnlyMyDivision", props.isOnlyMyDivision);
 params.append("_csrf", _CSRF);
 axios

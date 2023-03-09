@@ -4,13 +4,15 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Price {
-
     use JoyPla\Application\InputPorts\Api\Price\PriceRegisterInputData;
     use JoyPla\Application\InputPorts\Api\Price\PriceRegisterInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\Price\PriceRegisterOutputData;
     use JoyPla\Application\OutputPorts\Api\Price\PriceRegisterOutputPortInterface;
     use JoyPla\Enterprise\Models\HospitalId;
+    use JoyPla\Enterprise\Models\ItemId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\PriceRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class PriceRegisterInteractor
@@ -18,20 +20,15 @@ namespace JoyPla\Application\Interactors\Api\Price {
      */
     class PriceRegisterInteractor implements PriceRegisterInputPortInterface
     {
-        /** @var PriceRegisterOutputPortInterface */
-        private PriceRegisterOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var PriceRepositoryInterface */
-        private PriceRepositoryInterface $PriceRepository;
-
-        /**
-         * PriceRegisterInteractor constructor.
-         * @param PriceRegisterOutputPortInterface $outputPort
-         */
-        public function __construct(PriceRegisterOutputPortInterface $outputPort , PriceRepositoryInterface $PriceRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->PriceRepository = $PriceRepository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -39,22 +36,24 @@ namespace JoyPla\Application\Interactors\Api\Price {
          */
         public function handle(PriceRegisterInputData $inputData)
         {
-            $Price = $this->PriceRepository->saveToArray(
-                (new HospitalId($inputData->hospitalId)) ,
-                (new ItemId($inputData->itemId)) ,
-                $inputData->input
-            );
-            $this->outputPort->output(new PriceRegisterOutputData($Price));
+            $Price = $this->repositoryProvider
+                ->getPriceRepository()
+                ->saveToArray(
+                    new HospitalId($inputData->hospitalId),
+                    new ItemId($inputData->itemId),
+                    $inputData->input
+                );
+            $this->presenterProvider
+                ->getPriceRegisterPresenter()
+                ->output(new PriceRegisterOutputData($Price));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Price {
-
     use stdClass;
 
     /**
@@ -63,9 +62,10 @@ namespace JoyPla\Application\InputPorts\Api\Price {
      */
     class PriceRegisterInputData
     {
-        /**
-         * PriceRegisterInputData constructor.
-         */
+        public string $hospitalId;
+        public string $itemId;
+        public stdClass $input;
+
         public function __construct(string $hospitalId, array $input)
         {
             $this->hospitalId = $hospitalId;
@@ -75,17 +75,17 @@ namespace JoyPla\Application\InputPorts\Api\Price {
             $this->input->distributorMCode = $input['distributorMCode'];
             $this->input->quantity = $input['quantity'];
             $this->input->quantityUnit = $input['quantityUnit'];
-            $this->input->itemUnit= $input['itemUnit'];
-            $this->input->price= $input['price'];
-            $this->input->unitPrice= $input['unitPrice'];
-            $this->input->notice= $input['notice'];
+            $this->input->itemUnit = $input['itemUnit'];
+            $this->input->price = $input['price'];
+            $this->input->unitPrice = $input['unitPrice'];
+            $this->input->notice = $input['notice'];
         }
     }
 
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Price
-    */
+     */
     interface PriceRegisterInputPortInterface
     {
         /**
@@ -99,7 +99,6 @@ namespace JoyPla\Application\InputPorts\Api\Price {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Price {
-
     use Collection;
     use JoyPla\Enterprise\Models\Price;
 
@@ -109,9 +108,8 @@ namespace JoyPla\Application\OutputPorts\Api\Price {
      */
     class PriceRegisterOutputData
     {
-        /**
-         * PriceRegisterOutputData constructor.
-         */
+        public array $Prices;
+
         public function __construct(array $result)
         {
             $this->Prices = $result;
@@ -121,7 +119,7 @@ namespace JoyPla\Application\OutputPorts\Api\Price {
     /**
      * Interface PriceRegisterOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\Price;
-    */
+     */
     interface PriceRegisterOutputPortInterface
     {
         /**

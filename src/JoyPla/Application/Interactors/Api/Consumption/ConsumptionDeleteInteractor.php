@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Consumption {
-
     use App\Model\Division;
     use Exception;
     use framework\Exception\NotFoundException;
@@ -24,52 +23,56 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
     use JoyPla\Enterprise\Models\Pref;
     use JoyPla\InterfaceAdapters\GateWays\Repository\consumptionRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ConsumptionDeleteInteractor
      * @package JoyPla\Application\Interactors\Consumption\Api
      */
-    class ConsumptionDeleteInteractor implements ConsumptionDeleteInputPortInterface
+    class ConsumptionDeleteInteractor implements
+        ConsumptionDeleteInputPortInterface
     {
-        /** @var ConsumptionDeleteOutputPortInterface */
-        private ConsumptionDeleteOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var ConsumptionRepositoryInterface */
-        private ConsumptionRepositoryInterface $consumptionRepository;
-
-        /**
-         * ConsumptionDeleteInteractor constructor.
-         * @param ConsumptionDeleteOutputPortInterface $outputPort
-         */
-        public function __construct(ConsumptionDeleteOutputPortInterface $outputPort , ConsumptionRepositoryInterface $consumptionRepository , InventoryCalculationRepositoryInterface $inventoryCalculationRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->consumptionRepository = $consumptionRepository;
-            $this->inventoryCalculationRepository = $inventoryCalculationRepository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
-
         /**
          * @param ConsumptionDeleteInputData $inputData
          */
         public function handle(ConsumptionDeleteInputData $inputData)
         {
-
             $hospitalId = new HospitalId($inputData->user->hospitalId);
 
-            $consumption = $this->consumptionRepository->index($hospitalId , new ConsumptionId($inputData->consumptionId));
+            $consumption = $this->repositoryProvider
+                ->getConsumptionRepository()
+                ->find(
+                    $hospitalId,
+                    new ConsumptionId($inputData->consumptionId)
+                );
 
-            if(empty($consumption)){
-                throw new NotFoundException('not found.',404);
+            if (empty($consumption)) {
+                throw new NotFoundException('not found.', 404);
             }
 
-            if($inputData->isOnlyMyDivision && ! $consumption->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
-            {
-                throw new Exception('Illegal request',403);
+            if (
+                $inputData->isOnlyMyDivision &&
+                !$consumption
+                    ->getDivision()
+                    ->getDivisionId()
+                    ->equal($inputData->user->divisionId)
+            ) {
+                throw new Exception('Illegal request', 403);
             }
 
             $inventoryCalculations = [];
-            foreach($consumption->getConsumptionItems() as $item)
-            {
+            foreach ($consumption->getConsumptionItems() as $item) {
                 $inventoryCalculations[] = new InventoryCalculation(
                     $item->getHospitalId(),
                     $item->getDivision()->getDivisionId(),
@@ -77,25 +80,29 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
                     0,
                     1,
                     $item->getLot(),
-                    $item->getConsumptionQuantity(), //消費の取り消しなので増やす
+                    $item->getConsumptionQuantity() //消費の取り消しなので増やす
                 );
             }
 
-            $this->consumptionRepository->delete($hospitalId , $consumption->getConsumptionId());
+            $this->repositoryProvider
+                ->getConsumptionRepository()
+                ->delete($hospitalId, $consumption->getConsumptionId());
 
-            $this->inventoryCalculationRepository->saveToArray($inventoryCalculations);
+            $this->repositoryProvider
+                ->getInventoryCalculationRepository()
+                ->saveToArray($inventoryCalculations);
 
-            $this->outputPort->output(new ConsumptionDeleteOutputData());
+            $this->presenterProvider
+                ->getConsumptionDeletePresenter()
+                ->output(new ConsumptionDeleteOutputData());
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Consumption {
-
     use Auth;
     use stdClass;
 
@@ -105,11 +112,15 @@ namespace JoyPla\Application\InputPorts\Api\Consumption {
      */
     class ConsumptionDeleteInputData
     {
-        /**
-         * ConsumptionDeleteInputData constructor.
-         */
-        public function __construct(Auth $user , string $consumptionId, bool $isOnlyMyDivision)
-        {
+        public Auth $user;
+        public string $consumptionId;
+        public bool $isOnlyMyDivision;
+
+        public function __construct(
+            Auth $user,
+            string $consumptionId,
+            bool $isOnlyMyDivision
+        ) {
             $this->user = $user;
             $this->consumptionId = $consumptionId;
             $this->isOnlyMyDivision = $isOnlyMyDivision;
@@ -119,7 +130,7 @@ namespace JoyPla\Application\InputPorts\Api\Consumption {
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Consumption\Api
-    */
+     */
     interface ConsumptionDeleteInputPortInterface
     {
         /**
@@ -133,7 +144,6 @@ namespace JoyPla\Application\InputPorts\Api\Consumption {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Consumption {
-
     /**
      * Class ConsumptionDeleteOutputData
      * @package JoyPla\Application\OutputPorts\Consumption\Api;
@@ -153,7 +163,7 @@ namespace JoyPla\Application\OutputPorts\Api\Consumption {
     /**
      * Interface ConsumptionDeleteOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Consumption\Api;
-    */
+     */
     interface ConsumptionDeleteOutputPortInterface
     {
         /**
@@ -161,4 +171,4 @@ namespace JoyPla\Application\OutputPorts\Api\Consumption {
          */
         function output(ConsumptionDeleteOutputData $outputData);
     }
-} 
+}
