@@ -76,7 +76,34 @@ namespace JoyPla\Application\Interactors\Web\Order {
                 throw new NotFoundException('Not Found.', 404);
             }
 
+            $inHospitalItemIds = [];
+            foreach ($order->getOrderItems() as $orderItem) {
+                $inHospitalItemIds[] = $orderItem->getInHospitalItemId();
+            }
+
+            $stocks = $this->repositoryProvider
+                ->getStockRepository()
+                ->getStockByDivisionIdAndInHospitalItemIds(
+                    $hospitalId,
+                    [$order->getDivision()->getDivisionId()],
+                    $inHospitalItemIds
+                );
+
             $order = $order->toArray();
+
+            foreach ($order['orderItems'] as &$orderItem) {
+                $inHospitalItemId = $orderItem['inHospitalItemId'];
+                $stock = array_find($stocks, function ($stock) use (
+                    $inHospitalItemId
+                ) {
+                    return $stock->getInHospitalItemId()->value() ===
+                        $inHospitalItemId;
+                });
+
+                $orderItem['stockCount'] = $stock
+                    ? $stock->getInventoryQuantity()
+                    : 0;
+            }
 
             if ($order['receivedTarget'] == '2') {
                 $order['receivedDivisionName'] =
