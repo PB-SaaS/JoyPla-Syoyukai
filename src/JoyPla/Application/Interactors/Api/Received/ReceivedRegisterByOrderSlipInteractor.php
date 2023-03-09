@@ -196,7 +196,7 @@ namespace JoyPla\Application\Interactors\Api\Received {
                         $storehouse = $this->repositoryProvider
                             ->getDivisionRepository()
                             ->getStorehouse($hospitalId);
-
+                            
                         $inventoryCalculations[] = new InventoryCalculation(
                             $receivedItem->getHospitalId(),
                             $storehouse->getDivisionId(),
@@ -242,6 +242,7 @@ namespace JoyPla\Application\Interactors\Api\Received {
             $order = $order->setOrderItems($items); // オーダーデータを更新
             $order = $order->updateOrderStatus();
             $received = $received->setReceivedItems($receivedItems);
+
             $this->repositoryProvider
                 ->getOrderRepository()
                 ->saveToArray($hospitalId, [$order], ['isReceived' => true]);
@@ -277,6 +278,7 @@ namespace JoyPla\Application\InputPorts\Api\Received {
      */
     class ReceivedRegisterByOrderSlipInputData
     {
+
         public Auth $user;
         public string $orderId;
         public array $receivedItems;

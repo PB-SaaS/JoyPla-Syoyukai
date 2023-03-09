@@ -45,6 +45,7 @@ namespace JoyPla\Application\Interactors\Api\Received {
     class ReceivedRegisterInteractor implements
         ReceivedRegisterInputPortInterface
     {
+
         private PresenterProvider $presenterProvider;
         private RepositoryProvider $repositoryProvider;
 
@@ -62,6 +63,7 @@ namespace JoyPla\Application\Interactors\Api\Received {
         public function handle(ReceivedRegisterInputData $inputData)
         {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
+
             $orders = $this->repositoryProvider
                 ->getOrderRepository()
                 ->getOrderByOrderItemId(
@@ -142,6 +144,7 @@ namespace JoyPla\Application\Interactors\Api\Received {
                                     $storehouse = $this->repositoryProvider
                                         ->getDivisionRepository()
                                         ->getStorehouse($hospitalId);
+
 
                                     $inventoryCalculations[] = new InventoryCalculation(
                                         $receivedItem->getHospitalId(),
@@ -240,10 +243,6 @@ namespace JoyPla\Application\InputPorts\Api\Received {
      */
     class ReceivedRegisterInputData
     {
-        public Auth $user;
-        public array $receivedItems;
-        public bool $isOnlyMyDivision;
-
         public function __construct(
             Auth $user,
             array $receivedItems,
