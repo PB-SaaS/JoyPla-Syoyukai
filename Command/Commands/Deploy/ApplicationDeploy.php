@@ -184,7 +184,7 @@ class ApplicationDeploy extends Command
             }
 
             exec(
-                "git add -N .; git diff --name-only --relative=src/ $commitId | xargs -I % cp -r --parents ./src/% .tmp/$environment"
+                "git add -N .; git diff --name-only --relative=src/ $commitId | xargs -I % cp -r --parents ./src/% .tmp/$environment > /dev/null 2>&1"
             );
             exec("mv .tmp/$environment/src/* .tmp/$environment");
             rmdir(".tmp/$environment/src");

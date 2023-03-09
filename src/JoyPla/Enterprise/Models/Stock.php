@@ -60,36 +60,36 @@ class Stock
     public static function create(Collection $input)
     {
         return new Stock(
-            (int)$input->recordId,
-            (new DateYearMonthDayHourMinutesSecond($input->registrationTime)),
-            (new DateYearMonthDayHourMinutesSecond($input->updateTime)),
-            (new InHospitalItemId($input->inHospitalItemId)),
-            (Item::create($input)),
-            (new Price($input->price)),
-            (Quantity::create($input)),
-            (Division::create($input)),
-            (Distributor::create($input)),
+            (int) $input->recordId,
+            new DateYearMonthDayHourMinutesSecond($input->registrationTime),
+            new DateYearMonthDayHourMinutesSecond($input->updateTime),
+            new InHospitalItemId($input->inHospitalItemId),
+            Item::create($input),
+            new Price($input->price),
+            Quantity::create($input),
+            Division::create($input),
+            Distributor::create($input),
             ((string) $input->rackName),
-            (new DateYearMonthDayHourMinutesSecond($input->invFinishTime)),
-            (int)$input->stockQuantity,
-            (int)$input->orderWithinCount,
-            (int)$input->constantByDiv,
+            new DateYearMonthDayHourMinutesSecond($input->invFinishTime),
+            (int) $input->stockQuantity,
+            (int) $input->orderWithinCount,
+            (int) $input->constantByDiv,
             $input->inItemImage
         );
     }
 
     public function calcNumberOfOrdersRequired()
     {
-        if ($this->constant - ($this->calcPlannedInventory()) < 0) {
+        if ($this->constant - $this->calcPlannedInventory() < 0) {
             return 0;
         }
 
-        return $this->constant - ($this->calcPlannedInventory());
+        return $this->constant - $this->calcPlannedInventory();
     }
 
     public function calcPlannedInventory()
     {
-        if (($this->inventory + $this->orderedQuantity) < 0) {
+        if ($this->inventory + $this->orderedQuantity < 0) {
             return 0;
         }
         return $this->inventory + $this->orderedQuantity;
@@ -97,10 +97,26 @@ class Stock
 
     public function calcOrderQuantity()
     {
-        if ($this->quantity->getQuantityNum() == 0 || ($this->calcNumberOfOrdersRequired()) < 0) {
+        if (
+            $this->quantity->getQuantityNum() == 0 ||
+            $this->calcNumberOfOrdersRequired() < 0
+        ) {
             return 0;
         }
-        return ceil($this->calcNumberOfOrdersRequired() / $this->quantity->getQuantityNum());
+        return ceil(
+            $this->calcNumberOfOrdersRequired() /
+                $this->quantity->getQuantityNum()
+        );
+    }
+
+    public function getInHospitalItemId()
+    {
+        return $this->inHospitalItemId;
+    }
+
+    public function getInventoryQuantity()
+    {
+        return $this->inventory;
     }
 
     public function toArray()
@@ -123,7 +139,7 @@ class Stock
             'itemImage' => $this->itemImage,
             'orderQuantity' => $this->calcOrderQuantity(),
             'plannedInventory' => $this->calcPlannedInventory(),
-            'numberOfOrdersRequired' => $this->calcNumberOfOrdersRequired()
+            'numberOfOrdersRequired' => $this->calcNumberOfOrdersRequired(),
         ];
     }
 }

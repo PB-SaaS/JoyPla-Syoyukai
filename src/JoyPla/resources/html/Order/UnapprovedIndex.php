@@ -8,19 +8,19 @@
         <h1 class="text-2xl mb-2">未発注伝票の詳細</h1>
         <hr>
         <div class="p-4 text-base bg-gray-100 border border-gray-400 flex flex-col md:flex-row md:gap-6 gap-4 mb-6">
-          <?php if( gate('revision_of_unordered_slips')->can() ): ?>
+          <?php if (gate('revision_of_unordered_slips')->can()): ?>
           <v-button-primary type="button" :disabled="! isChange" class="md:w-1/6 w-full" @click.native="onUpdate">内容を更新</v-button-primary>
-          <?php endif ?>
-          <?php if( gate('decision_of_order_slips')->can() ): ?>
+          <?php endif; ?>
+          <?php if (gate('decision_of_order_slips')->can()): ?>
           <v-button-primary type="button" class="md:w-1/6 w-full" @click.native="approvalSlip( order.orderId )">
             承認
           </v-button-primary>
-          <?php endif ?>
-          <?php if( gate('deletion_of_unordered_slips')->can() ): ?>
+          <?php endif; ?>
+          <?php if (gate('deletion_of_unordered_slips')->can()): ?>
           <v-button-danger type="button" class="md:w-1/6 w-full" @click.native="deleteSlip( order.orderId )">
             削除
           </v-button-danger>
-          <?php endif ?>
+          <?php endif; ?>
         </div>
         <div class="p-4 text-base bg-gray-100 border border-gray-400">
           <v-text title="登録日" class="lg:flex w-full gap-6">{{ order.registDate }}</v-text>
@@ -33,14 +33,14 @@
           <v-text title="発注元部署" class="lg:flex w-full gap-6">{{ order.division.divisionName }}</v-text>
           <v-text title="発注担当者" class="lg:flex w-full gap-6">{{ order.orderUserName }}</v-text>
           <v-text title="卸業者" class="lg:flex w-full gap-6">{{ order.distributor.distributorName }}</v-text>
-          <?php if( gate('revision_of_unordered_slips')->can() ): ?>
+          <?php if (gate('revision_of_unordered_slips')->can()): ?>
           <v-select class="lg:flex w-full gap-6" @change="isChange = true" change-class-name="inputChange" :options="[{ label: '定数発注', value: 1 },{ label: '個別発注', value: 2 }]" name="adjustment" :rules="{required: true}" title="発注タイプ" label="発注タイプ"></v-select>
           <v-textarea title="備考" @change="isChange = true" change-class-name="inputChange" name="comment" :rules="{strlen: 512}" label="備考" class="lg:flex w-full gap-6 mt-4">
           </v-textarea>
           <?php else: ?>
           <v-text title="発注タイプ" class="flex w-full gap-6">{{ order.adjustmentToString }}</v-text>
           <v-text title="備考" class="flex w-full gap-6"><p class=" whitespace-pre-wrap">{{ order.orderComment }}</p></v-text>
-          <?php endif ?>
+          <?php endif; ?>
         </div>
         <hr>
         <div class="p-4 text-lg font-bold">
@@ -65,7 +65,10 @@
                         <p class="text-md text-gray-500">{{ item.value.item.itemCode }}</p>
                         <p class="text-md text-gray-500">{{ item.value.item.itemStandard }}</p>
                         <p class="text-md text-gray-500">{{ item.value.item.itemJANCode }}</p>
-                        <?php if( gate('revision_of_unordered_slips')->can() ): ?>
+                        <p class="text-md text-gray-500">在庫数: {{ numberFormat(item.value.stockCount ) }}{{item.value.quantity.quantityUnit}}</p>
+                        <?php if (
+                            gate('revision_of_unordered_slips')->can()
+                        ): ?>
                         <p class="text-base text-gray-900 lg:w-1/2">
                           <v-input-number
                             :rules="{ required: true , between: ( (item.value.rowOrderQuantity > 0)? [ 1 , 99999 ] : [ -99999 , -1 ] ) }" 
@@ -73,7 +76,7 @@
                             label="発注数（個数）" 
                             :unit="item.value.quantity.itemUnit" 
                             :step="1" 
-                            :title="`発注数（個数）/${item.value.quantity.quantityNum}${ item.value.quantity.quantityUnit }入り`" 
+                            :title="`発注数（個数）/${numberFormat(item.value.quantity.quantityNum)}${ item.value.quantity.quantityUnit }入り`" 
                             @change="isChange = true" 
                             change-class-name="inputChange"
                             ></v-input-number>
@@ -83,7 +86,7 @@
                             <div class="font-bold w-32">発注数</div>
                             <div>{{ numberFormat(item.value.orderQuantity) }} {{ item.value.quantity.itemUnit }}</div>
                         </div>
-                        <?php endif ?>
+                        <?php endif; ?>
                         <div>
                           <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(item.value.orderPrice) }}</span>
                           <span class="text-sm text-gray-900">( &yen; {{ numberFormat(item.value.price) }} / {{ item.value.quantity.itemUnit }} )</span>
@@ -92,11 +95,11 @@
                     </div>
                   </div>
                 </div>
-                <?php if( gate('revision_of_unordered_slips')->can() ): ?>
+                <?php if (gate('revision_of_unordered_slips')->can()): ?>
                 <div class="py-4">
                   <v-button-danger  class="w-full mx-auto lg:w-auto" type="button" @click.native="itemDelete(idx)">削除</v-button-danger>
                 </div>
-                <?php endif ?>
+                <?php endif; ?>
               </div>
             </div>
           </div>
@@ -108,7 +111,7 @@
 </div>
 <script>
 
-const PHPData = <?php echo json_encode($viewModel, true) ?>;
+const PHPData = <?php echo json_encode($viewModel, true); ?>;
 
 var JoyPlaApp = Vue.createApp({ 
     components: {

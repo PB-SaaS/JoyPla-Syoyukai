@@ -9,6 +9,7 @@ use JoyPla\Enterprise\Models\Distributor;
 use JoyPla\Enterprise\Models\DistributorId;
 use JoyPla\Enterprise\Models\Division;
 use JoyPla\Enterprise\Models\DivisionId;
+use JoyPla\Enterprise\Models\DivisionName;
 use JoyPla\Enterprise\Models\HospitalId;
 use JoyPla\Enterprise\Models\InHospitalItemId;
 use JoyPla\Enterprise\Models\Item;
@@ -50,11 +51,94 @@ class StockRepository implements StockRepositoryInterface
                 (int) $stock->stockQuantity,
                 (int) $stock->orderWithinCount,
                 (int) $stock->constantByDiv,
-                $stock->inItemImage
+                $stock->inItemImage ?? ''
             );
         }
 
-        var_dump($result);
+        //TODO
+    }
+
+    public function getStockByDivisionIdAndInHospitalItemIds(
+        HospitalId $hospitalId,
+        array $divisionIds,
+        array $inHospitalItemIds
+    ) {
+        $inHospitalItemIds = array_map(function (
+            InHospitalItemId $inHospitalItemId
+        ) {
+            return $inHospitalItemId;
+        },
+        $inHospitalItemIds);
+
+        $inHospitalItemInstance = ModelRepository::getInHospitalItemViewInstance()->where(
+            'hospitalId',
+            $hospitalId->value()
+        );
+
+        $divisionIds = array_map(function (DivisionId $divisionId) {
+            return $divisionId;
+        }, $divisionIds);
+
+        $stockInstance = ModelRepository::getStockViewInstance()->where(
+            'hospitalId',
+            $hospitalId->value()
+        );
+
+        foreach ($divisionIds as $divisionId) {
+            $stockInstance->orWhere('divisionId', $divisionId->value());
+        }
+
+        foreach ($inHospitalItemIds as $inHospitalItemId) {
+            $stockInstance->orWhere(
+                'inHospitalItemId',
+                $inHospitalItemId->value()
+            );
+            $inHospitalItemInstance->orWhere(
+                'inHospitalItemId',
+                $inHospitalItemId->value()
+            );
+        }
+
+        $stocks = $stockInstance->get();
+        $inHospitalItems = $inHospitalItemInstance->get();
+
+        $result = [];
+        foreach ($stocks->all() as $stock) {
+            $inHospitalItem = array_find($inHospitalItems, function (
+                $inHospitalItem
+            ) use ($stock) {
+                return $inHospitalItem->inHospitalItemId ===
+                    $stock->inHospitalItemId;
+            });
+
+            if (!$inHospitalItem) {
+                continue;
+            }
+
+            $result[] = new Stock(
+                $stock->id,
+                new DateYearMonthDayHourMinutesSecond($stock->registrationTime),
+                new DateYearMonthDayHourMinutesSecond($stock->updateTime),
+                new InHospitalItemId($stock->inHospitalItemId),
+                Item::create($inHospitalItem),
+                new Price($inHospitalItem->price),
+                Quantity::create($inHospitalItem),
+                Division::create($stock),
+                new Distributor(
+                    $hospitalId,
+                    new DistributorId($inHospitalItem->distributorId),
+                    $inHospitalItem->distributorName
+                ),
+                $stock->rackName,
+                new DateYearMonthDayHourMinutesSecond($stock->invFinishTime),
+                (int) $stock->stockQuantity,
+                (int) $stock->orderWithinCount,
+                (int) $stock->constantByDiv,
+                $inHospitalItem->inItemImage ?? ''
+            );
+        }
+
+        return $result;
     }
 
     public function search(Auth $auth, object $search)
