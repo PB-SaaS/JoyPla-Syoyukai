@@ -4,13 +4,13 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Received {
-    use App\Model\Division;
     use Exception;
     use framework\Exception\NotFoundException;
     use JoyPla\Application\InputPorts\Api\Received\ReceivedRegisterByOrderSlipInputData;
     use JoyPla\Application\InputPorts\Api\Received\ReceivedRegisterByOrderSlipInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\Received\ReceivedRegisterByOrderSlipOutputData;
-    use JoyPla\Application\OutputPorts\Api\Received\ReceivedRegisterByOrderSlipOutputPortInterface;
+    use JoyPla\Enterprise\Models\Card;
+    use JoyPla\Enterprise\Models\CardId;
     use JoyPla\Enterprise\Models\DateYearMonthDayHourMinutesSecond;
     use JoyPla\Enterprise\Models\OrderId;
     use JoyPla\Enterprise\Models\HospitalId;
@@ -18,7 +18,6 @@ namespace JoyPla\Application\Interactors\Api\Received {
     use JoyPla\Enterprise\Models\Lot;
     use JoyPla\Enterprise\Models\LotDate;
     use JoyPla\Enterprise\Models\LotNumber;
-    use JoyPla\Enterprise\Models\Order;
     use JoyPla\Enterprise\Models\OrderStatus;
     use JoyPla\Enterprise\Models\Price;
     use JoyPla\Enterprise\Models\Received;
@@ -29,11 +28,6 @@ namespace JoyPla\Application\Interactors\Api\Received {
     use JoyPla\Enterprise\Models\ReceivedStatus;
     use JoyPla\Enterprise\Models\Redemption;
     use JoyPla\Enterprise\Models\ReturnQuantity;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\DivisionRepositoryInterface;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepositoryInterface;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\ReceivedRepositoryInterface;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\stockRepositoryInterface;
     use JoyPla\Service\Presenter\Api\PresenterProvider;
     use JoyPla\Service\Repository\RepositoryProvider;
 
@@ -101,6 +95,20 @@ namespace JoyPla\Application\Interactors\Api\Received {
             $inventoryCalculations = [];
             $receivedItems = [];
 
+            $cardIds = [];
+            foreach ($inputData->receivedItems as $receivedItem) {
+                foreach ($receivedItem['receiveds'] as $receivedItem) {
+                    foreach ($receivedItem['cards'] as $card) {
+                        $cardIds[] = new CardId($card['cardId']);
+                    }
+                }
+            }
+
+            $cards = $this->repositoryProvider
+                ->getCardRepository()
+                ->getCards($hospitalId, $cardIds);
+
+            $updateCards = [];
             foreach ($items as $key => $item) {
                 $fkey = array_search(
                     $item->getOrderItemId()->value(),
@@ -122,6 +130,25 @@ namespace JoyPla\Application\Interactors\Api\Received {
                     $inputData->receivedItems[$fkey]['receiveds']
                     as $receivedItem
                 ) {
+                    $receivedCards = [];
+                    foreach ($receivedItem['cards'] as $c) {
+                        $cardId = $c['cardId'];
+                        $receivedCards[] = array_find($cards, function (
+                            Card $card
+                        ) use ($cardId) {
+                            return $card->getCardId()->value() === $cardId;
+                        });
+                    }
+
+                    if (
+                        count($receivedCards) !== count($receivedItem['cards'])
+                    ) {
+                        throw new Exception(
+                            'Card information did not exist.',
+                            422
+                        );
+                    }
+
                     $receivedQuantity = new ReceivedQuantity(
                         (int) $receivedItem['receivedQuantity']
                     );
@@ -137,7 +164,7 @@ namespace JoyPla\Application\Interactors\Api\Received {
                         $order->getHospital()->getHospitalId(),
                         $order->getDivision(),
                         $order->getDistributor(),
-                        $item->getQantity(),
+                        $item->getQuantity(),
                         $item->getPrice(),
                         0,
                         $receivedQuantity,
@@ -150,13 +177,26 @@ namespace JoyPla\Application\Interactors\Api\Received {
                         $item->getItemImage()
                     );
 
+                    if ($receivedItem->checkCards($receivedCards)) {
+                        throw new Exception(
+                            'The number of cards tied together exceeds the number of.',
+                            422
+                        );
+                    }
+
+                    foreach ($receivedCards as $receivedCard) {
+                        $updateCards[] = $receivedCard->setLot(
+                            $receivedItem->getLot()
+                        );
+                    }
+
                     if ($order->getReceivedTarget() === 1) {
                         //大倉庫
 
-                        $storehouse = $this->divisionRepository->getStorehouse(
-                            $hospitalId
-                        );
-                        
+                        $storehouse = $this->repositoryProvider
+                            ->getDivisionRepository()
+                            ->getStorehouse($hospitalId);
+                            
                         $inventoryCalculations[] = new InventoryCalculation(
                             $receivedItem->getHospitalId(),
                             $storehouse->getDivisionId(),
@@ -214,6 +254,10 @@ namespace JoyPla\Application\Interactors\Api\Received {
                 ->getInventoryCalculationRepository()
                 ->saveToArray($inventoryCalculations);
 
+            $this->repositoryProvider
+                ->getCardRepository()
+                ->update($hospitalId, $updateCards);
+
             $this->presenterProvider
                 ->getReceivedRegisterByOrderSlipPresenter()
                 ->output(new ReceivedRegisterByOrderSlipOutputData($received));
@@ -253,10 +297,19 @@ namespace JoyPla\Application\InputPorts\Api\Received {
                 $d['receiveds'] = [];
                 if (isset($item['receiveds'])) {
                     $d['receiveds'] = array_map(function ($item) {
-                        $s['receivedQuantity'] = $item['receivedQuantity'];
-                        $s['lotNumber'] = $item['lotNumber'];
-                        $s['lotDate'] = $item['lotDate'];
-                        return $s;
+                        return [
+                            'receivedQuantity' => $item['receivedQuantity'],
+                            'lotNumber' => $item['lotNumber'],
+                            'lotDate' => $item['lotDate'],
+                            'cards' => isset($item['cards'])
+                                ? array_map(function ($card) {
+                                    return [
+                                        'cardId' => $card['cardId'],
+                                        'cardQuantity' => $card['cardQuantity'],
+                                    ];
+                                }, $item['cards'])
+                                : [],
+                        ];
                     }, $item['receiveds']);
                 }
                 return $d;

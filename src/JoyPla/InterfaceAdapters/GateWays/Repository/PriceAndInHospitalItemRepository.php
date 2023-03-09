@@ -2,64 +2,73 @@
 
 namespace JoyPla\InterfaceAdapters\GateWays\Repository;
 
-use App\SpiralDb\Distributor;
-use App\SpiralDb\Item;
-use App\SpiralDb\Price;
-use App\SpiralDb\InHospitalItem;
-use Collection;
-use framework\SpiralConnecter\SpiralDB;
+use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 
-class PriceAndInHospitalItemRepository implements PriceAndInHospitalItemRepositoryInterface{
-
-    public function saveToArray($hospitalId, $itemId, array $input, array $attr = []){
+class PriceAndInHospitalItemRepository implements
+    PriceAndInHospitalItemRepositoryInterface
+{
+    public function saveToArray(
+        $hospitalId,
+        $itemId,
+        array $input,
+        array $attr = []
+    ) {
         $priceCreateArray = [
-            "hospitalId" => $hospitalId,
-            "itemId" => $itemId,
-            "distributorId" => $input["distributorId"],
-            "distributorMCode" => $input["distributorMCode"],
-            "quantity" => $input["quantity"],
-            "quantityUnit" => $input["quantityUnit"],
-            "itemUnit" => $input["itemUnit"],
-            "price" => $input["price"],
-            "unitPrice" => $input["unitPrice"],
-            "notice" => $input["notice"],
+            'hospitalId' => $hospitalId,
+            'itemId' => $itemId,
+            'distributorId' => $input['distributorId'],
+            'distributorMCode' => $input['distributorMCode'],
+            'quantity' => $input['quantity'],
+            'quantityUnit' => $input['quantityUnit'],
+            'itemUnit' => $input['itemUnit'],
+            'price' => $input['price'],
+            'unitPrice' => $input['unitPrice'],
+            'notice' => $input['notice'],
         ];
 
-        $priceCreateData = SpiralDb::title("NJ_PriceDB") -> create($priceCreateArray);
-        $id = $priceCreateData->get("id");
-        $priceData = SpiralDb::title("NJ_PriceDB") -> value(["priceId"]) ->find((int)$id);
-        $priceId = $priceData->get("priceId");
+        $priceCreateData = ModelRepository::getPriceInstance()->create(
+            $priceCreateArray
+        );
+        $priceData = ModelRepository::getPriceInstance()->find(
+            (int) $priceCreateData->get('id')
+        );
 
         $inHPItemCreateArray = [
-            "registrationTime" => "now",
-            "updateTime" => "now",
-            "itemId" => $itemId,
-            "hospitalId" => $hospitalId,
-            "priceId" => $priceId,
-            "distributorId" => $input["distributorId"],
-            "distributorMCode" => $input["distributorMCode"],
-            "quantity" => $input["quantity"],
-            "quantityUnit" => $input["quantityUnit"],
-            "itemUnit" => $input["itemUnit"],
-            "price" => $input["price"],
-            "unitPrice" => $input["unitPrice"],
-            "medicineCategory" => $input["medicineCategory"],
-            "homeCategory" => $input["homeCategory"],
-            "measuringInst" => $input["measuringInst"],
-            "notice" => $input["notice"],
+            'registrationTime' => 'now',
+            'updateTime' => 'now',
+            'itemId' => $itemId,
+            'hospitalId' => $hospitalId,
+            'priceId' => $priceData->get('priceId'),
+            'distributorId' => $input['distributorId'],
+            'distributorMCode' => $input['distributorMCode'],
+            'quantity' => $input['quantity'],
+            'quantityUnit' => $input['quantityUnit'],
+            'itemUnit' => $input['itemUnit'],
+            'price' => $input['price'],
+            'unitPrice' => $input['unitPrice'],
+            'medicineCategory' => $input['medicineCategory'],
+            'homeCategory' => $input['homeCategory'],
+            'measuringInst' => $input['measuringInst'],
+            'notice' => $input['notice'],
         ];
 
-        $inHPItemCreateData = SpiralDb::title("NJ_inHPItemDB") -> create($inHPItemCreateArray);
-        $id = $inHPItemCreateData->get("id");
-        $inHPItemData = SpiralDb::title("NJ_inHPItemDB") -> value(["inHospitalItemId"]) ->find((int)$id);
+        $inHPItemCreateData = ModelRepository::getInHospitalItemInstance()->create(
+            $inHPItemCreateArray
+        );
+        $inHPItemData = ModelRepository::getInHospitalItemInstance()->find(
+            (int) $inHPItemCreateData->get('id')
+        );
 
-        return ["price" => $priceData, "inHP" => $inHPItemData];
-
+        return ['price' => $priceData, 'inHP' => $inHPItemData];
     }
-
 }
 
-interface PriceAndInHospitalItemRepositoryInterface 
+interface PriceAndInHospitalItemRepositoryInterface
 {
-    public function saveToArray($hospitalId, $itemId, array $input, array $attr = []);
+    public function saveToArray(
+        $hospitalId,
+        $itemId,
+        array $input,
+        array $attr = []
+    );
 }

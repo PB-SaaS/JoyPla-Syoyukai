@@ -2,10 +2,7 @@
 
 namespace JoyPla\InterfaceAdapters\Controllers\Api;
 
-use App\SpiralDb\HospitalUser;
-use Auth;
 use Csrf;
-use Exception;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Routing\Router;

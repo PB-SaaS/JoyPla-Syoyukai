@@ -4,8 +4,6 @@ namespace JoyPla;
 
 use ApiResponse;
 use App\Lib\ApiSpiral;
-use App\SpiralDb\HospitalUser;
-use App\SpiralDb\Tenant;
 use Auth;
 use framework\Application;
 use framework\Facades\Gate;
@@ -13,6 +11,7 @@ use framework\Http\Request;
 use framework\SpiralConnecter\SpiralConnecter;
 use JoyPla\Application\LoggingObject\Spiralv2LogginObject;
 use JoyPla\Enterprise\CommonModels\GatePermissionModel;
+use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 use Logger;
 use LoggingConfig;
 
@@ -33,21 +32,24 @@ class JoyPlaApplication extends Application
             new Spiralv2LogginObject(
                 LoggingConfig::SPIRALV2_API_KEY,
                 LoggingConfig::LOGGING_APP_TITLE,
-                LoggingConfig::SPIRAL_API_LOGGING_DB_TITLE
+                LoggingConfig::SPIRAL_API_LOGGING_DB_TITLE,
+                LoggingConfig::LOG_LEVEL
             )
         );
         ApiSpiral::$logger = new Logger(
             new Spiralv2LogginObject(
                 LoggingConfig::SPIRALV2_API_KEY,
                 LoggingConfig::LOGGING_APP_TITLE,
-                LoggingConfig::SPIRAL_API_LOGGING_DB_TITLE
+                LoggingConfig::SPIRAL_API_LOGGING_DB_TITLE,
+                LoggingConfig::LOG_LEVEL
             )
         );
         ApiResponse::$logger = new Logger(
             new Spiralv2LogginObject(
                 LoggingConfig::SPIRALV2_API_KEY,
                 LoggingConfig::LOGGING_APP_TITLE,
-                LoggingConfig::JOYPLA_API_LOGGING_DB_TITLE
+                LoggingConfig::JOYPLA_API_LOGGING_DB_TITLE,
+                LoggingConfig::LOG_LEVEL
             )
         );
 
@@ -71,8 +73,10 @@ class JoyPlaApplication extends Application
             'userCheck',
         ]);
 
-        $tenant = Tenant::where('tenantId', $auth->tenantId)->get();
-        $tenant = $tenant->data->get(0);
+        $tenant = ModelRepository::getTenantInstance()
+            ->where('tenantId', $auth->tenantId)
+            ->get();
+        $tenant = $tenant->first();
 
         $auth = $auth->collectMerge($tenant, 'tenantId');
 

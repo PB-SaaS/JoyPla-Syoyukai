@@ -2,8 +2,6 @@
 
 namespace JoyPla\InterfaceAdapters\Presenters\Api\Order {
     use ApiResponse;
-    use App\SpiralDb\HospitalUser;
-    use framework\Http\View;
     use JoyPla\Application\OutputPorts\Api\Order\FixedQuantityOrderOutputData;
     use JoyPla\Application\OutputPorts\Api\Order\FixedQuantityOrderOutputPortInterface;
 

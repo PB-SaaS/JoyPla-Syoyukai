@@ -7,9 +7,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
     use JoyPla\Application\InputPorts\Api\Order\OrderUnReceivedShowInputData;
     use JoyPla\Application\InputPorts\Api\Order\OrderUnReceivedShowInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\Order\OrderUnReceivedShowOutputData;
-    use JoyPla\Application\OutputPorts\Api\Order\OrderUnReceivedShowOutputPortInterface;
     use JoyPla\Enterprise\Models\HospitalId;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
     use JoyPla\Service\Presenter\Api\PresenterProvider;
     use JoyPla\Service\Repository\RepositoryProvider;
 
@@ -46,7 +44,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
                     $inputData->search
                 );
             $this->presenterProvider
-                ->getOrderUnapprovedShowPresenter()
+                ->getOrderUnReceivedShowPresenter()
                 ->output(new OrderUnReceivedShowOutputData($orders, $count));
         }
     }
@@ -67,7 +65,7 @@ namespace JoyPla\Application\InputPorts\Api\Order {
     class OrderUnReceivedShowInputData
     {
         public Auth $user;
-        public array $search;
+        public stdClass $search;
 
         public function __construct(Auth $user, array $search)
         {

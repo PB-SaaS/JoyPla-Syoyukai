@@ -2,16 +2,7 @@
 
 namespace JoyPla\InterfaceAdapters\GateWays\Repository;
 
-use App\SpiralDb\Distributor as SpiralDbDistributor;
-use App\SpiralDb\DistributorAffiliationView;
-use App\SpiralDb\Order as SpiralDbOrder;
-use App\SpiralDb\OrderItem as SpiralDbOrderItem;
-use App\SpiralDb\OrderItemView;
-use App\SpiralDb\OrderView;
-use App\SpiralDb\HospitalUser;
-use App\SpiralDb\InHospitalItemView;
 use Auth;
-use framework\SpiralConnecter\SpiralDB;
 use JoyPla\Enterprise\Models\Order;
 use JoyPla\Enterprise\Models\OrderId;
 use JoyPla\Enterprise\Models\OrderItem;
@@ -28,15 +19,18 @@ use JoyPla\Enterprise\Models\OrderStatus;
 use JoyPla\Enterprise\Models\Price;
 use JoyPla\Enterprise\Models\Quantity;
 use JoyPla\Enterprise\Models\ReceivedQuantity;
-use JoyPla\Enterprise\Models\SelectName;
+use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
+use Model;
 
-class OrderRepository implements OrderRepositoryInterface
+class OrderRepository extends ModelRepository implements
+    OrderRepositoryInterface
 {
     public function findByHospitalId(HospitalId $hospitalId)
     {
-        $orderHistory = OrderItemView::where('hospitalId', $hospitalId->value())
+        $orderHistory = ModelRepository::getOrderItemViewInstance()
+            ->where('hospitalId', $hospitalId->value())
             ->get()
-            ->data->all();
+            ->all();
 
         return $orderHistory;
     }
@@ -45,16 +39,7 @@ class OrderRepository implements OrderRepositoryInterface
         HospitalId $hospitalId,
         array $orderItems
     ) {
-        $division = SpiralDB::title('NJ_divisionDB')->value([
-            'registrationTime',
-            'divisionId',
-            'hospitalId',
-            'divisionName',
-            'divisionType',
-            'deleteFlag',
-            'authkey',
-            'deliveryDestCode',
-        ]);
+        $division = ModelRepository::getDivisionInstance();
 
         foreach ($orderItems as $item) {
             $division->orWhere('divisionId', $item->divisionId);
@@ -63,7 +48,7 @@ class OrderRepository implements OrderRepositoryInterface
         $division = $division->get();
         $division = $division->all();
 
-        $inHospitalItem = InHospitalItemView::where(
+        $inHospitalItem = ModelRepository::getInHospitalItemViewInstance()->where(
             'hospitalId',
             $hospitalId->value()
         );
@@ -74,7 +59,7 @@ class OrderRepository implements OrderRepositoryInterface
             );
         }
 
-        $inHospitalItem = $inHospitalItem->get()->data->all();
+        $inHospitalItem = $inHospitalItem->get()->all();
 
         foreach ($orderItems as $item) {
             $division_find_key = array_search(
@@ -157,20 +142,17 @@ class OrderRepository implements OrderRepositoryInterface
                 if ($order->getReceivedTarget() === 1) {
                     // 大倉庫
 
-                    $division = SpiralDB::title('NJ_divisionDB')
-                        ->value(['deliveryDestCode'])
+                    $division = ModelRepository::getDivisionInstance()
                         ->where('hospitalId', $hospitalId->value())
                         ->where('divisionType', '1')
                         ->get();
 
                     $receivingDivisionCode = $division->first()
                         ->deliveryDestCode;
-                    //$receivingDivisionCode = (SpiralDbDivision::where('hospitalId', $hospitalId->value())->where('divisionType', '1')->get())->data->get(0)->deliveryDestCode;
                 }
                 if ($order->getReceivedTarget() === 2) {
                     // 部署
-                    $division = SpiralDB::title('NJ_divisionDB')
-                        ->value(['deliveryDestCode'])
+                    $division = ModelRepository::getDivisionInstance()
                         ->where('hospitalId', $hospitalId->value())
                         ->where(
                             'divisionId',
@@ -183,7 +165,6 @@ class OrderRepository implements OrderRepositoryInterface
 
                     $receivingDivisionCode = $division->first()
                         ->deliveryDestCode;
-                    //$receivingDivisionCode =(SpiralDbDivision::where('hospitalId', $hospitalId->value())->where('divisionId', $order->getDivision()->getDivisionId()->value())->get())->data->get(0)->deliveryDestCode;
                 }
             }
 
@@ -228,7 +209,8 @@ class OrderRepository implements OrderRepositoryInterface
         }
 
         if (count($deleteOrderIds) > 0) {
-            $instance = SpiralDbOrder::getNewInstance();
+            $instance = ModelRepository::getOrderInstance();
+            //$instance = SpiralDbOrder::getNewInstance();
             foreach ($deleteOrderIds as $orderId) {
                 $instance->orWhere('orderNumber', $orderId->value());
             }
@@ -236,7 +218,8 @@ class OrderRepository implements OrderRepositoryInterface
         }
 
         if (count($items) > 0) {
-            $instance = SpiralDbOrderItem::getNewInstance();
+            $instance = ModelRepository::getOrderItemInstance();
+            //$instance = SpiralDbOrderItem::getNewInstance();
             foreach ($items as $item) {
                 $instance->orWhere('orderNumber', $item['orderNumber']);
                 $instance->where('orderCNumber', $item['orderCNumber'], '!=');
@@ -245,10 +228,17 @@ class OrderRepository implements OrderRepositoryInterface
         }
 
         if (count($history) > 0) {
-            SpiralDbOrder::getNewInstance()->upsert('orderNumber', $history);
+            ModelRepository::getOrderInstance()->upsertBulk(
+                'orderNumber',
+                $history
+            );
         }
+
         if (count($items) > 0) {
-            SpiralDbOrderItem::getNewInstance()->upsert('orderCNumber', $items);
+            ModelRepository::getOrderItemInstance()->upsertBulk(
+                'orderCNumber',
+                $items
+            );
         }
         return array_values($orders);
     }
@@ -256,13 +246,11 @@ class OrderRepository implements OrderRepositoryInterface
     public function search(HospitalId $hospitalId, object $search)
     {
         $itemSearchFlag = false;
-        $itemViewInstance = OrderItemView::where(
-            'hospitalId',
-            $hospitalId->value()
-        )
+        $itemViewInstance = ModelRepository::getOrderItemViewInstance()
+            ->where('hospitalId', $hospitalId->value())
             ->value('orderNumber')
             ->value('orderCNumber');
-        $historyViewInstance = OrderView::where(
+        $historyViewInstance = ModelRepository::getOrderViewInstance()->where(
             'hospitalId',
             $hospitalId->value()
         );
@@ -329,10 +317,10 @@ class OrderRepository implements OrderRepositoryInterface
         $orderCNumbers = [];
         if ($itemSearchFlag) {
             $itemViewInstance = $itemViewInstance->get();
-            if ($itemViewInstance->count == 0) {
+            if ($itemViewInstance->count() == 0) {
                 return [[], 0];
             }
-            foreach ($itemViewInstance->data->all() as $item) {
+            foreach ($itemViewInstance->all() as $item) {
                 $historyViewInstance = $historyViewInstance->orWhere(
                     'orderNumber',
                     $item->orderNumber
@@ -394,18 +382,19 @@ class OrderRepository implements OrderRepositoryInterface
         }
 
         $historys = $historyViewInstance
-            ->sort('id', 'desc')
+            ->orderBy('id', 'desc')
             ->page($search->currentPage)
             ->paginate($search->perPage);
-        if ($historys->count == 0) {
+
+        if ($historys->getTotal() == 0) {
             return [[], 0];
         }
 
-        $itemViewInstance = OrderItemView::getNewInstance()->where(
+        $itemViewInstance = ModelRepository::getOrderItemViewInstance()->where(
             'hospitalId',
             $hospitalId->value()
         );
-        foreach ($historys->data->all() as $history) {
+        foreach ($historys->getData()->all() as $history) {
             $itemViewInstance = $itemViewInstance->orWhere(
                 'orderNumber',
                 $history->orderNumber
@@ -420,10 +409,9 @@ class OrderRepository implements OrderRepositoryInterface
 
         $items = $itemViewInstance->get();
         $orders = [];
-        foreach ($historys->data->all() as $history) {
+        foreach ($historys->getData()->all() as $history) {
             $order = Order::create($history);
-
-            foreach ($items->data->all() as $item) {
+            foreach ($items->all() as $item) {
                 if ($order->getOrderId()->equal($item->orderNumber)) {
                     $order = $order->addOrderItem(OrderItem::create($item));
                 }
@@ -432,7 +420,7 @@ class OrderRepository implements OrderRepositoryInterface
             $orders[] = $order;
         }
 
-        return [$orders, $historys->count];
+        return [$orders, $historys->getTotal()];
     }
 
     public function index(
@@ -440,10 +428,9 @@ class OrderRepository implements OrderRepositoryInterface
         OrderId $orderId,
         array $orderStatus = [OrderStatus::UnOrdered]
     ) {
-        $orderView = OrderView::where(
-            'hospitalId',
-            $hospitalId->value()
-        )->where('orderNumber', $orderId->value());
+        $orderView = ModelRepository::getOrderViewInstance()
+            ->where('hospitalId', $hospitalId->value())
+            ->where('orderNumber', $orderId->value());
 
         if (count($orderStatus) > 0) {
             foreach ($orderStatus as $o) {
@@ -453,17 +440,18 @@ class OrderRepository implements OrderRepositoryInterface
 
         $orderView = $orderView->get();
 
-        if ((int) $orderView->count === 0) {
+        if (count($orderView->all()) === 0) {
             return null;
         }
-        $orderItemView = OrderItemView::sort('id', 'asc')
+        $orderItemView = ModelRepository::getOrderItemViewInstance()
+            ->orderBy('id', 'asc')
             ->where('hospitalId', $hospitalId->value())
             ->where('orderNumber', $orderId->value())
             ->get();
 
-        $order = Order::create($orderView->data->get(0));
+        $order = Order::create($orderView->first());
 
-        foreach ($orderItemView->data->all() as $item) {
+        foreach ($orderItemView->all() as $item) {
             $order = $order->addOrderItem(OrderItem::create($item));
         }
 
@@ -472,17 +460,17 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function delete(HospitalId $hospitalId, OrderId $orderId)
     {
-        $result = SpiralDbOrder::where('hospitalId', $hospitalId->value())
+        return ModelRepository::getOrderInstance()
+            ->where('hospitalId', $hospitalId->value())
             ->where('orderNumber', $orderId->value())
             ->delete();
-        return $result->count;
     }
 
     public function getOrderByOrderItemId(
         HospitalId $hospitalId,
         array $orderItemIds
     ) {
-        $items = OrderItemView::getNewInstance()
+        $items = ModelRepository::getOrderItemViewInstance()
             ->where('hospitalId', $hospitalId->value())
             ->value('orderNumber');
         if (count($orderItemIds) === 0) {
@@ -494,18 +482,17 @@ class OrderRepository implements OrderRepositoryInterface
 
         $items = $items->get();
 
-        $historyViewInstance = OrderView::sort('id', 'desc')->where(
-            'hospitalId',
-            $hospitalId->value()
-        );
+        $historyViewInstance = ModelRepository::getOrderViewInstance()
+            ->orderBy('id', 'desc')
+            ->where('hospitalId', $hospitalId->value());
 
-        foreach ($items->data->all() as $item) {
+        foreach ($items->all() as $item) {
             $historyViewInstance->orWhere('orderNumber', $item->orderNumber);
         }
 
-        $historys = $historyViewInstance->get()->data->all();
+        $historys = $historyViewInstance->get()->all();
 
-        $itemViewInstance = OrderItemView::getNewInstance()->where(
+        $itemViewInstance = ModelRepository::getOrderItemViewInstance()->where(
             'hospitalId',
             $hospitalId->value()
         );
@@ -518,11 +505,12 @@ class OrderRepository implements OrderRepositoryInterface
         }
 
         $items = $itemViewInstance->get();
+
         $orders = [];
         foreach ($historys as $history) {
             $order = Order::create($history);
 
-            foreach ($items->data->all() as $item) {
+            foreach ($items->all() as $item) {
                 if ($order->getOrderId()->equal($item->orderNumber)) {
                     $order = $order->addOrderItem(OrderItem::create($item));
                 }
@@ -548,7 +536,8 @@ class OrderRepository implements OrderRepositoryInterface
             return $i;
         }, $orderItems);
 
-        $historyViewInstance = OrderView::sort('id', 'desc')
+        $historyViewInstance = ModelRepository::getOrderViewInstance()
+            ->orderBy('id', 'desc')
             ->where('hospitalId', $hospitalId->value())
             ->where('orderStatus', '1');
 
@@ -569,9 +558,9 @@ class OrderRepository implements OrderRepositoryInterface
             );
         }
 
-        $historys = $historyViewInstance->get()->data->all();
+        $historys = $historyViewInstance->get()->all();
 
-        $itemViewInstance = OrderItemView::where(
+        $itemViewInstance = ModelRepository::getOrderItemViewInstance()->where(
             'hospitalId',
             $hospitalId->value()
         );
@@ -584,11 +573,12 @@ class OrderRepository implements OrderRepositoryInterface
         }
 
         $items = $itemViewInstance->get();
+
         $orders = [];
         foreach ($historys as $history) {
             $order = Order::create($history);
 
-            foreach ($items->data->all() as $item) {
+            foreach ($items->all() as $item) {
                 if ($order->getOrderId()->equal($item->orderNumber)) {
                     $order = $order->addOrderItem(OrderItem::create($item));
                 }
@@ -634,13 +624,12 @@ class OrderRepository implements OrderRepositoryInterface
             false
         )->render();
 
-        $ids = SpiralDb::title('NJ_HUserDB')
+        $ids = ModelRepository::getHospitalUserInstance()
             ->where('hospitalId', $user->hospitalId)
-            ->value('id')
             ->whereIn('userPermission', [1, 3])
             ->get();
 
-        $mailId = SpiralDb::mail('NJ_HUserDB')
+        $ruleId = ModelRepository::getHospitalUserMailInstance()
             ->subject('[JoyPla] 未発注書が作成されました')
             ->standby(false)
             ->reserveDate('now')
@@ -652,8 +641,8 @@ class OrderRepository implements OrderRepositoryInterface
 
         $ids = array_values(array_column($ids->toArray(), 'id'));
 
-        SpiralDb::mail('NJ_HUserDB')
-            ->ruleId($mailId)
+        ModelRepository::getHospitalUserMailInstance()
+            ->ruleId($ruleId)
             ->sampling($ids);
     }
 
@@ -661,15 +650,8 @@ class OrderRepository implements OrderRepositoryInterface
     {
         $order = $order->toArray();
 
-        $distributor = SpiralDb::title('NJ_distributorDB')
+        $distributor = ModelRepository::getDistributorInstance()
             ->where('distributorId', $order['distributor']['distributorId'])
-            ->value([
-                'distributorId',
-                'distributorName',
-                'postalCode',
-                'prefectures',
-                'address',
-            ])
             ->get();
 
         $distributor = $distributor->first();
@@ -703,13 +685,13 @@ class OrderRepository implements OrderRepositoryInterface
             'login_url' => config('url.distributor', ''),
         ])->render();
 
-        $ids = SpiralDb::title('invitingDB')
+        $ids = ModelRepository::getInvitingInstance()
             ->where('distributorId', $order['distributor']['distributorId'])
             ->where('invitingAgree', 't')
             ->value('id')
             ->get();
 
-        $mailId = SpiralDb::mail('invitingDB')
+        $ruleId = ModelRepository::getInvitingMailInstance()
             ->subject('[JoyPla] 発注書に変更がありました')
             ->standby(false)
             ->reserveDate('now')
@@ -721,8 +703,8 @@ class OrderRepository implements OrderRepositoryInterface
 
         $ids = array_values(array_column($ids->toArray(), 'id'));
 
-        SpiralDb::mail('invitingDB')
-            ->ruleId($mailId)
+        ModelRepository::getInvitingMailInstance()
+            ->ruleId($ruleId)
             ->sampling($ids);
     }
 
@@ -730,15 +712,8 @@ class OrderRepository implements OrderRepositoryInterface
     {
         $order = $order->toArray();
 
-        $distributor = SpiralDb::title('NJ_distributorDB')
+        $distributor = ModelRepository::getDistributorInstance()
             ->where('distributorId', $order['distributor']['distributorId'])
-            ->value([
-                'distributorId',
-                'distributorName',
-                'postalCode',
-                'prefectures',
-                'address',
-            ])
             ->get();
 
         $distributor = $distributor->first();
@@ -772,13 +747,12 @@ class OrderRepository implements OrderRepositoryInterface
             'login_url' => config('url.distributor', ''),
         ])->render();
 
-        $ids = SpiralDb::title('invitingDB')
+        $ids = ModelRepository::getInvitingInstance()
             ->where('distributorId', $order['distributor']['distributorId'])
             ->where('invitingAgree', 't')
-            ->value('id')
             ->get();
 
-        $mailId = SpiralDb::mail('invitingDB')
+        $ruleId = ModelRepository::getInvitingMailInstance()
             ->subject('[JoyPla] 発注が行われました')
             ->standby(false)
             ->reserveDate('now')
@@ -790,8 +764,8 @@ class OrderRepository implements OrderRepositoryInterface
 
         $ids = array_values(array_column($ids->toArray(), 'id'));
 
-        SpiralDb::mail('invitingDB')
-            ->ruleId($mailId)
+        ModelRepository::getInvitingMailInstance()
+            ->ruleId($ruleId)
             ->sampling($ids);
 
         $mailBody = view('mail/Order/OrderFix', [
@@ -813,14 +787,13 @@ class OrderRepository implements OrderRepositoryInterface
             'login_url' => config('url.hospital', ''),
         ])->render();
 
-        $ids = SpiralDb::title('NJ_HUserDB')
+        $ids = ModelRepository::getHospitalUserInstance()
             ->where('hospitalId', $user->hospitalId)
             ->whereIn('userPermission', [1, 3])
-            ->value('id')
             ->get();
         $ids = array_values(array_column($ids->toArray(), 'id'));
 
-        $ids2 = SpiralDb::title('NJ_HUserDB')
+        $ids2 = ModelRepository::getHospitalUserInstance()
             ->where('hospitalId', $user->hospitalId)
             ->where('divisionId', $order['division']['divisionId'])
             ->whereIn('userPermission', [2])
@@ -832,7 +805,7 @@ class OrderRepository implements OrderRepositoryInterface
             array_values(array_column($ids2->toArray(), 'id'))
         );
 
-        $mailId = SpiralDb::mail('NJ_HUserDB')
+        $mailId = ModelRepository::getHospitalUserMailInstance()
             ->subject('[JoyPla] 発注が行われました')
             ->standby(false)
             ->reserveDate('now')
@@ -842,7 +815,7 @@ class OrderRepository implements OrderRepositoryInterface
             ->mailField('mailAddress')
             ->regist();
 
-        SpiralDb::mail('NJ_HUserDB')
+        ModelRepository::getHospitalUserMailInstance()
             ->ruleId($mailId)
             ->sampling($ids);
     }
@@ -850,20 +823,18 @@ class OrderRepository implements OrderRepositoryInterface
     //** メンテナンス用 */
     public function all()
     {
-        $items = OrderItemView::get();
-        $historys = OrderView::orWhere(
-            'orderStatus',
-            OrderStatus::OrderCompletion
-        )
+        $items = ModelRepository::getOrderItemViewInstance()->get();
+        $historys = ModelRepository::getOrderViewInstance()
+            ->orWhere('orderStatus', OrderStatus::OrderCompletion)
             ->orWhere('orderStatus', OrderStatus::OrderFinished)
             ->orWhere('orderStatus', OrderStatus::PartOfTheCollectionIsIn)
             ->orWhere('orderStatus', OrderStatus::DeliveryDateReported)
             ->get();
 
-        foreach ($historys->data->all() as $history) {
+        foreach ($historys->all() as $history) {
             $order = Order::create($history);
 
-            foreach ($items->data->all() as $item) {
+            foreach ($items->all() as $item) {
                 if ($order->getOrderId()->equal($item->orderNumber)) {
                     $order = $order->addOrderItem(OrderItem::create($item));
                 }
@@ -933,10 +904,16 @@ class OrderRepository implements OrderRepositoryInterface
             }
         }
         if (count($history) > 0) {
-            SpiralDB::title('NJ_OrderHDB')->updateBulk('orderNumber', $history);
+            ModelRepository::getOrderInstance()->updateBulk(
+                'orderNumber',
+                $history
+            );
         }
         if (count($items) > 0) {
-            SpiralDB::title('NJ_OrderDB')->updateBulk('orderCNumber', $items);
+            ModelRepository::getOrderItemInstance()->updateBulk(
+                'orderCNumber',
+                $items
+            );
         }
         return array_values($orders);
     }

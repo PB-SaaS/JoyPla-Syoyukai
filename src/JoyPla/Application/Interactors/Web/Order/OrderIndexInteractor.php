@@ -17,33 +17,25 @@ namespace JoyPla\Application\Interactors\Web\Order {
     use JoyPla\InterfaceAdapters\GateWays\Repository\DivisionRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\HospitalRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\orderRepositoryInterface;
+    use JoyPla\Service\Presenter\Web\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class OrderIndexInteractor
      * @package JoyPla\Application\Interactors\Web\Order
      */
-    class OrderIndexInteractor implements OrderIndexInputPortInterface
+    abstract class OrderIndexInteractor implements OrderIndexInputPortInterface
     {
-        /** @var OrderIndexOutputPortInterface */
-        private OrderIndexOutputPortInterface $outputPort;
+        private RepositoryProvider $repositoryProvider;
+        private OrderIndexOutputPortInterface $presenter;
 
-        /** @var OrderRepositoryInterface */
-        private OrderRepositoryInterface $orderRepository;
-
-        /**
-         * OrderIndexInteractor constructor.
-         * @param OrderIndexOutputPortInterface $outputPort
-         */
         public function __construct(
-            OrderIndexOutputPortInterface $outputPort,
-            OrderRepositoryInterface $orderRepository,
-            DivisionRepositoryInterface $divisionRepository
+            OrderIndexOutputPortInterface $presenter,
+            RepositoryProvider $repositoryProvider
         ) {
-            $this->outputPort = $outputPort;
-            $this->orderRepository = $orderRepository;
-            $this->divisionRepository = $divisionRepository;
+            $this->presenter = $presenter;
+            $this->repositoryProvider = $repositoryProvider;
         }
-
         /**
          * @param OrderIndexInputData $inputData
          */
@@ -66,11 +58,9 @@ namespace JoyPla\Application\Interactors\Web\Order {
                     OrderStatus::Borrowing,
                 ];
             }
-            $order = $this->orderRepository->index(
-                $hospitalId,
-                $orderId,
-                $orderstatus
-            );
+            $order = $this->repositoryProvider
+                ->getOrderRepository()
+                ->index($hospitalId, $orderId, $orderstatus);
 
             if ($order === null) {
                 throw new NotFoundException('Not Found.', 404);
@@ -91,17 +81,21 @@ namespace JoyPla\Application\Interactors\Web\Order {
             if ($order['receivedTarget'] == '2') {
                 $order['receivedDivisionName'] =
                     $order['division']['divisionName'];
+                $order['receivedDivisionId'] = $order['division']['divisionId'];
             }
             if ($order['receivedTarget'] == '1') {
-                $receivedDivision = $this->divisionRepository->getStorehouse(
-                    $hospitalId
-                );
+                $receivedDivision = $this->repositoryProvider
+                    ->getDivisionRepository()
+                    ->getStorehouse($hospitalId);
                 $order[
                     'receivedDivisionName'
                 ] = $receivedDivision->getDivisionName()->value();
+                $order[
+                    'receivedDivisionId'
+                ] = $receivedDivision->getDivisionId()->value();
             }
 
-            $this->outputPort->output(new OrderIndexOutputData($order));
+            $this->presenter->output(new OrderIndexOutputData($order));
         }
     }
 }
@@ -119,9 +113,11 @@ namespace JoyPla\Application\InputPorts\Web\Order {
      */
     class OrderIndexInputData
     {
-        /**
-         * OrderIndexInputData constructor.
-         */
+        public Auth $user;
+        public string $orderId;
+        public bool $isUnapproved;
+        public bool $isOnlyMyDivision;
+
         public function __construct(
             Auth $user,
             string $orderId,
@@ -152,19 +148,14 @@ namespace JoyPla\Application\InputPorts\Web\Order {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Web\Order {
-    use JoyPla\Enterprise\Models\Order;
-
     /**
      * Class OrderIndexOutputData
      * @package JoyPla\Application\OutputPorts\Web\Order;
      */
     class OrderIndexOutputData
     {
-        /** @var string */
+        public array $order;
 
-        /**
-         * OrderIndexOutputData constructor.
-         */
         public function __construct(array $order)
         {
             $this->order = $order;

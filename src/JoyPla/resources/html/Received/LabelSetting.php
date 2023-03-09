@@ -98,7 +98,7 @@
     </div>
 </div>
 <script>
-    const PHPData = <?php echo json_encode($viewModel, true) ?>;
+    const PHPData = <?php echo json_encode($viewModel, true); ?>;
 
     var JoyPlaApp = Vue
         .createApp({

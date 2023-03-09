@@ -123,14 +123,18 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
                     new ConsumptionStatus(ConsumptionStatus::Consumption)
                 );
             }
-
             $this->repositoryProvider
                 ->getConsumptionRepository()
                 ->saveToArray($result);
 
-            $cardIds = $this->repositoryProvider
+            $cards = $this->repositoryProvider
                 ->getCardRepository()
-                ->get($hospitalId, $cardIds);
+                ->getCards($hospitalId, $cardIds);
+
+            $cardIds = array_map(function ($card) {
+                return $card->getCardId();
+            }, $cards);
+
             $this->repositoryProvider
                 ->getCardRepository()
                 ->reset($hospitalId, $cardIds);

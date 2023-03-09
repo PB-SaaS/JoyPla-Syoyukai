@@ -1,15 +1,6 @@
 <?php
 
 namespace JoyPla\InterfaceAdapters\GateWays\Repository;
-
-use App\SpiralDb\Consumption as SpiralDbConsumption;
-use App\SpiralDb\ConsumptionItem as SpiralDbConsumptionItem;
-use App\SpiralDb\ConsumptionItemView;
-use App\SpiralDb\ConsumptionView;
-use App\SpiralDb\Hospital;
-use App\SpiralDb\InHospitalItemView;
-use Exception;
-use framework\SpiralConnecter\SpiralDB;
 use JoyPla\Enterprise\Models\Consumption;
 use JoyPla\Enterprise\Models\ConsumptionId;
 use JoyPla\Enterprise\Models\ConsumptionItem;
@@ -24,18 +15,16 @@ use JoyPla\Enterprise\Models\LotNumber;
 use JoyPla\Enterprise\Models\Price;
 use JoyPla\Enterprise\Models\Quantity;
 use JoyPla\Enterprise\Models\UnitPrice;
+use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 
 class ConsumptionRepository implements ConsumptionRepositoryInterface
 {
     public function findByHospitalId(HospitalId $hospitalId)
     {
-        $billingHistory = SpiralDbConsumption::where(
-            'hospitalId',
-            $hospitalId->value()
-        )
+        $billingHistory = ModelRepository::getConsumptionInstance()
+            ->where('hospitalId', $hospitalId->value())
             ->get()
-            ->data->all();
-
+            ->all();
         return $billingHistory;
     }
 
@@ -43,26 +32,12 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
         HospitalId $hospitalId,
         array $consumptionItems
     ) {
-        $consumptionUnitPriceUseFlag = Hospital::where(
-            'hospitalId',
-            $hospitalId->value()
-        )
-            ->value('billingUnitPrice')
+        $consumptionUnitPriceUseFlag = ModelRepository::getHospitalInstance()
+            ->where('hospitalId', $hospitalId->value())
             ->get()
-            ->data->get(0);
+            ->first();
 
-        //$division = SpiralDbDivision::where('hospitalId',$hospitalId->value());
-
-        $division = SpiralDB::title('NJ_divisionDB')->value([
-            'registrationTime',
-            'divisionId',
-            'hospitalId',
-            'divisionName',
-            'divisionType',
-            'deleteFlag',
-            'authkey',
-            'deliveryDestCode',
-        ]);
+        $division = ModelRepository::getDivisionInstance();
 
         $division->where('hospitalId', $hospitalId->value());
 
@@ -70,10 +45,9 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
             $division->orWhere('divisionId', $item->divisionId);
         }
 
-        $division = $division->get();
-        $division = $division->all();
+        $division = $division->get()->all();
 
-        $inHospitalItem = InHospitalItemView::where(
+        $inHospitalItem = ModelRepository::getInHospitalItemViewInstance()->where(
             'hospitalId',
             $hospitalId->value()
         );
@@ -83,7 +57,7 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
                 $item->inHospitalItemId
             );
         }
-        $inHospitalItem = $inHospitalItem->get()->data->all();
+        $inHospitalItem = $inHospitalItem->get()->all();
 
         $result = [];
         foreach ($consumptionItems as $item) {
@@ -197,14 +171,15 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
                     'lotNumber' => $consumptionItem['lot']['lotNumber'],
                     'lotDate' => $consumptionItem['lot']['lotDate'],
                     'unitPrice' => $consumptionItem['unitPrice'],
-                    'lotManagement' => $consumptionItem['lotManagement'],
+                    'lotManagement' => $consumptionItem['lotManagement']
+                        ? 't'
+                        : 'f',
                     'itemId' => $consumptionItem['item']['itemId'],
                 ];
             }
         }
-
-        SpiralDbConsumption::insert($history);
-        SpiralDbConsumptionItem::insert($items);
+        ModelRepository::getConsumptionInstance()->insert($history);
+        ModelRepository::getConsumptionItemInstance()->insert($items);
 
         return $consumptions;
     }
@@ -212,11 +187,11 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
     public function search(HospitalId $hospitalId, object $search)
     {
         $itemSearchFlag = false;
-        $itemViewInstance = ConsumptionItemView::where(
-            'hospitalId',
-            $hospitalId->value()
-        )->value('billingNumber');
-        $historyViewInstance = ConsumptionView::where(
+        $itemViewInstance = ModelRepository::getConsumptionItemViewInstance()
+            ->where('hospitalId', $hospitalId->value())
+            ->value('billingNumber');
+
+        $historyViewInstance = ModelRepository::getConsumptionViewInstance()->where(
             'hospitalId',
             $hospitalId->value()
         );
@@ -264,10 +239,10 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
 
         if ($itemSearchFlag) {
             $itemViewInstance = $itemViewInstance->get();
-            if ($itemViewInstance->count == 0) {
+            if ($itemViewInstance->count() == 0) {
                 return [[], 0];
             }
-            foreach ($itemViewInstance->data->all() as $item) {
+            foreach ($itemViewInstance->all() as $item) {
                 $historyViewInstance = $historyViewInstance->orWhere(
                     'billingNumber',
                     $item->billingNumber
@@ -298,20 +273,20 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
         }
 
         $historys = $historyViewInstance
-            ->sort('billingDate', 'desc')
+            ->orderBy('billingDate', 'desc')
             ->page($search->currentPage)
             ->paginate($search->perPage);
 
-        if ($historys->count == 0) {
+        if ($historys->getData()->count() == 0) {
             return [[], 0];
         }
 
-        $itemViewInstance = ConsumptionItemView::getNewInstance()->where(
+        $itemViewInstance = ModelRepository::getConsumptionItemViewInstance()->where(
             'hospitalId',
             $hospitalId->value()
         );
 
-        foreach ($historys->data->all() as $history) {
+        foreach ($historys->getData()->all() as $history) {
             $itemViewInstance = $itemViewInstance->orWhere(
                 'billingNumber',
                 $history->billingNumber
@@ -320,10 +295,10 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
 
         $items = $itemViewInstance->get();
         $consumptions = [];
-        foreach ($historys->data->all() as $history) {
+        foreach ($historys->getData()->all() as $history) {
             $consumption = Consumption::create($history);
 
-            foreach ($items->data->all() as $item) {
+            foreach ($items->all() as $item) {
                 if (
                     $consumption
                         ->getConsumptionId()
@@ -338,28 +313,27 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
             $consumptions[] = $consumption;
         }
 
-        return [$consumptions, $historys->count];
+        return [$consumptions, $historys->getData()->count()];
     }
 
     public function find(HospitalId $hospitalId, ConsumptionId $consumptionId)
     {
-        $consumptionView = ConsumptionView::where(
-            'hospitalId',
-            $hospitalId->value()
-        )
+        $consumptionView = ModelRepository::getConsumptionViewInstance()
+            ->where('hospitalId', $hospitalId->value())
             ->where('billingNumber', $consumptionId->value())
             ->get();
-        if ($consumptionView->count <= 0) {
+        if ($consumptionView->count() <= 0) {
             return null;
         }
-        $consumptionItemView = ConsumptionItemView::sort('id', 'asc')
+        $consumptionItemView = ModelRepository::getConsumptionItemViewInstance()
+            ->orderBy('id', 'asc')
             ->where('hospitalId', $hospitalId->value())
             ->where('billingNumber', $consumptionId->value())
             ->get();
 
-        $consumption = Consumption::create($consumptionView->data->get(0));
+        $consumption = Consumption::create($consumptionView->first());
 
-        foreach ($consumptionItemView->data->all() as $item) {
+        foreach ($consumptionItemView->all() as $item) {
             $consumption = $consumption->addConsumptionItem(
                 ConsumptionItem::create($item)
             );
@@ -370,7 +344,8 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
 
     public function delete(HospitalId $hospitalId, ConsumptionId $consumptionId)
     {
-        ConsumptionView::where('hospitalId', $hospitalId->value())
+        ModelRepository::getConsumptionInstance()
+            ->where('hospitalId', $hospitalId->value())
             ->where('billingNumber', $consumptionId->value())
             ->delete();
     }

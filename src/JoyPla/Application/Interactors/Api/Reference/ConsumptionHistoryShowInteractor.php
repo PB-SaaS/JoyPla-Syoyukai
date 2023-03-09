@@ -38,10 +38,15 @@ namespace JoyPla\Application\Interactors\Api\Reference {
          */
         public function handle(ConsumptionHistoryShowInputData $inputData)
         {
-            [$histories, $count] = $this->repository->search(
-                new HospitalId($inputData->hospitalId),
-                $inputData->search
-            );
+            [
+                $histories,
+                $count,
+            ] = $this->repositoryProvider
+                ->getConsumptionHistoryRepository()
+                ->search(
+                    new HospitalId($inputData->hospitalId),
+                    $inputData->search
+                );
 
             $this->presenterProvider
                 ->getConsumptionHistoryShowPresenter()

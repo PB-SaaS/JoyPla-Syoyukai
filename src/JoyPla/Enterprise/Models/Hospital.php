@@ -3,20 +3,19 @@
 namespace JoyPla\Enterprise\Models;
 
 use Collection;
-class Hospital 
+class Hospital
 {
     private HospitalId $hospitalId;
     private HospitalName $hospitalName;
 
     public function __construct(
-        HospitalId $hospitalId , 
-        HospitalName $hospitalName ,
+        HospitalId $hospitalId,
+        HospitalName $hospitalName,
         string $postalCode,
         string $phoneNumber,
         Pref $prefectures,
         string $address
-        )
-    {
+    ) {
         $this->hospitalId = $hospitalId;
         $this->hospitalName = $hospitalName;
         $this->postalCode = $postalCode;
@@ -28,12 +27,12 @@ class Hospital
     public static function create(Collection $i)
     {
         return new Hospital(
-            ( new HospitalId($i->hospitalId) ),
-            ( new HospitalName($i->hospitalName) ),
+            new HospitalId($i->hospitalId),
+            new HospitalName($i->hospitalName),
             $i->postalCode,
             $i->phoneNumber,
-            ( new Pref($i->prefectures)),
-            $i->address,
+            new Pref($i->prefectures),
+            $i->address
         );
     }
 
@@ -46,7 +45,7 @@ class Hospital
     {
         return $this->hospitalName;
     }
-    
+
     public function toArray()
     {
         return [

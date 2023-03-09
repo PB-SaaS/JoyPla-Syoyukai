@@ -5,7 +5,6 @@
  */
 
 namespace JoyPla\Application\Interactors\Web\ItemRequest {
-
     use framework\Exception\NotFoundException;
     use JoyPla\Application\InputPorts\Web\ItemRequest\ItemRequestShowInputData;
     use JoyPla\Application\InputPorts\Web\ItemRequest\ItemRequestShowInputPortInterface;
@@ -14,6 +13,8 @@ namespace JoyPla\Application\Interactors\Web\ItemRequest {
     use JoyPla\Enterprise\Models\RequestHId;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRequestRepositoryInterface;
+    use JoyPla\Service\Presenter\Web\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ItemRequestShowInteractor
@@ -21,22 +22,15 @@ namespace JoyPla\Application\Interactors\Web\ItemRequest {
      */
     class ItemRequestShowInteractor implements ItemRequestShowInputPortInterface
     {
-        /** @var ItemRequestShowOutputPortInterface */
-        private ItemRequestShowOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var ItemRequestRepositoryInterface */
-        private ItemRequestRepositoryInterface $repository;
-
-        /**
-         * ItemRequestShowInteractor constructor.
-         * @param ItemRequestShowOutputPortInterface $outputPort
-         */
         public function __construct(
-            ItemRequestShowOutputPortInterface $outputPort,
-            ItemRequestRepositoryInterface $repository
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
         ) {
-            $this->outputPort = $outputPort;
-            $this->repository = $repository;
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -44,34 +38,41 @@ namespace JoyPla\Application\Interactors\Web\ItemRequest {
          */
         public function handle(ItemRequestShowInputData $inputData)
         {
-
             $hospitalId = new HospitalId($inputData->user->hospitalId);
             $requestHId = new RequestHId($inputData->requestHId);
 
-            $itemRequest = $this->repository->show($hospitalId, $requestHId);
+            $itemRequest = $this->repositoryProvider
+                ->getItemRequestRepository()
+                ->show($hospitalId, $requestHId);
 
             if ($itemRequest === null) {
-                throw new NotFoundException("Not Found.", 404);
+                throw new NotFoundException('Not Found.', 404);
             }
 
-            if ($inputData->isOnlyMyDivision && !$itemRequest->getSourceDivision()->getDivisionId()->equal($inputData->user->divisionId)) {
-                throw new NotFoundException("Not Found.", 404);
+            if (
+                $inputData->isOnlyMyDivision &&
+                !$itemRequest
+                    ->getSourceDivision()
+                    ->getDivisionId()
+                    ->equal($inputData->user->divisionId)
+            ) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
             $itemRequest = $itemRequest->toArray();
 
-            $this->outputPort->output(new ItemRequestShowOutputData($itemRequest));
+            $this->presenterProvider
+                ->getItemRequestShowPresenter()
+                ->output(new ItemRequestShowOutputData($itemRequest));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 
 namespace JoyPla\Application\InputPorts\Web\ItemRequest {
-
     use Auth;
 
     /**
@@ -80,11 +81,15 @@ namespace JoyPla\Application\InputPorts\Web\ItemRequest {
      */
     class ItemRequestShowInputData
     {
-        /**
-         * ItemRequestShowInputData constructor.
-         */
-        public function __construct(Auth $user, string $requestHId, bool $isOnlyMyDivision)
-        {
+        public Auth $user;
+        public string $requestHId;
+        public bool $isOnlyMyDivision;
+
+        public function __construct(
+            Auth $user,
+            string $requestHId,
+            bool $isOnlyMyDivision
+        ) {
             $this->user = $user;
             $this->requestHId = $requestHId;
             $this->isOnlyMyDivision = $isOnlyMyDivision;
@@ -109,18 +114,14 @@ namespace JoyPla\Application\InputPorts\Web\ItemRequest {
  */
 
 namespace JoyPla\Application\OutputPorts\Web\ItemRequest {
-
     /**
      * Class ItemRequestShowOutputData
      * @package JoyPla\Application\OutputPorts\Web\ItemRequest;
      */
     class ItemRequestShowOutputData
     {
-        /** @var array */
+        public array $itemRequest;
 
-        /**
-         * ItemRequestShowOutputData constructor.
-         */
         public function __construct(array $itemRequest)
         {
             $this->itemRequest = $itemRequest;

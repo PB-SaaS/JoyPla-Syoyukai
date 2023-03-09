@@ -88,6 +88,11 @@ const vInput = {
       type: String,
       required: false,
       default : ""
+    },
+    disabled :{
+      type: Boolean,
+      required: false,
+      default : false
     }
   },
   watch: {
@@ -107,6 +112,7 @@ const vInput = {
             autocomplete="off"
             class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border"
             :class="[ ( ! meta.valid && meta.validated == true) ? errorClassName : successClassName , changeClass]"
+            :disabled="disabled"
         />
         <span class="text-red-500">{{ errorMessage }}</span>
     </v-text>
@@ -239,6 +245,11 @@ const vInputNumber = {
       type: String,
       required: false,
       default : ""
+    },
+    disabled :{
+      type: Boolean,
+      required: false,
+      default : false
     }
   },
   computed: {
@@ -285,6 +296,7 @@ const vInputNumber = {
             oncontextmenu="return false;"
             type="button" 
             class="bg-white hover:border-gray-400 text-gray-700 py-2 px-4 border border-gray-300 h-full w-full" 
+            :disabled="disabled"
             >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" />
@@ -298,6 +310,7 @@ const vInputNumber = {
               :name="name"
               v-model="value"
               class="appearance-none w-5/6 py-2 pl-3 leading-tight h-full text-right flex-initial bg-white"
+              :disabled="disabled"
           />
           <div class="px-2 flex items-center justify-center max-w-xs bg-white whitespace-pre"
               :class="changeClass">
@@ -311,6 +324,7 @@ const vInputNumber = {
             oncontextmenu="return false;"
             type="button" 
             class="bg-white hover:border-gray-400 text-gray-700 py-2 px-4 border border-gray-300 h-full w-full" 
+            :disabled="disabled"
             >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -584,7 +598,8 @@ const vButtonPrimary = {
   props: {
     type: { 
         type: String, 
-        required: true 
+        required: true ,
+        disabled: false
     },
   },
   data() {
@@ -596,13 +611,14 @@ const vButtonPrimary = {
   },
   template: `<button :type="type" class="
   disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-  hover:border-sushi-700 text-sushi-50 py-2 px-4 border border-sushi-200 bg-sushi-500 hover:bg-sushi-400"><slot></slot></button>`
+  hover:border-sushi-700 text-sushi-50 py-2 px-4 border border-sushi-200 bg-sushi-500 hover:bg-sushi-400" :disabled="disabled"><slot></slot></button>`
 };
 const vButtonDefault = {
   props: {
     type: { 
         type: String, 
-        required: true 
+        required: true ,
+        disabled: false
     },
   },
   data() {
@@ -614,14 +630,15 @@ const vButtonDefault = {
   },
   template: `<button :type="type" class="
   disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-  bg-white hover:border-gray-400 text-gray-700 py-2 px-4 border border-gray-300"><slot></slot></button>`
+  bg-white hover:border-gray-400 text-gray-700 py-2 px-4 border border-gray-300" :disabled="disabled"><slot></slot></button>`
 };
 
 const vButtonDanger = {
   props: {
     type: { 
         type: String, 
-        required: true 
+        required: true,
+        disabled: false
     },
   },
   data() {
@@ -633,7 +650,7 @@ const vButtonDanger = {
   },
   template: `<button :type="type" class="
   disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-  hover:border-red-700 text-white py-2 px-4 border border-red-200 bg-red-500 hover:bg-red-400"><slot></slot></button>`
+  hover:border-red-700 text-white py-2 px-4 border border-red-200 bg-red-500 hover:bg-red-400" :disabled="disabled"><slot></slot></button>`
 };
 
 const vAlert = {

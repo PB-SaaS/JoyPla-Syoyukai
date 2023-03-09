@@ -5,25 +5,17 @@
  */
 
 namespace JoyPla\Application\Interactors\Api\Barcode {
-    use App\SpiralDb\CardView;
-    use App\SpiralDb\Hospital;
-    use App\SpiralDb\HospitalUser;
-    use App\SpiralDb\InHospitalItemView;
-    use App\SpiralDb\PayoutItem;
-    use App\SpiralDb\ReceivedItemView;
     use Exception;
     use framework\Facades\Gate;
     use framework\SpiralConnecter\SpiralDB;
     use JoyPla\Application\InputPorts\Api\Barcode\BarcodeSearchInputPortInterface;
     use JoyPla\Application\InputPorts\Api\Barcode\BarcodeSearchInputData;
     use JoyPla\Application\OutputPorts\Api\Barcode\BarcodeSearchOutputData;
-    use JoyPla\Application\OutputPorts\Api\Barcode\BarcodeSearchOutputPortInterface;
     use JoyPla\Enterprise\Models\DateYearMonthDay;
     use JoyPla\Enterprise\Models\HospitalId;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\BarcodeRepositoryInterface;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\InHospitalItemRepositoryInterface;
     use NGT\Barcode\GS1Decoder\Decoder;
     use Collection;
+    use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
     use JoyPla\Service\Presenter\Api\PresenterProvider;
     use JoyPla\Service\Repository\RepositoryProvider;
 
@@ -83,31 +75,26 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                 //検収書から発行されたラベル
                 $receivedItemId = substr($inputData->barcode, 2);
                 if (Gate::allows('is_admin')) {
-                    $result = ReceivedItemView::where(
-                        'receivingNumber',
-                        'rec_' . $receivedItemId
-                    )
+                    $result = ModelRepository::getReceivedItemViewInstance()
+                        ->where('receivingNumber', 'rec_' . $receivedItemId)
                         ->where('hospitalId', $inputData->user->hospitalId)
                         ->get();
                 } else {
-                    $result = ReceivedItemView::where(
-                        'receivingNumber',
-                        'rec_' . $receivedItemId
-                    )
+                    $result = ModelRepository::getReceivedItemViewInstance()
+                        ->where('receivingNumber', 'rec_' . $receivedItemId)
                         ->where('hospitalId', $inputData->user->hospitalId)
                         ->where('divisionId', $inputData->user->divisionId)
                         ->get();
                 }
-                if ($result->count == 0) {
+                if ($result->count() == 0) {
                     throw new Exception('Not Received Label');
                 }
-                $record = $result->data->get(0);
+                $record = $result->first();
 
-                $hospital = Hospital::where(
-                    'hospitalId',
-                    $inputData->user->hospitalId
-                )->get();
-                $hospital = $hospital->data->get(0);
+                $hospital = ModelRepository::getHospitalInstance()
+                    ->where('hospitalId', $inputData->user->hospitalId)
+                    ->get();
+                $hospital = $hospital->first();
 
                 $divisionId = $record->divisionId;
 
@@ -121,16 +108,13 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                     $divisionId = $division->divisionId;
                 }
 
-                $inHospitalItems = InHospitalItemView::where(
-                    'notUsedFlag',
-                    '1',
-                    '!='
-                )
+                $inHospitalItems = ModelRepository::getInHospitalItemViewInstance()
+                    ->where('notUsedFlag', '1', '!=')
                     ->where('inHospitalItemId', $record->inHospitalItemId)
                     ->where('hospitalId', $inputData->user->hospitalId)
                     ->get();
-                $count = $inHospitalItems->count;
-                $inHospitalItems = $inHospitalItems->data->all();
+                $count = $inHospitalItems->count();
+                $inHospitalItems = $inHospitalItems->all();
                 foreach ($inHospitalItems as $key => $v) {
                     if ($record->lotDate != '') {
                         $record->lotDate = (new DateYearMonthDay(
@@ -155,17 +139,13 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                 //払出から発行されたラベル
                 $payout_num = substr($inputData->barcode, 2);
                 if (Gate::allows('is_admin')) {
-                    $result = PayoutItem::where(
-                        'payoutId',
-                        'payout_' . $payout_num
-                    )
+                    $result = ModelRepository::getPayoutItemInstance()
+                        ->where('payoutId', 'payout_' . $payout_num)
                         ->where('hospitalId', $inputData->user->hospitalId)
                         ->get();
                 } else {
-                    $result = PayoutItem::where(
-                        'payoutId',
-                        'payout_' . $payout_num
-                    )
+                    $result = ModelRepository::getPayoutItemInstance()
+                        ->where('payoutId', 'payout_' . $payout_num)
                         ->where('hospitalId', $inputData->user->hospitalId)
                         ->where(
                             'sourceDivisionId',
@@ -174,25 +154,22 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                         ->get();
                 }
 
-                if ($result->count == 0) {
+                if ($result->count() == 0) {
                     throw new Exception('Not Payout Label');
                 }
 
-                $record = $result->data->get(0);
-                $inHospitalItems = InHospitalItemView::where(
-                    'notUsedFlag',
-                    '1',
-                    '!='
-                )
+                $record = $result->first();
+                $inHospitalItems = ModelRepository::getInHospitalItemViewInstance()
+                    ->where('notUsedFlag', '1', '!=')
                     ->where('inHospitalItemId', $record->inHospitalItemId)
                     ->where('hospitalId', $inputData->user->hospitalId)
                     ->get();
 
-                if ($inHospitalItems->count === 0) {
+                if ($inHospitalItems->count() === 0) {
                     throw new Exception('Not Payout Label');
                 }
 
-                $inHospitalItems = $inHospitalItems->data->all();
+                $inHospitalItems = $inHospitalItems->first();
 
                 foreach ($inHospitalItems as $key => $v) {
                     if ($record->lotDate != '') {
@@ -222,34 +199,41 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
 
                 $type = 'card';
 
+                $cardInstance = SpiralDB::title('NJ_CardDB')
+                    ->where('cardId', $inputData->barcode)
+                    ->where('hospitalId', $inputData->user->hospitalId)
+                    ->value([
+                        'divisionId',
+                        'hospitalId',
+                        'cardId',
+                        'lotNumber',
+                        'lotDate',
+                        'inHospitalItemId',
+                        'quantity',
+                    ]);
+
                 if (Gate::allows('is_admin')) {
-                    $result = CardView::where('cardId', $inputData->barcode)
-                        ->where('hospitalId', $inputData->user->hospitalId)
-                        ->get();
-                    $record = $result->data->get(0);
+                    $record = $cardInstance->get()->first();
                 } else {
-                    $result = CardView::where('cardId', $inputData->barcode)
-                        ->where('hospitalId', $inputData->user->hospitalId)
+                    $record = $cardInstance
                         ->where('divisionId', $inputData->user->divisionId)
-                        ->get();
-                    $record = $result->data->get(0);
+                        ->get()
+                        ->first();
                 }
 
-                if ($result->count == '0') {
+                if (empty($record)) {
                     throw new Exception('Card Label');
                 }
-                $inHospitalItems = InHospitalItemView::where(
-                    'hospitalId',
-                    $inputData->user->hospitalId
-                )
+                $inHospitalItems = ModelRepository::getInHospitalItemViewInstance()
+                    ->where('hospitalId', $inputData->user->hospitalId)
                     ->where('inHospitalItemId', $record->inHospitalItemId)
                     ->get();
 
-                if ($inHospitalItems->count === 0) {
+                if ($inHospitalItems->count() === 0) {
                     throw new Exception('Not Payout Label');
                 }
 
-                $inHospitalItems = $inHospitalItems->data->all();
+                $inHospitalItems = $inHospitalItems->all();
 
                 foreach ($inHospitalItems as $key => $v) {
                     if ($record->lotDate != '') {
@@ -310,21 +294,18 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                     $label_id = substr($inputData->barcode, 2, 8);
                     $custom_quantity = substr($inputData->barcode, 10, 4);
                 }
-                $InHospitalItemView = InHospitalItemView::where(
-                    'notUsedFlag',
-                    '1',
-                    '!='
-                )
+                $InHospitalItemView = ModelRepository::getInHospitalItemViewInstance()
+                    ->where('notUsedFlag', '1', '!=')
                     ->where('labelId', $label_id)
                     ->where('hospitalId', $inputData->user->hospitalId);
 
                 $result = $InHospitalItemView->get();
-                $count = $result->count;
-                if ($result->count == '0') {
+                $count = $result->count();
+                if ($result->count() == '0') {
                     throw new Exception('Not Received Label');
                 }
 
-                $inHospitalItems = $result->data->all();
+                $inHospitalItems = $result->all();
                 foreach ($inHospitalItems as $key => $v) {
                     $inHospitalItems[$key]->set('lotNumber', '');
                     $inHospitalItems[$key]->set('lotDate', '');
@@ -384,12 +365,12 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
             }
 
             if (count($inHospitalItems) > 0 && !$isPickingList) {
-                $price = SpiralDB::title('NJ_PriceDB');
+                $price = ModelRepository::getPriceInstance();
                 foreach ($inHospitalItems as $key => $val) {
                     $price->orWhere('priceId', $val->priceId);
                 }
 
-                $prices = $price->get(['priceId', 'notice']);
+                $prices = $price->get();
 
                 foreach ($inHospitalItems as $key => $val) {
                     foreach ($prices as $price) {

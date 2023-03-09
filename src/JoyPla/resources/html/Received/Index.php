@@ -8,9 +8,9 @@
                 <h1 class="text-2xl mb-2">検収書</h1>
                 <hr>
                 <div class="p-4 text-base bg-gray-100 border border-gray-400 flex flex-col md:flex-row md:gap-6 gap-4 mb-6">
-                    <?php if (gate('register_return_slips')->can()) : ?>
+                    <?php if (gate('register_return_slips')->can()): ?>
                         <v-button-danger type="button" class="md:w-1/6 w-full" :disabled="! isChange" @click.native="onRegister">返品登録</v-button-danger>
-                    <?php endif ?>
+                    <?php endif; ?>
                     <v-button-default type="button" class="md:w-1/6 w-full" @click.native="label( received.receivedId )">ラベルプリント</v-button-default>
                 </div>
                 <div class="p-4 text-base bg-gray-100 border border-gray-400">
@@ -81,11 +81,15 @@
                                                         {{ item.value.quantity.itemUnit }}
                                                     </div>
                                                 </div>
-                                                <?php if (gate('register_return_slips')->can()) : ?>
+                                                <?php if (
+                                                    gate(
+                                                        'register_return_slips'
+                                                    )->can()
+                                                ): ?>
                                                     <div class="p-4 text-base bg-gray-100 border border-gray-400 my-2" v-if="( item.value.receivedQuantity - item.value.returnQuantity ) > 0">
                                                         <v-input-number :rules="{ between: [ 0 , ( item.value.receivedQuantity - item.value.returnQuantity) ] }" :name="`receivedItems[${idx}].returnQuantityEdit`" label="返品数" :unit="item.value.quantity.itemUnit" :step="1" @change="isChange = true" change-class-name="inputChange" title="返品数"></v-input-number>
                                                     </div>
-                                                <?php endif ?>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </div>
@@ -100,7 +104,7 @@
     </div>
 </div>
 <script>
-    const PHPData = <?php echo json_encode($viewModel, true) ?>;
+    const PHPData = <?php echo json_encode($viewModel, true); ?>;
 
     var JoyPlaApp = Vue
         .createApp({

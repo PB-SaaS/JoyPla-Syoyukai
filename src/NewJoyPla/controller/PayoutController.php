@@ -104,17 +104,27 @@ class PayoutController extends Controller
         // GETで呼ばれた
         //$mytable = new mytable();
         // テンプレートにパラメータを渡し、HTMLを生成し返却
-        $param = array();
+        $param = [];
         try {
-
             $user_info = new UserInfo($SPIRAL);
 
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
-            ], false);
+            $head = $this->view(
+                'NewJoyPla/view/template/parts/Head',
+                [],
+                false
+            );
+            $header = $this->view(
+                'NewJoyPla/src/HeaderForMypage',
+                [
+                    'SPIRAL' => $SPIRAL,
+                ],
+                false
+            );
 
-            throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+            throw new Exception(
+                FactoryApiErrorCode::factory(404)->getMessage(),
+                FactoryApiErrorCode::factory(404)->getCode()
+            );
             /* 
             if($user_info->isDistributorUser())
             {
@@ -147,25 +157,31 @@ class PayoutController extends Controller
                 ] , false);
  */
         } catch (Exception $ex) {
-            $content = $this->view('NewJoyPla/view/template/Error', [
-                'code' => $ex->getCode(),
-                'message' => $ex->getMessage(),
-                'csrf_token' => Csrf::generate(16)
-            ], false);
+            $content = $this->view(
+                'NewJoyPla/view/template/Error',
+                [
+                    'code' => $ex->getCode(),
+                    'message' => $ex->getMessage(),
+                    'csrf_token' => Csrf::generate(16),
+                ],
+                false
+            );
         } finally {
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 払出予定商品登録',
-                'script' => '',
-                'content'   => $content->render(),
-                'head' => $head->render(),
-                'header' => $header->render(),
-                'baseUrl' => '',
-            ], false);
+            return $this->view(
+                'NewJoyPla/view/template/Template',
+                [
+                    'title' => 'JoyPla 払出予定商品登録',
+                    'script' => '',
+                    'content' => $content->render(),
+                    'head' => $head->render(),
+                    'header' => $header->render(),
+                    'baseUrl' => '',
+                ],
+                false
+            );
         }
     }
-
-
 
     public function newPayout(): View
     {
@@ -173,106 +189,167 @@ class PayoutController extends Controller
         // GETで呼ばれた
         //$mytable = new mytable();
         // テンプレートにパラメータを渡し、HTMLを生成し返却
-        $param = array();
+        $param = [];
         try {
-
             $user_info = new UserInfo($SPIRAL);
 
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
-            ], false);
+            $head = $this->view(
+                'NewJoyPla/view/template/parts/Head',
+                [],
+                false
+            );
+            $header = $this->view(
+                'NewJoyPla/src/HeaderForMypage',
+                [
+                    'SPIRAL' => $SPIRAL,
+                ],
+                false
+            );
 
             if ($user_info->isDistributorUser()) {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(), FactoryApiErrorCode::factory(191)->getCode());
+                throw new Exception(
+                    FactoryApiErrorCode::factory(191)->getMessage(),
+                    FactoryApiErrorCode::factory(191)->getCode()
+                );
             }
-            $target_division = Division::where('hospitalId', $user_info->getHospitalId())->get();
-            if (($user_info->isHospitalUser() && !$user_info->isUser())) {
+            $target_division = Division::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )->get();
+            if ($user_info->isHospitalUser() && !$user_info->isUser()) {
                 $source_division = $target_division;
             } else {
-                $source_division = Division::where('hospitalId', $user_info->getHospitalId())->where('divisionId', $user_info->getDivisionId())->get();
+                $source_division = Division::where(
+                    'hospitalId',
+                    $user_info->getHospitalId()
+                )
+                    ->where('divisionId', $user_info->getDivisionId())
+                    ->get();
             }
 
-            $api_url = "%url/rel:mpgt:Payout%";
+            $api_url = '%url/rel:mpgt:Payout%';
 
-            $hospital_data = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
+            $hospital_data = Hospital::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )->get();
             $hospital_data = $hospital_data->data->get(0);
-            $useUnitPrice = (int)$hospital_data->payoutUnitPrice;
+            $useUnitPrice = (int) $hospital_data->payoutUnitPrice;
 
-            $content = $this->view('NewJoyPla/view/PayoutContent2', [
-                'api_url' => $api_url,
-                'user_info' => $user_info,
-                'source_division' => $source_division,
-                'target_division' => $target_division,
-                'useUnitPrice' => $useUnitPrice,
-                'csrf_token' => Csrf::generate(16)
-            ], false);
+            $content = $this->view(
+                'NewJoyPla/view/PayoutContent2',
+                [
+                    'api_url' => $api_url,
+                    'user_info' => $user_info,
+                    'source_division' => $source_division,
+                    'target_division' => $target_division,
+                    'useUnitPrice' => $useUnitPrice,
+                    'csrf_token' => Csrf::generate(16),
+                ],
+                false
+            );
         } catch (Exception $ex) {
-            $content = $this->view('NewJoyPla/view/template/Error', [
-                'code' => $ex->getCode(),
-                'message' => $ex->getMessage(),
-                'csrf_token' => Csrf::generate(16)
-            ], false);
+            $content = $this->view(
+                'NewJoyPla/view/template/Error',
+                [
+                    'code' => $ex->getCode(),
+                    'message' => $ex->getMessage(),
+                    'csrf_token' => Csrf::generate(16),
+                ],
+                false
+            );
         } finally {
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 払出登録',
-                'script' => '',
-                'content'   => $content->render(),
-                'head' => $head->render(),
-                'header' => $header->render(),
-                'baseUrl' => '',
-            ], false);
+            return $this->view(
+                'NewJoyPla/view/template/Template',
+                [
+                    'title' => 'JoyPla 払出登録',
+                    'script' => '',
+                    'content' => $content->render(),
+                    'head' => $head->render(),
+                    'header' => $header->render(),
+                    'baseUrl' => '',
+                ],
+                false
+            );
         }
     }
-
 
     public function payoutList(): View
     {
         global $SPIRAL;
         try {
-
             $user_info = new UserInfo($SPIRAL);
 
             if ($user_info->isDistributorUser()) {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(), FactoryApiErrorCode::factory(191)->getCode());
+                throw new Exception(
+                    FactoryApiErrorCode::factory(191)->getMessage(),
+                    FactoryApiErrorCode::factory(191)->getCode()
+                );
             }
 
-            if ($user_info->isHospitalUser() && ($user_info->isAdmin() || $user_info->isApprover())) {
-                $content = $this->view('NewJoyPla/view/template/List', [
-                    'title' => '払出履歴一覧',
-                    'table' => '%sf:usr:payoutList:mstfilter%',
-                    'csrf_token' => Csrf::generate(16),
-                    'submenulink' => "%url/rel:mpg:top%&path=payout",
-                    'submenu' => '払出メニュー',
-                ], false);
+            if (
+                $user_info->isHospitalUser() &&
+                ($user_info->isAdmin() || $user_info->isApprover())
+            ) {
+                $content = $this->view(
+                    'NewJoyPla/view/template/List',
+                    [
+                        'title' => '払出履歴一覧',
+                        'table' => '%sf:usr:payoutList:mstfilter%',
+                        'csrf_token' => Csrf::generate(16),
+                        'submenulink' => '%url/rel:mpg:top%&path=payout',
+                        'submenu' => '払出メニュー',
+                    ],
+                    false
+                );
             } else {
-                $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
-                    'table' => '%sf:usr:search105:table%',
-                    'title' => '払出履歴一覧 - 部署選択',
-                    'param' => 'payoutListForDivision',
-                ], false);
+                $content = $this->view(
+                    'NewJoyPla/view/template/DivisionSelectList',
+                    [
+                        'table' => '%sf:usr:search105:table%',
+                        'title' => '払出履歴一覧 - 部署選択',
+                        'param' => 'payoutListForDivision',
+                    ],
+                    false
+                );
             }
         } catch (Exception $ex) {
-            $content = $this->view('NewJoyPla/view/template/Error', [
-                'code' => $ex->getCode(),
-                'message' => $ex->getMessage(),
-            ], false);
+            $content = $this->view(
+                'NewJoyPla/view/template/Error',
+                [
+                    'code' => $ex->getCode(),
+                    'message' => $ex->getMessage(),
+                ],
+                false
+            );
         } finally {
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
-            ], false);
+            $head = $this->view(
+                'NewJoyPla/view/template/parts/Head',
+                [],
+                false
+            );
+            $header = $this->view(
+                'NewJoyPla/src/HeaderForMypage',
+                [
+                    'SPIRAL' => $SPIRAL,
+                ],
+                false
+            );
 
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 払出履歴一覧',
-                'script' => '',
-                'content'   => $content->render(),
-                'head' => $head->render(),
-                'header' => $header->render(),
-                'baseUrl' => '',
-            ], false);
+            return $this->view(
+                'NewJoyPla/view/template/Template',
+                [
+                    'title' => 'JoyPla 払出履歴一覧',
+                    'script' => '',
+                    'content' => $content->render(),
+                    'head' => $head->render(),
+                    'header' => $header->render(),
+                    'baseUrl' => '',
+                ],
+                false
+            );
         }
     }
 
@@ -280,50 +357,81 @@ class PayoutController extends Controller
     {
         global $SPIRAL;
         try {
-
             $user_info = new UserInfo($SPIRAL);
 
             if ($user_info->isDistributorUser()) {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+                throw new Exception(
+                    FactoryApiErrorCode::factory(404)->getMessage(),
+                    FactoryApiErrorCode::factory(404)->getCode()
+                );
             }
 
-            if ($user_info->isHospitalUser() && ($user_info->isApprover() || $user_info->isAdmin())) {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+            if (
+                $user_info->isHospitalUser() &&
+                ($user_info->isApprover() || $user_info->isAdmin())
+            ) {
+                throw new Exception(
+                    FactoryApiErrorCode::factory(404)->getMessage(),
+                    FactoryApiErrorCode::factory(404)->getCode()
+                );
             }
 
             if (\App\lib\isMypage()) {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+                throw new Exception(
+                    FactoryApiErrorCode::factory(404)->getMessage(),
+                    FactoryApiErrorCode::factory(404)->getCode()
+                );
             }
 
-            $api_url = "%url/rel:mpgt:Payout%";
+            $api_url = '%url/rel:mpgt:Payout%';
 
-            $content = $this->view('NewJoyPla/view/template/List', [
-                'title' => '払出履歴一覧',
-                'table' => '%sf:usr:payoutList:mstfilter%',
-                'csrf_token' => Csrf::generate(16),
-                'submenulink' => "%url/rel:mpg:top%&path=payout",
-                'submenu' => '払出メニュー',
-            ], false);
+            $content = $this->view(
+                'NewJoyPla/view/template/List',
+                [
+                    'title' => '払出履歴一覧',
+                    'table' => '%sf:usr:payoutList:mstfilter%',
+                    'csrf_token' => Csrf::generate(16),
+                    'submenulink' => '%url/rel:mpg:top%&path=payout',
+                    'submenu' => '払出メニュー',
+                ],
+                false
+            );
         } catch (Exception $ex) {
-            $content = $this->view('NewJoyPla/view/template/Error', [
-                'code' => $ex->getCode(),
-                'message' => $ex->getMessage(),
-            ], false);
+            $content = $this->view(
+                'NewJoyPla/view/template/Error',
+                [
+                    'code' => $ex->getCode(),
+                    'message' => $ex->getMessage(),
+                ],
+                false
+            );
         } finally {
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [], false);
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
-            ], false);
+            $head = $this->view(
+                'NewJoyPla/view/template/parts/Head',
+                [],
+                false
+            );
+            $header = $this->view(
+                'NewJoyPla/src/HeaderForMypage',
+                [
+                    'SPIRAL' => $SPIRAL,
+                ],
+                false
+            );
             // テンプレートにパラメータを渡し、HTMLを生成し返却
 
-            return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 払出履歴一覧',
-                'script' => '',
-                'content'   => $content->render(),
-                'head' => $head->render(),
-                'header' => $header->render(),
-                'baseUrl' => '',
-            ], false);
+            return $this->view(
+                'NewJoyPla/view/template/Template',
+                [
+                    'title' => 'JoyPla 払出履歴一覧',
+                    'script' => '',
+                    'content' => $content->render(),
+                    'head' => $head->render(),
+                    'header' => $header->render(),
+                    'baseUrl' => '',
+                ],
+                false
+            );
         }
     }
 
@@ -334,25 +442,40 @@ class PayoutController extends Controller
         //$mytable = new mytable();
         // テンプレートにパラメータを渡し、HTMLを生成し返却
         try {
-
             $user_info = new UserInfo($SPIRAL);
 
-
             if ($user_info->isDistributorUser()) {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(), FactoryApiErrorCode::factory(191)->getCode());
+                throw new Exception(
+                    FactoryApiErrorCode::factory(191)->getMessage(),
+                    FactoryApiErrorCode::factory(191)->getCode()
+                );
             }
 
             $payout_history_id = $SPIRAL->getParam('payoutHistoryId');
 
-            if ($payout_history_id == "" || $payout_history_id == null) {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(), FactoryApiErrorCode::factory(191)->getCode());
+            if ($payout_history_id == '' || $payout_history_id == null) {
+                throw new Exception(
+                    FactoryApiErrorCode::factory(191)->getMessage(),
+                    FactoryApiErrorCode::factory(191)->getCode()
+                );
             }
 
             if ($user_info->isAdmin() || $user_info->isApprover()) {
-                $payout_items = PayoutView::where('payoutHistoryId', $payout_history_id)->where('hospitalId', $user_info->getHospitalId())->get();
+                $payout_items = PayoutView::where(
+                    'payoutHistoryId',
+                    $payout_history_id
+                )
+                    ->where('hospitalId', $user_info->getHospitalId())
+                    ->get();
                 $payout_items = $payout_items->data->all();
             } else {
-                $payout_items = PayoutView::where('payoutHistoryId', $payout_history_id)->where('hospitalId', $user_info->getHospitalId())->where('sourceDivisionId', $user_info->getDivisionId())->get();
+                $payout_items = PayoutView::where(
+                    'payoutHistoryId',
+                    $payout_history_id
+                )
+                    ->where('hospitalId', $user_info->getHospitalId())
+                    ->where('sourceDivisionId', $user_info->getDivisionId())
+                    ->get();
                 $payout_items = $payout_items->data->all();
             }
 
@@ -362,17 +485,29 @@ class PayoutController extends Controller
                 Stock::orWhere('inHospitalItemId', $item->inHospitalItemId);
             }
 
-            $stock_items        = Stock::get();
+            $stock_items = Stock::get();
 
             foreach ($payout_items as $key => $item) {
                 foreach ($stock_items->data->all() as $stock_item) {
-                    if ($stock_item->inHospitalItemId == $item->inHospitalItemId && $stock_item->divisionId == $item->sourceDivisionId) {
-                        $payout_items[$key]->sourceRackName = $stock_item->rackName;
-                        $payout_items[$key]->constantByDiv = $stock_item->constantByDiv;
+                    if (
+                        $stock_item->inHospitalItemId ==
+                            $item->inHospitalItemId &&
+                        $stock_item->divisionId == $item->sourceDivisionId
+                    ) {
+                        $payout_items[$key]->sourceRackName =
+                            $stock_item->rackName;
+                        $payout_items[$key]->constantByDiv =
+                            $stock_item->constantByDiv;
                     }
-                    if ($stock_item->inHospitalItemId == $item->inHospitalItemId && $stock_item->divisionId == $item->targetDivisionId) {
-                        $payout_items[$key]->targetRackName = $stock_item->rackName;
-                        $payout_items[$key]->constantByDiv = $stock_item->constantByDiv;
+                    if (
+                        $stock_item->inHospitalItemId ==
+                            $item->inHospitalItemId &&
+                        $stock_item->divisionId == $item->targetDivisionId
+                    ) {
+                        $payout_items[$key]->targetRackName =
+                            $stock_item->rackName;
+                        $payout_items[$key]->constantByDiv =
+                            $stock_item->constantByDiv;
                     }
                 }
                 Distributor::orWhere('distributorId', $item->distributorId);
@@ -383,69 +518,109 @@ class PayoutController extends Controller
             $distributor = Distributor::get();
             $division = Division::get();
             foreach ($payout_items as $key => $item) {
-
                 foreach ($division->data->all() as $division_data) {
                     if ($item->sourceDivisionId == $division_data->divisionId) {
-                        $payout_items[$key]->sourceDivision = $division_data->divisionName;
+                        $payout_items[$key]->sourceDivision =
+                            $division_data->divisionName;
                     }
                     if ($item->targetDivisionId == $division_data->divisionId) {
-                        $payout_items[$key]->targetDivision = $division_data->divisionName;
+                        $payout_items[$key]->targetDivision =
+                            $division_data->divisionName;
                     }
                 }
 
                 foreach ($distributor->data->all() as $distributor_data) {
-                    if ($item->distributorId == $distributor_data->distributorId) {
-                        $payout_items[$key]->distributorName = $distributor_data->distributorName;
+                    if (
+                        $item->distributorId == $distributor_data->distributorId
+                    ) {
+                        $payout_items[$key]->distributorName =
+                            $distributor_data->distributorName;
                     }
                 }
             }
 
             $default_design = $this->defaultDesign();
 
-            $hospital_data = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
+            $hospital_data = Hospital::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )->get();
             $hospital_data = $hospital_data->data->get(0);
 
             if ($hospital_data->labelDesign2 != '') {
-                $default_design = htmlspecialchars_decode($hospital_data->labelDesign2);
+                $default_design = htmlspecialchars_decode(
+                    $hospital_data->labelDesign2
+                );
             }
-            $content = $this->view('NewJoyPla/view/PayoutLabel', [
-                //'api_url' => $api_url,
-                'user_info' => $user_info,
-                'payout_items' => $payout_items,
-                'default_design' => $default_design
-            ], false);
+            $content = $this->view(
+                'NewJoyPla/view/PayoutLabel',
+                [
+                    //'api_url' => $api_url,
+                    'user_info' => $user_info,
+                    'payout_items' => $payout_items,
+                    'default_design' => $default_design,
+                ],
+                false
+            );
         } catch (Exception $ex) {
-            $content = $this->view('NewJoyPla/view/template/Error', [
-                'code' => $ex->getCode(),
-                'message' => $ex->getMessage()
-            ], false);
+            $content = $this->view(
+                'NewJoyPla/view/template/Error',
+                [
+                    'code' => $ex->getCode(),
+                    'message' => $ex->getMessage(),
+                ],
+                false
+            );
         } finally {
+            $head = $this->view(
+                'NewJoyPla/view/template/parts/Head',
+                [
+                    'new' => true,
+                ],
+                false
+            );
 
-            $head   = $this->view('NewJoyPla/view/template/parts/Head', [
-                'new' => true
-            ], false);
+            $header = $this->view(
+                'NewJoyPla/src/HeaderForMypage',
+                [
+                    'SPIRAL' => $SPIRAL,
+                ],
+                false
+            );
 
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
-            ], false);
+            $style = $this->view(
+                'NewJoyPla/view/template/parts/LabelsCss',
+                [],
+                false
+            )->render();
 
-            $style   = $this->view('NewJoyPla/view/template/parts/LabelsCss', [], false)->render();
+            $style .= $this->view(
+                'NewJoyPla/view/template/parts/StyleCss',
+                [],
+                false
+            )->render();
 
-            $style   .= $this->view('NewJoyPla/view/template/parts/StyleCss', [], false)->render();
-
-            $script   = $this->view('NewJoyPla/view/template/parts/Script', [], false)->render();
+            $script = $this->view(
+                'NewJoyPla/view/template/parts/Script',
+                [],
+                false
+            )->render();
 
             // テンプレートにパラメータを渡し、HTMLを生成し返却
 
-            return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 払出ラベル',
-                'script' => $script,
-                'style' => $style,
-                'content'   => $content->render(),
-                'head' => $head->render(),
-                'header' => $header->render(),
-                'baseUrl' => '',
-            ], false);
+            return $this->view(
+                'NewJoyPla/view/template/Template',
+                [
+                    'title' => 'JoyPla 払出ラベル',
+                    'script' => $script,
+                    'style' => $style,
+                    'content' => $content->render(),
+                    'head' => $head->render(),
+                    'header' => $header->render(),
+                    'baseUrl' => '',
+                ],
+                false
+            );
         }
     }
 
@@ -481,13 +656,16 @@ EOM;
     {
         global $SPIRAL;
         try {
-            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            $token = !isset($_POST['_csrf']) ? '' : $_POST['_csrf'];
             Csrf::validate($token, true);
 
             $user_info = new UserInfo($SPIRAL);
 
             if ($user_info->isDistributorUser()) {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(), FactoryApiErrorCode::factory(191)->getCode());
+                throw new Exception(
+                    FactoryApiErrorCode::factory(191)->getMessage(),
+                    FactoryApiErrorCode::factory(191)->getCode()
+                );
             }
 
             $payout = $SPIRAL->getParam('payout');
@@ -497,9 +675,15 @@ EOM;
                 $payout_date = 'now';
             }
 
-            $in_hospital_item = InHospitalItemView::where('hospitalId', $user_info->getHospitalId());
+            $in_hospital_item = InHospitalItemView::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            );
             foreach ($payout as $key => $record) {
-                $in_hospital_item->orWhere('inHospitalItemId', $record['recordId']);
+                $in_hospital_item->orWhere(
+                    'inHospitalItemId',
+                    $record['recordId']
+                );
             }
             $in_hospital_item = $in_hospital_item->get();
 
@@ -507,36 +691,55 @@ EOM;
                 foreach ($in_hospital_item->data->all() as $in_hp_item) {
                     $lot_flag = 0;
                     if ($record['recordId'] == $in_hp_item->inHospitalItemId) {
-                        $lot_flag = (int)$in_hp_item->lotManagement;
+                        $lot_flag = (int) $in_hp_item->lotManagement;
                         break;
                     }
                 }
-                if ($lot_flag && ($record['lotNumber'] == '' || $record['lotDate'] == '')) {
+                if (
+                    $lot_flag &&
+                    ($record['lotNumber'] == '' || $record['lotDate'] == '')
+                ) {
                     throw new Exception('invalid lot', 100);
                 }
-                if (($record['lotNumber'] != '' && $record['lotDate'] == '') || ($record['lotNumber'] == '' && $record['lotDate'] != '')) {
+                if (
+                    ($record['lotNumber'] != '' && $record['lotDate'] == '') ||
+                    ($record['lotNumber'] == '' && $record['lotDate'] != '')
+                ) {
                     throw new Exception('invalid lotNumber input', 101);
                 }
-                if (($record['lotNumber'] != '') && ($record['lotDate'] != '')) {
+                if ($record['lotNumber'] != '' && $record['lotDate'] != '') {
                     //if ((!ctype_alnum($item['lotNumber'])) || (strlen($item['lotNumber']) > 20))
-                    if ((!preg_match('/^[a-zA-Z0-9!-\/:-@¥[-`{-~]+$/', $record['lotNumber'])) || (strlen($record['lotNumber']) > 20)) {
+                    if (
+                        !preg_match(
+                            '/^[a-zA-Z0-9!-\/:-@¥[-`{-~]+$/',
+                            $record['lotNumber']
+                        ) ||
+                        strlen($record['lotNumber']) > 20
+                    ) {
                         throw new Exception('invalid lotNumber format', 102);
                     }
                 }
-                if ((int)$payout['countNum'] < 0 || (int)$record['countLabelNum'] < 0) {
+                if (
+                    (int) $payout['countNum'] < 0 ||
+                    (int) $record['countLabelNum'] < 0
+                ) {
                     throw new Exception('invalid payout count', 200);
                 }
-                $payout[$key]['countNum'] = (int)$record['countNum'] * (int)$record['countLabelNum'];
+                $payout[$key]['countNum'] =
+                    (int) $record['countNum'] * (int) $record['countLabelNum'];
                 $payout[$key]['payoutCount'] = $record['countNum'];
             }
 
-            $hospital_data = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
+            $hospital_data = Hospital::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )->get();
             $hospital_data = $hospital_data->data->get(0);
 
             $use_unit_price = $hospital_data->payoutUnitPrice;
 
             $source_division_id = $SPIRAL->getParam('sourceDivisionId');
-            $source_division_name =  $SPIRAL->getParam('sourceDivisionName');
+            $source_division_name = $SPIRAL->getParam('sourceDivisionName');
             $target_division_id = $SPIRAL->getParam('targetDivisionId');
             $target_division_name = $SPIRAL->getParam('targetDivisionName');
 
@@ -553,15 +756,22 @@ EOM;
             $card_ids = [];
             $label_create_flg = false;
             foreach ($payout as $data) {
-                if ((int)$data['countNum']  > 0) {
-                    if (array_search($data['recordId'], $in_hospital_item_ids) === false) {
+                if ((int) $data['countNum'] > 0) {
+                    if (
+                        array_search(
+                            $data['recordId'],
+                            $in_hospital_item_ids
+                        ) === false
+                    ) {
                         $in_hospital_item_ids[] = $data['recordId'];
                     }
                     $unit_price = $use_unit_price
-                        ? (float)(str_replace(',', '', $data['unitPrice']))
-                        : (((float)str_replace(',', '', $data['kakaku']) == 0 || (float)$data['irisu'] == 0)
+                        ? (float) str_replace(',', '', $data['unitPrice'])
+                        : ((float) str_replace(',', '', $data['kakaku']) == 0 ||
+                        (float) $data['irisu'] == 0
                             ? 0
-                            : (float)(str_replace(',', '', $data['kakaku']) / (float)$data['irisu']));
+                            : (float) (str_replace(',', '', $data['kakaku']) /
+                                (float) $data['irisu']));
                     $insert_data[] = [
                         'registrationTime' => $payout_date,
                         'payoutHistoryId' => $payout_id,
@@ -573,24 +783,27 @@ EOM;
                         'quantityUnit' => $data['unit'],
                         'itemUnit' => $data['itemUnit'],
                         'price' => str_replace(',', '', $data['kakaku']),
-                        'payoutQuantity' => (int)$data['countNum'],
-                        'payoutAmount' => (float)$unit_price * (int)$data['countNum'],
+                        'payoutQuantity' => (int) $data['countNum'],
+                        'payoutAmount' =>
+                            (float) $unit_price * (int) $data['countNum'],
                         'payoutCount' => $data['payoutCount'],
                         'payoutLabelCount' => $data['countLabelNum'],
                         'lotNumber' => $data['lotNumber'],
                         'lotDate' => $data['lotDate'],
                         'unitPrice' => $unit_price,
                         'cardId' => $data['cardNum'],
-                        'payoutType' => 1
+                        'payoutType' => 1,
                     ];
-                    if ($data['cardNum'] != "") {
+                    if ($data['cardNum'] != '') {
                         $card_ids[] = $data['cardNum'];
                     }
 
-                    if ($data['cardNum'] == "") {
+                    if ($data['cardNum'] == '') {
                         $label_create_flg = true; //一つでもあれば発行する
                     }
-                    $total_amount = $total_amount + ((float)$unit_price * (int)$data['countNum']);
+                    $total_amount =
+                        $total_amount +
+                        (float) $unit_price * (int) $data['countNum'];
                 }
             }
 
@@ -605,11 +818,10 @@ EOM;
                     'targetDivision' => $target_division_name,
                     'itemsNumber' => count($in_hospital_item_ids),
                     'totalAmount' => $total_amount,
-                ]
+                ],
             ];
 
             $inventory_adjustment_trdata = [];
-
 
             foreach ($insert_data as $record) {
                 if ($record['lotNumber'] && $record['lotDate']) {
@@ -619,10 +831,15 @@ EOM;
                         'count' => $record['payoutQuantity'],
                         'pattern' => 5,
                         'hospitalId' => $user_info->getHospitalId(),
-                        'lotUniqueKey' => $user_info->getHospitalId() . $record['targetDivisionId'] . $record['inHospitalItemId'] . $record['lotNumber'] . $record['lotDate'],
+                        'lotUniqueKey' =>
+                            $user_info->getHospitalId() .
+                            $record['targetDivisionId'] .
+                            $record['inHospitalItemId'] .
+                            $record['lotNumber'] .
+                            $record['lotDate'],
                         'stockQuantity' => $record['payoutQuantity'],
-                        'lotNumber' =>  $record['lotNumber'],
-                        'lotDate' =>    $record['lotDate'],
+                        'lotNumber' => $record['lotNumber'],
+                        'lotDate' => $record['lotDate'],
                     ];
                     $inventory_adjustment_trdata[] = [
                         'divisionId' => $record['sourceDivisionId'],
@@ -630,10 +847,15 @@ EOM;
                         'count' => -$record['payoutQuantity'],
                         'pattern' => 4,
                         'hospitalId' => $user_info->getHospitalId(),
-                        'lotUniqueKey' => $user_info->getHospitalId() . $record['sourceDivisionId'] . $record['inHospitalItemId'] . $record['lotNumber'] . $record['lotDate'],
+                        'lotUniqueKey' =>
+                            $user_info->getHospitalId() .
+                            $record['sourceDivisionId'] .
+                            $record['inHospitalItemId'] .
+                            $record['lotNumber'] .
+                            $record['lotDate'],
                         'stockQuantity' => -$record['payoutQuantity'],
-                        'lotNumber' =>  $record['lotNumber'],
-                        'lotDate' =>    $record['lotDate'],
+                        'lotNumber' => $record['lotNumber'],
+                        'lotDate' => $record['lotDate'],
                     ];
                 } else {
                     $inventory_adjustment_trdata[] = [
@@ -661,7 +883,9 @@ EOM;
             $result = Payout::insert($insert_data);
 
             $payout = new Payout();
-            $payout->where('hospitalId', $user_info->getHospitalId())->where('payoutHistoryId', $payout_id);
+            $payout
+                ->where('hospitalId', $user_info->getHospitalId())
+                ->where('payoutHistoryId', $payout_id);
             foreach ($card_ids as $id) {
                 $payout->orWhere('cardId', $id);
             }
@@ -672,33 +896,55 @@ EOM;
                 if ($payout_item->cardId != '') {
                     $card_update[] = [
                         'cardId' => $payout_item->cardId,
-                        'payoutId' => $payout_item->payoutId,
+                        'lotNumber' => $payout_item->lotNumber,
+                        'lotDate' => $payout_item->lotDate,
+                        'payoutId' => '',
                     ];
                 }
             }
             if (count($card_update) > 0) {
                 Card::bulkUpdate('cardId', $card_update);
             }
-            $result = InventoryAdjustmentTransaction::insert($inventory_adjustment_trdata);
+            $result = InventoryAdjustmentTransaction::insert(
+                $inventory_adjustment_trdata
+            );
 
-            $content = new ApiResponse(['payoutHistoryId' => $payout_id, 'labelCreateFlg' => $label_create_flg], $result->count, $result->code, $result->message, ['insert']);
+            $content = new ApiResponse(
+                [
+                    'payoutHistoryId' => $payout_id,
+                    'labelCreateFlg' => $label_create_flg,
+                ],
+                $result->count,
+                $result->code,
+                $result->message,
+                ['insert']
+            );
             $content = $content->toJson();
         } catch (Exception $ex) {
-            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['payoutRegistApi']);
+            $content = new ApiResponse(
+                [],
+                0,
+                $ex->getCode(),
+                $ex->getMessage(),
+                ['payoutRegistApi']
+            );
             $content = $content->toJson();
         } finally {
-            return $this->view('NewJoyPla/view/template/ApiResponse', [
-                'content'   => $content,
-            ], false);
+            return $this->view(
+                'NewJoyPla/view/template/ApiResponse',
+                [
+                    'content' => $content,
+                ],
+                false
+            );
         }
     }
-
 
     public function regPayoutScheduledApi()
     {
         global $SPIRAL;
         try {
-            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            $token = !isset($_POST['_csrf']) ? '' : $_POST['_csrf'];
             Csrf::validate($token, true);
 
             $user_info = new UserInfo($SPIRAL);
@@ -708,13 +954,19 @@ EOM;
 
             $insert = [];
 
-            $division = Division::getNewInstance()->plain()->value('divisionId')->value('divisionName')->where('hospitalId', $user_info->getHospitalId());
+            $division = Division::getNewInstance()
+                ->plain()
+                ->value('divisionId')
+                ->value('divisionName')
+                ->where('hospitalId', $user_info->getHospitalId());
 
             foreach ($items as $item) {
-                $division->orWhere('divisionId', $item['source_division'])->orWhere('divisionId', $item['target_division']);
+                $division
+                    ->orWhere('divisionId', $item['source_division'])
+                    ->orWhere('divisionId', $item['target_division']);
             }
 
-            $division = ($division->get())->data->all();
+            $division = $division->get()->data->all();
 
             $divisionCheck = function ($divisions, $divisionId) {
                 foreach ($divisions as $division) {
@@ -737,16 +989,16 @@ EOM;
                 $psis[] = $psi;
 
                 $insert[] = [
-                    "payoutPlanTime" => $item['payout_schedule'],
-                    "payoutPlanId" => $psi, //payout schedule item
-                    "pickingId" => '',
-                    "inHospitalItemId" => $item['recordId'],
-                    "itemId" => $item['itemId'],
-                    "hospitalId" => $user_info->getHospitalId(),
-                    "cardId" => $item['cardNum'],
-                    "sourceDivisionId" => $item['source_division'],
-                    "targetDivisionId" => $item['target_division'],
-                    "payoutQuantity" => $item['payoutCount'],
+                    'payoutPlanTime' => $item['payout_schedule'],
+                    'payoutPlanId' => $psi, //payout schedule item
+                    'pickingId' => '',
+                    'inHospitalItemId' => $item['recordId'],
+                    'itemId' => $item['itemId'],
+                    'hospitalId' => $user_info->getHospitalId(),
+                    'cardId' => $item['cardNum'],
+                    'sourceDivisionId' => $item['source_division'],
+                    'targetDivisionId' => $item['target_division'],
+                    'payoutQuantity' => $item['payoutCount'],
                 ];
             }
 
@@ -782,54 +1034,106 @@ EOM;
             foreach ($items as $divisionId => $item) {
                 $hospital_user = HospitalUser::getNewInstance();
                 $select_name = $this->makeId($user_info->getHospitalId());
-                $test = $hospital_user::selectName($select_name)
-                    ->rule(['name' => 'hospitalId', 'label' => 'name_' . $user_info->getHospitalId(), 'value1' => $user_info->getHospitalId(), 'condition' => 'matches'])
-                    ->rule(['name' => 'userPermission', 'label' => 'permission_2', 'value1' => '2', 'condition' => 'contains'])
-                    ->rule(['name' => 'divisionId', 'label' => 'permission_division', 'value1' => $divisionId, 'condition' => 'matches'])
+                $test = $hospital_user
+                    ::selectName($select_name)
+                    ->rule([
+                        'name' => 'hospitalId',
+                        'label' => 'name_' . $user_info->getHospitalId(),
+                        'value1' => $user_info->getHospitalId(),
+                        'condition' => 'matches',
+                    ])
+                    ->rule([
+                        'name' => 'userPermission',
+                        'label' => 'permission_2',
+                        'value1' => '2',
+                        'condition' => 'contains',
+                    ])
+                    ->rule([
+                        'name' => 'divisionId',
+                        'label' => 'permission_division',
+                        'value1' => $divisionId,
+                        'condition' => 'matches',
+                    ])
                     ->filterCreate();
 
-                $mail_body = $this->view('NewJoyPla/view/Mail/RegPayoutScheduled', [
-                    'name' => '%val:usr:name%',
-                    'items' => $item,
-                    'login_url' => LOGIN_URL,
-                ], false)->render();
+                $mail_body = $this->view(
+                    'NewJoyPla/view/Mail/RegPayoutScheduled',
+                    [
+                        'name' => '%val:usr:name%',
+                        'items' => $item,
+                        'login_url' => LOGIN_URL,
+                    ],
+                    false
+                )->render();
 
-                $test = $hospital_user::selectRule($select_name)
+                $test = $hospital_user
+                    ::selectRule($select_name)
                     ->body($mail_body)
-                    ->subject("[JoyPla] 払出予定商品が追加されました")
+                    ->subject('[JoyPla] 払出予定商品が追加されました')
                     ->from(FROM_ADDRESS, FROM_NAME)
                     ->send();
             }
 
             $hospital_user = HospitalUser::getNewInstance();
             $select_name = $this->makeId($user_info->getHospitalId());
-            $test = $hospital_user::selectName($select_name)
-                ->rule(['name' => 'hospitalId', 'label' => 'name_' . $user_info->getHospitalId(), 'value1' => $user_info->getHospitalId(), 'condition' => 'matches'])
-                ->rule(['name' => 'userPermission', 'label' => 'permission_admin', 'value1' => '1,3', 'condition' => 'contains'])
+            $test = $hospital_user
+                ::selectName($select_name)
+                ->rule([
+                    'name' => 'hospitalId',
+                    'label' => 'name_' . $user_info->getHospitalId(),
+                    'value1' => $user_info->getHospitalId(),
+                    'condition' => 'matches',
+                ])
+                ->rule([
+                    'name' => 'userPermission',
+                    'label' => 'permission_admin',
+                    'value1' => '1,3',
+                    'condition' => 'contains',
+                ])
                 ->filterCreate();
 
-            $mail_body = $this->view('NewJoyPla/view/Mail/RegPayoutScheduled', [
-                'name' => '%val:usr:name%',
-                'items' => array_reduce($items, 'array_merge', []),
-                'login_url' => LOGIN_URL,
-            ], false)->render();
+            $mail_body = $this->view(
+                'NewJoyPla/view/Mail/RegPayoutScheduled',
+                [
+                    'name' => '%val:usr:name%',
+                    'items' => array_reduce($items, 'array_merge', []),
+                    'login_url' => LOGIN_URL,
+                ],
+                false
+            )->render();
 
-            $test = $hospital_user::selectRule($select_name)
+            $test = $hospital_user
+                ::selectRule($select_name)
                 ->body($mail_body)
-                ->subject("[JoyPla] 払出予定商品が追加されました")
+                ->subject('[JoyPla] 払出予定商品が追加されました')
                 ->from(FROM_ADDRESS, FROM_NAME)
                 ->send();
 
-
-            $content = new ApiResponse($result->ids, $result->count, $result->code, $result->message, ['insert']);
+            $content = new ApiResponse(
+                $result->ids,
+                $result->count,
+                $result->code,
+                $result->message,
+                ['insert']
+            );
             $content = $content->toJson();
         } catch (Exception $ex) {
-            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['payoutRegistApi']);
+            $content = new ApiResponse(
+                [],
+                0,
+                $ex->getCode(),
+                $ex->getMessage(),
+                ['payoutRegistApi']
+            );
             $content = $content->toJson();
         } finally {
-            return $this->view('NewJoyPla/view/template/ApiResponse', [
-                'content'   => $content,
-            ], false);
+            return $this->view(
+                'NewJoyPla/view/template/ApiResponse',
+                [
+                    'content' => $content,
+                ],
+                false
+            );
         }
     }
 
@@ -837,8 +1141,10 @@ EOM;
     {
         global $SPIRAL;
         try {
-
-            throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+            throw new Exception(
+                FactoryApiErrorCode::factory(404)->getMessage(),
+                FactoryApiErrorCode::factory(404)->getCode()
+            );
             /* 
             //フルスクラッチでやってみる
             $user_info = new UserInfo($SPIRAL);
@@ -1055,33 +1361,61 @@ EOM;
                     ] , true);
  */
         } catch (Exception $ex) {
-            $content = $this->view('NewJoyPla/view/template/Error', [
-                'code' => $ex->getCode(),
-                'message' => $ex->getMessage(),
-            ], false);
+            $content = $this->view(
+                'NewJoyPla/view/template/Error',
+                [
+                    'code' => $ex->getCode(),
+                    'message' => $ex->getMessage(),
+                ],
+                false
+            );
         } finally {
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [
-                'new' => true
-            ], false);
-            $style   = $this->view('NewJoyPla/view/template/parts/FormPrintCss', [], false)->render();
+            $head = $this->view(
+                'NewJoyPla/view/template/parts/Head',
+                [
+                    'new' => true,
+                ],
+                false
+            );
+            $style = $this->view(
+                'NewJoyPla/view/template/parts/FormPrintCss',
+                [],
+                false
+            )->render();
 
-            $style   .= $this->view('NewJoyPla/view/template/parts/StyleCss', [], false)->render();
+            $style .= $this->view(
+                'NewJoyPla/view/template/parts/StyleCss',
+                [],
+                false
+            )->render();
 
-            $script   = $this->view('NewJoyPla/view/template/parts/Script', [], false)->render();
+            $script = $this->view(
+                'NewJoyPla/view/template/parts/Script',
+                [],
+                false
+            )->render();
 
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
-            ], false);
+            $header = $this->view(
+                'NewJoyPla/src/HeaderForMypage',
+                [
+                    'SPIRAL' => $SPIRAL,
+                ],
+                false
+            );
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 払出予定商品一覧',
-                'script' => $script,
-                'style' => $style,
-                'content'   => $content->render(),
-                'head' => $head->render(),
-                'header' => $header->render(),
-                'baseUrl' => '',
-            ], false);
+            return $this->view(
+                'NewJoyPla/view/template/Template',
+                [
+                    'title' => 'JoyPla 払出予定商品一覧',
+                    'script' => $script,
+                    'style' => $style,
+                    'content' => $content->render(),
+                    'head' => $head->render(),
+                    'header' => $header->render(),
+                    'baseUrl' => '',
+                ],
+                false
+            );
         }
     }
 
@@ -1089,7 +1423,7 @@ EOM;
     {
         global $SPIRAL;
         try {
-            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            $token = !isset($_POST['_csrf']) ? '' : $_POST['_csrf'];
             Csrf::validate($token, true);
 
             $user_info = new UserInfo($SPIRAL);
@@ -1101,7 +1435,10 @@ EOM;
                 throw new Exception('not payout data', 200);
             }
 
-            $payschedule_items_view = PayScheduleItemsView::where('hospitalId', $user_info->getHospitalId());
+            $payschedule_items_view = PayScheduleItemsView::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            );
 
             foreach ($item_ids as $id) {
                 $payschedule_items_view->orWhere('id', $id);
@@ -1138,26 +1475,44 @@ EOM;
             }
 
             $result = PickingHistory::insert($picking_insert);
-            $result = PayScheduleItems::bulkUpdate('payoutPlanId', $picking_item_update);
+            $result = PayScheduleItems::bulkUpdate(
+                'payoutPlanId',
+                $picking_item_update
+            );
 
-            $content = new ApiResponse($result->ids, $result->count, $result->code, $result->message, ['insert']);
+            $content = new ApiResponse(
+                $result->ids,
+                $result->count,
+                $result->code,
+                $result->message,
+                ['insert']
+            );
             $content = $content->toJson();
         } catch (Exception $ex) {
-            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['payoutRegistApi']);
+            $content = new ApiResponse(
+                [],
+                0,
+                $ex->getCode(),
+                $ex->getMessage(),
+                ['payoutRegistApi']
+            );
             $content = $content->toJson();
         } finally {
-            return $this->view('NewJoyPla/view/template/ApiResponse', [
-                'content'   => $content,
-            ], false);
+            return $this->view(
+                'NewJoyPla/view/template/ApiResponse',
+                [
+                    'content' => $content,
+                ],
+                false
+            );
         }
     }
-
 
     public function pickingItemsDeleteApi()
     {
         global $SPIRAL;
         try {
-            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            $token = !isset($_POST['_csrf']) ? '' : $_POST['_csrf'];
             Csrf::validate($token, true);
 
             $user_info = new UserInfo($SPIRAL);
@@ -1169,7 +1524,10 @@ EOM;
                 throw new Exception('not delete data', 200);
             }
 
-            $payschedule_items = PayScheduleItems::where('hospitalId', $user_info->getHospitalId());
+            $payschedule_items = PayScheduleItems::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            );
 
             foreach ($item_ids as $id) {
                 $payschedule_items->orWhere('id', $id);
@@ -1181,7 +1539,10 @@ EOM;
                 throw new Exception('datas error', 200);
             }
 
-            $payschedule_items = PayScheduleItems::where('hospitalId', $user_info->getHospitalId());
+            $payschedule_items = PayScheduleItems::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            );
 
             foreach ($item_ids as $id) {
                 $payschedule_items->orWhere('id', $id);
@@ -1189,25 +1550,42 @@ EOM;
 
             $result = $payschedule_items->delete();
 
-            $content = new ApiResponse($result->ids, $result->count, $result->code, $result->message, ['insert']);
+            $content = new ApiResponse(
+                $result->ids,
+                $result->count,
+                $result->code,
+                $result->message,
+                ['insert']
+            );
             $content = $content->toJson();
         } catch (Exception $ex) {
-            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['payoutRegistApi']);
+            $content = new ApiResponse(
+                [],
+                0,
+                $ex->getCode(),
+                $ex->getMessage(),
+                ['payoutRegistApi']
+            );
             $content = $content->toJson();
         } finally {
-            return $this->view('NewJoyPla/view/template/ApiResponse', [
-                'content'   => $content,
-            ], false);
+            return $this->view(
+                'NewJoyPla/view/template/ApiResponse',
+                [
+                    'content' => $content,
+                ],
+                false
+            );
         }
     }
-
 
     public function pickingList()
     {
         global $SPIRAL;
         try {
-
-            throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+            throw new Exception(
+                FactoryApiErrorCode::factory(404)->getMessage(),
+                FactoryApiErrorCode::factory(404)->getCode()
+            );
             /* 
             //フルスクラッチでやってみる
             $user_info = new UserInfo($SPIRAL);
@@ -1347,43 +1725,72 @@ EOM;
                     ] , true);
  */
         } catch (Exception $ex) {
-            $content = $this->view('NewJoyPla/view/template/Error', [
-                'code' => $ex->getCode(),
-                'message' => $ex->getMessage(),
-            ], false);
+            $content = $this->view(
+                'NewJoyPla/view/template/Error',
+                [
+                    'code' => $ex->getCode(),
+                    'message' => $ex->getMessage(),
+                ],
+                false
+            );
         } finally {
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [
-                'new' => true
-            ], false);
-            $style   = $this->view('NewJoyPla/view/template/parts/FormPrintCss', [], false)->render();
+            $head = $this->view(
+                'NewJoyPla/view/template/parts/Head',
+                [
+                    'new' => true,
+                ],
+                false
+            );
+            $style = $this->view(
+                'NewJoyPla/view/template/parts/FormPrintCss',
+                [],
+                false
+            )->render();
 
-            $style   .= $this->view('NewJoyPla/view/template/parts/StyleCss', [], false)->render();
+            $style .= $this->view(
+                'NewJoyPla/view/template/parts/StyleCss',
+                [],
+                false
+            )->render();
 
-            $script   = $this->view('NewJoyPla/view/template/parts/Script', [], false)->render();
+            $script = $this->view(
+                'NewJoyPla/view/template/parts/Script',
+                [],
+                false
+            )->render();
 
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
-            ], false);
+            $header = $this->view(
+                'NewJoyPla/src/HeaderForMypage',
+                [
+                    'SPIRAL' => $SPIRAL,
+                ],
+                false
+            );
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla ピッキングリスト',
-                'script' => $script,
-                'style' => $style,
-                'content'   => $content->render(),
-                'head' => $head->render(),
-                'header' => $header->render(),
-                'baseUrl' => '',
-            ], false);
+            return $this->view(
+                'NewJoyPla/view/template/Template',
+                [
+                    'title' => 'JoyPla ピッキングリスト',
+                    'script' => $script,
+                    'style' => $style,
+                    'content' => $content->render(),
+                    'head' => $head->render(),
+                    'header' => $header->render(),
+                    'baseUrl' => '',
+                ],
+                false
+            );
         }
     }
-
 
     public function pickingListSlip()
     {
         global $SPIRAL;
         try {
-
-            throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+            throw new Exception(
+                FactoryApiErrorCode::factory(404)->getMessage(),
+                FactoryApiErrorCode::factory(404)->getCode()
+            );
             /* 
             //フルスクラッチでやってみる
             $user_info = new UserInfo($SPIRAL);
@@ -1513,33 +1920,61 @@ EOM;
                     ] , true);
  */
         } catch (Exception $ex) {
-            $content = $this->view('NewJoyPla/view/template/Error', [
-                'code' => $ex->getCode(),
-                'message' => $ex->getMessage(),
-            ], false);
+            $content = $this->view(
+                'NewJoyPla/view/template/Error',
+                [
+                    'code' => $ex->getCode(),
+                    'message' => $ex->getMessage(),
+                ],
+                false
+            );
         } finally {
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [
-                'new' => true
-            ], false);
-            $style   = $this->view('NewJoyPla/view/template/parts/FormPrintCss', [], false)->render();
+            $head = $this->view(
+                'NewJoyPla/view/template/parts/Head',
+                [
+                    'new' => true,
+                ],
+                false
+            );
+            $style = $this->view(
+                'NewJoyPla/view/template/parts/FormPrintCss',
+                [],
+                false
+            )->render();
 
-            $style   .= $this->view('NewJoyPla/view/template/parts/StyleCss', [], false)->render();
+            $style .= $this->view(
+                'NewJoyPla/view/template/parts/StyleCss',
+                [],
+                false
+            )->render();
 
-            $script   = $this->view('NewJoyPla/view/template/parts/Script', [], false)->render();
+            $script = $this->view(
+                'NewJoyPla/view/template/parts/Script',
+                [],
+                false
+            )->render();
 
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
-            ], false);
+            $header = $this->view(
+                'NewJoyPla/src/HeaderForMypage',
+                [
+                    'SPIRAL' => $SPIRAL,
+                ],
+                false
+            );
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla ピッキングリスト伝票',
-                'script' => $script,
-                'style' => $style,
-                'content'   => $content->render(),
-                'head' => $head->render(),
-                'header' => $header->render(),
-                'baseUrl' => '',
-            ], false);
+            return $this->view(
+                'NewJoyPla/view/template/Template',
+                [
+                    'title' => 'JoyPla ピッキングリスト伝票',
+                    'script' => $script,
+                    'style' => $style,
+                    'content' => $content->render(),
+                    'head' => $head->render(),
+                    'header' => $header->render(),
+                    'baseUrl' => '',
+                ],
+                false
+            );
         }
     }
 
@@ -1547,32 +1982,65 @@ EOM;
     {
         global $SPIRAL;
         try {
-            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            $token = !isset($_POST['_csrf']) ? '' : $_POST['_csrf'];
             Csrf::validate($token, true);
 
             $user_info = new UserInfo($SPIRAL);
 
             $pickingId = $SPIRAL->getParam('picking_id');
 
-            $picking_history = PickingHistory::where('hospitalId', $user_info->getHospitalId())->where('pickingId', $pickingId)->where('pickingStatus', '1')->get();
+            $picking_history = PickingHistory::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )
+                ->where('pickingId', $pickingId)
+                ->where('pickingStatus', '1')
+                ->get();
 
             if ($picking_history->count == 0) {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+                throw new Exception(
+                    FactoryApiErrorCode::factory(404)->getMessage(),
+                    FactoryApiErrorCode::factory(404)->getCode()
+                );
             }
 
             $picking_history = $picking_history->data->get(0);
 
-            $result = PayScheduleItems::where('hospitalId', $user_info->getHospitalId())->where('pickingId', $pickingId)->update(['pickingId' => '']);
-            PickingHistory::where('hospitalId', $user_info->getHospitalId())->where('pickingId', $pickingId)->where('pickingStatus', '1')->delete();
-            $content = new ApiResponse($result->ids, $result->count, $result->code, $result->message, ['insert']);
+            $result = PayScheduleItems::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )
+                ->where('pickingId', $pickingId)
+                ->update(['pickingId' => '']);
+            PickingHistory::where('hospitalId', $user_info->getHospitalId())
+                ->where('pickingId', $pickingId)
+                ->where('pickingStatus', '1')
+                ->delete();
+            $content = new ApiResponse(
+                $result->ids,
+                $result->count,
+                $result->code,
+                $result->message,
+                ['insert']
+            );
             $content = $content->toJson();
         } catch (Exception $ex) {
-            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['payoutRegistApi']);
+            $content = new ApiResponse(
+                [],
+                0,
+                $ex->getCode(),
+                $ex->getMessage(),
+                ['payoutRegistApi']
+            );
             $content = $content->toJson();
         } finally {
-            return $this->view('NewJoyPla/view/template/ApiResponse', [
-                'content'   => $content,
-            ], false);
+            return $this->view(
+                'NewJoyPla/view/template/ApiResponse',
+                [
+                    'content' => $content,
+                ],
+                false
+            );
         }
     }
 
@@ -1580,16 +2048,25 @@ EOM;
     {
         global $SPIRAL;
         try {
-            $token = (!isset($_POST['_csrf'])) ? '' : $_POST['_csrf'];
+            $token = !isset($_POST['_csrf']) ? '' : $_POST['_csrf'];
             Csrf::validate($token, true);
 
             $user_info = new UserInfo($SPIRAL);
 
             $picking_id = $SPIRAL->getParam('picking_id');
-            $picking_history = PickingHistory::where('hospitalId', $user_info->getHospitalId())->where('pickingId', $picking_id)->where('pickingStatus', '1')->get();
+            $picking_history = PickingHistory::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )
+                ->where('pickingId', $picking_id)
+                ->where('pickingStatus', '1')
+                ->get();
 
             if ($picking_history->count == 0) {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+                throw new Exception(
+                    FactoryApiErrorCode::factory(404)->getMessage(),
+                    FactoryApiErrorCode::factory(404)->getCode()
+                );
             }
 
             $picking_history = $picking_history->data->get(0);
@@ -1597,18 +2074,30 @@ EOM;
             $post_items = $SPIRAL->getParam('pay_schedule_items');
 
             if (!is_array($post_items)) {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+                throw new Exception(
+                    FactoryApiErrorCode::factory(404)->getMessage(),
+                    FactoryApiErrorCode::factory(404)->getCode()
+                );
             }
 
-            $pay_schedule_items = PayScheduleItems::where('pickingId', $picking_id)->where('hospitalId', $user_info->getHospitalId());
+            $pay_schedule_items = PayScheduleItems::where(
+                'pickingId',
+                $picking_id
+            )->where('hospitalId', $user_info->getHospitalId());
 
             foreach ($post_items as $item) {
-                $pay_schedule_items->orWhere('payoutPlanId', $item['payoutPlanId']);
+                $pay_schedule_items->orWhere(
+                    'payoutPlanId',
+                    $item['payoutPlanId']
+                );
             }
             $pay_schedule_items = $pay_schedule_items->get();
 
             if (count($post_items) != $pay_schedule_items->count) {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(), FactoryApiErrorCode::factory(404)->getCode());
+                throw new Exception(
+                    FactoryApiErrorCode::factory(404)->getMessage(),
+                    FactoryApiErrorCode::factory(404)->getCode()
+                );
             }
 
             $update = [];
@@ -1629,58 +2118,76 @@ EOM;
             }
 
             $result = PayScheduleItems::bulkUpdate('payoutPlanId', $update);
-            $result = PickingHistory::where('hospitalId', $user_info->getHospitalId())->where('pickingId', $picking_id)->update(['pickingStatus' => '2']);
+            $result = PickingHistory::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )
+                ->where('pickingId', $picking_id)
+                ->update(['pickingStatus' => '2']);
 
-            $content = new ApiResponse($result->ids, $result->count, $result->code, $result->message, ['insert']);
+            $content = new ApiResponse(
+                $result->ids,
+                $result->count,
+                $result->code,
+                $result->message,
+                ['insert']
+            );
             $content = $content->toJson();
         } catch (Exception $ex) {
-            $content = new ApiResponse([], 0, $ex->getCode(), $ex->getMessage(), ['payoutRegistApi']);
+            $content = new ApiResponse(
+                [],
+                0,
+                $ex->getCode(),
+                $ex->getMessage(),
+                ['payoutRegistApi']
+            );
             $content = $content->toJson();
         } finally {
-            return $this->view('NewJoyPla/view/template/ApiResponse', [
-                'content'   => $content,
-            ], false);
+            return $this->view(
+                'NewJoyPla/view/template/ApiResponse',
+                [
+                    'content' => $content,
+                ],
+                false
+            );
         }
     }
 }
-
-
 
 /***
  * 実行
  */
 $PayoutController = new PayoutController();
 
-$action = $SPIRAL->getParam('Action'); {
-    if ($action === 'payoutRegistApi') {
-        echo $PayoutController->payoutRegistApi()->render();
-    } else if ($action === 'newPayout') {
-        echo $PayoutController->newPayout()->render();
-    } else if ($action === 'payoutLabel') {
-        echo $PayoutController->payoutLabel()->render();
-    } else if ($action === 'payoutList') {
-        echo $PayoutController->payoutList()->render();
-    } else if ($action === 'payoutListForDivision') {
-        echo $PayoutController->payoutListForDivision()->render();
-    } else if ($action === 'payoutScheduled') {
-        echo $PayoutController->payoutScheduled()->render();
-    } else if ($action === 'regPayoutScheduledApi') {
-        echo $PayoutController->regPayoutScheduledApi()->render();
-    } else if ($action === 'payoutScheduledItemList') {
-        echo $PayoutController->payoutScheduledItemList()->render();
-    } else if ($action === 'pickingItemsDeleteApi') {
-        echo $PayoutController->pickingItemsDeleteApi()->render();
-    } else if ($action === 'pickingItemsRegistApi') {
-        echo $PayoutController->pickingItemsRegistApi()->render();
-    } else if ($action === 'pickingList') {
-        echo $PayoutController->pickingList()->render();
-    } else if ($action === 'pickingListSlip') {
-        echo $PayoutController->pickingListSlip()->render();
-    } else if ($action === 'pickingSlipDelete') {
-        echo $PayoutController->pickingSlipDelete()->render();
-    } else if ($action === 'pickingSlipCommit') {
-        echo $PayoutController->pickingSlipCommit()->render();
-    } else {
-        echo $PayoutController->newPayout()->render();
-    }
+$action = $SPIRAL->getParam('Action');
+if ($action === 'payoutRegistApi') {
+    echo $PayoutController->payoutRegistApi()->render();
+} elseif ($action === 'newPayout') {
+    echo $PayoutController->newPayout()->render();
+} elseif ($action === 'payoutLabel') {
+    echo $PayoutController->payoutLabel()->render();
+} elseif ($action === 'payoutList') {
+    echo $PayoutController->payoutList()->render();
+} elseif ($action === 'payoutListForDivision') {
+    echo $PayoutController->payoutListForDivision()->render();
+} elseif ($action === 'payoutScheduled') {
+    echo $PayoutController->payoutScheduled()->render();
+} elseif ($action === 'regPayoutScheduledApi') {
+    echo $PayoutController->regPayoutScheduledApi()->render();
+} elseif ($action === 'payoutScheduledItemList') {
+    echo $PayoutController->payoutScheduledItemList()->render();
+} elseif ($action === 'pickingItemsDeleteApi') {
+    echo $PayoutController->pickingItemsDeleteApi()->render();
+} elseif ($action === 'pickingItemsRegistApi') {
+    echo $PayoutController->pickingItemsRegistApi()->render();
+} elseif ($action === 'pickingList') {
+    echo $PayoutController->pickingList()->render();
+} elseif ($action === 'pickingListSlip') {
+    echo $PayoutController->pickingListSlip()->render();
+} elseif ($action === 'pickingSlipDelete') {
+    echo $PayoutController->pickingSlipDelete()->render();
+} elseif ($action === 'pickingSlipCommit') {
+    echo $PayoutController->pickingSlipCommit()->render();
+} else {
+    echo $PayoutController->newPayout()->render();
 }

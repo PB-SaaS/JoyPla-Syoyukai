@@ -2,20 +2,15 @@
 
 namespace JoyPla\InterfaceAdapters\Controllers\Api;
 
-use App\SpiralDb\HospitalUser;
-use Auth;
 use Csrf;
-use Exception;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Routing\Router;
 use JoyPla\Application\InputPorts\Api\Payout\PayoutRegisterInputData;
 use JoyPla\Application\InputPorts\Api\Payout\PayoutRegisterInputPortInterface;
 
-
 class PayoutController extends Controller
 {
-
     public function register($vars, PayoutRegisterInputPortInterface $inputPort)
     {
         $token = $this->request->get('_csrf');

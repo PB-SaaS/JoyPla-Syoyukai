@@ -2,19 +2,20 @@
 
 namespace JoyPla\InterfaceAdapters\GateWays\Repository;
 
-use App\SpiralDb\Distributor as SpiralDbDistributor;
-use JoyPla\Enterprise\Models\Distributor;
 use JoyPla\Enterprise\Models\HospitalId;
+use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 
-class DistributorRepository implements DistributorRepositoryInterface{
-
-    public function findByHospitalId( HospitalId $hospitalId )
+class DistributorRepository implements DistributorRepositoryInterface
+{
+    public function findByHospitalId(HospitalId $hospitalId)
     {
-        $Distributor = (SpiralDbDistributor::where('hospitalId',$hospitalId->value())->get())->data->all();
+        $distributor = ModelRepository::getDistributorInstance()
+            ->where('hospitalId', $hospitalId->value())
+            ->get()
+            ->all();
 
         $result = [];
-        foreach($Distributor as $d)
-        {
+        foreach ($distributor as $d) {
             $result[] = $d;
         }
 
@@ -22,7 +23,7 @@ class DistributorRepository implements DistributorRepositoryInterface{
     }
 }
 
-interface DistributorRepositoryInterface 
+interface DistributorRepositoryInterface
 {
-    public function findByHospitalId( HospitalId $hospitalId );
+    public function findByHospitalId(HospitalId $hospitalId);
 }
