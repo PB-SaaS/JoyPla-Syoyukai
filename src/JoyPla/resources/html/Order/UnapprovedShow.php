@@ -32,6 +32,7 @@
           <div class="flex-auto md:w-4/5">
           </div>
         </div>
+        
         <?php endif; ?>
         <div>
           {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.perPage) * values.currentPage )  < totalCount ) ?  parseInt(values.perPage) * values.currentPage : totalCount  }}件 / 全 {{ totalCount }}件
