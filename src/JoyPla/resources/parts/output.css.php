@@ -2958,6 +2958,14 @@ input[aria-invalid="true"] {
     width: 16.666667%;
   }
 
+  .md\:w-1\/5 {
+    width: 20%;
+  }
+
+  .md\:w-4\/5 {
+    width: 80%;
+  }
+
   .md\:grid-cols-4 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }

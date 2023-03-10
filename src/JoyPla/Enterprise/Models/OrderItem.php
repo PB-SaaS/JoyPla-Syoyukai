@@ -22,6 +22,8 @@ class OrderItem
     private bool $lotManagement;
     private string $distributorManagerCode;
     private string $itemImage;
+    private bool $useMedicode;
+    private int $medicodeStatus;
 
     public function __construct(
         OrderId $orderId,
@@ -256,6 +258,11 @@ class OrderItem
             $this->useMedicode,
             $this->medicodeStatus
         );
+    }
+
+    public function getOrderId()
+    {
+        return $this->orderId;
     }
 
     public function addOrderQuantity(OrderQuantity $quantity)

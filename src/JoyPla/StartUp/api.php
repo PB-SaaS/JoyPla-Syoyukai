@@ -114,6 +114,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'approval',
     ])->service($useCaseProvider->getOrderUnapprovedApprovalInteractor());
 
+    Router::map('POST', '/api/order/unapproved/approval/all', [
+        OrderController::class,
+        'approvalAll',
+    ])->service($useCaseProvider->getOrderUnapprovedApprovalAllInteractor());
+
     Router::map(
         'DELETE',
         '/api/order/unapproved/:orderId/:orderItemId/delete',

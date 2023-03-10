@@ -24,6 +24,16 @@
             </div>
           </div>
         </div>
+        <?php if (gate('decision_of_order_slips')->can()): ?>
+        <div class="w-full md:flex border-b-2 border-gray-200 py-4">
+          <div class="flex-auto md:w-1/5">
+            <v-button-primary type="button" class="w-full" @click.native="approvalSlipAll">一括承認</v-button-primary>
+          </div>
+          <div class="flex-auto md:w-4/5">
+          </div>
+        </div>
+        
+        <?php endif; ?>
         <div>
           {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.perPage) * values.currentPage )  < totalCount ) ?  parseInt(values.perPage) * values.currentPage : totalCount  }}件 / 全 {{ totalCount }}件
         </div>
@@ -434,7 +444,50 @@ var JoyPlaApp = Vue.createApp({
             
             Swal.fire({
                 icon: 'success',
-                title: '発注書を承認が完了しました。',
+                title: '発注書の承認が完了しました。',
+            }).then((result) => {
+              location.reload();
+            });
+            return true ;
+          }
+        }).catch((error) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'システムエラー',
+              text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+            });
+        });
+      }
+
+      
+      const approvalSlipAll = ( orderId ) => 
+      {
+        Swal.fire({
+          title: '発注書を一括承認',
+          text: "未発注書を全件一括承認をします。\r\nよろしいですか？",
+          icon: 'warning',
+          showCancelButton: true,
+          reverseButtons: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'OK'
+        }).then( async (result) => {
+          if(result.isConfirmed){
+            start();
+            let params = new URLSearchParams();
+            params.append("path", "/api/order/unapproved/approval/all");
+            params.append("_method", 'post');
+            params.append("_csrf", _CSRF);
+
+            const res = await axios.post(_APIURL,params);
+            complete();
+            if(res.data.code != 200) {
+              throw new Error(res.data.message);
+            }
+            
+            Swal.fire({
+                icon: 'success',
+                title: '発注書の一括承認が完了しました。',
             }).then((result) => {
               location.reload();
             });
@@ -514,6 +567,7 @@ var JoyPlaApp = Vue.createApp({
         numberFormat,
         deleteSlip,
         approvalSlip,
+        approvalSlipAll,
       }
   },
   watch: {

@@ -24,6 +24,7 @@ use JoyPla\InterfaceAdapters\Presenters\Api\Order\FixedQuantityOrderPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderRevisedPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderShowPresenter;
+use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderUnapprovedApprovalAllPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderUnapprovedApprovalPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderUnapprovedDeletePresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderUnapprovedItemDeletePresenter;
@@ -99,6 +100,11 @@ class PresenterProvider
     public function getOrderUnapprovedApprovalPresenter()
     {
         return new OrderUnapprovedApprovalPresenter();
+    }
+
+    public function getOrderUnapprovedApprovalAllPresenter()
+    {
+        return new OrderUnapprovedApprovalAllPresenter();
     }
 
     public function getOrderUnapprovedItemDeletePresenter()
