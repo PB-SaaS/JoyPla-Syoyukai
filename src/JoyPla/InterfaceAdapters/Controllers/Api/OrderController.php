@@ -24,6 +24,8 @@ use JoyPla\Application\InputPorts\Api\Order\OrderUnReceivedShowInputData;
 use JoyPla\Application\InputPorts\Api\Order\OrderUnReceivedShowInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Order\OrderRevisedInputData;
 use JoyPla\Application\InputPorts\Api\Order\OrderRevisedInputPortInterface;
+use JoyPla\Application\InputPorts\Api\Order\OrderUnapprovedApprovalAllInputData;
+use JoyPla\Application\InputPorts\Api\Order\OrderUnapprovedApprovalAllInputPortInterface;
 use JoyPla\Enterprise\Models\OrderStatus;
 
 class OrderController extends Controller
@@ -263,6 +265,23 @@ class OrderController extends Controller
         $inputData = new OrderUnapprovedApprovalInputData(
             $this->request->user(),
             $orderId,
+            $gate->isOnlyMyDivision()
+        );
+        $inputPort->handle($inputData);
+    }
+
+    public function approvalAll(
+        $vars,
+        OrderUnapprovedApprovalAllInputPortInterface $inputPort
+    ) {
+        if (Gate::denies('decision_of_order_slips')) {
+            Router::abort(403);
+        }
+
+        $gate = Gate::getGateInstance('decision_of_order_slips');
+
+        $inputData = new OrderUnapprovedApprovalAllInputData(
+            $this->request->user(),
             $gate->isOnlyMyDivision()
         );
         $inputPort->handle($inputData);

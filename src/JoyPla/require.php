@@ -27,6 +27,7 @@ require_once('JoyPla/Application/Interactors/Api/Order/OrderRegisterInteractor.p
 require_once('JoyPla/Application/Interactors/Api/Order/OrderRevisedInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Order/OrderShowInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Order/OrderUnReceivedShowInteractor.php');
+require_once('JoyPla/Application/Interactors/Api/Order/OrderUnapprovedApprovalAllInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Order/OrderUnapprovedApprovalInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Order/OrderUnapprovedDeleteInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Order/OrderUnapprovedItemDeleteInteractor.php');
@@ -162,6 +163,7 @@ require_once('JoyPla/InterfaceAdapters/Presenters/Api/Order/OrderRegisterPresent
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Order/OrderRevisedPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Order/OrderShowPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Order/OrderUnReceivedShowPresenter.php');
+require_once('JoyPla/InterfaceAdapters/Presenters/Api/Order/OrderUnapprovedApprovalAllPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Order/OrderUnapprovedApprovalPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Order/OrderUnapprovedDeletePresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Order/OrderUnapprovedItemDeletePresenter.php');

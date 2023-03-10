@@ -424,6 +424,54 @@ class OrderRepository extends ModelRepository implements
         return [$orders, $historys->getTotal()];
     }
 
+    public function getOrder(
+        HospitalId $hospitalId,
+        array $orderStatus = [OrderStatus::UnOrdered]
+    ) {
+        $historys = ModelRepository::getOrderViewInstance()->where(
+            'hospitalId',
+            $hospitalId->value()
+        );
+
+        if (count($orderStatus) > 0) {
+            foreach ($orderStatus as $o) {
+                $historys->orWhere('orderStatus', $o);
+            }
+        }
+
+        $orders = array_map(function ($order) {
+            return Order::create($order);
+        }, $historys->get()->all());
+
+        $orderIds =
+            array_map(function (Order $order) {
+                return $order->getOrderId()->value();
+            }, $orders) ?? [];
+
+        $orderItems = ModelRepository::getOrderItemViewInstance()
+            ->whereIn('orderNumber', $orderIds)
+            ->get()
+            ->all();
+
+        $orderItems =
+            array_map(function ($orderItem) {
+                return OrderItem::create($orderItem);
+            }, $orderItems) ?? [];
+
+        foreach ($orders as &$order) {
+            foreach ($orderItems as $orderItem) {
+                if (
+                    $order->getOrderId()->value() ==
+                    $orderItem->getOrderId()->value()
+                ) {
+                    $order = $order->addOrderItem($orderItem);
+                }
+            }
+        }
+
+        return $orders;
+    }
+
     public function index(
         HospitalId $hospitalId,
         OrderId $orderId,
@@ -706,6 +754,210 @@ class OrderRepository extends ModelRepository implements
 
         ModelRepository::getInvitingMailInstance()
             ->ruleId($ruleId)
+            ->sampling($ids);
+    }
+
+    public function sendApprovalAllOrderMail(array $orders, Auth $user)
+    {
+        $orders = array_map(function (Order $order) {
+            return $order;
+        }, $orders);
+
+        $hospital = $orders[0]->getHospital()->toArray();
+
+        $distributors = ModelRepository::getDistributorInstance();
+        $distributorUsers = ModelRepository::getInvitingInstance()->where(
+            'invitingAgree',
+            't'
+        );
+
+        $divisions = ModelRepository::getDivisionInstance()->where(
+            'hospitalId',
+            $user->hospitalId
+        );
+
+        $divisionUsers = ModelRepository::getHospitalUserInstance()
+            ->where('hospitalId', $user->hospitalId)
+            ->whereIn('userPermission', [2]);
+        foreach ($orders as $order) {
+            $distributors->orWhere(
+                'distributorId',
+                $order
+                    ->getDistributor()
+                    ->getDistributorId()
+                    ->value()
+            );
+
+            $distributorUsers->orWhere(
+                'distributorId',
+                $order
+                    ->getDistributor()
+                    ->getDistributorId()
+                    ->value()
+            );
+
+            $divisionUsers->orWhere(
+                'divisionId',
+                $order
+                    ->getDivision()
+                    ->getDivisionId()
+                    ->value()
+            );
+
+            $divisions->orWhere(
+                'divisionId',
+                $order
+                    ->getDivision()
+                    ->getDivisionId()
+                    ->value()
+            );
+        }
+
+        $distributors = $distributors->get()->all();
+        $distributorUsers = $distributorUsers->get()->all();
+        $divisions = $divisions->get()->all();
+        $divisionUsers = $divisionUsers->get()->all();
+
+        $orders = array_map(function (Order $order) {
+            return $order->toArray();
+        }, $orders);
+
+        foreach ($orders as &$order) {
+            $distributor = array_find($distributors, function (
+                $distributor
+            ) use ($order) {
+                return $distributor->distributorId ===
+                    $order['distributor']['distributorId'];
+            });
+
+            $order['distributor'] = $distributor->toArray();
+        }
+
+        foreach ($distributors as $distributor) {
+            $ids = array_filter($distributorUsers, function (
+                $distributorUser
+            ) use ($distributor) {
+                return $distributorUser->distributorId ===
+                    $distributor->distributorId;
+            });
+
+            $ids = array_values(array_column($ids, 'id'));
+
+            $orderData = array_filter($orders, function ($order) use (
+                $distributor
+            ) {
+                return $order['distributor']['distributorId'] ===
+                    $distributor->distributorId;
+            });
+
+            $useMedicode = false;
+            foreach ($orderData as $order) {
+                $useMedicode = in_array(
+                    true,
+                    array_map(function ($orderItem) {
+                        return $orderItem['useMedicode'];
+                    }, $order['orderItems']),
+                    true
+                );
+            }
+            $mailBody = view('mail/Order/OrderFixMultiForDistributor', [
+                'name' => '%val:usr:name%',
+                'hospital_name' => $hospital['hospitalName'],
+                'prefectures' => $hospital['prefectures'],
+                'address' => $hospital['address'],
+                'postal_code' => $hospital['postalCode'],
+                'distributor_name' => $distributor->distributorName,
+                'useMedicode' => $useMedicode,
+                'orders' => $orderData ?? [],
+                'slip_url' =>
+                    config('url.distributorBarcodeSearch', '') .
+                    '?searchValue=',
+                'login_url' => config('url.distributor', ''),
+            ])->render();
+            $ruleId = ModelRepository::getInvitingMailInstance()
+                ->subject('[JoyPla] 発注が行われました')
+                ->standby(false)
+                ->reserveDate('now')
+                ->bodyText($mailBody)
+                ->formAddress(FROM_ADDRESS)
+                ->formName(FROM_NAME)
+                ->mailField('mailAddress')
+                ->regist();
+            ModelRepository::getInvitingMailInstance()
+                ->ruleId($ruleId)
+                ->sampling($ids);
+        }
+
+        foreach ($divisions as $division) {
+            $ids = array_filter($divisionUsers, function ($divisionUser) use (
+                $division
+            ) {
+                return $divisionUser->divisionId === $division->divisionId;
+            });
+
+            $ids = array_values(array_column($ids, 'id'));
+
+            $orderData = array_filter($orders, function ($order) use (
+                $division
+            ) {
+                return $order['division']['divisionId'] ===
+                    $division->divisionId;
+            });
+
+            $mailBody = view('mail/Order/OrderFixMulti', [
+                'name' => '%val:usr:name%',
+                'hospital_name' => $hospital['hospitalName'],
+                'postal_code' => $hospital['postalCode'],
+                'prefectures' => $hospital['prefectures'],
+                'address' => $hospital['address'],
+                'orders' => $orderData ?? [],
+                'login_url' => config('url.hospital', ''),
+            ])->render();
+
+            $mailId = ModelRepository::getHospitalUserMailInstance()
+                ->subject('[JoyPla] 発注が行われました')
+                ->standby(false)
+                ->reserveDate('now')
+                ->bodyText($mailBody)
+                ->formAddress(FROM_ADDRESS)
+                ->formName(FROM_NAME)
+                ->mailField('mailAddress')
+                ->regist();
+
+            ModelRepository::getHospitalUserMailInstance()
+                ->ruleId($mailId)
+                ->sampling($ids);
+        }
+
+        $mailBody = view('mail/Order/OrderFixMulti', [
+            'name' => '%val:usr:name%',
+            'hospital_name' => $hospital['hospitalName'],
+            'postal_code' => $hospital['postalCode'],
+            'prefectures' => $hospital['prefectures'],
+            'address' => $hospital['address'],
+            'orders' => $orders ?? [],
+            'login_url' => config('url.hospital', ''),
+        ])->render();
+
+        $ids = ModelRepository::getHospitalUserInstance()
+            ->where('hospitalId', $user->hospitalId)
+            ->whereIn('userPermission', [1, 3])
+            ->get();
+
+        $ids = array_values(array_column($ids->toArray(), 'id'));
+
+        $mailId = ModelRepository::getHospitalUserMailInstance()
+            ->subject('[JoyPla] 発注が行われました')
+            ->standby(false)
+            ->reserveDate('now')
+            ->bodyText($mailBody)
+            ->formAddress(FROM_ADDRESS)
+            ->formName(FROM_NAME)
+            ->mailField('mailAddress')
+            ->regist();
+
+        ModelRepository::getHospitalUserMailInstance()
+            ->ruleId($mailId)
             ->sampling($ids);
     }
 

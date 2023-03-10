@@ -21,6 +21,7 @@ use JoyPla\Application\Interactors\Api\Order\FixedQuantityOrderInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderRevisedInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderShowInteractor;
+use JoyPla\Application\Interactors\Api\Order\OrderUnapprovedApprovalAllInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderUnapprovedApprovalInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderUnapprovedDeleteInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderUnapprovedItemDeleteInteractor;
@@ -241,6 +242,21 @@ class UseCaseProvider
             $this->repositoryProvider,
             $this->presenterProvider
         ) extends OrderUnapprovedApprovalInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getOrderUnapprovedApprovalAllInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends OrderUnapprovedApprovalAllInteractor {
             public function __construct(
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
