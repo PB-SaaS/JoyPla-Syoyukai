@@ -1,6 +1,8 @@
 <?php
 // ビューの生成
 namespace Command\Basis\Core;
+
+use framework\Http\Request;
 use stdClass;
 class View {
 
@@ -67,6 +69,10 @@ class View {
     {
         if ( ! is_object($value) && ! is_array($value)  ) return htmlspecialchars($value, ENT_QUOTES, "UTF-8");//PHPサーバーはUTF-8
         
+        if( $value instanceof Request){
+            return $value;
+        }
+
         if( is_object($value)){
             unset($value->spiralDataBase);
             unset($value->spiralSendMail);

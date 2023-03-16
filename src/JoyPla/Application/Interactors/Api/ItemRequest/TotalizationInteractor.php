@@ -5,7 +5,6 @@
  */
 
 namespace JoyPla\Application\Interactors\Api\ItemRequest {
-
     use JoyPla\Application\InputPorts\Api\ItemRequest\TotalizationInputData;
     use JoyPla\Application\InputPorts\Api\ItemRequest\TotalizationInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\ItemRequest\TotalizationOutputData;
@@ -13,6 +12,8 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\Enterprise\Models\TotalRequestItem;
     use JoyPla\InterfaceAdapters\GateWays\Repository\TotalizationRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class TotalizationInteractor
@@ -20,22 +21,15 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
      */
     class TotalizationInteractor implements TotalizationInputPortInterface
     {
-        /** @var TotalizationOutputPortInterface */
-        private TotalizationOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var TotalizationRepositoryInterface */
-        private TotalizationRepositoryInterface $repository;
-
-        /**
-         * TotalizationInteractor constructor.
-         * @param TotalizationOutputPortInterface $outputPort
-         */
         public function __construct(
-            TotalizationOutputPortInterface $outputPort,
-            TotalizationRepositoryInterface $repository
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
         ) {
-            $this->outputPort = $outputPort;
-            $this->repository = $repository;
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -43,23 +37,29 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
          */
         public function handle(TotalizationInputData $inputData)
         {
-
-            [$totalRequestItems, $count] = $this->repository->search(
-                (new HospitalId($inputData->user->hospitalId)),
-                $inputData->search
-            );
-            $this->outputPort->output(new TotalizationOutputData($totalRequestItems, $count));
+            [
+                $totalRequestItems,
+                $count,
+            ] = $this->repositoryProvider
+                ->getTotalizationRepository()
+                ->search(
+                    new HospitalId($inputData->user->hospitalId),
+                    $inputData->search
+                );
+            $this->presenterProvider
+                ->getTotalizationPresenter()
+                ->output(
+                    new TotalizationOutputData($totalRequestItems, $count)
+                );
         }
     }
 }
-
 
 /***
  * INPUT
  */
 
 namespace JoyPla\Application\InputPorts\Api\ItemRequest {
-
     use Auth;
     use stdClass;
 
@@ -69,9 +69,9 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
      */
     class TotalizationInputData
     {
-        /**
-         * TotalizationInputData constructor.
-         */
+        public Auth $user;
+        public stdClass $search;
+
         public function __construct(Auth $user, array $search)
         {
             $this->user = $user;
@@ -106,7 +106,6 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
  */
 
 namespace JoyPla\Application\OutputPorts\Api\ItemRequest {
-
     use Collection;
     use JoyPla\Enterprise\Models\TotalRequestItem;
 
@@ -116,14 +115,17 @@ namespace JoyPla\Application\OutputPorts\Api\ItemRequest {
      */
     class TotalizationOutputData
     {
-        /**
-         * TotalizationOutputData constructor.
-         */
+        public array $totalRequestItems;
+        public int $count;
+
         public function __construct(array $totalRequestItems, int $count)
         {
-            $this->totalRequestItems = array_map(function (TotalRequestItem $totalRequestItem) {
+            $this->totalRequestItems = array_map(function (
+                TotalRequestItem $totalRequestItem
+            ) {
                 return $totalRequestItem->toArray();
-            }, $totalRequestItems);
+            },
+            $totalRequestItems);
             $this->count = $count;
         }
     }

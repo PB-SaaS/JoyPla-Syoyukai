@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Notification {
-
     use JoyPla\Application\InputPorts\Api\Notification\NotificationShowInputData;
     use JoyPla\Application\InputPorts\Api\Notification\NotificationShowInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\Notification\NotificationShowOutputData;
@@ -12,27 +11,25 @@ namespace JoyPla\Application\Interactors\Api\Notification {
     use JoyPla\Enterprise\CommonModels\Notification;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\NotificationRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class NotificationShowInteractor
      * @package JoyPla\Application\Interactors\Api\Notification
      */
-    class NotificationShowInteractor implements NotificationShowInputPortInterface
+    class NotificationShowInteractor implements
+        NotificationShowInputPortInterface
     {
-        /** @var NotificationShowOutputPortInterface */
-        private NotificationShowOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var NotificationRepositoryInterface */
-        private NotificationRepositoryInterface $NotificationRepository;
-
-        /**
-         * NotificationShowInteractor constructor.
-         * @param NotificationShowOutputPortInterface $outputPort
-         */
-        public function __construct(NotificationShowOutputPortInterface $outputPort , NotificationRepositoryInterface $NotificationRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->NotificationRepository = $NotificationRepository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -40,29 +37,36 @@ namespace JoyPla\Application\Interactors\Api\Notification {
          */
         public function handle(NotificationShowInputData $inputData)
         {
-            [ $notifications , $count ] = $this->NotificationRepository->search($inputData->search);
+            [
+                $notifications,
+                $count,
+            ] = $this->repositoryProvider
+                ->getNotificationRepository()
+                ->search($inputData->search);
 
-            $notifications = array_map(function($notification){
+            $notifications = array_map(function ($notification) {
                 return new Notification(
                     $notification->registrationTime,
                     $notification->noticeId,
                     $notification->title,
                     $notification->content,
                     $notification->creator,
-                    (int)$notification->type
+                    (int) $notification->type
                 );
-            },$notifications);
-            $this->outputPort->output(new NotificationShowOutputData($notifications, $count));
+            }, $notifications);
+            $this->presenterProvider
+                ->getNotificationShowPresenter()
+                ->output(
+                    new NotificationShowOutputData($notifications, $count)
+                );
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Notification {
-
     use Auth;
     use stdClass;
 
@@ -72,21 +76,20 @@ namespace JoyPla\Application\InputPorts\Api\Notification {
      */
     class NotificationShowInputData
     {
-        /**
-         * NotificationShowInputData constructor.
-         */
+        public stdClass $search;
+
         public function __construct($search)
         {
             $this->search = new stdClass();
-            $this->search->page = (int)$search['currentPage'];
-            $this->search->limit = (int)$search['perPage'];
+            $this->search->page = (int) $search['currentPage'];
+            $this->search->limit = (int) $search['perPage'];
         }
     }
 
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Notification
-    */
+     */
     interface NotificationShowInputPortInterface
     {
         /**
@@ -100,7 +103,6 @@ namespace JoyPla\Application\InputPorts\Api\Notification {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Notification {
-
     use Collection;
     use JoyPla\Enterprise\CommonModels\Notification;
 
@@ -110,14 +112,14 @@ namespace JoyPla\Application\OutputPorts\Api\Notification {
      */
     class NotificationShowOutputData
     {
-        /**
-         * NotificationShowOutputData constructor.
-         */
-        public function __construct(array $result , int $count)
+        public array $notifications;
+        public int $count;
+
+        public function __construct(array $result, int $count)
         {
-            $this->notifications = array_map(function(Notification $n){
-                return (array)$n;
-            },$result);
+            $this->notifications = array_map(function (Notification $n) {
+                return (array) $n;
+            }, $result);
             $this->count = $count;
         }
     }
@@ -125,7 +127,7 @@ namespace JoyPla\Application\OutputPorts\Api\Notification {
     /**
      * Interface NotificationShowOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\Notification;
-    */
+     */
     interface NotificationShowOutputPortInterface
     {
         /**

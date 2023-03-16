@@ -1,18 +1,24 @@
 <?php
 
 namespace JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest {
-
     use ApiResponse;
     use framework\Http\View;
     use JoyPla\Application\OutputPorts\Api\ItemRequest\ItemRequestDeleteOutputData;
     use JoyPla\Application\OutputPorts\Api\ItemRequest\ItemRequestDeleteOutputPortInterface;
 
-    class ItemRequestDeletePresenter implements ItemRequestDeleteOutputPortInterface
+    class ItemRequestDeletePresenter implements
+        ItemRequestDeleteOutputPortInterface
     {
         public function output(ItemRequestDeleteOutputData $outputData)
         {
             $viewModel = new ItemRequestDeleteViewModel($outputData);
-            echo (new ApiResponse($viewModel->data, $viewModel->count, $viewModel->code, $viewModel->message, ['ItemRequestDelete']))->toJson();
+            echo (new ApiResponse(
+                $viewModel->data,
+                $viewModel->count,
+                $viewModel->code,
+                $viewModel->message,
+                ['ItemRequestDelete']
+            ))->toJson();
         }
     }
 
@@ -22,16 +28,17 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest {
      */
     class ItemRequestDeleteViewModel
     {
-        /**
-         * ItemRequestDelete constructor.
-         * @param ItemRequestDeleteOutputData $source
-         */
+        public array $data = [];
+        public int $count = 0;
+        public int $code = 0;
+        public string $message = '';
+
         public function __construct(ItemRequestDeleteOutputData $source)
         {
             $this->data = null;
             $this->count = $source->count;
             $this->code = 200;
-            $this->message = "success";
+            $this->message = 'success';
         }
     }
 }

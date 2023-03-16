@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Web\Order {
-
     use App\Model\Division;
     use framework\Exception\NotFoundException;
     use JoyPla\Application\InputPorts\Web\Order\OrderIndexInputData;
@@ -36,11 +35,10 @@ namespace JoyPla\Application\Interactors\Web\Order {
          * @param OrderIndexOutputPortInterface $outputPort
          */
         public function __construct(
-            OrderIndexOutputPortInterface $outputPort , 
-            OrderRepositoryInterface $orderRepository , 
+            OrderIndexOutputPortInterface $outputPort,
+            OrderRepositoryInterface $orderRepository,
             DivisionRepositoryInterface $divisionRepository
-            )
-        {
+        ) {
             $this->outputPort = $outputPort;
             $this->orderRepository = $orderRepository;
             $this->divisionRepository = $divisionRepository;
@@ -51,21 +49,14 @@ namespace JoyPla\Application\Interactors\Web\Order {
          */
         public function handle(OrderIndexInputData $inputData)
         {
-
             $hospitalId = new HospitalId($inputData->user->hospitalId);
             $orderId = new OrderId($inputData->orderId);
 
             $orderstatus = [];
-            if($inputData->isUnapproved)
-            {
-                $orderstatus = 
-                [
-                    OrderStatus::UnOrdered,
-                ];
-            } else 
-            {
-                $orderstatus = 
-                [
+            if ($inputData->isUnapproved) {
+                $orderstatus = [OrderStatus::UnOrdered];
+            } else {
+                $orderstatus = [
                     OrderStatus::OrderCompletion,
                     OrderStatus::OrderFinished,
                     OrderStatus::DeliveryDateReported,
@@ -81,27 +72,33 @@ namespace JoyPla\Application\Interactors\Web\Order {
                 $orderstatus
             );
 
-            if( $order === null )
-            {
-                throw new NotFoundException("Not Found.",404);
+            if ($order === null) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
-            if($inputData->isOnlyMyDivision && ! $order->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
-            {
-                throw new NotFoundException("Not Found.",404);
+            if (
+                $inputData->isOnlyMyDivision &&
+                !$order
+                    ->getDivision()
+                    ->getDivisionId()
+                    ->equal($inputData->user->divisionId)
+            ) {
+                throw new NotFoundException('Not Found.', 404);
             }
-            
 
             $order = $order->toArray();
-            
-            if($order['receivedTarget'] == '2')
-            {
-                $order['receivedDivisionName'] = $order['division']['divisionName'];
+
+            if ($order['receivedTarget'] == '2') {
+                $order['receivedDivisionName'] =
+                    $order['division']['divisionName'];
             }
-            if($order['receivedTarget'] == '1')
-            {
-                $receivedDivision = $this->divisionRepository->getStorehouse($hospitalId);
-                $order['receivedDivisionName'] = $receivedDivision->getDivisionName()->value();
+            if ($order['receivedTarget'] == '1') {
+                $receivedDivision = $this->divisionRepository->getStorehouse(
+                    $hospitalId
+                );
+                $order[
+                    'receivedDivisionName'
+                ] = $receivedDivision->getDivisionName()->value();
             }
 
             $this->outputPort->output(new OrderIndexOutputData($order));
@@ -109,12 +106,10 @@ namespace JoyPla\Application\Interactors\Web\Order {
     }
 }
 
-
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Web\Order {
-
     use Auth;
     use stdClass;
 
@@ -127,10 +122,14 @@ namespace JoyPla\Application\InputPorts\Web\Order {
         /**
          * OrderIndexInputData constructor.
          */
-        public function __construct(Auth $user , string $orderId , bool $isUnapproved , bool $isOnlyMyDivision)
-        {
+        public function __construct(
+            Auth $user,
+            string $orderId,
+            bool $isUnapproved,
+            bool $isOnlyMyDivision
+        ) {
             $this->user = $user;
-            $this->orderId= $orderId;
+            $this->orderId = $orderId;
             $this->isUnapproved = $isUnapproved;
             $this->isOnlyMyDivision = $isOnlyMyDivision;
         }
@@ -139,7 +138,7 @@ namespace JoyPla\Application\InputPorts\Web\Order {
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Web\Order
-    */
+     */
     interface OrderIndexInputPortInterface
     {
         /**
@@ -153,7 +152,6 @@ namespace JoyPla\Application\InputPorts\Web\Order {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Web\Order {
-
     use JoyPla\Enterprise\Models\Order;
 
     /**
@@ -176,7 +174,7 @@ namespace JoyPla\Application\OutputPorts\Web\Order {
     /**
      * Interface OrderIndexOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Web\Order;
-    */
+     */
     interface OrderIndexOutputPortInterface
     {
         /**
@@ -184,4 +182,4 @@ namespace JoyPla\Application\OutputPorts\Web\Order {
          */
         function output(OrderIndexOutputData $outputData);
     }
-} 
+}

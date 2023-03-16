@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Order {
-
     use App\Model\Division;
     use Exception;
     use JoyPla\Application\InputPorts\Api\Order\OrderRevisedInputData;
@@ -22,6 +21,8 @@ namespace JoyPla\Application\Interactors\Api\Order {
     use JoyPla\Enterprise\Models\OrderStatus;
     use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class OrderRevisedInteractor
@@ -29,21 +30,15 @@ namespace JoyPla\Application\Interactors\Api\Order {
      */
     class OrderRevisedInteractor implements OrderRevisedInputPortInterface
     {
-        /** @var OrderRevisedOutputPortInterface */
-        private OrderRevisedOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var OrderRepositoryInterface */
-        private OrderRepositoryInterface $orderRepository;
-
-        /**
-         * OrderRevisedInteractor constructor.
-         * @param OrderRevisedOutputPortInterface $outputPort
-         */
-        public function __construct(OrderRevisedOutputPortInterface $outputPort , OrderRepositoryInterface $orderRepository , InventoryCalculationRepositoryInterface $inventoryCalculationRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->orderRepository = $orderRepository;
-            $this->inventoryCalculationRepository = $inventoryCalculationRepository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -51,50 +46,69 @@ namespace JoyPla\Application\Interactors\Api\Order {
          */
         public function handle(OrderRevisedInputData $inputData)
         {
-            $order = $this->orderRepository->index(
-                (new HospitalId($inputData->user->hospitalId)),
-                (new OrderId($inputData->orderId)),
-                [
-                    OrderStatus::OrderCompletion,
-                    OrderStatus::OrderFinished,
-                    OrderStatus::DeliveryDateReported,
-                    OrderStatus::PartOfTheCollectionIsIn,
-                    OrderStatus::ReceivingIsComplete,
-                    OrderStatus::DeliveryIsCanceled,
-                    OrderStatus::Borrowing,
-                ]
-            ); 
+            $order = $this->repositoryProvider
+                ->getOrderRepository()
+                ->index(
+                    new HospitalId($inputData->user->hospitalId),
+                    new OrderId($inputData->orderId),
+                    [
+                        OrderStatus::OrderCompletion,
+                        OrderStatus::OrderFinished,
+                        OrderStatus::DeliveryDateReported,
+                        OrderStatus::PartOfTheCollectionIsIn,
+                        OrderStatus::ReceivingIsComplete,
+                        OrderStatus::DeliveryIsCanceled,
+                        OrderStatus::Borrowing,
+                    ]
+                );
 
             $orderItems = $order->getOrderItems();
-            foreach($orderItems as $fkey => $item)
-            {
-                foreach($inputData->revisedItems as $revisedItem)
-                {
-                    if( $item->getOrderItemId()->equal($revisedItem->orderItemId))
-                    {
+            foreach ($orderItems as $fkey => $item) {
+                foreach ($inputData->revisedItems as $revisedItem) {
+                    if (
+                        $item
+                            ->getOrderItemId()
+                            ->equal($revisedItem->orderItemId)
+                    ) {
                         $nowOrderQuantity = $item->getOrderQuantity();
-                        $orderQuantity = new OrderQuantity($revisedItem->revisedOrderQuantity);
-                        
-                        $isPlusRevised = (  $item->isPlus() && ($item->getOrderQuantity()->value() >= $orderQuantity->value()) && ($item->getReceivedQuantity()->value() <= $orderQuantity->value()) );
-                        $isMinusRevised = (  $item->isMinus() && ($item->getOrderQuantity()->value() <= $orderQuantity->value()) && ($item->getReceivedQuantity()->value() >= $orderQuantity->value()) );
-                        if( ! ( $isPlusRevised || $isMinusRevised ) )
-                        {
-                            throw new Exception('The number of orders exceeded the number of corrections possible, and therefore, could not be registered.',422);
+                        $orderQuantity = new OrderQuantity(
+                            $revisedItem->revisedOrderQuantity
+                        );
+
+                        $isPlusRevised =
+                            $item->isPlus() &&
+                            $item->getOrderQuantity()->value() >=
+                                $orderQuantity->value() &&
+                            $item->getReceivedQuantity()->value() <=
+                                $orderQuantity->value();
+                        $isMinusRevised =
+                            $item->isMinus() &&
+                            $item->getOrderQuantity()->value() <=
+                                $orderQuantity->value() &&
+                            $item->getReceivedQuantity()->value() >=
+                                $orderQuantity->value();
+                        if (!($isPlusRevised || $isMinusRevised)) {
+                            throw new Exception(
+                                'The number of orders exceeded the number of corrections possible, and therefore, could not be registered.',
+                                422
+                            );
                         }
 
-                        $orderItems[$fkey] = $item->setOrderQuantity($orderQuantity);
-                        
+                        $orderItems[$fkey] = $item->setOrderQuantity(
+                            $orderQuantity
+                        );
+
                         $inventoryCalculations[] = new InventoryCalculation(
                             $item->getHospitalId(),
                             $item->getDivision()->getDivisionId(),
                             $item->getInHospitalItemId(),
-                            ( $item->getOrderQuantity()->value() - $orderQuantity->value() ) * $item->getQuantity()->getQuantityNum() * -1,
+                            ($item->getOrderQuantity()->value() -
+                                $orderQuantity->value()) *
+                                $item->getQuantity()->getQuantityNum() *
+                                -1,
                             2,
-                            (new Lot(
-                                new LotNumber(''),
-                                new LotDate('')
-                            )),
-                            0,
+                            new Lot(new LotNumber(''), new LotDate('')),
+                            0
                         );
                     }
                 }
@@ -102,25 +116,31 @@ namespace JoyPla\Application\Interactors\Api\Order {
 
             $order = $order->setOrderItems($orderItems);
             $order = $order->updateOrderStatus();
-            $this->orderRepository->saveToArray(
-                (new HospitalId($inputData->user->hospitalId)),
-                [$order]);
-            
-            $this->inventoryCalculationRepository->saveToArray($inventoryCalculations);
+            $this->repositoryProvider
+                ->getOrderRepository()
+                ->saveToArray(new HospitalId($inputData->user->hospitalId), [
+                    $order,
+                ]);
 
-            $this->orderRepository->sendRevisedOrderMail($order , $inputData->user);
+            $this->repositoryProvider
+                ->getInventoryCalculationRepository()
+                ->saveToArray($inventoryCalculations);
 
-            $this->outputPort->output(new OrderRevisedOutputData());
+            $this->repositoryProvider
+                ->getOrderRepository()
+                ->sendRevisedOrderMail($order, $inputData->user);
+
+            $this->presenterProvider
+                ->getOrderRevisedPresenter()
+                ->output(new OrderRevisedOutputData());
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Order {
-
     use Auth;
     use stdClass;
 
@@ -130,26 +150,30 @@ namespace JoyPla\Application\InputPorts\Api\Order {
      */
     class OrderRevisedInputData
     {
-        /**
-         * OrderRevisedInputData constructor.
-         */
-        public function __construct(Auth $user , string $orderId , array $revisedItems)
-        {
+        public Auth $user;
+        public string $orderId;
+        public array $revisedItems;
+
+        public function __construct(
+            Auth $user,
+            string $orderId,
+            array $revisedItems
+        ) {
             $this->user = $user;
             $this->orderId = $orderId;
-            $this->revisedItems = array_map(function($x){
+            $this->revisedItems = array_map(function ($x) {
                 $test = new stdClass();
                 $test->orderItemId = $x['orderItemId'];
                 $test->revisedOrderQuantity = $x['revisedOrderQuantity'];
                 return $test;
-            },$revisedItems);
+            }, $revisedItems);
         }
     }
 
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Order
-    */
+     */
     interface OrderRevisedInputPortInterface
     {
         /**
@@ -163,7 +187,6 @@ namespace JoyPla\Application\InputPorts\Api\Order {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Order {
-
     use JoyPla\Enterprise\Models\Order;
 
     /**
@@ -177,7 +200,7 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
         /**
          * OrderRevisedOutputData constructor.
          */
-        
+
         public function __construct()
         {
         }
@@ -186,7 +209,7 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
     /**
      * Interface OrderRevisedOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\Order;
-    */
+     */
     interface OrderRevisedOutputPortInterface
     {
         /**
@@ -194,4 +217,4 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
          */
         function output(OrderRevisedOutputData $outputData);
     }
-} 
+}

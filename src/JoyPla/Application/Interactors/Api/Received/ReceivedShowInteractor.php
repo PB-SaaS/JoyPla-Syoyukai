@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Received {
-
     use App\Model\Division;
     use JoyPla\Application\InputPorts\Api\Received\ReceivedShowInputData;
     use JoyPla\Application\InputPorts\Api\Received\ReceivedShowInputPortInterface;
@@ -13,6 +12,8 @@ namespace JoyPla\Application\Interactors\Api\Received {
     use JoyPla\Enterprise\Models\Received;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ReceivedRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ReceivedShowInteractor
@@ -20,20 +21,15 @@ namespace JoyPla\Application\Interactors\Api\Received {
      */
     class ReceivedShowInteractor implements ReceivedShowInputPortInterface
     {
-        /** @var ReceivedShowOutputPortInterface */
-        private ReceivedShowOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var ReceivedRepositoryInterface */
-        private ReceivedRepositoryInterface $receivedRepository;
-
-        /**
-         * ReceivedShowInteractor constructor.
-         * @param ReceivedShowOutputPortInterface $outputPort
-         */
-        public function __construct(ReceivedShowOutputPortInterface $outputPort , ReceivedRepositoryInterface $receivedRepository)
-        {
-            $this->outputPort = $outputPort;
-            $this->receivedRepository = $receivedRepository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -41,21 +37,26 @@ namespace JoyPla\Application\Interactors\Api\Received {
          */
         public function handle(ReceivedShowInputData $inputData)
         {
-            [ $receiveds , $count ] = $this->receivedRepository->search(
-                (new HospitalId($inputData->user->hospitalId)),
-                $inputData->search
-            );
-            $this->outputPort->output(new ReceivedShowOutputData($receiveds , $count));
+            [
+                $receiveds,
+                $count,
+            ] = $this->repositoryProvider
+                ->getReceivedRepository()
+                ->search(
+                    new HospitalId($inputData->user->hospitalId),
+                    $inputData->search
+                );
+            $this->presenterProvider
+                ->getReceivedShowPresenter()
+                ->output(new ReceivedShowOutputData($receiveds, $count));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Received {
-
     use Auth;
     use stdClass;
 
@@ -65,10 +66,10 @@ namespace JoyPla\Application\InputPorts\Api\Received {
      */
     class ReceivedShowInputData
     {
-        /**
-         * ReceivedShowInputData constructor.
-         */
-        public function __construct(Auth $user , array $search)
+        public Auth $user;
+        public stdClass $search;
+
+        public function __construct(Auth $user, array $search)
         {
             $this->user = $user;
             $this->search = new stdClass();
@@ -81,15 +82,15 @@ namespace JoyPla\Application\InputPorts\Api\Received {
             $this->search->receivedDate = $search['receivedDate'];
             $this->search->divisionIds = $search['divisionIds'];
             $this->search->receivedStatus = $search['receivedStatus'];
-            $this->search->perPage= $search['perPage'];
-            $this->search->currentPage= $search['currentPage'];
+            $this->search->perPage = $search['perPage'];
+            $this->search->currentPage = $search['currentPage'];
         }
     }
 
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Received
-    */
+     */
     interface ReceivedShowInputPortInterface
     {
         /**
@@ -103,7 +104,6 @@ namespace JoyPla\Application\InputPorts\Api\Received {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Received {
-
     use JoyPla\Enterprise\Models\Received;
 
     /**
@@ -112,28 +112,22 @@ namespace JoyPla\Application\OutputPorts\Api\Received {
      */
     class ReceivedShowOutputData
     {
-        /** @var string */
+        public int $count;
+        public array $receiveds;
 
-        /**
-         * ReceivedShowOutputData constructor.
-         */
-        
-        public function __construct(array $receiveds , int $count)
+        public function __construct(array $receiveds, int $count)
         {
             $this->count = $count;
-            $this->receiveds = array_map(
-                function( Received $received)
-                {
-                    return $received->toArray();
-                },$receiveds
-            );
+            $this->receiveds = array_map(function (Received $received) {
+                return $received->toArray();
+            }, $receiveds);
         }
     }
 
     /**
      * Interface ReceivedShowOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\Received;
-    */
+     */
     interface ReceivedShowOutputPortInterface
     {
         /**
@@ -141,4 +135,4 @@ namespace JoyPla\Application\OutputPorts\Api\Received {
          */
         function output(ReceivedShowOutputData $outputData);
     }
-} 
+}

@@ -5,7 +5,7 @@
             <h1>カード情報一括登録</h1>
             <div class="js-upload uk-placeholder uk-text-center">
                 <div class="js-upload" uk-form-custom>
-                    <input type="file" @change="loadCsvFile" accept=".csv,.tsv,.txt">
+                    <input type="file" @change="loadCsvFile" accept=".csv,.tsv,.txt" id="file">
                     <span class="uk-link" tabindex="-1" v-if="filename !== ''">{{ filename }}</span>
                     <span class="uk-link" tabindex="-1" v-else> CSV/TSV ファイルを選択してください</span>
                 </div>

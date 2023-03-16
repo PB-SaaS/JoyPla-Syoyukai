@@ -4,8 +4,8 @@ namespace Command\Basis;
 
 use Command\Basis\Request\CommandArgv;
 
-abstract class Command {
-    
+abstract class Command
+{
     abstract function getSerialize();
     abstract function execute(CommandArgv $commandArgv);
 
@@ -14,10 +14,10 @@ abstract class Command {
      *
      * @param string $message
      */
-    protected function message(string $message , bool $escape = true)
+    protected function message(string $message, bool $escape = true)
     {
         // 危険な文字はエスケープする（HTMLエスケープのシェル版みたいなもの）
-        echo ($escape)? escapeshellcmd($message) : $message;
+        echo $escape ? escapeshellcmd($message) : $message;
     }
 
     /**
@@ -25,9 +25,15 @@ abstract class Command {
      *
      * @param string $message
      */
-    protected function line(string $message , bool $escape = true)
+    protected function line($message, bool $escape = true)
     {
-        echo ($escape)? escapeshellcmd($message) . "\n" : $message . "\n";
+        if (is_array($message)) {
+            foreach ($message as $m) {
+                $this->line($m, $escape);
+            }
+        } else {
+            echo $escape ? escapeshellcmd($message) . "\n" : $message . "\n";
+        }
     }
 
     /**
@@ -36,17 +42,16 @@ abstract class Command {
      * @param string $message
      * @return string
      */
-    protected function ask(string $message , bool $escape = true)
+    protected function ask(string $message, bool $escape = true)
     {
         // メッセージを表示し、「標準入力」の受け付け待ち。
         // 前後のスペースなど、入力ミスと思われるものを除外（trim）してあげるのは優しさ。
-        $this->message($message , $escape);
+        $this->message($message, $escape);
         return trim(fgets(STDIN));
     }
 
     protected function config()
     {
-        return require ".env.php";
+        return require '.env.php';
     }
-
 }

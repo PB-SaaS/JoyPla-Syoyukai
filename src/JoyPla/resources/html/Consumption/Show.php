@@ -11,11 +11,11 @@
           <v-button-default type="button" class="md:w-1/6 w-full" @click.native="openPrint( consumption.consumptionId )">
             消費伝票を印刷
           </v-button-default>
-          <?php if( gate('cancellation_of_consumption_slips')->can() ): ?>
+          <?php if (gate('cancellation_of_consumption_slips')->can()): ?>
           <v-button-danger type="button" class="md:w-1/6 w-full" @click.native="deleteSlip( consumption.consumptionId )" >
             消費伝票を削除
           </v-button-danger>
-          <?php endif ?>
+          <?php endif; ?>
         </div>
         <div class="p-4 text-base bg-gray-100 border border-gray-400">
           <div class="flex w-full gap-6">
@@ -81,7 +81,7 @@
 </div>
 <script>
 
-const PHPData = <?php echo json_encode($viewModel, true) ?>;
+const PHPData = <?php echo json_encode($viewModel, true); ?>;
 
 var JoyPlaApp = Vue.createApp({ 
     components: {
@@ -122,7 +122,7 @@ var JoyPlaApp = Vue.createApp({
           {
             text: '消費一覧',
             disabled: false,
-            href: _ROOT+'&path=/consumption/show&isCache=true',
+            href: _ROOT+'&path=/consumption/index&isCache=true',
           },
           {
             text: '消費伝票の詳細',
@@ -168,7 +168,7 @@ var JoyPlaApp = Vue.createApp({
                   icon: 'success',
                   title: '消費伝票の削除が完了しました。',
               }).then((result) => {
-                location.href = _ROOT+'&path=/consumption/show&isCache=true';
+                location.href = _ROOT+'&path=/consumption/index&isCache=true';
               });
               return true ;
             }

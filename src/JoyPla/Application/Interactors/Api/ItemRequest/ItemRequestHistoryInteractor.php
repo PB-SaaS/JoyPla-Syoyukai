@@ -5,57 +5,55 @@
  */
 
 namespace JoyPla\Application\Interactors\Api\ItemRequest {
-
     use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestHistoryInputData;
     use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestHistoryInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\ItemRequest\ItemRequestHistoryOutputData;
     use JoyPla\Application\OutputPorts\Api\ItemRequest\ItemRequestHistoryOutputPortInterface;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRequestRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ItemRequestHistoryInteractor
      * @package JoyPla\Application\Interactors\Api\ItemRequest
      */
-    class ItemRequestHistoryInteractor implements ItemRequestHistoryInputPortInterface
+    class ItemRequestHistoryInteractor implements
+        ItemRequestHistoryInputPortInterface
     {
-        /** @var ItemRequestHistoryOutputPortInterface */
-        private ItemRequestHistoryOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var itemRequestRepositoryInterface */
-        private ItemRequestRepositoryInterface $repository;
-
-        /**
-         * ItemRequestHistoryInteractor constructor.
-         * @param ItemRequestHistoryOutputPortInterface $outputPort
-         */
-        public function __construct(ItemRequestHistoryOutputPortInterface $outputPort, ItemRequestRepositoryInterface $repository)
-        {
-            $this->outputPort = $outputPort;
-            $this->repository = $repository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
-
         /**
          * @param ItemRequestHistoryInputData $inputData
          */
         public function handle(ItemRequestHistoryInputData $inputData)
         {
             [$itemRequests, $count] = $this->repository->search(
-                (new HospitalId($inputData->user->hospitalId)),
+                new HospitalId($inputData->user->hospitalId),
                 $inputData->search
             );
-            $this->outputPort->output(new ItemRequestHistoryOutputData($itemRequests, $count));
+            $this->presenterProvider
+                ->getItemRequestHistoryPresenter()
+                ->output(
+                    new ItemRequestHistoryOutputData($itemRequests, $count)
+                );
         }
     }
 }
-
 
 /***
  * INPUT
  */
 
 namespace JoyPla\Application\InputPorts\Api\ItemRequest {
-
     use Auth;
     use stdClass;
 
@@ -65,9 +63,8 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
      */
     class ItemRequestHistoryInputData
     {
-        /**
-         * ItemRequestHistoryInputData constructor.
-         */
+        public Auth $user;
+        public stdClass $search;
         public function __construct(Auth $user, array $search)
         {
             $this->user = $user;
@@ -104,7 +101,6 @@ namespace JoyPla\Application\InputPorts\Api\ItemRequest {
  */
 
 namespace JoyPla\Application\OutputPorts\Api\ItemRequest {
-
     use Collection;
     use JoyPla\Enterprise\Models\ItemRequest;
 
@@ -114,14 +110,17 @@ namespace JoyPla\Application\OutputPorts\Api\ItemRequest {
      */
     class ItemRequestHistoryOutputData
     {
-        /**
-         * ItemRequestHistoryOutputData constructor.
-         */
+        public array $itemRequests;
+        public int $count;
+
         public function __construct(array $itemRequests, int $count)
         {
-            $this->itemRequests = array_map(function (ItemRequest $itemRequest) {
+            $this->itemRequests = array_map(function (
+                ItemRequest $itemRequest
+            ) {
                 return $itemRequest->toArray();
-            }, $itemRequests);
+            },
+            $itemRequests);
             $this->count = $count;
         }
     }

@@ -4,7 +4,6 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Received {
-
     use App\Model\Division;
     use Exception;
     use framework\Exception\NotFoundException;
@@ -35,38 +34,25 @@ namespace JoyPla\Application\Interactors\Api\Received {
     use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\ReceivedRepositoryInterface;
     use JoyPla\InterfaceAdapters\GateWays\Repository\stockRepositoryInterface;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class ReceivedRegisterByOrderSlipInteractor
      * @package JoyPla\Application\Interactors\Api\Received
      */
-    class ReceivedRegisterByOrderSlipInteractor implements ReceivedRegisterByOrderSlipInputPortInterface
+    class ReceivedRegisterByOrderSlipInteractor implements
+        ReceivedRegisterByOrderSlipInputPortInterface
     {
-        /** @var ReceivedRegisterByOrderSlipOutputPortInterface */
-        private ReceivedRegisterByOrderSlipOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var OrderRepositoryInterface */
-        private OrderRepositoryInterface $orderRepository;
-        
-        /** @var ReceivedRepositoryInterface */
-        private ReceivedRepositoryInterface $receivedRepository;
-
-        /**
-         * ReceivedRegisterByOrderSlipInteractor constructor.
-         * @param ReceivedRegisterByOrderSlipOutputPortInterface $outputPort
-         */
-        public function __construct(ReceivedRegisterByOrderSlipOutputPortInterface $outputPort , 
-            OrderRepositoryInterface $orderRepository ,
-            ReceivedRepositoryInterface $receivedRepository,
-            DivisionRepositoryInterface $divisionRepository,
-            InventoryCalculationRepositoryInterface $inventoryCalculationRepository
-         )
-        {
-            $this->outputPort = $outputPort;
-            $this->orderRepository = $orderRepository;
-            $this->receivedRepository = $receivedRepository;
-            $this->divisionRepository = $divisionRepository;
-            $this->inventoryCalculationRepository = $inventoryCalculationRepository;
+        public function __construct(
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
+        ) {
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -76,56 +62,76 @@ namespace JoyPla\Application\Interactors\Api\Received {
         {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
             $orderId = new OrderId($inputData->orderId);
-            $orderstatus = array_values(array_filter(OrderStatus::list(),function($var){ return (OrderStatus::UnOrdered !== $var); }));//Unordered以外を取得
-            $order = $this->orderRepository->index($hospitalId ,$orderId ,$orderstatus);
+            $orderstatus = array_values(
+                array_filter(OrderStatus::list(), function ($var) {
+                    return OrderStatus::UnOrdered !== $var;
+                })
+            ); //Unordered以外を取得
+            $order = $this->repositoryProvider
+                ->getOrderRepository()
+                ->index($hospitalId, $orderId, $orderstatus);
 
-            if( $order === null )
-            {
-                throw new Exception("Invalid value.",422);
+            if ($order === null) {
+                throw new Exception('Invalid value.', 422);
             }
 
-            if($inputData->isOnlyMyDivision && ! $order->getDivision()->getDivisionId()->equal($inputData->user->divisionId))
-            {
-                throw new NotFoundException("Not Found.",404);
+            if (
+                $inputData->isOnlyMyDivision &&
+                !$order
+                    ->getDivision()
+                    ->getDivisionId()
+                    ->equal($inputData->user->divisionId)
+            ) {
+                throw new NotFoundException('Not Found.', 404);
             }
 
             $items = $order->getOrderItems();
 
             $received = new Received(
                 $order->getOrderId(),
-                (ReceivedId::generate()),
-                (new DateYearMonthDayHourMinutesSecond('now')),
+                ReceivedId::generate(),
+                new DateYearMonthDayHourMinutesSecond('now'),
                 [],
                 $order->getHospital(),
                 $order->getDivision(),
                 $order->getDistributor(),
                 new ReceivedStatus(ReceivedStatus::Received)
             );
-            
-            $storehouse = $this->divisionRepository->getStorehouse($hospitalId);
+
             $inventoryCalculations = [];
             $receivedItems = [];
 
-            foreach($items as $key => $item)
-            {
-                $fkey = array_search( $item->getOrderItemId()->value() ,array_column($inputData->receivedItems, 'orderItemId') , true);
-                if($fkey === false)
-                {
-                    throw new Exception('The item with this OrderItemId does not exist.',422);
+            foreach ($items as $key => $item) {
+                $fkey = array_search(
+                    $item->getOrderItemId()->value(),
+                    array_column($inputData->receivedItems, 'orderItemId'),
+                    true
+                );
+                if ($fkey === false) {
+                    throw new Exception(
+                        'The item with this OrderItemId does not exist.',
+                        422
+                    );
                 }
 
-                if(! isset($inputData->receivedItems[$fkey]['receiveds'])){
+                if (!isset($inputData->receivedItems[$fkey]['receiveds'])) {
                     continue;
                 }
 
-                foreach($inputData->receivedItems[$fkey]['receiveds'] as $receivedItem)
-                {
-                    $receivedQuantity = new ReceivedQuantity((int)$receivedItem['receivedQuantity']);
-                    $items[$key] = $items[$key]->addReceivedQuantity($receivedQuantity);// 入庫数を更新
+                foreach (
+                    $inputData->receivedItems[$fkey]['receiveds']
+                    as $receivedItem
+                ) {
+                    $receivedQuantity = new ReceivedQuantity(
+                        (int) $receivedItem['receivedQuantity']
+                    );
+                    $items[$key] = $items[$key]->addReceivedQuantity(
+                        $receivedQuantity
+                    ); // 入庫数を更新
                     $receivedItem = new ReceivedItem(
                         $item->getOrderItemId(),
                         $received->getReceivedId(),
-                        (ReceivedItemId::generate()),
+                        ReceivedItemId::generate(),
                         $item->getInHospitalItemId(),
                         $item->getItem(),
                         $order->getHospital()->getHospitalId(),
@@ -135,26 +141,33 @@ namespace JoyPla\Application\Interactors\Api\Received {
                         $item->getPrice(),
                         0,
                         $receivedQuantity,
-                        (new ReturnQuantity(0)),
-                        (new Lot(
+                        new ReturnQuantity(0),
+                        new Lot(
                             new LotNumber($receivedItem['lotNumber']),
-                            new LotDate($receivedItem['lotDate']),
-                        )),
-                        (new Redemption(false,new Price(0) )),
+                            new LotDate($receivedItem['lotDate'])
+                        ),
+                        new Redemption(false, new Price(0)),
                         $item->getItemImage()
                     );
 
-                    
-                    if($order->getReceivedTarget() === 1) //大倉庫
-                    {
+                    if ($order->getReceivedTarget() === 1) {
+                        //大倉庫
+
+                        $storehouse = $this->divisionRepository->getStorehouse(
+                            $hospitalId
+                        );
+                        
                         $inventoryCalculations[] = new InventoryCalculation(
                             $receivedItem->getHospitalId(),
                             $storehouse->getDivisionId(),
                             $receivedItem->getInHospitalItemId(),
-                            $receivedItem->getReceivedQuantity()->value() * $receivedItem->getQuantity()->getQuantityNum() * -1,
+                            $receivedItem->getReceivedQuantity()->value() *
+                                $receivedItem->getQuantity()->getQuantityNum() *
+                                -1,
                             3,
                             $receivedItem->getLot(),
-                            $receivedItem->getReceivedQuantity()->value() * $receivedItem->getQuantity()->getQuantityNum(),
+                            $receivedItem->getReceivedQuantity()->value() *
+                                $receivedItem->getQuantity()->getQuantityNum()
                         );
                         /*
                         $inventoryCalculations[] = new InventoryCalculation(
@@ -167,16 +180,18 @@ namespace JoyPla\Application\Interactors\Api\Received {
                             0,
                         );
                         */
-                    } else 
-                    {
+                    } else {
                         $inventoryCalculations[] = new InventoryCalculation(
                             $receivedItem->getHospitalId(),
                             $receivedItem->getDivision()->getDivisionId(),
                             $receivedItem->getInHospitalItemId(),
-                            $receivedItem->getReceivedQuantity()->value() * $receivedItem->getQuantity()->getQuantityNum() * -1,
+                            $receivedItem->getReceivedQuantity()->value() *
+                                $receivedItem->getQuantity()->getQuantityNum() *
+                                -1,
                             3,
                             $receivedItem->getLot(),
-                            $receivedItem->getReceivedQuantity()->value() * $receivedItem->getQuantity()->getQuantityNum(),
+                            $receivedItem->getReceivedQuantity()->value() *
+                                $receivedItem->getQuantity()->getQuantityNum()
                         );
                     }
 
@@ -184,25 +199,32 @@ namespace JoyPla\Application\Interactors\Api\Received {
                 }
             }
 
-            $order = $order->setOrderItems($items);// オーダーデータを更新
+            $order = $order->setOrderItems($items); // オーダーデータを更新
             $order = $order->updateOrderStatus();
             $received = $received->setReceivedItems($receivedItems);
-            $this->orderRepository->saveToArray($hospitalId , [$order] , [ 'isReceived' => true ]);
-            $this->receivedRepository->saveToArray($hospitalId , [$received]);
 
-            $this->inventoryCalculationRepository->saveToArray($inventoryCalculations);
+            $this->repositoryProvider
+                ->getOrderRepository()
+                ->saveToArray($hospitalId, [$order], ['isReceived' => true]);
+            $this->repositoryProvider
+                ->getReceivedRepository()
+                ->saveToArray($hospitalId, [$received]);
 
-            $this->outputPort->output(new ReceivedRegisterByOrderSlipOutputData($received));
+            $this->repositoryProvider
+                ->getInventoryCalculationRepository()
+                ->saveToArray($inventoryCalculations);
+
+            $this->presenterProvider
+                ->getReceivedRegisterByOrderSlipPresenter()
+                ->output(new ReceivedRegisterByOrderSlipOutputData($received));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 namespace JoyPla\Application\InputPorts\Api\Received {
-
     use Auth;
     use stdClass;
 
@@ -212,18 +234,25 @@ namespace JoyPla\Application\InputPorts\Api\Received {
      */
     class ReceivedRegisterByOrderSlipInputData
     {
-        /**
-         * ReceivedRegisterByOrderSlipInputData constructor.
-         */
-        public function __construct(Auth $user , $orderId ,array $receivedItems , bool $isOnlyMyDivision )
-        {
+
+        public Auth $user;
+        public string $orderId;
+        public array $receivedItems;
+        public bool $isOnlyMyDivision;
+
+        public function __construct(
+            Auth $user,
+            $orderId,
+            array $receivedItems,
+            bool $isOnlyMyDivision
+        ) {
             $this->user = $user;
             $this->orderId = $orderId;
-            $this->receivedItems = array_map(function($item){
+            $this->receivedItems = array_map(function ($item) {
                 $d['orderItemId'] = $item['orderItemId'];
                 $d['receiveds'] = [];
-                if(isset($item['receiveds']) ){
-                    $d['receiveds'] = array_map(function($item){
+                if (isset($item['receiveds'])) {
+                    $d['receiveds'] = array_map(function ($item) {
                         $s['receivedQuantity'] = $item['receivedQuantity'];
                         $s['lotNumber'] = $item['lotNumber'];
                         $s['lotDate'] = $item['lotDate'];
@@ -231,7 +260,7 @@ namespace JoyPla\Application\InputPorts\Api\Received {
                     }, $item['receiveds']);
                 }
                 return $d;
-            },$receivedItems);
+            }, $receivedItems);
             $this->isOnlyMyDivision = $isOnlyMyDivision;
         }
     }
@@ -239,7 +268,7 @@ namespace JoyPla\Application\InputPorts\Api\Received {
     /**
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Api\Received
-    */
+     */
     interface ReceivedRegisterByOrderSlipInputPortInterface
     {
         /**
@@ -253,7 +282,6 @@ namespace JoyPla\Application\InputPorts\Api\Received {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Received {
-
     use JoyPla\Enterprise\Models\Received;
     use JoyPla\Enterprise\Models\Stock;
 
@@ -263,11 +291,8 @@ namespace JoyPla\Application\OutputPorts\Api\Received {
      */
     class ReceivedRegisterByOrderSlipOutputData
     {
-        /** @var string */
+        public array $received;
 
-        /**
-         * ReceivedRegisterByOrderSlipOutputData constructor.
-         */
         public function __construct(Received $received)
         {
             $this->received = $received->toArray();
@@ -277,7 +302,7 @@ namespace JoyPla\Application\OutputPorts\Api\Received {
     /**
      * Interface ReceivedRegisterByOrderSlipOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Api\Received;
-    */
+     */
     interface ReceivedRegisterByOrderSlipOutputPortInterface
     {
         /**
@@ -285,4 +310,4 @@ namespace JoyPla\Application\OutputPorts\Api\Received {
          */
         function output(ReceivedRegisterByOrderSlipOutputData $outputData);
     }
-} 
+}

@@ -24,6 +24,8 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
     use JoyPla\InterfaceAdapters\GateWays\Repository\InHospitalItemRepositoryInterface;
     use NGT\Barcode\GS1Decoder\Decoder;
     use Collection;
+    use JoyPla\Service\Presenter\Api\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class BarcodeSearchInteractor
@@ -31,16 +33,15 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
      */
     class BarcodeSearchInteractor implements BarcodeSearchInputPortInterface
     {
-        /**
-         * BarcodeSearchInteractor constructor.
-         * @param BarcodeSearchOutputPortInterface $outputPort
-         */
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
+
         public function __construct(
-            BarcodeSearchOutputPortInterface $outputPort,
-            BarcodeRepositoryInterface $barcodeRepository
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
         ) {
-            $this->outputPort = $outputPort;
-            $this->barcodeRepository = $barcodeRepository;
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
 
         /**
@@ -278,10 +279,12 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                 [
                     $inHospitalItems,
                     $count,
-                ] = $this->barcodeRepository->searchByJanCode(
-                    new HospitalId($inputData->user->hospitalId),
-                    (string) $inputData->barcode
-                );
+                ] = $this->repositoryProvider
+                    ->getBarcodeRepository()
+                    ->searchByJanCode(
+                        new HospitalId($inputData->user->hospitalId),
+                        (string) $inputData->barcode
+                    );
             } elseif (
                 (preg_match('/^1/', $inputData->barcode) &&
                     strlen($inputData->barcode) == 14) ||
@@ -345,10 +348,12 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                     [
                         $inHospitalItems,
                         $count,
-                    ] = $this->barcodeRepository->searchByJanCode(
-                        new HospitalId($inputData->user->hospitalId),
-                        (string) $gtin13
-                    );
+                    ] = $this->repositoryProvider
+                        ->getBarcodeRepository()
+                        ->searchByJanCode(
+                            new HospitalId($inputData->user->hospitalId),
+                            (string) $gtin13
+                        );
 
                     $lotNumber = $gs1128Data['identifiers']['10']['content'];
                     if ($gs1128Data['identifiers']['17']['content']) {
@@ -398,9 +403,11 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                 }
             }
 
-            $this->outputPort->output(
-                new BarcodeSearchOutputData($inHospitalItems, $count, $type)
-            );
+            $this->presenterProvider
+                ->getBarcodeSearchPresenter()
+                ->output(
+                    new BarcodeSearchOutputData($inHospitalItems, $count, $type)
+                );
         }
 
         private static function gtin14ToGtin13Convert($code)
@@ -449,6 +456,8 @@ namespace JoyPla\Application\InputPorts\Api\Barcode {
      */
     class BarcodeSearchInputData
     {
+        public Auth $user;
+        public string $barcode;
         /**
          * BarcodeSearchInputData constructor.
          */
@@ -483,8 +492,9 @@ namespace JoyPla\Application\OutputPorts\Api\Barcode {
      */
     class BarcodeSearchOutputData
     {
-        /** @var string */
-
+        public array $inHospitalItems;
+        public int $count;
+        public string $type;
         /**
          * BarcodeSearchOutputData constructor.
          */

@@ -16,7 +16,7 @@ class WelcomeController extends Controller
 
     public function index(array $vars)
     {
-        //
+        echo view("html/welcome")->render();
     }
 
     public function create(array $vars)
@@ -31,8 +31,6 @@ class WelcomeController extends Controller
 
     public function show(array $vars)
     {
-        $body = View::forge("html/welcome")->render();
-        echo View::forge("template/base",compact("body"),false)->render();
     }
 
     public function edit(array $vars)
