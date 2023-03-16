@@ -3,7 +3,7 @@
 
 <head>
     <title>JoyPla 金額情報変更 - 入力</title>
-    <?php include_once "NewJoyPla/src/Head.php"; ?>
+    <?php include_once 'NewJoyPla/src/Head.php'; ?>
 
     <style>
         .uk-navbar-container {
@@ -75,7 +75,7 @@
                                 メーカー
                             </dt>
                             <dd class="data ">
-                                <?php echo $makerName ?>
+                                <?php echo $makerName; ?>
                             </dd>
                         </dl>
                         <dl class="cf">
@@ -83,7 +83,7 @@
                                 商品名
                             </dt>
                             <dd class="data ">
-                                <?php echo $itemName ?>
+                                <?php echo $itemName; ?>
                             </dd>
                         </dl>
                         <dl class="cf">
@@ -91,7 +91,7 @@
                                 製品コード
                             </dt>
                             <dd class="data ">
-                                <?php echo $itemCode ?>
+                                <?php echo $itemCode; ?>
                             </dd>
                         </dl>
                         <dl class="cf">
@@ -99,7 +99,7 @@
                                 規格
                             </dt>
                             <dd class="data ">
-                                <?php echo $itemStandard ?>
+                                <?php echo $itemStandard; ?>
                             </dd>
                         </dl>
                         <dl class="cf">
@@ -107,7 +107,7 @@
                                 JANコード
                             </dt>
                             <dd class="data ">
-                                <?php echo $itemJANCode ?>
+                                <?php echo $itemJANCode; ?>
                             </dd>
                         </dl>
                         <dl class="cf">
@@ -121,15 +121,22 @@
                                     <option value="">
                                         --- 選択してください ---
                                     </option>
-                                    <?php
-                                        foreach ($distributor as $dist) {
-                                            $selected = "";
-                                            if ($dist->distributorId == $currentDistributorId) {
-                                                $selected = "selected";
-                                            }
-                                            echo "<option value='".$dist->distributorId."' ".$selected.">".$dist->distributorName."</option>";
+                                    <?php foreach ($distributor as $dist) {
+                                        $selected = '';
+                                        if (
+                                            $dist->distributorId ==
+                                            $currentDistributorId
+                                        ) {
+                                            $selected = 'selected';
                                         }
-    ?>
+                                        echo "<option value='" .
+                                            $dist->distributorId .
+                                            "' " .
+                                            $selected .
+                                            '>' .
+                                            $dist->distributorName .
+                                            '</option>';
+                                    } ?>
                                 </select>
                                 <br>
                                 <span class="msg">$error:distributorId$</span>
@@ -199,6 +206,7 @@
                         <dl class="cf">
                             <dt class="title">
                                 単価
+                                <span class="need">必須</span>
                             </dt>
                             <dd class="data real">
 
