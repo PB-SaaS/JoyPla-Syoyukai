@@ -42,14 +42,15 @@ class ApplicationDeploy extends Command
             return null;
         }
 
-        $response = $this->createZip($environment);
+        $response = $this->createZip($environment, $commandArgv);
         $this->deploy(
             $response['filename'],
-            $environments['deploy'][$environment]
+            $environments['deploy'][$environment],
+            $commandArgv
         );
     }
 
-    private function deploy($filename, $config)
+    private function deploy($filename, $config, CommandArgv $commandArgv)
     {
         $MULTIPART_BOUNDARY = 'SPIRAL_API_MULTIPART_BOUNDARY';
         $API_TOKEN = $config['token'];
@@ -133,8 +134,13 @@ class ApplicationDeploy extends Command
         return true;
     }
 
-    private function createZip($environment)
+    private function createZip($environment, CommandArgv $commandArgv)
     {
+        $skip = false;
+        if ($commandArgv->__get('options')[0] === '--skip') {
+            $skip = true;
+        }
+
         if (file_exists('.tmp')) {
             exec('rm -rf .tmp');
         }
@@ -155,16 +161,21 @@ class ApplicationDeploy extends Command
                 exec("php $file/makeAutoload.php", $output, $retval);
             }
         }
-
-        $isGit = $this->ask(
-            'gitコマンドがインストールされている場合、差分更新が可能です。実行しますか？ [yes or no]: ',
-            false
-        );
-        if ($isGit === 'yes') {
-            $commitId = $this->ask(
-                '差分を取得するコミットIDがある場合は入力してください : ',
+        $isGit = 'yes';
+        if (!$skip) {
+            $isGit = $this->ask(
+                'gitコマンドがインストールされている場合、差分更新が可能です。実行しますか？ [yes or no]: ',
                 false
             );
+        }
+        if ($isGit === 'yes') {
+            $commitId = '';
+            if (!$skip) {
+                $commitId = $this->ask(
+                    '差分を取得するコミットIDがある場合は入力してください : ',
+                    false
+                );
+            }
             $output = null;
             exec(
                 "git add -N .; git diff --name-only --relative=src/ $commitId",
@@ -173,11 +184,13 @@ class ApplicationDeploy extends Command
 
             $this->line($output);
 
-            $isDeploy = $this->ask(
-                'これらのファイルがデプロイされます。よろしいですか？ [yes or no]: ',
-                false
-            );
-
+            $isDeploy = 'yes';
+            if (!$skip) {
+                $isDeploy = $this->ask(
+                    'これらのファイルがデプロイされます。よろしいですか？ [yes or no]: ',
+                    false
+                );
+            }
             if ($isDeploy !== 'yes') {
                 $this->line('中止します');
                 exit();
