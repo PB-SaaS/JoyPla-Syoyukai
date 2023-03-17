@@ -126,6 +126,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         ]);
     });
 
+    Router::map('GET', '/order/bulk/edit', [
+        OrderController::class,
+        'bulkEdit',
+    ]);
+
     Router::map('GET', '/order/register', [OrderController::class, 'register']);
 
     Router::map('GET', '/order/unapproved/show', [

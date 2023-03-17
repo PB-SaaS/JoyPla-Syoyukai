@@ -32,7 +32,6 @@
           <div class="flex-auto md:w-4/5">
           </div>
         </div>
-        
         <?php endif; ?>
         <div>
           {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.perPage) * values.currentPage )  < totalCount ) ?  parseInt(values.perPage) * values.currentPage : totalCount  }}件 / 全 {{ totalCount }}件
@@ -546,6 +545,60 @@ var JoyPlaApp = Vue.createApp({
         });
       }
 
+      const download = () => {
+        let result = [];
+        let count = 1;
+        orders.value.forEach((order) => {
+          order.orderItems.forEach((orderItem) => {
+            result.push(
+              [
+                count,
+                orderItem.orderId,
+                orderItem.orderItemId,
+                orderItem.division.divisionName,
+                orderItem.distributor.distributorName,
+                orderItem.item.itemName,
+                orderItem.item.makerName,
+                orderItem.item.itemCode,
+                orderItem.item.itemStandard,
+                orderItem.item.itemJANCode,
+                orderItem.quantity.quantityNum,
+                orderItem.quantity.quantityUnit,
+                orderItem.stockCount,
+                orderItem.quantity.quantityUnit,
+                orderItem.orderQuantity,
+                orderItem.quantity.itemUnit,
+              ]
+            );
+            count++
+          });
+        });
+
+        console.log(result);
+
+        result.unshift(['id', '発注伝票番号', '発注番号', '部署名', '卸業者名', '商品名', 'メーカー名', '製品コード', '規格', 'JANコード','入数','入数単位','在庫数','在庫単位','発注数','個数単位']);
+        exportTSV(result);
+      }
+      
+      const exportTSV = (records) => {
+          let data = records.map((record) => record.join('\t')).join('\r\n');
+          data = Encoding.stringToCode(data);
+          let shiftJisCodeList = Encoding.convert(data, 'sjis', 'unicode');
+          let uInt8List = new Uint8Array(shiftJisCodeList);
+
+          //let bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+          let blob = new Blob([uInt8List], {
+              type: 'text/tab-separated-values'
+          });
+          let url = (window.URL || window.webkitURL).createObjectURL(blob);
+          let link = document.createElement('a');
+          link.download = 'orderitems_<?php echo date('Ymd'); ?>.tsv';
+          link.href = url;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+      }
+
       return {
         loading, 
         start, 
@@ -568,6 +621,7 @@ var JoyPlaApp = Vue.createApp({
         deleteSlip,
         approvalSlip,
         approvalSlipAll,
+        download
       }
   },
   watch: {
