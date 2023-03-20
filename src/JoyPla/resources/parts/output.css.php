@@ -1839,6 +1839,56 @@ video {
   background-color: rgb(191 219 254 / var(--tw-bg-opacity));
 }
 
+.bg-lochmara-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(61 123 186 / var(--tw-bg-opacity));
+}
+
+.bg-lochmara-600 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(55 111 167 / var(--tw-bg-opacity));
+}
+
+.bg-gossamer-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(21 153 122 / var(--tw-bg-opacity));
+}
+
+.bg-gossamer-600 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(19 138 110 / var(--tw-bg-opacity));
+}
+
+.bg-carnation-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(230 90 85 / var(--tw-bg-opacity));
+}
+
+.bg-carnation-600 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(207 81 77 / var(--tw-bg-opacity));
+}
+
+.bg-citron-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(147 176 32 / var(--tw-bg-opacity));
+}
+
+.bg-citron-600 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(132 158 29 / var(--tw-bg-opacity));
+}
+
+.bg-ochre-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(202 118 34 / var(--tw-bg-opacity));
+}
+
+.bg-ochre-600 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(182 106 31 / var(--tw-bg-opacity));
+}
+
 .bg-\[\#1e87f0\] {
   --tw-bg-opacity: 1;
   background-color: rgb(30 135 240 / var(--tw-bg-opacity));
@@ -1930,6 +1980,26 @@ video {
 
 .stroke-sushi-700 {
   stroke: #5c8329;
+}
+
+.stroke-lochmara-700 {
+  stroke: #2e5c8c;
+}
+
+.stroke-gossamer-700 {
+  stroke: #10735c;
+}
+
+.stroke-carnation-700 {
+  stroke: #ad4440;
+}
+
+.stroke-citron-700 {
+  stroke: #6e8418;
+}
+
+.stroke-ochre-700 {
+  stroke: #98591a;
 }
 
 .object-contain {
@@ -2445,6 +2515,31 @@ video {
 .text-slate-400 {
   --tw-text-opacity: 1;
   color: rgb(148 163 184 / var(--tw-text-opacity));
+}
+
+.text-lochmara-50 {
+  --tw-text-opacity: 1;
+  color: rgb(245 248 252 / var(--tw-text-opacity));
+}
+
+.text-gossamer-50 {
+  --tw-text-opacity: 1;
+  color: rgb(243 250 248 / var(--tw-text-opacity));
+}
+
+.text-carnation-50 {
+  --tw-text-opacity: 1;
+  color: rgb(254 247 247 / var(--tw-text-opacity));
+}
+
+.text-citron-50 {
+  --tw-text-opacity: 1;
+  color: rgb(250 251 244 / var(--tw-text-opacity));
+}
+
+.text-ochre-50 {
+  --tw-text-opacity: 1;
+  color: rgb(252 248 244 / var(--tw-text-opacity));
 }
 
 .text-\[\#333333\] {
