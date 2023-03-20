@@ -345,7 +345,7 @@
             text: 'メールに登録・追加した発注番号を記載しています',
           }).then((result) => {
             let tmp = [];
-            //replace(tmp);
+            replace(tmp);
           });
           return true;
         } catch (error) {

@@ -137,7 +137,10 @@ class ApplicationDeploy extends Command
     private function createZip($environment, CommandArgv $commandArgv)
     {
         $skip = false;
-        if ($commandArgv->__get('options')[0] === '--skip') {
+        if (
+            !empty($commandArgv->__get('options')) &&
+            $commandArgv->__get('options')[0] === '--skip'
+        ) {
             $skip = true;
         }
 
@@ -175,27 +178,24 @@ class ApplicationDeploy extends Command
                     '差分を取得するコミットIDがある場合は入力してください : ',
                     false
                 );
-            }
-            $output = null;
-            exec(
-                "git add -N .; git diff --name-only --relative=src/ $commitId",
-                $output
-            );
+                $output = null;
+                exec(
+                    "git add -N .; git diff --name-only --relative=src/ $commitId",
+                    $output
+                );
 
-            $this->line($output);
+                $this->line($output);
 
-            $isDeploy = 'yes';
-            if (!$skip) {
                 $isDeploy = $this->ask(
                     'これらのファイルがデプロイされます。よろしいですか？ [yes or no]: ',
                     false
                 );
-            }
-            if ($isDeploy !== 'yes') {
-                $this->line('中止します');
-                exit();
-            }
 
+                if ($isDeploy !== 'yes') {
+                    $this->line('中止します');
+                    exit();
+                }
+            }
             exec(
                 "git add -N .; git diff --name-only --relative=src/ $commitId | xargs -I % cp -r --parents ./src/% .tmp/$environment > /dev/null 2>&1"
             );

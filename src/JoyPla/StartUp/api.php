@@ -130,6 +130,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'show',
     ])->service($useCaseProvider->getOrderShowInteractor());
 
+    Router::map('PATCH', '/api/order/item/bulkUpdate', [
+        OrderController::class,
+        'itemBulkUpdate',
+    ])->service($useCaseProvider->getOrderItemBulkUpdateInteractor());
+
     Router::map('PATCH', '/api/order/:orderId/revised', [
         OrderController::class,
         'revised',

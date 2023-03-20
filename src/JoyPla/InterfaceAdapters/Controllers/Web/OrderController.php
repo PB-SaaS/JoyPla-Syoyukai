@@ -19,6 +19,7 @@ class OrderController extends Controller
         $orderitems = ModelRepository::getOrderItemViewInstance()
             ->where('orderStatus', OrderStatus::UnOrdered)
             ->where('hospitalId', $this->request->user()->hospitalId)
+            ->orderBy('orderNumber', 'asc')
             ->get()
             ->all();
 

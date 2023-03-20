@@ -21,6 +21,7 @@ use JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest\RequestItemDeletePresent
 use JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest\TotalizationPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Notification\NotificationShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\FixedQuantityOrderPresenter;
+use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderItemBulkUpdatePresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderRevisedPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Order\OrderShowPresenter;
@@ -120,6 +121,11 @@ class PresenterProvider
     public function getOrderShowPresenter()
     {
         return new OrderShowPresenter();
+    }
+
+    public function getOrderItemBulkUpdatePresenter()
+    {
+        return new OrderItemBulkUpdatePresenter();
     }
 
     public function getPayoutRegisterPresenter()

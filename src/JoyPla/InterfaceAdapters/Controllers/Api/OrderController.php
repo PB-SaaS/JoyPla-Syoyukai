@@ -20,6 +20,8 @@ use JoyPla\Application\InputPorts\Api\Order\OrderUnapprovedUpdateInputData;
 use JoyPla\Application\InputPorts\Api\Order\OrderUnapprovedUpdateInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Order\FixedQuantityOrderInputData;
 use JoyPla\Application\InputPorts\Api\Order\FixedQuantityOrderInputPortInterface;
+use JoyPla\Application\InputPorts\Api\Order\OrderItemBulkUpdateInputData;
+use JoyPla\Application\InputPorts\Api\Order\OrderItemBulkUpdateInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Order\OrderUnReceivedShowInputData;
 use JoyPla\Application\InputPorts\Api\Order\OrderUnReceivedShowInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Order\OrderRevisedInputData;
@@ -334,8 +336,22 @@ class OrderController extends Controller
         $inputPort->handle($inputData);
     }
 
-    public function update($vars)
-    {
+    public function itemBulkUpdate(
+        $vars,
+        OrderItemBulkUpdateInputPortInterface $inputPort
+    ) {
+        $orderItems = $this->request->get('orderItems');
+
+        if (!is_array($orderItems)) {
+            $orderItems = [];
+        }
+
+        $inputData = new OrderItemBulkUpdateInputData(
+            $this->request->user(),
+            $orderItems
+        );
+
+        $inputPort->handle($inputData);
     }
 
     public function delete($vars)
