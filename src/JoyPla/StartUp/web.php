@@ -6,20 +6,8 @@ require_once 'JoyPla/require.php';
 
 /** components */
 
-use App\SpiralDb\HospitalUser;
-use App\SpiralDb\Notification;
-use framework\Application;
 use framework\Http\Request;
-use framework\Http\View;
 use framework\Routing\Router;
-use JoyPla\Application\Interactors\Web\Consumption\ConsumptionIndexInteractor;
-use JoyPla\Application\Interactors\Web\Consumption\ConsumptionShowInteractor;
-use JoyPla\Application\Interactors\Web\Order\OrderIndexInteractor;
-use JoyPla\Application\Interactors\Web\Received\OrderReceivedSlipIndexInteractor;
-use JoyPla\Application\Interactors\Web\Received\ReceivedIndexInteractor;
-use JoyPla\Application\Interactors\Web\Received\ReceivedLabelInteractor;
-use JoyPla\Application\Interactors\Web\ItemRequest\ItemRequestShowInteractor;
-use JoyPla\Application\Interactors\Web\ItemRequest\PickingListInteractor;
 use JoyPla\InterfaceAdapters\Controllers\Web\AgreeFormController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ConsumptionController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ItemAndPriceAndInHospitalItemRegisterController;
@@ -34,60 +22,33 @@ use JoyPla\InterfaceAdapters\Controllers\Web\TopController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ItemRequestController;
 use JoyPla\InterfaceAdapters\GateWays\Middleware\PersonalInformationConsentMiddleware;
 use JoyPla\InterfaceAdapters\GateWays\Middleware\UnorderDataExistMiddleware;
-use JoyPla\InterfaceAdapters\GateWays\Repository\ConsumptionRepository;
-use JoyPla\InterfaceAdapters\GateWays\Repository\DivisionRepository;
-use JoyPla\InterfaceAdapters\GateWays\Repository\HospitalRepository;
-use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepository;
-use JoyPla\InterfaceAdapters\GateWays\Repository\ReceivedRepository;
-use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRequestRepository;
-use JoyPla\InterfaceAdapters\GateWays\Repository\TotalizationRepository;
-use JoyPla\InterfaceAdapters\Presenters\Web\Consumption\ConsumptionIndexPresenter;
-use JoyPla\InterfaceAdapters\Presenters\Web\Consumption\ConsumptionPrintPresenter;
-use JoyPla\InterfaceAdapters\Presenters\Web\Consumption\ConsumptionShowPresenter;
-use JoyPla\InterfaceAdapters\Presenters\Web\Order\OrderIndexPresenter;
-use JoyPla\InterfaceAdapters\Presenters\Web\Order\OrderPrintPresenter;
-use JoyPla\InterfaceAdapters\Presenters\Web\Order\UnapprovedOrderIndexPresenter;
-use JoyPla\InterfaceAdapters\Presenters\Web\Received\OrderReceivedSlipIndexPresenter;
-use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedIndexPresenter;
-use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedLabelPresenter;
-use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedLabelSettingPresenter;
-use JoyPla\InterfaceAdapters\Presenters\Web\ItemRequest\ItemRequestShowPresenter;
-use JoyPla\InterfaceAdapters\Presenters\Web\ItemRequest\PickingListPresenter;
 use JoyPla\JoyPlaApplication;
+use JoyPla\Service\Presenter\Web\PresenterProvider;
+use JoyPla\Service\Repository\QueryProvider;
+use JoyPla\Service\Repository\RepositoryProvider;
+use JoyPla\Service\UseCase\Web\UseCaseProvider;
 use Test\Exceptions\WebExceptionHandler;
 
 //param _method="" を指定すると GET PUT DELETE GET PATCH を区別できる
 
 const VIEW_FILE_ROOT = 'JoyPla/resources';
 
+$repositoryProvider = new RepositoryProvider();
+$queryProvider = new QueryProvider();
+$presenterProvider = new PresenterProvider();
+$useCaseProvider = new UseCaseProvider(
+    $repositoryProvider,
+    $queryProvider,
+    $presenterProvider
+);
+
 Router::map('GET', '/agree', [AgreeFormController::class, 'index']);
 
 Router::map('POST', '/agree', [AgreeFormController::class, 'send']);
 
-Router::map('GET', '/maintenance', function () {
-    $rep = new OrderRepository();
-    $orders = $rep->all();
-
-    $cloneOrders = [];
-
-    foreach ($orders as $key => $order) {
-        $cloneOrders[$key] = $order->updateOrderStatus();
-    }
-
-    $updateOrders = [];
-    foreach ($cloneOrders as $key => $order) {
-        if (
-            $orders[$key]->getOrderStatus()->value() !==
-            $cloneOrders[$key]->getOrderStatus()->value()
-        ) {
-            $updateOrders[] = $cloneOrders[$key];
-        }
-    }
-
-    $rep->updateAll($updateOrders);
-});
-
-Router::group(PersonalInformationConsentMiddleware::class, function () {
+Router::group(PersonalInformationConsentMiddleware::class, function () use (
+    $useCaseProvider
+) {
     Router::map('GET', '/', [TopController::class, 'index']);
 
     Router::map('GET', '/order', [TopController::class, 'orderpage']);
@@ -151,22 +112,12 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
     Router::map('GET', '/consumption/:consumptionId', [
         ConsumptionController::class,
         'show',
-    ])->service(
-        new ConsumptionShowInteractor(
-            new ConsumptionShowPresenter(),
-            new ConsumptionRepository()
-        )
-    );
+    ])->service($useCaseProvider->getConsumptionShowInteractor());
 
     Router::map('GET', '/consumption/:consumptionId/print', [
         ConsumptionController::class,
         'print',
-    ])->service(
-        new ConsumptionShowInteractor(
-            new ConsumptionPrintPresenter(),
-            new ConsumptionRepository()
-        )
-    );
+    ])->service($useCaseProvider->getConsumptionPrintInteractor());
 
     Router::group(UnorderDataExistMiddleware::class, function () {
         Router::map('GET', '/order/fixedQuantityOrder', [
@@ -174,6 +125,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
             'fixedQuantityOrder',
         ]);
     });
+
+    Router::map('GET', '/order/bulk/edit', [
+        OrderController::class,
+        'bulkEdit',
+    ]);
 
     Router::map('GET', '/order/register', [OrderController::class, 'register']);
 
@@ -185,37 +141,19 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
     Router::map('GET', '/order/unapproved/:orderId', [
         OrderController::class,
         'unapprovedIndex',
-    ])->service(
-        new OrderIndexInteractor(
-            new UnapprovedOrderIndexPresenter(),
-            new OrderRepository(),
-            new DivisionRepository()
-        )
-    );
+    ])->service($useCaseProvider->getUnapprovedOrderIndexInteractor());
 
     Router::map('GET', '/order/show', [OrderController::class, 'show']);
 
     Router::map('GET', '/order/:orderId', [
         OrderController::class,
         'index',
-    ])->service(
-        new OrderIndexInteractor(
-            new OrderIndexPresenter(),
-            new OrderRepository(),
-            new DivisionRepository()
-        )
-    );
+    ])->service($useCaseProvider->getOrderIndexInteractor());
 
     Router::map('GET', '/order/:orderId/print', [
         OrderController::class,
         'print',
-    ])->service(
-        new OrderIndexInteractor(
-            new OrderPrintPresenter(),
-            new OrderRepository(),
-            new DivisionRepository()
-        )
-    );
+    ])->service($useCaseProvider->getOrderPrintInteractor());
 
     Router::map('GET', '/received/show', [ReceivedController::class, 'show']);
 
@@ -227,12 +165,7 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
     Router::map('GET', '/received/:receivedId', [
         ReceivedController::class,
         'index',
-    ])->service(
-        new ReceivedIndexInteractor(
-            new ReceivedIndexPresenter(),
-            new ReceivedRepository()
-        )
-    );
+    ])->service($useCaseProvider->getReceivedIndexInteractor());
 
     //TODO
     //Router::map('GET', '/received/:receivedId/labelsetting',[ReceivedController::class,'labelsetting'])->service(new ReceivedIndexInteractor(new ReceivedLabelSettingPresenter() , new ReceivedRepository(), new ReceivedRepository()) );
@@ -247,12 +180,7 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
     Router::map('GET', '/received/order/:orderId', [
         ReceivedController::class,
         'orderReceivedSlipIndex',
-    ])->service(
-        new OrderReceivedSlipIndexInteractor(
-            new OrderReceivedSlipIndexPresenter(),
-            new OrderRepository()
-        )
-    );
+    ])->service($useCaseProvider->getOrderReceivedSlipIndexInteractor());
 
     Router::map('GET', '/return/show', [ReturnController::class, 'show']);
 
@@ -315,22 +243,12 @@ Router::group(PersonalInformationConsentMiddleware::class, function () {
     Router::map('POST', '/itemrequest/pickingList', [
         ItemRequestController::class,
         'pickingList',
-    ])->service(
-        new PickingListInteractor(
-            new PickingListPresenter(),
-            new TotalizationRepository()
-        )
-    );
+    ])->service($useCaseProvider->getPickingListInteractor());
 
     Router::map('GET', '/itemrequest/:requestHId', [
         ItemRequestController::class,
         'show',
-    ])->service(
-        new ItemRequestShowInteractor(
-            new ItemRequestShowPresenter(),
-            new ItemRequestRepository()
-        )
-    );
+    ])->service($useCaseProvider->getItemRequestShowInteractor());
 });
 
 $router = new Router();

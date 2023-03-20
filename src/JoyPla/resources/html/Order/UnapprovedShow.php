@@ -24,6 +24,15 @@
             </div>
           </div>
         </div>
+        <?php if (gate('decision_of_order_slips')->can()): ?>
+        <div class="w-full md:flex border-b-2 border-gray-200 py-4">
+          <div class="flex-auto md:w-1/5">
+            <v-button-primary type="button" class="w-full" @click.native="approvalSlipAll">一括承認</v-button-primary>
+          </div>
+          <div class="flex-auto md:w-4/5">
+          </div>
+        </div>
+        <?php endif; ?>
         <div>
           {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.perPage) * values.currentPage )  < totalCount ) ?  parseInt(values.perPage) * values.currentPage : totalCount  }}件 / 全 {{ totalCount }}件
         </div>
@@ -44,21 +53,21 @@
                   合計金額：&yen; {{ numberFormat( order.totalAmount) }}
                 </p>
                 <div class="flex flex-col gap-3">
-                  <?php if( gate('list_of_unordered_slips')->can() ): ?>
+                  <?php if (gate('list_of_unordered_slips')->can()): ?>
                   <v-button-default type="button" class="w-full" @click.native="openSlip( order.orderId )">
                     発注書を表示
                   </v-button-default>
-                  <?php endif ?>
-                  <?php if( gate('decision_of_order_slips')->can() ): ?>
+                  <?php endif; ?>
+                  <?php if (gate('decision_of_order_slips')->can()): ?>
                   <v-button-primary type="button" class="w-full" @click.native="approvalSlip( order.orderId )">
                     発注書を承認
                   </v-button-primary>
-                  <?php endif ?>
-                  <?php if( gate('deletion_of_unordered_slips')->can() ): ?>
+                  <?php endif; ?>
+                  <?php if (gate('deletion_of_unordered_slips')->can()): ?>
                   <v-button-danger type="button" class="w-full" @click.native="deleteSlip( order.orderId )">
                     発注書を削除
                   </v-button-danger>
-                  <?php endif ?>
+                  <?php endif; ?>
                 </div>
               </div>
               <div class="lg:w-4/5 p-2">
@@ -72,9 +81,8 @@
                         <p class="text-md text-gray-500">{{ orderItem.item.itemCode }}</p>
                         <p class="text-md text-gray-500">{{ orderItem.item.itemStandard }}</p>
                         <p class="text-md text-gray-500">{{ orderItem.item.itemJANCode }}</p>
-                        <p class="text-base text-gray-900">
-                        {{ numberFormat(orderItem.orderQuantity) }}{{ orderItem.quantity.itemUnit }}
-                        </p>
+                        <p class="text-md text-gray-500">在庫数: {{ numberFormat(orderItem.stockCount ) }}{{ orderItem.quantity.quantityUnit }}</p>
+                        <p class="text-base text-gray-900">発注数: {{ numberFormat(orderItem.orderQuantity) }}{{ orderItem.quantity.itemUnit }}( {{ numberFormat(parseInt(orderItem.orderQuantity) * orderItem.quantity.quantityNum) }}{{ orderItem.quantity.quantityUnit }} )</p>
                         <p>
                           <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(orderItem.orderPrice) }}</span>
                           <span class="text-sm text-gray-900">( &yen; {{ numberFormat(orderItem.price) }} / {{ orderItem.quantity.itemUnit }} )</span>
@@ -149,15 +157,20 @@
                 title="JANコード"
                 ></v-input>
             </div>
-
-            <?php if( gate('list_of_unordered_slips')->isOnlyMyDivision() ): ?>
+            <?php if (gate('list_of_unordered_slips')->isOnlyMyDivision()): ?>
             <div class="my-4">
               <v-multiple-select-division
                 name="divisionIds"
                 title="発注書元部署名"
                 ></v-multiple-select-division>
             </div>
-            <?php endif ?>
+            <?php endif; ?>
+            <div class="my-4">
+              <v-multiple-select-distributor
+                name="distributorIds"
+                title="卸業者"
+                ></v-multiple-select-distributor>
+            </div>
             <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
               <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
               <v-button-primary type="button" @click.native="searchExec">絞り込み</v-button-primary>
@@ -193,7 +206,8 @@ var JoyPlaApp = Vue.createApp({
       'v-pagination' : vPagination,
       'v-select' : vSelect,
       'v-text' : vText,
-      'v-multiple-select-division' : vMultipleSelectDivision
+      'v-multiple-select-division' : vMultipleSelectDivision,
+      'v-multiple-select-distributor' : vMultipleSelectDistributor
     },
     setup(){
       const { ref , onMounted } = Vue;
@@ -254,6 +268,7 @@ var JoyPlaApp = Vue.createApp({
         url.searchParams.set('perPage',values.perPage);
         url.searchParams.set('currentPage',values.currentPage);
         url.searchParams.set('divisionIds',values.divisionIds);
+        url.searchParams.set('distributorIds',values.distributorIds);
         history.pushState({}, '', url);
       }
 
@@ -268,6 +283,7 @@ var JoyPlaApp = Vue.createApp({
           perPage: (Number.isInteger(getParam("perPage"))) ? getParam("perPage") : "10",
           currentPage : (Number.isInteger(parseInt(getParam("currentPage")))) ? parseInt(getParam("currentPage")) : 1,
           divisionIds: (getParam("divisionIds")) ? ( Array.isArray(getParam("divisionIds"))? getParam("divisionIds") : (getParam("divisionIds")).split(',') ) : [],
+          distributorIds: (getParam("distributorIds")) ? ( Array.isArray(getParam("distributorIds"))? getParam("distributorIds") : (getParam("distributorIds")).split(',') ) : [],
         },
       });
       const breadcrumbs = [
@@ -386,6 +402,7 @@ var JoyPlaApp = Vue.createApp({
           itemJANCode :  "",
           registerDate: "",
           divisionIds: [],
+          distributorIds: [],
           currentPage : 1,
           perPage: values.perPage,
         });
@@ -426,7 +443,50 @@ var JoyPlaApp = Vue.createApp({
             
             Swal.fire({
                 icon: 'success',
-                title: '発注書を承認が完了しました。',
+                title: '発注書の承認が完了しました。',
+            }).then((result) => {
+              location.reload();
+            });
+            return true ;
+          }
+        }).catch((error) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'システムエラー',
+              text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+            });
+        });
+      }
+
+      
+      const approvalSlipAll = ( orderId ) => 
+      {
+        Swal.fire({
+          title: '発注書を一括承認',
+          text: "未発注書を全件一括承認をします。\r\nよろしいですか？",
+          icon: 'warning',
+          showCancelButton: true,
+          reverseButtons: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'OK'
+        }).then( async (result) => {
+          if(result.isConfirmed){
+            start();
+            let params = new URLSearchParams();
+            params.append("path", "/api/order/unapproved/approval/all");
+            params.append("_method", 'post');
+            params.append("_csrf", _CSRF);
+
+            const res = await axios.post(_APIURL,params);
+            complete();
+            if(res.data.code != 200) {
+              throw new Error(res.data.message);
+            }
+            
+            Swal.fire({
+                icon: 'success',
+                title: '発注書の一括承認が完了しました。',
             }).then((result) => {
               location.reload();
             });
@@ -485,6 +545,7 @@ var JoyPlaApp = Vue.createApp({
         });
       }
 
+
       return {
         loading, 
         start, 
@@ -506,6 +567,7 @@ var JoyPlaApp = Vue.createApp({
         numberFormat,
         deleteSlip,
         approvalSlip,
+        approvalSlipAll
       }
   },
   watch: {

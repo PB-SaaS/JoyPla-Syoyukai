@@ -11,6 +11,7 @@ use framework\Http\Request;
 use framework\Routing\Router;
 use JoyPla\InterfaceAdapters\Controllers\Api\BarcodeController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ConsumptionController;
+use JoyPla\InterfaceAdapters\Controllers\Api\DistributorController;
 use JoyPla\InterfaceAdapters\Controllers\Api\DivisionController;
 use JoyPla\InterfaceAdapters\Controllers\Api\InHospitalItemController;
 use JoyPla\InterfaceAdapters\Controllers\Api\NotificationController;
@@ -47,6 +48,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         DivisionController::class,
         'index',
     ])->service($useCaseProvider->getDivisionIndexInteractor());
+
+    Router::map('GET', '/api/distributor/index', [
+        DistributorController::class,
+        'index',
+    ])->service($useCaseProvider->getDistributorIndexInteractor());
 
     Router::map('GET', '/api/inHospitalItem/index', [
         InHospitalItemController::class,
@@ -108,6 +114,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'approval',
     ])->service($useCaseProvider->getOrderUnapprovedApprovalInteractor());
 
+    Router::map('POST', '/api/order/unapproved/approval/all', [
+        OrderController::class,
+        'approvalAll',
+    ])->service($useCaseProvider->getOrderUnapprovedApprovalAllInteractor());
+
     Router::map(
         'DELETE',
         '/api/order/unapproved/:orderId/:orderItemId/delete',
@@ -118,6 +129,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         OrderController::class,
         'show',
     ])->service($useCaseProvider->getOrderShowInteractor());
+
+    Router::map('PATCH', '/api/order/item/bulkUpdate', [
+        OrderController::class,
+        'itemBulkUpdate',
+    ])->service($useCaseProvider->getOrderItemBulkUpdateInteractor());
 
     Router::map('PATCH', '/api/order/:orderId/revised', [
         OrderController::class,

@@ -2,10 +2,7 @@
 
 namespace JoyPla\InterfaceAdapters\Controllers\Api;
 
-use App\SpiralDb\HospitalUser;
-use Auth;
 use Csrf;
-use Exception;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Routing\Router;
@@ -22,11 +19,12 @@ use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestUpdateInputPortInte
 use JoyPla\Application\InputPorts\Api\ItemRequest\TotalizationInputData;
 use JoyPla\Application\InputPorts\Api\ItemRequest\TotalizationInputPortInterface;
 
-
 class ItemRequestController extends Controller
 {
-    public function history($vars, ItemRequestHistoryInputPortInterface $inputPort)
-    {
+    public function history(
+        $vars,
+        ItemRequestHistoryInputPortInterface $inputPort
+    ) {
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
 
@@ -48,9 +46,10 @@ class ItemRequestController extends Controller
         $inputPort->handle($inputData);
     }
 
-
-    public function register($vars, ItemRequestRegisterInputPortInterface $inputPort)
-    {
+    public function register(
+        $vars,
+        ItemRequestRegisterInputPortInterface $inputPort
+    ) {
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
 
@@ -62,7 +61,7 @@ class ItemRequestController extends Controller
 
         $requestItems = $this->request->get('requestItems');
 
-        $requestType = (int)$this->request->get('requestType');
+        $requestType = (int) $this->request->get('requestType');
 
         $user = $this->request->user();
 
@@ -75,9 +74,10 @@ class ItemRequestController extends Controller
         $inputPort->handle($inputData);
     }
 
-
-    public function delete($vars, ItemRequestDeleteInputPortInterface $inputPort)
-    {
+    public function delete(
+        $vars,
+        ItemRequestDeleteInputPortInterface $inputPort
+    ) {
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
 
@@ -87,13 +87,18 @@ class ItemRequestController extends Controller
 
         $gate = Gate::getGateInstance('delete_of_item_request_history');
 
-        $inputData = new ItemRequestDeleteInputData($this->request->user(), $vars['requestHId'], $gate->isOnlyMyDivision());
+        $inputData = new ItemRequestDeleteInputData(
+            $this->request->user(),
+            $vars['requestHId'],
+            $gate->isOnlyMyDivision()
+        );
         $inputPort->handle($inputData);
     }
 
-
-    public function itemDelete($vars, RequestItemDeleteInputPortInterface $inputPort)
-    {
+    public function itemDelete(
+        $vars,
+        RequestItemDeleteInputPortInterface $inputPort
+    ) {
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
 
@@ -106,13 +111,19 @@ class ItemRequestController extends Controller
 
         $gate = Gate::getGateInstance('update_of_item_request_history');
 
-        $inputData = new RequestItemDeleteInputData($this->request->user(), $requestHId, $requestId, $gate->isOnlyMyDivision());
+        $inputData = new RequestItemDeleteInputData(
+            $this->request->user(),
+            $requestHId,
+            $requestId,
+            $gate->isOnlyMyDivision()
+        );
         $inputPort->handle($inputData);
     }
 
-
-    public function update($vars, ItemRequestUpdateInputPortInterface $inputPort)
-    {
+    public function update(
+        $vars,
+        ItemRequestUpdateInputPortInterface $inputPort
+    ) {
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
 
@@ -129,15 +140,21 @@ class ItemRequestController extends Controller
         $itemRequest = [
             'requestHId' => $requestHId,
             'requestType' => $requestType,
-            'updateModel' => $updateModel
+            'updateModel' => $updateModel,
         ];
 
-        $inputData = new ItemRequestUpdateInputData($this->request->user(), $itemRequest, $gate->isOnlyMyDivision());
+        $inputData = new ItemRequestUpdateInputData(
+            $this->request->user(),
+            $itemRequest,
+            $gate->isOnlyMyDivision()
+        );
         $inputPort->handle($inputData);
     }
 
-    public function totalization($vars, TotalizationInputPortInterface $inputPort)
-    {
+    public function totalization(
+        $vars,
+        TotalizationInputPortInterface $inputPort
+    ) {
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
 

@@ -7,6 +7,7 @@ use JoyPla\Application\Interactors\Api\Barcode\BarcodeSearchInteractor;
 use JoyPla\Application\Interactors\Api\Consumption\ConsumptionDeleteInteractor;
 use JoyPla\Application\Interactors\Api\Consumption\ConsumptionIndexInteractor;
 use JoyPla\Application\Interactors\Api\Consumption\ConsumptionRegisterInteractor;
+use JoyPla\Application\Interactors\Api\Distributor\DistributorIndexInteractor;
 use JoyPla\Application\Interactors\Api\Division\DivisionIndexInteractor;
 use JoyPla\Application\Interactors\Api\InHospitalItem\InHospitalItemIndexInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestDeleteInteractor;
@@ -17,9 +18,11 @@ use JoyPla\Application\Interactors\Api\ItemRequest\RequestItemDeleteInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\TotalizationInteractor;
 use JoyPla\Application\Interactors\Api\Notification\NotificationShowInteractor;
 use JoyPla\Application\Interactors\Api\Order\FixedQuantityOrderInteractor;
+use JoyPla\Application\Interactors\Api\Order\OrderItemBulkUpdateInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderRevisedInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderShowInteractor;
+use JoyPla\Application\Interactors\Api\Order\OrderUnapprovedApprovalAllInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderUnapprovedApprovalInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderUnapprovedDeleteInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderUnapprovedItemDeleteInteractor;
@@ -60,6 +63,21 @@ class UseCaseProvider
             $this->repositoryProvider,
             $this->presenterProvider
         ) extends DivisionIndexInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getDistributorIndexInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends DistributorIndexInteractor {
             public function __construct(
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
@@ -159,6 +177,21 @@ class UseCaseProvider
         };
     }
 
+    public function getOrderItemBulkUpdateInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends OrderItemBulkUpdateInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
     public function getOrderUnapprovedUpdateInteractor()
     {
         return new class(
@@ -225,6 +258,21 @@ class UseCaseProvider
             $this->repositoryProvider,
             $this->presenterProvider
         ) extends OrderUnapprovedApprovalInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getOrderUnapprovedApprovalAllInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends OrderUnapprovedApprovalAllInteractor {
             public function __construct(
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider

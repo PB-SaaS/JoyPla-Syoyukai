@@ -5,16 +5,17 @@ namespace JoyPla\Enterprise\Models;
 use Collection;
 use Exception;
 
-class Lot 
+class Lot
 {
     private LotNumber $lotNumber;
     private LotDate $lotDate;
 
-    public function __construct(LotNumber $lotNumber , LotDate $lotDate)
+    public function __construct(LotNumber $lotNumber, LotDate $lotDate)
     {
-
-        if( ( ! $lotNumber->isEmpty() && $lotDate->isEmpty() ) || ( $lotNumber->isEmpty() && ! $lotDate->isEmpty() ) ) 
-        {
+        if (
+            (!$lotNumber->isEmpty() && $lotDate->isEmpty()) ||
+            ($lotNumber->isEmpty() && !$lotDate->isEmpty())
+        ) {
             throw new Exception('Two fields need to be filled.', 422);
         }
         $this->lotNumber = $lotNumber;
@@ -24,13 +25,14 @@ class Lot
     public static function create(Collection $i)
     {
         return new Lot(
-            ( new LotNumber($i->lotNumber) ),
-            ( new LotDate($i->lotDate) ),
-            ( ($i->lotManagement == "1") )
+            new LotNumber($i->lotNumber),
+            new LotDate($i->lotDate)
+            //( ($i->lotManagement == "1") )
         );
     }
 
-    public function isEmpty(){
+    public function isEmpty()
+    {
         return $this->lotNumber->isEmpty() || $this->lotDate->isEmpty();
     }
 

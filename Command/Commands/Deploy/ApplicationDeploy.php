@@ -42,14 +42,15 @@ class ApplicationDeploy extends Command
             return null;
         }
 
-        $response = $this->createZip($environment);
+        $response = $this->createZip($environment, $commandArgv);
         $this->deploy(
             $response['filename'],
-            $environments['deploy'][$environment]
+            $environments['deploy'][$environment],
+            $commandArgv
         );
     }
 
-    private function deploy($filename, $config)
+    private function deploy($filename, $config, CommandArgv $commandArgv)
     {
         $MULTIPART_BOUNDARY = 'SPIRAL_API_MULTIPART_BOUNDARY';
         $API_TOKEN = $config['token'];
@@ -133,11 +134,22 @@ class ApplicationDeploy extends Command
         return true;
     }
 
-    private function createZip($environment)
+    private function createZip($environment, CommandArgv $commandArgv)
     {
-        if (!file_exists('.tmp')) {
-            mkdir('.tmp');
+        $skip = false;
+        if (
+            !empty($commandArgv->__get('options')) &&
+            $commandArgv->__get('options')[0] === '--skip'
+        ) {
+            $skip = true;
         }
+
+        if (file_exists('.tmp')) {
+            exec('rm -rf .tmp');
+        }
+
+        mkdir('.tmp');
+
         if (!file_exists(".tmp/$environment")) {
             mkdir(".tmp/$environment");
         }
@@ -152,36 +164,40 @@ class ApplicationDeploy extends Command
                 exec("php $file/makeAutoload.php", $output, $retval);
             }
         }
-
-        $isGit = $this->ask(
-            'gitコマンドがインストールされている場合、差分更新が可能です。実行しますか？ [yes or no]: ',
-            false
-        );
+        $isGit = 'yes';
+        if (!$skip) {
+            $isGit = $this->ask(
+                'gitコマンドがインストールされている場合、差分更新が可能です。実行しますか？ [yes or no]: ',
+                false
+            );
+        }
         if ($isGit === 'yes') {
-            $commitId = $this->ask(
-                '差分を取得するコミットIDがある場合は入力してください : ',
-                false
-            );
-            $output = null;
-            exec(
-                "git add -N .; git diff --name-only --relative=src/ $commitId",
-                $output
-            );
+            $commitId = '';
+            if (!$skip) {
+                $commitId = $this->ask(
+                    '差分を取得するコミットIDがある場合は入力してください : ',
+                    false
+                );
+                $output = null;
+                exec(
+                    "git add -N .; git diff --name-only --relative=src/ $commitId",
+                    $output
+                );
 
-            $this->line($output);
+                $this->line($output);
 
-            $isDeploy = $this->ask(
-                'これらのファイルがデプロイされます。よろしいですか？ [yes or no]: ',
-                false
-            );
+                $isDeploy = $this->ask(
+                    'これらのファイルがデプロイされます。よろしいですか？ [yes or no]: ',
+                    false
+                );
 
-            if ($isDeploy !== 'yes') {
-                $this->line('中止します');
-                exit();
+                if ($isDeploy !== 'yes') {
+                    $this->line('中止します');
+                    exit();
+                }
             }
-
             exec(
-                "git add -N .; git diff --name-only --relative=src/ $commitId | xargs -I % cp -r --parents ./src/% .tmp/$environment"
+                "git add -N .; git diff --name-only --relative=src/ $commitId | xargs -I % cp -r --parents ./src/% .tmp/$environment > /dev/null 2>&1"
             );
             exec("mv .tmp/$environment/src/* .tmp/$environment");
             rmdir(".tmp/$environment/src");
@@ -200,8 +216,6 @@ class ApplicationDeploy extends Command
         }
 
         exec("cd .tmp/$environment ; zip -r ../$environment.zip * ; cd -");
-
-        $this->rmdir_recursively(".tmp/$environment");
 
         return ['filename' => ".tmp/$environment.zip"];
     }

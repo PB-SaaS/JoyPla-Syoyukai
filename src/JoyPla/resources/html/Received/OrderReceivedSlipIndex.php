@@ -38,6 +38,7 @@
                         </span>
                     </v-text>
                     <v-text title="発注元部署" class="flex w-full gap-6">{{ order.division.divisionName }}</v-text>
+                    <v-text title="入荷先部署" class="flex w-full gap-6">{{ order.receivedDivisionName }}</v-text>
                     <v-text title="発注担当者" class="flex w-full gap-6">{{ order.orderUserName }}</v-text>
                     <v-text title="卸業者" class="flex w-full gap-6">{{ order.distributor.distributorName }}</v-text>
                     <v-text title="発注タイプ" class="flex w-full gap-6">{{ order.adjustmentToString }}</v-text>
@@ -130,20 +131,61 @@
                                         <v-input :name="`orderItems[${idx}].sumReceivedQuantity`" label="合計入荷数" :rules="{ between: ( (item.value.orderQuantity > 0)? [ 0 , item.value.orderQuantity - item.value.receivedQuantity ] : [ item.value.orderQuantity - item.value.receivedQuantity , 0 ] ) }" type="hidden" title=""></v-input>
                                     </fieldset>
 
-                                    <div v-for="(received , ridx) in item.value.receiveds" class="lg:flex gap-6 mt-2">
-                                        <div class="lg:w-1/3">
-                                            <v-input :name="`orderItems[${idx}].receiveds[${ridx}].lotNumber`" label="ロット番号" :rules="{ required : isRequired(idx) ,lotnumber: true , twoFieldRequired : [ '消費期限', `@orderItems[${idx}].receiveds[${ridx}].lotDate`]  }" type="text" @change="isChange = true" title="ロット番号"></v-input>
+                                    <div v-for="(received , ridx) in item.value.receiveds">
+                                        <div class="lg:flex gap-6 mt-2">
+                                            <div class="lg:w-1/3">
+                                                <v-input 
+                                                    :name="`orderItems[${idx}].receiveds[${ridx}].lotNumber`" 
+                                                    label="ロット番号" 
+                                                    :rules="{ required : isRequired(idx) ,lotnumber: true , twoFieldRequired : [ '消費期限', `@orderItems[${idx}].receiveds[${ridx}].lotDate`]  }" 
+                                                    type="text" 
+                                                    @change="isChange = true" 
+                                                    title="ロット番号"
+                                                ></v-input>
+                                            </div>
+                                            <div class="lg:w-1/3">
+                                                <v-input 
+                                                    :name="`orderItems[${idx}].receiveds[${ridx}].lotDate`" 
+                                                    label="消費期限" 
+                                                    :rules="{ required : isRequired(idx) , twoFieldRequired : [ 'ロット番号' , `@orderItems[${idx}].receiveds[${ridx}].lotNumber`] }" 
+                                                    type="date" 
+                                                    @change="isChange = true" 
+                                                    title="消費期限"
+                                                ></v-input>
+                                            </div>
+                                            <div class="lg:w-1/3">
+                                                <v-input-number 
+                                                    :rules="{ between: ( (item.value.orderQuantity > 0)? [ 1 , 99999 ] : [ -99999 , -1 ] ) }" 
+                                                    :name="`orderItems[${idx}].receiveds[${ridx}].receivedQuantity`" 
+                                                    label="入荷数" 
+                                                    :unit="item.value.quantity.itemUnit" 
+                                                    :step="1" 
+                                                    @change="receivedQuantitySum(idx)" title="入荷数"></v-input-number>
+                                            </div>
+                                            <div class="lg:mt-0 mt-2">
+                                                <v-text title=" ">
+                                                    <v-button-danger type="button" class="whitespace-pre" @click.native="deleteReceived(idx,ridx)">削除</v-button-danger>
+                                                </v-text>
+                                            </div>
                                         </div>
-                                        <div class="lg:w-1/3">
-                                            <v-input :name="`orderItems[${idx}].receiveds[${ridx}].lotDate`" label="消費期限" :rules="{ required : isRequired(idx) , twoFieldRequired : [ 'ロット番号' , `@orderItems[${idx}].receiveds[${ridx}].lotNumber`] }" type="date" @change="isChange = true" title="消費期限"></v-input>
-                                        </div>
-                                        <div class="lg:w-1/3">
-                                            <v-input-number :rules="{ between: ( (item.value.orderQuantity > 0)? [ 1 , 99999 ] : [ -99999 , -1 ] ) }" :name="`orderItems[${idx}].receiveds[${ridx}].receivedQuantity`" label="入荷数" :unit="item.value.quantity.itemUnit" :step="1" @change="receivedQuantitySum(idx)" title="入荷数"></v-input-number>
-                                        </div>
-                                        <div class="lg:mt-0 mt-2">
-                                            <v-text title=" ">
-                                                <v-button-danger type="button" class="whitespace-pre" @click.native="deleteReceived(idx,ridx)">削除</v-button-danger>
-                                            </v-text>
+                                        <div class="p-4 text-base bg-gray-100 border border-gray-400 my-2" v-show="received.cards?.length > 0">
+                                            <div class="font-bold text-lg">
+                                                <span>入荷予定数: {{ numberFormat( received.receivedQuantity * item.value.quantity.quantityNum ) }}{{ item.value.quantity.quantityUnit }}</span><br>
+                                                <span :class="{
+                                                    'text-red-500': ( received.receivedQuantity * item.value.quantity.quantityNum) - ( received.cardQuantity ?? 0 ) < 0
+                                                }">割り当て可能数量: {{ numberFormat(( received.receivedQuantity * item.value.quantity.quantityNum) - ( received.cardQuantity ?? 0 )) }}{{ item.value.quantity.quantityUnit }}</span>
+                                            </div>
+                                            <div class="lg:flex gap-6 mt-2" v-for="(card , cidx) in received.cards">
+                                                <div class="lg:w-2/3 place-self-center">
+                                                    <v-text title="カードID" class="w-full gap-6">{{ card.cardId }}</v-text>
+                                                </div>
+                                                <div class="lg:w-1/2 place-self-center">
+                                                    <v-text title="カード入数" class="w-full gap-6">{{ card.cardQuantity }}{{ item.value.quantity.quantityUnit }}</v-text>
+                                                </div>
+                                                <div class="lg:mt-0 mt-2">
+                                                    <v-button-danger type="button" class="whitespace-pre" @click.native="deleteReceivedCard(idx,ridx , cidx)">カードを除外</v-button-danger>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="my-4">
@@ -212,7 +254,7 @@
 </div>
 </div>
 <script>
-    const PHPData = <?php echo json_encode($viewModel, true) ?>;
+    const PHPData = <?php echo json_encode($viewModel, true); ?>;
 
     var JoyPlaApp = Vue
         .createApp({
@@ -282,6 +324,8 @@
                     control
                 );
 
+                const readingCards = [];
+
                 console.log(fields);
 
                 const loading = ref(false);
@@ -336,12 +380,13 @@
                 }
 
                 const onRegister = async () => {
+                    
                     const {
                         valid,
                         errors
                     } = await validate();
 
-                    if (!valid) {
+                    if (!valid || !checkCardValid()) {
                         Swal.fire({
                             icon: 'error',
                             title: '入力エラー',
@@ -455,15 +500,56 @@
                         .receiveds
                         .push({
                             'receivedQuantity': 1,
+                            'cardQuantity': 0,
                             'lotNumber': ( item.lotNumber )? item.lotNumber : "" ,
-                            'lotDate': ( item.lotDate )? item.lotDate : ""
+                            'lotDate': ( item.lotDate )? item.lotDate : "",
+                            'cards' : []
                         });
 
                     receivedQuantitySum(idx);
                 };
+
+                const addReceivedItemCard = (idx, item) => {
+                    let receivedItem = fields.value[idx].value.receiveds.find(function(element, index) {
+                        let receivedQuantity = element.receivedQuantity * fields.value[idx].value.quantity.quantityNum;
+                        let cardQuantitySum = element.cardQuantity ?? 0;
+
+                        return (receivedQuantity - cardQuantitySum ) > 0;
+                    });
+                    if(receivedItem){
+                        let receivedItemIndex = fields.value[idx].value.receiveds.findIndex(function(elem){
+                            return elem === receivedItem;
+                        });
+
+                        if(! fields.value[idx].value.receiveds[receivedItemIndex].cards){
+                            fields.value[idx].value.receiveds[receivedItemIndex].cards = [];
+                        }
+
+                        fields.value[idx].value.receiveds[receivedItemIndex].cards.push({
+                            'cardId': item.barcode,
+                            'cardQuantity': item.cardQuantity,
+                        })
+                        
+                        fields.value[idx].value.receiveds[receivedItemIndex].cardQuantity = (fields.value[idx].value.receiveds[receivedItemIndex].cards) ? 
+                            fields.value[idx].value.receiveds[receivedItemIndex].cards.reduce(function(sum, elem) {
+                            return sum + parseInt(elem.cardQuantity);
+                        }, 0) : 0; 
+
+                        readingCards.push(item.barcode);
+                    } else {
+                        Swal.fire({
+                            icon: 'info',
+                            title: '紐づけ可能な入荷データがありませんでした',
+                        });
+                        return false;
+                    }
+                };
+
                 const addItemByBarcode = (items) => {
                     selectInHospitalItems.value = [];
-                    if (items.length === 0 || items.item.length === 0) {
+                    if (
+                        (items.type !== 'card' && items.type !== 'gs1-128')
+                        || items.length === 0 || items.item.length === 0) {
                         Swal.fire({
                             icon: 'info',
                             title: '商品が見つかりませんでした',
@@ -486,22 +572,46 @@
                         })
                         .filter(x => x);
 
-                    
                     if (inHospitalitems.length === 0) {
                         Swal.fire({
                             icon: 'info',
                             title: '商品が見つかりませんでした',
                         });
                         return false;
-                    }else if (inHospitalitems.length === 1) {
-                        addItem(inHospitalitems[0].id, inHospitalitems[0].item);
-                    } else {
-                        selectInHospitalItems.value = inHospitalitems;
-                        openModal
-                            .value
-                            .open();
                     }
 
+                    if( items.type === 'gs1-128' ) {
+                        if (inHospitalitems.length === 1) {
+                            addItem(inHospitalitems[0].id, inHospitalitems[0].item);
+                        } else {
+                            selectInHospitalItems.value = inHospitalitems;
+                            openModal
+                                .value
+                                .open();
+                        }
+                    }
+                    
+                    if( items.type === 'card' ) {
+                        if(order.receivedDivisionId !== items.item[0].divisionId){
+                            Swal.fire({
+                                icon: 'info',
+                                title: '入荷先の部署と異なるカードです',
+                            });
+                            return false;
+                        }
+
+                        if (readingCards.find(elem => elem === items.item[0].barcode))
+                        {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'すでに読み込まれたカード情報です',
+                            });
+                            return false;
+                        }
+                        if (inHospitalitems.length === 1) {
+                            addReceivedItemCard(inHospitalitems[0].id, items.item[0]);
+                        }
+                    }
                 };
                 const addReceived = (idx) => {
                     if (isReceived(idx))
@@ -548,12 +658,59 @@
                         result : [];
                 };
 
+                
+                const deleteReceivedCard = (idx, ridx , cidx) => {
+                    let index = readingCards.findIndex(elem => elem === fields
+                        .value[idx]
+                        .value
+                        .receiveds[ridx]
+                        .cards[cidx].cardId);
+
+                    delete readingCards[index];
+
+                    let result = fields
+                        .value[idx]
+                        .value
+                        .receiveds[ridx]
+                        .cards
+                        .filter((value, index) => {
+                            if (index === cidx) {
+                                return;
+                            }
+                            return value;
+                        })
+                        .filter(e => e);
+                    fields
+                        .value[idx]
+                        .value
+                        .receiveds[ridx].cards = (result) ? result : [];
+                    
+                    fields.value[idx].value.receiveds[ridx].cardQuantity = (fields.value[idx].value.receiveds[ridx].cards) ? 
+                        fields.value[idx].value.receiveds[ridx].cards.reduce(function(sum, elem) {
+                        return sum + parseInt(elem.cardQuantity);
+                    }, 0) : 0; 
+                };
+
+                const checkCardValid = () => {
+                    let flag = true;
+                    fields.value.forEach(function(element){
+                        element.value.receiveds.forEach(function(received){
+                            flag = (received.receivedQuantity * element.value.quantity.quantityNum) - ( received.cardQuantity ?? 0 ) >= 0;
+                        })
+                    })
+
+                    return flag;
+                }
+
                 const reflect = () => {
                     for(val of fields.value){
                         if(val.value.receiveds && val.value.receiveds.length > 0){ //入力済みは対象外
                             continue;
                         }
                         if (val.value.lotManagement == "1") { //ロット管理必須のものは対象外
+                            continue;
+                        }
+                        if ( val.value.receivedFlag ){
                             continue;
                         }
                         val.value.receiveds = [{"receivedQuantity": val.value.orderQuantity - val.value.receivedQuantity, "lotNumber": "", "lotDate": "",}];
@@ -569,6 +726,7 @@
                     addItem,
                     addItemByBarcode,
                     deleteReceived,
+                    deleteReceivedCard,
                     addReceived,
                     isRequired,
                     onRegister,

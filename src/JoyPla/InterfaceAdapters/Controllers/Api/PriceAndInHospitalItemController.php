@@ -2,14 +2,10 @@
 
 namespace JoyPla\InterfaceAdapters\Controllers\Api;
 
-use App\SpiralDb\HospitalUser;
-use Auth;
 use Csrf;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Routing\Router;
-use JoyPla\Application\InputPorts\Api\InHospitalItem\InHospitalItemIndexInputData;
-use JoyPla\Application\InputPorts\Api\InHospitalItem\InHospitalItemIndexInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Item\PriceAndInHospitalItemRegisterInputData;
 use JoyPla\Application\InputPorts\Api\Item\PriceAndInHospitalItemRegisterInputPortInterface;
 

@@ -27,7 +27,7 @@ class ConsumeController extends Controller
     public function __construct()
     {
     }
-    
+
     public function index(): View
     {
         global $SPIRAL;
@@ -35,247 +35,351 @@ class ConsumeController extends Controller
         //$mytable = new mytable();
         // テンプレートにパラメータを渡し、HTMLを生成し返却
         try {
-
             $user_info = new UserInfo($SPIRAL);
-            
-            if ($user_info->isDistributorUser())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+
+            if ($user_info->isDistributorUser()) {
+                throw new Exception(
+                    FactoryApiErrorCode::factory(404)->getMessage(),
+                    FactoryApiErrorCode::factory(404)->getCode()
+                );
             }
-            
-            if ($user_info->isHospitalUser() && $user_info->isApprover())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+
+            if ($user_info->isHospitalUser() && $user_info->isApprover()) {
+                throw new Exception(
+                    FactoryApiErrorCode::factory(404)->getMessage(),
+                    FactoryApiErrorCode::factory(404)->getCode()
+                );
             }
-            
-            if ($user_info->isHospitalUser() && $user_info->isAdmin())
-            {
-                 $divisionData = Division::where('hospitalId',$user_info->getHospitalId())->get();
+
+            if ($user_info->isHospitalUser() && $user_info->isAdmin()) {
+                $divisionData = Division::where(
+                    'hospitalId',
+                    $user_info->getHospitalId()
+                )->get();
             } else {
-                 $divisionData = Division::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$user_info->getDivisionId())->get();
+                $divisionData = Division::where(
+                    'hospitalId',
+                    $user_info->getHospitalId()
+                )
+                    ->where('divisionId', $user_info->getDivisionId())
+                    ->get();
             }
-            
+
             $useUnitPrice = '';
-            $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+            $hospital_data = Hospital::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )->get();
             $hospital_data = $hospital_data->data->get(0);
             $useUnitPrice = $hospital_data->billingUnitPrice;
-    
-            $api_url = "%url/rel:mpgt:Consume%";
-            $order_api_url = "%url/rel:mpgt:Order%";
-    
-            $content = $this->view('NewJoyPla/view/GoodsBillingContentEntry', [
-                'api_url' => $api_url,
-                'order_api_url' => $order_api_url,
-                'userInfo' => $user_info,
-                'divisionData'=> $divisionData,
-                'useUnitPrice'=> $useUnitPrice,
-                'csrf_token' => Csrf::generate(16)
-                ] , false);
-            
-        } catch ( Exception $ex ) {
-            $content = $this->view('NewJoyPla/view/template/Error', [
-                'code' => $ex->getCode(),
-                'message'=> $ex->getMessage(),
-                ] , false);
+
+            $api_url = '%url/rel:mpgt:Consume%';
+            $order_api_url = '%url/rel:mpgt:Order%';
+
+            $content = $this->view(
+                'NewJoyPla/view/GoodsBillingContentEntry',
+                [
+                    'api_url' => $api_url,
+                    'order_api_url' => $order_api_url,
+                    'userInfo' => $user_info,
+                    'divisionData' => $divisionData,
+                    'useUnitPrice' => $useUnitPrice,
+                    'csrf_token' => Csrf::generate(16),
+                ],
+                false
+            );
+        } catch (Exception $ex) {
+            $content = $this->view(
+                'NewJoyPla/view/template/Error',
+                [
+                    'code' => $ex->getCode(),
+                    'message' => $ex->getMessage(),
+                ],
+                false
+            );
         } finally {
-            
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
-            ], false);
+            $head = $this->view(
+                'NewJoyPla/view/template/parts/Head',
+                [],
+                false
+            );
+            $header = $this->view(
+                'NewJoyPla/src/HeaderForMypage',
+                [
+                    'SPIRAL' => $SPIRAL,
+                ],
+                false
+            );
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 消費登録/個別発注',
-                'script' => '',
-                'content'   => $content->render(),
-                'head' => $head->render(),
-                'header' => $header->render(),
-                'baseUrl' => '',
-            ],false);
+            return $this->view(
+                'NewJoyPla/view/template/Template',
+                [
+                    'title' => 'JoyPla 消費登録/個別発注',
+                    'script' => '',
+                    'content' => $content->render(),
+                    'head' => $head->render(),
+                    'header' => $header->render(),
+                    'baseUrl' => '',
+                ],
+                false
+            );
         }
     }
-    
+
     public function consumeList(): View
     {
         global $SPIRAL;
         try {
-
             $user_info = new UserInfo($SPIRAL);
-            
-            if ($user_info->isDistributorUser())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+
+            if ($user_info->isDistributorUser()) {
+                throw new Exception(
+                    FactoryApiErrorCode::factory(404)->getMessage(),
+                    FactoryApiErrorCode::factory(404)->getCode()
+                );
             }
-            
-            $api_url = "%url/rel:mpgt:Consume%";
-            if ($user_info->isHospitalUser() && ( $user_info->isAdmin() || $user_info->isApprover() ))
-            {
-                $content = $this->view('NewJoyPla/view/template/List', [
+
+            $api_url = '%url/rel:mpgt:Consume%';
+            if (
+                $user_info->isHospitalUser() &&
+                ($user_info->isAdmin() || $user_info->isApprover())
+            ) {
+                $content = $this->view(
+                    'NewJoyPla/view/template/List',
+                    [
                         'title' => '消費一覧',
                         'table' => '%sf:usr:goodsBillingList:mstfilter%',
                         'csrf_token' => Csrf::generate(16),
-                        'submenulink' => "%url/rel:mpg:top%&page=page1",
+                        'submenulink' => '%url/rel:mpg:top%&page=page1',
                         'submenu' => '消費・発注',
-                        ] , false);
+                    ],
+                    false
+                );
             } else {
-                $content = $this->view('NewJoyPla/view/template/DivisionSelectList', [
-                    'table' => '%sf:usr:search96:table%',
-                    'title' => '消費一覧 - 部署選択',
-                    'param' => 'consumeListForDivision',
-                    ] , false);
+                $content = $this->view(
+                    'NewJoyPla/view/template/DivisionSelectList',
+                    [
+                        'table' => '%sf:usr:search96:table%',
+                        'title' => '消費一覧 - 部署選択',
+                        'param' => 'consumeListForDivision',
+                    ],
+                    false
+                );
             }
-    
-        } catch ( Exception $ex ) {
-            $content = $this->view('NewJoyPla/view/template/Error', [
-                'code' => $ex->getCode(),
-                'message'=> $ex->getMessage(),
-                ] , false);
+        } catch (Exception $ex) {
+            $content = $this->view(
+                'NewJoyPla/view/template/Error',
+                [
+                    'code' => $ex->getCode(),
+                    'message' => $ex->getMessage(),
+                ],
+                false
+            );
         } finally {
-            
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
-            ], false);
+            $head = $this->view(
+                'NewJoyPla/view/template/parts/Head',
+                [],
+                false
+            );
+            $header = $this->view(
+                'NewJoyPla/src/HeaderForMypage',
+                [
+                    'SPIRAL' => $SPIRAL,
+                ],
+                false
+            );
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 消費一覧',
-                'script' => '',
-                'content'   => $content->render(),
-                'head' => $head->render(),
-                'header' => $header->render(),
-                'baseUrl' => '',
-            ],false);
+            return $this->view(
+                'NewJoyPla/view/template/Template',
+                [
+                    'title' => 'JoyPla 消費一覧',
+                    'script' => '',
+                    'content' => $content->render(),
+                    'head' => $head->render(),
+                    'header' => $header->render(),
+                    'baseUrl' => '',
+                ],
+                false
+            );
         }
     }
-    
+
     public function consumeListForDivision(): View
     {
         global $SPIRAL;
         try {
-
             $user_info = new UserInfo($SPIRAL);
-            
-            if ($user_info->isDistributorUser())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+
+            if ($user_info->isDistributorUser()) {
+                throw new Exception(
+                    FactoryApiErrorCode::factory(404)->getMessage(),
+                    FactoryApiErrorCode::factory(404)->getCode()
+                );
             }
-            
-            if ($user_info->isHospitalUser() && ( $user_info->isApprover() || $user_info->isAdmin()) )
-            {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+
+            if (
+                $user_info->isHospitalUser() &&
+                ($user_info->isApprover() || $user_info->isAdmin())
+            ) {
+                throw new Exception(
+                    FactoryApiErrorCode::factory(404)->getMessage(),
+                    FactoryApiErrorCode::factory(404)->getCode()
+                );
             }
-            
-            if ( \App\lib\isMypage() )
-            {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+
+            if (\App\lib\isMypage()) {
+                throw new Exception(
+                    FactoryApiErrorCode::factory(404)->getMessage(),
+                    FactoryApiErrorCode::factory(404)->getCode()
+                );
             }
-    
-            $api_url = "%url/rel:mpgt:Consume%";
-            
-            $content = $this->view('NewJoyPla/view/template/List', [
+
+            $api_url = '%url/rel:mpgt:Consume%';
+
+            $content = $this->view(
+                'NewJoyPla/view/template/List',
+                [
                     'title' => '消費一覧',
                     'table' => '%sf:usr:goodsBillingList:mstfilter%',
-                    'submenulink' => "%url/rel:mpg:top%&page=page1",
+                    'submenulink' => '%url/rel:mpg:top%&page=page1',
                     'submenu' => '消費・発注',
                     'csrf_token' => Csrf::generate(16),
-                    ] , false);
-    
-        } catch ( Exception $ex ) {
-            $content = $this->view('NewJoyPla/view/template/Error', [
-                'code' => $ex->getCode(),
-                'message'=> $ex->getMessage(),
-                ] , false);
+                ],
+                false
+            );
+        } catch (Exception $ex) {
+            $content = $this->view(
+                'NewJoyPla/view/template/Error',
+                [
+                    'code' => $ex->getCode(),
+                    'message' => $ex->getMessage(),
+                ],
+                false
+            );
         } finally {
-            $head = $this->view('NewJoyPla/view/template/parts/Head', [] , false);
-            $header = $this->view('NewJoyPla/src/HeaderForMypage', [
-                'SPIRAL' => $SPIRAL
-            ], false);
+            $head = $this->view(
+                'NewJoyPla/view/template/parts/Head',
+                [],
+                false
+            );
+            $header = $this->view(
+                'NewJoyPla/src/HeaderForMypage',
+                [
+                    'SPIRAL' => $SPIRAL,
+                ],
+                false
+            );
             // テンプレートにパラメータを渡し、HTMLを生成し返却
-            
-            return $this->view('NewJoyPla/view/template/Template', [
-                'title'     => 'JoyPla 消費一覧',
-                'script' => '',
-                'content'   => $content->render(),
-                'head' => $head->render(),
-                'header' => $header->render(),
-                'baseUrl' => '',
-            ],false);
+
+            return $this->view(
+                'NewJoyPla/view/template/Template',
+                [
+                    'title' => 'JoyPla 消費一覧',
+                    'script' => '',
+                    'content' => $content->render(),
+                    'head' => $head->render(),
+                    'header' => $header->render(),
+                    'baseUrl' => '',
+                ],
+                false
+            );
         }
     }
-        
+
     public function regGoodsBillingAPI()
     {
         global $SPIRAL;
         $content = '';
-        try{
-            $token = (!isset($_POST['_csrf']))? '' : $_POST['_csrf'];
-            Csrf::validate($token,true);
+        try {
+            $token = !isset($_POST['_csrf']) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
 
             $user_info = new UserInfo($SPIRAL);
 
-            if($user_info->isDistributorUser())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(191)->getMessage(),FactoryApiErrorCode::factory(191)->getCode());
+            if ($user_info->isDistributorUser()) {
+                throw new Exception(
+                    FactoryApiErrorCode::factory(191)->getMessage(),
+                    FactoryApiErrorCode::factory(191)->getCode()
+                );
             }
-            if ($user_info->isHospitalUser() && $user_info->isApprover())
-            {
-                throw new Exception(FactoryApiErrorCode::factory(404)->getMessage(),FactoryApiErrorCode::factory(404)->getCode());
+            if ($user_info->isHospitalUser() && $user_info->isApprover()) {
+                throw new Exception(
+                    FactoryApiErrorCode::factory(404)->getMessage(),
+                    FactoryApiErrorCode::factory(404)->getCode()
+                );
             }
 
-            $consume_date = ($SPIRAL->getParam('consumeDate') == "")? 'now' : $SPIRAL->getParam('consumeDate') ;
+            $consume_date =
+                $SPIRAL->getParam('consumeDate') == ''
+                    ? 'now'
+                    : $SPIRAL->getParam('consumeDate');
             $getBilling = $SPIRAL->getParam('billing');
             $divisionId = $SPIRAL->getParam('divisionId');
             $billingData = $this->requestUrldecode($getBilling);
-            
-            $in_hospital_item = InHospitalItemView::where('hospitalId', $user_info->getHospitalId());
-            foreach($billingData as $key => $record)
-            {
-                $in_hospital_item->orWhere('inHospitalItemId',$record['recordId']);
+
+            $in_hospital_item = InHospitalItemView::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            );
+            foreach ($billingData as $key => $record) {
+                $in_hospital_item->orWhere(
+                    'inHospitalItemId',
+                    $record['recordId']
+                );
             }
             $in_hospital_item = $in_hospital_item->get();
-            
+
             $card_update = [];
-            foreach ($billingData as $record)
-            {
-                foreach($in_hospital_item->data->all() as $in_hp_item)
-                {
+            foreach ($billingData as $record) {
+                foreach ($in_hospital_item->data->all() as $in_hp_item) {
                     $lot_flag = 0;
-                    if($record['recordId'] == $in_hp_item->inHospitalItemId)
-                    {
-                        $lot_flag = (int)$in_hp_item->lotManagement;
+                    if ($record['recordId'] == $in_hp_item->inHospitalItemId) {
+                        $lot_flag = (int) $in_hp_item->lotManagement;
                         break;
                     }
                 }
-                if($lot_flag && ($record['lotNumber'] == '' || $record['lotDate'] == '' ))
-                {
-                    throw new Exception('invalid lot',100);
+                if (
+                    $lot_flag &&
+                    ($record['lotNumber'] == '' || $record['lotDate'] == '')
+                ) {
+                    throw new Exception('invalid lot', 100);
                 }
-                
-                if (($record['lotNumber'] != '' && $record['lotDate'] == '' ) || ($record['lotNumber'] == '' && $record['lotDate'] != ''))
-                {
-                    throw new Exception('invalid lotNumber input',101);
+
+                if (
+                    ($record['lotNumber'] != '' && $record['lotDate'] == '') ||
+                    ($record['lotNumber'] == '' && $record['lotDate'] != '')
+                ) {
+                    throw new Exception('invalid lotNumber input', 101);
                 }
-                if (($record['lotNumber'] != '') && ($record['lotDate'] != '')) 
-                {
+                if ($record['lotNumber'] != '' && $record['lotDate'] != '') {
                     //if ((!ctype_alnum($item['lotNumber'])) || (strlen($item['lotNumber']) > 20))
-                    if ((!preg_match('/^[a-zA-Z0-9!-\/:-@¥[-`{-~]+$/', $record['lotNumber'])) || (strlen($record['lotNumber']) > 20))
-                    {
-                        throw new Exception('invalid lotNumber format',102);
+                    if (
+                        !preg_match(
+                            '/^[a-zA-Z0-9!-\/:-@¥[-`{-~]+$/',
+                            $record['lotNumber']
+                        ) ||
+                        strlen($record['lotNumber']) > 20
+                    ) {
+                        throw new Exception('invalid lotNumber format', 102);
                     }
                 }
-                if($record['card']){
+                if ($record['card']) {
                     $card_update[] = [
                         'cardId' => $record['card'],
                         'payoutId' => '',
-                        ];
+                        'lotNumber' => '',
+                        'lotDate' => '',
+                    ];
                 }
             }
-            
 
             $useUnitPrice = '';
-            $hospital_data = Hospital::where('hospitalId',$user_info->getHospitalId())->get();
+            $hospital_data = Hospital::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )->get();
             $hospital_data = $hospital_data->data->get(0);
-            $useUnitPrice = (int)$hospital_data->billingUnitPrice;
+            $useUnitPrice = (int) $hospital_data->billingUnitPrice;
             $billing_id = $this->makeId('02');
 
             $insert_data = [];
@@ -286,17 +390,22 @@ class ConsumeController extends Controller
             $total_amount = 0;
 
             foreach ($billingData as $key => $data) {
-                if ((int)$data['countNum']  > 0) {
+                if ((int) $data['countNum'] > 0) {
                     $unitPrice = $useUnitPrice
-                        ? (str_replace(',', '', $data['unitPrice']))
-                        : (((float)str_replace(',', '', $data['kakaku']) == 0 || (float)$data['irisu'] == 0)? 0 : ((float)str_replace(',', '', $data['kakaku']) / (float)$data['irisu'])) ;
+                        ? str_replace(',', '', $data['unitPrice'])
+                        : ((float) str_replace(',', '', $data['kakaku']) == 0 ||
+                        (float) $data['irisu'] == 0
+                            ? 0
+                            : (float) str_replace(',', '', $data['kakaku']) /
+                                (float) $data['irisu']);
                     $insert_data[] = [
                         'registrationTime' => $consume_date,
                         'inHospitalItemId' => $data['recordId'],
                         'billingNumber' => $billing_id,
                         'price' => str_replace(',', '', $data['kakaku']),
-                        'billingQuantity' => (int)$data['countNum'],
-                        'billingAmount' => (float)$unitPrice * (int)$data['countNum'],
+                        'billingQuantity' => (int) $data['countNum'],
+                        'billingAmount' =>
+                            (float) $unitPrice * (int) $data['countNum'],
                         'hospitalId' => $user_info->getHospitalId(),
                         'divisionId' => $divisionId,
                         'quantity' => $data['irisu'],
@@ -305,53 +414,58 @@ class ConsumeController extends Controller
                         'lotNumber' => $data['lotNumber'],
                         'lotDate' => $data['lotDate'],
                         'unitPrice' => $unitPrice,
-                        'lotManagement' => (int)$data['lotFlagBool']
+                        'lotManagement' => (int) $data['lotFlagBool'],
                     ];
-                    $total_amount = $total_amount + ((float)$unitPrice * (int)$data['countNum']);
-
+                    $total_amount =
+                        $total_amount +
+                        (float) $unitPrice * (int) $data['countNum'];
                 }
-                if (array_search($data['recordId'], $in_hospital_item_ids) === false) {
+                if (
+                    array_search($data['recordId'], $in_hospital_item_ids) ===
+                    false
+                ) {
                     $in_hospital_item_ids[] = $data['recordId'];
                 }
             }
-            
-            foreach($insert_data as $record)
-    		{
-    		    if($record['lotNumber'] && $record['lotDate'])
-    		    {
-        		    $inventory_adjustment_trdata[] = [
+
+            foreach ($insert_data as $record) {
+                if ($record['lotNumber'] && $record['lotDate']) {
+                    $inventory_adjustment_trdata[] = [
                         'divisionId' => $record['divisionId'],
                         'inHospitalItemId' => $record['inHospitalItemId'],
                         'count' => -$record['billingQuantity'],
                         'pattern' => 1,
                         'hospitalId' => $user_info->getHospitalId(),
-        		        'lotUniqueKey' => $user_info->getHospitalId().$record['divisionId'].$record['inHospitalItemId'].$record['lotNumber'].$record['lotDate'],
-        		        'stockQuantity' => -$record['billingQuantity'],
-                        'lotNumber' =>  $record['lotNumber'],
-                        'lotDate' =>    $record['lotDate'],
-        		    ];
-    		    }
-    		    else
-    		    {
-        		    $inventory_adjustment_trdata[] = [
+                        'lotUniqueKey' =>
+                            $user_info->getHospitalId() .
+                            $record['divisionId'] .
+                            $record['inHospitalItemId'] .
+                            $record['lotNumber'] .
+                            $record['lotDate'],
+                        'stockQuantity' => -$record['billingQuantity'],
+                        'lotNumber' => $record['lotNumber'],
+                        'lotDate' => $record['lotDate'],
+                    ];
+                } else {
+                    $inventory_adjustment_trdata[] = [
                         'divisionId' => $record['divisionId'],
                         'pattern' => 1,
                         'inHospitalItemId' => $record['inHospitalItemId'],
                         'count' => -$record['billingQuantity'],
                         'hospitalId' => $user_info->getHospitalId(),
-        		    ];   
-    		    }
-    		}
+                    ];
+                }
+            }
 
             $history_data[] = [
                 'registrationTime' => $consume_date,
                 'billingNumber' => $billing_id,
                 'hospitalId' => $user_info->getHospitalId(),
                 'divisionId' => $divisionId,
-                'itemsNumber' => count($in_hospital_item_ids),//院内商品マスタID数
-                'totalAmount' => $total_amount
+                'itemsNumber' => count($in_hospital_item_ids), //院内商品マスタID数
+                'totalAmount' => $total_amount,
             ];
-/*
+            /*
             Stock::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$divisionId);
             foreach($billingData as $id => $record)
             {
@@ -387,25 +501,40 @@ class ConsumeController extends Controller
 */
             BillingHistory::insert($history_data);
             Billing::insert($insert_data);
-            if(count($card_update) != 0){
-                Card::bulkUpdate('cardId',$card_update);
+            if (count($card_update) != 0) {
+                Card::bulkUpdate('cardId', $card_update);
             }
-            $result = InventoryAdjustmentTransaction::insert($inventory_adjustment_trdata);
+            $result = InventoryAdjustmentTransaction::insert(
+                $inventory_adjustment_trdata
+            );
 
-            $content = new ApiResponse($result->data , $result->count , $result->code, $result->message, ['insert']);
+            $content = new ApiResponse(
+                $result->data,
+                $result->count,
+                $result->code,
+                $result->message,
+                ['insert']
+            );
             $content = $content->toJson();
-
-        } catch ( Exception $ex ) {
-            $content = new ApiResponse([], 0 , $ex->getCode(), $ex->getMessage(), ['consumeRegistApi']);
+        } catch (Exception $ex) {
+            $content = new ApiResponse(
+                [],
+                0,
+                $ex->getCode(),
+                $ex->getMessage(),
+                ['consumeRegistApi']
+            );
             $content = $content->toJson();
         } finally {
-            
-            return $this->view('NewJoyPla/view/template/ApiResponse', [
-                'content'   => $content,
-            ],false);
+            return $this->view(
+                'NewJoyPla/view/template/ApiResponse',
+                [
+                    'content' => $content,
+                ],
+                false
+            );
         }
     }
-
 }
 
 /***
@@ -415,21 +544,12 @@ $ConsumeController = new ConsumeController();
 
 $action = $SPIRAL->getParam('Action');
 
-{
-    if($action === 'regGoodsBillingAPI')
-    {
-        echo $ConsumeController->regGoodsBillingAPI()->render();
-    }
-    else if($action === 'consumeList')
-    {
-        echo $ConsumeController->consumeList()->render();
-    }
-    else if($action === 'consumeListForDivision')
-    {
-        echo $ConsumeController->consumeListForDivision()->render();
-    }
-    else 
-    {
-        echo $ConsumeController->index()->render();
-    }
+if ($action === 'regGoodsBillingAPI') {
+    echo $ConsumeController->regGoodsBillingAPI()->render();
+} elseif ($action === 'consumeList') {
+    echo $ConsumeController->consumeList()->render();
+} elseif ($action === 'consumeListForDivision') {
+    echo $ConsumeController->consumeListForDivision()->render();
+} else {
+    echo $ConsumeController->index()->render();
 }

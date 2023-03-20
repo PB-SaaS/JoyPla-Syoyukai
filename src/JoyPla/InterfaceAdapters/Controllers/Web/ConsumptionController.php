@@ -2,14 +2,13 @@
 
 namespace JoyPla\InterfaceAdapters\Controllers\Web;
 
-use App\SpiralDb\Hospital;
-use Auth;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Http\View;
 use framework\Routing\Router;
 use JoyPla\Application\InputPorts\Web\Consumption\ConsumptionShowInputData;
 use JoyPla\Application\InputPorts\Web\Consumption\ConsumptionShowInputPortInterface;
+use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 
 class ConsumptionController extends Controller
 {
@@ -19,13 +18,11 @@ class ConsumptionController extends Controller
             Router::abort(403);
         }
 
-        $consumptionUnitPriceUseFlag = Hospital::where(
-            'hospitalId',
-            $this->request->user()->hospitalId
-        )
+        $consumptionUnitPriceUseFlag = ModelRepository::getHospitalInstance()
+            ->where('hospitalId', $this->request->user()->hospitalId)
             ->value('billingUnitPrice')
             ->get()
-            ->data->get(0);
+            ->first();
         $consumptionUnitPriceUseFlag =
             $consumptionUnitPriceUseFlag->billingUnitPrice;
         $body = View::forge(
@@ -42,13 +39,11 @@ class ConsumptionController extends Controller
             Router::abort(403);
         }
 
-        $consumptionUnitPriceUseFlag = Hospital::where(
-            'hospitalId',
-            $this->request->user()->hospitalId
-        )
+        $consumptionUnitPriceUseFlag = ModelRepository::getHospitalInstance()
+            ->where('hospitalId', $this->request->user()->hospitalId)
             ->value('billingUnitPrice')
             ->get()
-            ->data->get(0);
+            ->first();
         $consumptionUnitPriceUseFlag =
             $consumptionUnitPriceUseFlag->billingUnitPrice;
         $body = View::forge(

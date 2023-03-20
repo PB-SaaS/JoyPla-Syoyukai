@@ -4,19 +4,15 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Barcode {
-    use App\Model\Division;
-    use App\SpiralDb\InHospitalItemView;
     use Collection;
     use Exception;
     use JoyPla\Application\InputPorts\Api\Barcode\BarcodeOrderSearchInputPortInterface;
     use JoyPla\Application\InputPorts\Api\Barcode\BarcodeOrderSearchInputData;
     use JoyPla\Application\OutputPorts\Api\Barcode\BarcodeOrderSearchOutputData;
-    use JoyPla\Application\OutputPorts\Api\Barcode\BarcodeOrderSearchOutputPortInterface;
     use JoyPla\Enterprise\Models\DivisionId;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\Enterprise\Models\InHospitalItemId;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\BarcodeRepositoryInterface;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\InHospitalItemRepositoryInterface;
+    use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
     use JoyPla\Service\Presenter\Api\PresenterProvider;
     use JoyPla\Service\Repository\RepositoryProvider;
     use NGT\Barcode\GS1Decoder\Decoder;
@@ -79,21 +75,18 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                     $custom_quantity = substr($inputData->barcode, 10, 4);
                 }
 
-                $InHospitalItemView = InHospitalItemView::where(
-                    'notUsedFlag',
-                    '1',
-                    '!='
-                )
+                $InHospitalItemView = ModelRepository::getInHospitalItemViewInstance()
+                    ->where('notUsedFlag', '1', '!=')
                     ->where('labelId', $label_id)
                     ->where('hospitalId', $inputData->user->hospitalId);
 
                 $result = $InHospitalItemView->get();
-                $count = $result->count;
-                if ($result->count == '0') {
+                $count = $result->count();
+                if ($result->count() == '0') {
                     throw new Exception('Not Received Label');
                 }
 
-                $inHospitalItems = $result->data->get(0);
+                $inHospitalItems = $result->first();
 
                 [
                     $orders,

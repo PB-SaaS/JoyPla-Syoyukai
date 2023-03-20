@@ -5,7 +5,7 @@ namespace JoyPla\Enterprise\Models;
 use Collection;
 use Exception;
 
-class OrderItem 
+class OrderItem
 {
     private OrderId $orderId;
     private OrderItemId $orderItemId;
@@ -22,6 +22,8 @@ class OrderItem
     private bool $lotManagement;
     private string $distributorManagerCode;
     private string $itemImage;
+    private bool $useMedicode;
+    private int $medicodeStatus;
 
     public function __construct(
         OrderId $orderId,
@@ -41,8 +43,7 @@ class OrderItem
         $itemImage,
         bool $useMedicode,
         int $medicodeStatus
-        )
-    {
+    ) {
         $this->orderId = $orderId;
         $this->orderItemId = $orderItemId;
         $this->inHospitalItemId = $inHospitalItemId;
@@ -57,31 +58,31 @@ class OrderItem
         $this->dueDate = $dueDate;
         $this->distributorManagerCode = $distributorManagerCode;
         $this->lotManagement = $lotManagement;
-        $this->itemImage = ($itemImage)? $itemImage : "";
+        $this->itemImage = $itemImage ? $itemImage : '';
         $this->useMedicode = $useMedicode;
         $this->medicodeStatus = $medicodeStatus;
     }
 
-    public static function create( Collection $input )
+    public static function create(Collection $input)
     {
         return new OrderItem(
-            (new OrderId($input->orderNumber) ),
-            (new OrderItemId($input->orderCNumber) ),
-            (new InHospitalItemId($input->inHospitalItemId) ),
-            (Item::create($input) ),
-            (new HospitalId($input->hospitalId) ),
-            (Division::create($input) ),
-            (Distributor::create($input) ),
-            (Quantity::create($input) ),
-            (new Price($input->price) ),
-            (new OrderQuantity((int)$input->orderQuantity)) ,
-            (new ReceivedQuantity((int)$input->receivingNum)) ,
-            (new DateYearMonthDay($input->dueDate)) ,
+            new OrderId($input->orderNumber),
+            new OrderItemId($input->orderCNumber),
+            new InHospitalItemId($input->inHospitalItemId),
+            Item::create($input),
+            new HospitalId($input->hospitalId),
+            Division::create($input),
+            Distributor::create($input),
+            Quantity::create($input),
+            new Price($input->price),
+            new OrderQuantity((int) $input->orderQuantity),
+            new ReceivedQuantity((int) $input->receivingNum),
+            new DateYearMonthDay($input->dueDate),
             $input->distributorMCode,
-            (int) $input->lotManagement ,
+            (int) $input->lotManagement,
             $input->inItemImage,
             $input->useMedicode,
-            (int)$input->medicodeStatus,
+            (int) $input->medicodeStatus
         );
     }
 
@@ -95,14 +96,9 @@ class OrderItem
         return $this->hospitalId;
     }
 
-    public function getQantity()
-    {
-        return $this->quantity;
-    }
-
     public function getPrice()
     {
-        return $this->price;   
+        return $this->price;
     }
 
     public function getItemImage()
@@ -135,14 +131,14 @@ class OrderItem
         return $this->division === $division;
     }
 
-    public function equalOrderSlip(Division $division , Distributor $distributor)
+    public function equalOrderSlip(Division $division, Distributor $distributor)
     {
-        return (
-            $this->division->getDivisionId()->value() === $division->getDivisionId()->value() && 
-            $this->distributor->getDistributorId()->value() === $distributor->getDistributorId()->value()
-        );
+        return $this->division->getDivisionId()->value() ===
+            $division->getDivisionId()->value() &&
+            $this->distributor->getDistributorId()->value() ===
+                $distributor->getDistributorId()->value();
     }
-    
+
     public function setOrderId(OrderId $orderId)
     {
         return new OrderItem(
@@ -162,25 +158,28 @@ class OrderItem
             $this->lotManagement,
             $this->itemImage,
             $this->useMedicode,
-            $this->medicodeStatus,
+            $this->medicodeStatus
         );
     }
 
     public function isMinus()
     {
-        return $this->orderQuantity->value() < 0 ;
+        return $this->orderQuantity->value() < 0;
     }
 
     public function isPlus()
     {
-        return $this->orderQuantity->value() >= 0 ;
+        return $this->orderQuantity->value() >= 0;
     }
 
-    public function price(){
-        return (float)$this->price->value() * (float)$this->orderQuantity->value();
+    public function price()
+    {
+        return (float) $this->price->value() *
+            (float) $this->orderQuantity->value();
     }
-    
-    public function getInHospitalItemId(){
+
+    public function getInHospitalItemId()
+    {
         return $this->inHospitalItemId;
     }
 
@@ -194,15 +193,27 @@ class OrderItem
         return $this->receivedQuantity;
     }
 
-    public function addReceivedQuantity( ReceivedQuantity $receivedQuantity )
+    public function addReceivedQuantity(ReceivedQuantity $receivedQuantity)
     {
-        if( $this->isPlus() && $this->orderQuantity->value() < ( $this->receivedQuantity->value() + $receivedQuantity->value() ) )
-        {
-            throw new Exception('The number of incoming orders exceeds the number of orders placed.',422);
+        if (
+            $this->isPlus() &&
+            $this->orderQuantity->value() <
+                $this->receivedQuantity->value() + $receivedQuantity->value()
+        ) {
+            throw new Exception(
+                'The number of incoming orders exceeds the number of orders placed.',
+                422
+            );
         }
-        if( $this->isMinus() && $this->orderQuantity->value() > ( $this->receivedQuantity->value() + $receivedQuantity->value() ) )
-        {
-            throw new Exception('The number of incoming orders exceeds the number of orders placed.',422);
+        if (
+            $this->isMinus() &&
+            $this->orderQuantity->value() >
+                $this->receivedQuantity->value() + $receivedQuantity->value()
+        ) {
+            throw new Exception(
+                'The number of incoming orders exceeds the number of orders placed.',
+                422
+            );
         }
 
         return new OrderItem(
@@ -216,13 +227,13 @@ class OrderItem
             $this->quantity,
             $this->price,
             $this->orderQuantity,
-            $this->receivedQuantity->add( $receivedQuantity ),
+            $this->receivedQuantity->add($receivedQuantity),
             $this->dueDate,
             $this->distributorManagerCode,
             $this->lotManagement,
             $this->itemImage,
             $this->useMedicode,
-            $this->medicodeStatus,
+            $this->medicodeStatus
         );
     }
 
@@ -245,33 +256,45 @@ class OrderItem
             $this->lotManagement,
             $this->itemImage,
             $this->useMedicode,
-            $this->medicodeStatus,
+            $this->medicodeStatus
         );
+    }
+
+    public function getOrderId()
+    {
+        return $this->orderId;
     }
 
     public function addOrderQuantity(OrderQuantity $quantity)
     {
-        return $this->setOrderQuantity(  $this->orderQuantity->add((int)$quantity->value()));
+        return $this->setOrderQuantity(
+            $this->orderQuantity->add((int) $quantity->value())
+        );
     }
 
     public function getOrderItemReceivedStatus()
     {
-        if($this->receivedQuantity->value() == $this->orderQuantity->value())
-        {
-            return new OrderItemReceivedStatus(OrderItemReceivedStatus::ReceivingIsComplete);
+        if ($this->receivedQuantity->value() == $this->orderQuantity->value()) {
+            return new OrderItemReceivedStatus(
+                OrderItemReceivedStatus::ReceivingIsComplete
+            );
         }
 
-        if($this->receivedQuantity->value() == 0)
-        {
-            return new OrderItemReceivedStatus(OrderItemReceivedStatus::NotInStock);
+        if ($this->receivedQuantity->value() == 0) {
+            return new OrderItemReceivedStatus(
+                OrderItemReceivedStatus::NotInStock
+            );
         }
-        
-        return new OrderItemReceivedStatus(OrderItemReceivedStatus::PartOfTheCollectionIsIn);
+
+        return new OrderItemReceivedStatus(
+            OrderItemReceivedStatus::PartOfTheCollectionIsIn
+        );
     }
 
     public function receivedFlag()
     {
-        return $this->orderQuantity->value() === $this->receivedQuantity->value();
+        return $this->orderQuantity->value() ===
+            $this->receivedQuantity->value();
     }
 
     public function toArray()

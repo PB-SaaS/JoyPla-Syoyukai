@@ -1,7 +1,6 @@
 <?php
 
 namespace JoyPla\Enterprise\Models {
-
     use DateTime;
     use JoyPla\Enterprise\Traits\ValueObjectTrait;
     use Exception;
@@ -11,8 +10,8 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
-        public function __construct(string $value)
+        private string $value = '';
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -22,11 +21,11 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
-        public function __construct(string $value)
+        private string $value = '';
+        public function __construct(string $value = '')
         {
             if (!self::isValid($value)) {
-                throw new Exception(self::class . " is valid error.", 422);
+                throw new Exception(self::class . ' is valid error.', 422);
             }
             $this->value = $value;
         }
@@ -52,17 +51,16 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        public const FORMAT_DELIMITER_SLASH = "/^[0-9]{4}\/([1-9]|0[1-9]|1[0-2])\/([1-9]|0[1-9]|[12][0-9]|3[01])$/";
-        public const FORMAT_DELIMITER_HYPHEN = "/^[0-9]{4}-([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12][0-9]|3[01])$/";
-        public const FORMAT_DELIMITER_JAPANESE_CHARACTER = "/^([0-9]{4}|[0-9]{3}|[0-9]{2}|[0-9]{1})年([1-9]|0[1-9]|1[0-2])月([1-9]|0[1-9]|[12][0-9]|3[01])日$/";
+        public const FORMAT_DELIMITER_SLASH = '/^[0-9]{4}\/([1-9]|0[1-9]|1[0-2])\/([1-9]|0[1-9]|[12][0-9]|3[01])$/';
+        public const FORMAT_DELIMITER_HYPHEN = '/^[0-9]{4}-([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12][0-9]|3[01])$/';
+        public const FORMAT_DELIMITER_JAPANESE_CHARACTER = '/^([0-9]{4}|[0-9]{3}|[0-9]{2}|[0-9]{1})年([1-9]|0[1-9]|1[0-2])月([1-9]|0[1-9]|[12][0-9]|3[01])日$/';
 
-
-        private string $value = "";
+        private string $value = '';
         private $date;
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             if (!self::isValid($value)) {
-                throw new Exception(self::class . " is valid error.", 422);
+                throw new Exception(self::class . ' is valid error.', 422);
             }
 
             $date = SiDateTime::parse($value);
@@ -72,10 +70,9 @@ namespace JoyPla\Enterprise\Models {
             $this->value = $value;
         }
 
-
         public static function isValid(string $value)
         {
-            if ($value === "" || $value === null) {
+            if ($value === '' || $value === null) {
                 return true;
             }
             if (
@@ -94,17 +91,19 @@ namespace JoyPla\Enterprise\Models {
         }
     }
 
-
     class Jancode
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
 
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
-            if ($value === "") {
-                throw new Exception(self::class . ": Null is not allowed.", 422);
+            if ($value === '') {
+                throw new Exception(
+                    self::class . ': Null is not allowed.',
+                    422
+                );
             }
             $this->value = $value;
         }
@@ -114,8 +113,8 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
-        public function __construct(string $value)
+        private string $value = '';
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -125,24 +124,26 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
-        public function __construct(string $value)
+        private string $value = '';
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
     }
 
-
     class ItemId
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
 
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
-            if ($value === "") {
-                throw new Exception(self::class . ": Null is not allowed.", 422);
+            if ($value === '') {
+                throw new Exception(
+                    self::class . ': Null is not allowed.',
+                    422
+                );
             }
             $this->value = $value;
         }
@@ -152,8 +153,8 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
-        public function __construct(string $value)
+        private string $value = '';
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -179,12 +180,15 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
 
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
-            if ($value === "") {
-                throw new Exception(self::class . ": Null is not allowed.", 422);
+            if ($value === '') {
+                throw new Exception(
+                    self::class . ': Null is not allowed.',
+                    422
+                );
             }
             $this->value = $value;
         }
@@ -194,8 +198,8 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
-        public function __construct(string $value)
+        private string $value = '';
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -205,8 +209,8 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
-        public function __construct(string $value)
+        private string $value = '';
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -216,8 +220,8 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
-        public function __construct(string $value)
+        private string $value = '';
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -231,7 +235,7 @@ namespace JoyPla\Enterprise\Models {
 
         public function __construct($value)
         {
-            $this->value = (float)$value;
+            $this->value = (float) $value;
         }
     }
 
@@ -239,7 +243,7 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         public function __construct(int $value)
         {
             $this->value = $value;
@@ -247,7 +251,7 @@ namespace JoyPla\Enterprise\Models {
 
         public function add(int $value)
         {
-            return new OrderQuantity(($this->value + $value));
+            return new OrderQuantity($this->value + $value);
         }
 
         public static function isValid(int $value)
@@ -259,7 +263,7 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         public function __construct(int $value)
         {
             $this->value = $value;
@@ -267,7 +271,7 @@ namespace JoyPla\Enterprise\Models {
 
         public function add(ReceivedQuantity $value)
         {
-            return new ReceivedQuantity(($this->value + $value->value()));
+            return new ReceivedQuantity($this->value + $value->value());
         }
 
         public static function isValid(int $value)
@@ -279,7 +283,7 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         public function __construct(int $value)
         {
             $this->value = $value;
@@ -287,7 +291,7 @@ namespace JoyPla\Enterprise\Models {
 
         public function add(ReturnQuantity $value)
         {
-            return new ReturnQuantity(($this->value + $value->value()));
+            return new ReturnQuantity($this->value + $value->value());
         }
 
         public static function isValid(int $value)
@@ -308,7 +312,7 @@ namespace JoyPla\Enterprise\Models {
         public const DeliveryReset = 7; //受注
         public const Rental = 8; //受注
 
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             switch ($value) {
                 case self::Unordered:
@@ -343,7 +347,7 @@ namespace JoyPla\Enterprise\Models {
                     $this->value = self::Rental;
                     break;
                 default:
-                    throw new Exception(self::class . " Is Not Value", 422);
+                    throw new Exception(self::class . ' Is Not Value', 422);
             }
         }
     }
@@ -352,7 +356,7 @@ namespace JoyPla\Enterprise\Models {
             use ValueObjectTrait;
 
             private string $value = "";
-            public function __construct(string $value)
+            public function __construct(string $value = '')
             {
                 $this->value = $value;
             }
@@ -370,12 +374,15 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
 
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
-            if ($value === "") {
-                throw new Exception(self::class . ": Null is not allowed.", 422);
+            if ($value === '') {
+                throw new Exception(
+                    self::class . ': Null is not allowed.',
+                    422
+                );
             }
             $this->value = $value;
         }
@@ -385,12 +392,15 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
 
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
-            if ($value === "") {
-                throw new Exception(self::class . ": Null is not allowed.", 422);
+            if ($value === '') {
+                throw new Exception(
+                    self::class . ': Null is not allowed.',
+                    422
+                );
             }
             $this->value = $value;
         }
@@ -400,12 +410,15 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
 
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
-            if ($value === "") {
-                throw new Exception(self::class . ": Null is not allowed.", 422);
+            if ($value === '') {
+                throw new Exception(
+                    self::class . ': Null is not allowed.',
+                    422
+                );
             }
             $this->value = $value;
         }
@@ -415,25 +428,27 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
 
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
     }
 
-
     class DivisionId
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
 
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
-            if ($value === "") {
-                throw new Exception(self::class . ": Null is not allowed.", 422);
+            if ($value === '') {
+                throw new Exception(
+                    self::class . ': Null is not allowed.',
+                    422
+                );
             }
             $this->value = $value;
         }
@@ -443,24 +458,26 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
 
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
-            if ($value === "") {
-                throw new Exception(self::class . ": Null is not allowed.", 422);
+            if ($value === '') {
+                throw new Exception(
+                    self::class . ': Null is not allowed.',
+                    422
+                );
             }
             $this->value = $value;
         }
     }
 
-
     class CatalogNo
     {
         use ValueObjectTrait;
 
-        private string $value = "";
-        public function __construct(string $value)
+        private string $value = '';
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -470,10 +487,10 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -497,7 +514,7 @@ namespace JoyPla\Enterprise\Models {
 
         private SiDateTime $siDateTime;
 
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             $this->siDateTime = new SiDateTime($value);
         }
@@ -517,10 +534,10 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -538,15 +555,14 @@ namespace JoyPla\Enterprise\Models {
         }
     }
 
-
     class OrderId
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -568,15 +584,14 @@ namespace JoyPla\Enterprise\Models {
         }
     }
 
-
     class OrderItemId
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -598,15 +613,14 @@ namespace JoyPla\Enterprise\Models {
         }
     }
 
-
     class ReceivedId
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -632,11 +646,11 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
 
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -662,11 +676,11 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
 
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -688,15 +702,14 @@ namespace JoyPla\Enterprise\Models {
         }
     }
 
-
     class ReceivedItemId
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -725,7 +738,7 @@ namespace JoyPla\Enterprise\Models {
         public const FixedQuantityOrder = 1;
         public const IndividualOrder = 2; //発注
 
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             switch ($value) {
                 case self::FixedQuantityOrder:
@@ -745,46 +758,44 @@ namespace JoyPla\Enterprise\Models {
         {
             switch ($this->value) {
                 case self::FixedQuantityOrder:
-                    return "定数発注";
+                    return '定数発注';
                     break;
 
                 case self::IndividualOrder:
-                    return "個別発注";
+                    return '個別発注';
                     break;
                 default:
-                    return "";
+                    return '';
                     break;
             }
         }
     }
 
-
     class DateYearMonthDay
     {
         use ValueObjectTrait;
 
-        public const FORMAT_DELIMITER_SLASH = "/^[0-9]{4}\/([1-9]|0[1-9]|1[0-2])\/([1-9]|0[1-9]|[12][0-9]|3[01])$/";
-        public const FORMAT_DELIMITER_HYPHEN = "/^[0-9]{4}-([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12][0-9]|3[01])$/";
-        public const FORMAT_DELIMITER_JAPANESE_CHARACTER = "/^([0-9]{4}|[0-9]{3}|[0-9]{2}|[0-9]{1})年([1-9]|0[1-9]|1[0-2])月([1-9]|0[1-9]|[12][0-9]|3[01])日$/";
+        public const FORMAT_DELIMITER_SLASH = '/^[0-9]{4}\/([1-9]|0[1-9]|1[0-2])\/([1-9]|0[1-9]|[12][0-9]|3[01])$/';
+        public const FORMAT_DELIMITER_HYPHEN = '/^[0-9]{4}-([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12][0-9]|3[01])$/';
+        public const FORMAT_DELIMITER_JAPANESE_CHARACTER = '/^([0-9]{4}|[0-9]{3}|[0-9]{2}|[0-9]{1})年([1-9]|0[1-9]|1[0-2])月([1-9]|0[1-9]|[12][0-9]|3[01])日$/';
 
-
-        private string $value = "";
-        public function __construct(string $value)
+        private string $value = '';
+        public function __construct(string $value = '')
         {
             if (!self::isValid($value)) {
-                throw new Exception(self::class . " is valid error.", 422);
+                throw new Exception(self::class . ' is valid error.', 422);
             }
             if (preg_match(self::FORMAT_DELIMITER_SLASH, $value)) {
                 $value = $value;
-                $date = DateTime::createFromFormat("Y/m/d", $value);
+                $date = DateTime::createFromFormat('Y/m/d', $value);
             }
             if (preg_match(self::FORMAT_DELIMITER_HYPHEN, $value)) {
                 $value = $value;
-                $date = DateTime::createFromFormat("Y-m-d", $value);
+                $date = DateTime::createFromFormat('Y-m-d', $value);
             }
             if (preg_match(self::FORMAT_DELIMITER_JAPANESE_CHARACTER, $value)) {
                 $value = $value;
-                $date = DateTime::createFromFormat("Y年m月d日", $value);
+                $date = DateTime::createFromFormat('Y年m月d日', $value);
             }
 
             $this->date = $date;
@@ -798,10 +809,10 @@ namespace JoyPla\Enterprise\Models {
 
         public static function isValid(string $value)
         {
-            if ($value === "" || $value === null) {
+            if ($value === '' || $value === null) {
                 return true;
             }
-            if ($value === "now") {
+            if ($value === 'now') {
                 return true;
             }
             if (
@@ -822,20 +833,20 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        public const FORMAT = "/[ぁ-ん]+|[ァ-ヴー]+|[一-龠]/u";
+        public const FORMAT = '/[ぁ-ん]+|[ァ-ヴー]+|[一-龠]/u';
         public const LIMIT_BYTES_NUMBER = 32;
 
         public function __construct($value)
         {
             if (!self::isValid($value)) {
-                throw new Exception(self::class . " is valid error.", 422);
+                throw new Exception(self::class . ' is valid error.', 422);
             }
             $this->value = $value;
         }
 
         public static function isValid($value)
         {
-            if ($value === "" || $value === null) {
+            if ($value === '' || $value === null) {
                 return true;
             }
 
@@ -843,7 +854,12 @@ namespace JoyPla\Enterprise\Models {
                 return false;
             }
 
-            if (self::isLimitOverSingleByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+            if (
+                self::isLimitOverSingleByteSentence(
+                    $value,
+                    self::LIMIT_BYTES_NUMBER
+                )
+            ) {
                 return false;
             }
 
@@ -855,24 +871,24 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        public const FORMAT_DELIMITER_SLASH = "/^[0-9]{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01]) ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/";
-        public const FORMAT_DELIMITER_HYPHEN = "/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01]) ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/";
-        public const FORMAT_DELIMITER_JAPANESE_CHARACTER = "/^([0-9]{4}|[0-9]{3}|[0-9]{2}|[0-9]{1})年([1-9]|0[1-9]|1[0-2])月([1-9]|[0-2][0-9]|3[01])日 ([0-9]|[0-1][0-9]|2[0-3])時([0-9]|[0-5][0-9])分([0-9]|[0-5][0-9])秒$/";
+        public const FORMAT_DELIMITER_SLASH = '/^[0-9]{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01]) ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/';
+        public const FORMAT_DELIMITER_HYPHEN = '/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01]) ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/';
+        public const FORMAT_DELIMITER_JAPANESE_CHARACTER = '/^([0-9]{4}|[0-9]{3}|[0-9]{2}|[0-9]{1})年([1-9]|0[1-9]|1[0-2])月([1-9]|[0-2][0-9]|3[01])日 ([0-9]|[0-1][0-9]|2[0-3])時([0-9]|[0-5][0-9])分([0-9]|[0-5][0-9])秒$/';
 
         public function __construct($value)
         {
             if (!self::isValid($value)) {
-                throw new Exception(self::class . " is valid error.", 422);
+                throw new Exception(self::class . ' is valid error.', 422);
             }
             $this->value = $value;
         }
 
         public static function isValid($value)
         {
-            if ($value === "" || $value === null) {
+            if ($value === '' || $value === null) {
                 return true;
             }
-            if ($value === "now") {
+            if ($value === 'now') {
                 return true;
             }
             if (
@@ -898,7 +914,7 @@ namespace JoyPla\Enterprise\Models {
         public function __construct($value)
         {
             if (!self::isValid($value)) {
-                throw new Exception(self::class . " is valid error.", 422);
+                throw new Exception(self::class . ' is valid error.', 422);
             }
             $this->value = $value;
         }
@@ -909,7 +925,12 @@ namespace JoyPla\Enterprise\Models {
                 return true;
             }
 
-            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+            if (
+                self::isLimitOverMultiByteSentence(
+                    $value,
+                    self::LIMIT_BYTES_NUMBER
+                )
+            ) {
                 return false;
             }
 
@@ -929,7 +950,7 @@ namespace JoyPla\Enterprise\Models {
         public function __construct($value)
         {
             if (!self::isValid($value)) {
-                throw new Exception(self::class . " is valid error.", 422);
+                throw new Exception(self::class . ' is valid error.', 422);
             }
             $this->value = $value;
         }
@@ -940,14 +961,18 @@ namespace JoyPla\Enterprise\Models {
                 return true;
             }
 
-            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+            if (
+                self::isLimitOverMultiByteSentence(
+                    $value,
+                    self::LIMIT_BYTES_NUMBER
+                )
+            ) {
                 return false;
             }
 
             return true;
         }
     }
-
 
     /**
      * テキストフィールド(128 bytes)
@@ -961,7 +986,7 @@ namespace JoyPla\Enterprise\Models {
         public function __construct($value)
         {
             if (!self::isValid($value)) {
-                throw new Exception(self::class . " is valid error.", 422);
+                throw new Exception(self::class . ' is valid error.', 422);
             }
             $this->value = $value;
         }
@@ -972,7 +997,12 @@ namespace JoyPla\Enterprise\Models {
                 return true;
             }
 
-            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+            if (
+                self::isLimitOverMultiByteSentence(
+                    $value,
+                    self::LIMIT_BYTES_NUMBER
+                )
+            ) {
                 return false;
             }
 
@@ -992,7 +1022,7 @@ namespace JoyPla\Enterprise\Models {
         public function __construct($value)
         {
             if (!self::isValid($value)) {
-                throw new Exception(self::class . " is valid error.", 422);
+                throw new Exception(self::class . ' is valid error.', 422);
             }
             $this->value = $value;
         }
@@ -1003,14 +1033,18 @@ namespace JoyPla\Enterprise\Models {
                 return true;
             }
 
-            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+            if (
+                self::isLimitOverMultiByteSentence(
+                    $value,
+                    self::LIMIT_BYTES_NUMBER
+                )
+            ) {
                 return false;
             }
 
             return true;
         }
     }
-
 
     /**
      * テキストエリア(512 bytes)
@@ -1024,7 +1058,7 @@ namespace JoyPla\Enterprise\Models {
         public function __construct($value)
         {
             if (!self::isValid($value)) {
-                throw new Exception(self::class . " is valid error.", 422);
+                throw new Exception(self::class . ' is valid error.', 422);
             }
             $this->value = $value;
         }
@@ -1035,7 +1069,12 @@ namespace JoyPla\Enterprise\Models {
                 return true;
             }
 
-            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+            if (
+                self::isLimitOverMultiByteSentence(
+                    $value,
+                    self::LIMIT_BYTES_NUMBER
+                )
+            ) {
                 return false;
             }
 
@@ -1055,7 +1094,7 @@ namespace JoyPla\Enterprise\Models {
         public function __construct($value)
         {
             if (!self::isValid($value)) {
-                throw new Exception(self::class . " is valid error.", 422);
+                throw new Exception(self::class . ' is valid error.', 422);
             }
             $this->value = $value;
         }
@@ -1066,7 +1105,12 @@ namespace JoyPla\Enterprise\Models {
                 return true;
             }
 
-            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+            if (
+                self::isLimitOverMultiByteSentence(
+                    $value,
+                    self::LIMIT_BYTES_NUMBER
+                )
+            ) {
                 return false;
             }
 
@@ -1086,7 +1130,7 @@ namespace JoyPla\Enterprise\Models {
         public function __construct($value)
         {
             if (!self::isValid($value)) {
-                throw new Exception(self::class . " is valid error.", 422);
+                throw new Exception(self::class . ' is valid error.', 422);
             }
             $this->value = $value;
         }
@@ -1097,7 +1141,12 @@ namespace JoyPla\Enterprise\Models {
                 return true;
             }
 
-            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+            if (
+                self::isLimitOverMultiByteSentence(
+                    $value,
+                    self::LIMIT_BYTES_NUMBER
+                )
+            ) {
                 return false;
             }
 
@@ -1117,7 +1166,7 @@ namespace JoyPla\Enterprise\Models {
         public function __construct($value)
         {
             if (!self::isValid($value)) {
-                throw new Exception(self::class . " is valid error.", 422);
+                throw new Exception(self::class . ' is valid error.', 422);
             }
             $this->value = $value;
         }
@@ -1128,7 +1177,12 @@ namespace JoyPla\Enterprise\Models {
                 return true;
             }
 
-            if (self::isLimitOverMultiByteSentence($value, self::LIMIT_BYTES_NUMBER)) {
+            if (
+                self::isLimitOverMultiByteSentence(
+                    $value,
+                    self::LIMIT_BYTES_NUMBER
+                )
+            ) {
                 return false;
             }
 
@@ -1143,37 +1197,37 @@ namespace JoyPla\Enterprise\Models {
         private DateTime $date;
 
         public const FORMAT_DELIMITER_SLASH = "/^[0-9]{4}\/([1-9]|0[1-9]|1[0-2])\$/";
-        public const FORMAT_DELIMITER_HYPHEN = "/^[0-9]{4}-([1-9]|0[1-9]|1[0-2])$/";
-        public const FORMAT_DELIMITER_JAPANESE_CHARACTER = "/^[0-9]{4}年([1-9]|0[1-9]|1[0-2])月$/";
+        public const FORMAT_DELIMITER_HYPHEN = '/^[0-9]{4}-([1-9]|0[1-9]|1[0-2])$/';
+        public const FORMAT_DELIMITER_JAPANESE_CHARACTER = '/^[0-9]{4}年([1-9]|0[1-9]|1[0-2])月$/';
 
         public function __construct($value)
         {
             if (!self::isValid($value)) {
-                throw new Exception(self::class . " is valid error.", 422);
+                throw new Exception(self::class . ' is valid error.', 422);
             }
 
             if (preg_match(self::FORMAT_DELIMITER_SLASH, $value)) {
-                $value = $value . "/01";
-                $date = DateTime::createFromFormat("Y/m/d", $value);
+                $value = $value . '/01';
+                $date = DateTime::createFromFormat('Y/m/d', $value);
             }
             if (preg_match(self::FORMAT_DELIMITER_HYPHEN, $value)) {
-                $value = $value . "-01";
-                $date = DateTime::createFromFormat("Y-m-d", $value);
+                $value = $value . '-01';
+                $date = DateTime::createFromFormat('Y-m-d', $value);
             }
             if (preg_match(self::FORMAT_DELIMITER_JAPANESE_CHARACTER, $value)) {
-                $value = $value . "01日";
-                $date = DateTime::createFromFormat("Y年m月d日", $value);
+                $value = $value . '01日';
+                $date = DateTime::createFromFormat('Y年m月d日', $value);
             }
             $this->date = $date;
-            $this->value = $date->format("Y-m-d");
+            $this->value = $date->format('Y-m-d');
         }
 
         public static function isValid($value)
         {
-            if ($value === "" || $value === null) {
+            if ($value === '' || $value === null) {
                 return true;
             }
-            if ($value === "now") {
+            if ($value === 'now') {
                 return true;
             }
             if (
@@ -1194,8 +1248,8 @@ namespace JoyPla\Enterprise\Models {
         public function nextMonth()
         {
             $date = $this->format('Y-m-d');
-            $val = DateTime::createFromFormat("Y-m-d", $date);
-            return new DateYearMonth($val->modify('+1 month')->format("Y-m"));
+            $val = DateTime::createFromFormat('Y-m-d', $date);
+            return new DateYearMonth($val->modify('+1 month')->format('Y-m'));
         }
     }
 
@@ -1226,19 +1280,18 @@ namespace JoyPla\Enterprise\Models {
         {
             switch ($this->value) {
                 case self::Consumption:
-                    return "通常消費";
+                    return '通常消費';
                     break;
 
                 case self::Borrowing:
-                    return "貸出品";
+                    return '貸出品';
                     break;
                 default:
-                    return "";
+                    return '';
                     break;
             }
         }
     }
-
 
     class ReceivedStatus
     {
@@ -1267,14 +1320,14 @@ namespace JoyPla\Enterprise\Models {
         {
             switch ($this->value) {
                 case self::Received:
-                    return "通常入庫";
+                    return '通常入庫';
                     break;
 
                 case self::Borrowing:
-                    return "貸出品";
+                    return '貸出品';
                     break;
                 default:
-                    return "";
+                    return '';
                     break;
             }
         }
@@ -1341,32 +1394,32 @@ namespace JoyPla\Enterprise\Models {
         {
             switch ($this->value) {
                 case self::UnOrdered:
-                    return "未発注";
+                    return '未発注';
                     break;
 
                 case self::OrderCompletion:
-                    return "発注完了";
+                    return '発注完了';
                     break;
                 case self::OrderFinished:
-                    return "受注完了";
+                    return '受注完了';
                     break;
                 case self::DeliveryDateReported:
-                    return "納期報告済";
+                    return '納期報告済';
                     break;
                 case self::PartOfTheCollectionIsIn:
-                    return "一部入庫完了";
+                    return '一部入庫完了';
                     break;
                 case self::ReceivingIsComplete:
-                    return "入庫完了";
+                    return '入庫完了';
                     break;
                 case self::DeliveryIsCanceled:
-                    return "納品取消";
+                    return '納品取消';
                     break;
                 case self::Borrowing:
-                    return "貸出品";
+                    return '貸出品';
                     break;
                 default:
-                    return "";
+                    return '';
                     break;
             }
         }
@@ -1381,7 +1434,7 @@ namespace JoyPla\Enterprise\Models {
                 self::PartOfTheCollectionIsIn,
                 self::ReceivingIsComplete,
                 self::DeliveryIsCanceled,
-                self::Borrowing
+                self::Borrowing,
             ];
         }
     }
@@ -1417,17 +1470,17 @@ namespace JoyPla\Enterprise\Models {
         {
             switch ($this->value) {
                 case self::NotInStock:
-                    return "未入庫";
+                    return '未入庫';
                     break;
 
                 case self::PartOfTheCollectionIsIn:
-                    return "一部入庫完了";
+                    return '一部入庫完了';
                     break;
                 case self::ReceivingIsComplete:
-                    return "入庫完了";
+                    return '入庫完了';
                     break;
                 default:
-                    return "";
+                    return '';
                     break;
             }
         }
@@ -1437,9 +1490,9 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         private static array $values = [];
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -1461,10 +1514,10 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -1485,10 +1538,10 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -1523,7 +1576,7 @@ namespace JoyPla\Enterprise\Models {
                     $this->value = self::ConsumptionRequest;
                     break;
                 default:
-                    return "";
+                    return '';
                     break;
             }
         }
@@ -1532,14 +1585,14 @@ namespace JoyPla\Enterprise\Models {
         {
             switch ($this->value) {
                 case self::OrdinaryRequest:
-                    return "個別請求";
+                    return '個別請求';
                     break;
 
                 case self::ConsumptionRequest:
-                    return "消費請求";
+                    return '消費請求';
                     break;
                 default:
-                    return "";
+                    return '';
                     break;
             }
         }
@@ -1549,7 +1602,7 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         public function __construct(int $value)
         {
             $this->value = $value;
@@ -1557,7 +1610,7 @@ namespace JoyPla\Enterprise\Models {
 
         public function add(RequestQuantity $value)
         {
-            return new RequestQuantity(($this->value + $value->value()));
+            return new RequestQuantity($this->value + $value->value());
         }
 
         public static function isValid(int $value)
@@ -1569,10 +1622,10 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
-        public function __construct(string $value)
+        public function __construct(string $value = '')
         {
             $this->value = $value;
         }
@@ -1594,7 +1647,7 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = "";
+        private string $value = '';
         public function __construct(int $value)
         {
             $this->value = $value;
@@ -1602,7 +1655,7 @@ namespace JoyPla\Enterprise\Models {
 
         public function add(PayoutQuantity $value)
         {
-            return new PayoutQuantity(($this->value + $value->value()));
+            return new PayoutQuantity($this->value + $value->value());
         }
 
         public static function isValid(int $value)
@@ -1616,56 +1669,56 @@ namespace JoyPla\Enterprise\Models {
     class Pref
     {
         use ValueObjectTrait;
-        public const ALLOW_LIST = array(
-            "北海道",
-            "青森県",
-            "岩手県",
-            "宮城県",
-            "秋田県",
-            "山形県",
-            "福島県",
-            "茨城県",
-            "栃木県",
-            "群馬県",
-            "埼玉県",
-            "千葉県",
-            "東京都",
-            "神奈川県",
-            "新潟県",
-            "富山県",
-            "石川県",
-            "福井県",
-            "山梨県",
-            "長野県",
-            "岐阜県",
-            "静岡県",
-            "愛知県",
-            "三重県",
-            "滋賀県",
-            "京都府",
-            "大阪府",
-            "兵庫県",
-            "奈良県",
-            "和歌山県",
-            "鳥取県",
-            "島根県",
-            "岡山県",
-            "広島県",
-            "山口県",
-            "徳島県",
-            "香川県",
-            "愛媛県",
-            "高知県",
-            "福岡県",
-            "佐賀県",
-            "長崎県",
-            "熊本県",
-            "大分県",
-            "宮崎県",
-            "鹿児島県",
-            "沖縄県",
-            "その他"
-        );
+        public const ALLOW_LIST = [
+            '北海道',
+            '青森県',
+            '岩手県',
+            '宮城県',
+            '秋田県',
+            '山形県',
+            '福島県',
+            '茨城県',
+            '栃木県',
+            '群馬県',
+            '埼玉県',
+            '千葉県',
+            '東京都',
+            '神奈川県',
+            '新潟県',
+            '富山県',
+            '石川県',
+            '福井県',
+            '山梨県',
+            '長野県',
+            '岐阜県',
+            '静岡県',
+            '愛知県',
+            '三重県',
+            '滋賀県',
+            '京都府',
+            '大阪府',
+            '兵庫県',
+            '奈良県',
+            '和歌山県',
+            '鳥取県',
+            '島根県',
+            '岡山県',
+            '広島県',
+            '山口県',
+            '徳島県',
+            '香川県',
+            '愛媛県',
+            '高知県',
+            '福岡県',
+            '佐賀県',
+            '長崎県',
+            '熊本県',
+            '大分県',
+            '宮崎県',
+            '鹿児島県',
+            '沖縄県',
+            'その他',
+        ];
 
         public function __construct($value)
         {

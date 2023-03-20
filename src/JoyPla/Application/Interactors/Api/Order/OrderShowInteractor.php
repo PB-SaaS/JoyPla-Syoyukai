@@ -46,6 +46,48 @@ namespace JoyPla\Application\Interactors\Api\Order {
                     new HospitalId($inputData->user->hospitalId),
                     $inputData->search
                 );
+
+            $orders = array_map(function (Order $order) {
+                return $order;
+            }, $orders);
+
+            $inHospitalItemIds = [];
+            $divisionIds = [];
+            foreach ($orders as $order) {
+                foreach ($order->getOrderItems() as $orderItem) {
+                    $inHospitalItemIds[] = $orderItem->getInHospitalItemId();
+                }
+                $divisionIds[] = $order->getDivision()->getDivisionId();
+            }
+
+            $stocks = $this->repositoryProvider
+                ->getStockRepository()
+                ->getStockByDivisionIdAndInHospitalItemIds(
+                    new HospitalId($inputData->user->hospitalId),
+                    $divisionIds,
+                    $inHospitalItemIds
+                );
+
+            $orders = array_map(function ($order) {
+                return $order->toArray();
+            }, $orders);
+
+            foreach ($orders as &$order) {
+                foreach ($order['orderItems'] as &$orderItem) {
+                    $inHospitalItemId = $orderItem['inHospitalItemId'];
+                    $stock = array_find($stocks, function ($stock) use (
+                        $inHospitalItemId
+                    ) {
+                        return $stock->getInHospitalItemId()->value() ===
+                            $inHospitalItemId;
+                    });
+
+                    $orderItem['stockCount'] = $stock
+                        ? $stock->getInventoryQuantity()
+                        : 0;
+                }
+            }
+
             $this->presenterProvider
                 ->getOrderShowPresenter()
                 ->output(new OrderShowOutputData($orders, $count));
@@ -82,6 +124,7 @@ namespace JoyPla\Application\InputPorts\Api\Order {
             $this->search->registerDate = $search['registerDate'];
             $this->search->orderDate = $search['orderDate'];
             $this->search->divisionIds = $search['divisionIds'];
+            $this->search->distributorIds = $search['distributorIds'];
             $this->search->orderStatus = $search['orderStatus'];
             $this->search->perPage = $search['perPage'];
             $this->search->currentPage = $search['currentPage'];
@@ -105,8 +148,6 @@ namespace JoyPla\Application\InputPorts\Api\Order {
  * OUTPUT
  */
 namespace JoyPla\Application\OutputPorts\Api\Order {
-    use JoyPla\Enterprise\Models\Order;
-
     /**
      * Class OrderShowOutputData
      * @package JoyPla\Application\OutputPorts\Api\Order;
@@ -119,9 +160,7 @@ namespace JoyPla\Application\OutputPorts\Api\Order {
         public function __construct(array $orders, int $count)
         {
             $this->count = $count;
-            $this->orders = array_map(function (Order $order) {
-                return $order->toArray();
-            }, $orders);
+            $this->orders = $orders;
         }
     }
 

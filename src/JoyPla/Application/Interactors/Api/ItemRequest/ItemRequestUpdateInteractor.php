@@ -5,14 +5,11 @@
  */
 
 namespace JoyPla\Application\Interactors\Api\ItemRequest {
-    use ApiErrorCode\AccessFrequencyLimitExceededScopeIs;
-    use App\SpiralDb\StockView;
     use Exception;
     use framework\Exception\NotFoundException;
     use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestUpdateInputData;
     use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestUpdateInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\ItemRequest\ItemRequestUpdateOutputData;
-    use JoyPla\Application\OutputPorts\Api\ItemRequest\ItemRequestUpdateOutputPortInterface;
     use JoyPla\Enterprise\Models\ItemRequest;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\Enterprise\Models\RequestHId;
@@ -20,8 +17,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
     use JoyPla\Enterprise\Models\RequestType;
     use JoyPla\Enterprise\Models\RequestItem;
     use JoyPla\Enterprise\Models\RequestItemCount;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRequestRepositoryInterface;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\RequestItemCountRepositoryInterface;
+    use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
     use JoyPla\Service\Presenter\Api\PresenterProvider;
     use JoyPla\Service\Repository\RepositoryProvider;
 
@@ -51,7 +47,9 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
             $requestHId = new RequestHId($inputData->requestHId);
             $requestType = new RequestType((int) $inputData->requestType);
 
-            $itemRequest = $this->repository->show($hospitalId, $requestHId);
+            $itemRequest = $this->repositoryProvider
+                ->getItemRequestRepository()
+                ->show($hospitalId, $requestHId);
 
             if ($itemRequest === null) {
                 throw new NotFoundException('Not Found.', 404);
@@ -89,7 +87,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
             $itemRequest = $itemRequest->setRequestItem($requestItems);
             $itemRequest = $itemRequest->setRequestType($requestType);
 
-            $stockViewInstance = StockView::where(
+            $stockViewInstance = ModelRepository::getStockViewInstance()->where(
                 'hospitalId',
                 $hospitalId->value()
             );
@@ -108,7 +106,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
             }
 
             $stocks = $stockViewInstance->get();
-            if ((int) $stocks->count === 0) {
+            if ((int) $stocks->count() === 0) {
                 throw new Exception("Stocks don't exist.", 998);
             }
 
@@ -116,7 +114,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 return $v->toArray();
             }, $oldRequestItems);
 
-            $stocks = $stocks->data->all();
+            $stocks = $stocks->all();
             $requestItemCounts = [];
             foreach ($itemRequest->getRequestItems() as $item) {
                 foreach ($stocks as $stock) {
@@ -171,7 +169,9 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 ->getRequestItemCountRepository()
                 ->saveToArray($requestItemCounts);
 
-            $this->repository->update($hospitalId, $itemRequest);
+            $this->repositoryProvider
+                ->getItemRequestRepository()
+                ->update($hospitalId, $itemRequest);
 
             $this->presenterProvider
                 ->getItemRequestUpdatePresenter()

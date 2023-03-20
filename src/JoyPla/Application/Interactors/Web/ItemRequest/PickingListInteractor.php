@@ -5,7 +5,6 @@
  */
 
 namespace JoyPla\Application\Interactors\Web\ItemRequest {
-
     use JoyPla\Application\InputPorts\Web\ItemRequest\PickingListInputData;
     use JoyPla\Application\InputPorts\Web\ItemRequest\PickingListInputPortInterface;
     use JoyPla\Application\OutputPorts\Web\ItemRequest\PickingListOutputData;
@@ -13,6 +12,8 @@ namespace JoyPla\Application\Interactors\Web\ItemRequest {
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\Enterprise\Models\TotalRequestItem;
     use JoyPla\InterfaceAdapters\GateWays\Repository\TotalizationRepositoryInterface;
+    use JoyPla\Service\Presenter\Web\PresenterProvider;
+    use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
      * Class PickingListInteractor
@@ -20,46 +21,43 @@ namespace JoyPla\Application\Interactors\Web\ItemRequest {
      */
     class PickingListInteractor implements PickingListInputPortInterface
     {
-        /** @var PickingListOutputPortInterface */
-        private PickingListOutputPortInterface $outputPort;
+        private PresenterProvider $presenterProvider;
+        private RepositoryProvider $repositoryProvider;
 
-        /** @var TotalizationRepositoryInterface */
-        private TotalizationRepositoryInterface $repository;
-
-        /**
-         * PickingListInteractor constructor.
-         * @param PickingListOutputPortInterface $outputPort
-         */
         public function __construct(
-            PickingListOutputPortInterface $outputPort,
-            TotalizationRepositoryInterface $repository
+            PresenterProvider $presenterProvider,
+            RepositoryProvider $repositoryProvider
         ) {
-            $this->outputPort = $outputPort;
-            $this->repository = $repository;
+            $this->presenterProvider = $presenterProvider;
+            $this->repositoryProvider = $repositoryProvider;
         }
-
         /**
          * @param PickingListInputData $inputData
          */
         public function handle(PickingListInputData $inputData)
         {
-            [$totalRequestItems, $count] = $this->repository->search(
-                (new HospitalId($inputData->user->hospitalId)),
-                $inputData->search
-            );
+            [
+                $totalRequestItems,
+                $count,
+            ] = $this->repositoryProvider
+                ->getTotalizationRepository()
+                ->search(
+                    new HospitalId($inputData->user->hospitalId),
+                    $inputData->search
+                );
 
-            $this->outputPort->output(new PickingListOutputData($totalRequestItems, $count));
+            $this->presenterProvider
+                ->getPickingListPresenter()
+                ->output(new PickingListOutputData($totalRequestItems, $count));
         }
     }
 }
-
 
 /***
  * INPUT
  */
 
 namespace JoyPla\Application\InputPorts\Web\ItemRequest {
-
     use Auth;
     use stdClass;
 
@@ -69,9 +67,9 @@ namespace JoyPla\Application\InputPorts\Web\ItemRequest {
      */
     class PickingListInputData
     {
-        /**
-         * PickingListInputData constructor.
-         */
+        public Auth $user;
+        public stdClass $search;
+
         public function __construct(Auth $user, array $search)
         {
             $this->user = $user;
@@ -106,7 +104,6 @@ namespace JoyPla\Application\InputPorts\Web\ItemRequest {
  */
 
 namespace JoyPla\Application\OutputPorts\Web\ItemRequest {
-
     use Collection;
     use JoyPla\Enterprise\Models\TotalRequestItem;
 
@@ -116,14 +113,17 @@ namespace JoyPla\Application\OutputPorts\Web\ItemRequest {
      */
     class PickingListOutputData
     {
-        /**
-         * PickingListOutputData constructor.
-         */
+        public array $totalRequestItems;
+        public int $count;
+
         public function __construct(array $totalRequestItems, int $count)
         {
-            $this->totalRequestItems = array_map(function (TotalRequestItem $totalRequestItem) {
+            $this->totalRequestItems = array_map(function (
+                TotalRequestItem $totalRequestItem
+            ) {
                 return $totalRequestItem->toArray();
-            }, $totalRequestItems);
+            },
+            $totalRequestItems);
             $this->count = $count;
         }
     }

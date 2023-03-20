@@ -1,11 +1,8 @@
 <?php
 
-namespace JoyPla\InterfaceAdapters\Controllers\Api ;
+namespace JoyPla\InterfaceAdapters\Controllers\Api;
 
-use App\SpiralDb\HospitalUser;
-use Auth;
 use Csrf;
-use Exception;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Routing\Router;
@@ -14,8 +11,10 @@ use JoyPla\Application\InputPorts\Api\Reference\ConsumptionHistoryShowInputPortI
 
 class ReferenceController extends Controller
 {
-    public function consumption($vars, ConsumptionHistoryShowInputPortInterface $inputPort)
-    {
+    public function consumption(
+        $vars,
+        ConsumptionHistoryShowInputPortInterface $inputPort
+    ) {
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
 
@@ -33,7 +32,10 @@ class ReferenceController extends Controller
             $search['divisionIds'] = [$this->request->get('divisionIds')];
         }
 
-        $inputData = new ConsumptionHistoryShowInputData($this->request->user()->hospitalId, $search);
+        $inputData = new ConsumptionHistoryShowInputData(
+            $this->request->user()->hospitalId,
+            $search
+        );
         $inputPort->handle($inputData);
     }
 }

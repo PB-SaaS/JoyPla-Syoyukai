@@ -5,7 +5,7 @@ namespace JoyPla\Enterprise\Models;
 use Collection;
 use Exception;
 
-class ReceivedItem 
+class ReceivedItem
 {
     private OrderItemId $orderItemId;
     private ReceivedId $receivedId;
@@ -41,8 +41,7 @@ class ReceivedItem
         Lot $lot,
         Redemption $redemption,
         $itemImage
-        )
-    {
+    ) {
         $this->orderItemId = $orderItemId;
         $this->receivedId = $receivedId;
         $this->receivedItemId = $receivedItemId;
@@ -61,25 +60,26 @@ class ReceivedItem
         $this->itemImage = $itemImage;
     }
 
-    public static function create( Collection $input )
+    public static function create(Collection $input)
     {
         return new self(
-            (new OrderItemId($input->orderCNumber) ),
-            (new ReceivedId($input->receivingHId) ),
-            (new ReceivedItemId($input->receivingNumber) ),
-            (new InHospitalItemId($input->inHospitalItemId) ),
-            (Item::create($input) ),
-            (new HospitalId($input->hospitalId) ),
-            (Division::create($input) ),
-            (Distributor::create($input) ),
-            (Quantity::create($input) ),
-            (new Price($input->price) ),
-            ((float)$input->adjAmount),
-            (new ReceivedQuantity((int)$input->receivingCount)) ,
-            (new ReturnQuantity((int)$input->totalReturnCount)) ,
-            (Lot::create($input) ),
-            (Redemption::create($input) ),
+            new OrderItemId($input->orderCNumber),
+            new ReceivedId($input->receivingHId),
+            new ReceivedItemId($input->receivingNumber),
+            new InHospitalItemId($input->inHospitalItemId),
+            Item::create($input),
+            new HospitalId($input->hospitalId),
+            Division::create($input),
+            Distributor::create($input),
+            Quantity::create($input),
+            new Price($input->price),
+            ((float) $input->adjAmount),
+            new ReceivedQuantity((int) $input->receivingCount),
+            new ReturnQuantity((int) $input->totalReturnCount),
+            Lot::create($input),
+            Redemption::create($input),
             $input->inItemImage,
+            []
         );
     }
 
@@ -87,7 +87,7 @@ class ReceivedItem
     {
         return $this->hospitalId;
     }
- 
+
     public function getOrderItemId()
     {
         return $this->orderItemId;
@@ -122,38 +122,42 @@ class ReceivedItem
     {
         return $this->receivedQuantity;
     }
-    
+
     public function getPrice()
     {
         return $this->price;
     }
-    
+
     public function getLot()
     {
         return $this->lot;
     }
-    
+
     public function getItemImage()
     {
         return $this->itemImage;
     }
-    
+
     public function getReceivedItemId()
     {
         return $this->receivedItemId;
     }
-    
+
     public function getReturnQuantity()
     {
         return $this->returnQuantity;
     }
 
-    public function price(){
-        return (float)$this->price->value() * (float)$this->receivedQuantity->value();
+    public function price()
+    {
+        return (float) $this->price->value() *
+            (float) $this->receivedQuantity->value();
     }
 
-    public function returnPrice(){
-        return (float)$this->price->value() * (float)$this->returnQuantity->value();
+    public function returnPrice()
+    {
+        return (float) $this->price->value() *
+            (float) $this->returnQuantity->value();
     }
 
     public function calcReturnBeforeTotalPrice()
@@ -168,19 +172,24 @@ class ReceivedItem
 
     public function priceAfterAdjustment()
     {
-        return $this->price() + (float)$this->adjustmentAmount;
+        return $this->price() + (float) $this->adjustmentAmount;
     }
 
-    public function addReturnQuantity( ReturnQuantity $returnQuantity )
+    public function addReturnQuantity(ReturnQuantity $returnQuantity)
     {
-        if( $this->receivedQuantity->value() < ( $this->returnQuantity->value() + $returnQuantity->value() ) )
-        {
-            throw new Exception('The number of returns is high compared to the number of items received.',422);
+        if (
+            $this->receivedQuantity->value() <
+            $this->returnQuantity->value() + $returnQuantity->value()
+        ) {
+            throw new Exception(
+                'The number of returns is high compared to the number of items received.',
+                422
+            );
         }
         return new self(
             $this->orderItemId,
             $this->receivedId,
-            $this->receivedItemId ,
+            $this->receivedItemId,
             $this->inHospitalItemId,
             $this->item,
             $this->hospitalId,
@@ -190,11 +199,28 @@ class ReceivedItem
             $this->price,
             $this->adjustmentAmount,
             $this->receivedQuantity,
-            ($this->returnQuantity->add($returnQuantity)),
+            $this->returnQuantity->add($returnQuantity),
             $this->lot,
             $this->redemption,
             $this->itemImage
         );
+    }
+
+    public function checkCards(array $cards)
+    {
+        $cards = array_map(function (Card $card) {
+            return $card;
+        }, $cards);
+
+        $cardQuantity = 0;
+        foreach ($cards as $card) {
+            $cardQuantity += $card->getQuantity()->getQuantityNum();
+        }
+
+        return $this->receivedQuantity->value() *
+            $this->quantity->getQuantityNum() -
+            $cardQuantity <
+            0;
     }
 
     public function toArray()
@@ -219,7 +245,7 @@ class ReceivedItem
             'receivedQuantity' => $this->receivedQuantity->value(),
             'lot' => $this->lot->toArray(),
             'redemption' => $this->redemption->toArray(),
-            'itemImage' => $this->itemImage
+            'itemImage' => $this->itemImage,
         ];
     }
 }
