@@ -694,9 +694,11 @@
                 const checkCardValid = () => {
                     let flag = true;
                     fields.value.forEach(function(element){
-                        element.value.receiveds.forEach(function(received){
-                            flag = (received.receivedQuantity * element.value.quantity.quantityNum) - ( received.cardQuantity ?? 0 ) >= 0;
-                        })
+                        if(!!element.value.receiveds){
+                            element.value.receiveds.forEach(function(received){
+                                flag = (received.receivedQuantity * element.value.quantity.quantityNum) - ( received.cardQuantity ?? 0 ) >= 0;
+                            })
+                        }
                     })
 
                     return flag;
