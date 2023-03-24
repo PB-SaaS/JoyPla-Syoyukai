@@ -130,6 +130,10 @@ namespace JoyPla\Application\Interactors\Api\Received {
                     $inputData->receivedItems[$fkey]['receiveds']
                     as $receivedItem
                 ) {
+                    if ((int) $receivedItem['receivedQuantity'] === 0) {
+                        continue;
+                    }
+
                     $receivedCards = [];
                     foreach ($receivedItem['cards'] as $c) {
                         $cardId = $c['cardId'];
@@ -196,7 +200,7 @@ namespace JoyPla\Application\Interactors\Api\Received {
                         $storehouse = $this->repositoryProvider
                             ->getDivisionRepository()
                             ->getStorehouse($hospitalId);
-                            
+
                         $inventoryCalculations[] = new InventoryCalculation(
                             $receivedItem->getHospitalId(),
                             $storehouse->getDivisionId(),
@@ -278,7 +282,6 @@ namespace JoyPla\Application\InputPorts\Api\Received {
      */
     class ReceivedRegisterByOrderSlipInputData
     {
-
         public Auth $user;
         public string $orderId;
         public array $receivedItems;

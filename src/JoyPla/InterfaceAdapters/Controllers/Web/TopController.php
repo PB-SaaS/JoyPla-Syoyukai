@@ -1,6 +1,6 @@
 <?php
 
-namespace JoyPla\InterfaceAdapters\Controllers\Web ;
+namespace JoyPla\InterfaceAdapters\Controllers\Web;
 
 use framework\Http\Controller;
 use framework\Http\View;
@@ -57,7 +57,11 @@ class TopController extends Controller
 
     public function monthlyreportpage($vars)
     {
-        $body = View::forge('html/Common/MonthlyReportPage', [], false)->render();
+        $body = View::forge(
+            'html/Common/MonthlyReportPage',
+            [],
+            false
+        )->render();
         echo view('html/Common/Template', compact('body'), false)->render();
     }
 
@@ -94,6 +98,12 @@ class TopController extends Controller
     public function itemrequestpage($vars)
     {
         $body = View::forge('html/Common/ItemRequestPage', [], false)->render();
+        echo view('html/Common/Template', compact('body'), false)->render();
+    }
+
+    public function accountant($vars)
+    {
+        $body = View::forge('html/Common/AccountantPage', [], false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
     }
 }

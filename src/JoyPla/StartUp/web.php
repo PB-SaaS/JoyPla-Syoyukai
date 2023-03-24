@@ -249,6 +249,8 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         ItemRequestController::class,
         'show',
     ])->service($useCaseProvider->getItemRequestShowInteractor());
+
+    Router::map('GET', '/accountant', [TopController::class, 'accountant']);
 });
 
 $router = new Router();
