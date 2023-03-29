@@ -92,6 +92,7 @@
     <div id="content">
       <?php echo $content; ?>
     </div>
+    
     <footer class="no_print">
       <?php echo $footer; ?>
     </footer>
