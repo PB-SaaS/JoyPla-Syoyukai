@@ -548,7 +548,7 @@
                 const addItemByBarcode = (items) => {
                     selectInHospitalItems.value = [];
                     if (
-                        (items.type !== 'card' && items.type !== 'gs1-128')
+                        (items.type !== 'jancode' && items.type !== 'card' && items.type !== 'gs1-128')
                         || items.length === 0 || items.item.length === 0) {
                         Swal.fire({
                             icon: 'info',
@@ -580,7 +580,7 @@
                         return false;
                     }
 
-                    if( items.type === 'gs1-128' ) {
+                    if( items.type === 'gs1-128' || items.type === 'jancode') {
                         if (inHospitalitems.length === 1) {
                             addItem(inHospitalitems[0].id, inHospitalitems[0].item);
                         } else {

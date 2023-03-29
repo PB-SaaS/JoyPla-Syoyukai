@@ -169,8 +169,7 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                     throw new Exception('Not Payout Label');
                 }
 
-                $inHospitalItems = $inHospitalItems->first();
-
+                $inHospitalItems = $inHospitalItems->all();
                 foreach ($inHospitalItems as $key => $v) {
                     if ($record->lotDate != '') {
                         $record->lotDate = (new DateYearMonthDay(

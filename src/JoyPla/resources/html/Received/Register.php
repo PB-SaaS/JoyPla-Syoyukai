@@ -515,7 +515,7 @@
       const selectOrderItems = ref([]);
       const addItemByBarcode = (items) => {
         selectOrderItems.value = [];
-        if (items.length === 0 || items.item.length === 0) {
+        if (!items || items.length === 0 || items.item.length === 0) {
           Swal.fire({
               icon: 'info',
               title: '商品が見つかりませんでした',
