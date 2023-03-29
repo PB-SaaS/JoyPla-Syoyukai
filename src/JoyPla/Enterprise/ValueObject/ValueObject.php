@@ -402,6 +402,7 @@ namespace JoyPla\Enterprise\Models {
                     422
                 );
             }
+
             $this->value = $value;
         }
     }

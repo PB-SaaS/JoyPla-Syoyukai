@@ -7,6 +7,10 @@ class Hospital
 {
     private HospitalId $hospitalId;
     private HospitalName $hospitalName;
+    private string $postalCode;
+    private string $phoneNumber;
+    private Pref $prefectures;
+    private string $address;
 
     public function __construct(
         HospitalId $hospitalId,
@@ -28,7 +32,7 @@ class Hospital
     {
         return new Hospital(
             new HospitalId($i->hospitalId),
-            new HospitalName($i->hospitalName),
+            new HospitalName($i->hospitalName ?? ''),
             $i->postalCode,
             $i->phoneNumber,
             new Pref($i->prefectures),
