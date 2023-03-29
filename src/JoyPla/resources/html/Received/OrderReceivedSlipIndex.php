@@ -348,7 +348,7 @@
                     sleepComplate();
                 });
                 const breadcrumbs = [{
-                    text: '発注メニュー',
+                    text: '発注・入荷メニュー',
                     disabled: false,
                     href: _ROOT + '&path=/order'
                 }, {
