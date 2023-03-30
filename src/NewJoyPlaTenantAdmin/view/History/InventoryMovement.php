@@ -260,7 +260,7 @@
 <script>
 
     var datas = {
-        'hospitals': <?php echo json_encode($hospital) ?>,
+        'hospitals': <?php echo json_encode($hospital); ?>,
         'divisions': [],
         'hospitalName': '',
         'histories': {},
@@ -466,7 +466,7 @@
                             type: 'POST',
                             data: {
                                 Action: "hospitalInventorySelectApi",
-                                _csrf: "<?php echo $csrf_token ?>",
+                                _csrf: "<?php echo $csrf_token; ?>",
                                 hospitalId: app.select_data.hospitalId,
                             },
                             dataType: 'json'
@@ -487,7 +487,7 @@
                             type: 'POST',
                             data: {
                                 Action: "hospitalItemsSelectApi",
-                                _csrf: "<?php echo $csrf_token ?>",
+                                _csrf: "<?php echo $csrf_token; ?>",
                                 hospitalId: app.select_data.hospitalId,
                             },
                             dataType: 'json'
@@ -542,7 +542,7 @@
                             url: '%url/rel:mpgt:MonthlyReport%',
                             type: 'POST',
                             data: {
-                                _csrf: "<?php echo $csrf_token ?>",
+                                _csrf: "<?php echo $csrf_token; ?>",
                                 Action: "getInventoryItemNumsApi",
                                 hospitalId: app.select_data.hospitalId,
                                 inventoryEndId: app.select_data.inventoryEndId
@@ -565,7 +565,7 @@
                             url: '%url/rel:mpgt:MonthlyReport%',
                             type: 'POST',
                             data: {
-                                _csrf: "<?php echo $csrf_token ?>",
+                                _csrf: "<?php echo $csrf_token; ?>",
                                 Action: "getBeforeInventoryItemNumsApi",
                                 inventoryEndId: app.select_data.inventoryEndId,
                                 hospitalId: app.select_data.hospitalId,
@@ -590,7 +590,7 @@
                             url: '%url/rel:mpgt:MonthlyReport%',
                             type: 'POST',
                             data: {
-                                _csrf: "<?php echo $csrf_token ?>",
+                                _csrf: "<?php echo $csrf_token; ?>",
                                 Action: "getReceivingItemNumsApi",
                                 hospitalId: app.select_data.hospitalId,
                                 inventoryEndId: app.select_data.inventoryEndId,
@@ -614,7 +614,7 @@
                             url: '%url/rel:mpgt:MonthlyReport%',
                             type: 'POST',
                             data: {
-                                _csrf: "<?php echo $csrf_token ?>",
+                                _csrf: "<?php echo $csrf_token; ?>",
                                 Action: "getConsumedItemNumsApi",
                                 hospitalId: app.select_data.hospitalId,
                                 inventoryEndId: app.select_data.inventoryEndId,
@@ -658,7 +658,9 @@
                 let blob = new Blob([uInt8List], {type: 'text/tab-separated-values'});
                 let url = (window.URL || window.webkitURL).createObjectURL(blob);
                 let link = document.createElement('a');
-                link.download = 'inventoryMovement_<?php echo date('Ymd'); ?>.tsv';
+                link.download = 'inventoryMovement_<?php echo date(
+                    'Ymd'
+                ); ?>.tsv';
                 link.href = url;
                 document
                     .body
