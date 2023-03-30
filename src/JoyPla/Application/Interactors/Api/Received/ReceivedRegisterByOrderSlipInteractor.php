@@ -103,10 +103,12 @@ namespace JoyPla\Application\Interactors\Api\Received {
                     }
                 }
             }
-
-            $cards = $this->repositoryProvider
-                ->getCardRepository()
-                ->getCards($hospitalId, $cardIds);
+            $cards = [];
+            if (!empty($cardIds)) {
+                $cards = $this->repositoryProvider
+                    ->getCardRepository()
+                    ->getCards($hospitalId, $cardIds);
+            }
 
             $updateCards = [];
             foreach ($items as $key => $item) {
@@ -177,7 +179,7 @@ namespace JoyPla\Application\Interactors\Api\Received {
                         $item->getItemImage()
                     );
 
-                    if ($receivedItem->checkCards($receivedCards)) {
+                    if (!$receivedItem->isCheckCards($receivedCards)) {
                         throw new Exception(
                             'The number of cards tied together exceeds the number of.',
                             422
@@ -196,7 +198,7 @@ namespace JoyPla\Application\Interactors\Api\Received {
                         $storehouse = $this->repositoryProvider
                             ->getDivisionRepository()
                             ->getStorehouse($hospitalId);
-                            
+
                         $inventoryCalculations[] = new InventoryCalculation(
                             $receivedItem->getHospitalId(),
                             $storehouse->getDivisionId(),
@@ -278,7 +280,6 @@ namespace JoyPla\Application\InputPorts\Api\Received {
      */
     class ReceivedRegisterByOrderSlipInputData
     {
-
         public Auth $user;
         public string $orderId;
         public array $receivedItems;

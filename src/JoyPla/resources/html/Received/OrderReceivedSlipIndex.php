@@ -696,7 +696,10 @@
                     fields.value.forEach(function(element){
                         if(!!element.value.receiveds){
                             element.value.receiveds.forEach(function(received){
-                                flag = (received.receivedQuantity * element.value.quantity.quantityNum) - ( received.cardQuantity ?? 0 ) >= 0;
+                                if(received.receivedQuantity > 0)
+                                {
+                                    flag = (received.receivedQuantity * element.value.quantity.quantityNum) - ( received.cardQuantity ?? 0 ) >= 0;
+                                }
                             })
                         }
                     })
