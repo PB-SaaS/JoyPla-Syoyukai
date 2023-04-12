@@ -34,54 +34,21 @@
                             </div>
                         </div>
 
-                        <div class="uk-form-controls uk-margin">
+                        <div class="uk-form-controls uk-margin" id="distributor">
                             <label class="uk-form-label">卸業者</label>
                             <div class="uk-child-width-1-1">
                                 <div>
-                                    <select name="distributorId" class="uk-select">
-                                        <option value="">----- 選択してください -----</option>
-                                        <?php
-                                            foreach ($distributor as $record)
-                                            {
-                                                $selected = '';
-                                                if ($distributorId == $record->distributorId) { $selected = 'selected'; }
-                                                echo '<option value="'.$record->distributorId.'"' .$selected .'>'.$record->distributorName.'</option>';
-                                            }
-                                        ?>
-                                    </select>
+                                    <searchable-select name="distributorId" v-model="distributorId" :default="distributorId" :options="distributorOptions"></searchable-select>
                                 </div>
                             </div>
                         </div>
 
-                        <?php if(!$userInfo->isUser()): ?>
-                        <div class="uk-form-controls uk-margin">
+                        <?php if (!$userInfo->isUser()): ?>
+                        <div class="uk-form-controls uk-margin" id="division">
                             <label class="uk-form-label">部署</label>
                             <div class="uk-child-width-1-1">
                                 <div>
-                                    <select name="divisionId" class="uk-select">
-                                        <option value="">----- 選択してください -----</option>
-                                    <?php
-                                        foreach ($division->data as $data)
-                                        {
-                                            $selected = '';
-                                            if ($divisionId == $data->divisionId) { $selected = 'selected'; }
-                                            if ($data->divisionType === '1')
-                                            {
-                                                echo '<option value="'.$data->divisionId.'" ' .$selected .'>'.$data->divisionName.'(大倉庫)</option>';
-                                                echo '<option value="" disabled>--------------------</option>';
-                                            }
-                                        }
-                                        foreach ($division->data as $data)
-                                        {
-                                            $selected = '';
-                                            if ($divisionId == $data->divisionId) { $selected = 'selected'; }
-                                            if ($data->divisionType === '2')
-                                            {
-                                                echo '<option value="'.$data->divisionId.'" ' .$selected .'>'.$data->divisionName.'</option>';
-                                            }
-                                        }
-                                    ?>
-                                    </select>
+                                    <searchable-select name="divisionId" v-model="divisionId" :default="divisionId" :options="divisionOptions"></searchable-select>
                                 </div>
                             </div>
                         </div>
@@ -90,30 +57,26 @@
                             <label class="uk-form-label">部署</label>
                             <div class="uk-child-width-1-1">
                                 <div>
-                                    <?php
-                                        foreach ($division->data as $data)
-                                        {
-                                            if ($divisionId == $data->divisionId) { echo $data->divisionName; }
+                                    <?php foreach ($division->data as $data) {
+                                        if ($divisionId == $data->divisionId) {
+                                            echo $data->divisionName;
                                         }
-                                    ?>
+                                    } ?>
                                 </div>
                             </div>
                         </div>
-                        <?php endif ?>
+                        <?php endif; ?>
 
                         <div class="uk-form-controls uk-margin">
                             <label class="uk-form-label">分類</label>
                             <div class="uk-child-width-1-1">
                                 <div class="uk-form-controls">
-                                <?php
-                                    foreach ($category as $key => $val)
-                                    {
-                                        echo "<label class='uk-margin-small-right'>\n";
-                                        echo "    <input type='checkbox' class='uk-checkbox uk-margin-small-right' name='category' value='{$key}' {$val['checked']}>\n";
-                                        echo $val['label']."\n";
-                                        echo "</label>\n";
-                                    }
-                                ?>
+                                <?php foreach ($category as $key => $val) {
+                                    echo "<label class='uk-margin-small-right'>\n";
+                                    echo "    <input type='checkbox' class='uk-checkbox uk-margin-small-right' name='category' value='{$key}' {$val['checked']}>\n";
+                                    echo $val['label'] . "\n";
+                                    echo "</label>\n";
+                                } ?>
                                 </div>
                             </div>
                         </div>
@@ -162,25 +125,41 @@
                             <tbody>
                                 <tr class="uk-text-large">
                                     <td>合計金額</td>
-                                    <td class="uk-text-right">￥<script>price(fixed('<?php echo $report['totalAmount']; ?>'))</script> -</td>
+                                    <td class="uk-text-right">￥<script>
+                                    price(fixed('<?php echo $report[
+                                        'totalAmount'
+                                    ]; ?>'));
+                                    </script> -</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <?php \App\Lib\pager($page, $report['count'],$limit); ?>
+                    <?php \App\Lib\pager($page, $report['count'], $limit); ?>
                     <div>
                         <div class="uk-width-1-3@m">
                             <span class="smp-offset-start">
-                                <?php echo ($report['count'] > 0)? ($limit * ($page - 1)) + 1 : 0 ; ?></span> - <span class="smp-offset-end">
-                                <?php echo ($limit * $page > $report['count']) ? $report['count'] : $limit * $page; ?></span>件 / <span class="smp-count">
+                                <?php echo $report['count'] > 0
+                                    ? $limit * ($page - 1) + 1
+                                    : 0; ?></span> - <span class="smp-offset-end">
+                                <?php echo $limit * $page > $report['count']
+                                    ? $report['count']
+                                    : $limit *
+                                        $page; ?></span>件 / <span class="smp-count">
                                 <?php echo $report['count']; ?></span>件
                         </div>
                         <div class="uk-width-1-3@m" uk-grid>
                             <div class="uk-width-2-3">
                                 <select name="limit" class=" uk-select">
-                                    <option value="10" <?php echo ($limit == '10') ? 'selected' : ''; ?>>10件</option>
-                                    <option value="50" <?php echo ($limit == '50') ? 'selected' : ''; ?>>50件</option>
-                                    <option value="100" <?php echo ($limit == '100') ? 'selected' : ''; ?>>100件</option>
+                                    <option value="10" <?php echo $limit == '10'
+                                        ? 'selected'
+                                        : ''; ?>>10件</option>
+                                    <option value="50" <?php echo $limit == '50'
+                                        ? 'selected'
+                                        : ''; ?>>50件</option>
+                                    <option value="100" <?php echo $limit ==
+                                    '100'
+                                        ? 'selected'
+                                        : ''; ?>>100件</option>
                                 </select></div>
                             <div class="uk-width-1-3">
                                 <input type="submit" name="smp-table-submit-button" class="uk-button uk-button-default" value="表示">
@@ -206,57 +185,143 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <?php 
-                                    if ($report['count'] > 0) {
-                                        foreach ($report['data'] as $record) {
-                                            echo "<tr>";
-                                            echo "<td>".$record['id']."</td>";
-                                            echo "<td>".$record['inHospitalItemId']."</td>";
-                                            echo "<td>";
-                                            foreach ($record['distributorName'] as $distributorName) {
-                                                echo $distributorName."<br>";
-                                            }
-                                            echo "</td>";
-                                            echo "<td>".$record['makerName']."</td>";
-                                            echo "<td>".$record['category']."</td>";
-                                            echo "<td>".$record['smallCategory']."</td>";
-                                            echo "<td>".$record['itemName']."</td>";
-                                            echo "<td>".$record['itemCode']."</td>";
-                                            echo "<td>".$record['itemStandard']."</td>";
-                                            echo "<td>".$record['itemJANCode']."</td>";
-                                            echo "<td>";
-                                            foreach ($record['price'] as $price) {
-                                                echo "￥<script>price(fixed('".$price."'))</script><br>";
-                                            }
-                                            echo "</td>";
-                                            echo "<td>";
-                                            foreach ($record['orderQuantity'] as $key => $orderQuantity) {
-                                                echo $orderQuantity." ".$record['itemUnit'][$key]."<br>";
-                                            }
-                                            echo "</td>";
-                                            echo "<td>";
-                                            foreach ($record['totalAmount'] as $totalAmount) {
-                                                echo "￥<script>price(fixed('".$totalAmount."'))</script><br>";
-                                            }
-                                            echo "</td>";
-                                            echo "</tr>";
+                                <?php if ($report['count'] > 0) {
+                                    foreach ($report['data'] as $record) {
+                                        echo '<tr>';
+                                        echo '<td>' . $record['id'] . '</td>';
+                                        echo '<td>' .
+                                            $record['inHospitalItemId'] .
+                                            '</td>';
+                                        echo '<td>';
+                                        foreach (
+                                            $record['distributorName']
+                                            as $distributorName
+                                        ) {
+                                            echo $distributorName . '<br>';
                                         }
-                                    } 
-                                ?>
+                                        echo '</td>';
+                                        echo '<td>' .
+                                            $record['makerName'] .
+                                            '</td>';
+                                        echo '<td>' .
+                                            $record['category'] .
+                                            '</td>';
+                                        echo '<td>' .
+                                            $record['smallCategory'] .
+                                            '</td>';
+                                        echo '<td>' .
+                                            $record['itemName'] .
+                                            '</td>';
+                                        echo '<td>' .
+                                            $record['itemCode'] .
+                                            '</td>';
+                                        echo '<td>' .
+                                            $record['itemStandard'] .
+                                            '</td>';
+                                        echo '<td>' .
+                                            $record['itemJANCode'] .
+                                            '</td>';
+                                        echo '<td>';
+                                        foreach ($record['price'] as $price) {
+                                            echo "￥<script>price(fixed('" .
+                                                $price .
+                                                "'));</script><br>";
+                                        }
+                                        echo '</td>';
+                                        echo '<td>';
+                                        foreach (
+                                            $record['orderQuantity']
+                                            as $key => $orderQuantity
+                                        ) {
+                                            echo $orderQuantity .
+                                                ' ' .
+                                                $record['itemUnit'][$key] .
+                                                '<br>';
+                                        }
+                                        echo '</td>';
+                                        echo '<td>';
+                                        foreach (
+                                            $record['totalAmount']
+                                            as $totalAmount
+                                        ) {
+                                            echo "￥<script>price(fixed('" .
+                                                $totalAmount .
+                                                "'));</script><br>";
+                                        }
+                                        echo '</td>';
+                                        echo '</tr>';
+                                    }
+                                } ?>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     <input name="page" value="1" type="hidden">
-                    <?php \App\Lib\pager($page, $report['count'],$limit); ?>
+                    <?php \App\Lib\pager($page, $report['count'], $limit); ?>
                 </form>
             </div>
         </div>
     </div>
 </div>
 <script>
-class OrderMR
-{
+<?php
+$distributorOptions = [
+    [
+        'value' => '',
+        'text' => '----- 卸業者を選択してください -----',
+    ],
+];
+
+foreach ($distributor as $data) {
+    $distributorOptions[] = [
+        'value' => $data->distributorId,
+        'text' => $data->distributorName,
+    ];
+}
+
+$divisionOptions = [
+    [
+        'value' => '',
+        'text' => '----- 部署を選択してください -----',
+    ],
+];
+foreach ($division->data as $data) {
+    if ($data->divisionType === '1') {
+        $divisionOptions[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+foreach ($division->data as $data) {
+    if ($data->divisionType === '2') {
+        $divisionOptions[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+?>
+
+var distributor = new Vue({
+    el: '#distributor',
+    data: {
+        distributorOptions: <?php echo json_encode($distributorOptions); ?>,
+        distributorId: "<?php echo $distributorId; ?>",
+    },
+});
+
+
+var division = new Vue({
+    el: '#division',
+    data: {
+        divisionOptions: <?php echo json_encode($divisionOptions); ?>,
+        divisionId: "<?php echo $divisionId; ?>",
+    },
+});
+
+
+class OrderMR {
     constructor()
     {
         this.list = <?php echo json_encode($report['data']); ?>;
@@ -340,7 +405,7 @@ class OrderMR
     }
 }
 
-    let order_report = new OrderMR();
+let order_report = new OrderMR();
 
 function pageSubmit(page)
 {

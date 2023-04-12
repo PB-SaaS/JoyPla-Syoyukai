@@ -1102,4 +1102,20 @@ class ModelRepository
             'measuringInst',
         ]);
     }
+
+    public static function getAccountantInstance()
+    {
+        return SpiralDB::title('NJ_Accountant')->value([
+            'id',
+            'registTime',
+            'updateTime',
+            'hospitalId',
+            'divisionId',
+            'distributorId',
+            'accountantId',
+            'accountantDate',
+            'orderNumber',
+            'receivingNumber',
+        ]);
+    }
 }

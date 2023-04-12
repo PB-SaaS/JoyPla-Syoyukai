@@ -94,45 +94,29 @@ if ($validate) {
                                     ); ?></span>
                                 </div>
                             </div>
-                            <div class="cf">
+                            <div class="cf mt-4">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
                                     卸業者 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
                                 </div>
                                 <div class="relative">
-                                    <select name="distributorId"
-                                    class="appearance-none border w-full py-2 px-3 leading-tight 
-                                    <?= $is_error &&
-                                    $val['distributorId']['message']
-                                        ? 'text-red-500 border-red-500'
-                                        : 'text-gray-700 border-gray-300' ?>" 
-                                    >
-                                        <option value="">----- 選択してください -----</option>
-                                        <?php foreach ($distributor as $key) {
-                                            $selected =
-                                                $input['distributorId'] ===
-                                                $key['distributorId']
-                                                    ? 'selected'
-                                                    : '';
-                                            echo "<option value='" .
-                                                html($key['distributorId']) .
-                                                "' " .
-                                                $selected .
-                                                '>' .
-                                                html($key['distributorName']) .
-                                                "</option>\n";
-                                        } ?>
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                                        </svg>
-                                    </div>
+                                    
+                                    <searchable-dropdown-for-form
+                                        name="distributorId" :error="<?php echo $is_error &&
+                                        !empty($val['distributorId']['message'])
+                                            ? 'true'
+                                            : 'false'; ?>" title="" :disabled="disabled" :absolute="true"
+                                        :options="options"
+                                        selected="<?php echo html(
+                                            $input['distributorId']
+                                        ); ?>"
+                                        @input="selectedOption = $event"
+                                    ></searchable-dropdown-for-form>
                                 </div>
                                 <span class="text-red-500"><?php echo html(
                                     $val['distributorId']['message']
                                 ); ?></span>
                             </div>
-                            <div class="cf">
+                            <div class="cf mt-4">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
                                     卸業者管理コード
                                 </div>
@@ -150,7 +134,7 @@ if ($validate) {
                                     ); ?></span>
                                 </div>
                             </div>
-                            <div class="cf">
+                            <div class="cf mt-4">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
                                     入数 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
                                 </div>
@@ -167,7 +151,7 @@ if ($validate) {
                                     ); ?></span>
                                 </div>
                             </div>
-                            <div class="cf">
+                            <div class="cf mt-4">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
                                     入数単位
                                 </div>
@@ -177,7 +161,7 @@ if ($validate) {
                                     ); ?></span>
                                 </div>
                             </div>
-                            <div class="cf">
+                            <div class="cf mt-4">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
                                     個数単位 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
                                 </div>
@@ -194,7 +178,7 @@ if ($validate) {
                                     ); ?></span>
                                 </div>
                             </div>
-                            <div class="cf">
+                            <div class="cf mt-4">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
                                     購買価格 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
                                 </div>
@@ -211,7 +195,7 @@ if ($validate) {
                                     ); ?></span>
                                 </div>
                             </div>
-                            <div class="cf">
+                            <div class="cf mt-4">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
                                     単価 <span class="bg-red-400 text-white text-md font-medium inline-flex items-center px-2.5 rounded">必須</span>
                                 </div>
@@ -251,7 +235,7 @@ if ($validate) {
                                     </script>
                                 </div>
                             </div>
-                            <div class="cf" id="medicineCategory">
+                            <div class="cf mt-4" id="medicineCategory">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
                                     保険請求分類（医科）
                                 </div>
@@ -273,7 +257,7 @@ if ($validate) {
                                     $val['medicineCategory']['message']
                                 ); ?></span>
                             </div>
-                            <div class="cf">
+                            <div class="cf mt-4">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
                                     保険請求分類（在宅）
                                 </div>
@@ -295,7 +279,7 @@ if ($validate) {
                                     $val['homeCategory']['message']
                                 ); ?></span>
                             </div>
-                            <div class="cf">
+                            <div class="cf mt-4">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
                                     測定機器名
                                 </div>
@@ -313,7 +297,7 @@ if ($validate) {
                                     ); ?></span>
                                 </div>
                             </div>
-                            <div class="cf">
+                            <div class="cf mt-4">
                                 <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal">
                                     特記事項
                                 </div>
@@ -349,8 +333,27 @@ if ($validate) {
     }
 </script>
 <script>
+    <?php
+    $distributorOptions = [
+        [
+            'value' => '',
+            'label' => ' ----- 選択してください -----',
+        ],
+    ];
+    foreach ($distributor as $dist) {
+        $distributorOptions[] = [
+            'value' => $dist['distributorId'],
+            'label' => $dist['distributorName'],
+        ];
+    }
+    ?>
 var JoyPlaApp = Vue
     .createApp({
+        data() {
+            return {
+                options: <?php echo json_encode($distributorOptions, true); ?>,
+            }
+        },
         setup() {
             const {ref, onCreated, onMounted} = Vue;
             const loading = ref(false);
@@ -441,6 +444,7 @@ const breadcrumbs = [
     }
 },
 components: {
+    'searchable-dropdown-for-form': SearchableDropdownForForm,  
     'v-checkbox': vCheckbox,
     'v-loading': vLoading,
     'v-text': vText,

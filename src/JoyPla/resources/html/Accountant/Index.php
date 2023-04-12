@@ -5,7 +5,7 @@
   <div id="content" class="flex h-full px-1">
     <div class="flex-auto">
       <div class="index container mx-auto">
-        <h1 class="text-2xl mb-2">発注書一覧</h1>
+        <h1 class="text-2xl mb-2">会計伝票一覧</h1>
         <hr>
         <div class="w-full flex border-b-2 border-gray-200 py-4">
           <div class="flex-auto w-1/2">
@@ -24,105 +24,51 @@
             </div>
           </div>
         </div>
+        <div class="w-full md:flex border-b-2 border-gray-200 py-4">
+          <div class="flex-auto md:w-1/5" data-micromodal-trigger="openCreateModal">
+            <v-button-primary type="button" class="w-full" @click="onOpenCreateModal">会計伝票発行</v-button-primary>
+          </div>
+          <div class="flex-auto md:w-4/5">
+          </div>
+        </div>
         <div>
           {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.perPage) * values.currentPage )  < totalCount ) ?  parseInt(values.perPage) * values.currentPage : totalCount  }}件 / 全 {{ totalCount }}件
         </div>
-        <div class="pt-2 hover:bg-sushi-50" v-for="(order) in orders">
-          <div class="border-b-2 border-solid border-gray-100 w-full">
-            <div class="lg:flex lg:divide-x ">
-              <div class="lg:w-1/5 p-2">
-                <p class="text-md font-bold">登録日時<br>{{ order.registDate }}</p>
-                <p class="text-md font-bold">発注日時<br>{{ order.orderDate }}</p>
-                <p class="text-md">
-                  発注番号：{{ order.orderId }}<br>
-                  発注ステータス：
-                  <span class="bg-red-100 text-red-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="order.orderStatus == 2">
-                    {{ order.orderStatusToString}} 
-                  </span>
-                  <span class="bg-amber-100 text-amber-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="order.orderStatus == 3">
-                    {{ order.orderStatusToString}} 
-                  </span>
-                  <span class="bg-orange-100 text-orange-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="order.orderStatus == 4">
-                    {{ order.orderStatusToString}} 
-                  </span>
-                  <span class="bg-orange-100 text-orange-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="order.orderStatus == 5">
-                    {{ order.orderStatusToString}} 
-                  </span>
-                  <span class="bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="order.orderStatus == 6">
-                    {{ order.orderStatusToString}} 
-                  </span>
-                  <span class="bg-red-100 text-red-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="order.orderStatus == 7">
-                    {{ order.orderStatusToString}} 
-                  </span>
-                  <span class="bg-zinc-100 text-zinc-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="order.orderStatus == 8">
-                    {{ order.orderStatusToString}} 
-                  </span>
-                  <br>
-                  発注タイプ：{{ order.adjustmentToString }}<br>
-                  発注元部署：{{ order.division.divisionName }}<br>
-                  卸業者：{{ order.distributor.distributorName }}<br>
-                  合計金額：&yen; {{ numberFormat( order.totalAmount) }}
-                </p>
-                <div class="flex flex-col gap-3">
-                  <v-button-default type="button" class="w-full" @click.native="openSlip( order.orderId )">
-                    発注書を表示
-                  </v-button-default>
-                  <v-button-default type="button" class="w-full" @click.native="openPrint( order.orderId )">
-                    発注書を印刷
-                  </v-button-default>
-                </div>
-              </div>
-              <div class="lg:w-4/5 p-2">
-                <div class="w-full lg:flex mt-3" v-for="(orderItem) in order.orderItems">
-                  <div class="lg:flex-1 flex lg:w-3/4">
-                    <item-view class="md:h-44 md:w-44 h-32 w-32" :base64="orderItem.itemImage"></item-view>
-                    <div class="flex-1 pl-4 lg:flex gap-6 break-all">
-                      <div class="flex-auto lg:w-4/5 w-full">
-                        <h3 class="text-xl font-bold font-heading">{{ orderItem.item.makerName }}</h3>
-                        <p class="text-md font-bold font-heading">{{ orderItem.item.itemName }}</p>
-                        <p class="text-md text-gray-500">{{ orderItem.item.itemCode }}</p>
-                        <p class="text-md text-gray-500">{{ orderItem.item.itemStandard }}</p>
-                        <p class="text-md text-gray-500">{{ orderItem.item.itemJANCode }}</p>
-                        <p class="text-base text-gray-900">
-                        {{ numberFormat(orderItem.orderQuantity) }}{{ orderItem.quantity.itemUnit }}
-                        </p>
-                        <p>
-                          <span class="bg-red-100 text-red-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="orderItem.orderItemReceivedStatus == 1">
-                            {{ orderItem.orderItemReceivedStatusToString }}
-                          </span>
-                          <span class="bg-orange-100 text-orange-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="orderItem.orderItemReceivedStatus == 2">
-                            {{ orderItem.orderItemReceivedStatusToString }}
-                          </span>
-                          <span class="bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="orderItem.orderItemReceivedStatus == 3">
-                            {{ orderItem.orderItemReceivedStatusToString }}
-                          </span>
-                        </p>
-                        <p v-if="orderItem.useMedicode">
-                          <span class="bg-orange-100 text-orange-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="orderItem.medicodeStatus == 1">
-                            Medicode-Web 未送信
-                          </span>
-                          <span class="bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="orderItem.medicodeStatus == 2">
-                            Medicode-Web 送信済み
-                          </span>
-                          <span class="bg-red-100 text-red-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="orderItem.medicodeStatus == 3">
-                            Medicode-Web 連携エラー
-                          </span>
-                        </p>
-                        <p>
-                          <span class="text-blue-700 text-lg mr-4" v-if="orderItem.dueDate != ''">納期：{{ orderItem.dueDate }}</span>
-                          <span class="text-orange-700 text-lg mr-4" v-else>納期：未定</span>
-                        </p>
-                        <p>
-                          <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(orderItem.orderPrice) }}</span>
-                          <span class="text-sm text-gray-900">( &yen; {{ numberFormat(orderItem.price) }} / {{ orderItem.quantity.itemUnit }} )</span>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="mt-4">
+          <table class="table-auto w-full text-sm">
+            <thead>
+              <tr>
+                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">No</th>
+                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">会計番号</th>
+                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">日付</th>
+                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">部署</th>
+                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">卸業者</th>
+                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">合計金額</th>
+                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">発注番号</th>
+                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">検収番号</th>
+                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left"></th>
+                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(accountant) in accountants">
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant._id }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant.accountantId }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant.accountantDate }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant._division?.divisionName }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant._distributor?.distributorName }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant._distributor?.distributorName }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant.orderId }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant.receivedId }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">
+                  <v-button-primary type="button" @click.native="createAccountant">詳細</v-button-primary>
+                </td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">
+                  <v-button-danger type="button" @click.native="createAccountant">削除</v-button-danger>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <v-pagination
         :show-pages="showPages"
@@ -133,14 +79,41 @@
       </div>
     </div>
   </div>
-  <v-open-modal ref="openModal" headtext="絞り込み" id="openModal">
+  <v-open-modal ref="openCreateModal" headtext="会計伝票発行" id="openCreateModal">
     <div class="flex flex-col">
       <div class="w-full overflow-y-auto" style="max-height: 85vh;">
         <div class="flex flex-wrap">
           <div class="w-full px-3 my-6 md:mb-0">
             <div class="my-4">
               <v-input
-                name="orderId"
+                name="register.accountantDate"
+                type="date"
+                label="会計日"
+                title="会計日"
+                ></v-input>
+            </div>
+            <div class="my-4">
+              <v-select-division
+                  name="register.divisionId"
+                  label="部署" 
+                  title="部署指定"
+                  :absolute="false"
+                  :is-only-my-division="<?php var_export(
+                      gate('register_of_accountant')->isOnlyMyDivision()
+                  ); ?>"
+                  ></v-select-division>
+            </div>
+            <div class="my-4">
+              <v-select-distributor
+                  name="register.distributorId"
+                  label="卸業者" 
+                  title="卸業者指定"
+                  :absolute="false"
+                  ></v-select-distributor>
+            </div>
+            <div class="my-4">
+              <v-input
+                name="register.orderId"
                 type="text"
                 label="発注番号"
                 title="発注番号"
@@ -148,18 +121,31 @@
             </div>
             <div class="my-4">
               <v-input
-                name="registerDate"
-                type="month"
-                label="作成年月"
-                title="作成年月"
+                name="register.receivedId"
+                type="text"
+                label="検収番号"
+                title="検収番号"
                 ></v-input>
             </div>
+            <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
+              <v-button-primary type="button" @click.native="createAccountant">発行</v-button-primary>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </v-open-modal>
+  <v-open-modal ref="openModal" headtext="絞り込み" id="openModal">
+    <div class="flex flex-col">
+      <div class="w-full overflow-y-auto" style="max-height: 85vh;">
+        <div class="flex flex-wrap">
+          <div class="w-full px-3 my-6 md:mb-0">
             <div class="my-4">
               <v-input
-                name="orderDate"
+                name="yearMonth"
                 type="month"
-                label="発注年月"
-                title="発注年月"
+                label="会計年月"
+                title="会計年月"
                 ></v-input>
             </div>
             <div class="my-4">
@@ -202,14 +188,20 @@
                 title="JANコード"
                 ></v-input>
             </div>
-            <?php if (!gate('list_of_order_slips')->isOnlyMyDivision): ?>
+            <?php if (!gate('list_of_accountant_slips')->isOnlyMyDivision()): ?>
             <div class="my-4">
               <v-multiple-select-division
                 name="divisionIds"
-                title="発注書元部署名"
+                title="部署名"
                 ></v-multiple-select-division>
             </div>
             <?php endif; ?>
+            <div class="my-4">
+              <v-multiple-select-distributor
+                name="distributorIds"
+                title="卸業者"
+                ></v-multiple-select-distributor>
+            </div>
             <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
               <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
               <v-button-primary type="button" @click.native="searchExec">絞り込み</v-button-primary>
@@ -219,6 +211,15 @@
       </div>
     </div>
   </v-open-modal>
+  <div class="hidden">
+    <v-input type="hidden" name="makerName"></v-input>
+    <v-input type="hidden" name="itemName"></v-input>
+    <v-input type="hidden" name="itemCode"></v-input>
+    <v-input type="hidden" name="itemStandard"></v-input>
+    <v-input type="hidden" name="itemJANCode"></v-input>
+    <v-input type="hidden" name="currentPage"></v-input>
+    <v-input type="hidden" name="perPage"></v-input>
+  </div>
 </div>
 <script>
 var JoyPlaApp = Vue.createApp({
@@ -235,8 +236,10 @@ var JoyPlaApp = Vue.createApp({
       'item-view': itemView,
       'v-pagination' : vPagination,
       'v-select' : vSelect,
-      'v-text' : vText,
-      'v-multiple-select-division' : vMultipleSelectDivision
+      'v-select-division' : vSelectDivision,
+      'v-select-distributor' : vSelectDistributor,
+      'v-multiple-select-division' : vMultipleSelectDivision,
+      'v-multiple-select-distributor' : vMultipleSelectDistributor
     },
     setup(){
       const { ref , onMounted } = Vue;
@@ -252,6 +255,7 @@ var JoyPlaApp = Vue.createApp({
       }
 
       start();
+      
 
       const getCache = () => {
           let url = window.location.href;
@@ -263,7 +267,7 @@ var JoyPlaApp = Vue.createApp({
           return decodeURIComponent(results[2].replace(/\+/g, " "));
       }
 
-      const pagetitle = "ordershow";
+      const pagetitle = "accountantIndex";
 
       const getParam = (name) => {
           let url = window.location.href;
@@ -287,48 +291,55 @@ var JoyPlaApp = Vue.createApp({
       const setParam = (values) => {
         sessionStorage.setItem(pagetitle,JSON.stringify(values));
         const url = new URL(window.location);
-        url.searchParams.set('orderId',values.orderId);
         url.searchParams.set('itemName',values.itemName);
         url.searchParams.set('makerName',values.makerName);
         url.searchParams.set('itemCode',values.itemCode);
         url.searchParams.set('itemStandard',values.itemStandard);
         url.searchParams.set('itemJANCode',values.itemJANCode);
-        url.searchParams.set('registerDate',values.registerDate);
-        url.searchParams.set('orderDate',values.orderDate);
+        url.searchParams.set('yearMonth',values.yearMonth);
         url.searchParams.set('perPage',values.perPage);
         url.searchParams.set('currentPage',values.currentPage);
         url.searchParams.set('divisionIds',values.divisionIds);
+        url.searchParams.set('distributorIds',values.distributorIds);
         history.pushState({}, '', url);
       }
 
       const { meta , validate , values , setFieldValue , resetForm} = useForm({
         initialValues: {
-          orderId  : (getParam("orderId")) ? getParam("orderId") : "",
           itemName  : (getParam("itemName")) ? getParam("itemName") : "",
           makerName : (getParam("makerName")) ? getParam("makerName") : "",
           itemCode : (getParam("itemCode")) ? getParam("itemCode") : "",
           itemStandard : (getParam("itemStandard")) ? getParam("itemStandard") : "",
           itemJANCode : (getParam("itemJANCode")) ? getParam("itemJANCode") : "",
-          registerDate: (getParam("registerDate")) ? getParam("registerDate") : "",
-          orderDate: (getParam("orderDate")) ? getParam("orderDate") : "",
+          yearMonth: (getParam("yearMonth")) ? getParam("yearMonth") : "",
           perPage: (Number.isInteger(getParam("perPage"))) ? getParam("perPage") : "10",
           currentPage : (Number.isInteger(parseInt(getParam("currentPage")))) ? parseInt(getParam("currentPage")) : 1,
           divisionIds: (getParam("divisionIds")) ? ( Array.isArray(getParam("divisionIds"))? getParam("divisionIds") : (getParam("divisionIds")).split(',') ) : [],
+          distributorIds: (getParam("distributorIds")) ? ( Array.isArray(getParam("distributorIds"))? getParam("distributorIds") : (getParam("distributorIds")).split(',') ) : [],
+          register : {
+            accountantDate : '<?php echo date('Y-m-d'); ?>',
+            divisionId : '',
+            distributorId : '',
+            orderId : '',
+            receivedId : '',
+          }
         },
       });
+
       const breadcrumbs = [
           {
-            text: '発注メニュー',
+            text: '会計メニュー',
             disabled: false,
-            href: _ROOT + '&path=/order',
+            href: _ROOT + '&path=/accountant',
           },
           {
-            text: '発注書一覧',
+            text: '会計一覧',
             disabled: true, 
           }
         ];
 
       const openModal = ref();
+      const openCreateModal = ref();
 
       const numberFormat = (value) => {
           if (! value ) { return 0; }
@@ -339,6 +350,9 @@ var JoyPlaApp = Vue.createApp({
         openModal.value.open();
       }
       
+      const onOpenCreateModal = () => {
+        openCreateModal.value.open();
+      }
       const Toast = Swal.mixin({
         toast: true,
         position: 'top-end',
@@ -355,16 +369,15 @@ var JoyPlaApp = Vue.createApp({
       const showPages = ref(5);
       const totalCount = ref(0);
 
-      const orders = ref([]);
+      const accountants = ref([]);
             
       const perPageOptions = [{ label: "10件表示", value: "10" },{ label: "50件表示", value: "50" },{ label: "100件表示", value: "100" }];
-
 
       const searchCount = ref(0);
       
       const listGet = () => {
         let params = new URLSearchParams();
-        params.append("path", "/api/order/show");
+        params.append("path", "/api/accountant/index");
         params.append("search", JSON.stringify(encodeURIToObject(values)));
         params.append("_csrf", _CSRF);
 
@@ -374,7 +387,7 @@ var JoyPlaApp = Vue.createApp({
 
         axios.post(_APIURL,params)
         .then( (response) => {
-          orders.value = response.data.data;
+          accountants.value = response.data.data;
           totalCount.value = parseInt(response.data.count);
         }) 
         .catch((error) => {
@@ -424,7 +437,6 @@ var JoyPlaApp = Vue.createApp({
       const searchClear = () =>
       {
         values.currentPage = 1;
-        values.orderId = '';
         values.itemName = '';
         values.makerName = '';
         values.itemCode = '';
@@ -432,17 +444,104 @@ var JoyPlaApp = Vue.createApp({
         values.itemJANCode = '';
         values.yearMonth = '';
         values.divisionIds = [];
+        values.distributorIds = [];
         listGet();
       };
 
       const openSlip = ( url ) => {
-        location.href = _ROOT + "&path=/order/" + url;    
+        location.href = _ROOT + "&path=/accountant/" + url;    
       }
       const openPrint = ( url ) => {
-        location.href = _ROOT + "&path=/order/" + url + "/print";    
+        location.href = _ROOT + "&path=/accountant/" + url + "/print";    
+      }
+
+      const deleteSlip = ( accountantId ) => 
+      {
+          Swal.fire({
+            title: '消費伝票を削除',
+            text: "削除後は元に戻せません。\r\nよろしいですか？",
+            icon: 'warning',
+            confirmButtonText: '削除します',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+          }).then( async (result) => {
+            if(result.isConfirmed){
+              start();
+              
+              let params = new URLSearchParams();
+              params.append("path", "/api/accountant/"+accountantId+"/delete");
+              params.append("_method", 'delete');
+              params.append("_csrf", _CSRF);
+
+              const res = await axios.post(_APIURL,params);
+              
+              complete();
+              if(res.data.code != 200) {
+                throw new Error(res.data.message)
+              }
+              Swal.fire({
+                  icon: 'success',
+                  title: '消費伝票の削除が完了しました。',
+              }).then((result) => {
+                location.reload();
+              });
+              return true ;
+            }
+          }).catch((error) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'システムエラー',
+              text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+            });
+          });
+      }
+
+      const createAccountant = () => {
+        let params = new URLSearchParams();
+        params.append("accountantDate", values.register.accountantDate);
+        params.append("divisionId", values.register.divisionId);
+        params.append("distributorId", values.register.distributorId);
+        params.append("orderId", values.register.orderId);
+        params.append("receivedId", values.register.receivedId);
+        params.append("_csrf", _CSRF);
+        params.append("_method", 'post');
+        params.append("path", "/api/accountant/register");
+
+        start();
+
+        axios.post(_APIURL,params)
+        .then( (response) => {
+          if(response.data.code != 200){
+            Swal.fire({
+              icon: 'error',
+              title: 'システムエラー',
+              text: '伝票発行が失敗しました。\r\nしばらく経ってから再度送信してください。',
+            });
+            return '';
+          }
+          Swal.fire({
+            icon: 'success',
+            title: '伝票発行が完了しました。',
+          }).then( () => {
+            location.reload();
+          })
+        }) 
+        .catch((error) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'システムエラー',
+            text: '伝票発行が失敗しました。\r\nしばらく経ってから再度送信してください。',
+          });
+        })
+        .then(() => {
+          complete();
+        });
       }
 
       return {
+        deleteSlip,
         loading, 
         start, 
         complete,
@@ -456,11 +555,14 @@ var JoyPlaApp = Vue.createApp({
         totalCount,
         showPages,
         values,
-        orders,
+        accountants,
         onOpenModal,
         openModal,
+        onOpenCreateModal,
+        openCreateModal,
         breadcrumbs,
         numberFormat,
+        createAccountant
       }
   },
   watch: {

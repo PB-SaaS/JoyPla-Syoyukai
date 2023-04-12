@@ -2,9 +2,7 @@
 <div class="animsition uk-margin-bottom" uk-height-viewport="expand: true">
 	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove" id="page_top">
 		<div class="uk-container uk-container-expand">
-			<?php
-			if($isExistUnorder):
-			?>	
+			<?php if ($isExistUnorder): ?>	
 			<script>
 				$(function(){
 					UIkit.modal.alert('未発注伝票があります。<br>未発注伝票一覧へ移動します。').then(function(){
@@ -13,18 +11,7 @@
 				});
 			</script>
 			
-			<?php	
-			else:
-			?>
-			<ul class="uk-breadcrumb no_print uk-margin-top">
-				<li><a href="%url/rel:mpg:top%">TOP</a></li>
-                	<li><a href="%url/rel:mpg:top%&page=page1">消費・発注</a></li>
-				<li><span>定数発注</span></li>
-			</ul>
-			<div class="no_print" uk-margin id="app">
-				<input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
-				<input class="print_hidden uk-button uk-button-primary" type="button" value="表示内容で未発注伝票を作成" v-on:click="sendUnorderedSlip">
-				<?php /* ?>
+			 /* ?>
 				<div class="uk-inline uk-margin-small-left">
 					<div uk-grid class="uk-margin-remove">
 						<div class="uk-padding-remove">
@@ -39,7 +26,50 @@
 						</div>
 					</div>
 				</div>
-				<?php */ ?>
+				<?php */<?php
+       /* ?>
+				<div class="uk-inline uk-margin-small-left">
+					<div uk-grid class="uk-margin-remove">
+						<div class="uk-padding-remove">
+							<label class="uk-switch" for="default-1">
+								<input type="checkbox" id="default-1" v-model="integrate" />
+								<div class="uk-switch-slider uk-switch-big"></div>
+							</label>
+						</div>
+						<div style="padding: 7px 0px 7px 8px;">
+							<small v-if="integrate">既存の未発注伝票に追加する</small>
+							<small v-else>新規で未発注伝票を発行する</small>
+						</div>
+					</div>
+				</div>
+				<?php */
+       ?>else: ?>
+			<ul class="uk-breadcrumb no_print uk-margin-top">
+				<li><a href="%url/rel:mpg:top%">TOP</a></li>
+                	<li><a href="%url/rel:mpg:top%&page=page1">消費・発注</a></li>
+				<li><span>定数発注</span></li>
+			</ul>
+			<div class="no_print" uk-margin id="app">
+				<input class="print_hidden uk-button uk-button-default" type="button" value="印刷プレビュー" onclick="window.print();return false;">
+				<input class="print_hidden uk-button uk-button-primary" type="button" value="表示内容で未発注伝票を作成" v-on:click="sendUnorderedSlip">
+				<?php
+       /* ?>
+				<div class="uk-inline uk-margin-small-left">
+					<div uk-grid class="uk-margin-remove">
+						<div class="uk-padding-remove">
+							<label class="uk-switch" for="default-1">
+								<input type="checkbox" id="default-1" v-model="integrate" />
+								<div class="uk-switch-slider uk-switch-big"></div>
+							</label>
+						</div>
+						<div style="padding: 7px 0px 7px 8px;">
+							<small v-if="integrate">既存の未発注伝票に追加する</small>
+							<small v-else>新規で未発注伝票を発行する</small>
+						</div>
+					</div>
+				</div>
+				<?php */
+       ?>
 			</div>
 			<h2 class="page_title">定数発注</h2>
 			<hr>
@@ -47,9 +77,7 @@
 				%sf:usr:search75:mstfilter%
 			</div>
 			
-			<?php	
-			endif
-			?>
+			<?php endif; ?>
 		</div>
 	</div>
 </div>
@@ -105,7 +133,7 @@ var app = new Vue({
 					url:'%url/rel:mpgt:Order%&Action=regUnorderedDivisionApi',
 					type:'POST',
 					data:{
-						_csrf: "<?php echo $csrf_token ?>",
+						_csrf: "<?php echo $csrf_token; ?>",
 						ordered : JSON.stringify( app.lists ),
 						integrate : app.integrate,
 					},

@@ -40,11 +40,15 @@
                                     <v-button-default type="button" class="w-full" @click.native="openSlip( itemRequest.requestHId )">
                                         請求内容を表示
                                     </v-button-default>
-                                    <?php if (gate('delete_of_item_request_history')->can()) : ?>
+                                    <?php if (
+                                        gate(
+                                            'delete_of_item_request_history'
+                                        )->can()
+                                    ): ?>
                                         <v-button-danger type="button" class="w-full" @click.native="deleteSlip( itemRequest.requestHId )">
                                             請求内容を削除
                                         </v-button-danger>
-                                    <?php endif ?>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             <div class="lg:w-3/4 p-2">
@@ -110,7 +114,11 @@
                             <v-input name="itemJANCode" type="text" label="JANコード" title="JANコード"></v-input>
                         </div>
                         <div class="my-4">
-                            <v-multiple-select-division-v2 id="sourceDivisionIds" name="sourceDivisionIds" title="請求元部署名" :is-only-my-division="<?php var_export(gate('list_of_item_request_history')->isOnlyMyDivision()); ?>" />
+                            <v-multiple-select-division-v2 id="sourceDivisionIds" name="sourceDivisionIds" title="請求元部署名" :is-only-my-division="<?php var_export(
+                                gate(
+                                    'list_of_item_request_history'
+                                )->isOnlyMyDivision()
+                            ); ?>" />
                             </v-multiple-select-division-v2>
                         </div>
                         <div class="my-4">
@@ -353,19 +361,15 @@
             };
             const searchClear = () => {
                 values.currentPage = 1;
-                resetForm({
-                    itemName: "",
-                    makerName: "",
-                    itemCode: "",
-                    itemStandard: "",
-                    itemJANCode: "",
-                    yearMonth: "",
-                    sourceDivisionIds: [],
-                    targetDivisionIds: [],
-                    requestType: [],
-                    currentPage: 1,
-                    perPage: values.perPage,
-                });
+                values.itemName = '';
+                values.makerName = '';
+                values.itemCode = '';
+                values.itemStandard = '';
+                values.itemJANCode = '';
+                values.yearMonth = '';
+                values.sourceDivisionIds = [];
+                values.targetDivisionIds = [];
+                values.requestType = [];
                 let targets = document.querySelectorAll(`input[type='checkbox'][name='requestType']`);
                 for (const i of targets) {
                     i.checked = false;

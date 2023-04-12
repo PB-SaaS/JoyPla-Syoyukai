@@ -31,10 +31,8 @@
                                 <label class="uk-form-label">部署</label>
                                 <div class="uk-child-width-1-1">
                                     <div>
-                                        <select class="uk-select" v-model="select_data.divisionId" v-on:change="divisionSelected">
-                                            <option value="">----- 選択してください -----</option>
-                                            <option v-for="d in divisions" :value="d.divisionId">{{ d.divisionName }}</option>
-                                        </select>
+                                        <searchable-select name="divisionId" v-model="select_data.divisionId" id="divisionId" :options="divisionOptions"></searchable-select>
+
                                     </div>
                                 </div>
                             </div>
@@ -227,9 +225,23 @@
     </div>
 </div>
 <script>
+<?php
+$options = [
+    [
+        'value' => '',
+        'text' => '----- 部署を選択してください -----',
+    ],
+];
+foreach ($division as $data) {
+    $options[] = [
+        'value' => $data->divisionId,
+        'text' => $data->divisionName,
+    ];
+}
+?>
     var datas = {
-        'divisions': <?php echo json_encode($division) ?>,
-        'hospitalName': <?php echo json_encode($hospitalName) ?>,
+        'divisions': <?php echo json_encode($division); ?>,
+        'hospitalName': <?php echo json_encode($hospitalName); ?>,
         'histories': {},
         'select_data': {
             inventoryHId: "",
@@ -246,6 +258,7 @@
         'completeDate': '',
         sort_key: "",
         sort_asc: true,
+        divisionOptions: <?php echo json_encode($options, true); ?>,
     };
 
     var app = new Vue({
@@ -260,7 +273,11 @@
                 return new Intl.NumberFormat('ja-JP').format(value);
             },
         },
-        watch: {},
+        watch: {
+            'select_data.divisionId': (newValue, oldValue) => {
+                app.divisionSelected();
+            },
+        },
         computed: {
             sort_items() {
                 if (this.sort_key != "") {
@@ -414,7 +431,7 @@
                             type: 'POST',
                             data: {
                                 Action: "divisonInventorySelectApi",
-                                _csrf: "<?php echo $csrf_token ?>",
+                                _csrf: "<?php echo $csrf_token; ?>",
                                 divisionId: app.select_data.divisionId,
                             },
                             dataType: 'json'
@@ -435,7 +452,7 @@
                             type: 'POST',
                             data: {
                                 Action: "divisonItemsSelectApi",
-                                _csrf: "<?php echo $csrf_token ?>",
+                                _csrf: "<?php echo $csrf_token; ?>",
                                 divisionId: app.select_data.divisionId,
                             },
                             dataType: 'json'
@@ -478,7 +495,7 @@
                             url: '%url/rel:mpgt:Inventory%',
                             type: 'POST',
                             data: {
-                                _csrf: "<?php echo $csrf_token ?>",
+                                _csrf: "<?php echo $csrf_token; ?>",
                                 Action: "getInventoryItemNumsApi",
                                 inventoryHId: app.select_data.inventoryHId,
                             },
@@ -500,7 +517,7 @@
                             url: '%url/rel:mpgt:Inventory%',
                             type: 'POST',
                             data: {
-                                _csrf: "<?php echo $csrf_token ?>",
+                                _csrf: "<?php echo $csrf_token; ?>",
                                 Action: "getBeforeInventoryItemNumsApi",
                                 inventoryHId: app.select_data.inventoryHId,
                                 divisionId: app.select_data.divisionId,
@@ -526,7 +543,7 @@
                             url: '%url/rel:mpgt:Inventory%',
                             type: 'POST',
                             data: {
-                                _csrf: "<?php echo $csrf_token ?>",
+                                _csrf: "<?php echo $csrf_token; ?>",
                                 Action: "getReceivingItemNumsApi",
                                 inventoryHId: app.select_data.inventoryHId,
                                 divisionId: app.select_data.divisionId,
@@ -549,7 +566,7 @@
                             url: '%url/rel:mpgt:Inventory%',
                             type: 'POST',
                             data: {
-                                _csrf: "<?php echo $csrf_token ?>",
+                                _csrf: "<?php echo $csrf_token; ?>",
                                 Action: "getConsumedItemNumsApi",
                                 inventoryHId: app.select_data.inventoryHId,
                                 divisionId: app.select_data.divisionId,
@@ -593,7 +610,9 @@
                 });
                 let url = (window.URL || window.webkitURL).createObjectURL(blob);
                 let link = document.createElement('a');
-                link.download = 'inventoryMovement_<?php echo date('Ymd'); ?>.tsv';
+                link.download = 'inventoryMovement_<?php echo date(
+                    'Ymd'
+                ); ?>.tsv';
                 link.href = url;
                 document.body.appendChild(link);
                 link.click();

@@ -75,9 +75,20 @@ class StockRepository implements StockRepositoryInterface
             $hospitalId->value()
         );
 
-        $divisionIds = array_map(function (DivisionId $divisionId) {
-            return $divisionId;
-        }, $divisionIds);
+        $division = ModelRepository::getDivisionInstance()
+            ->where('hospitalId', $hospitalId->value())
+            ->orWhere('deleteFlag', 'f')
+            ->orWhereNull('deleteFlag');
+
+        foreach ($divisionIds as $divisionId) {
+            $division->orWhere('divisionId', $divisionId->value());
+        }
+
+        $divisions = $division->get();
+        $divisionIds = [];
+        foreach ($divisions as $division) {
+            $divisionIds[] = new DivisionId($division->divisionId);
+        }
 
         $stockInstance = ModelRepository::getStockViewInstance()->where(
             'hospitalId',

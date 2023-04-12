@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja">
     <head>
-        <?php include_once "NewJoyPla/src/Head.php"; ?>
+        <?php include_once 'NewJoyPla/src/Head.php'; ?>
         <title>JoyPla 病院ユーザー情報変更 - 入力</title>
 
+        <?php include_once 'NewJoyPla/view/template/parts/Script.php'; ?>
         <style>
             .uk-navbar-container {
                 border-bottom: solid 2px #98CB00;
@@ -47,24 +48,8 @@
                                     部署
                                     <span class="need">必須</span>
                                 </dt>
-                                <dd class="data ">
-                                    <select
-                                        name="divisionId"
-                                        class="uk-select $errorInputColor:divisionId$"
-                                        >
-                                        <option value="">----- 選択してください -----</option>
-                                        <?php
-                                        foreach($division_data as $division)
-                                        {
-                                            $selected = '';
-                                            if($division->divisionId === $current_division)
-                                            {
-                                                $selected = 'selected';
-                                            }  
-                                            echo "<option value='".$division->divisionId."' ".$selected.">".$division->divisionName."</option>".PHP_EOL;
-                                        }
-                                        ?>
-                                    </select>
+                                <dd class="data " id="division">
+                                    <searchable-select name="divisionId" :error="'$errorInputColor:divisionId$' == 'error'" v-model="divisionId" :default="divisionId" :options="divisionOptions"></searchable-select>
                                     <br>
                                     <span class="msg">$error:divisionId$</span>
                                 </dd>
@@ -182,6 +167,39 @@
             </div>
         </div>
         <script>
+            <?php
+            $divisionOptions = [
+                [
+                    'value' => '',
+                    'text' => '----- 部署を選択してください -----',
+                ],
+            ];
+            foreach ($division_data as $data) {
+                if ($data->divisionType === '1') {
+                    $divisionOptions[] = [
+                        'value' => $data->divisionId,
+                        'text' => $data->divisionName,
+                    ];
+                }
+            }
+            foreach ($division_data as $data) {
+                if ($data->divisionType === '2') {
+                    $divisionOptions[] = [
+                        'value' => $data->divisionId,
+                        'text' => $data->divisionName,
+                    ];
+                }
+            }
+            ?>
+            var division = new Vue({
+                el: '#division',
+                data: {
+                    divisionOptions: <?php echo json_encode(
+                        $divisionOptions
+                    ); ?>,
+                    divisionId: "<?php echo $current_division; ?>",
+                },
+            });
             $(function () {
                 $("form").addClass(
                     "uk-form-horizontal uk-margin-large uk-text-center uk-margin-remove"

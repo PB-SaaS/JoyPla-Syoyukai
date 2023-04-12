@@ -101,11 +101,11 @@
             <div class="my-4">
               <v-input name="itemJANCode" type="text" label="JANコード" title="JANコード"></v-input>
             </div>
-            <?php if (!gate('fixed_quantity_order_slips')->isOnlyMyDivision) : ?>
+            <?php if (!gate('fixed_quantity_order_slips')->isOnlyMyDivision): ?>
               <div class="my-4">
                 <v-multiple-select-division name="divisionIds" title="発注書元部署名"></v-multiple-select-division>
               </div>
-            <?php endif ?>
+            <?php endif; ?>
             <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
               <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
               <v-button-primary type="button" @click.native="searchExec">絞り込み</v-button-primary>
@@ -390,17 +390,15 @@
       };
       const searchClear = () => {
         values.currentPage = 1;
-        resetForm({
-          itemName: "",
-          makerName: "",
-          itemCode: "",
-          itemStandard: "",
-          itemJANCode: "",
-          registerDate: "",
-          divisionIds: [],
-          currentPage: 1,
-          perPage: values.perPage,
-        });
+        values.itemName = '';
+        values.makerName = '';
+        values.itemCode = '';
+        values.itemStandard = '';
+        values.itemJANCode = '';
+        values.yearMonth = '';
+        values.divisionIds = [];
+        values.requestType = [];
+        values.registerDate = [];
         listGet();
       };
 

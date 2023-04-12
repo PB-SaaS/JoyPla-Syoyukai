@@ -374,17 +374,15 @@ var JoyPlaApp = Vue.createApp({
       const searchClear = () =>
       {
         values.currentPage = 1;
-        resetForm({
-          itemName  : "",
-          makerName : "",
-          itemCode : "",
-          itemStandard :  "",
-          itemJANCode :  "",
-          yearMonth: "",
-          divisionIds: [],
-          currentPage : 1,
-          perPage: values.perPage,
-        });
+        
+        values.itemName = '';
+        values.makerName = '';
+        values.itemCode = '';
+        values.itemStandard = '';
+        values.itemJANCode = '';
+        values.yearMonth = '';
+        values.divisionIds = [];
+        
         listGet();
       };
 

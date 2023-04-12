@@ -81,37 +81,18 @@
         <div class="uk-container uk-container-expand uk-margin-top">
             <ul class="uk-breadcrumb">
                 <li><a href="%url/rel:mpg:top%">TOP</a></li>
-                <?php if($isOldTopPage): ?>
+                <?php if ($isOldTopPage): ?>
                 <li><a href="%url/rel:mpg:top%&page=page5">貸出</a></li>
                 <?php else: ?>
                 <li><a href="%url/rel:mpg:top%&path=lending">貸出メニュー</a></li>
-                <?php endif ?>
+                <?php endif; ?>
                 <li><span>貸出登録</span></li>
             </ul>
             <h2 class="page_title">貸出登録</h2>
             <hr>
             <div class="uk-width-1-3@m">
                 <div class="uk-margin">
-                    <select class="uk-select" name="busyo" v-model="divisionId" v-bind:disabled="lists.length > 0">
-                        <option value="">----- 部署選択 -----</option>
-                        <?php
-                        foreach($divisionData->data as $data)
-                        {
-                            if($data->divisionType === '1')
-                            {
-                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
-                                echo '<option value="" disabled>--------------------</option>';
-                            }
-                        }
-                        foreach($divisionData->data as $data)
-                        {
-                            if($data->divisionType === '2')
-                            {
-                                echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
-                            }
-                        }
-                        ?>
-                    </select>
+                    <searchable-select name="busyo" v-model="divisionId" v-bind:disabled="lists.length > 0" :options="divisionOptions"></searchable-select>
                 </div>
             </div>
             <div class="uk-margin-bottom">
@@ -119,9 +100,9 @@
                     <button class="uk-button uk-button-default"  v-on:click="sanshouClick">商品マスタを開く</button>
                     <button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
                     <button class="uk-button uk-button-primary " v-on:click="borrowingRegist">貸出リスト登録</button>
-                    <?php if(!$user_info->isDistributorUser()): ?>
+                    <?php if (!$user_info->isDistributorUser()): ?>
                     <button class="uk-button uk-button-primary "  v-on:click="usedReport">使用申請</button>
-                    <?php endif ?>
+                    <?php endif; ?>
                 </div>
             </div>
             <div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky" class="uk-padding-top uk-background-muted uk-padding-small">
@@ -309,13 +290,39 @@
     </div>
 </div>
 <script>
-let now_date = '<?php echo date("Y-m-d") ?>';
-
+let now_date = '<?php echo date('Y-m-d'); ?>';
+<?php
+$options = [
+    [
+        'value' => '',
+        'text' => '----- 部署を選択してください -----',
+    ],
+];
+foreach ($divisionData->data as $data) {
+    if ($data->divisionType === '1') {
+        $options[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+foreach ($divisionData->data as $data) {
+    if ($data->divisionType === '2') {
+        $options[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+$defaultDivisionId = $user_info->isUser() ? $user_info->getDivisionId() : '';
+?>
 var app = new Vue({
     el: '#app',
     data: {
         lists: [],
-        divisionId: "<?php echo ($user_info->isUser())? $user_info->getDivisionId() : "" ; ?>",
+        divisionId: '',
+        divisionOptions: <?php echo json_encode($options); ?>,
+        divisionId: "<?php echo $defaultDivisionId; ?>",
         allUsedDate: now_date,
         canAjax : true,
         useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
@@ -535,10 +542,10 @@ var app = new Vue({
                 loading();
                 $.ajax({
                     async: false,
-                    url: "<?php echo $api_url ?>",
+                    url: "<?php echo $api_url; ?>",
                     type:'POST',
                     data:{
-                        _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+                        _csrf: "<?php echo $csrf_token; ?>",  // CSRFトークンを送信
                         Action : "borrowingRegistApi",
                         borrowing : JSON.stringify( objectValueToURIencode(app.lists) ),
                         divisionId : app.divisionId
@@ -590,11 +597,11 @@ var app = new Vue({
                 loading();
                 $.ajax({
                     async: true,
-                    url: "<?php echo $api_url ?>",
+                    url: "<?php echo $api_url; ?>",
                     type:'POST',
                     data:{
-                        _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
-                        Action : "<?php echo $borrowingAction ?>",
+                        _csrf: "<?php echo $csrf_token; ?>",  // CSRFトークンを送信
+                        Action : "<?php echo $borrowingAction; ?>",
                         divisionId : app.divisionId,
                         borrowing : JSON.stringify( objectValueToURIencode(app.lists) ),
                     },
@@ -632,10 +639,10 @@ var app = new Vue({
             }
             $.ajax({
                 async: false,
-                url:'<?php echo $label_api_url ?>',
+                url:'<?php echo $label_api_url; ?>',
                 type:'POST',
                 data:{
-                    _csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+                    _csrf: "<?php echo $csrf_token; ?>",  // CSRFトークンを送信
                     divisionId :app.divisionId,
                     barcode : barcode,
                 },

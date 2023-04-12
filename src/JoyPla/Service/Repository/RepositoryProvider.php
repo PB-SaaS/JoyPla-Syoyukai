@@ -2,6 +2,7 @@
 
 namespace JoyPla\Service\Repository;
 
+use JoyPla\InterfaceAdapters\GateWays\Repository\AccountantRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\BarcodeRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\CardRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ConsumptionHistoryRepository;
@@ -135,5 +136,10 @@ class RepositoryProvider
     public function getTotalizationRepository()
     {
         return new TotalizationRepository();
+    }
+
+    public function getAccountantRepository()
+    {
+        return new AccountantRepository();
     }
 }

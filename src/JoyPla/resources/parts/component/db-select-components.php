@@ -1,436 +1,504 @@
 const vSelectDivision = {
-components: {
-'v-select': vSelect
-},
-props: {
-name: {
-type: String,
-required: true,
-default: 'divisionId'
-},
-label: {
-type: String,
-required: false,
-default: ""
-},
-rules: {
-type: Object,
-required: false,
-default: {}
-},
-title: {
-type: String,
-required: false,
-default: ""
-},
-isOnlyMyDivision: {
-type: Boolean,
-required: false,
-default: false
-},
-},
-watch: {},
-data() {
-return {
-options: [{
-label: "----- 部署を選択してください -----",
-value: ""
-}]
-}
-},
-mounted() {
-this.load();
-},
-methods: {
-load() {
-let self = this;
-let params = new URLSearchParams();
-params.append("path", "/api/division/index");
-params.append("isOnlyMyDivision", this.isOnlyMyDivision);
-params.append("_csrf", _CSRF);
-axios
-.post(_APIURL, params)
-.then((response) => {
-let options = self.options;
-if (response.data.data.length === 1) {
-options = [];
-}
-response.data.data.forEach(function(x, i) {
-options.push({
-label: x.divisionName,
-value: x.divisionId
-});
-});
-self.options = options;
-})
-.catch((error) => {
-console.log(error);
-});
-}
-},
-template: `
-<v-select :options="options" :name="name" :rules="rules" :title="title" :label="label" :disabled="disabled"></v-select>
-`
+  components: {
+    "searchable-dropdown": SearchableDropdown,
+  },
+  props: {
+    name: {
+      type: String,
+      required: true,
+      default: "divisionId",
+    },
+    label: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    rules: {
+      type: Object,
+      required: false,
+      default: {},
+    },
+    title: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    isOnlyMyDivision: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    absolute: {
+      type: Boolean,
+      required: false,
+      default: true,
+    }
+  },
+  watch: {},
+  data() {
+    return {
+      options: [
+        {
+          label: "----- 部署を選択してください -----",
+          value: "",
+        },
+      ],
+      selectedOption: "",
+    };
+  },
+  mounted() {
+    this.load();
+  },
+  methods: {
+    load() {
+      let self = this;
+      let params = new URLSearchParams();
+      params.append("path", "/api/division/index");
+      params.append("isOnlyMyDivision", this.isOnlyMyDivision);
+      params.append("_csrf", _CSRF);
+      axios
+        .post(_APIURL, params)
+        .then((response) => {
+          let options = self.options;
+          if (response.data.data.length === 1) {
+            options = [];
+          }
+          response.data.data.forEach(function (x, i) {
+            options.push({
+              label: x.divisionName,
+              value: x.divisionId,
+            });
+          });
+          self.options = options;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+  },
+  template: `<searchable-dropdown
+    :name="name" :rules="rules" :title="title" :label="label" :disabled="disabled" :absolute="absolute"
+    :options="options"
+    @input="selectedOption = $event"
+  ></searchable-dropdown>
+    `,
+};
+
+const vSelectDistributor= {
+  components: {
+    "searchable-dropdown": SearchableDropdown,
+  },
+  props: {
+    name: {
+      type: String,
+      required: true,
+      default: "divisionId",
+    },
+    label: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    rules: {
+      type: Object,
+      required: false,
+      default: {},
+    },
+    title: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    absolute: {
+      type: Boolean,
+      required: false,
+      default: true,
+    }
+  },
+  watch: {},
+  data() {
+    return {
+      options: [
+        {
+          label: "----- 卸業者を選択してください -----",
+          value: "",
+        },
+      ],
+      selectedOption: "",
+    };
+  },
+  mounted() {
+    this.load();
+  },
+  methods: {
+    load() {
+      let self = this;
+      let params = new URLSearchParams();
+      params.append("path", "/api/distributor/index");
+      params.append("_csrf", _CSRF);
+      axios
+        .post(_APIURL, params)
+        .then((response) => {
+          let options = self.options;
+          if (response.data.data.length === 1) {
+            options = [];
+          }
+          response.data.data.forEach(function (x, i) {
+            options.push({
+              label: x.distributorName,
+              value: x.distributorId,
+            });
+          });
+          self.options = options;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+  },
+  template: `<searchable-dropdown
+    :name="name" :rules="rules" :title="title" :label="label" :disabled="disabled" :absolute="absolute"
+    :options="options"
+    @input="selectedOption = $event"
+  ></searchable-dropdown>
+    `,
 };
 
 const vMultipleSelectDivision = {
-components: {
-'v-multiple-select': vMultipleSelect
-},
-setup(props) {
-const {
-ref,
-onMounted
-} = Vue;
+  components: {
+    "v-multiple-select": vMultipleSelect,
+  },
+  setup(props) {
+    const { ref, onMounted } = Vue;
 
-const options = ref([]);
-const load = () => {
-let self = this;
-let params = new URLSearchParams();
-params.append("path", "/api/division/index");
-params.append("_csrf", _CSRF);
-axios
-.post(_APIURL, params)
-.then((response) => {
-response
-.data
-.data
-.forEach(function(x, i) {
-options
-.value
-.push({
-label: x.divisionName,
-value: x.divisionId
-});
-});
-})
-.catch((error) => {
-console.log(error);
-});
-};
+    const options = ref([]);
+    const load = () => {
+      let self = this;
+      let params = new URLSearchParams();
+      params.append("path", "/api/division/index");
+      params.append("_csrf", _CSRF);
+      axios
+        .post(_APIURL, params)
+        .then((response) => {
+          response.data.data.forEach(function (x, i) {
+            options.value.push({
+              label: x.divisionName,
+              value: x.divisionId,
+            });
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
 
-onMounted(() => {
-load();
-});
+    onMounted(() => {
+      load();
+    });
 
-return {
-options
-}
-},
-props: {
-name: {
-type: String,
-required: true,
-default: 'divisionIds'
-},
-title: {
-type: String,
-required: true,
-default: ''
-}
-},
-template: `
+    return {
+      options,
+    };
+  },
+  props: {
+    name: {
+      type: String,
+      required: true,
+      default: "divisionIds",
+    },
+    title: {
+      type: String,
+      required: true,
+      default: "",
+    },
+  },
+  template: `
 <v-multiple-select :name="name" :title="title" :options="options" id="multipleDivision" />
-`
+`,
 };
 
 const vMultipleSelectDistributor = {
-components: {
-'v-multiple-select': vMultipleSelect
-},
-setup(props) {
-const {
-ref,
-onMounted
-} = Vue;
+  components: {
+    "v-multiple-select": vMultipleSelect,
+  },
+  setup(props) {
+    const { ref, onMounted } = Vue;
 
-const options = ref([]);
-const load = () => {
-let self = this;
-let params = new URLSearchParams();
-params.append("path", "/api/distributor/index");
-params.append("_csrf", _CSRF);
-axios
-.post(_APIURL, params)
-.then((response) => {
-response
-.data
-.data
-.forEach(function(x, i) {
-options
-.value
-.push({
-label: x.distributorName,
-value: x.distributorId
-});
-});
-})
-.catch((error) => {
-console.log(error);
-});
-};
+    const options = ref([]);
+    const load = () => {
+      let self = this;
+      let params = new URLSearchParams();
+      params.append("path", "/api/distributor/index");
+      params.append("_csrf", _CSRF);
+      axios
+        .post(_APIURL, params)
+        .then((response) => {
+          response.data.data.forEach(function (x, i) {
+            options.value.push({
+              label: x.distributorName,
+              value: x.distributorId,
+            });
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
 
-onMounted(() => {
-load();
-});
+    onMounted(() => {
+      load();
+    });
 
-return {
-options
-}
-},
-props: {
-name: {
-type: String,
-required: true,
-default: 'distributorIds'
-},
-title: {
-type: String,
-required: true,
-default: ''
-}
-},
-template: `
+    return {
+      options,
+    };
+  },
+  props: {
+    name: {
+      type: String,
+      required: true,
+      default: "distributorIds",
+    },
+    title: {
+      type: String,
+      required: true,
+      default: "",
+    },
+  },
+  template: `
 <v-multiple-select :name="name" :title="title" :options="options" id="multipleDistributor" />
-`
+`,
 };
 
 const vInHospitalItemModal = {
-props: {
-unitPriceUse: {
-type: Boolean,
-required: true,
-default: '1'
-},
-},
-setup(props, context) {
-const {
-ref,
-toRef,
-toRefs,
-reactive,
-onMounted
-} = Vue;
-const {
-useForm
-} = VeeValidate;
+  props: {
+    unitPriceUse: {
+      type: Boolean,
+      required: true,
+      default: "1",
+    },
+  },
+  setup(props, context) {
+    const { ref, toRef, toRefs, reactive, onMounted } = Vue;
+    const { useForm } = VeeValidate;
 
-const loading = ref(false);
-const start = () => {
-loading.value = true;
-}
+    const loading = ref(false);
+    const start = () => {
+      loading.value = true;
+    };
 
-const complete = () => {
-loading.value = false;
-}
+    const complete = () => {
+      loading.value = false;
+    };
 
-const sleepComplate = () => {
-window.setTimeout(function() {
-complete();
-}, 500);
-}
-start();
+    const sleepComplate = () => {
+      window.setTimeout(function () {
+        complete();
+      }, 500);
+    };
+    start();
 
-onMounted(() => {
-sleepComplate()
-});
+    onMounted(() => {
+      sleepComplate();
+    });
 
-const {
-meta,
-validate,
-values,
-setFieldValue
-} = useForm({
-initialValues: {
-itemName: "",
-makerName: "",
-itemCode: "",
-itemStandard: "",
-itemJANCode: "",
-distributorIds: [],
-perPage: "10",
-currentPage: 1
-}
-});
+    const { meta, validate, values, setFieldValue } = useForm({
+      initialValues: {
+        itemName: "",
+        makerName: "",
+        itemCode: "",
+        itemStandard: "",
+        itemJANCode: "",
+        distributorIds: [],
+        perPage: "10",
+        currentPage: 1,
+      },
+    });
 
-const Toast = Swal.mixin({
-toast: true,
-position: 'top-end',
-showConfirmButton: false,
-timer: 3000,
-timerProgressBar: true,
-showCloseButton: true,
-didOpen: (toast) => {
-toast.addEventListener('mouseenter', Swal.stopTimer)
-toast.addEventListener('mouseleave', Swal.resumeTimer)
-}
-});
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      showCloseButton: true,
+      didOpen: (toast) => {
+        toast.addEventListener("mouseenter", Swal.stopTimer);
+        toast.addEventListener("mouseleave", Swal.resumeTimer);
+      },
+    });
 
-const showPages = ref(5);
-const totalCount = ref(0);
-const inHospitalItems = ref([]);
-const currentTab = ref('list');
-const tabs = [{
-label: 'リスト',
-value: 'list',
-disabled: false
-}, {
-label: '検索',
-value: 'search',
-disabled: false
-}];
-const perPageOptions = [{
-label: "10件表示",
-value: "10"
-}, {
-label: "50件表示",
-value: "50"
-}, {
-label: "100件表示",
-value: "100"
-}];
+    const showPages = ref(5);
+    const totalCount = ref(0);
+    const inHospitalItems = ref([]);
+    const currentTab = ref("list");
+    const tabs = [
+      {
+        label: "リスト",
+        value: "list",
+        disabled: false,
+      },
+      {
+        label: "検索",
+        value: "search",
+        disabled: false,
+      },
+    ];
+    const perPageOptions = [
+      {
+        label: "10件表示",
+        value: "10",
+      },
+      {
+        label: "50件表示",
+        value: "50",
+      },
+      {
+        label: "100件表示",
+        value: "100",
+      },
+    ];
 
-const numberFormat = (value) => {
-if (!value) {
-return 0;
-}
-return value
-.toString()
-.replace(/([0-9]+?)(?=(?:[0-9]{3})+$)/g, '$1,');
-};
+    const numberFormat = (value) => {
+      if (!value) {
+        return 0;
+      }
+      return value.toString().replace(/([0-9]+?)(?=(?:[0-9]{3})+$)/g, "$1,");
+    };
 
-const currentPageEdited = ref(1);
+    const currentPageEdited = ref(1);
 
-const searchExec = () => {
-currentPageEdited.value = 1;
-listGet();
-};
+    const searchExec = () => {
+      currentPageEdited.value = 1;
+      listGet();
+    };
 
-const searchCount = ref(0);
+    const searchCount = ref(0);
 
+    const listGet = () => {
+      let params = new URLSearchParams();
+      params.append("path", "/api/inHospitalItem/index");
+      params.append("search", JSON.stringify(encodeURIToObject(values)));
+      params.append("_csrf", _CSRF);
 
-const listGet = () => {
-let params = new URLSearchParams();
-params.append("path", "/api/inHospitalItem/index");
-params.append("search", JSON.stringify(encodeURIToObject(values)));
-params.append("_csrf", _CSRF);
+      start();
 
-start();
+      axios
+        .post(_APIURL, params)
+        .then((response) => {
+          if (props.unitPriceUse !== "1") {
+            response.data.data.forEach((x, id) => {
+              response.data.data[id].unitPrice = x.price / x.quantity;
+            });
+          }
+          inHospitalItems.value = response.data.data;
+          totalCount.value = parseInt(response.data.count);
+          currentTab.value = "list";
+        })
+        .catch((error) => {
+          complete();
+          if (searchCount.value > 0) {
+            Toast.fire({
+              icon: "error",
+              title: "検索に失敗しました。再度お試しください。",
+            });
+          }
+          searchCount.value++;
+        })
+        .then(() => {
+          complete();
+          if (
+            document
+              .getElementById("inHospitalItemModal")
+              .classList.contains("is-open") == true
+          ) {
+            searchCount.value++;
+            if (searchCount.value > 0) {
+              Toast.fire({
+                icon: "success",
+                title: "検索が完了しました",
+              });
+            }
+          }
+        });
+    };
 
-axios
-.post(_APIURL, params)
-.then((response) => {
-if (props.unitPriceUse !== '1') {
-response.data.data.forEach((x, id) => {
-response.data.data[id].unitPrice = (x.price / x.quantity);
-});
-}
-inHospitalItems.value = response.data.data;
-totalCount.value = parseInt(response.data.count);
-currentTab.value = 'list';
-})
-.catch((error) => {
-complete();
-if (searchCount.value > 0) {
-Toast.fire({
-icon: 'error',
-title: '検索に失敗しました。再度お試しください。'
-})
-}
-searchCount.value++;
-})
-.then(() => {
-complete();
-if (document.getElementById('inHospitalItemModal').classList.contains('is-open') == true) {
-searchCount.value++;
-if (searchCount.value > 0) {
-Toast.fire({
-icon: 'success',
-title: '検索が完了しました'
-})
-}
-}
-});
-};
+    const getCurrentTab = (tab) => {
+      currentTab.value = tab;
+    };
 
-const getCurrentTab = (tab) => {
-currentTab.value = tab;
-};
+    const changeParPage = () => {
+      currentPageEdited.value = 1;
+      listGet();
+    };
 
-const changeParPage = () => {
-currentPageEdited.value = 1;
-listGet();
-};
+    const searchClear = () => {
+      setFieldValue("itemName", "");
+      setFieldValue("makerName", "");
+      setFieldValue("itemCode", "");
+      setFieldValue("itemStandard", "");
+      setFieldValue("itemJANCode", "");
+      setFieldValue("distributorIds", []);
+      listGet();
+    };
+    const add = (elem) => {
+      context.emit("additem", elem);
+      Toast.fire({
+        icon: "success",
+        title: "反映しました",
+      });
+    };
 
-const searchClear = () => {
-setFieldValue('itemName', '');
-setFieldValue('makerName', '');
-setFieldValue('itemCode', '');
-setFieldValue('itemStandard', '');
-setFieldValue('itemJANCode', '');
-setFieldValue('distributorIds', []);
-listGet();
-};
-const add = (elem) => {
-context.emit('additem', elem);
-Toast.fire({
-icon: 'success',
-title: '反映しました'
-})
-};
+    onMounted(() => {
+      listGet();
+    });
 
-onMounted(() => {
-listGet();
-});
-
-return {
-loading,
-start,
-complete,
-currentPageEdited,
-values,
-searchExec,
-showPages,
-totalCount,
-inHospitalItems,
-currentTab,
-tabs,
-perPageOptions,
-listGet,
-getCurrentTab,
-changeParPage,
-searchClear,
-add,
-numberFormat
-}
-},
-emits: ['additem'],
-components: {
-'v-loading': vLoading,
-'v-tab': vTab,
-'v-input': vInput,
-'v-select': vSelect,
-'v-select-division': vSelectDivision,
-'v-multiple-select-distributorId': vMultipleSelectDistributor,
-'v-pagination': vPagination,
-'v-open-modal': vOpenModal,
-'v-button-default': vButtonDefault,
-'v-button-primary': vButtonPrimary,
-'v-input-number': vInputNumber,
-'item-view': itemView,
-'blowing': blowing
-},
-watch: {
-currentPageEdited() {
-this.values.currentPage = this.currentPageEdited;
-this.listGet();
-document
-.getElementById('inHospitalItemsList')
-.scrollTop = 0;
-}
-},
-methods: {},
-template: `
+    return {
+      loading,
+      start,
+      complete,
+      currentPageEdited,
+      values,
+      searchExec,
+      showPages,
+      totalCount,
+      inHospitalItems,
+      currentTab,
+      tabs,
+      perPageOptions,
+      listGet,
+      getCurrentTab,
+      changeParPage,
+      searchClear,
+      add,
+      numberFormat,
+    };
+  },
+  emits: ["additem"],
+  components: {
+    "v-loading": vLoading,
+    "v-tab": vTab,
+    "v-input": vInput,
+    "v-select": vSelect,
+    "v-select-division": vSelectDivision,
+    "v-multiple-select-distributorId": vMultipleSelectDistributor,
+    "v-pagination": vPagination,
+    "v-open-modal": vOpenModal,
+    "v-button-default": vButtonDefault,
+    "v-button-primary": vButtonPrimary,
+    "v-input-number": vInputNumber,
+    "item-view": itemView,
+    blowing: blowing,
+  },
+  watch: {
+    currentPageEdited() {
+      this.values.currentPage = this.currentPageEdited;
+      this.listGet();
+      document.getElementById("inHospitalItemsList").scrollTop = 0;
+    },
+  },
+  methods: {},
+  template: `
 <v-loading :show="loading"></v-loading>
 <teleport to="body">
   <v-open-modal id="inHospitalItemModal" headtext="商品検索" @show="listGet">
@@ -544,240 +612,230 @@ template: `
     </div>
   </v-open-modal>
 </teleport>
-`
+`,
 };
 
 const vOrderItemModal = {
-setup(props, context) {
-const {
-ref,
-toRef,
-toRefs,
-reactive,
-onMounted
-} = Vue;
-const {
-useForm
-} = VeeValidate;
+  setup(props, context) {
+    const { ref, toRef, toRefs, reactive, onMounted } = Vue;
+    const { useForm } = VeeValidate;
 
-const loading = ref(false);
-const start = () => {
-loading.value = true;
-}
+    const loading = ref(false);
+    const start = () => {
+      loading.value = true;
+    };
 
-const complete = () => {
-loading.value = false;
-}
+    const complete = () => {
+      loading.value = false;
+    };
 
-const sleepComplate = () => {
-window.setTimeout(function() {
-complete();
-}, 500);
-}
-start();
+    const sleepComplate = () => {
+      window.setTimeout(function () {
+        complete();
+      }, 500);
+    };
+    start();
 
-onMounted(() => {
-sleepComplate()
-listGet();
-});
+    onMounted(() => {
+      sleepComplate();
+      listGet();
+    });
 
-const {
-meta,
-validate,
-values,
-setFieldValue
-} = useForm({
-initialValues: {
-orderDate: "",
-itemName: "",
-makerName: "",
-itemCode: "",
-itemStandard: "",
-itemJANCode: "",
-distributorIds: [],
-divisionIds: [],
-perPage: "10",
-currentPage: 1
-}
-});
+    const { meta, validate, values, setFieldValue } = useForm({
+      initialValues: {
+        orderDate: "",
+        itemName: "",
+        makerName: "",
+        itemCode: "",
+        itemStandard: "",
+        itemJANCode: "",
+        distributorIds: [],
+        divisionIds: [],
+        perPage: "10",
+        currentPage: 1,
+      },
+    });
 
-const Toast = Swal.mixin({
-toast: true,
-position: 'top-end',
-showConfirmButton: false,
-timer: 3000,
-timerProgressBar: true,
-showCloseButton: true,
-didOpen: (toast) => {
-toast.addEventListener('mouseenter', Swal.stopTimer)
-toast.addEventListener('mouseleave', Swal.resumeTimer)
-}
-});
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      showCloseButton: true,
+      didOpen: (toast) => {
+        toast.addEventListener("mouseenter", Swal.stopTimer);
+        toast.addEventListener("mouseleave", Swal.resumeTimer);
+      },
+    });
 
-const showPages = ref(5);
-const totalCount = ref(0);
-const orders = ref([]);
-const currentTab = ref('list');
-const tabs = [{
-label: 'リスト',
-value: 'list',
-disabled: false
-}, {
-label: '検索',
-value: 'search',
-disabled: false
-}];
-const perPageOptions = [{
-label: "10件表示",
-value: "10"
-}, {
-label: "50件表示",
-value: "50"
-}, {
-label: "100件表示",
-value: "100"
-}];
+    const showPages = ref(5);
+    const totalCount = ref(0);
+    const orders = ref([]);
+    const currentTab = ref("list");
+    const tabs = [
+      {
+        label: "リスト",
+        value: "list",
+        disabled: false,
+      },
+      {
+        label: "検索",
+        value: "search",
+        disabled: false,
+      },
+    ];
+    const perPageOptions = [
+      {
+        label: "10件表示",
+        value: "10",
+      },
+      {
+        label: "50件表示",
+        value: "50",
+      },
+      {
+        label: "100件表示",
+        value: "100",
+      },
+    ];
 
-const numberFormat = (value) => {
-if (!value) {
-return 0;
-}
-return value
-.toString()
-.replace(/([0-9]+?)(?=(?:[0-9]{3})+$)/g, '$1,');
-};
+    const numberFormat = (value) => {
+      if (!value) {
+        return 0;
+      }
+      return value.toString().replace(/([0-9]+?)(?=(?:[0-9]{3})+$)/g, "$1,");
+    };
 
-const searchExec = () => {
-currentPageEdited.value = 1;
-listGet();
-};
+    const searchExec = () => {
+      currentPageEdited.value = 1;
+      listGet();
+    };
 
-const searchCount = ref(0);
+    const searchCount = ref(0);
 
-const listGet = () => {
-let params = new URLSearchParams();
-params.append("path", "/api/order/unreceivedShow");
-params.append("search", JSON.stringify(encodeURIToObject(values)));
-params.append("_csrf", _CSRF);
+    const listGet = () => {
+      let params = new URLSearchParams();
+      params.append("path", "/api/order/unreceivedShow");
+      params.append("search", JSON.stringify(encodeURIToObject(values)));
+      params.append("_csrf", _CSRF);
 
-start();
+      start();
 
-axios
-.post(_APIURL, params)
-.then((response) => {
-orders.value = response.data.data;
-totalCount.value = parseInt(response.data.count);
-currentTab.value = 'list';
-})
-.catch((error) => {
-complete();
-if (searchCount.value > 0) {
-Toast.fire({
-icon: 'error',
-title: '検索に失敗しました。再度お試しください。'
-})
-}
-searchCount.value++;
-})
-.then(() => {
-complete();
-if (searchCount.value > 0) {
-Toast.fire({
-icon: 'success',
-title: '検索が完了しました'
-})
-}
-searchCount.value++;
-});
-};
+      axios
+        .post(_APIURL, params)
+        .then((response) => {
+          orders.value = response.data.data;
+          totalCount.value = parseInt(response.data.count);
+          currentTab.value = "list";
+        })
+        .catch((error) => {
+          complete();
+          if (searchCount.value > 0) {
+            Toast.fire({
+              icon: "error",
+              title: "検索に失敗しました。再度お試しください。",
+            });
+          }
+          searchCount.value++;
+        })
+        .then(() => {
+          complete();
+          if (searchCount.value > 0) {
+            Toast.fire({
+              icon: "success",
+              title: "検索が完了しました",
+            });
+          }
+          searchCount.value++;
+        });
+    };
 
-const getCurrentTab = (tab) => {
-currentTab.value = tab;
-};
+    const getCurrentTab = (tab) => {
+      currentTab.value = tab;
+    };
 
-const currentPageEdited = ref(1);
+    const currentPageEdited = ref(1);
 
-const changeParPage = () => {
-currentPageEdited.value = 1;
-listGet();
-};
+    const changeParPage = () => {
+      currentPageEdited.value = 1;
+      listGet();
+    };
 
-const searchClear = () => {
-setFieldValue('orderDate', '');
-setFieldValue('itemName', '');
-setFieldValue('makerName', '');
-setFieldValue('itemCode', '');
-setFieldValue('itemStandard', '');
-setFieldValue('itemJANCode', '');
-setFieldValue('distributorIds', []);
-setFieldValue('divisionIds', []);
-listGet();
-};
-const add = (list, idx) => {
-context.emit('additem', list, idx);
-Toast.fire({
-icon: 'success',
-title: '反映しました'
-})
-};
+    const searchClear = () => {
+      setFieldValue("orderDate", "");
+      setFieldValue("itemName", "");
+      setFieldValue("makerName", "");
+      setFieldValue("itemCode", "");
+      setFieldValue("itemStandard", "");
+      setFieldValue("itemJANCode", "");
+      setFieldValue("distributorIds", []);
+      setFieldValue("divisionIds", []);
+      listGet();
+    };
+    const add = (list, idx) => {
+      context.emit("additem", list, idx);
+      Toast.fire({
+        icon: "success",
+        title: "反映しました",
+      });
+    };
 
-return {
-loading,
-start,
-complete,
-currentPageEdited,
-values,
-searchExec,
-showPages,
-totalCount,
-orders,
-currentTab,
-tabs,
-perPageOptions,
-listGet,
-getCurrentTab,
-changeParPage,
-searchClear,
-add,
-numberFormat
-}
-},
-props: {
-isOnlyMyDivision: {
-type: Boolean,
-required: false,
-default: false
-}
-},
-emits: ['additem'],
-components: {
-'v-loading': vLoading,
-'v-tab': vTab,
-'v-input': vInput,
-'v-select': vSelect,
-'v-select-division': vSelectDivision,
-'v-multiple-select-distributor': vMultipleSelectDistributor,
-'v-multiple-select-division': vMultipleSelectDivision,
-'v-pagination': vPagination,
-'v-open-modal': vOpenModal,
-'v-button-default': vButtonDefault,
-'v-button-primary': vButtonPrimary,
-'v-input-number': vInputNumber,
-'item-view': itemView,
-'blowing': blowing,
-'v-text': vText,
-},
-watch: {
-currentPageEdited() {
-this.values.currentPage = this.currentPageEdited;
-this.listGet();
-document
-.getElementById('ordersList')
-.scrollTop = 0;
-}
-},
-methods: {},
-template: `
+    return {
+      loading,
+      start,
+      complete,
+      currentPageEdited,
+      values,
+      searchExec,
+      showPages,
+      totalCount,
+      orders,
+      currentTab,
+      tabs,
+      perPageOptions,
+      listGet,
+      getCurrentTab,
+      changeParPage,
+      searchClear,
+      add,
+      numberFormat,
+    };
+  },
+  props: {
+    isOnlyMyDivision: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
+  emits: ["additem"],
+  components: {
+    "v-loading": vLoading,
+    "v-tab": vTab,
+    "v-input": vInput,
+    "v-select": vSelect,
+    "v-select-division": vSelectDivision,
+    "v-multiple-select-distributor": vMultipleSelectDistributor,
+    "v-multiple-select-division": vMultipleSelectDivision,
+    "v-pagination": vPagination,
+    "v-open-modal": vOpenModal,
+    "v-button-default": vButtonDefault,
+    "v-button-primary": vButtonPrimary,
+    "v-input-number": vInputNumber,
+    "item-view": itemView,
+    blowing: blowing,
+    "v-text": vText,
+  },
+  watch: {
+    currentPageEdited() {
+      this.values.currentPage = this.currentPageEdited;
+      this.listGet();
+      document.getElementById("ordersList").scrollTop = 0;
+    },
+  },
+  methods: {},
+  template: `
 <v-loading :show="loading"></v-loading>
 <teleport to="body">
   <v-open-modal id="orderItemModal" headtext="商品検索" @show="listGet">
@@ -920,106 +978,100 @@ template: `
     </div>
   </v-open-modal>
 </teleport>
-`
+`,
 };
 
 const vBarcodeSearch = {
-setup(props, {
-emit
-}) {
-const {
-ref
-} = Vue;
-const {
-useForm
-} = VeeValidate;
-const {
-handleSubmit,
-control,
-meta,
-validate,
-values,
-isSubmitting,
-resetForm
-} = useForm({
-initialValues: {
-barcode: ""
-},
-validateOnMount: false
-});
+  setup(props, { emit }) {
+    const { ref } = Vue;
+    const { useForm } = VeeValidate;
+    const {
+      handleSubmit,
+      control,
+      meta,
+      validate,
+      values,
+      isSubmitting,
+      resetForm,
+    } = useForm({
+      initialValues: {
+        barcode: "",
+      },
+      validateOnMount: false,
+    });
 
-const loading = ref(false);
-const start = () => {
-loading.value = true;
-}
+    const loading = ref(false);
+    const start = () => {
+      loading.value = true;
+    };
 
-const complete = () => {
-loading.value = false;
-}
+    const complete = () => {
+      loading.value = false;
+    };
 
-const Toast = Swal.mixin({
-toast: true,
-position: 'top-end',
-showConfirmButton: false,
-timer: 3000,
-timerProgressBar: true,
-showCloseButton: true,
-didOpen: (toast) => {
-toast.addEventListener('mouseenter', Swal.stopTimer)
-toast.addEventListener('mouseleave', Swal.resumeTimer)
-}
-});
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      showCloseButton: true,
+      didOpen: (toast) => {
+        toast.addEventListener("mouseenter", Swal.stopTimer);
+        toast.addEventListener("mouseleave", Swal.resumeTimer);
+      },
+    });
 
-const getInHospitalItem = () => {
-if (!values.barcode) {
-return false;
-}
-let params = new URLSearchParams();
-params.append("path", "/api/barcode/search");
-params.append("barcode", values.barcode);
-params.append("_csrf", _CSRF);
-start();
+    const getInHospitalItem = () => {
+      if (!values.barcode) {
+        return false;
+      }
+      let params = new URLSearchParams();
+      params.append("path", "/api/barcode/search");
+      params.append("barcode", values.barcode);
+      params.append("_csrf", _CSRF);
+      start();
 
-axios
-.post(_APIURL, params)
-.then((response) => {
-complete();
-emit('additem', response.data.data);
-resetForm({
-barcode: ""
-});
-})
-.catch((error) => {
-complete();
-resetForm({
-barcode: ""
-});
-Toast.fire({
-icon: 'error',
-title: '検索に失敗しました。再度お試しください。'
-})
-})
-};
+      axios
+        .post(_APIURL, params)
+        .then((response) => {
+          complete();
+          emit("additem", response.data.data);
+          resetForm({
+            barcode: "",
+          });
+        })
+        .catch((error) => {
+          complete();
+          resetForm({
+            barcode: "",
+          });
+          Toast.fire({
+            icon: "error",
+            title: "検索に失敗しました。再度お試しください。",
+          });
+        });
+    };
 
-return {
-getInHospitalItem,
-values,
-loading
-}
-},
-components: {
-'v-button-primary': vButtonPrimary,
-'v-input': vInput,
-'v-text': vText,
-'v-loading': vLoading
-},
-props: {},
-methods: {
-onEnter: function() {
-this.getInHospitalItem();
-}
-},
-template: `
+    return {
+      getInHospitalItem,
+      values,
+      loading,
+    };
+  },
+  components: {
+    "v-button-primary": vButtonPrimary,
+    "v-input": vInput,
+    "v-text": vText,
+    "v-loading": vLoading,
+  },
+  props: {},
+  methods: {
+    onEnter: function () {
+      this.getInHospitalItem();
+    },
+  },
+  template: `
 <v-loading :show="loading"></v-loading>
 <fieldset class="relative flex gap-2">
   <div class="pointer-events-none flex items-center px-2 text-gray-700 flex-none">
@@ -1030,110 +1082,104 @@ template: `
   <v-input name="barcode" label="バーコード" type="text" title="" class="flex-1 w-5/6" autocomplete="false" @keypress.enter.native="onEnter"></v-input>
   <v-button-primary type="button" class="flex-none" @click.native="onEnter">検索</v-button-primary>
 </fieldset>
-`
+`,
 };
 
 const vBarcodeSlipSearch = {
-setup(props, {
-emit
-}) {
-const {
-ref
-} = Vue;
-const {
-useForm
-} = VeeValidate;
-const {
-handleSubmit,
-control,
-meta,
-validate,
-values,
-isSubmitting,
-resetForm
-} = useForm({
-initialValues: {
-barcode: ""
-},
-validateOnMount: false
-});
+  setup(props, { emit }) {
+    const { ref } = Vue;
+    const { useForm } = VeeValidate;
+    const {
+      handleSubmit,
+      control,
+      meta,
+      validate,
+      values,
+      isSubmitting,
+      resetForm,
+    } = useForm({
+      initialValues: {
+        barcode: "",
+      },
+      validateOnMount: false,
+    });
 
-const loading = ref(false);
-const start = () => {
-loading.value = true;
-}
+    const loading = ref(false);
+    const start = () => {
+      loading.value = true;
+    };
 
-const complete = () => {
-loading.value = false;
-}
+    const complete = () => {
+      loading.value = false;
+    };
 
-const Toast = Swal.mixin({
-toast: true,
-position: 'top-end',
-showConfirmButton: false,
-timer: 3000,
-timerProgressBar: true,
-showCloseButton: true,
-didOpen: (toast) => {
-toast.addEventListener('mouseenter', Swal.stopTimer)
-toast.addEventListener('mouseleave', Swal.resumeTimer)
-}
-});
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      showCloseButton: true,
+      didOpen: (toast) => {
+        toast.addEventListener("mouseenter", Swal.stopTimer);
+        toast.addEventListener("mouseleave", Swal.resumeTimer);
+      },
+    });
 
-const search = () => {
-if (!values.barcode) {
-return false;
-}
-let params = new URLSearchParams();
-params.append("searchValue", values.barcode);
-params.append("_csrf", _CSRF);
-start();
+    const search = () => {
+      if (!values.barcode) {
+        return false;
+      }
+      let params = new URLSearchParams();
+      params.append("searchValue", values.barcode);
+      params.append("_csrf", _CSRF);
+      start();
 
-axios
-.post('%url/rel:mpgt:barcodeSearchAPI%', params)
-.then((response) => {
-complete();
-if (!response.data.urls) {
-Swal.fire({
-icon: 'warning',
-title: '情報がありませんでした',
-});
-return false;
-}
-Swal.fire({
-icon: 'success',
-title: '検索完了',
-}).then((result) => {
-location.href = response.data.urls[0];
-});
-})
-.catch((error) => {
-complete();
-resetForm({
-barcode: ""
-});
-})
-};
+      axios
+        .post("%url/rel:mpgt:barcodeSearchAPI%", params)
+        .then((response) => {
+          complete();
+          if (!response.data.urls) {
+            Swal.fire({
+              icon: "warning",
+              title: "情報がありませんでした",
+            });
+            return false;
+          }
+          Swal.fire({
+            icon: "success",
+            title: "検索完了",
+          }).then((result) => {
+            location.href = response.data.urls[0];
+          });
+        })
+        .catch((error) => {
+          complete();
+          resetForm({
+            barcode: "",
+          });
+        });
+    };
 
-return {
-search,
-values,
-loading
-}
-},
-components: {
-'v-button-primary': vButtonPrimary,
-'v-input': vInput,
-'v-text': vText,
-'v-loading': vLoading
-},
-props: {},
-methods: {
-onEnter: function() {
-this.search();
-}
-},
-template: `
+    return {
+      search,
+      values,
+      loading,
+    };
+  },
+  components: {
+    "v-button-primary": vButtonPrimary,
+    "v-input": vInput,
+    "v-text": vText,
+    "v-loading": vLoading,
+  },
+  props: {},
+  methods: {
+    onEnter: function () {
+      this.search();
+    },
+  },
+  template: `
 <v-loading :show="loading"></v-loading>
 <fieldset class="relative flex gap-2">
   <div class="pointer-events-none flex items-center px-2 text-gray-700 flex-none">
@@ -1144,111 +1190,105 @@ template: `
   <v-input name="barcode" label="バーコード" type="text" title="" class="flex-1 w-5/6" autocomplete="false" @keypress.enter.native="onEnter"></v-input>
   <v-button-primary type="button" class="flex-none" @click.native="onEnter">検索</v-button-primary>
 </fieldset>
-`
+`,
 };
 
 const vBarcodeSearchForOrderData = {
-setup(props, {
-emit
-}) {
-const {
-ref
-} = Vue;
-const {
-useForm
-} = VeeValidate;
-const {
-handleSubmit,
-control,
-meta,
-validate,
-values,
-isSubmitting,
-resetForm
-} = useForm({
-initialValues: {
-barcode: ""
-},
-validateOnMount: false
-});
+  setup(props, { emit }) {
+    const { ref } = Vue;
+    const { useForm } = VeeValidate;
+    const {
+      handleSubmit,
+      control,
+      meta,
+      validate,
+      values,
+      isSubmitting,
+      resetForm,
+    } = useForm({
+      initialValues: {
+        barcode: "",
+      },
+      validateOnMount: false,
+    });
 
-const loading = ref(false);
-const start = () => {
-loading.value = true;
-}
+    const loading = ref(false);
+    const start = () => {
+      loading.value = true;
+    };
 
-const complete = () => {
-loading.value = false;
-}
+    const complete = () => {
+      loading.value = false;
+    };
 
-const sleepComplate = () => {
-window.setTimeout(function() {
-complete();
-}, 500);
-}
-const Toast = Swal.mixin({
-toast: true,
-position: 'top-end',
-showConfirmButton: false,
-timer: 3000,
-timerProgressBar: true,
-showCloseButton: true,
-didOpen: (toast) => {
-toast.addEventListener('mouseenter', Swal.stopTimer)
-toast.addEventListener('mouseleave', Swal.resumeTimer)
-}
-});
+    const sleepComplate = () => {
+      window.setTimeout(function () {
+        complete();
+      }, 500);
+    };
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      showCloseButton: true,
+      didOpen: (toast) => {
+        toast.addEventListener("mouseenter", Swal.stopTimer);
+        toast.addEventListener("mouseleave", Swal.resumeTimer);
+      },
+    });
 
-const getOrderItem = () => {
-if (!values.barcode) {
-return false;
-}
-let params = new URLSearchParams();
-params.append("path", "/api/barcode/order/search");
-params.append("barcode", values.barcode);
-params.append("_csrf", _CSRF);
-start();
+    const getOrderItem = () => {
+      if (!values.barcode) {
+        return false;
+      }
+      let params = new URLSearchParams();
+      params.append("path", "/api/barcode/order/search");
+      params.append("barcode", values.barcode);
+      params.append("_csrf", _CSRF);
+      start();
 
-axios
-.post(_APIURL, params)
-.then((response) => {
-complete();
-emit('additem', response.data.data);
-resetForm({
-barcode: ""
-});
-})
-.catch((error) => {
-complete();
-resetForm({
-barcode: ""
-});
-Toast.fire({
-icon: 'error',
-title: '検索に失敗しました。再度お試しください。'
-})
-})
-};
+      axios
+        .post(_APIURL, params)
+        .then((response) => {
+          complete();
+          emit("additem", response.data.data);
+          resetForm({
+            barcode: "",
+          });
+        })
+        .catch((error) => {
+          complete();
+          resetForm({
+            barcode: "",
+          });
+          Toast.fire({
+            icon: "error",
+            title: "検索に失敗しました。再度お試しください。",
+          });
+        });
+    };
 
-return {
-getOrderItem,
-values,
-loading
-}
-},
-components: {
-'v-button-primary': vButtonPrimary,
-'v-input': vInput,
-'v-text': vText,
-'v-loading': vLoading
-},
-props: {},
-methods: {
-onEnter: function() {
-this.getOrderItem();
-}
-},
-template: `
+    return {
+      getOrderItem,
+      values,
+      loading,
+    };
+  },
+  components: {
+    "v-button-primary": vButtonPrimary,
+    "v-input": vInput,
+    "v-text": vText,
+    "v-loading": vLoading,
+  },
+  props: {},
+  methods: {
+    onEnter: function () {
+      this.getOrderItem();
+    },
+  },
+  template: `
 <v-loading :show="loading"></v-loading>
 <fieldset class="relative flex gap-2">
   <div class="pointer-events-none flex items-center px-2 text-gray-700 flex-none">
@@ -1259,249 +1299,243 @@ template: `
   <v-input name="barcode" label="バーコード" type="text" title="" class="flex-1 w-5/6" autocomplete="false" @keypress.enter.native="onEnter"></v-input>
   <v-button-primary type="button" class="flex-none" @click.native="onEnter">検索</v-button-primary>
 </fieldset>
-`
+`,
 };
 
 const vConsumptionHistoryModalForItemRequest = {
-props: {
-sourceDivisionId: {
-type: String,
-required: true,
-default: ""
-}
-},
-setup(props, context) {
-const {
-ref,
-toRef,
-toRefs,
-reactive,
-onMounted
-} = Vue;
-const {
-useForm
-} = VeeValidate;
+  props: {
+    sourceDivisionId: {
+      type: String,
+      required: true,
+      default: "",
+    },
+  },
+  setup(props, context) {
+    const { ref, toRef, toRefs, reactive, onMounted } = Vue;
+    const { useForm } = VeeValidate;
 
-const loading = ref(false);
-const start = () => {
-loading.value = true;
-}
+    const loading = ref(false);
+    const start = () => {
+      loading.value = true;
+    };
 
-const complete = () => {
-loading.value = false;
-}
+    const complete = () => {
+      loading.value = false;
+    };
 
-const sleepComplate = () => {
-window.setTimeout(function() {
-complete();
-}, 500);
-}
-start();
+    const sleepComplate = () => {
+      window.setTimeout(function () {
+        complete();
+      }, 500);
+    };
+    start();
 
-onMounted(() => {
-sleepComplate()
-listGet();
-});
+    onMounted(() => {
+      sleepComplate();
+      listGet();
+    });
 
-const {
-meta,
-validate,
-values,
-setFieldValue
-} = useForm({
-initialValues: {
-perPage: "10",
-currentPage: 1
-}
-});
+    const { meta, validate, values, setFieldValue } = useForm({
+      initialValues: {
+        perPage: "10",
+        currentPage: 1,
+      },
+    });
 
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      showCloseButton: true,
+      didOpen: (toast) => {
+        toast.addEventListener("mouseenter", Swal.stopTimer);
+        toast.addEventListener("mouseleave", Swal.resumeTimer);
+      },
+    });
 
-const Toast = Swal.mixin({
-toast: true,
-position: 'top-end',
-showConfirmButton: false,
-timer: 3000,
-timerProgressBar: true,
-showCloseButton: true,
-didOpen: (toast) => {
-toast.addEventListener('mouseenter', Swal.stopTimer)
-toast.addEventListener('mouseleave', Swal.resumeTimer)
-}
-});
+    const showPages = ref(5);
+    const totalCount = ref(0);
+    const searchCount = ref(0);
+    const consumptions = ref([]);
+    const currentTab = ref("list");
+    const tabs = [
+      {
+        label: "消費",
+        value: "list",
+        disabled: false,
+      },
+    ];
+    const perPageOptions = [
+      {
+        label: "10件表示",
+        value: "10",
+      },
+      {
+        label: "50件表示",
+        value: "50",
+      },
+      {
+        label: "100件表示",
+        value: "100",
+      },
+    ];
 
-const showPages = ref(5);
-const totalCount = ref(0);
-const searchCount = ref(0);
-const consumptions = ref([]);
-const currentTab = ref('list');
-const tabs = [{
-label: '消費',
-value: 'list',
-disabled: false
-}];
-const perPageOptions = [{
-label: "10件表示",
-value: "10"
-}, {
-label: "50件表示",
-value: "50"
-}, {
-label: "100件表示",
-value: "100"
-}];
+    const numberFormat = (value) => {
+      if (!value) {
+        return 0;
+      }
+      return value.toString().replace(/([0-9]+?)(?=(?:[0-9]{3})+$)/g, "$1,");
+    };
 
-const numberFormat = (value) => {
-if (!value) {
-return 0;
-}
-return value
-.toString()
-.replace(/([0-9]+?)(?=(?:[0-9]{3})+$)/g, '$1,');
-};
+    const searchExec = () => {
+      currentPageEdited.value = 1;
+      listGet();
+    };
 
-const searchExec = () => {
-currentPageEdited.value = 1;
-listGet();
-};
+    const listGet = () => {
+      if (props.sourceDivisionId == "") {
+        MicroModal.close("consumptionHistoryModalForItemRequest");
+        return false;
+      }
 
-const listGet = () => {
-if (props.sourceDivisionId == "") {
-MicroModal.close("consumptionHistoryModalForItemRequest");
-return false;
-}
+      if (
+        document
+          .getElementById("consumptionHistoryModalForItemRequest")
+          .classList.contains("is-open") == false
+      ) {
+        MicroModal.close("consumptionHistoryModalForItemRequest");
+        return false;
+      }
 
-if (document.getElementById('consumptionHistoryModalForItemRequest').classList.contains('is-open') == false) {
-MicroModal.close("consumptionHistoryModalForItemRequest");
-return false;
-}
+      let params = new URLSearchParams();
+      params.append("path", "/api/reference/consumption");
+      params.append("divisionIds", props.sourceDivisionId);
+      params.append("search", JSON.stringify(encodeURIToObject(values)));
+      params.append("_csrf", _CSRF);
 
-let params = new URLSearchParams();
-params.append("path", "/api/reference/consumption");
-params.append("divisionIds", props.sourceDivisionId);
-params.append("search", JSON.stringify(encodeURIToObject(values)));
-params.append("_csrf", _CSRF);
+      start();
 
-start();
+      axios
+        .post(_APIURL, params)
+        .then((response) => {
+          response.data.data.forEach((item, idx) => {
+            response.data.data[idx].open = false;
+          });
+          consumptions.value = response.data.data;
+          totalCount.value = parseInt(response.data.count);
+          currentTab.value = "list";
+        })
+        .catch((error) => {
+          console.log(error);
+          complete();
+          if (searchCount.value > 0) {
+            Toast.fire({
+              icon: "error",
+              title: "検索に失敗しました。再度お試しください。",
+            });
+          }
+          searchCount.value++;
+        })
+        .finally(() => {
+          complete();
+          if (
+            document
+              .getElementById("consumptionHistoryModalForItemRequest")
+              .classList.contains("is-open") == true
+          ) {
+            searchCount.value++;
+            if (totalCount.value == 0) {
+              Swal.fire({
+                title: "情報がありませんでした",
+                icon: "warning",
+              });
+              MicroModal.close("consumptionHistoryModalForItemRequest");
+              return false;
+            }
+            if (searchCount.value > 0) {
+              Toast.fire({
+                icon: "success",
+                title: "検索が完了しました",
+              });
+            }
+          }
+        });
+    };
 
-axios
-.post(_APIURL, params)
-.then((response) => {
-response.data.data.forEach((item, idx) => {
-response.data.data[idx].open = false;
-});
-consumptions.value = response.data.data;
-totalCount.value = parseInt(response.data.count);
-currentTab.value = 'list';
-})
-.catch((error) => {
-console.log(error);
-complete();
-if (searchCount.value > 0) {
-Toast.fire({
-icon: 'error',
-title: '検索に失敗しました。再度お試しください。'
-})
-}
-searchCount.value++;
-})
-.finally(() => {
-complete();
-if (document.getElementById('consumptionHistoryModalForItemRequest').classList.contains('is-open') == true) {
-searchCount.value++;
-if (totalCount.value == 0) {
-Swal.fire({
-title: '情報がありませんでした',
-icon: 'warning'
-})
-MicroModal.close("consumptionHistoryModalForItemRequest");
-return false;
-}
-if (searchCount.value > 0) {
-Toast.fire({
-icon: 'success',
-title: '検索が完了しました'
-})
-}
-}
-});
+    const getCurrentTab = (tab) => {
+      currentTab.value = tab;
+    };
 
-};
+    const currentPageEdited = ref(1);
 
-const getCurrentTab = (tab) => {
-currentTab.value = tab;
-};
+    const changeParPage = () => {
+      currentPageEdited.value = 1;
+      listGet();
+    };
 
-const currentPageEdited = ref(1);
+    const add = (items) => {
+      context.emit("addconsumptions", items);
+      Toast.fire({
+        icon: "success",
+        title: "反映しました",
+      });
+    };
 
-const changeParPage = () => {
-currentPageEdited.value = 1;
-listGet();
-};
+    const open = (index) => {
+      const consumption = consumptions.value[index];
+      consumption.open = !consumption.open;
+    };
 
-const add = (items) => {
-context.emit('addconsumptions', items);
-Toast.fire({
-icon: 'success',
-title: '反映しました'
-})
-};
-
-const open = (index) => {
-const consumption = consumptions.value[index];
-consumption.open = !consumption.open;
-};
-
-
-return {
-loading,
-start,
-complete,
-currentPageEdited,
-values,
-searchExec,
-showPages,
-totalCount,
-consumptions,
-currentTab,
-tabs,
-perPageOptions,
-listGet,
-getCurrentTab,
-changeParPage,
-add,
-numberFormat,
-open
-}
-},
-emits: ['addconsumptions'],
-components: {
-'v-loading': vLoading,
-'v-tab': vTab,
-'v-input': vInput,
-'v-select': vSelect,
-'v-select-division': vSelectDivision,
-'v-multiple-select-distributor': vMultipleSelectDistributor,
-'v-multiple-select-division': vMultipleSelectDivision,
-'v-pagination': vPagination,
-'v-open-modal': vOpenModal,
-'v-button-default': vButtonDefault,
-'v-button-primary': vButtonPrimary,
-'v-input-number': vInputNumber,
-'item-view': itemView,
-'blowing': blowing,
-'v-text': vText,
-},
-watch: {
-currentPageEdited() {
-this.values.currentPage = this.currentPageEdited;
-this.listGet();
-document
-.getElementById('consumptionsList')
-.scrollTop = 0;
-}
-},
-methods: {},
-template: `
+    return {
+      loading,
+      start,
+      complete,
+      currentPageEdited,
+      values,
+      searchExec,
+      showPages,
+      totalCount,
+      consumptions,
+      currentTab,
+      tabs,
+      perPageOptions,
+      listGet,
+      getCurrentTab,
+      changeParPage,
+      add,
+      numberFormat,
+      open,
+    };
+  },
+  emits: ["addconsumptions"],
+  components: {
+    "v-loading": vLoading,
+    "v-tab": vTab,
+    "v-input": vInput,
+    "v-select": vSelect,
+    "v-select-division": vSelectDivision,
+    "v-multiple-select-distributor": vMultipleSelectDistributor,
+    "v-multiple-select-division": vMultipleSelectDivision,
+    "v-pagination": vPagination,
+    "v-open-modal": vOpenModal,
+    "v-button-default": vButtonDefault,
+    "v-button-primary": vButtonPrimary,
+    "v-input-number": vInputNumber,
+    "item-view": itemView,
+    blowing: blowing,
+    "v-text": vText,
+  },
+  watch: {
+    currentPageEdited() {
+      this.values.currentPage = this.currentPageEdited;
+      this.listGet();
+      document.getElementById("consumptionsList").scrollTop = 0;
+    },
+  },
+  methods: {},
+  template: `
 <v-loading :show="loading"></v-loading>
 <teleport to="body">
   <v-open-modal id="consumptionHistoryModalForItemRequest" headtext="伝票検索" @show="listGet">
@@ -1620,247 +1654,247 @@ template: `
     </div>
   </v-open-modal>
 </teleport>
-`
+`,
 };
 
 const vConsumptionHistoryModalForOrder = {
-props: {
-divisionId: {
-type: String,
-required: true,
-default: ""
-}
-},
-setup(props, context) {
-const {
-ref,
-toRef,
-toRefs,
-reactive,
-onMounted
-} = Vue;
-const {
-useForm
-} = VeeValidate;
+  props: {
+    divisionId: {
+      type: String,
+      required: true,
+      default: "",
+    },
+  },
+  setup(props, context) {
+    const { ref, toRef, toRefs, reactive, onMounted } = Vue;
+    const { useForm } = VeeValidate;
 
-const loading = ref(false);
-const start = () => {
-loading.value = true;
-}
+    const loading = ref(false);
+    const start = () => {
+      loading.value = true;
+    };
 
-const complete = () => {
-loading.value = false;
-}
+    const complete = () => {
+      loading.value = false;
+    };
 
-const sleepComplate = () => {
-window.setTimeout(function() {
-complete();
-}, 500);
-}
-start();
+    const sleepComplate = () => {
+      window.setTimeout(function () {
+        complete();
+      }, 500);
+    };
+    start();
 
-onMounted(() => {
-sleepComplate()
-listGet();
-});
+    onMounted(() => {
+      sleepComplate();
+      listGet();
+    });
 
-const {
-meta,
-validate,
-values,
-setFieldValue
-} = useForm({
-initialValues: {
-perPage: "10",
-currentPage: 1
-}
-});
+    const { meta, validate, values, setFieldValue } = useForm({
+      initialValues: {
+        perPage: "10",
+        currentPage: 1,
+      },
+    });
 
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      showCloseButton: true,
+      didOpen: (toast) => {
+        toast.addEventListener("mouseenter", Swal.stopTimer);
+        toast.addEventListener("mouseleave", Swal.resumeTimer);
+      },
+    });
 
-const Toast = Swal.mixin({
-toast: true,
-position: 'top-end',
-showConfirmButton: false,
-timer: 3000,
-timerProgressBar: true,
-showCloseButton: true,
-didOpen: (toast) => {
-toast.addEventListener('mouseenter', Swal.stopTimer)
-toast.addEventListener('mouseleave', Swal.resumeTimer)
-}
-});
+    const showPages = ref(5);
+    const totalCount = ref(0);
+    const searchCount = ref(0);
+    const consumptions = ref([]);
+    const currentTab = ref("list");
+    const tabs = [
+      {
+        label: "消費",
+        value: "list",
+        disabled: false,
+      },
+    ];
+    const perPageOptions = [
+      {
+        label: "10件表示",
+        value: "10",
+      },
+      {
+        label: "50件表示",
+        value: "50",
+      },
+      {
+        label: "100件表示",
+        value: "100",
+      },
+    ];
 
-const showPages = ref(5);
-const totalCount = ref(0);
-const searchCount = ref(0);
-const consumptions = ref([]);
-const currentTab = ref('list');
-const tabs = [{
-label: '消費',
-value: 'list',
-disabled: false
-}];
-const perPageOptions = [{
-label: "10件表示",
-value: "10"
-}, {
-label: "50件表示",
-value: "50"
-}, {
-label: "100件表示",
-value: "100"
-}];
+    const numberFormat = (value) => {
+      if (!value) {
+        return 0;
+      }
+      return value.toString().replace(/([0-9]+?)(?=(?:[0-9]{3})+$)/g, "$1,");
+    };
 
-const numberFormat = (value) => {
-if (!value) {
-return 0;
-}
-return value
-.toString()
-.replace(/([0-9]+?)(?=(?:[0-9]{3})+$)/g, '$1,');
-};
+    const listGet = () => {
+      if (props.sourceDivisionId == "") {
+        MicroModal.close("consumptionHistoryModalForOrder");
+        return false;
+      }
 
-const listGet = () => {
-if (props.sourceDivisionId == "") {
-MicroModal.close("consumptionHistoryModalForOrder");
-return false;
-}
+      if (
+        document
+          .getElementById("consumptionHistoryModalForOrder")
+          .classList.contains("is-open") == false
+      ) {
+        MicroModal.close("consumptionHistoryModalForOrder");
+        return false;
+      }
 
-if (document.getElementById('consumptionHistoryModalForOrder').classList.contains('is-open') == false) {
-MicroModal.close("consumptionHistoryModalForOrder");
-return false;
-}
+      let params = new URLSearchParams();
+      params.append("path", "/api/reference/consumption");
+      params.append("divisionIds", props.divisionId);
+      params.append("search", JSON.stringify(encodeURIToObject(values)));
+      params.append("_csrf", _CSRF);
 
-let params = new URLSearchParams();
-params.append("path", "/api/reference/consumption");
-params.append("divisionIds", props.divisionId);
-params.append("search", JSON.stringify(encodeURIToObject(values)));
-params.append("_csrf", _CSRF);
+      start();
 
-start();
+      axios
+        .post(_APIURL, params)
+        .then((response) => {
+          response.data.data.forEach((item, idx) => {
+            response.data.data[idx].open = false;
+            response.data.data[idx].consumptionItems.forEach(
+              (consumptionItem, id) => {
+                let quantity = ~~(
+                  consumptionItem.consumptionQuantity /
+                  consumptionItem.quantity.quantityNum
+                );
+                response.data.data[idx].consumptionItems[id].orderableQuantity =
+                  quantity;
+              }
+            );
+          });
+          consumptions.value = response.data.data;
+          totalCount.value = parseInt(response.data.count);
+          currentTab.value = "list";
+        })
+        .catch((error) => {
+          console.log(error);
+          complete();
+          if (searchCount.value > 0) {
+            Toast.fire({
+              icon: "error",
+              title: "検索に失敗しました。再度お試しください。",
+            });
+          }
+          searchCount.value++;
+        })
+        .finally(() => {
+          complete();
+          if (
+            document
+              .getElementById("consumptionHistoryModalForOrder")
+              .classList.contains("is-open") == true
+          ) {
+            searchCount.value++;
+            if (totalCount.value == 0) {
+              Swal.fire({
+                title: "情報がありませんでした",
+                icon: "warning",
+              });
+              MicroModal.close("consumptionHistoryModalForOrder");
+              return false;
+            }
+            if (searchCount.value > 0) {
+              Toast.fire({
+                icon: "success",
+                title: "検索が完了しました",
+              });
+            }
+          }
+        });
+    };
 
-axios
-.post(_APIURL, params)
-.then((response) => {
-response.data.data.forEach((item, idx) => {
-response.data.data[idx].open = false;
-response.data.data[idx].consumptionItems.forEach((consumptionItem, id) => {
-let quantity = ~~(consumptionItem.consumptionQuantity / consumptionItem.quantity.quantityNum);
-response.data.data[idx].consumptionItems[id].orderableQuantity = quantity;
-});
-});
-consumptions.value = response.data.data;
-totalCount.value = parseInt(response.data.count);
-currentTab.value = 'list';
-})
-.catch((error) => {
-console.log(error);
-complete();
-if (searchCount.value > 0) {
-Toast.fire({
-icon: 'error',
-title: '検索に失敗しました。再度お試しください。'
-})
-}
-searchCount.value++;
-})
-.finally(() => {
-complete();
-if (document.getElementById('consumptionHistoryModalForOrder').classList.contains('is-open') == true) {
-searchCount.value++;
-if (totalCount.value == 0) {
-Swal.fire({
-title: '情報がありませんでした',
-icon: 'warning'
-})
-MicroModal.close("consumptionHistoryModalForOrder");
-return false;
-}
-if (searchCount.value > 0) {
-Toast.fire({
-icon: 'success',
-title: '検索が完了しました'
-})
-}
-}
-});
+    const getCurrentTab = (tab) => {
+      currentTab.value = tab;
+    };
 
-};
+    const currentPageEdited = ref(1);
 
-const getCurrentTab = (tab) => {
-currentTab.value = tab;
-};
+    const changeParPage = () => {
+      currentPageEdited.value = 1;
+      listGet();
+    };
 
-const currentPageEdited = ref(1);
+    const add = (items) => {
+      context.emit("addconsumptions", items);
+      Toast.fire({
+        icon: "success",
+        title: "反映しました",
+      });
+    };
 
-const changeParPage = () => {
-currentPageEdited.value = 1;
-listGet();
-};
+    const open = (index) => {
+      const consumption = consumptions.value[index];
+      consumption.open = !consumption.open;
+    };
 
-const add = (items) => {
-context.emit('addconsumptions', items);
-Toast.fire({
-icon: 'success',
-title: '反映しました'
-})
-};
-
-const open = (index) => {
-const consumption = consumptions.value[index];
-consumption.open = !consumption.open;
-};
-
-
-return {
-loading,
-start,
-complete,
-currentPageEdited,
-values,
-showPages,
-totalCount,
-consumptions,
-currentTab,
-tabs,
-perPageOptions,
-listGet,
-getCurrentTab,
-changeParPage,
-add,
-numberFormat,
-open
-}
-},
-emits: ['addconsumptions'],
-components: {
-'v-loading': vLoading,
-'v-tab': vTab,
-'v-input': vInput,
-'v-select': vSelect,
-'v-select-division': vSelectDivision,
-'v-multiple-select-distributor': vMultipleSelectDistributor,
-'v-multiple-select-division': vMultipleSelectDivision,
-'v-pagination': vPagination,
-'v-open-modal': vOpenModal,
-'v-button-default': vButtonDefault,
-'v-button-primary': vButtonPrimary,
-'v-input-number': vInputNumber,
-'item-view': itemView,
-'blowing': blowing,
-'v-text': vText,
-},
-watch: {
-currentPageEdited() {
-this.values.currentPage = this.currentPageEdited;
-this.listGet();
-document
-.getElementById('consumptionsList')
-.scrollTop = 0;
-}
-},
-methods: {},
-template: `
+    return {
+      loading,
+      start,
+      complete,
+      currentPageEdited,
+      values,
+      showPages,
+      totalCount,
+      consumptions,
+      currentTab,
+      tabs,
+      perPageOptions,
+      listGet,
+      getCurrentTab,
+      changeParPage,
+      add,
+      numberFormat,
+      open,
+    };
+  },
+  emits: ["addconsumptions"],
+  components: {
+    "v-loading": vLoading,
+    "v-tab": vTab,
+    "v-input": vInput,
+    "v-select": vSelect,
+    "v-select-division": vSelectDivision,
+    "v-multiple-select-distributor": vMultipleSelectDistributor,
+    "v-multiple-select-division": vMultipleSelectDivision,
+    "v-pagination": vPagination,
+    "v-open-modal": vOpenModal,
+    "v-button-default": vButtonDefault,
+    "v-button-primary": vButtonPrimary,
+    "v-input-number": vInputNumber,
+    "item-view": itemView,
+    blowing: blowing,
+    "v-text": vText,
+  },
+  watch: {
+    currentPageEdited() {
+      this.values.currentPage = this.currentPageEdited;
+      this.listGet();
+      document.getElementById("consumptionsList").scrollTop = 0;
+    },
+  },
+  methods: {},
+  template: `
 <v-loading :show="loading"></v-loading>
 <teleport to="body">
   <v-open-modal id="consumptionHistoryModalForOrder" headtext="伝票検索" @show="listGet">
@@ -1982,77 +2016,69 @@ template: `
     </div>
   </v-open-modal>
 </teleport>
-`
+`,
 };
 
 const vMultipleSelectDivisionV2 = {
-components: {
-'v-multiple-select': vMultipleSelect
-},
-setup(props) {
-const {
-ref,
-onMounted
-} = Vue;
+  components: {
+    "v-multiple-select": vMultipleSelect,
+  },
+  setup(props) {
+    const { ref, onMounted } = Vue;
 
-const options = ref([]);
-const load = () => {
-let self = this;
-let params = new URLSearchParams();
-params.append("path", "/api/division/index");
-params.append("isOnlyMyDivision", props.isOnlyMyDivision);
-params.append("_csrf", _CSRF);
-axios
-.post(_APIURL, params)
-.then((response) => {
-response
-.data
-.data
-.forEach(function(x, i) {
-options
-.value
-.push({
-label: x.divisionName,
-value: x.divisionId
-});
-});
-})
-.catch((error) => {
-console.log(error);
-});
-};
+    const options = ref([]);
+    const load = () => {
+      let self = this;
+      let params = new URLSearchParams();
+      params.append("path", "/api/division/index");
+      params.append("isOnlyMyDivision", props.isOnlyMyDivision);
+      params.append("_csrf", _CSRF);
+      axios
+        .post(_APIURL, params)
+        .then((response) => {
+          response.data.data.forEach(function (x, i) {
+            options.value.push({
+              label: x.divisionName,
+              value: x.divisionId,
+            });
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
 
-onMounted(() => {
-load();
-});
+    onMounted(() => {
+      load();
+    });
 
-return {
-options
-}
-},
-props: {
-id: {
-type: String,
-required: false,
-default: 'divisions'
-},
-name: {
-type: String,
-required: true,
-default: 'divisionIds'
-},
-title: {
-type: String,
-required: true,
-default: ''
-},
-isOnlyMyDivision: {
-type: Boolean,
-required: false,
-default: false
-}
-},
-template: `
+    return {
+      options,
+    };
+  },
+  props: {
+    id: {
+      type: String,
+      required: false,
+      default: "divisions",
+    },
+    name: {
+      type: String,
+      required: true,
+      default: "divisionIds",
+    },
+    title: {
+      type: String,
+      required: true,
+      default: "",
+    },
+    isOnlyMyDivision: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
+  template: `
 <v-multiple-select :name="name" :title="title" :options="options" :id="id" />
-`
+`,
 };

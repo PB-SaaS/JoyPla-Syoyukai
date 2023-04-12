@@ -48,7 +48,8 @@ namespace JoyPla\Application\Interactors\Api\Division {
                 $divisions = $this->repositoryProvider
                     ->getDivisionRepository()
                     ->findByHospitalId(
-                        new HospitalId($inputData->user->hospitalId)
+                        new HospitalId($inputData->user->hospitalId),
+                        $inputData->deleted
                     );
             }
 
@@ -73,14 +74,19 @@ namespace JoyPla\Application\InputPorts\Api\Division {
     {
         public Auth $user;
         public bool $isOnlyMyDivision = false;
+        public bool $deleted = false;
 
         /**
          * DivisionIndexInputData constructor.
          */
-        public function __construct(Auth $user, bool $isOnlyMyDivision)
-        {
+        public function __construct(
+            Auth $user,
+            bool $isOnlyMyDivision,
+            bool $deleted = false
+        ) {
             $this->user = $user;
             $this->isOnlyMyDivision = $isOnlyMyDivision;
+            $this->deleted = $deleted;
         }
     }
 

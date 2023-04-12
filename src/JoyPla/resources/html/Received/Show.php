@@ -146,14 +146,16 @@
                 title="JANコード"
                 ></v-input>
             </div>
-            <?php if(! gate('list_of_acceptance_inspection_slips')->isOnlyMyDivision()): ?>
+            <?php if (
+                !gate('list_of_acceptance_inspection_slips')->isOnlyMyDivision()
+            ): ?>
             <div class="my-4">
               <v-multiple-select-division
                 name="divisionIds"
                 title="発注書元部署名"
                 ></v-multiple-select-division>
             </div>
-            <?php endif ?>
+            <?php endif; ?>
             <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
               <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
               <v-button-primary type="button" @click.native="searchExec">絞り込み</v-button-primary>
@@ -367,18 +369,14 @@ var JoyPlaApp = Vue.createApp({
       const searchClear = () =>
       {
         values.currentPage = 1;
-        resetForm({
-          itemName  : "",
-          makerName : "",
-          itemCode : "",
-          itemStandard :  "",
-          itemJANCode :  "",
-          registerDate: "",
-          receivedDate: "",
-          divisionIds: [],
-          currentPage : 1,
-          perPage: values.perPage,
-        });
+        values.itemName = '';
+        values.makerName = '';
+        values.itemCode = '';
+        values.itemStandard = '';
+        values.itemJANCode = '';
+        values.registerDate = '';
+        values.receivedDate = '';
+        values.divisionIds = [];
         listGet();
       };
 

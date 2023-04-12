@@ -24,6 +24,7 @@ use App\Model\InventoryAdjustmentTransaction;
 use App\Model\StockView;
 
 use ApiErrorCode\FactoryApiErrorCode;
+use App\Model\CardInfoView;
 use App\Model\HospitalUser;
 use stdClass;
 use validate\FieldSet;
@@ -746,7 +747,6 @@ EOM;
             $payout = \App\Lib\requestUrldecode($payout);
             $source_division_name = urldecode($source_division_name);
             $target_division_name = urldecode($target_division_name);
-
             $payout_id = $this->makeId('05');
 
             /* インサートデータ作成 */

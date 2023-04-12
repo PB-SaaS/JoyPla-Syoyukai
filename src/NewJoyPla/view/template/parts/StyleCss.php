@@ -187,4 +187,51 @@ input:checked + .uk-switch-slider.uk-switch-big:before {
   background-color: rgb(255, 204, 153);
   color: rgb(68, 68, 68)
 }
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    overflow: auto;
+    border: 1px solid #ddd;
+    z-index: 1;
+    box-sizing: border-box;
+}
+
+.dropdown-content input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    font-size: 16px;
+    background-color: #f1f1f1;
+    padding: 12px 20px 12px 20px;
+}
+
+.dropdown-content select {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    font-size: 16px;
+    background-color: #f1f1f1;
+    padding: 12px 20px 12px 20px;
+}
+
+.dropdown-content option {
+    display: block;
+    padding: 12px 0;
+}
+
+.hover-bg-gray-200 {
+    transition: background-color 0s ease-in-out;
+}
+.hover-bg-gray-200:hover {
+    background-color: #e5e7eb; /* Gray-200 */
+}
 </style>

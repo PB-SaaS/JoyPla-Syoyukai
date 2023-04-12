@@ -8,6 +8,7 @@ require_once 'JoyPla/require.php';
 
 use framework\Http\Request;
 use framework\Routing\Router;
+use JoyPla\InterfaceAdapters\Controllers\Web\AccountantController;
 use JoyPla\InterfaceAdapters\Controllers\Web\AgreeFormController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ConsumptionController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ItemAndPriceAndInHospitalItemRegisterController;
@@ -251,6 +252,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
     ])->service($useCaseProvider->getItemRequestShowInteractor());
 
     Router::map('GET', '/accountant', [TopController::class, 'accountant']);
+
+    Router::map('GET', '/accountant/index', [
+        AccountantController::class,
+        'index',
+    ]);
 });
 
 $router = new Router();

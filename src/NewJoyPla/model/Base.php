@@ -88,6 +88,7 @@ class Division extends Model
 
     //デフォルト値
     public static $attributes = [];
+    public static $search = [];
 }
 
 class Billing extends Model

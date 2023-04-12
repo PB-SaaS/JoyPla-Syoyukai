@@ -22,6 +22,7 @@ use JoyPla\InterfaceAdapters\Controllers\Api\StocktakingController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ReferenceController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ItemRequestController;
 use JoyPla\InterfaceAdapters\Controllers\Api\PayoutController;
+use JoyPla\InterfaceAdapters\Controllers\Api\AccountantController;
 use JoyPla\JoyPlaApplication;
 use JoyPla\Service\Presenter\Api\PresenterProvider;
 use JoyPla\Service\Repository\QueryProvider;
@@ -229,6 +230,16 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         PayoutController::class,
         'register',
     ])->service($useCaseProvider->getPayoutRegisterInteractor());
+
+    Router::map('POST', '/api/accountant/register', [
+        AccountantController::class,
+        'register',
+    ])->service($useCaseProvider->getAccountantRegisterInteractor());
+
+    Router::map('GET', '/api/accountant/index', [
+        AccountantController::class,
+        'index',
+    ])->service($useCaseProvider->getAccountantIndexInteractor());
 });
 
 $router = new Router();
