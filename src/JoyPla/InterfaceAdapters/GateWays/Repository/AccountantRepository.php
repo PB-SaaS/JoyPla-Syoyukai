@@ -146,6 +146,50 @@ class AccountantRepository implements AccountantRepositoryInterface
 
         return [$accountants, $historys->getTotal()];
     }
+
+    public function findByAccountantId(
+        HospitalId $hospitalId,
+        AccountantId $accountantId
+    ) {
+        $accountant = ModelRepository::getAccountantInstance()
+            ->where('hospitalId', $hospitalId->value())
+            ->where('accountantId', $accountantId->value())
+            ->get();
+
+        $accountant = $accountant->first();
+
+        $division = ModelRepository::getDivisionInstance()
+            ->where('divisionId', $accountant->divisionId)
+            ->where('hospitalId', $hospitalId->value())
+            ->get()
+            ->first();
+        $distributor = ModelRepository::getDistributorInstance()
+            ->where('distributorId', $accountant->distributorId)
+            ->where('hospitalId', $hospitalId->value())
+            ->get()
+            ->first();
+
+        $accountant = new Accountant(
+            new AccountantId($accountant->accountantId),
+            $accountant->accountantDate
+                ? new DateYearMonthDay($accountant->accountantDate)
+                : '',
+            new HospitalId($accountant->hospitalId),
+            $accountant->divisionId
+                ? new DivisionId($accountant->divisionId)
+                : null,
+            $accountant->distributorId
+                ? new DistributorId($accountant->distributorId)
+                : null,
+            $accountant->orderNumber ?? null,
+            $accountant->receivingNumber ?? null
+        );
+
+        $accountant->_division = $division;
+        $accountant->_distributor = $distributor;
+
+        return $accountant;
+    }
 }
 
 interface AccountantRepositoryInterface

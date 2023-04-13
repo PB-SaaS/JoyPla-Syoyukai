@@ -4,6 +4,7 @@ require_once('JoyPla/config.php');
 require_once('JoyPla/JoyPlaApplication.php');
 require_once('JoyPla/Application/Interactors/Api/Accountant/AccountantIndexInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Accountant/AccountantRegisterInteractor.php');
+require_once('JoyPla/Application/Interactors/Api/Accountant/AccountantShowInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Barcode/BarcodeOrderSearchInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Barcode/BarcodeSearchInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Consumption/ConsumptionDeleteInteractor.php');

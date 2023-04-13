@@ -2,27 +2,30 @@
 
 namespace JoyPla\Enterprise\Models;
 
+use JoyPla\Enterprise\TmpModels\TmpValueObject;
+
 class Accountant
 {
-    private DateYearMonthDay $accountantDate;
+    private ?DateYearMonthDay $accountantDate;
     private AccountantId $accountantId;
     private HospitalId $hospitalId;
     private ?DivisionId $divisionId;
     private ?DistributorId $distributorId;
     private ?string $orderId;
     private ?string $receivedId;
+    private array $option = [];
 
     public function __construct(
-        DateYearMonthDay $accountantDate,
         AccountantId $accountantId,
+        ?DateYearMonthDay $accountantDate = null,
         HospitalId $hospitalId,
         ?DivisionId $divisionId = null,
         ?DistributorId $distributorId = null,
-        ?string $orderId = '',
-        ?string $receivedId = ''
+        ?string $orderId = null,
+        ?string $receivedId = null
     ) {
-        $this->accountantDate = $accountantDate;
         $this->accountantId = $accountantId;
+        $this->accountantDate = $accountantDate;
         $this->hospitalId = $hospitalId;
         $this->divisionId = $divisionId;
         $this->distributorId = $distributorId;
@@ -31,7 +34,7 @@ class Accountant
     }
 
     public static function init(
-        string $accountantDate,
+        string $accountantDate = null,
         string $hospitalId,
         ?string $divisionId = null,
         ?string $distributorId = null,
@@ -39,8 +42,8 @@ class Accountant
         ?string $receivedId = null
     ) {
         return new self(
-            new DateYearMonthDay($accountantDate),
             AccountantId::generate(),
+            $accountantDate ? new DateYearMonthDay($accountantDate) : null,
             new HospitalId($hospitalId),
             $divisionId ? new DivisionId($divisionId) : null,
             $distributorId ? new DistributorId($distributorId) : null,
@@ -54,9 +57,24 @@ class Accountant
         return $this->accountantId;
     }
 
+    public function getDivisionId()
+    {
+        return $this->divisionId;
+    }
+
+    public function __get($field)
+    {
+        return $this->option[$field];
+    }
+
+    public function __set($field, $value)
+    {
+        return $this->option[$field] = $value;
+    }
+
     public function toArray()
     {
-        return [
+        $result = [
             'accountantDate' => $this->accountantDate->value(),
             'accountantId' => $this->accountantId->value(),
             'hospitalId' => $this->hospitalId->value(),
@@ -67,5 +85,15 @@ class Accountant
             'orderId' => $this->orderId ?? '',
             'receivedId' => $this->receivedId ?? '',
         ];
+
+        foreach ($this->option as $field => $value) {
+            if (is_object($value)) {
+                $result[$field] = (array) $value;
+            } else {
+                $result[$field] = $value;
+            }
+        }
+
+        return $result;
     }
 }

@@ -46,8 +46,8 @@
                 <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">合計金額</th>
                 <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">発注番号</th>
                 <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">検収番号</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left"></th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left"></th>
+                <th></th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -60,10 +60,10 @@
                 <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant._distributor?.distributorName }}</td>
                 <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant.orderId }}</td>
                 <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant.receivedId }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">
-                  <v-button-primary type="button" @click.native="createAccountant">詳細</v-button-primary>
+                <td class="border-b border-slate-100 p-4">
+                  <v-button-primary type="button" @click.native="openSlip(accountant.accountantId)">詳細</v-button-primary>
                 </td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">
+                <td class="border-b border-slate-100 p-4">
                   <v-button-danger type="button" @click.native="createAccountant">削除</v-button-danger>
                 </td>
               </tr>

@@ -257,6 +257,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         AccountantController::class,
         'index',
     ]);
+
+    Router::map('GET', '/accountant/:accountantId', [
+        AccountantController::class,
+        'show',
+    ]);
 });
 
 $router = new Router();

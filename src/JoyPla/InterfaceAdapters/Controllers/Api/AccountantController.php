@@ -9,6 +9,8 @@ use JoyPla\Application\InputPorts\Api\Accountant\AccountantIndexInputData;
 use JoyPla\Application\InputPorts\Api\Accountant\AccountantIndexInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Accountant\AccountantRegisterInputData;
 use JoyPla\Application\InputPorts\Api\Accountant\AccountantRegisterInputPortInterface;
+use JoyPla\Application\InputPorts\Api\Accountant\AccountantShowInputData;
+use JoyPla\Application\InputPorts\Api\Accountant\AccountantShowInputPortInterface;
 
 class AccountantController extends Controller
 {
@@ -53,6 +55,22 @@ class AccountantController extends Controller
             $this->request->user(),
             $search
         );
+
+        $inputPort->handle($inputData);
+    }
+
+    public function show($vars, AccountantShowInputPortInterface $inputPort)
+    {
+        $token = $this->request->get('_csrf');
+        Csrf::validate($token, true);
+
+        $accountantId = $vars['accountantId'];
+
+        $inputData = new AccountantShowInputData(
+            $this->request->user(),
+            $accountantId
+        );
+
         $inputPort->handle($inputData);
     }
 }
