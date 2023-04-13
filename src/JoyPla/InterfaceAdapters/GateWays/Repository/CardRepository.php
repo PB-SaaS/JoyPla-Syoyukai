@@ -90,6 +90,7 @@ class CardRepository implements CardRepositoryInterface
         }, $cardIds);
 
         $instance->update([
+            'updateTime' => 'now',
             'payoutId' => '',
             'lotNumber' => '',
             'lotDate' => '',
