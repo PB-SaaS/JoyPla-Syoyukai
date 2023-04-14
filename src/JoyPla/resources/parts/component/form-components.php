@@ -110,7 +110,7 @@ const vInput = {
             :placeholder="placeholder"
             v-model="value"
             autocomplete="off"
-            class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border"
+            class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border"
             :class="[ ( ! meta.valid && meta.validated == true) ? errorClassName : successClassName , changeClass]"
             :disabled="disabled"
         />

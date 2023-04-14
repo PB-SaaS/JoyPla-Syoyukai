@@ -305,16 +305,22 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                 }
             }
 
-            $cardIds = array_map(function ($item) {
-                return new CardId($item->card);
-            }, $inputData->payoutItems);
+            $cardIds = [];
+
+            foreach ($inputData->payoutItems as $item) {
+                if (empty($item->card)) {
+                    continue;
+                }
+
+                $cardIds[] = new CardId($item->card);
+            }
+            $updateCards = [];
 
             if (!empty($cardIds)) {
                 $cards = $this->repositoryProvider
                     ->getCardRepository()
                     ->getCards($hospitalId, $cardIds);
 
-                $updateCards = [];
                 foreach ($inputData->payoutItems as $item) {
                     $card = array_find($cards, function ($card) use ($item) {
                         return $card->getCardId()->value() === $item->card;
@@ -345,9 +351,11 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                 ->getInventoryCalculationRepository()
                 ->saveToArray($inventoryCalculations);
 
-            $this->repositoryProvider
-                ->getCardRepository()
-                ->update($hospitalId, $updateCards);
+            if (!empty($updateCards)) {
+                $this->repositoryProvider
+                    ->getCardRepository()
+                    ->update($hospitalId, $updateCards);
+            }
 
             $this->presenterProvider->getPayoutRegisterPresenter()->output(
                 new PayoutRegisterOutputData(
