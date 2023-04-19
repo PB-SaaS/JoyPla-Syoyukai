@@ -154,7 +154,7 @@ class InHospitalItemRepository implements InHospitalItemRepositoryInterface
             foreach ($inHospitalItems as $key => $item) {
                 $inHospitalItems[$key]->set('priceNotice', '');
             }
-            return [$inHospitalItems, $result->getData()->count()];
+            return [$inHospitalItems, $result->getTotal()];
         }
 
         $price = ModelRepository::getPriceInstance()->where(
@@ -179,7 +179,7 @@ class InHospitalItemRepository implements InHospitalItemRepositoryInterface
             );
         }
 
-        return [$inHospitalItems, $result->getData()->count()];
+        return [$inHospitalItems, $result->getTotal()];
     }
 
     public function saveToArray(

@@ -306,11 +306,10 @@ const vInput = {
     "v-text": vText,
   },
   setup(props) {
-    // a simple `name` field with basic required validator
-    const { ref } = Vue;
+    const { ref, watchEffect } = Vue;
     const { value, errorMessage, meta, validate } = VeeValidate.useField(
-      Vue.toRef(props, "name"),
-      Vue.toRef(props, "rules"),
+      props.name,
+      props.rules,
       { label: props.label }
     );
 
@@ -322,6 +321,12 @@ const vInput = {
     };
 
     const changeClass = ref({});
+    watchEffect(() => {
+      changeClass.value = {
+        [props.changeClassName]: true,
+      };
+    });
+
     return {
       changeClass,
       isRequired,
@@ -333,6 +338,8 @@ const vInput = {
     };
   },
   props: {
+    suffix: String,
+    prefix: String,
     label: {
       type: String,
       required: false,
@@ -353,7 +360,7 @@ const vInput = {
     rules: {
       type: Object,
       required: false,
-      default: {},
+      default: () => ({}),
     },
     title: {
       type: String,
@@ -371,28 +378,30 @@ const vInput = {
       default: false,
     },
   },
-  watch: {
-    value() {
-      this.changeClass = {
-        [this.changeClassName]: true,
-      };
-    },
-  },
   template: `
     <v-text :title="title" :isRequired="isRequired()">
-      <input
-            :type="type"
-            :placeholder="placeholder"
-            v-model="value"
-            autocomplete="off"
-            class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border"
-            :class="[ ( ! meta.valid && meta.validated == true) ? errorClassName : successClassName , changeClass]"
-            :disabled="disabled"
-        />
-        <span class="text-red-500">{{ errorMessage }}</span>
+      <div class="flex gap-1">
+        <div class="flex-none flex items-center" v-if="!!suffix">
+          {{ suffix }}
+        </div>
+        <input
+                :type="type"
+                :placeholder="placeholder"
+                v-model="value"
+                autocomplete="off"
+                class="grow appearance-none w-full py-2 px-3 leading-tight flex-initial bg-white border"
+                :class="[ ( ! meta.valid && meta.validated == true) ? errorClassName : successClassName, (type !== 'number')? 'text-left' : 'text-right' , changeClass  ]"
+                :disabled="disabled"
+            />
+        <div class="flex-none flex items-center" v-if="!!prefix">
+          {{ prefix }}
+        </div>
+      </div>
+      <span class="text-red-500">{{ errorMessage }}</span>
     </v-text>
      `,
 };
+
 const vInputNumber = {
   components: {
     "v-text": vText,
