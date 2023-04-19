@@ -313,7 +313,7 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
             $consumptions[] = $consumption;
         }
 
-        return [$consumptions, $historys->getData()->count()];
+        return [$consumptions, $historys->getTotal()];
     }
 
     public function find(HospitalId $hospitalId, ConsumptionId $consumptionId)

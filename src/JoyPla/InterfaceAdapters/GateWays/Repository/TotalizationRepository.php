@@ -218,7 +218,7 @@ class TotalizationRepository implements TotalizationRepositoryInterface
 
             return [
                 $totalRequestItems,
-                (int) $totalzationByInHPItems->getData()->count(),
+                (int) $totalzationByInHPItems->getTotal(),
             ];
         }
 
@@ -326,10 +326,7 @@ class TotalizationRepository implements TotalizationRepositoryInterface
             $totalRequestItems[] = $totalRequestItem;
         }
 
-        return [
-            $totalRequestItems,
-            (int) $totalzationByInHPItems->getData()->count(),
-        ];
+        return [$totalRequestItems, (int) $totalzationByInHPItems->getTotal()];
     }
 }
 

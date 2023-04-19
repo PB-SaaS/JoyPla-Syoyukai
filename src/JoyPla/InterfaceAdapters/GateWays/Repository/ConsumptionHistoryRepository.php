@@ -143,7 +143,7 @@ class ConsumptionHistoryRepository implements
             $consumptions[] = $consumption;
         }
 
-        return [$consumptions, $histories->getData()->count()];
+        return [$consumptions, $histories->getTotal()];
     }
 }
 

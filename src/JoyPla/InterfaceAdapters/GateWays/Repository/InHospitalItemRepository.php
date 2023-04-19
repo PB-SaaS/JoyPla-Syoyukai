@@ -16,7 +16,6 @@ class InHospitalItemRepository implements InHospitalItemRepositoryInterface
             ->where('hospitalId', $hospitalId->value())
             ->get()
             ->all();
-
         $result = [];
         foreach ($inHospitalItems as $d) {
             $result[] = InHospitalItem::create($d);
