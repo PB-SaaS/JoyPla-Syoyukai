@@ -20,10 +20,10 @@
                 <h2 class="page_title uk-margin-remove">棚卸実績</h2>
                 <hr>
                 <ul class="uk-child-width-expand uk-tab no_print" style="margin-top: 50px!important">
-                    <li class="uk-active">
+                    <li>
                         <a href="%url/rel:mpgt:Inventory%&Action=inventoryMovement">部署別</a>
                     </li>
-                    <li>
+                    <li class="uk-active">
                         <a href="%url/rel:mpgt:Inventory%&Action=inventoryMovementAll">全部署</a>
                     </li>
                 </ul>
@@ -36,23 +36,12 @@
                         <div class="uk-width-3-4@m uk-margin-auto">
                             <h3>検索</h3>
                             <div class="uk-form-controls uk-margin">
-                                <label class="uk-form-label">部署</label>
-                                <div class="uk-child-width-1-1">
-                                    <div>
-                                        <select class="uk-select" v-model="select_data.divisionId" v-on:change="divisionSelected">
-                                            <option value="">----- 選択してください -----</option>
-                                            <option v-for="d in divisions" :value="d.divisionId">{{ d.divisionName }}</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="uk-form-controls uk-margin">
                                 <label class="uk-form-label">基準棚卸日</label>
                                 <div class="uk-child-width-1-1">
                                     <div>
-                                        <select class="uk-select" v-model="select_data.inventoryHId" v-on:change="getItemNums">
+                                        <select class="uk-select" v-model="select_data.inventoryEndId" v-on:change="getItemNums">
                                             <option value="">----- 選択してください -----</option>
-                                            <option v-for="h in histories" :value="h.inventoryHId">
+                                            <option v-for="h in histories" :value="h.inventoryEndId">
                                                 <template v-if="h.inventoryTime == ''">
                                                     現在日時（棚卸中）
                                                 </template>
@@ -75,6 +64,9 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
+                                        <th>
+                                            <a href="#" @click="sortBy('divisionName')" :class="addClass('rackName')">部署名</a>
+                                        </th>
                                         <th>
                                             <a href="#" @click="sortBy('rackName')" :class="addClass('rackName')">棚名</a>
                                         </th>
@@ -99,6 +91,7 @@
                                 <tbody>
                                     <tr v-for="( i , key) in sort_items">
                                         <td>{{ key + 1 }}</td>
+                                        <td>{{ i.divisionName }}</td>
                                         <td>{{ i.rackName }}</td>
                                         <td>{{ i.categoryToString }}</td>
                                         <td>
@@ -125,7 +118,7 @@
                                     </tr>
                                 </tbody>
                                 <tfoot>
-                                    <td colspan='8'>合計</td>
+                                    <td colspan='9'>合計</td>
                                     <td></td>
                                     <td>&yen;{{ get_before_inventory_total_price() | number_format }}</td>
                                     <td></td>
@@ -142,7 +135,7 @@
             </div>
         </div>
     </div>
-    <!-- print Only -->
+    <!-- print Only =
     <div id="detail-sheet">
         <section class="sheet">
             <p class="uk-text-center print-text-xlarge title_spacing">棚卸実績</p>
@@ -152,7 +145,6 @@
                         <span>棚卸確定日：{{ (completeDate !== '')? completeDate : "未確定" }}</span><br>
                         <span>期間：{{searchStartDate}} ~ {{searchEndDate}}</span><br>
                         <span>病院名：{{hospitalName}}</span><br>
-                        <span>部署名：{{get_division(select_data.divisionId).divisionName}}</span>
                     </div>
                     <div class="uk-width-1-3" style="height:100pt">
                         <table style="line-height: normal;" class="print-table">
@@ -173,6 +165,7 @@
                     <thead>
                         <tr>
                             <th>No</th>
+                            <th>部署名</th>
                             <th>棚名</th>
                             <th>分類</th>
                             <th class="uk-width-1-6">商品情報</th>
@@ -193,6 +186,7 @@
                     <tbody>
                         <tr v-for="( i , key) in sort_items">
                             <td>{{ key + 1 }}</td>
+                            <td>{{ i.divisionName }}</td>
                             <td>{{ i.rackName }}</td>
                             <td>{{ i.categoryToString }}</td>
                             <td>
@@ -219,7 +213,7 @@
                         </tr>
                     </tbody>
                     <tfoot>
-                        <td colspan='8'>合計</td>
+                        <td colspan='9'>合計</td>
                         <td></td>
                         <td>&yen;{{ get_before_inventory_total_price() | number_format }}</td>
                         <td></td>
@@ -236,12 +230,10 @@
 </div>
 <script>
     var datas = {
-        'divisions': <?php echo json_encode($division); ?>,
         'hospitalName': <?php echo json_encode($hospitalName); ?>,
-        'histories': {},
+        'histories': <?php echo json_encode($historys); ?>,
         'select_data': {
-            inventoryHId: "",
-            divisionId: "",
+            inventoryEndId: ""
         },
         'inventoryNums': [],
         'beforeInventoryNums': [],
@@ -259,7 +251,9 @@
     var app = new Vue({
         el: '#app',
         data: datas,
-        mounted() {},
+        mounted() {
+            this.defaultSelected();
+        },
         filters: {
             number_format: function(value) {
                 if (!value) {
@@ -395,24 +389,19 @@
                     };
                 }
             },
-            divisionSelected: function() {
-                app.select_data.inventoryHId = '';
-                app.inventoryNums = [];
-                app.receivingNums = [];
-                app.consumedNums = [];
-                app.beforeInventoryNums = [];
-                app.items = [];
-                app.searchStartDate = '';
-                app.searchEndDate = '';
-                app.complete = false;
-                app.completeDate = '',
-                    app.histories = [];
+            defaultSelected: function() {
+                this.select_data.inventoryEndId = '';
+                this.inventoryNums = [];
+                this.receivingNums = [];
+                this.consumedNums = [];
+                this.beforeInventoryNums = [];
+                this.items = [];
+                this.searchStartDate = '';
+                this.searchEndDate = '';
+                this.complete = false;
+                this.completeDate = '',
 
                 custom_loading = true;
-
-                if (app.select_data.divisionId === "") {
-                    return "";
-                }
 
                 function ajax1() {
                     let dfd = $.Deferred();
@@ -421,30 +410,8 @@
                             url: '%url/rel:mpgt:Inventory%',
                             type: 'POST',
                             data: {
-                                Action: "divisonInventorySelectApi",
+                                Action: "hospitalItemsSelectApi",
                                 _csrf: "<?php echo $csrf_token; ?>",
-                                divisionId: app.select_data.divisionId,
-                            },
-                            dataType: 'json'
-                        })
-                        .done(function(returnData) {
-                            app.histories = returnData.data;
-                        });
-                    // fail()は省略
-                    return dfd.promise();
-                }
-
-
-                function ajax2() {
-                    let dfd = $.Deferred();
-                    $.ajax({
-                            async: true,
-                            url: '%url/rel:mpgt:Inventory%',
-                            type: 'POST',
-                            data: {
-                                Action: "divisonItemsSelectApi",
-                                _csrf: "<?php echo $csrf_token; ?>",
-                                divisionId: app.select_data.divisionId,
                             },
                             dataType: 'json'
                         })
@@ -456,10 +423,7 @@
                 }
                 loading();
                 setTimeout(function() {
-                    ajax1();
-                }, 0);
-                setTimeout(function() {
-                    ajax2().then(loading_remove());
+                    ajax1().then(loading_remove());
                 }, 1000);
             },
             getItemNums: function() {
@@ -472,10 +436,10 @@
                 app.complete = false;
                 app.completeDate = '',
 
-                    app.histories.forEach(e => (app.select_data.inventoryHId === e.inventoryHId) ? app.searchStartDate = e.searchStartDate : "");
-                app.histories.forEach(e => (app.select_data.inventoryHId === e.inventoryHId) ? app.searchEndDate = e.searchEndDate : "");
+                app.histories.forEach(e => (app.select_data.inventoryEndId === e.inventoryEndId) ? app.searchStartDate = e.searchStartDate : "");
+                app.histories.forEach(e => (app.select_data.inventoryEndId === e.inventoryEndId) ? app.searchEndDate = e.searchEndDate : "");
 
-                app.histories.forEach(e => (app.select_data.inventoryHId === e.inventoryHId) ? app.completeDate = e.inventoryTime : "");
+                app.histories.forEach(e => (app.select_data.inventoryEndId === e.inventoryEndId) ? app.completeDate = e.inventoryTime : "");
 
                 custom_loading = true;
 
@@ -487,8 +451,8 @@
                             type: 'POST',
                             data: {
                                 _csrf: "<?php echo $csrf_token; ?>",
-                                Action: "getInventoryItemNumsApi",
-                                inventoryHId: app.select_data.inventoryHId,
+                                Action: "getInventoryItemNumsAllDivisionsApi",
+                                inventoryEndId: app.select_data.inventoryEndId,
                             },
                             dataType: 'json'
                         })
@@ -509,9 +473,8 @@
                             type: 'POST',
                             data: {
                                 _csrf: "<?php echo $csrf_token; ?>",
-                                Action: "getBeforeInventoryItemNumsApi",
-                                inventoryHId: app.select_data.inventoryHId,
-                                divisionId: app.select_data.divisionId,
+                                Action: "getBeforeInventoryItemNumsAllDivisionsApi",
+                                inventoryEndId: app.select_data.inventoryEndId,
                             },
                             dataType: 'json'
                         })
@@ -525,8 +488,6 @@
                     return dfd.promise();
                 }
 
-
-
                 function ajax3() {
                     let dfd = $.Deferred();
                     $.ajax({
@@ -535,9 +496,8 @@
                             type: 'POST',
                             data: {
                                 _csrf: "<?php echo $csrf_token; ?>",
-                                Action: "getReceivingItemNumsApi",
-                                inventoryHId: app.select_data.inventoryHId,
-                                divisionId: app.select_data.divisionId,
+                                Action: "getReceivingItemNumsAllDivisionsApi",
+                                inventoryEndId: app.select_data.inventoryEndId,
                                 startDate: encodeURI(app.searchStartDate),
                                 endDate: encodeURI(app.searchEndDate)
                             },
@@ -558,9 +518,8 @@
                             type: 'POST',
                             data: {
                                 _csrf: "<?php echo $csrf_token; ?>",
-                                Action: "getConsumedItemNumsApi",
-                                inventoryHId: app.select_data.inventoryHId,
-                                divisionId: app.select_data.divisionId,
+                                Action: "getConsumedItemNumsAllDivisionsApi",
+                                inventoryEndId: app.select_data.inventoryEndId,
                                 startDate: encodeURI(app.searchStartDate),
                                 endDate: encodeURI(app.searchEndDate)
                             },
@@ -573,7 +532,7 @@
                     return dfd.promise();
                 }
 
-                if (app.select_data.inventoryHId !== '' && app.select_data.divisionId !== '') {
+                if (app.select_data.inventoryEndId !== '') {
                     loading();
                     setTimeout(function() {
                         ajax1()
@@ -635,11 +594,9 @@
                         app.get_inventory_nums(app.items[i].inHospitalItemId).count,
                         Math.round(app.get_inventory_nums(app.items[i].inHospitalItemId).count * app.items[i].unitPrice * 100) / 100,
                         app.hospitalName,
-                        app.get_division(app.select_data.divisionId).divisionName
+                        app.items[i].divisionName,
                     ];
                 }
-
-                console.log(result);
 
                 result.unshift(['id', '棚名', '分類', '商品名', '製品コード', '規格', 'メーカー名', 'JANコード', '卸業者名', '購買価格', '単価', '入数', '入数単位', '前回数量', '前回金額', '入荷数量', '入荷金額', '消費数量', '消費金額', '棚卸数量', '棚卸金額', '病院名', '部署名']);
 
