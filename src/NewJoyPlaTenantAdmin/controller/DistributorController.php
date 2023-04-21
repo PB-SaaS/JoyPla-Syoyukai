@@ -223,6 +223,7 @@ class DistributorController extends Controller
                     'phoneNumber' => $rows['data'][6],
                     'faxNumber' => $rows['data'][7],
                     'vendorFlag' => $rows['data'][8],
+                    'orderMethod' => $rows['data'][9],
                     'hospitalId' => $SPIRAL->getParam('hospitalId'),
                 ];
             }

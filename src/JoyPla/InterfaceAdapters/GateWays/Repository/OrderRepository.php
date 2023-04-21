@@ -426,7 +426,8 @@ class OrderRepository extends ModelRepository implements
 
     public function getOrder(
         HospitalId $hospitalId,
-        array $orderStatus = [OrderStatus::UnOrdered]
+        array $orderStatus = [OrderStatus::UnOrdered],
+        array $orderIds = []
     ) {
         $historys = ModelRepository::getOrderViewInstance()->where(
             'hospitalId',
@@ -436,6 +437,12 @@ class OrderRepository extends ModelRepository implements
         if (count($orderStatus) > 0) {
             foreach ($orderStatus as $o) {
                 $historys->orWhere('orderStatus', $o);
+            }
+        }
+
+        if (count($orderIds) > 0) {
+            foreach ($orderIds as $orderId) {
+                $historys->orWhere('orderNumber', $orderId->value());
             }
         }
 
@@ -647,13 +654,30 @@ class OrderRepository extends ModelRepository implements
 
         $unapprovedOrderMailViewModel = [];
 
+        $distributor = ModelRepository::getDistributorInstance();
         foreach ($orders as $order) {
             $orderToArray = $order->toArray();
+            $distributor->orWhere(
+                'distributorId',
+                $orderToArray['distributor']['distributorId']
+            );
+        }
+
+        $distributors = $distributor->get();
+
+        foreach ($orders as $order) {
+            $orderToArray = $order->toArray();
+            $distributor = array_find($distributors, function (
+                $distributor
+            ) use ($orderToArray) {
+                return $distributor->distributorId ==
+                    $orderToArray['distributor']['distributorId'];
+            });
             $unapprovedOrderMailViewModel[] = [
                 'orderNumber' => $orderToArray['orderId'],
                 'divisionName' => $orderToArray['division']['divisionName'],
-                'distributorName' =>
-                    $orderToArray['distributor']['distributorName'],
+                'distributorName' => $distributor->distributorName,
+                'orderMethod' => $distributor->orderMethod,
                 'totalAmount' => number_format_jp($orderToArray['totalAmount']),
             ];
         }
@@ -867,6 +891,7 @@ class OrderRepository extends ModelRepository implements
                 'address' => $hospital['address'],
                 'postal_code' => $hospital['postalCode'],
                 'distributor_name' => $distributor->distributorName,
+                'order_method' => $distributor->orderMethod,
                 'useMedicode' => $useMedicode,
                 'orders' => $orderData ?? [],
                 'slip_url' =>
@@ -986,6 +1011,8 @@ class OrderRepository extends ModelRepository implements
             'address' => $order['hospital']['address'],
             'postal_code' => $order['hospital']['postalCode'],
             'distributor_name' => $distributor->distributorName,
+            'order_method' => $distributor->orderMethod,
+            'order_items' => $order['orderItems'],
             'division_name' => $order['division']['divisionName'],
             'order_date' => $order['orderDate'],
             'order_number' => $order['orderId'],
@@ -1027,6 +1054,7 @@ class OrderRepository extends ModelRepository implements
             'distributor_postal_code' => $distributor->postalCode,
             'distributor_prefectures' => $distributor->prefectures,
             'distributor_address' => $distributor->address,
+            'order_method' => $distributor->orderMethod,
             'hospital_name' => $order['hospital']['hospitalName'],
             'postal_code' => $order['hospital']['postalCode'],
             'prefectures' => $order['hospital']['prefectures'],

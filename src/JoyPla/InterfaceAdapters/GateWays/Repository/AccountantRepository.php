@@ -2,8 +2,11 @@
 
 namespace JoyPla\InterfaceAdapters\GateWays\Repository;
 
+use framework\SpiralConnecter\SpiralDB;
 use JoyPla\Enterprise\Models\Accountant;
 use JoyPla\Enterprise\Models\AccountantId;
+use JoyPla\Enterprise\Models\AccountantItem;
+use JoyPla\Enterprise\Models\AccountantItemChageLog;
 use JoyPla\Enterprise\Models\DateYearMonth;
 use JoyPla\Enterprise\Models\DateYearMonthDay;
 use JoyPla\Enterprise\Models\DistributorId;
@@ -28,6 +31,7 @@ class AccountantRepository implements AccountantRepositoryInterface
             'accountantDate' => $accountant['accountantDate'],
             'orderNumber' => $accountant['orderId'],
             'receivingNumber' => $accountant['receivedId'],
+            'totalAmount' => $accountant['totalAmount'],
         ]);
     }
 
@@ -126,6 +130,7 @@ class AccountantRepository implements AccountantRepositoryInterface
             $accountant->distributorId = $history->distributorId;
             $accountant->orderId = $history->orderNumber;
             $accountant->receivedId = $history->receivingNumber;
+            $accountant->totalAmount = $history->totalAmount;
 
             $accountant->_division = array_find($divisions, function (
                 $division
@@ -188,7 +193,118 @@ class AccountantRepository implements AccountantRepositoryInterface
         $accountant->_division = $division;
         $accountant->_distributor = $distributor;
 
+        $items = ModelRepository::getAccountantItemInstance()
+            ->where('accountantId', $accountantId->value())
+            ->get();
+
+        $additems = [];
+        foreach ($items->all() as $item) {
+            $additems[] = AccountantItem::init(
+                $item->index,
+                $item->accountantId,
+                $item->method,
+                $item->action,
+                $item->accountantItemId,
+                $item->itemId,
+                $item->makerName,
+                $item->itemName,
+                $item->itemCode,
+                $item->itemStandard,
+                $item->itemJANCode,
+                $item->count,
+                $item->unit,
+                $item->price,
+                $item->taxrate
+            );
+        }
+        $accountant->setItems($additems);
         return $accountant;
+    }
+
+    public function save(Accountant $accountant)
+    {
+        $itemUpsert = [];
+        $itemInstance = ModelRepository::getAccountantItemInstance()->where(
+            'accountantId',
+            $accountant->getAccountantId()->value()
+        );
+        foreach ($accountant->getItems() as $item) {
+            $item = $item->toArray();
+            $itemUpsert[] = [
+                'updateTime' => 'now',
+                'accountantId' => $accountant->getAccountantId()->value(),
+                'itemId' => $item['itemId'],
+                'itemName' => $item['itemName'],
+                'makerName' => $item['makerName'],
+                'itemCode' => $item['itemCode'],
+                'itemStandard' => $item['itemStandard'],
+                'itemJANCode' => $item['itemJANCode'],
+                'count' => $item['count'],
+                'unit' => $item['unit'],
+                'price' => $item['price'],
+                'taxrate' => $item['taxrate'],
+                'accountantItemId' => $item['accountantItemId'],
+                'action' => $item['action'],
+                'method' => $item['method'],
+                'index' => $item['index'],
+            ];
+
+            $itemInstance->where(
+                'accountantItemId',
+                $item['accountantItemId'],
+                '!='
+            );
+        }
+
+        ModelRepository::getAccountantInstance()
+            ->where('accountantId', $accountant->getAccountantId()->value())
+            ->update([
+                'updateTime' => 'now',
+                'totalAmount' => $accountant->totalAmount(),
+            ]);
+
+        $itemInstance->delete();
+        if (!empty($itemUpsert)) {
+            ModelRepository::getAccountantItemInstance()->upsertBulk(
+                'accountantItemId',
+                $itemUpsert
+            );
+        }
+    }
+
+    public function saveItemLog(array $logs)
+    {
+        $logs = array_map(function (AccountantItemChageLog $log) {
+            return $log;
+        }, $logs);
+
+        $insert = [];
+        foreach ($logs as $log) {
+            $log = $log->toArray();
+            $insert[] = [
+                'accountantId' => $log['accountantItem']['accountantId'],
+                'itemId' => $log['accountantItem']['itemId'],
+                'itemName' => $log['accountantItem']['itemName'],
+                'makerName' => $log['accountantItem']['makerName'],
+                'itemCode' => $log['accountantItem']['itemCode'],
+                'itemStandard' => $log['accountantItem']['itemStandard'],
+                'itemJANCode' => $log['accountantItem']['itemJANCode'],
+                'count' => $log['accountantItem']['count'],
+                'unit' => $log['accountantItem']['unit'],
+                'price' => $log['accountantItem']['price'],
+                'taxrate' => $log['accountantItem']['taxrate'],
+                'accountantItemId' =>
+                    $log['accountantItem']['accountantItemId'],
+                'action' => $log['accountantItem']['action'],
+                'method' => $log['accountantItem']['method'],
+                'index' => $log['accountantItem']['index'],
+                'kinds' => $log['kinds'],
+                'userId' => $log['userId'],
+            ];
+        }
+        if (!empty($insert)) {
+            ModelRepository::getAccountantItemLogInstance()->insert($insert);
+        }
     }
 }
 

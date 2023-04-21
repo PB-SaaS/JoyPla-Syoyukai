@@ -13,6 +13,7 @@ class Accountant
     private ?DistributorId $distributorId;
     private ?string $orderId;
     private ?string $receivedId;
+    private array $items = [];
     private array $option = [];
 
     public function __construct(
@@ -72,6 +73,34 @@ class Accountant
         return $this->option[$field] = $value;
     }
 
+    public function setItems(array $items)
+    {
+        $this->items = array_map(function (AccountantItem $item) {
+            return $item;
+        }, $items);
+    }
+
+    public function addItem(AccountantItem $item)
+    {
+        $this->items[] = $item;
+    }
+
+    public function getItems()
+    {
+        return $this->items;
+    }
+
+    public function totalAmount()
+    {
+        $num = 0;
+
+        foreach ($this->items as $item) {
+            $num += $item->subTotal();
+        }
+
+        return $num;
+    }
+
     public function toArray()
     {
         $result = [
@@ -84,6 +113,10 @@ class Accountant
                 : '',
             'orderId' => $this->orderId ?? '',
             'receivedId' => $this->receivedId ?? '',
+            'totalAmount' => $this->totalAmount(),
+            'items' => array_map(function (AccountantItem $item) {
+                return $item->toArray();
+            }, $this->items),
         ];
 
         foreach ($this->option as $field => $value) {

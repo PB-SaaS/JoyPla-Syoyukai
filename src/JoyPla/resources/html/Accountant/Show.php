@@ -8,11 +8,15 @@
         <h1 class="text-2xl mb-2">会計伝票の詳細</h1>
         <hr>
         <div class="p-4 text-base bg-gray-100 border border-gray-400 flex flex-col md:flex-row md:gap-6 gap-4 mb-6">
-          <?php if (true): ?>
-          <v-button-danger type="button" class="md:w-1/6 w-full" >
+          <v-button-primary type="button" class="md:w-1/6 w-full" @click.native="itemRegister">
+            会計伝票を更新
+          </v-button-primary>
+          <v-button-danger type="button" class="md:w-1/6 w-full" @click.native="slipDelete">
             会計伝票を削除
           </v-button-danger>
-          <?php endif; ?>
+          <v-button-default type="button" class="md:w-1/6 w-full" >
+            印刷
+          </v-button-default>
         </div>
         <div class="p-4 text-base bg-gray-100 border border-gray-400">
           <div class="flex w-full gap-6">
@@ -71,7 +75,7 @@
             <div class="flex-auto w-full">
               <div class="p-4 text-lg font-bold">商品情報</div>
               <div class="overflow-x-auto w-full">
-                <table class="table-auto text-sm w-full">
+                <table class="table-auto text-sm w-full whitespace-nowrap">
                   <thead>
                     <tr>
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">No</th>
@@ -82,14 +86,11 @@
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">製品コード</th>
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">規格</th>
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">JANコード</th>
-                      <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">
-                        <div class="w-24">数量</div>
+                      <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">数量
                       </th>
-                      <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">
-                        <div class="w-24">価格</div>
+                      <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">価格
                       </th>
-                      <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">
-                        <div class="w-24">税率</div>
+                      <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">税率
                       </th>
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">合計金額</th>
                       <th></th>
@@ -97,7 +98,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(item, index)  in fields.sort((a, b) => a.value.index - b.value.index)" 
+                    <tr v-for="(item, index)  in values.items" 
                         class="draggable"
                         :key="item.key" 
                         :draggable="true"
@@ -108,50 +109,54 @@
                         :class="index === dragIndex ? 'dragging' : ''"
                       >
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ index + 1 }}</td>
-                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.value.method }}</td>
-                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.value.action }}</td>
-                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.value.itemName }}</td>
-                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.value.makerName }}</td>
-                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.value.itemCode }}</td>
-                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.value.itemStandard }}</td>
-                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.value.itemJANCode }}</td>
+                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.method }}</td>
+                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.action }}</td>
+                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.itemName }}</td>
+                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.makerName }}</td>
+                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.itemCode }}</td>
+                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.itemStandard }}</td>
+                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.itemJANCode }}</td>
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">
                         <v-input
-                          v-model="item.value.count"
+                          v-model="item.count"
                           :name="`items[${index}].count`"
                           type="number"
-                          label=""
+                          label="数量"
                           title=""
                           suffix=""
-                          class="w-24"
+                          :prefix="item.unit"
+                          class="w-full"
+                          :rules="{ between: [-99999 , 99999] }"
                           change-class-name="inputChange"
                           ></v-input>
                       </td>
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">
                         <v-input
-                          v-model="item.value.price"
+                          v-model="item.price"
                           :name="`items[${index}].price`"
                           type="number"
-                          label=""
+                          label="価格"
                           title=""
                           suffix="&yen;"
+                          :rules="{ between: [-99999 , 99999] }"
                           class="w-24"
                           change-class-name="inputChange"
                           ></v-input>
                       </td>
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">
                         <v-input
-                          v-model="item.value.tax"
-                          :name="`items[${index}].tax`"
+                          v-model="item.taxrate"
+                          :name="`items[${index}].taxrate`"
                           type="number"
-                          label=""
+                          label="税率"
                           title=""
                           prefix="%"
+                          :rules="{ between: [-99999 , 99999] }"
                           class="w-24"
                           change-class-name="inputChange"
                           ></v-input>
                       </td>
-                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">&yen;{{ numberFormat(itemSubtotal(item.value)) }}</td>
+                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">&yen;{{ numberFormat(itemSubtotal(item)) }}</td>
                       <td class="border-b border-slate-100">
                         <v-button-primary type="button" @click.native="copyItem(index)">複製</v-button-primary>
                       </td>
@@ -162,7 +167,26 @@
                   </tbody>
                 </table>
               </div>
-              <div class="w-full" v-if="!openRegistPage">
+              <div class="flex items-center justify-center w-full mt-4">
+                <label for="file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 ">
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg aria-hidden="true" class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                        <p class="mb-2 text-sm text-gray-500 ">ファイルをアップロードしてください</p>
+                        <p class="text-xs text-gray-500 ">TSV,CSV,TXT</p>
+                    </div>
+                    <input 
+                      id="file" 
+                      type="file" 
+                      class="hidden"
+                      accept=".csv,.tsv,.txt"
+                      @change="loadCsvFile" />
+                </label>
+              </div> 
+              <div class="inline-flex items-center justify-center w-full">
+                  <hr class="w-64 h-px my-8 bg-gray-200 border-0 ">
+                  <span class="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 ">or</span>
+              </div>
+              <div class="w-full mt-4" v-if="!openRegistPage">
                 <v-button-default type="button" class="w-full" @click.native="openRegistPage = true">+ 行を追加</v-button-default>
               </div>
               <div class="lg:flex w-full gap-6" v-if="openRegistPage">
@@ -231,7 +255,7 @@
                             <v-input
                               name="register.count"
                               type="number"
-                              :rules="{ required: true}"
+                              :rules="{ between: [-99999 , 99999] }"
                               label="数量"
                               title="数量"
                               ></v-input>
@@ -240,7 +264,6 @@
                             <v-input
                               name="register.unit"
                               type="text"
-                              :rules="{ required: true}"
                               label="単位"
                               title="単位"
                               ></v-input>
@@ -250,7 +273,7 @@
                           <v-input
                             name="register.price"
                             type="number"
-                            :rules="{ required: true}"
+                            :rules="{ between: [-99999 , 99999] }" 
                             label="価格"
                             title="価格"
                             suffix="&yen;"
@@ -258,9 +281,9 @@
                         </div>
                         <div class="my-4">
                           <v-input
-                            name="register.tax"
+                            name="register.taxrate"
                             type="number"
-                            :rules="{ required: true}"
+                            :rules="{ between: [-99999 , 99999] }" 
                             label="税率"
                             title="税率"
                             prefix="%"
@@ -314,14 +337,14 @@ var JoyPlaApp = Vue.createApp({
           initialValues: {
             bulkTax: 0,
             register : {
-              inHospitalItemId: "",
+              itemId: "",
               action  : "",
               itemName  : "",
               makerName : "",
               itemCode : "",
               itemStandard : "",
               itemJANCode : "",
-              tax: 0,
+              taxrate: 0,
               unit : "",
               count : 0,
               price : 0,
@@ -394,7 +417,7 @@ var JoyPlaApp = Vue.createApp({
         startLoading();
         const response = await getSlipData(accountantId);
         values.accountant = response.data;
-        replace([]);
+        replace(response.data.items);
         completeLoading();
       };
       
@@ -408,6 +431,29 @@ var JoyPlaApp = Vue.createApp({
           return new Intl.NumberFormat('ja-JP').format(value);
       };
 
+      const insertItem = (item) => {
+        if (!values.items) {
+            values.items = [];
+          }
+
+        insert(fields.value.length, {
+          index: fields.value.length,
+          method: "手動",
+          accountantItemId: '',
+          itemId: item.itemId,
+          action: item.action,
+          makerName: item.makerName,
+          itemName: item.itemName,
+          itemCode: item.itemCode,
+          itemStandard: item.itemStandard,
+          itemJANCode: item.itemJANCode,
+          count: item.count,
+          price: item.price,
+          taxrate: item.taxrate,
+          unit: item.unit,
+        });
+      }
+
       const addItemHandler = async () => {
         const { valid, errors } = await validate();
 
@@ -420,27 +466,90 @@ var JoyPlaApp = Vue.createApp({
           return;
         }
 
-        if (!values.items) {
-          values.items = [];
-        }
-
-        insert(fields.value.length, {
-          index: fields.value.length,
-          method: "手動",
-          inHospitalItemId: values.register.inHospitalItemId,
-          action: values.register.action,
-          makerName: values.register.makerName,
-          itemName: values.register.itemName,
-          itemCode: values.register.itemCode,
-          itemStandard: values.register.itemStandard,
-          itemJANCode: values.register.itemJANCode,
-          count: values.register.count,
-          price: values.register.price,
-          tax: values.register.tax,
-          unit: values.register.unit,
-        });
+        insertItem(values.register)
       };
-      
+
+      const slipDelete = (values) => {
+          Swal.fire({
+            title: '伝票を削除',
+            text: "削除後は元に戻せません。\r\nよろしいですか？",
+            icon: 'warning',
+            confirmButtonText: '削除します',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+          }).then( async (result) => {
+            try {
+              startLoading();
+              let params = new URLSearchParams();
+              params.append("path", "/api/accountant/"+accountantId+"/delete");
+              params.append("_method", 'delete');
+              params.append("_csrf", _CSRF);
+
+              const res = await axios.post(_APIURL, params);
+
+              if (res.data.code != 200) {
+                throw new Error(res.data.message)
+              }
+
+              Swal.fire({
+                icon: 'success',
+                title: '削除が完了しました。',
+              }).then((result) => {
+                location.href = _ROOT+'&path=/accountant/index&isCache=true';
+              });
+
+              return true;
+            } catch (error) {
+              Swal.fire({
+                icon: 'error',
+                title: 'システムエラー',
+                text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+              });
+            } finally {
+              completeLoading();
+            }
+          });
+        };
+
+      const itemRegister = handleSubmit(async (values) => {
+        try {
+          startLoading();
+          let params = new URLSearchParams();
+          params.append("path", "/api/accountant/"+accountantId+"/update");
+          params.append("_method", 'patch');
+          params.append("_csrf", _CSRF);
+          params.append("accountant", JSON.stringify(encodeURIToObject(
+            {
+              'items' : values.items ?? []
+            })));
+
+          const res = await axios.post(_APIURL, params);
+
+          if (res.data.code != 200) {
+            throw new Error(res.data.message)
+          }
+
+          Swal.fire({
+            icon: 'success',
+            title: '更新が完了しました。',
+          }).then((result) => {
+            location.reload();
+          });
+
+          return true;
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'システムエラー',
+            text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+          });
+        } finally {
+          completeLoading();
+        }
+      });
+
       const itemSubtotal = (item) => {
         if(!item){
           console.log(item);
@@ -449,13 +558,13 @@ var JoyPlaApp = Vue.createApp({
         item = {
           price : item.price ?? 0,
           count : item.count ?? 0,
-          tax : item.tax ?? 0,
+          taxrate : item.taxrate ?? 0,
         }
 
         // 価格、数量、税率を整数に変換
         const priceInt = Math.round(item.price * 100);
         const countInt = Math.round(item.count * 100);
-        const taxRateInt = Math.round(item.tax);
+        const taxRateInt = Math.round(item.taxrate);
 
         // 小計と税額を計算
         const itemTotalInt = priceInt * countInt / 100;
@@ -475,36 +584,23 @@ var JoyPlaApp = Vue.createApp({
         remove(index);
       }
 
-      const debounce = (func, wait) => {
-        let timeout;
-        return function (...args) {
-          const context = this;
-          clearTimeout(timeout);
-          timeout = setTimeout(() => func.apply(context, args), wait);
-        };
-      }
+      const copyItem = (index) => {
+        const originalItem = values.items[index];
+        const copiedItem = JSON.parse(JSON.stringify({ ...originalItem, index: originalItem.index + 1 , accountantItemId: ''}));
 
-      const copyItem = debounce((index) => {
-        // indexプロパティをインクリメントする必要があるアイテムのキーを収集
-        const keysToUpdate = fields.value
-          .filter((field) => field.value.index > fields.value[index].value.index)
-          .map((field) => field.key);
-
-        // コピー元のアイテムのindexプロパティより大きい値を持つすべてのアイテムのindexプロパティをインクリメント
-        keysToUpdate.forEach((key) => {
-          const updatedItem = { ...fields.value[key].value, index: fields.value[key].value.index + 1 };
-          update(key, updatedItem);
+        fields.value.forEach((field, idx) => {
+          if (field.value.index > fields.value[index].value.index) {
+            const updatedItem = { ...fields.value[idx].value, index: fields.value[idx].value.index + 1 };
+            update(idx, updatedItem);
+          }
         });
-
-        // 新しいアイテムをコピーして、適切なindexプロパティを設定
-        const copiedItem = JSON.parse(JSON.stringify({ ...fields.value[index].value, index: fields.value[index].value.index + 1 }));
 
         // 新しいアイテムを挿入
         insert(index + 1, copiedItem);
-      }, 300);
+      };
 
       const addInHospitalItem =  (elem) => {
-        values.register.inHospitalItemId = elem.inHospitalItemId
+        values.register.itemId = elem.itemId
         values.register.makerName = elem.makerName
         values.register.itemName = elem.itemName
         values.register.itemCode = elem.itemCode
@@ -512,7 +608,7 @@ var JoyPlaApp = Vue.createApp({
         values.register.itemJANCode = elem.itemJANCode
         values.register.count = 1
         values.register.price = elem.price
-        values.register.tax = 0
+        values.register.taxrate = 0
         values.register.unit = elem.itemUnit
         MicroModal.close("inHospitalItemModal", {// モーダルを閉じる処理
           awaitCloseAnimation: true // 開閉時のアニメーションを可能に
@@ -520,7 +616,7 @@ var JoyPlaApp = Vue.createApp({
       }
       
       const clear = () => {
-        values.register.inHospitalItemId = '',
+        values.register.itemId = '',
         values.register.action = ''
         values.register.makerName = ''
         values.register.itemName = ''
@@ -529,15 +625,15 @@ var JoyPlaApp = Vue.createApp({
         values.register.itemJANCode = ''
         values.register.count = 0
         values.register.price = 0
-        values.register.tax = 0
+        values.register.taxrate = 0
         values.register.unit = ''
       }
 
       const bulkUpdateTax = () => {
         fields.value.forEach((element , index) => {
-          if(element.value.tax === 0)
+          if(element.value.taxrate === 0)
           {
-            element.value.tax = values.bulkTax;
+            element.value.taxrate = values.bulkTax;
           }
           update(index, element.value)
         });
@@ -573,7 +669,138 @@ var JoyPlaApp = Vue.createApp({
         },
       };
 
+      const loadCsvFile = (e) => {
+          const headers = ['アクション','商品名','メーカー名','製品コード','規格','JANコード','数量','単位','価格','税率'];
+      
+          let file = e
+              .target
+              .files[0];
+
+          let extension = file
+              .name
+              .split('.')
+              .pop();
+
+          if (!file.type.match("text/csv") && !file.type.match("application/vnd.ms-excel") && (extension != 'tsv' && extension != 'txt')) {
+              throw new Error( "CSV/TSV ファイルを選択してください" );
+          }
+
+          let extension_type = extension;
+          if ((file.type.match("text/csv") || file.type.match("application/vnd.ms-excel"))) {
+              extension_type = 'csv';
+          }
+
+          if ((extension == 'tsv' || extension == 'txt')) {
+              extension_type = 'tsv';
+          }
+
+          let reader = new FileReader();
+          reader.readAsArrayBuffer(file);
+          //reader.readAsText(file);
+          startLoading();
+          reader.onload = function (e) {
+            try{
+              // 8ビット符号なし整数値配列と見なす
+              let array = new Uint8Array(e.target.result);
+
+              // 文字コードを取得
+              switch (Encoding.detect(array)) {
+                  case 'UTF16':
+                      // 16ビット符号なし整数値配列と見なす
+                      array = new Uint16Array(e.target.result);
+                      break;
+                  case 'UTF32':
+                      // 32ビット符号なし整数値配列と見なす
+                      array = new Uint32Array(e.target.result);
+                      break;
+              }
+
+              // Unicodeの数値配列に変換
+              let unicodeArray = Encoding.convert(array, 'UNICODE');
+              // Unicodeの数値配列を文字列に変換
+              let text = Encoding.codeToString(unicodeArray);
+
+              let lines = text.split(/\r\n|\n/);
+              let linesArr = [];
+
+              for (let i = 0; i < lines.length; i++) {
+                  if (lines[i] === "") {
+                      lines.splice(i, 1);
+                  }
+              }
+              /*
+              if (5000 < lines.length) {
+                  messages.value.push("読み込んだファイルは5000件を超えています");
+                  return false;
+              }
+              */
+              for (let i = 0; i < lines.length; i++) {
+                  if (lines[i] === "") {
+                      continue;
+                  }
+                  linesArr[i] = {
+                      'index': '',
+                      'data': []
+                  };
+                  if (extension_type == 'csv') {
+                      console.log(lines[i].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/));
+                      linesArr[i]['data'] = lines[i].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
+                      //linesArr[i] = lines[i].split(",");
+                  }
+                  if (extension_type == 'tsv') {
+                      linesArr[i]['data'] = lines[i].split("\t");
+                      //linesArr[i] = lines[i].split("\t");
+                  }
+                  if (headers.length !== linesArr[i]['data'].length) {
+                      throw new Error( "カラム数がヘッダーと一致しません" );
+                  }
+                  for (let j = 0; j < linesArr[i]['data'].length; j++) {
+                      if (linesArr[i]['data'][j].match(/^"/)) {
+                          linesArr[i]['data'][j] = linesArr[i]['data'][j].replace(/^"/, "");
+                      }
+                      if (linesArr[i]['data'][j].match(/"$/)) {
+                          linesArr[i]['data'][j] = linesArr[i]['data'][j].replace(/"$/, "");
+                      }
+                  }
+                  let percent = 100;
+                  if ((lines.length - 1) > 0) {
+                      percent = (1 / (lines.length - 1)) * 100;
+                  }
+              }
+
+              linesArr.forEach(function (line , index) {
+                insertItem({
+                  method: "手動",
+                  itemId: '',
+                  action: line['data'][0],
+                  itemName: line['data'][1],
+                  makerName: line['data'][2],
+                  itemCode: line['data'][3],
+                  itemStandard: line['data'][4],
+                  itemJANCode: line['data'][5],
+                  count: line['data'][6],
+                  unit: line['data'][7],
+                  price: line['data'][8],
+                  taxrate: line['data'][9],
+                });
+              })
+            } catch (error){
+              Swal.fire({
+                icon: "error",
+                title: "ファイルエラー",
+                text: error.message,
+              });
+            }  finally {
+              document.getElementById('file').value = "";
+              completeLoading();
+            }
+          };
+      };
     return {
+      slipDelete,
+      itemRegister,
+      loadCsvFile,
+      dragIndex,
       dragHandlers,
       bulkUpdateTax,
       clear,

@@ -2,6 +2,7 @@
 
 namespace JoyPla\InterfaceAdapters\Controllers\Api;
 
+use ApiResponse;
 use Csrf;
 use framework\Facades\Gate;
 use framework\Http\Controller;
@@ -11,6 +12,9 @@ use JoyPla\Application\InputPorts\Api\Accountant\AccountantRegisterInputData;
 use JoyPla\Application\InputPorts\Api\Accountant\AccountantRegisterInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Accountant\AccountantShowInputData;
 use JoyPla\Application\InputPorts\Api\Accountant\AccountantShowInputPortInterface;
+use JoyPla\Application\InputPorts\Api\Accountant\AccountantUpdateInputData;
+use JoyPla\Application\InputPorts\Api\Accountant\AccountantUpdateInputPortInterface;
+use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 
 class AccountantController extends Controller
 {
@@ -72,5 +76,36 @@ class AccountantController extends Controller
         );
 
         $inputPort->handle($inputData);
+    }
+
+    public function update($vars, AccountantUpdateInputPortInterface $inputPort)
+    {
+        $token = $this->request->get('_csrf');
+        Csrf::validate($token, true);
+
+        $accountantId = $vars['accountantId'];
+        $accountant = $this->request->get('accountant');
+
+        $inputData = new AccountantUpdateInputData(
+            $this->request->user(),
+            $accountantId,
+            $accountant['items'] ?? []
+        );
+
+        $inputPort->handle($inputData);
+    }
+
+    public function delete($vars)
+    {
+        $token = $this->request->get('_csrf');
+        Csrf::validate($token, true);
+
+        $accountantId = $vars['accountantId'];
+
+        ModelRepository::getAccountantInstance()
+            ->where('accountantId', $accountantId)
+            ->where('hospitalId', $this->request->user()->hospitalId)
+            ->delete();
+        echo (new ApiResponse('', 1, 200, 'deleted', []))->toJson();
     }
 }

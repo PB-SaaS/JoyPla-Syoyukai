@@ -79,6 +79,7 @@ var app = new Vue({
                 "電話番号",
                 "FAX番号",
                 "見積対応可能フラグ",
+                "発注方法",
                 ],
             workers: [],
             lists: []

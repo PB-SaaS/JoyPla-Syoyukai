@@ -50,6 +50,10 @@ $auth = new App\Lib\Auth(); ?>
                 <li class=" <?php echo $n3_9; ?>"><a href="%url/rel:mpgt:Goods%&Action=allBulkInsert">新規導入用一括登録</a></li>
                 <?php endif; ?>
                 <li class=" <?php echo $n3_10; ?>"><a href="%url/rel:mpgt:Goods%&Action=allInsertForm">商品・金額・院内商品登録</a></li>
+                <?php if ($auth->Gate('PriceBulkUpsert')): ?>
+                <li class=" <?php echo $n3_11; ?>"><a href="%url/rel:mpgt:PriceCont%&Action=priceInformationReservationUpdate">金額情報予約更新</a></li>
+                <li class=" <?php echo $n3_12; ?>"><a href="%url/rel:mpgt:PriceCont%&Action=priceInformationReservationList">金額情報予約一覧</a></li>
+                <?php endif; ?>
             </ul>
         </li>
         <li class="uk-parent <?php echo $n5; ?>">

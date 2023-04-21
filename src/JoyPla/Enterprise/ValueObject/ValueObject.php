@@ -10,7 +10,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         public function __construct(string $value = '')
         {
             $this->value = $value;
@@ -21,7 +20,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         public function __construct(string $value = '')
         {
             if (!self::isValid($value)) {
@@ -55,7 +53,6 @@ namespace JoyPla\Enterprise\Models {
         public const FORMAT_DELIMITER_HYPHEN = '/^[0-9]{4}-([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12][0-9]|3[01])$/';
         public const FORMAT_DELIMITER_JAPANESE_CHARACTER = '/^([0-9]{4}|[0-9]{3}|[0-9]{2}|[0-9]{1})年([1-9]|0[1-9]|1[0-2])月([1-9]|0[1-9]|[12][0-9]|3[01])日$/';
 
-        private string $value = '';
         private $date;
         public function __construct(string $value = '')
         {
@@ -95,8 +92,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
-
         public function __construct(string $value = '')
         {
             if ($value === '') {
@@ -113,7 +108,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         public function __construct(string $value = '')
         {
             $this->value = $value;
@@ -124,7 +118,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         public function __construct(string $value = '')
         {
             $this->value = $value;
@@ -134,8 +127,6 @@ namespace JoyPla\Enterprise\Models {
     class ItemId
     {
         use ValueObjectTrait;
-
-        private string $value = '';
 
         public function __construct(string $value = '')
         {
@@ -153,7 +144,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         public function __construct(string $value = '')
         {
             $this->value = $value;
@@ -163,8 +153,6 @@ namespace JoyPla\Enterprise\Models {
     class UnitPrice
     {
         use ValueObjectTrait;
-
-        private float $value = 0;
 
         public function __construct(float $value)
         {
@@ -179,8 +167,6 @@ namespace JoyPla\Enterprise\Models {
     class TenantId
     {
         use ValueObjectTrait;
-
-        private string $value = '';
 
         public function __construct(string $value = '')
         {
@@ -198,7 +184,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         public function __construct(string $value = '')
         {
             $this->value = $value;
@@ -209,7 +194,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         public function __construct(string $value = '')
         {
             $this->value = $value;
@@ -220,7 +204,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         public function __construct(string $value = '')
         {
             $this->value = $value;
@@ -230,8 +213,6 @@ namespace JoyPla\Enterprise\Models {
     class Price
     {
         use ValueObjectTrait;
-
-        private float $value = 0;
 
         public function __construct($value)
         {
@@ -243,7 +224,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         public function __construct(int $value)
         {
             $this->value = $value;
@@ -263,7 +243,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         public function __construct(int $value)
         {
             $this->value = $value;
@@ -283,7 +262,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         public function __construct(int $value)
         {
             $this->value = $value;
@@ -374,8 +352,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
-
         public function __construct(string $value = '')
         {
             if ($value === '') {
@@ -391,8 +367,6 @@ namespace JoyPla\Enterprise\Models {
     class HospitalName
     {
         use ValueObjectTrait;
-
-        private string $value = '';
 
         public function __construct(string $value = '')
         {
@@ -410,8 +384,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
-
         public function __construct(string $value = '')
         {
             if ($value === '') {
@@ -428,8 +400,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
-
         public function __construct(string $value = '')
         {
             $this->value = $value;
@@ -439,8 +409,6 @@ namespace JoyPla\Enterprise\Models {
     class DivisionId
     {
         use ValueObjectTrait;
-
-        private string $value = '';
 
         public function __construct(string $value = '')
         {
@@ -458,8 +426,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
-
         public function __construct(string $value = '')
         {
             if ($value === '') {
@@ -476,7 +442,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         public function __construct(string $value = '')
         {
             $this->value = $value;
@@ -487,7 +452,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
         public function __construct(string $value = '')
@@ -534,7 +498,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
         public function __construct(string $value = '')
@@ -555,11 +518,34 @@ namespace JoyPla\Enterprise\Models {
         }
     }
 
+    class AccountantItemId
+    {
+        use ValueObjectTrait;
+
+        private static array $values = [];
+        private static int $count = 0;
+        public function __construct(string $value = '')
+        {
+            $this->value = $value;
+        }
+
+        public static function generate()
+        {
+            $id = uniqid('81');
+            if (in_array($id, self::$values, true)) {
+                return self::generate();
+            }
+            self::$values[] = $id;
+
+            usleep(1000);
+            return new self($id);
+        }
+    }
+
     class CardId
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
         public function __construct(string $value = '')
@@ -584,7 +570,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
         public function __construct(string $value = '')
@@ -613,7 +598,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
         public function __construct(string $value = '')
@@ -642,7 +626,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
         public function __construct(string $value = '')
@@ -671,7 +654,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
 
@@ -701,7 +683,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
 
@@ -731,7 +712,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
         public function __construct(string $value = '')
@@ -804,7 +784,8 @@ namespace JoyPla\Enterprise\Models {
         public const FORMAT_DELIMITER_HYPHEN = '/^[0-9]{4}-([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12][0-9]|3[01])$/';
         public const FORMAT_DELIMITER_JAPANESE_CHARACTER = '/^([0-9]{4}|[0-9]{3}|[0-9]{2}|[0-9]{1})年([1-9]|0[1-9]|1[0-2])月([1-9]|0[1-9]|[12][0-9]|3[01])日$/';
 
-        private string $value = '';
+        public ?DateTime $date;
+
         public function __construct(string $value = '')
         {
             if (!self::isValid($value)) {
@@ -1515,7 +1496,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         private static array $values = [];
         public function __construct(string $value = '')
         {
@@ -1539,7 +1519,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
         public function __construct(string $value = '')
@@ -1563,7 +1542,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
         public function __construct(string $value = '')
@@ -1627,7 +1605,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         public function __construct(int $value)
         {
             $this->value = $value;
@@ -1647,7 +1624,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         private static array $values = [];
         private static int $count = 0;
         public function __construct(string $value = '')
@@ -1672,7 +1648,6 @@ namespace JoyPla\Enterprise\Models {
     {
         use ValueObjectTrait;
 
-        private string $value = '';
         public function __construct(int $value)
         {
             $this->value = $value;
@@ -1753,6 +1728,46 @@ namespace JoyPla\Enterprise\Models {
         public static function isValid($value)
         {
             if (in_array($value, Pref::ALLOW_LIST, true)) {
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    class AccountantMethod
+    {
+        use ValueObjectTrait;
+        public const ALLOW_LIST = ['手動', '自動'];
+
+        public function __construct($value)
+        {
+            $this->value = $value;
+        }
+
+        public static function isValid($value)
+        {
+            if (in_array($value, self::ALLOW_LIST, true)) {
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    class AccountantAction
+    {
+        use ValueObjectTrait;
+        public const ALLOW_LIST = ['消費', '入荷', '払出', 'その他'];
+
+        public function __construct($value)
+        {
+            $this->value = $value;
+        }
+
+        public static function isValid($value)
+        {
+            if (in_array($value, self::ALLOW_LIST, true)) {
                 return true;
             }
 

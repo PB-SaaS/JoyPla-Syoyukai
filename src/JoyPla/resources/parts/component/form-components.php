@@ -389,7 +389,7 @@ const vInput = {
                 :placeholder="placeholder"
                 v-model="value"
                 autocomplete="off"
-                class="grow appearance-none w-full py-2 px-3 leading-tight flex-initial bg-white border"
+                class="grow appearance-none w-full py-2 px-3 leading-tight flex-initial bg-white border min-w-[4rem]"
                 :class="[ ( ! meta.valid && meta.validated == true) ? errorClassName : successClassName, (type !== 'number')? 'text-left' : 'text-right' , changeClass  ]"
                 :disabled="disabled"
             />

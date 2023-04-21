@@ -30,6 +30,10 @@ foreach (scanDirctory('src/JoyPla/Application') as $file) {
     $file = str_replace('src/', '', $file);
     $outputtext .= "require_once('$file');" . PHP_EOL;
 }
+foreach (scanDirctory('src/JoyPla/Batch') as $file) {
+    $file = str_replace('src/', '', $file);
+    $outputtext .= "require_once('$file');" . PHP_EOL;
+}
 
 foreach (scanDirctory('src/JoyPla/Service') as $file) {
     $file = str_replace('src/', '', $file);

@@ -271,25 +271,7 @@ $exceptionHandler = new WebExceptionHandler();
 $kernel = new \framework\Http\Kernel($app, $router, $exceptionHandler);
 $request = new Request();
 
-$auth = new Auth('NJ_HUserDB', [
-    'registrationTime',
-    'updateTime',
-    'authKey',
-    'hospitalId',
-    'divisionId',
-    'userPermission',
-    'loginId',
-    'loginPassword',
-    'name',
-    'nameKana',
-    'mailAddress',
-    'remarks',
-    'termsAgreement',
-    'tenantId',
-    'agreementDate',
-    'hospitalAuthKey',
-    'userCheck',
-]);
+$auth = $app->getAuth();
 
 $request->setUser($auth);
 $kernel->handle($request);

@@ -63,11 +63,13 @@ class ReceivedController extends Controller
         $gate = Gate::getGateInstance('receipt');
 
         $registerModel = $this->request->get('registerModel');
+        $receivedDate = $this->request->get('receivedDate');
         $inputData = new ReceivedRegisterByOrderSlipInputData(
             $this->request->user(),
             $vars['orderId'],
             $registerModel,
-            $gate->isOnlyMyDivision()
+            $gate->isOnlyMyDivision(),
+            $receivedDate
         );
         $inputPort->handle($inputData);
     }
@@ -86,10 +88,12 @@ class ReceivedController extends Controller
         $gate = Gate::getGateInstance('receipt');
 
         $receivedItems = $this->request->get('receivedItems');
+        $receivedDate = $this->request->get('receivedDate');
         $inputData = new ReceivedRegisterInputData(
             $this->request->user(),
             $receivedItems,
-            $gate->isOnlyMyDivision()
+            $gate->isOnlyMyDivision(),
+            $receivedDate
         );
         $inputPort->handle($inputData);
     }

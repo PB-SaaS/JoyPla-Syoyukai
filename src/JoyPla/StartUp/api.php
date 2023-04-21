@@ -141,6 +141,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'revised',
     ])->service($useCaseProvider->getOrderRevisedInteractor());
 
+    Router::map('DELETE', '/api/order/:orderId/delete', [
+        OrderController::class,
+        'delete',
+    ]);
+
     Router::map('GET', '/api/received/order/list', [
         ReceivedController::class,
         'orderList',
@@ -245,6 +250,16 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         AccountantController::class,
         'show',
     ])->service($useCaseProvider->getAccountantShowInteractor());
+
+    Router::map('patch', '/api/accountant/:accountantId/update', [
+        AccountantController::class,
+        'update',
+    ])->service($useCaseProvider->getAccountantUpdateInteractor());
+
+    Router::map('delete', '/api/accountant/:accountantId/delete', [
+        AccountantController::class,
+        'delete',
+    ]);
 });
 
 $router = new Router();
@@ -252,25 +267,8 @@ $app = new JoyPlaApplication();
 $exceptionHandler = new ApiExceptionHandler();
 $kernel = new \framework\Http\Kernel($app, $router, $exceptionHandler);
 $request = new Request();
-$auth = new Auth('NJ_HUserDB', [
-    'registrationTime',
-    'updateTime',
-    'authKey',
-    'hospitalId',
-    'divisionId',
-    'userPermission',
-    'loginId',
-    'loginPassword',
-    'name',
-    'nameKana',
-    'mailAddress',
-    'remarks',
-    'termsAgreement',
-    'tenantId',
-    'agreementDate',
-    'hospitalAuthKey',
-    'userCheck',
-]);
+
+$auth = $app->getAuth();
 
 $request->setUser($auth);
 $kernel->handle($request);

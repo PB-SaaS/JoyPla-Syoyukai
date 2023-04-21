@@ -43,6 +43,8 @@ require_once('framework/Library/SiDateTime/SiDateTime.php');
 require_once('framework/Library/SiValidator/SiRuleInterface.php');
 require_once('framework/Library/SiValidator/SiValidator.php');
 require_once('framework/Library/SiValidator/SiValidatorDefineRule.php');
+require_once('framework/Batch/BatchJob.php');
+require_once('framework/Batch/BatchScheduler.php');
 require_once('framework/SpiralConnecter/SpiralConnecterInterface.php');
 require_once('framework/SpiralConnecter/SpiralConnecter.php');
 require_once('framework/SpiralConnecter/SpiralDB.php');

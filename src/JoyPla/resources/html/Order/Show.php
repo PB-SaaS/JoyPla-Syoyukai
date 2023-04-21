@@ -61,12 +61,16 @@
                   発注タイプ：{{ order.adjustmentToString }}<br>
                   発注元部署：{{ order.division.divisionName }}<br>
                   卸業者：{{ order.distributor.distributorName }}<br>
+                  発注情報：{{ order.distributor.orderMethod }}<br>
                   合計金額：&yen; {{ numberFormat( order.totalAmount) }}
                 </p>
                 <div class="flex flex-col gap-3">
                   <v-button-default type="button" class="w-full" @click.native="openSlip( order.orderId )">
                     発注書を表示
                   </v-button-default>
+                  <v-button-danger type="button" class="w-full" @click.native="deleteSlip( order.orderId )" v-if="order.orderStatus == 2">
+                    発注書を削除
+                  </v-button-danger>
                   <v-button-default type="button" class="w-full" @click.native="openPrint( order.orderId )">
                     発注書を印刷
                   </v-button-default>
@@ -438,11 +442,56 @@ var JoyPlaApp = Vue.createApp({
       const openSlip = ( url ) => {
         location.href = _ROOT + "&path=/order/" + url;    
       }
+      
+      const deleteSlip = ( orderId ) => 
+      {
+          Swal.fire({
+            title: '伝票を削除',
+            text: "削除後は元に戻せません。\r\nよろしいですか？",
+            icon: 'warning',
+            confirmButtonText: '削除します',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+          }).then( async (result) => {
+            if(result.isConfirmed){
+              start();
+              
+              let params = new URLSearchParams();
+              params.append("path", "/api/order/"+orderId+"/delete");
+              params.append("_method", 'delete');
+              params.append("_csrf", _CSRF);
+
+              const res = await axios.post(_APIURL,params);
+              
+              complete();
+              if(res.data.code != 200) {
+                throw new Error(res.data.message)
+              }
+              Swal.fire({
+                  icon: 'success',
+                  title: '消費伝票の削除が完了しました。',
+              }).then((result) => {
+                location.reload();
+              });
+              return true ;
+            }
+          }).catch((error) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'システムエラー',
+              text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+            });
+          });
+      }
+      
       const openPrint = ( url ) => {
         location.href = _ROOT + "&path=/order/" + url + "/print";    
       }
 
       return {
+        deleteSlip,
         loading, 
         start, 
         complete,

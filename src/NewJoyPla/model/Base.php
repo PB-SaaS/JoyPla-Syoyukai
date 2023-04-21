@@ -2293,6 +2293,38 @@ class DistributorAndHospitalDB extends Model
 
     public static $select = [];
 }
+
+class ReservationPriceDB extends Model
+{
+    public const CREATED_AT = 'registrationTime';
+    public const UPDATED_AT = '';
+    public const DELETED_AT = '';
+
+    public static $spiral_db_name = 'NJ_Reservation';
+    public static $guarded = ['id'];
+    public static $primary_key = 'id';
+    public static $fillable = [
+        'registrationTime',
+        'updateTime',
+        'reservationTime',
+        'priceId',
+        'hospitalId',
+        'itemId',
+        'distributorId',
+        'distributorMCode',
+        'quantity',
+        'itemUnit',
+        'unitPrice',
+        'price',
+        'notice',
+        'isActive',
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
 class DistributorUpsertDB extends Model
 {
     public const CREATED_AT = 'registrationTime';
@@ -2313,6 +2345,7 @@ class DistributorUpsertDB extends Model
         'phoneNumber',
         'faxNumber',
         'vendorFlag',
+        'orderMethod',
         'hospitalId',
     ];
 

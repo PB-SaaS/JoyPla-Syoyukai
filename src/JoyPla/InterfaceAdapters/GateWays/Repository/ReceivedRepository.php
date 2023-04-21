@@ -23,6 +23,7 @@ class ReceivedRepository implements ReceivedRepositoryInterface
         foreach ($receiveds as $key => $received) {
             $receivedToArray = $received->toArray();
             $history[] = [
+                'registrationTime' => $receivedToArray['registDate'],
                 'receivingHId' => $receivedToArray['receivedId'],
                 'distributorId' =>
                     $receivedToArray['distributor']['distributorId'],

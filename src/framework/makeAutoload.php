@@ -26,6 +26,10 @@ foreach (scanDirctory('src/framework/Library') as $file) {
     $file = str_replace('src/', '', $file);
     $outputtext .= "require_once('$file');" . PHP_EOL;
 }
+foreach (scanDirctory('src/framework/Batch') as $file) {
+    $file = str_replace('src/', '', $file);
+    $outputtext .= "require_once('$file');" . PHP_EOL;
+}
 
 $outputtext .=
     "require_once('framework/SpiralConnecter/SpiralConnecterInterface.php');" .

@@ -16,12 +16,16 @@
               ></v-select>
           </div>
           <div class="flex-auto w-1/2">
+          <?php
+/*
             <div class="ml-auto h-10 w-20 cursor-pointer" data-micromodal-trigger="openModal">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="h-8 w-8 mx-auto" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" @click="onOpenModal">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
               </svg>
               <p class="text-sm text-center">絞り込み</p>
             </div>
+          */
+?>
           </div>
         </div>
         <div class="w-full md:flex border-b-2 border-gray-200 py-4">
@@ -57,7 +61,7 @@
                 <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant.accountantDate }}</td>
                 <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant._division?.divisionName }}</td>
                 <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant._distributor?.distributorName }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant._distributor?.distributorName }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ numberFormat(accountant.totalAmount) }}</td>
                 <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant.orderId }}</td>
                 <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant.receivedId }}</td>
                 <td class="border-b border-slate-100 p-4">
@@ -320,6 +324,7 @@ var JoyPlaApp = Vue.createApp({
             accountantDate : '<?php echo date('Y-m-d'); ?>',
             divisionId : '',
             distributorId : '',
+            totalAmount: 0,
             orderId : '',
             receivedId : '',
           }
@@ -483,7 +488,7 @@ var JoyPlaApp = Vue.createApp({
               }
               Swal.fire({
                   icon: 'success',
-                  title: '消費伝票の削除が完了しました。',
+                  title: '伝票の削除が完了しました。',
               }).then((result) => {
                 location.reload();
               });

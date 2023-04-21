@@ -27,7 +27,18 @@
         <?php if (gate('decision_of_order_slips')->can()): ?>
         <div class="w-full md:flex border-b-2 border-gray-200 py-4">
           <div class="flex-auto md:w-1/5">
-            <v-button-primary type="button" class="w-full" @click.native="approvalSlipAll">一括承認</v-button-primary>
+            <v-button-default type="button" class="w-full" @click.native="menuOpen = !menuOpen">アクション選択</v-button-default>
+            <!-- Dropdown menu -->
+            <div id="dropdownHover" class="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow" v-if="menuOpen">
+                <ul class="py-2 text-sm text-gray-700 " aria-labelledby="dropdownHoverButton">
+                  <li>
+                    <a href="#" class="block px-4 py-2 hover:bg-gray-100 " @click.native="approvalSlipAll">全件一括承認</a>
+                  </li>
+                  <li>
+                    <a href="#" class="block px-4 py-2 hover:bg-gray-100 " @click.native="approvalSlipSelectedAll">表示している情報のみ一括承認</a>
+                  </li>
+                </ul>
+            </div>
           </div>
           <div class="flex-auto md:w-4/5">
           </div>
@@ -50,6 +61,7 @@
                   <br>
                   発注元部署：{{ order.division.divisionName }}<br>
                   卸業者：{{ order.distributor.distributorName }}<br>
+                  発注情報：{{ order.distributor.orderMethod }}<br>
                   合計金額：&yen; {{ numberFormat( order.totalAmount) }}
                 </p>
                 <div class="flex flex-col gap-3">
@@ -454,8 +466,17 @@ var JoyPlaApp = Vue.createApp({
         });
       }
 
+      const getOrderIds = () => {
+        let orderIds = [];
+        orders.value.forEach(elem => {
+          orderIds.push(elem.orderId);
+        });
+
+        return orderIds;
+      }
+
       
-      const approvalSlipAll = ( orderId ) => 
+      const approvalSlipAll = (  ) => 
       {
         Swal.fire({
           title: '発注書を一括承認',
@@ -473,6 +494,49 @@ var JoyPlaApp = Vue.createApp({
             params.append("path", "/api/order/unapproved/approval/all");
             params.append("_method", 'post');
             params.append("_csrf", _CSRF);
+
+            const res = await axios.post(_APIURL,params);
+            complete();
+            if(res.data.code != 200) {
+              throw new Error(res.data.message);
+            }
+            
+            Swal.fire({
+                icon: 'success',
+                title: '発注書の一括承認が完了しました。',
+            }).then((result) => {
+              location.reload();
+            });
+            return true ;
+          }
+        }).catch((error) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'システムエラー',
+              text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+            });
+        });
+      }
+
+      const approvalSlipSelectedAll = (  ) => 
+      {
+        Swal.fire({
+          title: '発注書を一括承認',
+          text: "表示している情報のみ一括承認をします。\r\nよろしいですか？",
+          icon: 'warning',
+          showCancelButton: true,
+          reverseButtons: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'OK'
+        }).then( async (result) => {
+          if(result.isConfirmed){
+            start();
+            let params = new URLSearchParams();
+            params.append("path", "/api/order/unapproved/approval/all");
+            params.append("_method", 'post');
+            params.append("_csrf", _CSRF);
+            params.append('orderIds',  JSON.stringify(encodeURIToObject(getOrderIds())));
 
             const res = await axios.post(_APIURL,params);
             complete();
@@ -541,8 +605,11 @@ var JoyPlaApp = Vue.createApp({
         });
       }
 
+      const menuOpen = ref(false);
 
       return {
+        approvalSlipSelectedAll,
+        menuOpen,
         loading, 
         start, 
         complete,

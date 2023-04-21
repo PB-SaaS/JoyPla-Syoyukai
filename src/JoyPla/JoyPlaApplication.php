@@ -17,10 +17,42 @@ use LoggingConfig;
 
 class JoyPlaApplication extends Application
 {
+    private ?Auth $auth = null;
+
     public function __construct()
     {
         config_path('JoyPla/Config/app');
+        $this->auth = self::initAuth();
         $this->boot();
+    }
+
+    public function getAuth()
+    {
+        return $this->auth;
+    }
+
+    public static function initAuth()
+    {
+        return new Auth('NJ_HUserDB', [
+            'id',
+            'registrationTime',
+            'updateTime',
+            'authKey',
+            'hospitalId',
+            'divisionId',
+            'userPermission',
+            'loginId',
+            'loginPassword',
+            'name',
+            'nameKana',
+            'mailAddress',
+            'remarks',
+            'termsAgreement',
+            'tenantId',
+            'agreementDate',
+            'hospitalAuthKey',
+            'userCheck',
+        ]);
     }
 
     public function boot()
@@ -53,25 +85,7 @@ class JoyPlaApplication extends Application
             )
         );
 
-        $auth = new Auth('NJ_HUserDB', [
-            'registrationTime',
-            'updateTime',
-            'authKey',
-            'hospitalId',
-            'divisionId',
-            'userPermission',
-            'loginId',
-            'loginPassword',
-            'name',
-            'nameKana',
-            'mailAddress',
-            'remarks',
-            'termsAgreement',
-            'tenantId',
-            'agreementDate',
-            'hospitalAuthKey',
-            'userCheck',
-        ]);
+        $auth = $this->auth;
 
         $tenant = ModelRepository::getTenantInstance()
             ->where('tenantId', $auth->tenantId)
