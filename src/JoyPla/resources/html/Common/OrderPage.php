@@ -120,7 +120,7 @@ var JoyPlaApp = Vue.createApp({
       return { 
         breadcrumbs: [
             {
-              text: '発注メニュー',
+              text: '発注・入荷メニュー',
               disabled: true,
             }
         ],
