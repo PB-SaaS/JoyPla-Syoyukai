@@ -249,7 +249,7 @@ class StockRepository implements StockRepositoryInterface
         }
 
         $result = [];
-        $maxcount = $stocks->getData()->count();
+        $maxcount = $stocks->getTotal();
 
         foreach ($stocks->getData()->all() as $i) {
             $fkey = array_search(

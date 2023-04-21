@@ -218,7 +218,7 @@ class ReturnRepository implements ReturnRepositoryInterface
             $returns[] = $return;
         }
 
-        return [$returns, $historys->getData()->count()];
+        return [$returns, $historys->getTotal()];
     }
 }
 
