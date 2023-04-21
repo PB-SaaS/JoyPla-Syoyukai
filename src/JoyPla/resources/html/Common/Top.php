@@ -18,7 +18,7 @@
                         </svg>
                     </card-button>
                     <card-button main-color="bg-scooter-500" text-color="text-scooter-50" sub-color="bg-scooter-600"
-                        label-text="発注" label-sub-text="Order" path="/order">
+                        label-text="発注・入荷" label-sub-text="Order" path="/order">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" class="stroke-scooter-700" stroke-linejoin="round"
                                 d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />

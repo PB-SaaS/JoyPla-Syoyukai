@@ -274,7 +274,7 @@
       });
 
       const breadcrumbs = [{
-          text: '発注メニュー',
+          text: '発注・入荷メニュー',
           disabled: false,
           href: _ROOT + '&path=/order',
         },
@@ -520,7 +520,7 @@
       const selectOrderItems = ref([]);
       const addItemByBarcode = (items) => {
         selectOrderItems.value = [];
-        if (items.length === 0 || items.item.length === 0) {
+        if (!items || items.length === 0 || items.item.length === 0) {
           Swal.fire({
               icon: 'info',
               title: '商品が見つかりませんでした',

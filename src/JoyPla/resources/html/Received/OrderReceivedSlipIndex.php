@@ -352,7 +352,7 @@
                     sleepComplate();
                 });
                 const breadcrumbs = [{
-                    text: '発注メニュー',
+                    text: '発注・入荷メニュー',
                     disabled: false,
                     href: _ROOT + '&path=/order'
                 }, {
@@ -553,7 +553,7 @@
                 const addItemByBarcode = (items) => {
                     selectInHospitalItems.value = [];
                     if (
-                        (items.type !== 'card' && items.type !== 'gs1-128')
+                        (items.type !== 'jancode' && items.type !== 'card' && items.type !== 'gs1-128')
                         || items.length === 0 || items.item.length === 0) {
                         Swal.fire({
                             icon: 'info',
@@ -585,7 +585,7 @@
                         return false;
                     }
 
-                    if( items.type === 'gs1-128' ) {
+                    if( items.type === 'gs1-128' || items.type === 'jancode') {
                         if (inHospitalitems.length === 1) {
                             addItem(inHospitalitems[0].id, inHospitalitems[0].item);
                         } else {
@@ -701,7 +701,10 @@
                     fields.value.forEach(function(element){
                         if(!!element.value.receiveds){
                             element.value.receiveds.forEach(function(received){
-                                flag = (received.receivedQuantity * element.value.quantity.quantityNum) - ( received.cardQuantity ?? 0 ) >= 0;
+                                if(received.receivedQuantity > 0)
+                                {
+                                    flag = (received.receivedQuantity * element.value.quantity.quantityNum) - ( received.cardQuantity ?? 0 ) >= 0;
+                                }
                             })
                         }
                     })

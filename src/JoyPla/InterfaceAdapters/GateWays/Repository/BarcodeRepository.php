@@ -2,11 +2,19 @@
 
 namespace JoyPla\InterfaceAdapters\GateWays\Repository;
 
+use JoyPla\Enterprise\Models\DateYearMonthDayHourMinutesSecond;
+use JoyPla\Enterprise\Models\Distributor;
+use JoyPla\Enterprise\Models\Division;
 use JoyPla\Enterprise\Models\DivisionId;
+use JoyPla\Enterprise\Models\Hospital;
 use JoyPla\Enterprise\Models\HospitalId;
 use JoyPla\Enterprise\Models\InHospitalItemId;
 use JoyPla\Enterprise\Models\Order;
+use JoyPla\Enterprise\Models\OrderAdjustment;
+use JoyPla\Enterprise\Models\OrderId;
 use JoyPla\Enterprise\Models\OrderItem;
+use JoyPla\Enterprise\Models\OrderStatus;
+use JoyPla\Enterprise\Models\TextArea512Bytes;
 use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 
 class BarcodeRepository implements BarcodeRepositoryInterface
@@ -73,18 +81,39 @@ class BarcodeRepository implements BarcodeRepositoryInterface
         $orderItems = $result->all();
 
         //$historys = OrderView::where('hospitalId', $hospitalId->value());
-        $historys = ModelRepository::getOrderItemInstance()->where(
+        $historys = ModelRepository::getOrderViewInstance()->where(
             'hospitalId',
             $hospitalId->value()
         );
+
+        $hospital = ModelRepository::getHospitalInstance()
+            ->where('hospitalId', $hospitalId->value())
+            ->get()
+            ->first();
+
         foreach ($orderItems as $item) {
             $historys->orWhere('orderNumber', $item->orderNumber);
         }
         $historys = $historys->get();
         $orders = [];
         foreach ($historys->all() as $history) {
-            $order = Order::create($history);
-
+            $order = new Order(
+                new OrderId($history->orderNumber),
+                new DateYearMonthDayHourMinutesSecond(
+                    $history->registrationTime
+                ),
+                new DateYearMonthDayHourMinutesSecond($history->orderTime),
+                [],
+                Hospital::create($hospital),
+                Division::create($history),
+                Distributor::create($history),
+                new OrderStatus($history->orderStatus),
+                new OrderAdjustment($history->adjustment),
+                new TextArea512Bytes($history->ordercomment),
+                new TextArea512Bytes($history->distrComment),
+                $history->ordererUserName,
+                $history->receivingTarget != '2' ? 1 : 2 //1	大倉庫  2	発注部署
+            );
             foreach ($orderItems as $item) {
                 if ($order->getOrderId()->equal($item->orderNumber)) {
                     $order = $order->addOrderItem(OrderItem::create($item));
@@ -121,6 +150,11 @@ class BarcodeRepository implements BarcodeRepositoryInterface
 
         $orderItems = $result->all();
 
+        $hospital = ModelRepository::getHospitalInstance()
+            ->where('hospitalId', $hospitalId->value())
+            ->get()
+            ->first();
+
         //$historys = OrderView::where('hospitalId', $hospitalId->value());
         $historys = ModelRepository::getOrderViewInstance()->where(
             'hospitalId',
@@ -132,8 +166,23 @@ class BarcodeRepository implements BarcodeRepositoryInterface
         $historys = $historys->get();
         $orders = [];
         foreach ($historys->all() as $history) {
-            $order = Order::create($history);
-
+            $order = new Order(
+                new OrderId($history->orderNumber),
+                new DateYearMonthDayHourMinutesSecond(
+                    $history->registrationTime
+                ),
+                new DateYearMonthDayHourMinutesSecond($history->orderTime),
+                [],
+                Hospital::create($hospital),
+                Division::create($history),
+                Distributor::create($history),
+                new OrderStatus($history->orderStatus),
+                new OrderAdjustment($history->adjustment),
+                new TextArea512Bytes($history->ordercomment),
+                new TextArea512Bytes($history->distrComment),
+                $history->ordererUserName,
+                $history->receivingTarget != '2' ? 1 : 2 //1	大倉庫  2	発注部署
+            );
             foreach ($orderItems as $item) {
                 if ($order->getOrderId()->equal($item->orderNumber)) {
                     $order = $order->addOrderItem(OrderItem::create($item));

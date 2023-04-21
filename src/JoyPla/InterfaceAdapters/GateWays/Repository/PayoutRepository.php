@@ -62,6 +62,7 @@ class PayoutRepository implements PayoutRepositoryInterface
                 ];
             }
         }
+
         ModelRepository::getPayoutInstance()->insert($histories);
         ModelRepository::getPayoutItemInstance()->insert($items);
 

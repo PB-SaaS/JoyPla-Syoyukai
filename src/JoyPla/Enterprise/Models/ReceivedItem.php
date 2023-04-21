@@ -206,8 +206,16 @@ class ReceivedItem
         );
     }
 
-    public function checkCards(array $cards)
+    public function isCheckCards(array $cards)
     {
+        if (
+            $this->receivedQuantity->value() *
+                $this->quantity->getQuantityNum() <
+            0
+        ) {
+            return true;
+        }
+
         $cards = array_map(function (Card $card) {
             return $card;
         }, $cards);
@@ -219,7 +227,7 @@ class ReceivedItem
 
         return $this->receivedQuantity->value() *
             $this->quantity->getQuantityNum() -
-            $cardQuantity <
+            $cardQuantity >=
             0;
     }
 

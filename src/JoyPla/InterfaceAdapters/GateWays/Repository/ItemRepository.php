@@ -87,7 +87,7 @@ class ItemRepository implements ItemRepositoryInterface
 
         $items = $result->getData()->all();
 
-        return [$items, $result->getData()->count()];
+        return [$items, $result->getTotal()];
     }
 
     public function saveToArray(

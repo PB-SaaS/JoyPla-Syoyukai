@@ -225,7 +225,7 @@ class ReceivedRepository implements ReceivedRepositoryInterface
             $receiveds[] = $received;
         }
 
-        return [$receiveds, $historys->getData()->count()];
+        return [$receiveds, $historys->getTotal()];
     }
 
     public function index(HospitalId $hospitalId, ReceivedId $receivedId)
