@@ -10,11 +10,21 @@ use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 
 class DivisionRepository implements DivisionRepositoryInterface
 {
-    public function findByHospitalId(HospitalId $hospitalId)
-    {
-        $division = ModelRepository::getDivisionInstance()
-            ->where('hospitalId', $hospitalId->value())
-            ->get();
+    public function findByHospitalId(
+        HospitalId $hospitalId,
+        bool $deleted = false
+    ) {
+        $division = ModelRepository::getDivisionInstance()->where(
+            'hospitalId',
+            $hospitalId->value()
+        );
+        /*
+        if (!$deleted) {
+            $division->orWhere('deleteFlag', 'f');
+            $division->orWhereNull('deleteFlag');
+        }
+        */
+        $division = $division->get();
 
         $result = [];
         foreach ($division as $d) {

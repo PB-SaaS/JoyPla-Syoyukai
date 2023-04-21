@@ -1357,7 +1357,6 @@ class InventoryController extends Controller
             );
         }
     }
-
     public function divisonInventorySelectApi($SPIRAL)
     {
         try {

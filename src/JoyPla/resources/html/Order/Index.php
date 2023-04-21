@@ -41,6 +41,7 @@
           <v-text title="入荷先部署" class="flex w-full gap-6">{{ order.receivedDivisionName }}</v-text>
           <v-text title="発注担当者" class="flex w-full gap-6">{{ order.orderUserName }}</v-text>
           <v-text title="卸業者" class="lg:flex w-full gap-6">{{ order.distributor.distributorName }}</v-text>
+          <v-text title="発注方法" class="lg:flex w-full gap-6">{{ order.distributor.orderMethod }}</v-text>
           <v-text title="発注タイプ" class="flex w-full gap-6">{{ order.adjustmentToString }}</v-text>
           <fieldset class="md:flex w-full gap-6">
             <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal" v-if="title != ''">

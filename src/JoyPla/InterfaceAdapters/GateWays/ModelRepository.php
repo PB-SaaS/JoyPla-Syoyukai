@@ -52,6 +52,7 @@ class ModelRepository
             'authKey',
             'vendorFlag',
             'distCommonId',
+            'orderMethod',
         ]);
     }
 
@@ -112,6 +113,7 @@ class ModelRepository
             'receivingTarget',
             'adjustment',
             'distrComment',
+            'orderMethod',
         ]);
     }
 
@@ -159,6 +161,7 @@ class ModelRepository
             'distributorCode',
             'medicodeStatus',
             'medicodeSentDate',
+            'orderMethod',
         ]);
     }
 
@@ -1100,6 +1103,136 @@ class ModelRepository
             'itemUnit',
             'notUsedFlag',
             'measuringInst',
+        ]);
+    }
+
+    public static function getAccountantInstance()
+    {
+        return SpiralDB::title('NJ_Accountant')->value([
+            'id',
+            'registTime',
+            'updateTime',
+            'hospitalId',
+            'divisionId',
+            'distributorId',
+            'accountantId',
+            'accountantDate',
+            'orderNumber',
+            'receivingNumber',
+            'totalAmount',
+        ]);
+    }
+
+    public static function getAccountantItemInstance()
+    {
+        return SpiralDB::title('NJ_AccountantI')->value([
+            'id',
+            'registTime',
+            'updateTime',
+            'accountantId',
+            'itemId',
+            'itemName',
+            'makerName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'count',
+            'unit',
+            'price',
+            'taxrate',
+            'accountantItemId',
+            'action',
+            'method',
+            'index',
+        ]);
+    }
+
+    public static function getAccountantItemLogInstance()
+    {
+        return SpiralDB::title('NJ_AItemLog')->value([
+            'id',
+            'registTime',
+            'accountantId',
+            'itemId',
+            'itemName',
+            'makerName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'count',
+            'unit',
+            'price',
+            'taxrate',
+            'accountantItemId',
+            'action',
+            'method',
+            'index',
+            'kinds',
+            'userId',
+        ]);
+    }
+
+    public static function getReservationPriceInstance()
+    {
+        return SpiralDB::title('NJ_Reservation')->value([
+            'id',
+            'registrationTime',
+            'updateTime',
+            'reservationTime',
+            'priceId',
+            'hospitalId',
+            'itemId',
+            'distributorId',
+            'distributorMCode',
+            'quantity',
+            'itemUnit',
+            'unitPrice',
+            'price',
+            'notice',
+            'isActive',
+            'recordId',
+        ]);
+    }
+
+    public static function getReservationPriceViewInstance()
+    {
+        return SpiralDB::title('reservationPrice')->value([
+            'id',
+            'registrationTime',
+            'updateTime',
+            'reservationTime',
+            'priceId',
+            'hospitalId',
+            'itemId',
+            'distributorId',
+            'distributorMCode',
+            'quantity',
+            'quantityUnit',
+            'itemUnit',
+            'unitPrice',
+            'price',
+            'notice',
+            'isActive',
+            'authKey',
+        ]);
+    }
+
+    public static function getPriceUpsertTransactionInstance()
+    {
+        return SpiralDB::title('T_Price')->value([
+            'id',
+            'registrationTime',
+            'priceId',
+            'itemId',
+            'itemsAuthKey',
+            'hospitalId',
+            'distributorId',
+            'quantity',
+            'itemUnit',
+            'price',
+            'notice',
+            'unitPrice',
+            'distributorMCode',
         ]);
     }
 }

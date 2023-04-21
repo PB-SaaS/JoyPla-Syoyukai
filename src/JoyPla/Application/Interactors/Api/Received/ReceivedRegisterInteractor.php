@@ -45,7 +45,6 @@ namespace JoyPla\Application\Interactors\Api\Received {
     class ReceivedRegisterInteractor implements
         ReceivedRegisterInputPortInterface
     {
-
         private PresenterProvider $presenterProvider;
         private RepositoryProvider $repositoryProvider;
 
@@ -90,7 +89,9 @@ namespace JoyPla\Application\Interactors\Api\Received {
                 $received = new Received(
                     $order->getOrderId(),
                     ReceivedId::generate(),
-                    new DateYearMonthDayHourMinutesSecond('now'),
+                    new DateYearMonthDayHourMinutesSecond(
+                        $inputData->receivedDate ?? 'now'
+                    ),
                     [],
                     $order->getHospital(),
                     $order->getDivision(),
@@ -144,7 +145,6 @@ namespace JoyPla\Application\Interactors\Api\Received {
                                     $storehouse = $this->repositoryProvider
                                         ->getDivisionRepository()
                                         ->getStorehouse($hospitalId);
-
 
                                     $inventoryCalculations[] = new InventoryCalculation(
                                         $receivedItem->getHospitalId(),
@@ -243,10 +243,16 @@ namespace JoyPla\Application\InputPorts\Api\Received {
      */
     class ReceivedRegisterInputData
     {
+        public Auth $user;
+        public array $receivedItems;
+        public bool $isOnlyMyDivision;
+        public string $receivedDate;
+
         public function __construct(
             Auth $user,
             array $receivedItems,
-            bool $isOnlyMyDivision
+            bool $isOnlyMyDivision,
+            string $receivedDate
         ) {
             $this->user = $user;
             $this->receivedItems = array_map(function ($item) {
@@ -262,6 +268,9 @@ namespace JoyPla\Application\InputPorts\Api\Received {
                 return $d;
             }, $receivedItems);
             $this->isOnlyMyDivision = $isOnlyMyDivision;
+            $this->receivedDate = $receivedDate
+                ? $receivedDate . ' 00:00:00'
+                : 'now';
         }
     }
 

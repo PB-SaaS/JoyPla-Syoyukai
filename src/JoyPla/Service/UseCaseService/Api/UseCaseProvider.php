@@ -2,6 +2,10 @@
 
 namespace JoyPla\Service\UseCase\Api;
 
+use JoyPla\Application\Interactors\Api\Accountant\AccountantIndexInteractor;
+use JoyPla\Application\Interactors\Api\Accountant\AccountantRegisterInteractor;
+use JoyPla\Application\Interactors\Api\Accountant\AccountantShowInteractor;
+use JoyPla\Application\Interactors\Api\Accountant\AccountantUpdateInteractor;
 use JoyPla\Application\Interactors\Api\Barcode\BarcodeOrderSearchInteractor;
 use JoyPla\Application\Interactors\Api\Barcode\BarcodeSearchInteractor;
 use JoyPla\Application\Interactors\Api\Consumption\ConsumptionDeleteInteractor;
@@ -573,6 +577,66 @@ class UseCaseProvider
             $this->repositoryProvider,
             $this->presenterProvider
         ) extends ItemRequestUpdateInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getAccountantRegisterInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends AccountantRegisterInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getAccountantIndexInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends AccountantIndexInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getAccountantShowInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends AccountantShowInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getAccountantUpdateInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends AccountantUpdateInteractor {
             public function __construct(
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider

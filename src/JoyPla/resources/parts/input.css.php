@@ -216,3 +216,16 @@ input[aria-invalid="true"] {
     @apply border-gray-300;
   }
 }
+
+.draggable {
+  cursor: grab;
+}
+
+.draggable:active {
+  cursor: grabbing;
+}
+
+.dragging {
+  background-color: #eee;
+}
+

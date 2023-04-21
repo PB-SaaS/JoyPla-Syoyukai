@@ -37,9 +37,11 @@ abstract class FieldTypeValidate
         //$startRowNumber = intval(htmlSanitize($_POST["rowStartNumber"]));
         $startRowNumber = intval(htmlSanitize($this->startRowNumber));
         if (!is_int($startRowNumber)) {
-            throw new Exception("post parameter '\$rowStartNumber' is not int :" . gettype($startRowNumber));
+            throw new Exception(
+                "post parameter '\$rowStartNumber' is not int :" .
+                    gettype($startRowNumber)
+            );
         }
-
 
         $errorLimitCount = 1000;
 
@@ -48,17 +50,29 @@ abstract class FieldTypeValidate
         $rowData = $this->rowData;
         for ($i = 0; true; $i++) {
             $rowNumber = $i;
-            if ($rowData[$rowNumber]['data'] === "" || is_null($rowData[$rowNumber]['data'])) {
+            if (
+                $rowData[$rowNumber]['data'] === '' ||
+                is_null($rowData[$rowNumber]['data'])
+            ) {
                 break;
             }
             if (count($fieldInfoList) !== count($rowData[$rowNumber]['data'])) {
-                throw new Exception("header length(" . count($fieldInfoList) . "), body length(" . count($rowData[$rowNumber]['data']) . ") is not equal ");
+                throw new Exception(
+                    'header length(' .
+                        count($fieldInfoList) .
+                        '), body length(' .
+                        count($rowData[$rowNumber]['data']) .
+                        ') is not equal '
+                );
             }
             //$row = explode("\t", $_POST["rowData[" . $rowNumber . "]"]);
             $row = $rowData[$rowNumber]['data'];
             $index = $rowData[$rowNumber]['index'];
-            foreach (array_map(null, $fieldInfoList, $row) as [$info, $column]) {
-                $signingColumn = (isValueEmpty($column)) ? "" : ($column);
+            foreach (
+                array_map(null, $fieldInfoList, $row)
+                as [$info, $column]
+            ) {
+                $signingColumn = isValueEmpty($column) ? '' : $column;
                 /* 2021/11追加ここから */
                 /*
                 文字列型の場合は文頭・文末の空白文字を削除
@@ -67,16 +81,29 @@ abstract class FieldTypeValidate
                 */
 
                 /* 2021/11追加ここまで */
-                $dbField = DbField::of($info["key"], $info["fieldType"], $info["replaceKey"], $signingColumn, $info);
+                $dbField = DbField::of(
+                    $info['key'],
+                    $info['fieldType'],
+                    $info['replaceKey'],
+                    $signingColumn,
+                    $info
+                );
                 $validatedResult = $this->personalValidate($dbField);
 
                 if ($validatedResult->isFailed()) {
-                    $errorSentence = $this->makeErrorSentence($info["key"], $index, $validatedResult->getValue()->getMessage());
+                    $errorSentence = $this->makeErrorSentence(
+                        $info['key'],
+                        $index,
+                        $validatedResult->getValue()->getMessage()
+                    );
                     $this->tryDbFieldList->add(new Failed($errorSentence));
                 }
 
                 // エラー件数が1000件を超えたら強制的に処理を終了する
-                if ($errorLimitCount <= $this->tryDbFieldList->countFailedObject()) {
+                if (
+                    $errorLimitCount <=
+                    $this->tryDbFieldList->countFailedObject()
+                ) {
                     return;
                 }
             }
@@ -90,29 +117,43 @@ abstract class FieldTypeValidate
         return $this->tryDbFieldList;
     }
 
-    private function makeErrorSentence(string $key, int $rowNumber, string $detailSentence): string
-    {
-        return ($rowNumber + 1) . "行目の" . $key . "：" . $detailSentence;
+    private function makeErrorSentence(
+        string $key,
+        int $rowNumber,
+        string $detailSentence
+    ): string {
+        return $rowNumber + 1 . '行目の' . $key . '：' . $detailSentence;
     }
 
     private function trim($column)
     {
         $column = rawurldecode(rawurldecode(urlencode($column)));
-        return $column = (is_string($column)) ? preg_replace('/\A[\p{Cc}\p{Cf}\p{Z}]++|[\p{Cc}\p{Cf}\p{Z}]++\z/u', '', $column) : $column;
+        return $column = is_string($column)
+            ? preg_replace(
+                '/\A[\p{Cc}\p{Cf}\p{Z}]++|[\p{Cc}\p{Cf}\p{Z}]++\z/u',
+                '',
+                $column
+            )
+            : $column;
     }
 
     protected function trimRowData($rowData)
     {
         for ($i = 0; true; $i++) {
             $rowNumber = $i;
-            if ($rowData[$rowNumber]['data'] === "" || is_null($rowData[$rowNumber]['data'])) {
+            if (
+                $rowData[$rowNumber]['data'] === '' ||
+                is_null($rowData[$rowNumber]['data'])
+            ) {
                 break;
             }
             //$row = explode("\t", $_POST["rowData[" . $rowNumber . "]"]);
             $row = $rowData[$rowNumber]['data'];
             foreach ($row as $key => $column) {
-                $signingColumn = (isValueEmpty($column)) ? "" : $column;
-                $rowData[$rowNumber]['data'][$key] = $this->trim($signingColumn);
+                $signingColumn = isValueEmpty($column) ? '' : $column;
+                $rowData[$rowNumber]['data'][$key] = $this->trim(
+                    $signingColumn
+                );
             }
         }
 
@@ -122,9 +163,9 @@ abstract class FieldTypeValidate
 
 class itemDB extends FieldTypeValidate
 {
-    public const TARGET_NAME = "items";
+    public const TARGET_NAME = 'items';
 
-    public const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
+    public const SENTENCE_INPUT_REQUIRED = '値は入力必須です';
 
     public $dbFieldInfo = [
         [
@@ -247,7 +288,10 @@ class itemDB extends FieldTypeValidate
         }
 
         $columnObj = $field->getValue();
-        if ($columnObj->isNotNullFlg() && isValueEmpty($columnObj->getValue())) {
+        if (
+            $columnObj->isNotNullFlg() &&
+            isValueEmpty($columnObj->getValue())
+        ) {
             return new Failed(new FormatError(itemDB::SENTENCE_INPUT_REQUIRED));
         }
 
@@ -255,12 +299,11 @@ class itemDB extends FieldTypeValidate
     }
 }
 
-
 class PriceTrDB extends FieldTypeValidate
 {
-    public const TARGET_NAME = "PriceTrDB";
+    public const TARGET_NAME = 'PriceTrDB';
 
-    public const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
+    public const SENTENCE_INPUT_REQUIRED = '値は入力必須です';
 
     public $dbFieldInfo = [
         [
@@ -345,7 +388,10 @@ class PriceTrDB extends FieldTypeValidate
         }
 
         $columnObj = $field->getValue();
-        if ($columnObj->isNotNullFlg() && isValueEmpty($columnObj->getValue())) {
+        if (
+            $columnObj->isNotNullFlg() &&
+            isValueEmpty($columnObj->getValue())
+        ) {
             return new Failed(new FormatError(itemDB::SENTENCE_INPUT_REQUIRED));
         }
 
@@ -353,12 +399,104 @@ class PriceTrDB extends FieldTypeValidate
     }
 }
 
+class PriceReservationUpdateDB extends FieldTypeValidate
+{
+    public const TARGET_NAME = 'NJ_Reservation';
 
+    public const SENTENCE_INPUT_REQUIRED = '値は入力必須です';
+
+    public $dbFieldInfo = [
+        [
+            'key' => '反映日時',
+            'fieldType' => 'DateYearMonthDayHour',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [
+            'key' => '金額管理ID',
+            'fieldType' => 'NumberSymbolAlphabet32bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [
+            'key' => '卸業者ID',
+            'fieldType' => 'NumberSymbolAlphabet32bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [
+            'key' => '卸業者管理コード',
+            'fieldType' => 'TextField128bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [
+            'key' => '入数',
+            'fieldType' => 'Integer_',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [
+            'key' => '個数単位',
+            'fieldType' => 'TextField32bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [
+            'key' => '単価',
+            'fieldType' => 'RealNumber',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+        [
+            'key' => '購買価格',
+            'fieldType' => 'RealNumber',
+            'replaceKey' => 't',
+            'notNullFlg' => 't',
+        ],
+        [
+            'key' => '特記事項',
+            'fieldType' => 'TextArea512Bytes',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
+    ];
+
+    public $rowData = [
+        //"商品名\t商品コード（製品コード）\t商品規格\t1235\tメーカー名\tカタログNo\tあ000\t1\t100\t10\t枚\t個",
+    ];
+
+    public function __construct()
+    {
+        $this->rowData = $this->trimRowData($_POST['rowData']);
+
+        $this->startRowNumber = $_POST['startRowNumber'];
+        parent::__construct();
+        $this->validate();
+    }
+
+    public function personalValidate(Try_ $field): Try_
+    {
+        if ($field->isFailed()) {
+            return $field;
+        }
+
+        $columnObj = $field->getValue();
+        if (
+            $columnObj->isNotNullFlg() &&
+            isValueEmpty($columnObj->getValue())
+        ) {
+            return new Failed(new FormatError(itemDB::SENTENCE_INPUT_REQUIRED));
+        }
+
+        return $field;
+    }
+}
 class InHospitalNewInsertDb extends FieldTypeValidate
 {
-    public const TARGET_NAME = "InHospitalTrDb";
+    public const TARGET_NAME = 'InHospitalTrDb';
 
-    public const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
+    public const SENTENCE_INPUT_REQUIRED = '値は入力必須です';
 
     public $dbFieldInfo = [
         [
@@ -457,20 +595,24 @@ class InHospitalNewInsertDb extends FieldTypeValidate
         }
 
         $columnObj = $field->getValue();
-        if ($columnObj->isNotNullFlg() && isValueEmpty($columnObj->getValue())) {
-            return new Failed(new FormatError(InHospitalNewInsertDb::SENTENCE_INPUT_REQUIRED));
+        if (
+            $columnObj->isNotNullFlg() &&
+            isValueEmpty($columnObj->getValue())
+        ) {
+            return new Failed(
+                new FormatError(InHospitalNewInsertDb::SENTENCE_INPUT_REQUIRED)
+            );
         }
 
         return $field;
     }
 }
 
-
 class DistributorDB extends FieldTypeValidate
 {
-    public const TARGET_NAME = "DistributorDB";
+    public const TARGET_NAME = 'DistributorDB';
 
-    public const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
+    public const SENTENCE_INPUT_REQUIRED = '値は入力必須です';
 
     public $dbFieldInfo = [
         [
@@ -527,6 +669,12 @@ class DistributorDB extends FieldTypeValidate
             'replaceKey' => 't',
             'notNullFlg' => '',
         ],
+        [
+            'key' => '発注方法',
+            'fieldType' => 'Select_',
+            'replaceKey' => 't',
+            'notNullFlg' => '',
+        ],
     ];
 
     public $rowData = [
@@ -549,20 +697,24 @@ class DistributorDB extends FieldTypeValidate
         }
 
         $columnObj = $field->getValue();
-        if ($columnObj->isNotNullFlg() && isValueEmpty($columnObj->getValue())) {
-            return new Failed(new FormatError(DistributorDB::SENTENCE_INPUT_REQUIRED));
+        if (
+            $columnObj->isNotNullFlg() &&
+            isValueEmpty($columnObj->getValue())
+        ) {
+            return new Failed(
+                new FormatError(DistributorDB::SENTENCE_INPUT_REQUIRED)
+            );
         }
 
         return $field;
     }
 }
 
-
 class AllNewItemInsertDB extends FieldTypeValidate
 {
-    public const TARGET_NAME = "AllNewItemInsertDB";
+    public const TARGET_NAME = 'AllNewItemInsertDB';
 
-    public const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
+    public const SENTENCE_INPUT_REQUIRED = '値は入力必須です';
 
     public $dbFieldInfo = [
         [
@@ -731,8 +883,13 @@ class AllNewItemInsertDB extends FieldTypeValidate
         }
 
         $columnObj = $field->getValue();
-        if ($columnObj->isNotNullFlg() && isValueEmpty($columnObj->getValue())) {
-            return new Failed(new FormatError(AllNewItemInsertDB::SENTENCE_INPUT_REQUIRED));
+        if (
+            $columnObj->isNotNullFlg() &&
+            isValueEmpty($columnObj->getValue())
+        ) {
+            return new Failed(
+                new FormatError(AllNewItemInsertDB::SENTENCE_INPUT_REQUIRED)
+            );
         }
 
         return $field;
@@ -741,9 +898,9 @@ class AllNewItemInsertDB extends FieldTypeValidate
 
 class CardDB extends FieldTypeValidate
 {
-    public const TARGET_NAME = "CardDB";
+    public const TARGET_NAME = 'CardDB';
 
-    public const SENTENCE_INPUT_REQUIRED = "値は入力必須です";
+    public const SENTENCE_INPUT_REQUIRED = '値は入力必須です';
 
     public $dbFieldInfo = [
         [
@@ -786,7 +943,10 @@ class CardDB extends FieldTypeValidate
         }
 
         $columnObj = $field->getValue();
-        if ($columnObj->isNotNullFlg() && isValueEmpty($columnObj->getValue())) {
+        if (
+            $columnObj->isNotNullFlg() &&
+            isValueEmpty($columnObj->getValue())
+        ) {
             return new Failed(new FormatError(CardDB::SENTENCE_INPUT_REQUIRED));
         }
 

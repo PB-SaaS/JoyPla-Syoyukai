@@ -22,6 +22,22 @@ JoyPla からお知らせです。
 
 合計金額 <?php echo '￥' . number_format_jp((float) $order['totalAmount']); ?> 
 
+商品情報：
+<?php foreach ($order['orderItems'] as $item) { ?>
+-----------------------------------------------------------
+商品名 <?php echo $item['item']['itemName']; ?> 
+メーカー名 <?php echo $item['item']['makerName']; ?> 
+製品コード <?php echo $item['item']['itemCode']; ?> 
+規格 <?php echo $item['item']['itemStandard']; ?> 
+JANコード <?php echo $item['item']['itemJANCode']; ?> 
+卸業者管理コード <?php echo $item['distributorManagerCode']; ?> 
+数量 <?php
+echo $item['orderQuantity'];
+echo $item['quantity']['itemUnit'];
+?> 
+<?php } ?>
+-----------------------------------------------------------
+
 下記URLより発注伝票を確認できます
 <?php echo $slip_url . $order['orderId']; ?> 
 ===========================================================

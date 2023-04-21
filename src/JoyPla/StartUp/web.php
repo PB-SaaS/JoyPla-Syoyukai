@@ -8,6 +8,7 @@ require_once 'JoyPla/require.php';
 
 use framework\Http\Request;
 use framework\Routing\Router;
+use JoyPla\InterfaceAdapters\Controllers\Web\AccountantController;
 use JoyPla\InterfaceAdapters\Controllers\Web\AgreeFormController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ConsumptionController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ItemAndPriceAndInHospitalItemRegisterController;
@@ -249,6 +250,18 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         ItemRequestController::class,
         'show',
     ])->service($useCaseProvider->getItemRequestShowInteractor());
+
+    Router::map('GET', '/accountant', [TopController::class, 'accountant']);
+
+    Router::map('GET', '/accountant/index', [
+        AccountantController::class,
+        'index',
+    ]);
+
+    Router::map('GET', '/accountant/:accountantId', [
+        AccountantController::class,
+        'show',
+    ]);
 });
 
 $router = new Router();
@@ -258,25 +271,7 @@ $exceptionHandler = new WebExceptionHandler();
 $kernel = new \framework\Http\Kernel($app, $router, $exceptionHandler);
 $request = new Request();
 
-$auth = new Auth('NJ_HUserDB', [
-    'registrationTime',
-    'updateTime',
-    'authKey',
-    'hospitalId',
-    'divisionId',
-    'userPermission',
-    'loginId',
-    'loginPassword',
-    'name',
-    'nameKana',
-    'mailAddress',
-    'remarks',
-    'termsAgreement',
-    'tenantId',
-    'agreementDate',
-    'hospitalAuthKey',
-    'userCheck',
-]);
+$auth = $app->getAuth();
 
 $request->setUser($auth);
 $kernel->handle($request);

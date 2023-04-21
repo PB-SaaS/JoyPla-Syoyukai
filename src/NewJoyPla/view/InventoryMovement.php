@@ -39,10 +39,8 @@
                                 <label class="uk-form-label">部署</label>
                                 <div class="uk-child-width-1-1">
                                     <div>
-                                        <select class="uk-select" v-model="select_data.divisionId" v-on:change="divisionSelected">
-                                            <option value="">----- 選択してください -----</option>
-                                            <option v-for="d in divisions" :value="d.divisionId">{{ d.divisionName }}</option>
-                                        </select>
+                                        <searchable-select name="divisionId" v-model="select_data.divisionId" id="divisionId" :options="divisionOptions"></searchable-select>
+
                                     </div>
                                 </div>
                             </div>
@@ -235,6 +233,20 @@
     </div>
 </div>
 <script>
+<?php
+$options = [
+    [
+        'value' => '',
+        'text' => '----- 部署を選択してください -----',
+    ],
+];
+foreach ($division as $data) {
+    $options[] = [
+        'value' => $data->divisionId,
+        'text' => $data->divisionName,
+    ];
+}
+?>
     var datas = {
         'divisions': <?php echo json_encode($division); ?>,
         'hospitalName': <?php echo json_encode($hospitalName); ?>,
@@ -254,6 +266,7 @@
         'completeDate': '',
         sort_key: "",
         sort_asc: true,
+        divisionOptions: <?php echo json_encode($options, true); ?>,
     };
 
     var app = new Vue({
@@ -268,7 +281,11 @@
                 return new Intl.NumberFormat('ja-JP').format(value);
             },
         },
-        watch: {},
+        watch: {
+            'select_data.divisionId': (newValue, oldValue) => {
+                app.divisionSelected();
+            },
+        },
         computed: {
             sort_items() {
                 if (this.sort_key != "") {

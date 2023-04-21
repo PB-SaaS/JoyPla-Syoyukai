@@ -2,7 +2,9 @@
 
 namespace JoyPla\InterfaceAdapters\Controllers\Api;
 
+use ApiResponse;
 use Csrf;
+use Exception;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Routing\Router;
@@ -29,6 +31,7 @@ use JoyPla\Application\InputPorts\Api\Order\OrderRevisedInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Order\OrderUnapprovedApprovalAllInputData;
 use JoyPla\Application\InputPorts\Api\Order\OrderUnapprovedApprovalAllInputPortInterface;
 use JoyPla\Enterprise\Models\OrderStatus;
+use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 
 class OrderController extends Controller
 {
@@ -284,7 +287,8 @@ class OrderController extends Controller
 
         $inputData = new OrderUnapprovedApprovalAllInputData(
             $this->request->user(),
-            $gate->isOnlyMyDivision()
+            $gate->isOnlyMyDivision(),
+            $this->request->get('orderIds', [])
         );
         $inputPort->handle($inputData);
     }
@@ -356,5 +360,25 @@ class OrderController extends Controller
 
     public function delete($vars)
     {
+        $token = $this->request->get('_csrf');
+        Csrf::validate($token, true);
+
+        $order = ModelRepository::getOrderInstance()
+            ->where('hospitalId', $this->request->user()->hospitalId)
+            ->where('orderNumber', $vars['orderId'])
+            ->get();
+
+        $order = $order->first();
+
+        if (empty($order) || $order->orderStatus !== '2') {
+            throw new Exception('can not delete');
+        }
+
+        ModelRepository::getOrderInstance()
+            ->where('hospitalId', $this->request->user()->hospitalId)
+            ->where('orderNumber', $vars['orderId'])
+            ->delete();
+
+        echo (new ApiResponse([], 1, 200, 'success', []))->toJson();
     }
 }

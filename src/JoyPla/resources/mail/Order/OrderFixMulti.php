@@ -18,6 +18,7 @@ JoyPla からお知らせです。
 <?php echo $order['distributor']['prefectures']; ?> <?php echo $order[
      'distributor'
  ]['address']; ?> 
+<?php echo $order['distributor']['orderMethod']; ?> 
 
 部署名 <?php echo $order['division']['divisionName']; ?> 
 

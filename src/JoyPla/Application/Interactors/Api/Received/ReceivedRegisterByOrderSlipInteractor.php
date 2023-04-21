@@ -84,7 +84,9 @@ namespace JoyPla\Application\Interactors\Api\Received {
             $received = new Received(
                 $order->getOrderId(),
                 ReceivedId::generate(),
-                new DateYearMonthDayHourMinutesSecond('now'),
+                new DateYearMonthDayHourMinutesSecond(
+                    $inputData->receivedDate ?? 'now'
+                ),
                 [],
                 $order->getHospital(),
                 $order->getDivision(),
@@ -132,6 +134,10 @@ namespace JoyPla\Application\Interactors\Api\Received {
                     $inputData->receivedItems[$fkey]['receiveds']
                     as $receivedItem
                 ) {
+                    if ((int) $receivedItem['receivedQuantity'] === 0) {
+                        continue;
+                    }
+
                     $receivedCards = [];
                     foreach ($receivedItem['cards'] as $c) {
                         $cardId = $c['cardId'];
@@ -284,12 +290,14 @@ namespace JoyPla\Application\InputPorts\Api\Received {
         public string $orderId;
         public array $receivedItems;
         public bool $isOnlyMyDivision;
+        public string $receivedDate;
 
         public function __construct(
             Auth $user,
             $orderId,
             array $receivedItems,
-            bool $isOnlyMyDivision
+            bool $isOnlyMyDivision,
+            string $receivedDate
         ) {
             $this->user = $user;
             $this->orderId = $orderId;
@@ -316,6 +324,9 @@ namespace JoyPla\Application\InputPorts\Api\Received {
                 return $d;
             }, $receivedItems);
             $this->isOnlyMyDivision = $isOnlyMyDivision;
+            $this->receivedDate = $receivedDate
+                ? $receivedDate . ' 00:00:00'
+                : 'now';
         }
     }
 

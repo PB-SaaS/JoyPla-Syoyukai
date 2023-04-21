@@ -127,6 +127,12 @@ class SpiralManager
         return $this;
     }
 
+    public function orWhereNull(string $field)
+    {
+        $this->orWhere($field, '0', 'ISNULL');
+        return $this;
+    }
+
     public function whereNull(string $field)
     {
         $this->where($field, '0', 'ISNULL');

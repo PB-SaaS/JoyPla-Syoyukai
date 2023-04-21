@@ -37,6 +37,7 @@
                 <div class="uk-margin">
                     <label class="uk-form-label">払出元部署</label>
                     <div class="uk-form-controls sourceDivision">
+						<input name="sourceDivision" type="hidden">
                     </div>
                 </div>
                 <hr>
@@ -136,78 +137,107 @@
 			$(o).html("<svg id='barcode_"+i+"'></svg>");
 			generateBarcode("barcode_"+i,num);
 		});
-		makeDivitionSelect();
-		makeCreateLabelDivitionSelect();
+		makeDivisionSelect();
+		makeSourceDivisionSelect();
 	})
 	
-	function makeCreateLabelDivitionSelect(){
-		//html = '<input type="number" class="uk-input" style="width:72px" step="10">';
-	    html = document.createElement("div");
-	    select = document.createElement("select");
-	    select.className = 'uk-select';
-	    select.name = 'sourceDivision';
-	    
-	    option = document.createElement("option");
-	    option.value = '';
-	    option.text = ' ----- 部署を選択してください -----';
-	    //input.step = listObject[object.recordId].irisu;
-	    //<span class="uk-text-bottom">個</span>
-		select.appendChild(option);
-	    
-		Object.keys(divisitonData).forEach(function (key) {
-		    
-		    option = document.createElement("option");
-		    option.value = divisitonData[key].divisionId;
-		    option.text = divisitonData[key].divisionName;
-		    //input.step = listObject[object.recordId].irisu;
-		    //<span class="uk-text-bottom">個</span>
-		    
-			select.appendChild(option);
-		});
-	
-		html.appendChild(select);
+	function makeSourceDivisionSelect() {
+		const sourceDivisionDiv = document.querySelector("div.sourceDivision");
+		const divisionOptions = [{
+			id: '',
+			text: '----- 部署を選択してください -----'
+		}];;
 		
-		$('div.sourceDivision').append(html);
+		Object.keys(divisitonData).forEach(function (key) {
+		    divisionOptions.push({
+				id: divisitonData[key].divisionId,
+				text: divisitonData[key].divisionName,
+			});
+		});
+		createCustomDropdown(sourceDivisionDiv, divisionOptions , 'sourceDivisionLabel' , '' , function(value , label){ $('input[name="sourceDivision"]').val(value) });
 	}
 
-	function makeDivitionSelect(){
-   		let selectval = $('#divisionId').val();
-		//html = '<input type="number" class="uk-input" style="width:72px" step="10">';
-	    html = document.createElement("div");
-	    select = document.createElement("select");
-	    select.className = 'uk-select';
-	    select.onchange  = function () {  
-	    	onchangeSelect(this.value);
-	    };
-	    
-	    option = document.createElement("option");
-	    option.value = '';
-	    option.text = ' ----- 部署を選択してください -----';
-	    //input.step = listObject[object.recordId].irisu;
-	    //<span class="uk-text-bottom">個</span>
-		select.appendChild(option);
-	    
-		Object.keys(divisitonData).forEach(function (key) {
-		    
-		    option = document.createElement("option");
-		    option.value = divisitonData[key].divisionId;
-		    option.text = divisitonData[key].divisionName;
-		    //input.step = listObject[object.recordId].irisu;
-		    //<span class="uk-text-bottom">個</span>
-		    
-		    if(divisitonData[key].divisionId == selectval){
-		    	option.selected = 'selected';
-		    }
-			select.appendChild(option);
+	function createCustomDropdown(element, data , name , defaultValue = '' , callback) {
+		const dropdown = document.createElement('div');
+		dropdown.className = 'uk-inline uk-width-1-1';
+		element.appendChild(dropdown);
+
+		const input = document.createElement('input');
+		input.className = 'uk-input';
+		input.type = 'text';
+		input.placeholder = '部署を選択してください';
+		input.readOnly = true;
+		input.name = name;
+		dropdown.appendChild(input);
+
+		const dropdownList = document.createElement('div');
+		dropdownList.className = 'uk-dropdown uk-width-1-1 uk-padding-remove';
+		dropdownList.setAttribute('uk-dropdown', 'mode: click; pos: bottom-justify');
+		dropdown.appendChild(dropdownList);
+
+		const searchInput = document.createElement('input');
+		searchInput.type = 'text';
+		searchInput.placeholder = '部署を検索...';
+		searchInput.className = 'uk-input';
+		dropdownList.appendChild(searchInput);
+
+		const list = document.createElement('ul');
+		list.className = 'uk-nav uk-dropdown-nav';
+		dropdownList.appendChild(list);
+
+		data.forEach(function (item) {
+			const listItem = document.createElement('li');
+			listItem.className = "uk-padding-small uk-link hover-bg-gray-200 uk-transition-toggle";
+			listItem.addEventListener('click', function (event) {
+				event.preventDefault();
+				input.value = item.text;
+				callback ? callback(item.id) : null;
+			});
+			list.appendChild(listItem);
+
+			if(defaultValue === item.id){
+				input.value = item.text;
+				callback ? callback(item.id) : null;
+			}
+
+			const listItemLink = document.createElement('a');
+			listItemLink.className = "uk-text-emphasis";
+			listItemLink.href = '#';
+			listItemLink.textContent = item.text;
+			listItem.appendChild(listItemLink);
 		});
-	
-		html.appendChild(select);
-		
-		$('#divisionIdDiv').append(html);
+
+		searchInput.addEventListener('input', function () {
+			const filter = searchInput.value.toUpperCase();
+			const listItems = list.getElementsByTagName('li');
+
+			for (let i = 0; i < listItems.length; i++) {
+				const txtValue = listItems[i].textContent;
+				if (txtValue.toUpperCase().indexOf(filter) > -1) {
+					listItems[i].style.display = 'block';
+				} else {
+					listItems[i].style.display = 'none';
+				}
+			}
+		});
 	}
-   
-	function onchangeSelect(val){
-		$('#divisionId').val(val);
+
+	
+	function makeDivisionSelect() {
+		const divisionDiv = document.querySelector("div#divisionIdDiv");
+		const defaultValue = document.querySelector("input#divisionId").value;
+		const divisionOptions = [{
+			id: '',
+			text: '----- 部署を選択してください -----'
+		}];
+		
+		Object.keys(divisitonData).forEach(function (key) {
+		    divisionOptions.push({
+				id: divisitonData[key].divisionId,
+				text: divisitonData[key].divisionName,
+			});
+		});
+		createCustomDropdown(divisionDiv, divisionOptions , '' , defaultValue , function(value){ $('#divisionId').val(value) });
 	}
 
 	let itemsToJs = {};
@@ -256,7 +286,7 @@
 		
 		$("#itemsData").val(JSON.stringify( objectValueToURIencode(itemsToJs) ));
 
-		sourceDivision = $('select[name="sourceDivision"]').val();
+		sourceDivision = $('input[name="sourceDivision"]').val();
 		flag = true;
 		if(sourceDivision == ''){
 			UIkit.modal.confirm("払出元部署が選択されていません。<br>元部署印字なしで出力しますか").then(function () {

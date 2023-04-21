@@ -4,6 +4,7 @@
 <head>
     <title>JoyPla 金額情報変更 - 入力</title>
     <?php include_once 'NewJoyPla/src/Head.php'; ?>
+    <?php include_once 'NewJoyPla/view/template/parts/Script.php'; ?>
 
     <style>
         .uk-navbar-container {
@@ -115,29 +116,8 @@
                                 卸業者
                                 <span class="need">必須</span>
                             </dt>
-                            <dd class="data ">
-                                <select name="distributorId" id="distributorId"
-                                    class="uk-select $errorInputColor:distributorId$">
-                                    <option value="">
-                                        --- 選択してください ---
-                                    </option>
-                                    <?php foreach ($distributor as $dist) {
-                                        $selected = '';
-                                        if (
-                                            $dist->distributorId ==
-                                            $currentDistributorId
-                                        ) {
-                                            $selected = 'selected';
-                                        }
-                                        echo "<option value='" .
-                                            $dist->distributorId .
-                                            "' " .
-                                            $selected .
-                                            '>' .
-                                            $dist->distributorName .
-                                            '</option>';
-                                    } ?>
-                                </select>
+                            <dd class="data " id="distributor">
+                                <searchable-select name="distributorId" :error="'$errorInputColor:distributorId$' == 'error'" v-model="distributorId" :default="distributorId" :options="distributorOptions"></searchable-select>
                                 <br>
                                 <span class="msg">$error:distributorId$</span>
                             </dd>
@@ -265,6 +245,28 @@
         </div>
     </div>
     <script>
+    <?php
+    $distributorOptions = [
+        [
+            'value' => '',
+            'text' => '----- 卸業者を選択してください -----',
+        ],
+    ];
+
+    foreach ($distributor as $data) {
+        $distributorOptions[] = [
+            'value' => $data->distributorId,
+            'text' => $data->distributorName,
+        ];
+    }
+    ?>
+    var distributor = new Vue({
+        el: '#distributor',
+        data: {
+            distributorOptions: <?php echo json_encode($distributorOptions); ?>,
+            distributorId: "<?php echo $currentDistributorId; ?>",
+        },
+    });
         $(function() {
             $("form").addClass(
                 "uk-form-horizontal uk-margin-large uk-text-center uk-margin-remove"
