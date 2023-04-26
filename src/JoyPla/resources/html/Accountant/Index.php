@@ -64,7 +64,7 @@
                   <v-button-primary type="button" @click.native="openSlip(accountant.accountantId)">詳細</v-button-primary>
                 </td>
                 <td class="border-b border-slate-100 p-4">
-                  <v-button-danger type="button" @click.native="createAccountant">削除</v-button-danger>
+                  <v-button-danger type="button" @click.native="deleteSlip(accountant.accountantId)">削除</v-button-danger>
                 </td>
               </tr>
             </tbody>

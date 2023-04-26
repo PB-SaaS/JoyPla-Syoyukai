@@ -469,7 +469,7 @@ var JoyPlaApp = Vue.createApp({
         insertItem(values.register)
       };
 
-      const slipDelete = (values) => {
+      const slipDelete = () => {
           Swal.fire({
             title: '伝票を削除',
             text: "削除後は元に戻せません。\r\nよろしいですか？",
