@@ -11,6 +11,8 @@ namespace JoyPla\Application\Interactors\Api\Received {
     use JoyPla\Application\InputPorts\Api\Received\ReceivedRegisterInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\Received\ReceivedRegisterOutputData;
     use JoyPla\Application\OutputPorts\Api\Received\ReceivedRegisterOutputPortInterface;
+    use JoyPla\Enterprise\Models\Accountant;
+    use JoyPla\Enterprise\Models\AccountantService;
     use JoyPla\Enterprise\Models\DateYearMonthDayHourMinutesSecond;
     use JoyPla\Enterprise\Models\OrderId;
     use JoyPla\Enterprise\Models\HospitalId;
@@ -211,6 +213,34 @@ namespace JoyPla\Application\Interactors\Api\Received {
                 $orders[$orderKey] = $order->updateOrderStatus();
                 $receiveds[] = $received->setReceivedItems($receivedItems);
             }
+
+            $accountants = [];
+            $accountantLogs = [];
+            foreach ($receiveds as $received) {
+                $accountant = AccountantService::ReceivedToAccountant(
+                    $received
+                );
+                $oldaccountant = clone $accountant;
+                $oldaccountant->setItems([]);
+
+                $accountantLogs = array_merge(
+                    $accountantLogs,
+                    AccountantService::checkAccountant(
+                        $accountant,
+                        $oldaccountant,
+                        $inputData->user->id
+                    )
+                );
+
+                $accountants[] = $accountant;
+            }
+            $this->repositoryProvider
+                ->getAccountantRepository()
+                ->saveToArray($accountants);
+
+            $this->repositoryProvider
+                ->getAccountantRepository()
+                ->saveItemLog($accountantLogs);
 
             $this->repositoryProvider
                 ->getOrderRepository()

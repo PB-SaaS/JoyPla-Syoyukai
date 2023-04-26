@@ -320,7 +320,6 @@ var app = new Vue({
     el: '#app',
     data: {
         lists: [],
-        divisionId: '',
         divisionOptions: <?php echo json_encode($options); ?>,
         divisionId: "<?php echo $defaultDivisionId; ?>",
         allUsedDate: now_date,

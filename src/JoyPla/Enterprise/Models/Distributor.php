@@ -49,6 +49,11 @@ class Distributor
 
     public function getOrderMethod()
     {
+        return $this->orderMethod;
+    }
+
+    public function getOrderMethodName()
+    {
         if ($this->orderMethod == '1') {
             return 'JoyPla';
         }
@@ -73,7 +78,7 @@ class Distributor
             'hospitalId' => $this->hospitalId->value(),
             'distributorId' => $this->distributorId->value(),
             'distributorName' => $this->distributorName,
-            'orderMethod' => $this->getOrderMethod(),
+            'orderMethod' => $this->getOrderMethodName(),
         ];
     }
 }

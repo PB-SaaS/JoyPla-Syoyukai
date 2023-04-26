@@ -34,7 +34,15 @@ const vSelectDivision = {
       default: true,
     }
   },
-  watch: {},
+  watch: {
+    options: {
+      handler(newOptions) {
+        this.selectedOption = newOptions.find(option => option.value === '');
+        this.filteredOptions = newOptions;
+      },
+      deep: true,
+    },
+  },
   data() {
     return {
       options: [
@@ -63,6 +71,7 @@ const vSelectDivision = {
           if (response.data.data.length === 1) {
             options = [];
           }
+
           response.data.data.forEach(function (x, i) {
             options.push({
               label: x.divisionName,

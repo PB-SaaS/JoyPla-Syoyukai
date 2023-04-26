@@ -14,6 +14,7 @@ use JoyPla\Application\Interactors\Api\Consumption\ConsumptionRegisterInteractor
 use JoyPla\Application\Interactors\Api\Distributor\DistributorIndexInteractor;
 use JoyPla\Application\Interactors\Api\Division\DivisionIndexInteractor;
 use JoyPla\Application\Interactors\Api\InHospitalItem\InHospitalItemIndexInteractor;
+use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestBulkUpdateInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestDeleteInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestHistoryInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestRegisterInteractor;
@@ -532,6 +533,21 @@ class UseCaseProvider
             $this->repositoryProvider,
             $this->presenterProvider
         ) extends ItemRequestRegisterInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getItemRequestBulkUpdateInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends ItemRequestBulkUpdateInteractor {
             public function __construct(
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider

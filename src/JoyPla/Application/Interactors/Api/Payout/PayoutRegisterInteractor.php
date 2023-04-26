@@ -238,6 +238,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                         ->getDivisionId()
                         ->value()
                 );
+
                 foreach ($payout->getPayoutItems() as $payoutItem) {
                     $stockViewInstance->orWhere(
                         'inHospitalItemId',

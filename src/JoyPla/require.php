@@ -19,6 +19,7 @@ require_once('JoyPla/Application/Interactors/Api/Item/ItemAndPriceAndInHospitalI
 require_once('JoyPla/Application/Interactors/Api/Item/ItemRegisterInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Item/ItemShowInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Item/PriceAndInHospitalItemRegisterInteractor.php');
+require_once('JoyPla/Application/Interactors/Api/ItemRequest/ItemRequestBulkUpdateInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/ItemRequest/ItemRequestDeleteInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/ItemRequest/ItemRequestHistoryInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/ItemRequest/ItemRequestRegisterInteractor.php');

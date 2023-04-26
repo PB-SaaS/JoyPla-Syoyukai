@@ -51,7 +51,7 @@ namespace JoyPla\Application\Interactors\Api\Accountant {
 
             if (
                 Gate::allows('is_user') &&
-                $accountant->getDivisionId()->value() ===
+                $accountant->getDivisionId()->value() !==
                     $inputData->user->divisionId
             ) {
                 throw new NotFoundException('not found', '404');

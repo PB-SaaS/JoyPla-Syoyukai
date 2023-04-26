@@ -52,6 +52,7 @@ class OrderController extends Controller
             compact('orderitems'),
             false
         )->render();
+
         echo view('html/Common/Template', compact('body'), false)->render();
     }
 

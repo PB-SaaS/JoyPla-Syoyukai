@@ -32,7 +32,7 @@ Vue.component('searchable-select', {
     },
   },
   mounted(){
-	const selectedOption = this.options.find(option => option.value === (this.default ?? this.inputValue ) ?? '');
+	const selectedOption = this.options.find(option => option.value === (this.default ?? this.value ) ?? '');
 	this.inputValue = selectedOption.value;
 	this.inputValueText = selectedOption.text;
   },
@@ -56,6 +56,18 @@ Vue.component('searchable-select', {
     value(val) {
       const selectedOption = this.options.find(option => option.value === val);
       this.inputValue = selectedOption ? selectedOption.value : '';
+    },
+    options: {
+      handler(newOptions) {
+        if(newOptions.length === 1)
+        {
+          this.selectOption(newOptions[0]);
+        } else {
+          this.selectOption(newOptions.find(option => option.value === this.value));
+        }
+        this.filteredOptions = newOptions;
+      },
+      deep: true,
     },
   },
 });

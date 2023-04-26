@@ -20,6 +20,7 @@ class Order
     private TextArea512Bytes $distributorComment;
     private string $orderUserName;
     private int $receivedTarget;
+    private bool $sentFlag = false;
 
     public function __construct(
         OrderId $orderId,
@@ -33,17 +34,16 @@ class Order
         OrderAdjustment $adjustment,
         TextArea512Bytes $orderComment,
         TextArea512Bytes $distributorComment,
-        string $orderUserName = "",
-        int $receivedTarget = 1 
-        )
-    {
-        
+        string $orderUserName = '',
+        int $receivedTarget = 1,
+        bool $sentFlag = false
+    ) {
         $this->orderId = $orderId;
         $this->registDate = $registDate;
         $this->orderDate = $orderDate;
-        $this->orderItems = array_map(function(OrderItem $v){
+        $this->orderItems = array_map(function (OrderItem $v) {
             return $v;
-        },$orderItems);
+        }, $orderItems);
         $this->hospital = $hospital;
         $this->division = $division;
         $this->distributor = $distributor;
@@ -53,24 +53,26 @@ class Order
         $this->distributorComment = $distributorComment;
         $this->orderUserName = $orderUserName;
         $this->receivedTarget = $receivedTarget;
+        $this->sentFlag = $sentFlag;
     }
 
-    public static function create( Collection $input)
+    public static function create(Collection $input)
     {
         return new Order(
-            (new OrderId($input->orderNumber) ),
-            (new DateYearMonthDayHourMinutesSecond($input->registrationTime) ),
-            (new DateYearMonthDayHourMinutesSecond($input->orderTime) ),
+            new OrderId($input->orderNumber),
+            new DateYearMonthDayHourMinutesSecond($input->registrationTime),
+            new DateYearMonthDayHourMinutesSecond($input->orderTime),
             [],
-            (Hospital::create($input) ),
-            (Division::create($input) ),
-            (Distributor::create($input) ),
-            (new OrderStatus($input->orderStatus) ),
-            (new OrderAdjustment($input->adjustment)),
-            (new TextArea512Bytes($input->ordercomment)),
-            (new TextArea512Bytes($input->distrComment)),
+            Hospital::create($input),
+            Division::create($input),
+            Distributor::create($input),
+            new OrderStatus($input->orderStatus),
+            new OrderAdjustment($input->adjustment),
+            new TextArea512Bytes($input->ordercomment),
+            new TextArea512Bytes($input->distrComment),
             $input->ordererUserName,
-            ( $input->receivingTarget != '2' )? 1 : 2, //1	大倉庫  2	発注部署
+            $input->receivingTarget != '2' ? 1 : 2, //1	大倉庫  2	発注部署
+            $input->sentFlag == '1'
         );
     }
 
@@ -81,9 +83,8 @@ class Order
 
     public function isMinus()
     {
-        foreach($this->orderItems as $item){
-            if($item->isMinus())
-            {
+        foreach ($this->orderItems as $item) {
+            if ($item->isMinus()) {
                 return true;
             }
         }
@@ -92,9 +93,8 @@ class Order
 
     public function isPlus()
     {
-        foreach($this->orderItems as $item){
-            if($item->isPlus())
-            {
+        foreach ($this->orderItems as $item) {
+            if ($item->isPlus()) {
                 return true;
             }
         }
@@ -103,10 +103,8 @@ class Order
 
     public function isExistOrderItemId(OrderItemId $orderItemId)
     {
-        foreach($this->orderItems as $item)
-        {
-            if($item->getOrderItemId()->equal($orderItemId->value()))
-            {
+        foreach ($this->orderItems as $item) {
+            if ($item->getOrderItemId()->equal($orderItemId->value())) {
                 return true;
             }
         }
@@ -121,9 +119,8 @@ class Order
 
     public function searchOrderItem(OrderItemId $orderItemId)
     {
-        foreach($this->orderItems as $item){
-            if($item->getOrderItemId()->equal($orderItemId->value()))
-            {
+        foreach ($this->orderItems as $item) {
+            if ($item->getOrderItemId()->equal($orderItemId->value())) {
                 return $item;
             }
         }
@@ -151,25 +148,25 @@ class Order
     }
     public function approval()
     {
-        if($this->orderStatus->value() !== OrderStatus::UnOrdered)
-        {
-            throw new Exception('This slip has been approved.',422);
+        if ($this->orderStatus->value() !== OrderStatus::UnOrdered) {
+            throw new Exception('This slip has been approved.', 422);
         }
-        
+
         return new Order(
             $this->orderId,
             $this->registDate,
-            (new DateYearMonthDayHourMinutesSecond(date('Y-m-d H:i:s'))),
+            new DateYearMonthDayHourMinutesSecond(date('Y-m-d H:i:s')),
             $this->orderItems,
             $this->hospital,
             $this->division,
             $this->distributor,
-            (new OrderStatus(OrderStatus::OrderCompletion)),
+            new OrderStatus(OrderStatus::OrderCompletion),
             $this->adjustment,
             $this->orderComment,
             $this->distributorComment,
             $this->orderUserName,
-            $this->receivedTarget
+            $this->receivedTarget,
+            $this->sentFlag
         );
     }
 
@@ -188,7 +185,8 @@ class Order
             $this->orderComment,
             $this->distributorComment,
             $this->orderUserName,
-            $this->receivedTarget
+            $this->receivedTarget,
+            $this->sentFlag
         );
     }
 
@@ -199,49 +197,51 @@ class Order
         $result[OrderItemReceivedStatus::NotInStock] = 0;
         $result[OrderItemReceivedStatus::PartOfTheCollectionIsIn] = 0;
         $result[OrderItemReceivedStatus::ReceivingIsComplete] = 0;
-        foreach($this->orderItems as $item)
-        {
+        foreach ($this->orderItems as $item) {
             $result[$item->getOrderItemReceivedStatus()->value()]++;
         }
 
-        if($count === $result[OrderItemReceivedStatus::NotInStock])
-        {
+        if ($count === $result[OrderItemReceivedStatus::NotInStock]) {
             $status = [
                 OrderStatus::UnOrdered,
                 OrderStatus::OrderCompletion,
                 OrderStatus::OrderFinished,
-                OrderStatus::DeliveryDateReported
+                OrderStatus::DeliveryDateReported,
             ];
-            $fkey = array_search( $this->orderStatus->value() , $status , true);
+            $fkey = array_search($this->orderStatus->value(), $status, true);
 
-            if($fkey !== false)
-            {
-                return $this->setOrderStatus( new OrderStatus($status[$fkey]) );
+            if ($fkey !== false) {
+                return $this->setOrderStatus(new OrderStatus($status[$fkey]));
             }
 
-            return $this->setOrderStatus( new OrderStatus(OrderStatus::UnOrdered));
+            return $this->setOrderStatus(
+                new OrderStatus(OrderStatus::UnOrdered)
+            );
         }
 
-        if($count === $result[OrderItemReceivedStatus::ReceivingIsComplete])
-        {
-            return $this->setOrderStatus( new OrderStatus(OrderStatus::ReceivingIsComplete));
+        if ($count === $result[OrderItemReceivedStatus::ReceivingIsComplete]) {
+            return $this->setOrderStatus(
+                new OrderStatus(OrderStatus::ReceivingIsComplete)
+            );
         }
 
-        return $this->setOrderStatus( new OrderStatus(OrderStatus::PartOfTheCollectionIsIn)); 
-    }
-
-    public function equalOrderSlip(Division $division , Distributor $distributor)
-    {
-        return (
-            $this->division->getDivisionId()->value() === $division->getDivisionId()->value() && 
-            $this->distributor->getDistributorId()->value() === $distributor->getDistributorId()->value()
+        return $this->setOrderStatus(
+            new OrderStatus(OrderStatus::PartOfTheCollectionIsIn)
         );
     }
 
-    public function totalAmount(){
+    public function equalOrderSlip(Division $division, Distributor $distributor)
+    {
+        return $this->division->getDivisionId()->value() ===
+            $division->getDivisionId()->value() &&
+            $this->distributor->getDistributorId()->value() ===
+                $distributor->getDistributorId()->value();
+    }
+
+    public function totalAmount()
+    {
         $num = 0;
-        foreach($this->orderItems as $item)
-        {
+        foreach ($this->orderItems as $item) {
             $num += $item->price();
         }
         return $num;
@@ -250,21 +250,19 @@ class Order
     public function deleteItem(OrderItemId $orderItemId)
     {
         $tmp = $this->orderItems;
-        foreach($tmp as $key => $orderItem)
-        {
-            if($orderItem->getOrderItemId()->equal($orderItemId->value()))
-            {
+        foreach ($tmp as $key => $orderItem) {
+            if ($orderItem->getOrderItemId()->equal($orderItemId->value())) {
                 unset($tmp[$key]);
                 break;
             }
         }
         return $this->setOrderItems(array_values($tmp));
     }
-    
-    public function itemCount(){
+
+    public function itemCount()
+    {
         $array = [];
-        foreach($this->orderItems as $item)
-        {
+        foreach ($this->orderItems as $item) {
             $array[] = $item->getInHospitalItemId()->value();
         }
         return count(array_unique($array));
@@ -274,28 +272,32 @@ class Order
     {
         $items = $this->orderItems;
         $flag = false;
-        foreach($items as $key => $orderItem)
-        {
-            if($orderItem->getInHospitalItemId()->equal($item->getInHospitalItemId()->value()))
-            {
+        foreach ($items as $key => $orderItem) {
+            if (
+                $orderItem
+                    ->getInHospitalItemId()
+                    ->equal($item->getInHospitalItemId()->value())
+            ) {
                 $flag = true;
-                $items[$key] = $orderItem->addOrderQuantity($item->getOrderQuantity());
+                $items[$key] = $orderItem->addOrderQuantity(
+                    $item->getOrderQuantity()
+                );
                 break;
             }
         }
-        if(!$flag){ 
+        if (!$flag) {
             $items[] = $item;
         }
         return $this->setOrderItems($items);
     }
 
-    public function addOrderItemQuantity(OrderItemId $orderItemId , OrderQuantity $orderQuantity)
-    {
+    public function addOrderItemQuantity(
+        OrderItemId $orderItemId,
+        OrderQuantity $orderQuantity
+    ) {
         $tmp = $this->orderItems;
-        foreach($tmp as $key => $val)
-        {
-            if($val->getOrderItemId()->equal($orderItemId->value()))
-            {
+        foreach ($tmp as $key => $val) {
+            if ($val->getOrderItemId()->equal($orderItemId->value())) {
                 $tmp[$key] = $val->addOrderQuantity($orderQuantity);
                 break;
             }
@@ -314,7 +316,7 @@ class Order
         return $this->orderDate;
     }
 
-    public function setOrderComment( TextArea512Bytes $comment )
+    public function setOrderComment(TextArea512Bytes $comment)
     {
         return new Order(
             $this->orderId,
@@ -329,18 +331,19 @@ class Order
             $comment,
             $this->distributorComment,
             $this->orderUserName,
-            $this->receivedTarget
+            $this->receivedTarget,
+            $this->sentFlag
         );
     }
 
     public function setOrderItems(array $orderItems)
     {
         $orderId = $this->orderId;
-        $orderItems = array_map(function(OrderItem $v) use ($orderId){
+        $orderItems = array_map(function (OrderItem $v) use ($orderId) {
             $tmp = $v;
             $tmp = $tmp->setOrderId($orderId);
             return $tmp;
-        },$orderItems);
+        }, $orderItems);
 
         return new Order(
             $this->orderId,
@@ -355,7 +358,8 @@ class Order
             $this->orderComment,
             $this->distributorComment,
             $this->orderUserName,
-            $this->receivedTarget
+            $this->receivedTarget,
+            $this->sentFlag
         );
     }
 
@@ -374,7 +378,8 @@ class Order
             $this->orderComment,
             $this->distributorComment,
             $this->orderUserName,
-            $this->receivedTarget
+            $this->receivedTarget,
+            $this->sentFlag
         );
     }
 
@@ -384,9 +389,9 @@ class Order
             'orderId' => $this->orderId->value(),
             'registDate' => $this->registDate->value(),
             'orderDate' => $this->orderDate->value(),
-            'orderItems' =>  array_map(function(OrderItem $v){
+            'orderItems' => array_map(function (OrderItem $v) {
                 return $v->toArray();
-            },$this->orderItems),
+            }, $this->orderItems),
             'hospital' => $this->hospital->toArray(),
             'division' => $this->division->toArray(),
             'distributor' => $this->distributor->toArray(),
@@ -399,7 +404,8 @@ class Order
             'orderComment' => $this->orderComment->value(),
             'distributorComment' => $this->distributorComment->value(),
             'orderUserName' => $this->orderUserName,
-            'receivedTarget' => $this->receivedTarget
+            'receivedTarget' => $this->receivedTarget,
+            'sentFlag' => $this->sentFlag,
         ];
-    } 
+    }
 }

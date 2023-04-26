@@ -31,7 +31,7 @@
           <div class="border-b-2 border-solid border-gray-100 w-full">
             <div class="lg:flex lg:divide-x ">
               <div class="lg:w-1/5 p-2">
-                <p class="text-md font-bold">登録日時<br>{{ received.registDate }}</p>
+                <p class="text-md font-bold">入荷日<br>{{ received.registDate }}</p>
                 <p class="text-md">
                   発注番号：{{ received.orderId }}<br>
                   検収番号：{{ received.receivedId }}<br>

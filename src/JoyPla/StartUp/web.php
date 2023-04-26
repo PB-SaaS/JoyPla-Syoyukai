@@ -246,6 +246,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'pickingList',
     ])->service($useCaseProvider->getPickingListInteractor());
 
+    Router::map('GET', '/itemrequest/bulk', [
+        ItemRequestController::class,
+        'list',
+    ])->service($useCaseProvider->getPickingListInteractor());
+
     Router::map('GET', '/itemrequest/:requestHId', [
         ItemRequestController::class,
         'show',

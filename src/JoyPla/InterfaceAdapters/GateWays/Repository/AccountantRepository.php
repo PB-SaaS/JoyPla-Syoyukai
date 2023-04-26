@@ -50,7 +50,6 @@ class AccountantRepository implements AccountantRepositoryInterface
         if ($search->yearMonth !== '') {
             $yearMonth = new DateYearMonth($search->yearMonth);
             $nextMonth = $yearMonth->nextMonth();
-
             $accountantInstance->where(
                 'accountantDate',
                 $yearMonth->format('Y-m-01'),
@@ -79,7 +78,6 @@ class AccountantRepository implements AccountantRepositoryInterface
         }
 
         $historys = $accountantInstance
-            ->orderBy('accountantDate', 'desc')
             ->page($search->currentPage)
             ->paginate($search->perPage);
 
@@ -272,6 +270,76 @@ class AccountantRepository implements AccountantRepositoryInterface
         }
     }
 
+    public function saveToArray(array $accountants)
+    {
+        $accountants = array_map(function (Accountant $accountant) {
+            return $accountant;
+        }, $accountants);
+
+        $itemInstance = ModelRepository::getAccountantItemInstance();
+
+        $upsertHistory = [];
+        $itemUpsert = [];
+
+        foreach ($accountants as $accountant) {
+            $accountantToArray = $accountant->toArray();
+            $upsertHistory[] = [
+                'hospitalId' => $accountantToArray['hospitalId'],
+                'divisionId' => $accountantToArray['divisionId'],
+                'distributorId' => $accountantToArray['distributorId'],
+                'accountantId' => $accountantToArray['accountantId'],
+                'accountantDate' => $accountantToArray['accountantDate'],
+                'orderNumber' => $accountantToArray['orderId'],
+                'receivingNumber' => $accountantToArray['receivedId'],
+                'totalAmount' => $accountantToArray['totalAmount'],
+            ];
+
+            foreach ($accountant->getItems() as $item) {
+                $item = $item->toArray();
+                $itemUpsert[] = [
+                    'updateTime' => 'now',
+                    'accountantId' => (string) $accountant
+                        ->getAccountantId()
+                        ->value(),
+                    'itemId' => (string) $item['itemId'],
+                    'itemName' => (string) $item['itemName'],
+                    'makerName' => (string) $item['makerName'],
+                    'itemCode' => (string) $item['itemCode'],
+                    'itemStandard' => (string) $item['itemStandard'],
+                    'itemJANCode' => (string) $item['itemJANCode'],
+                    'count' => (string) $item['count'],
+                    'unit' => (string) $item['unit'],
+                    'price' => (string) $item['price'],
+                    'taxrate' => (string) $item['taxrate'],
+                    'accountantItemId' => (string) $item['accountantItemId'],
+                    'action' => (string) $item['action'],
+                    'method' => (string) $item['method'],
+                    'index' => (string) $item['index'],
+                ];
+
+                $itemInstance
+                    ->orWhere('accountantId', $item['accountantId'], '=')
+                    ->where(
+                        'accountantItemId',
+                        $item['accountantItemId'],
+                        '!='
+                    );
+            }
+        }
+        ModelRepository::getAccountantInstance()->upsertBulk(
+            'accountantId',
+            $upsertHistory
+        );
+
+        $itemInstance->delete();
+        if (!empty($itemUpsert)) {
+            ModelRepository::getAccountantItemInstance()->upsertBulk(
+                'accountantItemId',
+                $itemUpsert
+            );
+        }
+    }
+
     public function saveItemLog(array $logs)
     {
         $logs = array_map(function (AccountantItemChageLog $log) {
@@ -282,24 +350,26 @@ class AccountantRepository implements AccountantRepositoryInterface
         foreach ($logs as $log) {
             $log = $log->toArray();
             $insert[] = [
-                'accountantId' => $log['accountantItem']['accountantId'],
-                'itemId' => $log['accountantItem']['itemId'],
-                'itemName' => $log['accountantItem']['itemName'],
-                'makerName' => $log['accountantItem']['makerName'],
-                'itemCode' => $log['accountantItem']['itemCode'],
-                'itemStandard' => $log['accountantItem']['itemStandard'],
-                'itemJANCode' => $log['accountantItem']['itemJANCode'],
-                'count' => $log['accountantItem']['count'],
-                'unit' => $log['accountantItem']['unit'],
-                'price' => $log['accountantItem']['price'],
-                'taxrate' => $log['accountantItem']['taxrate'],
+                'accountantId' =>
+                    (string) $log['accountantItem']['accountantId'],
+                'itemId' => (string) $log['accountantItem']['itemId'],
+                'itemName' => (string) $log['accountantItem']['itemName'],
+                'makerName' => (string) $log['accountantItem']['makerName'],
+                'itemCode' => (string) $log['accountantItem']['itemCode'],
+                'itemStandard' =>
+                    (string) $log['accountantItem']['itemStandard'],
+                'itemJANCode' => (string) $log['accountantItem']['itemJANCode'],
+                'count' => (string) $log['accountantItem']['count'],
+                'unit' => (string) $log['accountantItem']['unit'],
+                'price' => (string) $log['accountantItem']['price'],
+                'taxrate' => (string) $log['accountantItem']['taxrate'],
                 'accountantItemId' =>
-                    $log['accountantItem']['accountantItemId'],
-                'action' => $log['accountantItem']['action'],
-                'method' => $log['accountantItem']['method'],
-                'index' => $log['accountantItem']['index'],
-                'kinds' => $log['kinds'],
-                'userId' => $log['userId'],
+                    (string) $log['accountantItem']['accountantItemId'],
+                'action' => (string) $log['accountantItem']['action'],
+                'method' => (string) $log['accountantItem']['method'],
+                'index' => (string) $log['accountantItem']['index'],
+                'kinds' => (string) $log['kinds'],
+                'userId' => (string) $log['userId'],
             ];
         }
         if (!empty($insert)) {

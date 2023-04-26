@@ -68,11 +68,30 @@
                   <v-button-default type="button" class="w-full" @click.native="openSlip( order.orderId )">
                     発注書を表示
                   </v-button-default>
+                  <?php if (!gate('is_user')): ?>
                   <v-button-danger type="button" class="w-full" @click.native="deleteSlip( order.orderId )" v-if="order.orderStatus == 2">
-                    発注書を削除
+                    発注書を取消
                   </v-button-danger>
+                  <?php endif; ?>
                   <v-button-default type="button" class="w-full" @click.native="openPrint( order.orderId )">
                     発注書を印刷
+                  </v-button-default>
+                  <v-button-default type="button" class="inline-flex items-center relative" :disabled="order.sent.disabled" @click.native="sentSlip(order.orderId)">
+                    <template v-if="order.sentFlag && ! order.sent.disabled">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-3 h-5 w-5 stroke-sushi-700 absolute" viewBox="0 96 960 960" width="48"><path d="M633 976 472 815l43-43 118 118 244-244 43 43-287 287ZM478 529l334-213H144l334 213Zm0 60L140 372v452h256l60 60H140q-24 0-42-18t-18-42V316q0-24 18-42t42-18h677q24 0 42 18t18 42v244l-60 60V372L478 589Zm1 9Zm-1-69Zm1 60Z"/></svg>
+                      <p class="w-full">FAXまたは電話：完了</p>
+                    </template>
+                    <template v-if="! order.sentFlag && ! order.sent.disabled">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-3 h-5 w-5 stroke-sushi-700 absolute" viewBox="0 96 960 960" width="48"><path d="M140 896q-24 0-42-18t-18-42V316q0-24 18-42t42-18h680q24 0 42 18t18 42v520q0 24-18 42t-42 18H140Zm340-302L140 371v465h680V371L480 594Zm0-60 336-218H145l335 218ZM140 371v-55 520-465Z"/></svg>
+                      <p class="w-full">FAXまたは電話：未完了<br>（クリックで完了します）</p>
+                    </template>
+                    <template v-if="order.sent.disabled">
+                      <svg class="animate-spin -ml-1 mr-3 h-5 w-5 stroke-sushi-700 absolute" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <p class="w-full">お待ちください...</p>
+                    </template>
                   </v-button-default>
                 </div>
               </div>
@@ -378,7 +397,9 @@ var JoyPlaApp = Vue.createApp({
 
         axios.post(_APIURL,params)
         .then( (response) => {
-          orders.value = response.data.data;
+          orders.value = response.data.data.map(order => {
+            return { ...order, sent: { disabled: false } };
+          });
           totalCount.value = parseInt(response.data.count);
         }) 
         .catch((error) => {
@@ -446,10 +467,10 @@ var JoyPlaApp = Vue.createApp({
       const deleteSlip = ( orderId ) => 
       {
           Swal.fire({
-            title: '伝票を削除',
-            text: "削除後は元に戻せません。\r\nよろしいですか？",
+            title: '伝票を取消',
+            text: "取消後は元に戻せません。\r\nよろしいですか？",
             icon: 'warning',
-            confirmButtonText: '削除します',
+            confirmButtonText: '取消します',
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonColor: '#3085d6',
@@ -471,7 +492,7 @@ var JoyPlaApp = Vue.createApp({
               }
               Swal.fire({
                   icon: 'success',
-                  title: '消費伝票の削除が完了しました。',
+                  title: '消費伝票の取消が完了しました。',
               }).then((result) => {
                 location.reload();
               });
@@ -486,11 +507,40 @@ var JoyPlaApp = Vue.createApp({
           });
       }
       
+      const sentSlip = async( orderId ) => 
+      {
+          let orderIndex = orders.value.findIndex(order => order.orderId === orderId);
+          if(orders.value[orderIndex].sent.disabled){
+            return '';
+          }
+          if(orders.value[orderIndex].sentFlag){
+            return '';
+          }
+
+          orders.value[orderIndex].sent.disabled = true;
+
+          let params = new URLSearchParams();
+          params.append("path", "/api/order/"+orderId+"/sent");
+          params.append("_method", 'post');
+          params.append("_csrf", _CSRF);
+
+          const res = await axios.post(_APIURL,params);
+          
+          complete();
+          if(res.data.code != 200) {
+            orders.value[orderIndex].sent.disabled = false;
+          }
+
+          orders.value[orderIndex].sent.disabled = false;
+          orders.value[orderIndex].sentFlag = true;
+      }
+      
       const openPrint = ( url ) => {
         location.href = _ROOT + "&path=/order/" + url + "/print";    
       }
 
       return {
+        sentSlip,
         deleteSlip,
         loading, 
         start, 

@@ -114,6 +114,7 @@ class ModelRepository
             'adjustment',
             'distrComment',
             'orderMethod',
+            'sentFlag',
         ]);
     }
 
@@ -202,6 +203,7 @@ class ModelRepository
             'staffName',
             'adjustment',
             'distrComment',
+            'sentFlag',
         ]);
     }
 
@@ -1037,6 +1039,31 @@ class ModelRepository
             'labelId',
             'recordId',
             'divisionName',
+        ]);
+    }
+
+    public static function getStockItemViewInstance()
+    {
+        return SpiralDB::title('340_stock')->value([
+            'id',
+            'inHospitalItemId',
+            'rackName',
+            'itemId',
+            'itemName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'makerName',
+            'quantity',
+            'quantityUnit',
+            'itemUnit',
+            'stockQuantity',
+            'hospitalName',
+            'divisionName',
+            'hospitalId',
+            'divisionId',
+            'constantByDiv',
+            'distributorName',
         ]);
     }
 

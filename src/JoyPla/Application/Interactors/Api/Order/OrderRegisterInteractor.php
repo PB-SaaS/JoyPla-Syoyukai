@@ -127,7 +127,9 @@ namespace JoyPla\Application\Interactors\Api\Order {
                     new TextArea512Bytes(''),
                     new TextArea512Bytes(''),
                     $inputData->user->name,
-                    1
+                    1,
+                    $i->getDistributor()->getOrderMethod() == '1' ||
+                        $i->getDistributor()->getOrderMethod() == '2'
                 );
             }
 

@@ -9,6 +9,7 @@ namespace JoyPla\Application\Interactors\Api\Received {
     use JoyPla\Application\InputPorts\Api\Received\ReceivedRegisterByOrderSlipInputData;
     use JoyPla\Application\InputPorts\Api\Received\ReceivedRegisterByOrderSlipInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\Received\ReceivedRegisterByOrderSlipOutputData;
+    use JoyPla\Enterprise\Models\AccountantService;
     use JoyPla\Enterprise\Models\Card;
     use JoyPla\Enterprise\Models\CardId;
     use JoyPla\Enterprise\Models\DateYearMonthDayHourMinutesSecond;
@@ -250,6 +251,31 @@ namespace JoyPla\Application\Interactors\Api\Received {
             $order = $order->setOrderItems($items); // オーダーデータを更新
             $order = $order->updateOrderStatus();
             $received = $received->setReceivedItems($receivedItems);
+
+            $accountants = [];
+            $accountantLogs = [];
+            $accountant = AccountantService::ReceivedToAccountant($received);
+
+            $oldaccountant = clone $accountant;
+            $oldaccountant->setItems([]);
+
+            $accountantLogs = array_merge(
+                $accountantLogs,
+                AccountantService::checkAccountant(
+                    $accountant,
+                    $oldaccountant,
+                    $inputData->user->id
+                )
+            );
+
+            $accountants[] = $accountant;
+            $this->repositoryProvider
+                ->getAccountantRepository()
+                ->saveToArray($accountants);
+
+            $this->repositoryProvider
+                ->getAccountantRepository()
+                ->saveItemLog($accountantLogs);
 
             $this->repositoryProvider
                 ->getOrderRepository()

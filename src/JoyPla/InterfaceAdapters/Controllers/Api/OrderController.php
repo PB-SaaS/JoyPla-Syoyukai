@@ -363,6 +363,10 @@ class OrderController extends Controller
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
 
+        if (Gate::allows('is_user')) {
+            throw new Exception('can not delete');
+        }
+
         $order = ModelRepository::getOrderInstance()
             ->where('hospitalId', $this->request->user()->hospitalId)
             ->where('orderNumber', $vars['orderId'])
@@ -373,12 +377,44 @@ class OrderController extends Controller
         if (empty($order) || $order->orderStatus !== '2') {
             throw new Exception('can not delete');
         }
-
         ModelRepository::getOrderInstance()
             ->where('hospitalId', $this->request->user()->hospitalId)
             ->where('orderNumber', $vars['orderId'])
             ->delete();
 
         echo (new ApiResponse([], 1, 200, 'success', []))->toJson();
+    }
+
+    public function sent($vars)
+    {
+        $token = $this->request->get('_csrf');
+        Csrf::validate($token, true);
+
+        $order = ModelRepository::getOrderInstance()
+            ->where('hospitalId', $this->request->user()->hospitalId)
+            ->where('orderNumber', $vars['orderId'])
+            ->get();
+
+        $order = $order->first();
+
+        if (empty($order) || $order->sentFlag == '1') {
+            echo (new ApiResponse([], 1, 200, 'success', []))->toJson();
+        }
+
+        if (
+            Gate::allows('is_user') &&
+            $order->divisionId !== $this->request->user()->divisionId
+        ) {
+            throw new Exception('can not delete');
+        }
+
+        $result = ModelRepository::getOrderInstance()
+            ->where('hospitalId', $this->request->user()->hospitalId)
+            ->where('orderNumber', $vars['orderId'])
+            ->update([
+                'sentFlag' => 't',
+            ]);
+
+        echo (new ApiResponse([$result], 1, 200, 'success', []))->toJson();
     }
 }

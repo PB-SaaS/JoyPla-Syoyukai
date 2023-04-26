@@ -146,6 +146,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'delete',
     ]);
 
+    Router::map('POST', '/api/order/:orderId/sent', [
+        OrderController::class,
+        'sent',
+    ]);
+
     Router::map('GET', '/api/received/order/list', [
         ReceivedController::class,
         'orderList',
@@ -230,6 +235,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         ItemRequestController::class,
         'totalization',
     ])->service($useCaseProvider->getTotalizationInteractor());
+
+    Router::map('PATCH', '/api/itemrequest/item/bulk', [
+        ItemRequestController::class,
+        'itemBulk',
+    ])->service($useCaseProvider->getItemRequestBulkUpdateInteractor());
 
     Router::map('POST', '/api/payout/register', [
         PayoutController::class,

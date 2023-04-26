@@ -40,13 +40,13 @@ class OrderRepository extends ModelRepository implements
         array $orderItems
     ) {
         $division = ModelRepository::getDivisionInstance();
+        $distributor = ModelRepository::getDistributorInstance();
 
         foreach ($orderItems as $item) {
             $division->orWhere('divisionId', $item->divisionId);
         }
 
-        $division = $division->get();
-        $division = $division->all();
+        $division = $division->get()->all();
 
         $inHospitalItem = ModelRepository::getInHospitalItemViewInstance()->where(
             'hospitalId',
@@ -60,11 +60,19 @@ class OrderRepository extends ModelRepository implements
         }
 
         $inHospitalItem = $inHospitalItem->get()->all();
+        foreach ($inHospitalItem as $item) {
+            $distributor->orWhere('distributorId', $item->distributorId);
+        }
+        $distributor = $distributor->get()->all();
 
         foreach ($orderItems as $item) {
             $division_find_key = array_search(
                 $item->divisionId,
                 collect_column($division, 'divisionId')
+            );
+            $distributor_find_key = array_search(
+                $item->distributorId,
+                collect_column($distributor, 'distributorId')
             );
             $inHospitalItem_find_key = array_search(
                 $item->inHospitalItemId,
@@ -79,7 +87,7 @@ class OrderRepository extends ModelRepository implements
                 Item::create($inHospitalItem[$inHospitalItem_find_key]),
                 $hospitalId,
                 Division::create($division[$division_find_key]),
-                Distributor::create($inHospitalItem[$inHospitalItem_find_key]),
+                Distributor::create($distributor[$distributor_find_key]),
                 Quantity::create($inHospitalItem[$inHospitalItem_find_key]),
                 new Price($inHospitalItem[$inHospitalItem_find_key]->price),
                 new OrderQuantity((int) $item->orderUnitQuantity),
@@ -132,6 +140,7 @@ class OrderRepository extends ModelRepository implements
                 'adjustment' => (string) $orderToArray['adjustment'],
                 'ordercomment' => (string) $orderToArray['orderComment'],
                 'ordererUserName' => (string) $orderToArray['orderUserName'],
+                'sentFlag' => (string) $orderToArray['sentFlag'],
             ];
 
             $receivingDivisionCode = '';

@@ -78,6 +78,20 @@ const SearchableDropdown = {
       filteredOptions: this.options,
     };
   },
+  watch: {
+    options: {
+      handler(newOptions) {
+        if(newOptions.length === 1)
+        {
+          this.selectOption(newOptions[0]);
+        } else {
+          this.selectOption(newOptions.find(option => option.value === ''));
+        }
+        this.filteredOptions = newOptions;
+      },
+      deep: true,
+    },
+  },
   setup(props) {
 
     // a simple `name` field with basic required validator
@@ -235,6 +249,20 @@ const SearchableDropdownForForm = {
       successClassName: ["text-gray-700", "border-gray-300"],
       errorClassName: ["text-red-500", "border-red-500"],
     };
+  },
+  watch: {
+    options: {
+      handler(newOptions) {
+        if(newOptions.length === 1)
+        {
+          this.selectOption(newOptions[0]);
+        } else {
+          this.selectOption(newOptions.find(option => option.value === ''));
+        }
+        this.filteredOptions = newOptions;
+      },
+      deep: true,
+    },
   },
   methods: {
     filterOptions() {

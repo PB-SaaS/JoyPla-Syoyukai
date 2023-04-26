@@ -559,6 +559,15 @@ class JoyPlaApplication extends Application
             return new GatePermissionModel(true, false);
         });
 
+        Gate::define('item_request_bulk', function (Auth $auth) {
+            //請求商品一覧
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(false, false);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
         Gate::define('register_of_payouts', function (Auth $auth) {
             //払出登録
             if ($auth->userPermission == '2') {
