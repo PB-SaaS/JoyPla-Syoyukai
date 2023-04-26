@@ -80,6 +80,9 @@
                     発注書を削除
                   </v-button-danger>
                   <?php endif; ?>
+                  <v-button-default type="button" class="w-full" @click.native="openPrint( order.orderId )">
+                    発注書を印刷
+                  </v-button-default>
                 </div>
               </div>
               <div class="lg:w-4/5 p-2">
@@ -421,7 +424,7 @@ var JoyPlaApp = Vue.createApp({
         location.href = _ROOT + "&path=/order/unapproved/" + url;    
       }
       const openPrint = ( url ) => {
-        location.href = _ROOT + "&path=/order/" + url + "/print";    
+        location.href = _ROOT + "&path=/order/unapproved/" + url + "/print";    
       }
 
       const approvalSlip = ( orderId ) => 

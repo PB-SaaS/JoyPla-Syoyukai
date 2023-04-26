@@ -151,6 +151,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'index',
     ])->service($useCaseProvider->getOrderIndexInteractor());
 
+    Router::map('GET', '/order/unapproved/:orderId/print', [
+        OrderController::class,
+        'printOfUnapproved',
+    ])->service($useCaseProvider->getOrderPrintInteractor());
+
     Router::map('GET', '/order/:orderId/print', [
         OrderController::class,
         'print',

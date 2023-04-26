@@ -149,4 +149,23 @@ class OrderController extends Controller
         );
         $inputPort->handle($inputData);
     }
+
+    public function printOfUnapproved(
+        $vars,
+        OrderIndexInputPortInterface $inputPort
+    ) {
+        if (Gate::denies('list_of_order_slips')) {
+            Router::abort(403);
+        }
+
+        $gate = Gate::getGateInstance('list_of_order_slips');
+
+        $inputData = new OrderIndexInputData(
+            $this->request->user(),
+            $vars['orderId'],
+            true,
+            $gate->isOnlyMyDivision()
+        );
+        $inputPort->handle($inputData);
+    }
 }
