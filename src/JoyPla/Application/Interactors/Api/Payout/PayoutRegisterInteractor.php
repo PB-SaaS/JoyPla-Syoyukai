@@ -177,7 +177,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                         $inHospitalItemId;
                 });
 
-                $unitprice = $inHospitalItem->getUnitPrice();
+                $unitprice = $inHospitalItem->getUnitPrice()->value();
 
                 if ($hospitalRow->payoutUnitPrice !== '1') {
                     if (
