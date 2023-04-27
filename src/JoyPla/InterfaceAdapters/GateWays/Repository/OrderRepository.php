@@ -855,7 +855,7 @@ class OrderRepository extends ModelRepository implements
             return $order->toArray();
         }, $orders);
 
-        foreach ($orders as &$order) {
+        foreach ($orders as $key => $order) {
             $distributor = array_find($distributors, function (
                 $distributor
             ) use ($order) {
@@ -864,6 +864,7 @@ class OrderRepository extends ModelRepository implements
             });
 
             $order['distributor'] = $distributor->toArray();
+            $orders[$key] = $order;
         }
 
         foreach ($distributors as $distributor) {

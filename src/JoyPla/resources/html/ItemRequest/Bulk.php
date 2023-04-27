@@ -358,11 +358,11 @@
               item.value._item?.itemStandard,
               item.value._item?.itemJANCode,
               item.value._item?.distributorName,
-              item.value._item?.quantityNum,
+              item.value._item?.quantity,
               item.value._item?.quantityUnit,
               item.value._item?.itemUnit,
-              item.value._sourceStock?.stockQuantity,
-              item.value._targetStock?.stockQuantity,
+              item.value._sourceStock?.stockQuantity ?? 0,
+              item.value._targetStock?.stockQuantity ?? 0,
               item.value.requestQuantity,
             ]
           );
