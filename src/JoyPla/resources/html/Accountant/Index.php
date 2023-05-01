@@ -452,9 +452,6 @@ var JoyPlaApp = Vue.createApp({
       const openSlip = ( url ) => {
         location.href = _ROOT + "&path=/accountant/" + url;    
       }
-      const openPrint = ( url ) => {
-        location.href = _ROOT + "&path=/accountant/" + url + "/print";    
-      }
 
       const deleteSlip = ( accountantId ) => 
       {
@@ -546,7 +543,6 @@ var JoyPlaApp = Vue.createApp({
         loading, 
         start, 
         complete,
-        openPrint,
         openSlip,
         searchClear,
         searchExec,

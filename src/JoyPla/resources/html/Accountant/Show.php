@@ -14,7 +14,7 @@
           <v-button-danger type="button" class="md:w-1/6 w-full" @click.native="slipDelete">
             会計伝票を削除
           </v-button-danger>
-          <v-button-default type="button" class="md:w-1/6 w-full" >
+          <v-button-default type="button" class="md:w-1/6 w-full"  @click.native="openPrint(values.accountant?.accountantId)">
             印刷
           </v-button-default>
         </div>
@@ -796,7 +796,13 @@ var JoyPlaApp = Vue.createApp({
             }
           };
       };
+
+    const openPrint = ( id ) => {
+      location.href = _ROOT + "&path=/accountant/" + id + "/print";    
+    }
+
     return {
+      openPrint,
       slipDelete,
       itemRegister,
       loadCsvFile,

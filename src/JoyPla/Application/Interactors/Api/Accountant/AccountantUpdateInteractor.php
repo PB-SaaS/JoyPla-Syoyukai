@@ -82,7 +82,7 @@ namespace JoyPla\Application\Interactors\Api\Accountant {
 
             $accountant->setItems($items);
 
-            $accoutantItemLogs = AccountantService::checkAccountant(
+            $accountantItemLogs = AccountantService::checkAccountant(
                 $accountant,
                 $oldAccountant,
                 $inputData->user->id
@@ -94,7 +94,7 @@ namespace JoyPla\Application\Interactors\Api\Accountant {
 
             $this->repositoryProvider
                 ->getAccountantRepository()
-                ->saveItemLog($accoutantItemLogs);
+                ->saveItemLog($accountantItemLogs);
 
             echo (new ApiResponse($accountant->toArray(), 1, 200, 'success', [
                 'AccountantUpdatePresenter',

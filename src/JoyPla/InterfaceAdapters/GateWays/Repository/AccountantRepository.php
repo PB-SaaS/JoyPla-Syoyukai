@@ -160,14 +160,26 @@ class AccountantRepository implements AccountantRepositoryInterface
             ->get();
 
         $accountant = $accountant->first();
+        $division = null;
+        $distributor = null;
 
-        $division = ModelRepository::getDivisionInstance()
-            ->where('divisionId', $accountant->divisionId)
-            ->where('hospitalId', $hospitalId->value())
-            ->get()
-            ->first();
-        $distributor = ModelRepository::getDistributorInstance()
-            ->where('distributorId', $accountant->distributorId)
+        if ($accountant->divisionId) {
+            $division = ModelRepository::getDivisionInstance()
+                ->where('divisionId', $accountant->divisionId)
+                ->where('hospitalId', $hospitalId->value())
+                ->get()
+                ->first();
+        }
+
+        if ($accountant->distributorId) {
+            $distributor = ModelRepository::getDistributorInstance()
+                ->where('distributorId', $accountant->distributorId)
+                ->where('hospitalId', $hospitalId->value())
+                ->get()
+                ->first();
+        }
+
+        $hospital = ModelRepository::getHospitalInstance()
             ->where('hospitalId', $hospitalId->value())
             ->get()
             ->first();
@@ -190,6 +202,7 @@ class AccountantRepository implements AccountantRepositoryInterface
 
         $accountant->_division = $division;
         $accountant->_distributor = $distributor;
+        $accountant->_hospital = $hospital;
 
         $items = ModelRepository::getAccountantItemInstance()
             ->where('accountantId', $accountantId->value())
