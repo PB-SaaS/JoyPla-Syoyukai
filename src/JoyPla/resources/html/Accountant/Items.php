@@ -3,8 +3,8 @@
   <header-navi></header-navi>
   <v-breadcrumbs :items="breadcrumbs"></v-breadcrumbs>
   <div id="content" class="flex h-full px-1">
-    <div class="flex-auto">
-      <div class="index container mx-auto">
+    <div class="flex-auto w-full">
+      <div class="index px-1 w-full mx-auto mb-96">
         <h1 class="text-2xl mb-2">会計データ</h1>
         <hr>
         <div class="w-full flex border-b-2 border-gray-200 py-4">
@@ -56,6 +56,22 @@
             <tbody>
               <tr v-for="(item) in values.items">
                 <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item._id }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.accountantId }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.orderNumber }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.receivingNumber }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item._division?.divisionName }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item._distributor?.distributorName }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.method }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.action }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.itemId }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.itemName }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.makerName }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.itemCode }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.itemStandard }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.itemJANCode }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ numberFormat(item.count) }}{{ item.unit }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.taxrate }}%</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">&yen;{{ numberFormat(itemSubtotal(item)) }}</td>
               </tr>
             </tbody>
           </table>
@@ -175,7 +191,8 @@ var JoyPlaApp = Vue.createApp({
       'v-select-division' : vSelectDivision,
       'v-select-distributor' : vSelectDistributor,
       'v-multiple-select-division' : vMultipleSelectDivision,
-      'v-multiple-select-distributor' : vMultipleSelectDistributor
+      'v-multiple-select-distributor' : vMultipleSelectDistributor,
+      'v-pagination' : vPagination,
     },
     setup(){
         const {ref , onCreated , onMounted} = Vue;
@@ -203,6 +220,9 @@ var JoyPlaApp = Vue.createApp({
             if (!results[2]) return '';
             return decodeURIComponent(results[2].replace(/\+/g, " "));
         }
+
+        const showPages = ref(5);
+        const totalCount = ref(0);
 
         const pagetitle = "AccountantItemsIndex";
 
@@ -314,6 +334,7 @@ var JoyPlaApp = Vue.createApp({
             startLoading();
             const res = await getData();
             values.items = res.data
+            totalCount.value = parseInt(res.count);
             completeLoading();
         };
         
@@ -408,6 +429,11 @@ var JoyPlaApp = Vue.createApp({
         const perPageOptions = [{ label: "10件表示", value: "10" },{ label: "50件表示", value: "50" },{ label: "100件表示", value: "100" }];
 
         return {
+            numberFormat,
+            itemSubtotal,
+            fetchData,
+            showPages,
+            totalCount,
             values,
             openModal,
             perPageOptions,
@@ -418,5 +444,11 @@ var JoyPlaApp = Vue.createApp({
             breadcrumbs
         };
     },
+    watch: {
+        'values.search.currentPage': function(val) {
+            this.fetchData();
+            window.scrollTo(0, 0);
+        }
+    }
 }).mount("#top");
 </script> 

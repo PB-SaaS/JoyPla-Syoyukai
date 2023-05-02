@@ -94,6 +94,48 @@ class AccountantItemRepository implements AccountantItemRepositoryInterface
             return [[], 0];
         }
 
+        $count =
+            $search->currentPage - 1 > 0
+                ? $search->perPage * ($search->currentPage - 1) + 1
+                : 1;
+
+        if ($historys->getData()->count() > 0) {
+            $division = ModelRepository::getDivisionInstance()->where(
+                'hospitalId',
+                $hospitalId->value()
+            );
+            foreach ($historys->getData()->all() as $history) {
+                $division->orWhere('divisionId', $history->divisionId);
+            }
+            $divisions = $division->get();
+
+            $distributor = ModelRepository::getDistributorInstance()->where(
+                'hospitalId',
+                $hospitalId->value()
+            );
+            foreach ($historys->getData()->all() as $history) {
+                $distributor->orWhere('distributorId', $history->distributorId);
+            }
+            $distributors = $distributor->get();
+        }
+
+        foreach ($historys->getData()->all() as $history) {
+            $history->_division = array_find($divisions, function (
+                $division
+            ) use ($history) {
+                return $division->divisionId == $history->divisionId;
+            });
+
+            $history->_distributor = array_find($distributors, function (
+                $distributor
+            ) use ($history) {
+                return $distributor->distributorId == $history->distributorId;
+            });
+
+            $history->_id = $count;
+            $count++;
+        }
+
         return [$historys->getData(), $historys->getTotal()];
     }
 }
