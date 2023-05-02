@@ -9,7 +9,7 @@
         <hr>
         <div>
           <div class="mb-2 lg:w-1/3">
-            <v-select-division name="divisionId" label="発注部署" :rules="{ required : true }" title="発注部署指定" :disabled="values.divisionId != '' && fields.length > 0" :is-only-my-division="<?php var_export(
+            <v-select-division :is-only-use-data="true" name="divisionId" label="発注部署" :rules="{ required : true }" title="発注部署指定" :disabled="values.divisionId != '' && fields.length > 0" :is-only-my-division="<?php var_export(
                 gate('register_of_unordered_slips')->isOnlyMyDivision()
             ); ?>" />
           </div>

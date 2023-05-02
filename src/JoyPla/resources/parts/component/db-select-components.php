@@ -32,6 +32,11 @@ const vSelectDivision = {
       type: Boolean,
       required: false,
       default: true,
+    },
+    isOnlyUseData: {
+      type: Boolean,
+      required: false,
+      default: false,
     }
   },
   watch: {
@@ -63,6 +68,7 @@ const vSelectDivision = {
       let params = new URLSearchParams();
       params.append("path", "/api/division/index");
       params.append("isOnlyMyDivision", this.isOnlyMyDivision);
+      params.append("isOnlyUseData", this.isOnlyUseData);
       params.append("_csrf", _CSRF);
       axios
         .post(_APIURL, params)

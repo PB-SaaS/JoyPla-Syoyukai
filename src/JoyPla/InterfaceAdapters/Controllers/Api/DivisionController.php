@@ -14,13 +14,18 @@ class DivisionController extends Controller
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
 
+        $isOnlyUseData =
+            $this->request->get('isOnlyUseData') === 'true' ||
+            $this->request->get('isOnlyUseData') === '1';
+
         $isOnlyMyDivision =
             $this->request->get('isOnlyMyDivision') === 'true' ||
             $this->request->get('isOnlyMyDivision') === '1';
 
         $inputData = new DivisionIndexInputData(
             $this->request->user(),
-            $isOnlyMyDivision
+            $isOnlyMyDivision,
+            $isOnlyUseData
         );
         $inputPort->handle($inputData);
     }
