@@ -58,8 +58,10 @@
                 <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant._division?.divisionName }}</td>
                 <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant._distributor?.distributorName }}</td>
                 <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ numberFormat(accountant.totalAmount) }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant.orderId }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ accountant.receivedId }}</td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500 no-underline hover:underline">
+                  <a :href="_ROOT + '&path=/order/' + accountant.orderId">{{ accountant.orderId }}</a></td>
+                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500 no-underline hover:underline">
+                  <a :href="_ROOT + '&path=/received/' + accountant.receivedId">{{ accountant.receivedId }}</a></td>
                 <td class="border-b border-slate-100 p-4">
                   <v-button-primary type="button" @click.native="openSlip(accountant.accountantId)">詳細</v-button-primary>
                 </td>

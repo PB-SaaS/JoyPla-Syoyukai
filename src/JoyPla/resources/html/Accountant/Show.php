@@ -37,11 +37,15 @@
           </div>
           <div class="flex w-full gap-6">
             <div class="flex-initial lg:w-1/6 w-1/3">発注番号</div>
-            <div class="flex-auto">{{ values.accountant?.orderId }}</div>
+            <div class="flex-auto">
+              <a class="no-underline hover:underline" :href="_ROOT + '&path=/order/' + values.accountant?.orderId">{{ values.accountant?.orderId }}</a>
+            </div>
           </div>
           <div class="flex w-full gap-6">
             <div class="flex-initial lg:w-1/6 w-1/3">検収番号</div>
-            <div class="flex-auto">{{ values.accountant?.receivedId }}</div>
+            <div class="flex-auto">
+              <a class="no-underline hover:underline" :href="_ROOT + '&path=/received/' + values.accountant?.receivedId">{{ values.accountant?.receivedId }}</a>
+            </div>
           </div>
         </div>
         <hr>
