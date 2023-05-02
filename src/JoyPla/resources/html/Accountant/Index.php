@@ -148,46 +148,6 @@
                 title="会計年月"
                 ></v-input>
             </div>
-            <div class="my-4">
-              <v-input
-                name="makerName"
-                type="text"
-                label="メーカー名"
-                title="メーカー名"
-                ></v-input>
-            </div>
-            <div class="my-4">
-              <v-input
-                name="itemName"
-                type="text"
-                label="商品名"
-                title="商品名"
-                ></v-input>
-            </div>
-            <div class="my-4">
-              <v-input
-                name="itemCode"
-                type="text"
-                label="製品コード"
-                title="製品コード"
-                ></v-input>
-            </div>
-            <div class="my-4">
-              <v-input
-                name="itemStandard"
-                type="text"
-                label="規格"
-                title="規格"
-                ></v-input>
-            </div>
-            <div class="my-4">
-              <v-input
-                name="itemJANCode"
-                type="text"
-                label="JANコード"
-                title="JANコード"
-                ></v-input>
-            </div>
             <?php if (!gate('list_of_accountant_slips')->isOnlyMyDivision()): ?>
             <div class="my-4">
               <v-multiple-select-division
@@ -291,11 +251,6 @@ var JoyPlaApp = Vue.createApp({
       const setParam = (values) => {
         sessionStorage.setItem(pagetitle,JSON.stringify(values));
         const url = new URL(window.location);
-        url.searchParams.set('itemName',values.itemName);
-        url.searchParams.set('makerName',values.makerName);
-        url.searchParams.set('itemCode',values.itemCode);
-        url.searchParams.set('itemStandard',values.itemStandard);
-        url.searchParams.set('itemJANCode',values.itemJANCode);
         url.searchParams.set('yearMonth',values.yearMonth);
         url.searchParams.set('perPage',values.perPage);
         url.searchParams.set('currentPage',values.currentPage);
@@ -306,11 +261,6 @@ var JoyPlaApp = Vue.createApp({
 
       const { meta , validate , values , setFieldValue , resetForm} = useForm({
         initialValues: {
-          itemName  : (getParam("itemName")) ? getParam("itemName") : "",
-          makerName : (getParam("makerName")) ? getParam("makerName") : "",
-          itemCode : (getParam("itemCode")) ? getParam("itemCode") : "",
-          itemStandard : (getParam("itemStandard")) ? getParam("itemStandard") : "",
-          itemJANCode : (getParam("itemJANCode")) ? getParam("itemJANCode") : "",
           yearMonth: (getParam("yearMonth")) ? getParam("yearMonth") : "",
           perPage: (Number.isInteger(getParam("perPage"))) ? getParam("perPage") : "10",
           currentPage : (Number.isInteger(parseInt(getParam("currentPage")))) ? parseInt(getParam("currentPage")) : 1,
@@ -438,11 +388,6 @@ var JoyPlaApp = Vue.createApp({
       const searchClear = () =>
       {
         values.currentPage = 1;
-        values.itemName = '';
-        values.makerName = '';
-        values.itemCode = '';
-        values.itemStandard = '';
-        values.itemJANCode = '';
         values.yearMonth = '';
         values.divisionIds = [];
         values.distributorIds = [];

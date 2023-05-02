@@ -336,8 +336,8 @@ const vInput = {
   setup(props) {
     const { ref, watchEffect } = Vue;
     const { value, errorMessage, meta, validate } = VeeValidate.useField(
-      props.name,
-      props.rules,
+      Vue.toRef(props, "name"),
+      Vue.toRef(props, "rules"),
       { label: props.label }
     );
 

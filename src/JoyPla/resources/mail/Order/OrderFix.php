@@ -7,7 +7,29 @@ JoyPla からお知らせです。
 卸業者名 <?php echo $distributor_name; ?> 
 〒<?php echo $distributor_postal_code; ?>  
 <?php echo $distributor_prefectures; ?> <?php echo $distributor_address; ?> 
-<?php echo $order_method; ?> 
+<?php
+echo orderMethod($order_method);
+
+function orderMethod($index)
+{
+    if ($index == '1') {
+        return 'JoyPla';
+    }
+    if ($index == '2') {
+        return 'メール';
+    }
+    if ($index == '3') {
+        return 'FAX';
+    }
+    if ($index == '4') {
+        return '電話';
+    }
+    if ($index == '5') {
+        return '業者システム';
+    }
+    return 'その他';
+}
+?> 
 
 [医療機関]
 施設名 <?php echo $hospital_name; ?> 

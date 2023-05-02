@@ -586,7 +586,7 @@ var JoyPlaApp = Vue.createApp({
 
       const copyItem = (index) => {
         const originalItem = values.items[index];
-        const copiedItem = JSON.parse(JSON.stringify({ ...originalItem, index: originalItem.index + 1 , accountantItemId: ''}));
+        const copiedItem = JSON.parse(JSON.stringify({ ...originalItem, index: originalItem.index + 1 , accountantItemId: '' , method: "手動",}));
 
         fields.value.forEach((field, idx) => {
           if (field.value.index > fields.value[index].value.index) {

@@ -18,7 +18,28 @@ JoyPla からお知らせです。
 <?php echo $order['distributor']['prefectures']; ?> <?php echo $order[
      'distributor'
  ]['address']; ?> 
-<?php echo $order['distributor']['orderMethod']; ?> 
+<?php
+echo orderMethod($order['distributor']['orderMethod']);
+function orderMethod($index)
+{
+    if ($index == '1') {
+        return 'JoyPla';
+    }
+    if ($index == '2') {
+        return 'メール';
+    }
+    if ($index == '3') {
+        return 'FAX';
+    }
+    if ($index == '4') {
+        return '電話';
+    }
+    if ($index == '5') {
+        return '業者システム';
+    }
+    return 'その他';
+}
+?> 
 
 部署名 <?php echo $order['division']['divisionName']; ?> 
 

@@ -76,7 +76,7 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> 
               </div>
               <div class="lg:flex-1 flex-col">
                 <div v-for="(received , rid) in item.value.receiveds">
@@ -88,7 +88,7 @@
                       <v-input :name="`receivedItems[${idx}].receiveds[${rid}].lotDate`" label="消費期限" :rules="{ required : isRequired(idx) , twoFieldRequired : [ 'ロット番号' , `@receivedItems[${idx}].receiveds[${rid}].lotNumber`] }" type="date" change-class-name="inputChange" title="消費期限"></v-input>
                     </div>
                     <div class="lg:w-1/3">
-                      <v-input-number :rules="{ required : true , between: ( (item.value.orderQuantity > 0)? [ 0 , item.value.orderQuantity - item.value.receivedQuantity ] : [ item.value.orderQuantity - item.value.receivedQuantity , 0 ] ) }" :name="`receivedItems[${idx}].receiveds[${rid}].receivedUnitQuantity`" label="入荷数（個数）" :unit="item.value.quantity.itemUnit" @change="receivedQuantitySum(idx)" change-class-name="inputChange" :step="1" :title="`入荷数（個数）/${item.value.quantity.quantityNum}${ item.value.quantity.quantityUnit }入り`"></v-input-number>
+                      <v-input-number :name="`receivedItems[${idx}].receiveds[${rid}].receivedUnitQuantity`" :rules="{ required : true , between: ( (item.value.orderQuantity > 0)? [ 0 , item.value.orderQuantity - item.value.receivedQuantity ] : [ item.value.orderQuantity - item.value.receivedQuantity , 0 ] ) }" label="入荷数（個数）" :unit="item.value.quantity.itemUnit" @change="receivedQuantitySum(idx)" change-class-name="inputChange" :step="1" :title="`入荷数（個数）/${item.value.quantity.quantityNum}${ item.value.quantity.quantityUnit }入り`"></v-input-number>
                     </div>
                     <div class="lg:mt-0 mt-2 flex justify-between gap-4">
                       <v-text title=" ">
@@ -469,8 +469,7 @@
 
       const additem = (list, idx) => {
         list.orderItems[idx].orderDate = list.orderDate;
-        let item = list.orderItems[idx];
-        item = JSON.parse(JSON.stringify(item));
+        const item = JSON.parse(JSON.stringify(list.orderItems[idx]));
         item.sumReceivedQuantity = 1;
         item.receiveds = [{
           'lotNumber': (item.lotNumber) ? item.lotNumber : "",
