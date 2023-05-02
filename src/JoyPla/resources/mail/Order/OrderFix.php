@@ -8,7 +8,7 @@ JoyPla からお知らせです。
 〒<?php echo $distributor_postal_code; ?>  
 <?php echo $distributor_prefectures; ?> <?php echo $distributor_address; ?> 
 <?php
-echo orderMethod($order_method);
+echo '発注方法: ' . orderMethod($order_method);
 
 function orderMethod($index)
 {

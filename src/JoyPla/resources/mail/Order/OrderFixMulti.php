@@ -19,7 +19,7 @@ JoyPla からお知らせです。
      'distributor'
  ]['address']; ?> 
 <?php
-echo orderMethod($order['distributor']['orderMethod']);
+echo '発注方法: ' . orderMethod($order['distributor']['orderMethod']);
 function orderMethod($index)
 {
     if ($index == '1') {
