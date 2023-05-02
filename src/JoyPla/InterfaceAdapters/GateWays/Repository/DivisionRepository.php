@@ -12,18 +12,18 @@ class DivisionRepository implements DivisionRepositoryInterface
 {
     public function findByHospitalId(
         HospitalId $hospitalId,
-        bool $deleted = false
+        bool $isOnlyUseData = false
     ) {
         $division = ModelRepository::getDivisionInstance()->where(
             'hospitalId',
             $hospitalId->value()
         );
-        /*
-        if (!$deleted) {
+
+        if ($isOnlyUseData) {
             $division->orWhere('deleteFlag', 'f');
             $division->orWhereNull('deleteFlag');
         }
-        */
+
         $division = $division->get();
 
         $result = [];
@@ -34,12 +34,21 @@ class DivisionRepository implements DivisionRepositoryInterface
         return $result;
     }
 
-    public function find(HospitalId $hospitalId, DivisionId $divisionId)
-    {
+    public function find(
+        HospitalId $hospitalId,
+        DivisionId $divisionId,
+        bool $isOnlyUseData = false
+    ) {
         $division = ModelRepository::getDivisionInstance()
             ->where('hospitalId', $hospitalId->value())
-            ->where('divisionId', $divisionId->value())
-            ->get();
+            ->where('divisionId', $divisionId->value());
+
+        if ($isOnlyUseData) {
+            $division->orWhere('deleteFlag', 'f');
+            $division->orWhereNull('deleteFlag');
+        }
+
+        $division = $division->get();
 
         if ($division->count() === 0) {
             return null;

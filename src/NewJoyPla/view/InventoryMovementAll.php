@@ -135,7 +135,6 @@
             </div>
         </div>
     </div>
-    <!-- print Only =
     <div id="detail-sheet">
         <section class="sheet">
             <p class="uk-text-center print-text-xlarge title_spacing">棚卸実績</p>

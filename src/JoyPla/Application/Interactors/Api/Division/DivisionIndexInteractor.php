@@ -42,14 +42,15 @@ namespace JoyPla\Application\Interactors\Api\Division {
                     ->getDivisionRepository()
                     ->find(
                         new HospitalId($inputData->user->hospitalId),
-                        new DivisionId($inputData->user->divisionId)
+                        new DivisionId($inputData->user->divisionId),
+                        $inputData->isOnlyUseData
                     );
             } else {
                 $divisions = $this->repositoryProvider
                     ->getDivisionRepository()
                     ->findByHospitalId(
                         new HospitalId($inputData->user->hospitalId),
-                        $inputData->deleted
+                        $inputData->isOnlyUseData
                     );
             }
 
@@ -74,7 +75,7 @@ namespace JoyPla\Application\InputPorts\Api\Division {
     {
         public Auth $user;
         public bool $isOnlyMyDivision = false;
-        public bool $deleted = false;
+        public bool $isOnlyUseData = false;
 
         /**
          * DivisionIndexInputData constructor.
@@ -82,11 +83,11 @@ namespace JoyPla\Application\InputPorts\Api\Division {
         public function __construct(
             Auth $user,
             bool $isOnlyMyDivision,
-            bool $deleted = false
+            bool $isOnlyUseData = false
         ) {
             $this->user = $user;
             $this->isOnlyMyDivision = $isOnlyMyDivision;
-            $this->deleted = $deleted;
+            $this->isOnlyUseData = $isOnlyUseData;
         }
     }
 
