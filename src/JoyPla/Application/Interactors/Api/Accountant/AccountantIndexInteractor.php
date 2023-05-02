@@ -71,11 +71,7 @@ namespace JoyPla\Application\InputPorts\Api\Accountant {
         {
             $this->user = $user;
             $this->search = new stdClass();
-            $this->search->itemName = $search['itemName'];
-            $this->search->makerName = $search['makerName'];
-            $this->search->itemCode = $search['itemCode'];
-            $this->search->itemStandard = $search['itemStandard'];
-            $this->search->itemJANCode = $search['itemJANCode'];
+            $this->search->distributorIds = $search['distributorIds'];
             $this->search->yearMonth = $search['yearMonth'];
             $this->search->divisionIds = $search['divisionIds'];
             $this->search->perPage = $search['perPage'];

@@ -13,11 +13,11 @@
           <v-button-default type="button" class="md:w-1/6 w-full inline-flex items-center relative" :disabled="order.sent.disabled" @click.native="sentSlip()">
             <template v-if="order.sentFlag && ! order.sent.disabled">
               <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-3 h-5 w-5 stroke-sushi-700 absolute" viewBox="0 96 960 960" width="48"><path d="M633 976 472 815l43-43 118 118 244-244 43 43-287 287ZM478 529l334-213H144l334 213Zm0 60L140 372v452h256l60 60H140q-24 0-42-18t-18-42V316q0-24 18-42t42-18h677q24 0 42 18t18 42v244l-60 60V372L478 589Zm1 9Zm-1-69Zm1 60Z"/></svg>
-              <p class="w-full">FAXまたは電話：完了</p>
+              <p class="w-full">発注対応：完了</p>
             </template>
             <template v-if="! order.sentFlag && ! order.sent.disabled">
               <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-3 h-5 w-5 stroke-sushi-700 absolute" viewBox="0 96 960 960" width="48"><path d="M140 896q-24 0-42-18t-18-42V316q0-24 18-42t42-18h680q24 0 42 18t18 42v520q0 24-18 42t-42 18H140Zm340-302L140 371v465h680V371L480 594Zm0-60 336-218H145l335 218ZM140 371v-55 520-465Z"/></svg>
-              <p class="w-full">FAXまたは電話：未完了<br>（クリックで完了します）</p>
+              <p class="w-full">発注対応：未完了<br>（クリックで完了します）</p>
             </template>
             <template v-if="order.sent.disabled">
               <svg class="animate-spin -ml-1 mr-3 h-5 w-5 stroke-sushi-700 absolute" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

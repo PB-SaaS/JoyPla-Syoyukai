@@ -14,9 +14,6 @@
           <v-button-danger type="button" class="md:w-1/6 w-full" @click.native="slipDelete">
             会計伝票を削除
           </v-button-danger>
-          <v-button-default type="button" class="md:w-1/6 w-full" >
-            印刷
-          </v-button-default>
         </div>
         <div class="p-4 text-base bg-gray-100 border border-gray-400">
           <div class="flex w-full gap-6">
@@ -586,7 +583,7 @@ var JoyPlaApp = Vue.createApp({
 
       const copyItem = (index) => {
         const originalItem = values.items[index];
-        const copiedItem = JSON.parse(JSON.stringify({ ...originalItem, index: originalItem.index + 1 , accountantItemId: ''}));
+        const copiedItem = JSON.parse(JSON.stringify({ ...originalItem, index: originalItem.index + 1 , accountantItemId: '' , method: "手動",}));
 
         fields.value.forEach((field, idx) => {
           if (field.value.index > fields.value[index].value.index) {

@@ -61,7 +61,7 @@
                   <br>
                   発注元部署：{{ order.division.divisionName }}<br>
                   卸業者：{{ order.distributor.distributorName }}<br>
-                  発注情報：{{ order.distributor.orderMethod }}<br>
+                  発注方法：{{ order.distributor.orderMethod }}<br>
                   合計金額：&yen; {{ numberFormat( order.totalAmount) }}
                 </p>
                 <div class="flex flex-col gap-3">

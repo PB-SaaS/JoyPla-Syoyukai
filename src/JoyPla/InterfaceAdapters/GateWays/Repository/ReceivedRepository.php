@@ -38,6 +38,7 @@ class ReceivedRepository implements ReceivedRepositoryInterface
 
             foreach ($receivedToArray['receivedItems'] as $receivedItem) {
                 $items[] = [
+                    'registrationTime' => $receivedToArray['registDate'],
                     'orderCNumber' => $receivedItem['orderItemId'],
                     'receivingCount' => $receivedItem['receivedQuantity'],
                     'receivingHId' => $receivedItem['receivedId'],
