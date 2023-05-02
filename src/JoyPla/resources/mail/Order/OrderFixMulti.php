@@ -18,7 +18,20 @@ JoyPla からお知らせです。
 <?php echo $order['distributor']['prefectures']; ?> <?php echo $order[
      'distributor'
  ]['address']; ?> 
-<?php echo '発注方法: ' . orderMethod($order['distributor']['orderMethod']); ?> 
+<?php
+$order_methods = [
+    '1' => 'JoyPla',
+    '2' => 'メール',
+    '3' => 'FAX',
+    '4' => '電話',
+    '5' => '業者システム',
+];
+
+echo '発注方法: ' .
+    (isset($order_methods[$order['distributor']['orderMethod']])
+        ? $order_methods[$order['distributor']['orderMethod']]
+        : 'その他');
+?> 
 
 部署名 <?php echo $order['division']['divisionName']; ?> 
 
@@ -35,23 +48,3 @@ JoyPla からお知らせです。
 <?php echo $login_url; ?>
 
 ※このメールへの返信は受け付けていません。
-<?php function orderMethod($index)
-{
-    if ($index == '1') {
-        return 'JoyPla';
-    }
-    if ($index == '2') {
-        return 'メール';
-    }
-    if ($index == '3') {
-        return 'FAX';
-    }
-    if ($index == '4') {
-        return '電話';
-    }
-    if ($index == '5') {
-        return '業者システム';
-    }
-    return 'その他';
-}
-?>

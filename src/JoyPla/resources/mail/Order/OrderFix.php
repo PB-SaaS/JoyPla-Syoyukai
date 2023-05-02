@@ -8,27 +8,18 @@ JoyPla からお知らせです。
 〒<?php echo $distributor_postal_code; ?>  
 <?php echo $distributor_prefectures; ?> <?php echo $distributor_address; ?> 
 <?php
-echo '発注方法: ' . orderMethod($order_method);
+$order_methods = [
+    '1' => 'JoyPla',
+    '2' => 'メール',
+    '3' => 'FAX',
+    '4' => '電話',
+    '5' => '業者システム',
+];
 
-function orderMethod($index)
-{
-    if ($index == '1') {
-        return 'JoyPla';
-    }
-    if ($index == '2') {
-        return 'メール';
-    }
-    if ($index == '3') {
-        return 'FAX';
-    }
-    if ($index == '4') {
-        return '電話';
-    }
-    if ($index == '5') {
-        return '業者システム';
-    }
-    return 'その他';
-}
+echo '発注方法: ' .
+    (isset($order_methods[$order_method])
+        ? $order_methods[$order_method]
+        : 'その他');
 ?> 
 
 [医療機関]
