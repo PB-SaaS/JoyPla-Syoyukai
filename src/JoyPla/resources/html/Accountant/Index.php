@@ -387,6 +387,7 @@ var JoyPlaApp = Vue.createApp({
         values.currentPage = 1;
         listGet();
       };
+      
       const searchClear = () =>
       {
         values.currentPage = 1;

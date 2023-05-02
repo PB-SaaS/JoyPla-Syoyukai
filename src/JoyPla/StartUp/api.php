@@ -256,6 +256,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'index',
     ])->service($useCaseProvider->getAccountantIndexInteractor());
 
+    Router::map('GET', '/api/accountant/items', [
+        AccountantController::class,
+        'items',
+    ])->service($useCaseProvider->getAccountantItemsIndexInteractor());
+
     Router::map('GET', '/api/accountant/:accountantId', [
         AccountantController::class,
         'show',

@@ -1174,6 +1174,37 @@ class ModelRepository
         ]);
     }
 
+    public static function getAccountantItemViewInstance()
+    {
+        return SpiralDB::title('accountantItems')->value([
+            'id',
+            'registTime',
+            'updateTime',
+            'hospitalId',
+            'divisionId',
+            'distributorId',
+            'accountantId',
+            'accountantDate',
+            'orderNumber',
+            'receivingNumber',
+            'totalAmount',
+            'itemId',
+            'itemName',
+            'makerName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'count',
+            'unit',
+            'price',
+            'taxrate',
+            'accountantItemId',
+            'action',
+            'method',
+            'index',
+        ]);
+    }
+
     public static function getAccountantItemLogInstance()
     {
         return SpiralDB::title('NJ_AItemLog')->value([

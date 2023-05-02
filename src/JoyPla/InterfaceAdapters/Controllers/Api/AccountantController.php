@@ -8,6 +8,8 @@ use framework\Facades\Gate;
 use framework\Http\Controller;
 use JoyPla\Application\InputPorts\Api\Accountant\AccountantIndexInputData;
 use JoyPla\Application\InputPorts\Api\Accountant\AccountantIndexInputPortInterface;
+use JoyPla\Application\InputPorts\Api\Accountant\AccountantItemsIndexInputData;
+use JoyPla\Application\InputPorts\Api\Accountant\AccountantItemsIndexInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Accountant\AccountantRegisterInputData;
 use JoyPla\Application\InputPorts\Api\Accountant\AccountantRegisterInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Accountant\AccountantShowInputData;
@@ -56,6 +58,29 @@ class AccountantController extends Controller
         }
 
         $inputData = new AccountantIndexInputData(
+            $this->request->user(),
+            $search
+        );
+
+        $inputPort->handle($inputData);
+    }
+
+    public function items(
+        $vars,
+        AccountantItemsIndexInputPortInterface $inputPort
+    ) {
+        $token = $this->request->get('_csrf');
+        Csrf::validate($token, true);
+
+        $gate = Gate::getGateInstance('list_of_accountant_slips');
+
+        $search = $this->request->get('search', []);
+
+        if ($gate->isOnlyMyDivision()) {
+            $search['divisionIds'] = [$this->request->user()->divisionId];
+        }
+
+        $inputData = new AccountantItemsIndexInputData(
             $this->request->user(),
             $search
         );

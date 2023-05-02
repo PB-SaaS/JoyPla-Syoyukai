@@ -19,6 +19,12 @@ class AccountantController extends Controller
         echo view('html/Common/Template', compact('body'), false)->render();
     }
 
+    public function items($vars)
+    {
+        $body = View::forge('html/Accountant/Items', [], false)->render();
+        echo view('html/Common/Template', compact('body'), false)->render();
+    }
+
     public function show($vars)
     {
         if (Gate::denies('list_of_accountant_slips')) {
