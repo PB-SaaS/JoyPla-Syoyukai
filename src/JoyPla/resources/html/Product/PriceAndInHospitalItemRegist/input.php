@@ -448,7 +448,7 @@ components: {
     'v-checkbox': vCheckbox,
     'v-loading': vLoading,
     'v-text': vText,
-    'v-input' : vInput,
+    'v-input' : ,
     'v-textarea' : vTextarea,
     'v-select': vSelect,
     'v-checkbox': vCheckbox,

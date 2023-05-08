@@ -65,7 +65,7 @@
                                     <tr>
                                         <th>No</th>
                                         <th>
-                                            <a href="#" @click="sortBy('divisionName')" :class="addClass('rackName')">部署名</a>
+                                            <a href="#" @click="sortBy('divisionName')" :class="addClass('divisionName')">部署名</a>
                                         </th>
                                         <th>
                                             <a href="#" @click="sortBy('rackName')" :class="addClass('rackName')">棚名</a>

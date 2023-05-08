@@ -24,57 +24,66 @@
             </div>
           </div>
         </div>
+        <div class="w-full flex border-b-2 border-gray-200 py-4">
+            <v-button-primary type="button" class="w-1/4" data-micromodal-trigger="downloadModal">ダウンロード</v-button-primary>
+            <download-modal></download-modal>
+        </div>
         <div>
           {{ (totalCount == 0)? 0 : ( parseInt(values.search.perPage) * ( values.search.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.search.perPage) * values.search.currentPage )  < totalCount ) ?  parseInt(values.search.perPage) * values.search.currentPage : totalCount  }}件 / 全 {{ totalCount }}件
         </div>
         <div class="mt-4">
-          <table class="table-auto w-full text-sm">
-            <thead>
-              <tr>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">No</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">会計番号</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">発注番号</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">検収番号</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">部署</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">卸業者</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">登録元</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">アクション</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">商品ID</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">商品名</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">メーカー名</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">製品コード</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">規格</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">JANコード</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">個数</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">価格</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">税率</th>
-                <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">小計</th>
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item) in values.items">
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item._id }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.accountantId }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.orderNumber }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.receivingNumber }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item._division?.divisionName }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item._distributor?.distributorName }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.method }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.action }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.itemId }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.itemName }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.makerName }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.itemCode }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.itemStandard }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.itemJANCode }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ numberFormat(item.count) }}{{ item.unit }}</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.taxrate }}%</td>
-                <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">&yen;{{ numberFormat(itemSubtotal(item)) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div id="table-content">
+            <table class="table-auto w-full text-sm">
+              <thead>
+                <tr class="whitespace-nowrap">
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">No</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">会計日</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">会計番号</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">発注番号</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">検収番号</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">部署</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">卸業者</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">登録元</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">アクション</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">商品ID</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">商品名</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">メーカー名</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">製品コード</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">規格</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">JANコード</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">個数</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">価格</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">税率</th>
+                  <th class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">小計</th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item) in values.items">
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item._id }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.accountantDate }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.accountantId }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.orderNumber }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.receivingNumber }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item._division?.divisionName }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item._distributor?.distributorName }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.method }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.action }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.itemId }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.itemName }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.makerName }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.itemCode }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.itemStandard }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.itemJANCode }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ numberFormat(item.count) }}{{ item.unit }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">&yen;{{ numberFormat(item.price) }}</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">{{ item.taxrate }}%</td>
+                  <td class="border-b border-slate-100 p-4 pr-8 text-slate-500">&yen;{{ numberFormat(itemSubtotal(item)) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <v-pagination
         :show-pages="showPages"
@@ -94,8 +103,8 @@
               <v-input
                 name="search.yearMonth"
                 type="month"
-                label="消費年月"
-                title="消費年月"
+                label="会計年月"
+                title="会計年月"
                 ></v-input>
             </div>
             <div class="my-4">
@@ -188,6 +197,7 @@ var JoyPlaApp = Vue.createApp({
       'v-button-danger' : vButtonDanger,
       'v-button-primary' : vButtonPrimary,
       'v-in-hospital-item-modal': vInHospitalItemModal,
+      'download-modal' : downloadModal,
       'v-select-division' : vSelectDivision,
       'v-select-distributor' : vSelectDistributor,
       'v-multiple-select-division' : vMultipleSelectDivision,
@@ -384,6 +394,11 @@ var JoyPlaApp = Vue.createApp({
         const onOpenModal = () => {
             openModal.value.open();
         }
+
+        const openDownloadModal = ref();
+        const onOpenDownloadModal = () => {
+          openDownloadModal.value.open();
+        }
         
         const searchExec = async () => {
             values.search.currentPage = 1;
@@ -428,6 +443,8 @@ var JoyPlaApp = Vue.createApp({
         
         const perPageOptions = [{ label: "10件表示", value: "10" },{ label: "50件表示", value: "50" },{ label: "100件表示", value: "100" }];
 
+        
+
         return {
             numberFormat,
             itemSubtotal,
@@ -436,6 +453,8 @@ var JoyPlaApp = Vue.createApp({
             totalCount,
             values,
             openModal,
+            openDownloadModal,
+            onOpenDownloadModal,
             perPageOptions,
             searchClear,
             searchExec,
@@ -451,4 +470,15 @@ var JoyPlaApp = Vue.createApp({
         }
     }
 }).mount("#top");
+
+
+window.addEventListener('DOMContentLoaded', function() {
+    new ScrollHint('#table-content', {
+      scrollHintIconAppendClass: 'scroll-hint-icon-white', // white-icon will appear
+      applyToParents: true,
+      i18n: {
+        scrollable: 'スクロールできます'
+      }
+    });
+});
 </script> 

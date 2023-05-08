@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla_developer/340/scroll-hint.css">
-<script src="https://i02.smp.ne.jp/u/joypla_developer/340/scroll-hint.min.js"></script>
 <style>
     .scroll-hint-icon {
         top: 8%;

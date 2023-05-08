@@ -630,6 +630,7 @@ const vInHospitalItemModal = {
 `,
 };
 
+
 const vOrderItemModal = {
   setup(props, context) {
     const { ref, toRef, toRefs, reactive, onMounted } = Vue;
@@ -995,6 +996,129 @@ const vOrderItemModal = {
 </teleport>
 `,
 };
+
+const downloadModal = {
+  setup(props, context) {
+    const { ref, toRef, toRefs, reactive, onMounted } = Vue;
+    const { useForm } = VeeValidate;
+
+    const getCurrentTimestamp = () => {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+
+      return `${year}${month}${day}_${hours}${minutes}${seconds}`;
+    }
+
+    const { meta, validate, values, setFieldValue } = useForm({
+      initialValues: {
+        'download-file-mame': getCurrentTimestamp(),
+        'download-file-extensions': "tab-txt",
+        'download-range-type': 0,
+        'download-start-record': 1,
+        'download-end-record': 10000,
+        'download-start-page': 1,
+        'download-end-page': 0,
+      },
+    });
+
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      showCloseButton: true,
+      didOpen: (toast) => {
+        toast.addEventListener("mouseenter", Swal.stopTimer);
+        toast.addEventListener("mouseleave", Swal.resumeTimer);
+      },
+    });
+
+
+
+    const fileExtensions = [
+      {
+        label: ".txt（タブ区切りファイル）",
+        value: "tab-txt",
+      },
+      {
+        label: ".tsv（タブ区切りファイル）",
+        value: "tsv",
+      },
+      {
+        label: ".txt（カンマ区切りファイル）",
+        value: "csv-txt",
+      },
+      {
+        label: ".csv（カンマ区切りファイル）",
+        value: "csv",
+      },
+    ];
+
+    return {
+      values,
+      fileExtensions,
+    };
+  },
+  props: {
+    search: {
+      type: Object,
+      required: false,
+      default: false,
+    },
+  },
+  components: {
+    "v-open-modal": vOpenModal,
+    "v-input": vInput,
+    "v-radio": vRadio,
+    "v-select": vSelect,
+  },
+  template: `
+<teleport to="body">
+  <v-open-modal id="downloadModal" headtext="検索結果データダウンロード">
+    <div class="flex flex-col" style="max-height: 68vh;">
+      <div class="w-full overflow-y-auto lg:w-2/3 mx-auto" style="max-height: 85vh;">
+        <div class="flex flex-wrap">
+          <div class="w-full px-3 my-6 md:mb-0">
+            <div class="mx-auto mb-4">
+              <v-input type="text" name="download-file-mame" title="ファイル名"></v-input>
+            </div>
+            <div class="mx-auto mb-4">
+              <v-select name="download-file-extensions" :options="fileExtensions" title="出力形式"></v-select>
+            </div>
+          </div>
+        </div>
+        <hr>
+        <div class="my-6 px-3">
+          <p>ダウンロード範囲　（最大10,000件まで）</p>
+          <v-radio type="radio" name="download-range-type" :value="0" label-class="flex gap-4 p-3 my-2 w-full bg-white border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 place-items-center">
+            <div class="mx-auto w-1/2 px-4">
+              <v-input type="text" name="download-start-record" suffix="" prefix="件目から"></v-input>
+            </div>
+            <div class="mx-auto w-1/2 px-4">
+              <v-input type="text" name="download-end-record" suffix="最大" prefix="件分"></v-input>
+            </div>
+          </v-radio>
+          <v-radio type="radio" name="download-range-type" :value="1" label-class="flex gap-4 p-3 my-2 w-full bg-white border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 place-items-center">
+            <div class="mx-auto w-1/2 px-4">
+              <v-input type="text" name="download-start-page" suffix="" prefix="ページ目から"></v-input>
+            </div>
+            <div class="mx-auto w-1/2 px-4">
+              <v-input type="text" name="download-end-page" suffix="最大" prefix="ページ分"></v-input>
+            </div>
+          </v-radio>
+        </div>
+      </div>
+    </div>
+  </v-open-modal>
+</teleport>
+`,
+}
 
 const vBarcodeSearch = {
   setup(props, { emit }) {
@@ -1637,7 +1761,7 @@ const vConsumptionHistoryModalForItemRequest = {
                                     <p class="text-gray-500">{{ consumptionItem.quantity.quantityNum }}{{ consumptionItem.quantity.quantityUnit }} 入り</p>
                                   </div>
                                   <div class="w-auto">
-                                    <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-2 rounded dark:bg-blue-200 dark:text-blue-800">
+                                    <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-2 rounded">
                                       消費数
                                       <span class="font-bold text-base px-1">{{ consumptionItem.consumptionQuantity }}</span>
                                       {{ consumptionItem.quantity.quantityUnit }}

@@ -916,6 +916,79 @@ const vCheckbox = {
     <span class="text-red-500">{{ errorMessage }}</span>
     `,
 };
+
+const vRadio = {
+  setup(props) {
+    const { toRef } = Vue;
+    const { useField } = VeeValidate;
+    // Must use `toRef` to make the radio buttons names reactive
+    const { checked, handleChange, value, errorMessage } = useField(
+      toRef(props, "name"),
+      toRef(props, "rules"),
+      {
+        label: props.label,
+        type: "radio",
+        checkedValue: props.value,
+      }
+    );
+
+    return {
+      checked, // readonly
+      handleChange,
+      errorMessage,
+    };
+  },
+  props: {
+    modelValue: {
+      type: null,
+    },
+    // Field's own value
+    value: {
+      type: null,
+    },
+    name: {
+      type: String,
+    },
+    rules: {
+      type: Object,
+      default: {},
+    },
+    label: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    title: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    id: {
+      type: String,
+      required: true,
+    },
+    labelClass: {
+      type: [String, Object],
+      required: false,
+      default: "",
+    },
+  },
+  template: `
+    <label :class="labelClass">
+      <input
+        type="radio"
+        @input="handleChange(value)"
+        class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-full bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain cursor-pointer"
+        :value="value"
+        :name="name"
+        :id="id"
+      />
+      <slot></slot>
+    </label><br>
+    <span class="text-red-500">{{ errorMessage }}</span>
+    `,
+};
+
 const vButtonPrimary = {
   props: {
     type: {
