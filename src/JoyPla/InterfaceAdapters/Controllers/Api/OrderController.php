@@ -22,6 +22,8 @@ use JoyPla\Application\InputPorts\Api\Order\OrderUnapprovedUpdateInputData;
 use JoyPla\Application\InputPorts\Api\Order\OrderUnapprovedUpdateInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Order\FixedQuantityOrderInputData;
 use JoyPla\Application\InputPorts\Api\Order\FixedQuantityOrderInputPortInterface;
+use JoyPla\Application\InputPorts\Api\Order\OrderDeleteInputData;
+use JoyPla\Application\InputPorts\Api\Order\OrderDeleteInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Order\OrderItemBulkUpdateInputData;
 use JoyPla\Application\InputPorts\Api\Order\OrderItemBulkUpdateInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Order\OrderUnReceivedShowInputData;
@@ -358,7 +360,7 @@ class OrderController extends Controller
         $inputPort->handle($inputData);
     }
 
-    public function delete($vars)
+    public function delete($vars, OrderDeleteInputPortInterface $inputPort)
     {
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
@@ -367,22 +369,12 @@ class OrderController extends Controller
             throw new Exception('can not delete');
         }
 
-        $order = ModelRepository::getOrderInstance()
-            ->where('hospitalId', $this->request->user()->hospitalId)
-            ->where('orderNumber', $vars['orderId'])
-            ->get();
+        $inputData = new OrderDeleteInputData(
+            $this->request->user(),
+            $vars['orderId']
+        );
 
-        $order = $order->first();
-
-        if (empty($order) || $order->orderStatus !== '2') {
-            throw new Exception('can not delete');
-        }
-        ModelRepository::getOrderInstance()
-            ->where('hospitalId', $this->request->user()->hospitalId)
-            ->where('orderNumber', $vars['orderId'])
-            ->delete();
-
-        echo (new ApiResponse([], 1, 200, 'success', []))->toJson();
+        $inputPort->handle($inputData);
     }
 
     public function sent($vars)

@@ -144,7 +144,7 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
     Router::map('DELETE', '/api/order/:orderId/delete', [
         OrderController::class,
         'delete',
-    ]);
+    ])->service($useCaseProvider->getOrderDeleteInteractor());
 
     Router::map('POST', '/api/order/:orderId/sent', [
         OrderController::class,
