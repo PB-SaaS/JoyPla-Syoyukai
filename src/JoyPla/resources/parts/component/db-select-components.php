@@ -1073,6 +1073,7 @@ const downloadModal = {
     },
   },
   components: {
+    "v-button-primary": vButtonPrimary,
     "v-open-modal": vOpenModal,
     "v-input": vInput,
     "v-radio": vRadio,
@@ -1095,13 +1096,13 @@ const downloadModal = {
         </div>
         <hr>
         <div class="my-6 px-3">
-          <p>ダウンロード範囲　（最大10,000件まで）</p>
+          <p>ダウンロード範囲（最大10,000件まで）</p>
           <v-radio type="radio" name="download-range-type" :value="0" label-class="flex gap-4 p-3 my-2 w-full bg-white border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 place-items-center">
             <div class="mx-auto w-1/2 px-4">
               <v-input type="text" name="download-start-record" suffix="" prefix="件目から"></v-input>
             </div>
             <div class="mx-auto w-1/2 px-4">
-              <v-input type="text" name="download-end-record" suffix="最大" prefix="件分"></v-input>
+              <v-input type="number" name="download-max-record" suffix="最大" prefix="件分"></v-input>
             </div>
           </v-radio>
           <v-radio type="radio" name="download-range-type" :value="1" label-class="flex gap-4 p-3 my-2 w-full bg-white border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 place-items-center">
@@ -1109,9 +1110,12 @@ const downloadModal = {
               <v-input type="text" name="download-start-page" suffix="" prefix="ページ目から"></v-input>
             </div>
             <div class="mx-auto w-1/2 px-4">
-              <v-input type="text" name="download-end-page" suffix="最大" prefix="ページ分"></v-input>
+              <v-input type="number" name="download-max-page" suffix="最大" prefix="ページ分"></v-input>
             </div>
           </v-radio>
+        </div>
+        <div class="text-center">
+          <v-button-primary type="button" class="flex-none" @click.native="onDownload">ダウンロード</v-button-primary>
         </div>
       </div>
     </div>

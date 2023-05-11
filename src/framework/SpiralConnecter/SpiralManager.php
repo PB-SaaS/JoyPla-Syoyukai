@@ -414,6 +414,73 @@ class SpiralManager
         return new Collection($res);
     }
 
+    public function fetchPaginatedPagesWithLimit($startPage, $limit, $maxPages)
+    {
+        $data = [];
+        $totalPages = 0;
+        $page = $startPage;
+        $availablePages = 0;
+
+        do {
+            $this->page($page);
+            $response = $this->paginate($limit);
+            $pageData = $response->getData()->all(); // Assuming 'data' holds the actual data
+
+            // Append the page data to the total data
+            $data = array_merge($data, $pageData);
+            $availablePages = intdiv($response->getTotal(), $limit);
+
+            // Update the total pages
+            $totalPages++;
+        } while ($totalPages < $maxPages && $page < $availablePages);
+
+        // Return the data
+        return collect($data);
+    }
+
+    public function fetchPaginatedDataWithLimit($startRecord, $limit, $maxCount)
+    {
+        // Calculate the page number
+        $page = intdiv($startRecord, $limit) + 1;
+
+        // Calculate the offset within the page
+        $offset = $startRecord % $limit;
+
+        $data = [];
+        $totalCount = 0;
+        $availableCount = 0;
+        do {
+            $this->page($page);
+            $response = $this->paginate($limit);
+            $pageData = $response->getData()->all(); // Assuming 'data' holds the actual data
+            $availableCount = $response->getTotal(); // Update available count
+
+            // If the offset is not zero and we are on the first page, trim the array to start from the offset
+            if ($offset > 0 && $totalCount == 0) {
+                $pageData = array_slice($pageData, $offset);
+            }
+
+            // Append the page data to the total data
+            $data = array_merge($data, $pageData);
+
+            // Update the total count
+            $totalCount += count($pageData);
+
+            // If the total count is less than maxCount, increment the page number for the next loop
+            if ($totalCount < $maxCount && $totalCount < $availableCount) {
+                $page++;
+            }
+        } while ($totalCount < $maxCount && $totalCount < $availableCount);
+
+        // Trim the data array if it exceeds the maxCount
+        if ($totalCount > $maxCount) {
+            $data = array_slice($data, 0, $maxCount);
+        }
+
+        // Return the data
+        return collect($data);
+    }
+
     public function get(array $fields = [])
     {
         $count = 1; // 1件以上ある想定
