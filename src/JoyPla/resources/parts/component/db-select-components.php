@@ -1020,9 +1020,9 @@ const downloadModal = {
         'download-file-extensions': "tab-txt",
         'download-range-type': 0,
         'download-start-record': 1,
-        'download-end-record': 10000,
+        'download-max-record': 10000,
         'download-start-page': 1,
-        'download-end-page': 0,
+        'download-max-page': 1,
       },
     });
 
@@ -1039,28 +1039,110 @@ const downloadModal = {
       },
     });
 
+    const loading = ref(false);
+    const start = () => {
+      loading.value = true;
+    };
 
+    const complete = () => {
+      loading.value = false;
+    };
 
     const fileExtensions = [
       {
         label: ".txt（タブ区切りファイル）",
         value: "tab-txt",
+        extension : ".txt"
       },
       {
         label: ".tsv（タブ区切りファイル）",
         value: "tsv",
+        extension : ".tsv"
       },
       {
         label: ".txt（カンマ区切りファイル）",
         value: "csv-txt",
+        extension : ".txt"
       },
       {
         label: ".csv（カンマ区切りファイル）",
         value: "csv",
+        extension : ".csv"
       },
     ];
 
+    const utf8_to_b64 = (str) => {
+      return window.btoa(unescape(encodeURIComponent(str)));
+    }
+
+    // Decode from Base64
+    const b64_to_utf8 = (str) => {
+      return decodeURIComponent(escape(window.atob(str)));
+    }
+
+    const download = (base64) => {
+
+      let file = fileExtensions.find(file => file.value === values['download-file-extensions'])
+
+      // Decode the base64 string
+      let decodedString = b64_to_utf8(base64);
+
+      // Create a Blob object from the decoded string
+      let blob = new Blob([decodedString], {type: "text/plain"});
+
+      // Create a URL from the Blob
+      let url = URL.createObjectURL(blob);
+
+      // Create a link element
+      let link = document.createElement("a");
+      link.href = url;
+      link.download = values['download-file-mame'] + file.extension;
+
+      // Append the link to the body
+      document.body.appendChild(link);
+
+      // Simulate a click on the link
+      link.click();
+
+      // Remove the link from the body
+      document.body.removeChild(link);
+    }
+
+    const onDownload = async () =>{
+      const { valid, errors } = await validate();
+      if(!valid){
+        Swal.fire({
+          icon: 'error',
+          title: '入力エラー',
+          text: '入力エラーがございます。ご確認ください',
+        })
+      } else {
+        let params = new URLSearchParams();
+        params.append("path", props.downloadPath);values
+        params.append("search", JSON.stringify(encodeURIToObject(props.search)));
+        params.append("download_setting", JSON.stringify(encodeURIToObject(values)));
+        params.append("_csrf", _CSRF);
+        start();
+
+        const res = await axios.post(_APIURL,params);
+        complete();
+        if(res.data.code != 200) {
+          Swal.fire({
+            icon: 'error',
+            title: 'システムエラー',
+            text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+          });
+        }
+
+        download(res.data.data);
+
+        return true ;
+      }
+    }
+
     return {
+      loading,
+      onDownload,
       values,
       fileExtensions,
     };
@@ -1071,8 +1153,14 @@ const downloadModal = {
       required: false,
       default: false,
     },
+    downloadPath: {
+      type: String,
+      required: true,
+      default: '',
+    }
   },
   components: {
+    "v-loading": vLoading,
     "v-button-primary": vButtonPrimary,
     "v-open-modal": vOpenModal,
     "v-input": vInput,
@@ -1080,6 +1168,7 @@ const downloadModal = {
     "v-select": vSelect,
   },
   template: `
+<v-loading :show="loading"></v-loading>
 <teleport to="body">
   <v-open-modal id="downloadModal" headtext="検索結果データダウンロード">
     <div class="flex flex-col" style="max-height: 68vh;">
@@ -1102,7 +1191,7 @@ const downloadModal = {
               <v-input type="text" name="download-start-record" suffix="" prefix="件目から"></v-input>
             </div>
             <div class="mx-auto w-1/2 px-4">
-              <v-input type="number" name="download-max-record" suffix="最大" prefix="件分"></v-input>
+              <v-input type="number" name="download-max-record" suffix="最大" prefix="件分" label="最大レコード数" :min="1" :max="10000" :rules="{ between: [1 , 10000] }"></v-input>
             </div>
           </v-radio>
           <v-radio type="radio" name="download-range-type" :value="1" label-class="flex gap-4 p-3 my-2 w-full bg-white border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 place-items-center">
@@ -1110,7 +1199,7 @@ const downloadModal = {
               <v-input type="text" name="download-start-page" suffix="" prefix="ページ目から"></v-input>
             </div>
             <div class="mx-auto w-1/2 px-4">
-              <v-input type="number" name="download-max-page" suffix="最大" prefix="ページ分"></v-input>
+              <v-input type="number" name="download-max-page" suffix="最大" prefix="ページ分" label="最大ページ" :min="1" :max="( 10000 / search.perPage )" :rules="{ between: [1 , ( 10000 / search.perPage )] }"></v-input>
             </div>
           </v-radio>
         </div>

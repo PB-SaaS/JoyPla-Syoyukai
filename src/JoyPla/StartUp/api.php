@@ -275,6 +275,16 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         AccountantController::class,
         'delete',
     ]);
+
+    Router::map('get', '/api/accountant/items/download', [
+        AccountantController::class,
+        'itemsDownload',
+    ]);
+
+    Router::map('get', '/api/accountant/items/totalPrice', [
+        AccountantController::class,
+        'totalPrice',
+    ]);
 });
 
 $router = new Router();

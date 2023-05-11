@@ -167,6 +167,22 @@ class SpiralManager
         return $this;
     }
 
+    public function resetValue($value)
+    {
+        $this->fields = [];
+        if (is_array($value)) {
+            $this->fields = $value;
+        }
+
+        if (is_string($value)) {
+            $this->fields[] = $value;
+        }
+
+        $this->request->set('select_columns', $this->fields);
+
+        return $this;
+    }
+
     private function combine($keys, $values)
     {
         foreach ($values as &$val) {
@@ -414,8 +430,11 @@ class SpiralManager
         return new Collection($res);
     }
 
-    public function fetchPaginatedPagesWithLimit($startPage, $limit, $maxPages)
-    {
+    public function fetchPaginatedPagesWithLimit(
+        int $startPage,
+        int $limit,
+        int $maxPages
+    ) {
         $data = [];
         $totalPages = 0;
         $page = $startPage;
@@ -432,19 +451,23 @@ class SpiralManager
 
             // Update the total pages
             $totalPages++;
+            $page++;
         } while ($totalPages < $maxPages && $page < $availablePages);
 
         // Return the data
         return collect($data);
     }
 
-    public function fetchPaginatedDataWithLimit($startRecord, $limit, $maxCount)
-    {
+    public function fetchPaginatedDataWithLimit(
+        int $startRecord,
+        int $limit,
+        int $maxCount
+    ) {
         // Calculate the page number
         $page = intdiv($startRecord, $limit) + 1;
 
         // Calculate the offset within the page
-        $offset = $startRecord % $limit;
+        $offset = ($startRecord - 1) % $limit;
 
         $data = [];
         $totalCount = 0;
@@ -454,6 +477,8 @@ class SpiralManager
             $response = $this->paginate($limit);
             $pageData = $response->getData()->all(); // Assuming 'data' holds the actual data
             $availableCount = $response->getTotal(); // Update available count
+
+            $availablePages = intdiv($response->getTotal(), $limit);
 
             // If the offset is not zero and we are on the first page, trim the array to start from the offset
             if ($offset > 0 && $totalCount == 0) {
@@ -465,12 +490,12 @@ class SpiralManager
 
             // Update the total count
             $totalCount += count($pageData);
-
-            // If the total count is less than maxCount, increment the page number for the next loop
-            if ($totalCount < $maxCount && $totalCount < $availableCount) {
-                $page++;
-            }
-        } while ($totalCount < $maxCount && $totalCount < $availableCount);
+            $page++;
+        } while (
+            $totalCount < $maxCount &&
+            $totalCount < $availableCount &&
+            $page < $availablePages
+        );
 
         // Trim the data array if it exceeds the maxCount
         if ($totalCount > $maxCount) {

@@ -26,7 +26,10 @@
         </div>
         <div class="w-full flex border-b-2 border-gray-200 py-4">
             <v-button-primary type="button" class="w-1/4" data-micromodal-trigger="downloadModal">ダウンロード</v-button-primary>
-            <download-modal></download-modal>
+            <download-modal :search="values.search" download-path="/api/accountant/items/download"></download-modal>
+        </div>
+        <div>
+          {{ &yen;{{ numberFormat(totalPrice) }} }}
         </div>
         <div>
           {{ (totalCount == 0)? 0 : ( parseInt(values.search.perPage) * ( values.search.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.search.perPage) * values.search.currentPage )  < totalCount ) ?  parseInt(values.search.perPage) * values.search.currentPage : totalCount  }}件 / 全 {{ totalCount }}件
@@ -347,12 +350,30 @@ var JoyPlaApp = Vue.createApp({
             totalCount.value = parseInt(res.count);
             completeLoading();
         };
+
+        const totalPrice = ref(0);
+
+        const getTotalPrice = async () => {
+            let params = new URLSearchParams();
+            params.append("path", "/api/accountant/items/totalPrice");
+            params.append("search", JSON.stringify(encodeURIToObject(values.search)));
+            params.append("_method", 'get');
+            params.append("_csrf", _CSRF);
+
+            const res = await axios.post(_APIURL,params);
+            
+            if(res.data.code != 200) {
+                throw new Error(res.data.message)
+            }
+            totalPrice.value = res.data.data
+        };
+
         
         onMounted(async () => {
             await sleepCompleteLoading();
-            
             try {
                 await fetchData();
+                await getTotalPrice();
             } catch ( e ){
                 Toast.fire({
                 icon: 'error',
@@ -446,6 +467,7 @@ var JoyPlaApp = Vue.createApp({
         
 
         return {
+            totalPrice,
             numberFormat,
             itemSubtotal,
             fetchData,
