@@ -234,6 +234,15 @@ class JoyPlaApplication extends Application
             return new GatePermissionModel(true, false);
         });
 
+        Gate::define('delete_of_order_slips', function (Auth $auth) {
+            //発注削除
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(false, false);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
         Gate::define('list_of_order_slips', function (Auth $auth) {
             //発注伝票一覧
             if ($auth->userPermission == '2') {

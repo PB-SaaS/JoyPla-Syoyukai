@@ -29,6 +29,7 @@ require_once('JoyPla/Application/Interactors/Api/ItemRequest/RequestItemDeleteIn
 require_once('JoyPla/Application/Interactors/Api/ItemRequest/TotalizationInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Notification/NotificationShowInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Order/FixedQuantityOrderInteractor.php');
+require_once('JoyPla/Application/Interactors/Api/Order/OrderDeleteInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Order/OrderItemBulkUpdateInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Order/OrderRegisterInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Order/OrderRevisedInteractor.php');

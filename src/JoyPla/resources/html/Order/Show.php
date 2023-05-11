@@ -492,7 +492,7 @@ var JoyPlaApp = Vue.createApp({
               }
               Swal.fire({
                   icon: 'success',
-                  title: '消費伝票の取消が完了しました。',
+                  title: '発注書の取消が完了しました。',
               }).then((result) => {
                 location.reload();
               });

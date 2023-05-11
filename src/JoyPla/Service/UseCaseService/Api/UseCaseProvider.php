@@ -24,6 +24,7 @@ use JoyPla\Application\Interactors\Api\ItemRequest\RequestItemDeleteInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\TotalizationInteractor;
 use JoyPla\Application\Interactors\Api\Notification\NotificationShowInteractor;
 use JoyPla\Application\Interactors\Api\Order\FixedQuantityOrderInteractor;
+use JoyPla\Application\Interactors\Api\Order\OrderDeleteInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderItemBulkUpdateInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderRevisedInteractor;
@@ -249,6 +250,21 @@ class UseCaseProvider
             $this->repositoryProvider,
             $this->presenterProvider
         ) extends OrderUnapprovedDeleteInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getOrderDeleteInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends OrderDeleteInteractor {
             public function __construct(
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
