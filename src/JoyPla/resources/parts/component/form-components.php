@@ -982,6 +982,7 @@ const vRadio = {
         :value="value"
         :name="name"
         :id="id"
+        :checked="checked"
       />
       <slot></slot>
     </label><br>

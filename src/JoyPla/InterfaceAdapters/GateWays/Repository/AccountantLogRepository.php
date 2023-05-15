@@ -8,11 +8,11 @@ use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 use JoyPla\Service\Functions\FunctionService;
 use stdClass;
 
-class AccountantItemRepository implements AccountantItemRepositoryInterface
+class AccountantLogRepository implements AccountantLogRepositoryInterface
 {
     public function totalPrice(HospitalId $hospitalId, object $search)
     {
-        $accountantInstance = ModelRepository::getAccountantItemViewInstance()
+        $accountantInstance = ModelRepository::getAccountantLogViewInstance()
             ->where('hospitalId', $hospitalId->value())
             ->orderBy($search->sortColumn, $search->sortDirection);
 
@@ -106,7 +106,7 @@ class AccountantItemRepository implements AccountantItemRepositoryInterface
 
     public function search(HospitalId $hospitalId, object $search)
     {
-        $accountantInstance = ModelRepository::getAccountantItemViewInstance()
+        $accountantInstance = ModelRepository::getAccountantLogViewInstance()
             ->where('hospitalId', $hospitalId->value())
             ->orderBy($search->sortColumn, $search->sortDirection);
 
@@ -213,6 +213,15 @@ class AccountantItemRepository implements AccountantItemRepositoryInterface
                 $distributor->orWhere('distributorId', $history->distributorId);
             }
             $distributors = $distributor->get();
+
+            $user = ModelRepository::getHospitalUserInstance()->where(
+                'hospitalId',
+                $hospitalId->value()
+            );
+            foreach ($historys->getData()->all() as $history) {
+                $user->orWhere('id', $history->userId);
+            }
+            $users = $user->get();
         }
 
         foreach ($historys->getData()->all() as $history) {
@@ -228,6 +237,12 @@ class AccountantItemRepository implements AccountantItemRepositoryInterface
                 return $distributor->distributorId == $history->distributorId;
             });
 
+            $history->_user = array_find($users, function ($user) use (
+                $history
+            ) {
+                return $user->id == $history->userId;
+            });
+
             $history->_id = $count;
             $count++;
         }
@@ -240,7 +255,7 @@ class AccountantItemRepository implements AccountantItemRepositoryInterface
         object $search,
         object $downloadSetting
     ) {
-        $accountantInstance = ModelRepository::getAccountantItemViewInstance()
+        $accountantInstance = ModelRepository::getAccountantLogViewInstance()
             ->where('hospitalId', $hospitalId->value())
             ->orderBy($search->sortColumn, $search->sortDirection);
 
@@ -354,7 +369,17 @@ class AccountantItemRepository implements AccountantItemRepositoryInterface
             foreach ($items->all() as $history) {
                 $distributor->orWhere('distributorId', $history->distributorId);
             }
+
+            $user = ModelRepository::getHospitalUserInstance()->where(
+                'hospitalId',
+                $hospitalId->value()
+            );
             $distributors = $distributor->get();
+
+            foreach ($items->all() as $history) {
+                $user->orWhere('id', $history->userId);
+            }
+            $users = $user->get();
         }
         foreach ($items->all() as $item) {
             $division = array_find($divisions, function ($division) use (
@@ -369,8 +394,13 @@ class AccountantItemRepository implements AccountantItemRepositoryInterface
                 return $distributor->distributorId == $item->distributorId;
             });
 
+            $user = array_find($users, function ($user) use ($item) {
+                return $user->id == $item->userId;
+            });
+
             $item->divisionName = $division->divisionName;
             $item->distributorName = $distributor->distributorName;
+            $item->userName = $user->name;
 
             $data[] = $item;
         }
@@ -379,6 +409,6 @@ class AccountantItemRepository implements AccountantItemRepositoryInterface
     }
 }
 
-interface AccountantItemRepositoryInterface
+interface AccountantLogRepositoryInterface
 {
 }

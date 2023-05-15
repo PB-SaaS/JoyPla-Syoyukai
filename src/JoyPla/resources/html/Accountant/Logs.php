@@ -26,7 +26,7 @@
         </div>
         <div class="w-full flex border-b-2 border-gray-200 py-4">
             <v-button-primary type="button" class="md:w-1/4" data-micromodal-trigger="downloadModal">ダウンロード</v-button-primary>
-            <download-modal :search="values.search" download-path="/api/accountant/items/download"></download-modal>
+            <download-modal :search="values.search" download-path="/api/accountant/logs/download"></download-modal>
         </div>
         <div class="w-full flex border-b-2 border-gray-200 py-4 text-xl">
          <p>合計金額 : &yen;{{ numberFormat(totalPrice) }} </p>
@@ -283,7 +283,7 @@ var JoyPlaApp = Vue.createApp({
         const getData = async() => 
         {
             let params = new URLSearchParams();
-            params.append("path", "/api/accountant/items");
+            params.append("path", "/api/accountant/logs");
             params.append("search", JSON.stringify(encodeURIToObject(values.search)));
             params.append("_method", 'get');
             params.append("_csrf", _CSRF);
@@ -338,7 +338,7 @@ var JoyPlaApp = Vue.createApp({
 
         const getTotalPrice = async () => {
             let params = new URLSearchParams();
-            params.append("path", "/api/accountant/items/totalPrice");
+            params.append("path", "/api/accountant/logs/totalPrice");
             params.append("search", JSON.stringify(encodeURIToObject(values.search)));
             params.append("_method", 'get');
             params.append("_csrf", _CSRF);
@@ -473,10 +473,10 @@ var JoyPlaApp = Vue.createApp({
       return {
         headers: [
           { name: 'id', text: 'id' },
-          { name: 'accountantDate', text: '会計日' },
+          { name: 'registTime', text: '日付' },
           { name: 'accountantId', text: '会計番号' },
-          { name: 'orderNumber', text: '発注番号' },
-          { name: 'receivingNumber', text: '検収番号' },
+          { name: 'kinds', text: '種別' },
+          { name: 'itemId', text: '商品ID' },
           { name: 'divisionId', text: '部署' },
           { name: 'distributorId', text: '卸業者' },
           { name: 'method', text: '登録元' },

@@ -3,6 +3,7 @@
 namespace JoyPla\Service\Repository;
 
 use JoyPla\InterfaceAdapters\GateWays\Repository\AccountantItemRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\AccountantLogRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\AccountantRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\BarcodeRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\CardRepository;
@@ -147,5 +148,10 @@ class RepositoryProvider
     public function getAccountantItemRepository()
     {
         return new AccountantItemRepository();
+    }
+
+    public function getAccountantLogRepository()
+    {
+        return new AccountantLogRepository();
     }
 }

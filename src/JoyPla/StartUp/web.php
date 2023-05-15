@@ -273,6 +273,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'items',
     ]);
 
+    Router::map('GET', '/accountant/logs', [
+        AccountantController::class,
+        'logs',
+    ]);
+
     Router::map('GET', '/accountant/:accountantId', [
         AccountantController::class,
         'show',

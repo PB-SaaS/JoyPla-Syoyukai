@@ -6,19 +6,19 @@
 namespace JoyPla\Application\Interactors\Api\Accountant {
     use ApiResponse;
     use Collection;
-    use JoyPla\Application\InputPorts\Api\Accountant\AccountantItemsIndexInputPortInterface;
-    use JoyPla\Application\InputPorts\Api\Accountant\AccountantItemsIndexInputData;
+    use JoyPla\Application\InputPorts\Api\Accountant\AccountantLogsIndexInputPortInterface;
+    use JoyPla\Application\InputPorts\Api\Accountant\AccountantLogsIndexInputData;
     use JoyPla\Enterprise\Models\Accountant;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\Service\Presenter\Api\PresenterProvider;
     use JoyPla\Service\Repository\RepositoryProvider;
 
     /**
-     * Class AccountantItemsIndexInteractor
+     * Class AccountantLogsIndexInteractor
      * @package JoyPla\Application\Interactors\Accountant\Api
      */
-    class AccountantItemsIndexInteractor implements
-        AccountantItemsIndexInputPortInterface
+    class AccountantLogsIndexInteractor implements
+        AccountantLogsIndexInputPortInterface
     {
         private PresenterProvider $presenterProvider;
         private RepositoryProvider $repositoryProvider;
@@ -32,20 +32,20 @@ namespace JoyPla\Application\Interactors\Api\Accountant {
         }
 
         /**
-         * @param AccountantItemsIndexInputData $inputData
+         * @param AccountantLogsIndexInputData $inputData
          */
-        public function handle(AccountantItemsIndexInputData $inputData)
+        public function handle(AccountantLogsIndexInputData $inputData)
         {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
             [
                 $accountants,
                 $count,
             ] = $this->repositoryProvider
-                ->getAccountantItemRepository()
+                ->getAccountantLogRepository()
                 ->search($hospitalId, $inputData->search);
 
             echo (new ApiResponse($accountants, $count, 200, 'success', [
-                'AccountantItemsIndexPresenter',
+                'AccountantLogsIndexPresenter',
             ]))->toJson();
         }
     }
@@ -59,10 +59,10 @@ namespace JoyPla\Application\InputPorts\Api\Accountant {
     use stdClass;
 
     /**
-     * Class AccountantItemsIndexInputData
+     * Class AccountantLogsIndexInputData
      * @package JoyPla\Application\InputPorts\Accountant\Api
      */
-    class AccountantItemsIndexInputData
+    class AccountantLogsIndexInputData
     {
         public Auth $user;
         public stdClass $search;
@@ -90,12 +90,12 @@ namespace JoyPla\Application\InputPorts\Api\Accountant {
      * Interface UserCreateInputPortInterface
      * @package JoyPla\Application\InputPorts\Accountant\Api
      */
-    interface AccountantItemsIndexInputPortInterface
+    interface AccountantLogsIndexInputPortInterface
     {
         /**
-         * @param AccountantItemsIndexInputData $inputData
+         * @param AccountantLogsIndexInputData $inputData
          */
-        function handle(AccountantItemsIndexInputData $inputData);
+        function handle(AccountantLogsIndexInputData $inputData);
     }
 }
 
@@ -106,15 +106,15 @@ namespace JoyPla\Application\OutputPorts\Api\Accountant {
     use Collection;
 
     /**
-     * Class AccountantItemsIndexOutputData
+     * Class AccountantLogsIndexOutputData
      * @package JoyPla\Application\OutputPorts\Accountant\Api;
      */
-    class AccountantItemsIndexOutputData
+    class AccountantLogsIndexOutputData
     {
         public array $data;
         public int $count;
         /**
-         * AccountantItemsIndexOutputData constructor.
+         * AccountantLogsIndexOutputData constructor.
          */
         public function __construct(array $data, int $count, $type)
         {
@@ -124,14 +124,14 @@ namespace JoyPla\Application\OutputPorts\Api\Accountant {
     }
 
     /**
-     * Interface AccountantItemsIndexOutputPortInterface
+     * Interface AccountantLogsIndexOutputPortInterface
      * @package JoyPla\Application\OutputPorts\Accountant\Api;
      */
-    interface AccountantItemsIndexOutputPortInterface
+    interface AccountantLogsIndexOutputPortInterface
     {
         /**
-         * @param AccountantItemsIndexOutputData $outputData
+         * @param AccountantLogsIndexOutputData $outputData
          */
-        function output(AccountantItemsIndexOutputData $outputData);
+        function output(AccountantLogsIndexOutputData $outputData);
     }
 }

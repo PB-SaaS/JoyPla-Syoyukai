@@ -3311,6 +3311,10 @@ input[aria-invalid="true"] {
     width: 50%;
   }
 
+  .md\:w-1\/4 {
+    width: 25%;
+  }
+
   .md\:w-1\/5 {
     width: 20%;
   }

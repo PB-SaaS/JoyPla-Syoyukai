@@ -2314,3 +2314,137 @@ const vMultipleSelectDivisionV2 = {
 <v-multiple-select :name="name" :title="title" :options="options" :id="id" />
 `,
 };
+
+const tableComponent = {
+  props: {
+    tableId: {
+      type: String,
+      required: true
+    },
+    headers: {
+      type: Array,
+      required: true
+    },
+    rowsData: {
+      type: Array,
+      required: true
+    },
+    sortColumn: {
+      type: String,
+      required: true
+    },
+    sortDirection: {
+      type: String,
+      required: true
+    },
+  },
+  setup(props, { emit }) {
+    const { ref, toRefs, onMounted, watchEffect } = Vue;
+    const propsRefs = toRefs(props);
+    const sortColumn = ref(props.sortColumn);
+    const sortDirection = ref(props.sortDirection);
+    const checkedColumns = ref(propsRefs.headers.value.map(() => true));
+      
+    const requestSort = (columnName) => {
+      if (!columnName) {
+        return false;
+      }
+      if (sortColumn.value === columnName) {
+        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortColumn.value = columnName;
+        sortDirection.value = 'asc';
+      }
+      emit('requestSort', { column: sortColumn.value, direction: sortDirection.value });
+    };
+
+
+    onMounted(() => {
+      const savedColumns = localStorage.getItem(propsRefs.tableId.value);
+      if (savedColumns) {
+        checkedColumns.value = JSON.parse(savedColumns);
+      }
+
+      window.addEventListener('DOMContentLoaded', function() {
+        new ScrollHint('#' + propsRefs.tableId.value, {
+          scrollHintIconAppendClass: 'scroll-hint-icon-white',
+          applyToParents: true,
+          i18n: {
+            scrollable: 'スクロールできます'
+          }
+        });
+      });
+
+      watchEffect(() => {
+        localStorage.setItem(propsRefs.tableId.value, JSON.stringify(checkedColumns.value));
+      });
+    });
+
+    return {
+      ...propsRefs,
+      checkedColumns,
+      sortColumn,
+      sortDirection,
+      requestSort
+    };
+  },
+  components : {
+    'v-open-modal': vOpenModal,
+    'v-button-default': vButtonDefault,
+  },
+  template: `
+  <div>
+    <div class="md:w-1/4 my-2">
+      <v-button-default type="button" data-micromodal-trigger="displayColumns" class="w-full">表示項目設定</v-button-default>
+    </div>
+    <teleport to="body">
+      <v-open-modal id="displayColumns" headtext="表示項目設定" @show="listGet">
+        <div class="px-4 py-2">
+          <div v-for="(header, index) in headers" :key="index">
+            <div v-show="header.name != ''">
+              <label>
+                <input
+                  type="checkbox" 
+                  v-model="checkedColumns[index]"
+                  class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain mr-2 cursor-pointer"
+                />{{ header.text }}
+              </label>
+            </div>
+          </div>
+          <div class="md:w-1/4 mx-auto text-center">
+            <v-button-default type="button" aria-label="Close modal" data-micromodal-close class="w-full">閉じる</v-button-default>
+          </div>
+        </div>
+      </v-open-modal>
+    </teleport>
+    <div class="my-2">
+      <table class="table-auto w-full text-sm whitespace-nowrap" :id="tableId">
+        <thead>
+          <tr>
+            <th v-for="(header, index) in headers" :key="index" v-show="checkedColumns[index]" class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">
+              <template v-if="! header.name">
+                {{ header.text }}
+              </template>
+              <template v-if="!! header.name">
+                <a href="#" class="hover:underline" @click="requestSort(header.name)">
+                  {{ header.text }}
+                  <span v-if="sortColumn === header.name">
+                    <span v-if="sortDirection === 'asc'">▲</span>
+                    <span v-if="sortDirection === 'desc'">▼</span>
+                  </span>
+                </a>
+              </template>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(row, rowIndex) in rowsData" :key="rowIndex">
+            <td v-for="(cell, index) in row" :key="index" v-show="checkedColumns[index]" v-html="cell" class="border-b border-slate-100 p-4 pr-8 text-slate-500">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  `
+};

@@ -23,6 +23,7 @@ use JoyPla\InterfaceAdapters\Controllers\Api\ReferenceController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ItemRequestController;
 use JoyPla\InterfaceAdapters\Controllers\Api\PayoutController;
 use JoyPla\InterfaceAdapters\Controllers\Api\AccountantController;
+use JoyPla\InterfaceAdapters\Controllers\Api\AccountantLogController;
 use JoyPla\JoyPlaApplication;
 use JoyPla\Service\Presenter\Api\PresenterProvider;
 use JoyPla\Service\Repository\QueryProvider;
@@ -261,6 +262,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'items',
     ])->service($useCaseProvider->getAccountantItemsIndexInteractor());
 
+    Router::map('GET', '/api/accountant/logs', [
+        AccountantLogController::class,
+        'logs',
+    ])->service($useCaseProvider->getAccountantLogsIndexInteractor());
+
     Router::map('GET', '/api/accountant/:accountantId', [
         AccountantController::class,
         'show',
@@ -283,6 +289,16 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
 
     Router::map('get', '/api/accountant/items/totalPrice', [
         AccountantController::class,
+        'totalPrice',
+    ]);
+
+    Router::map('get', '/api/accountant/logs/download', [
+        AccountantLogController::class,
+        'itemsDownload',
+    ]);
+
+    Router::map('get', '/api/accountant/logs/totalPrice', [
+        AccountantLogController::class,
         'totalPrice',
     ]);
 });
