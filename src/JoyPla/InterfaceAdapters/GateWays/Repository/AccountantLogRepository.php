@@ -237,11 +237,11 @@ class AccountantLogRepository implements AccountantLogRepositoryInterface
                 return $distributor->distributorId == $history->distributorId;
             });
 
-            $history->_user = array_find($users, function ($user) use (
-                $history
-            ) {
+            $_user = array_find($users, function ($user) use ($history) {
                 return $user->id == $history->userId;
             });
+
+            $history->userName = $_user->name ?? '';
 
             $history->_id = $count;
             $count++;

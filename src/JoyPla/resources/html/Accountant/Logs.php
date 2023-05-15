@@ -5,7 +5,7 @@
   <div id="content" class="flex h-full px-1">
     <div class="flex-auto w-full">
       <div class="index px-1 w-full mx-auto mb-96">
-        <h1 class="text-2xl mb-2">会計データ</h1>
+        <h1 class="text-2xl mb-2">会計ログデータ</h1>
         <hr>
         <div class="w-full flex border-b-2 border-gray-200 py-4">
           <div class="flex-auto w-1/2">
@@ -274,7 +274,7 @@ var JoyPlaApp = Vue.createApp({
             href: _ROOT+'&path=/accountant',
             },
             {
-            text: '会計データ',
+            text: '会計ログデータ',
             disabled: true,
             }
         ];
@@ -303,10 +303,12 @@ var JoyPlaApp = Vue.createApp({
             rowsData.value.push(
               [
                 obj[key].id,
+                obj[key].registTime,
+                obj[key].kinds,
+                obj[key].userName,
                 obj[key].accountantDate,
                 "<a class='text-blue-600 hover:underline' href='"+_ROOT+"&path=/accountant/"+ obj[key].accountantId + "'>"+obj[key].accountantId+"</a>",
-                obj[key].orderNumber,
-                obj[key].receivingNumber,
+                obj[key].accountantItemId,
                 obj[key]._division?.divisionName,
                 obj[key]._distributor?.distributorName,
                 obj[key].method,
@@ -474,9 +476,11 @@ var JoyPlaApp = Vue.createApp({
         headers: [
           { name: 'id', text: 'id' },
           { name: 'registTime', text: '日付' },
-          { name: 'accountantId', text: '会計番号' },
           { name: 'kinds', text: '種別' },
-          { name: 'itemId', text: '商品ID' },
+          { name: '', text: '担当者' },
+          { name: 'accountantDate', text: '会計日' },
+          { name: 'accountantId', text: '会計番号' },
+          { name: 'accountantItemId', text: '会計商品ID' },
           { name: 'divisionId', text: '部署' },
           { name: 'distributorId', text: '卸業者' },
           { name: 'method', text: '登録元' },
