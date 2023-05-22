@@ -1262,4 +1262,82 @@ class ModelRepository
             'distributorMCode',
         ]);
     }
+
+    public static function getItemListTableInstance()
+    {
+        return SpiralDB::title('NJ_ItemListTbl')->value([ //商品リストDB
+            'id',
+            'registrationTime',
+            'updateTime',
+            'itemListId',
+            'itemListName',
+            'hospitalId',
+            'divisionId',
+            'itemsNumber',
+            'usableStatus',
+        ]);
+    }
+
+    public static function getItemListRowsInstance()
+    {
+        return SpiralDB::title('NJ_ItemListRows')->value([ //商品リスト項目DB
+            'id',
+            'registrationTime',
+            'updateTime',
+            'itemListId',
+            'itemListRowId',
+            'hospitalId',
+            'divisionId',
+            'inHospitalItemId',
+            'itemId',
+            'distributorId',
+            'index',
+        ]);
+    }
+
+    public static function getItemListTableViewInstance()
+    {
+        return SpiralDB::title('itemListTblView')->value([ //商品リスト仮想DB-画面表示に使うかもしれないやつ
+            'id',
+            'registrationTime',
+            'updateTime',
+            'itemListId',
+            'itemListName',
+            'hospitalId',
+            'divisionId',
+            'itemsNumber',
+            'usableStatus',
+            'hospitalName',
+            'divisionName',
+        ]);
+    }
+
+    public static function getItemListRowsViewInstance()
+    {
+        return SpiralDB::title('itemListRowsView')->value([ //商品リスト項目仮想DB-画面表示に使うかもしれないやつ
+            'id',
+            'registrationTime',
+            'updateTime',
+            'itemListId',
+            'itemListRowId',
+            'hospitalId',
+            'divisionId',
+            'inHospitalItemId',
+            'itemId',
+            'distributorId',
+            'index',
+            'distributorName',
+            'hospitalName',
+            'divisionName',
+            'itemName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'quantity',
+            'quantityUnit',
+            'itemUnit',
+            'labelId',
+        ]);
+    }
+
 }

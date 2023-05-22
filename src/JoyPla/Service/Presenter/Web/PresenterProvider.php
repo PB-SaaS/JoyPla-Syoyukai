@@ -13,6 +13,7 @@ use JoyPla\InterfaceAdapters\Presenters\Web\Received\OrderReceivedSlipIndexPrese
 use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedIndexPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedLabelPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Web\Received\ReceivedLabelSettingPresenter;
+use JoyPla\InterfaceAdapters\Presenters\Web\Product\ItemList\ItemListPrintPresenter;
 
 class PresenterProvider
 {
@@ -69,5 +70,10 @@ class PresenterProvider
     public function getReceivedLabelSettingPresenter()
     {
         return new ReceivedLabelSettingPresenter();
+    }
+
+    public function getItemListShowPresenter()
+    {
+        return new ItemListPrintPresenter();
     }
 }

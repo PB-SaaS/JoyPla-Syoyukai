@@ -21,6 +21,7 @@ use JoyPla\InterfaceAdapters\Controllers\Web\ReturnController;
 use JoyPla\InterfaceAdapters\Controllers\Web\StocktakingController;
 use JoyPla\InterfaceAdapters\Controllers\Web\TopController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ItemRequestController;
+use JoyPla\InterfaceAdapters\Controllers\Web\ItemListController; //商品一覧表用
 use JoyPla\InterfaceAdapters\GateWays\Middleware\PersonalInformationConsentMiddleware;
 use JoyPla\InterfaceAdapters\GateWays\Middleware\UnorderDataExistMiddleware;
 use JoyPla\JoyPlaApplication;
@@ -272,6 +273,22 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         AccountantController::class,
         'show',
     ]);
+
+    Router::map('GET', '/product/itemList/index', [
+        ItemListController::class,
+        'index',
+    ]);
+
+    Router::map('GET', '/product/itemList/:itemListId', [
+        ItemListController::class,
+        'show',
+    ]);
+
+    Router::map('GET', '/product/itemList/:itemListId/print', [
+        ItemListController::class,
+        'print',
+    ])/* ->service($useCaseProvider->getItemListPrintInteractor()) */;
+
 });
 
 $router = new Router();

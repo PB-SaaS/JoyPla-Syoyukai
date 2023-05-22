@@ -603,5 +603,24 @@ class JoyPlaApplication extends Application
             }
             return new GatePermissionModel(true, false);
         });
+
+        Gate::define('list_of_itemList_slips', function (Auth $auth) {
+            //商品リスト
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
+        Gate::define('register_of_itemList', function (Auth $auth) {
+            //商品リスト-詳細
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
     }
 }
