@@ -24,6 +24,7 @@ use JoyPla\InterfaceAdapters\Controllers\Api\ItemRequestController;
 use JoyPla\InterfaceAdapters\Controllers\Api\PayoutController;
 use JoyPla\InterfaceAdapters\Controllers\Api\AccountantController;
 use JoyPla\InterfaceAdapters\Controllers\Api\AccountantLogController;
+use JoyPla\InterfaceAdapters\Controllers\Api\ItemListController; //商品一覧表用
 use JoyPla\JoyPlaApplication;
 use JoyPla\Service\Presenter\Api\PresenterProvider;
 use JoyPla\Service\Repository\QueryProvider;
@@ -60,6 +61,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         InHospitalItemController::class,
         'index',
     ])->service($useCaseProvider->getInHospitalItemIndexInteractor());
+
+    Router::map('GET', '/api/inHospitalItem/show', [
+        InHospitalItemController::class,
+        'show',
+    ])->service($useCaseProvider->getInHospitalItemShowInteractor());
 
     Router::map('POST', '/api/consumption/register', [
         ConsumptionController::class,
@@ -301,6 +307,32 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         AccountantLogController::class,
         'totalPrice',
     ]);
+
+    Router::map('GET', '/api/product/itemList/index', [
+        ItemListController::class,
+        'index',
+    ])->service($useCaseProvider->getItemListIndexInteractor());
+
+    Router::map('POST', '/api/product/itemList/register', [
+        ItemListController::class,
+        'register',
+    ])->service($useCaseProvider->getItemListRegisterInteractor());
+
+    Router::map('GET', '/api/product/itemList/:itemListId', [
+        ItemListController::class,
+        'show',
+    ])->service($useCaseProvider->getItemListShowInteractor());
+
+    Router::map('patch', '/api/product/itemList/:itemListId/update', [
+        ItemListController::class,
+        'update',
+    ])->service($useCaseProvider->getItemListUpdateInteractor());
+
+    Router::map('delete', '/api/product/itemList/:itemListId/delete', [
+        ItemListController::class,
+        'delete',
+    ]);
+
 });
 
 $router = new Router();
