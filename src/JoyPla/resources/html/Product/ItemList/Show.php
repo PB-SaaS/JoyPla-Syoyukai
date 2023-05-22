@@ -26,15 +26,10 @@
           <div class="flex w-full gap-6">
             <div class="flex-initial lg:w-1/6 w-1/3">商品リスト名称</div>
             <div class="flex-auto">
-<!-- 
-              {{ values.itemList?.itemListName }}
- -->
-
               <v-input
                 name="itemListName"
                 type="text"
                 ></v-input>
-
             </div>
           </div>
           <div class="flex w-full gap-6">
@@ -84,7 +79,6 @@
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.quantityUnit }}</td>
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.itemUnit }}</td>
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">
-                        <!-- {{ item.itemJANCode }} -->
                         <v-barcode :value="item.itemLabelBarcode" :options="{format:'CODE128', textmargin:'0', fontoptions:'bold'}"></v-barcode>
                       </td>
                       <td class="border-b border-slate-100">
@@ -139,54 +133,6 @@
       </div>
     </div>
   </div>
-<!-- 
-  <div id="printpage">
-    <div>
-      <img class="ml-auto h-6" src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png" />
-    </div>
-    <h1 style="text-align: center;
-      font-size: 24px;
-      font-weight: bold;">
-      {{ values.itemList?.itemListName }}
-    </h1>
-    <div style="text-align:right">
-        商品リストID:{{ values.itemList?.itemListId }}<br>
-        部署:{{ values.itemList?._division?.divisionName }}<br>
-        発行日：<?php echo date('Y年m月d日') ?><br>
-        <span style="padding-right:120px">記入日：</span>
-    </div>
-    <table class="border-collapse border border-slate-500 w-full">
-      <thead class="text-xs">
-        <tr class="bg-gray-100">
-          <th class="border border-b font-medium pt-0 pb-3 text-left w-10">No</th>
-          <th class="border border-b font-medium pt-0 pb-3 text-left w-36">商品情報</th>
-          <th class="border border-b font-medium pt-0 pb-3 text-left w-20">卸業者</th>
-          <th class="border border-b font-medium pt-0 pb-3 text-left w-20">バーコード</th>
-          <th class="border border-b font-medium pt-0 pb-3 text-left w-36">備考</th>
-        </tr>
-      </thead>
-      <tbody class="text-xxs">
-        <tr v-for="(item, index)  in values.items" 
-          :key="item.key" 
-          class="bg-white"
-        >
-          <td class="border border-slate-600 p-1">{{ index + 1 }}</td>
-          <td class="border border-slate-600 p-1">
-            {{ item.itemName }}<br>
-            {{ item.itemCode }}<br>
-            {{ item.itemStandard }}<br>
-            {{ item.quantity }} / {{ item.quantityUnit }} / {{ item.itemUnit }}
-          </td>
-          <td class="border border-slate-600 p-1">{{ item.distributorName }}</td>
-          <td class="border border-slate-600 p-1">
-            <v-barcode :value="item.itemLabelBarcode" :options="{format:'CODE128', textmargin:'0', fontoptions:'bold', fontSize:12, width:1, height:50,}"></v-barcode>
-          </td>
-          <td class="border border-slate-600 p-1"></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
- -->
 </div>
 <style>
   @media screen{
