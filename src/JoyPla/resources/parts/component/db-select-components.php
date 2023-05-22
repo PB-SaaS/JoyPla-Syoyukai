@@ -292,6 +292,11 @@ const vInHospitalItemModal = {
       required: true,
       default: "1",
     },
+    divisionId: {
+      type: String,
+      required: false,
+      default: "",
+    }
   },
   setup(props, context) {
     const { ref, toRef, toRefs, reactive, onMounted } = Vue;
@@ -394,6 +399,7 @@ const vInHospitalItemModal = {
       let params = new URLSearchParams();
       params.append("path", "/api/inHospitalItem/index");
       params.append("search", JSON.stringify(encodeURIToObject(values)));
+      params.append("divisionId", props.divisionId);
       params.append("_csrf", _CSRF);
 
       start();

@@ -5,28 +5,36 @@
   <div id="content" class="flex h-full px-1">
     <div class="flex-auto">
       <div class="index container mx-auto mb-96">
-        <h1 class="text-2xl mb-2">個別発注</h1>
+        <h1 class="text-2xl mb-2">出庫・払出登録</h1>
         <hr>
         <div>
-          <div class="mb-2 lg:w-1/3">
-            <v-select-division :is-only-use-data="true" name="divisionId" label="発注部署" :rules="{ required : true }" title="発注部署指定" :disabled="values.divisionId != '' && fields.length > 0" :is-only-my-division="<?php var_export(
-                gate('register_of_unordered_slips')->isOnlyMyDivision()
-            ); ?>" />
+          <div class="lg:flex lg:flex-row gap-4">
+            <div class="mb-2 lg:w-1/3">
+              <v-input type="date" name="receivedDate" :rules="{}" title="払出日指定" label="払出日指定"></v-input>
+            </div>
+            <div class="mb-2 lg:w-1/3">
+              <v-select-division :is-only-use-data="true" name="sourceDivisionId" label="払出元部署" :rules="{ required : true ,  notTwoFieldSameAs : [ '払出先部署', `@targetDivisionId`] }" title="払出元部署指定" :disabled="values.divisionId != '' && fields.length > 0" :is-only-my-division="<?php var_export(
+                  gate('register_of_unordered_slips')->isOnlyMyDivision()
+              ); ?>" />
+            </div>
+            <div class="mb-2 lg:w-1/3">
+              <v-select-division :is-only-use-data="true" name="targetDivisionId" label="払出先部署" :rules="{ required : true ,  notTwoFieldSameAs : [ '払出元部署', `@sourceDivisionId`] }" title="払出先部署指定" :disabled="values.divisionId != '' && fields.length > 0" />
+            </div>
           </div>
           <div class="lg:flex lg:flex-row gap-4">
             <div class="my-4 w-1/3 lg:w-1/6">
-              <v-button-default class="w-full" type="button" data-micromodal-trigger="inHospitalItemModal">商品検索</v-button-default>
-              <v-in-hospital-item-modal v-on:additem="additem">
+              <v-button-default class="w-full" type="button" data-micromodal-trigger="inHospitalItemModal" :disabled="values.sourceDivisionId == ''">商品検索</v-button-default>
+              <v-in-hospital-item-modal v-on:additem="additem" :division-id="values.sourceDivisionId">
               </v-in-hospital-item-modal>
             </div>
             <div class="my-4 w-1/3 lg:w-1/6">
-              <v-button-default class="w-full" type="button" :disabled="values.divisionId == ''" data-micromodal-trigger="consumptionHistoryModalForOrder">伝票検索</v-button-default>
-              <v-consumption-history-modal-for-order v-on:addconsumptions="addconsumptions" :division-id="values.divisionId">
+              <v-button-default class="w-full" type="button" :disabled="values.targetDivisionId == ''" data-micromodal-trigger="consumptionHistoryModalForOrder">伝票検索</v-button-default>
+              <v-consumption-history-modal-for-order v-on:addconsumptions="addconsumptions" :division-id="values.targetDivisionId">
               </v-consumption-history-modal-for-order>
             </div>
           </div>
           <div class="my-4 lg:w-1/3 items-center">
-            <v-switch id="integrate" v-model="integrate" :message="(integrate)? '既存の未発注伝票に追加します' : '新規発行します'"></v-switch>
+            <v-switch id="labelCreate" v-model="labelCreate" :message="(labelCreate)? 'ラベル発行をする' : 'ラベル発行をしない'"></v-switch>
           </div>
           <div class="p-2 bg-gray-300">
             <v-barcode-search @additem="addItemByBarcode"></v-barcode-search>
@@ -39,46 +47,93 @@
           <div class="mt-4 p-4 shadow-md drop-shadow-md" v-if="fields.length > 0">
             <p class=" text-xl">登録アイテム数: {{ numberFormat(itemCount()) }} アイテム</p>
             <p class=" text-xl">合計金額: &yen; {{ numberFormat(totalAmount()) }} </p>
-            <v-button-primary type="button" class="w-full" @click.native="onSubmit">発注登録</v-button-primary>
+            <div class="lg:flex lg:flex-row gap-4">
+              <v-button-primary type="button" class="w-full lg:w-1/2" @click.native="onSubmit">払出登録</v-button-primary>
+              <v-button-primary type="button" class="w-full lg:w-1/2" @click.native="onSubmit">出庫登録</v-button-primary>
+            </div>
           </div>
-          <transition-group tag="div" name="list" appear>
-            <div class="my-2" v-for="(item, idx) in fields" :key="item.key">
+          <table>
+              <tr>
+                <th class="text-center">No</th>
+                <th class="text-center">商品情報</th>
+                <th class="text-center">払出元在庫数</th>
+                <th class="text-center">ロット番号</th>
+                <th class="text-center">使用期限</th>
+                <th class="text-center">カード番号</th>
+                <th class="text-center">払出数</th>
+                <th class="text-center">合計払出数</th>
+                <th class="text-center">合計金額</th>
+                <th class="text-center"></th>
+                <th class="text-center"></th>
+              </tr>
+              <template v-for="(item, idx) in values.payoutItems">
+                <template v-for="(_payout, pid) in item._payout">
+                  <tr class="my-2" :key="item.key + '/' + pid">
+                    <template v-if="pid == 0">
+                      <td class="text-center" :rowspan="item._payout.length">{{ idx + 1 }}</td>
+                      <td class="text-left" :rowspan="item._payout.length">
+                        <p class="text-gray-500" v-if="item.makerName">{{ item.makerName }}</h3>
+                        <p class="text-gray-500" v-if="item.itemName">{{ item.itemName }}</p>
+                        <p class="text-gray-500" v-if="item.itemCode">{{ item.itemCode }}</p>
+                        <p class="text-gray-500" v-if="item.itemStandard">{{ item.itemStandard }}</p>
+                        <p class="text-gray-500" v-if="item.itemJANCode">{{ item.itemJANCode }}</p>
+                        <p class="text-gray-500">&yen;{{ numberFormat(item.unitPrice) }} / {{ numberFormat(item.quantity) }}{{ item.quantityUnit }}</p>
+                      </td>
+                      <td class="text-center" :rowspan="item._payout.length">{{ numberFormat(item._stock.stockQuantity) }}{{ item.quantityUnit }}</td>
+                    </template>
+                    <td class="text-center">
+                      <v-input 
+                          v-model="_payout.lotNumber"
+                           :name="`payoutItems[${idx}]._payout[${pid}].lotNumber`" label="ロット番号" :rules="{ required : isRequired(idx) ,lotnumber: true , twoFieldRequired : [ '使用期限', `@payoutItems[${idx}]._payout[${pid}].lotDate`]  }" type="text" change-class-name="inputChange" title="ロット番号"></v-input>
+                    </td>
+                    <td class="text-center">
+                      <v-input 
+                          v-model="_payout.lotDate"
+                          :name="`payoutItems[${idx}]._payout[${pid}].lotDate`" label="使用期限" :rules="{ required : isRequired(idx) ,lotdate: true , twoFieldRequired : [ 'ロット番号', `@payoutItems[${idx}]._payout[${pid}].lotNumber`]  }" type="date" change-class-name="inputChange" title="使用期限"></v-input>
+                    </td>
+                    <td class="text-center">{{ item._payout }}</td>
+                    <td class="text-center">{{ item._payout }}</td>
+                  </tr>
+                </template>
+              </template>
+            </table>
+            <?php /*
               <div class="w-full lg:flex mt-3">
                 <div class="flex-auto lg:flex-1 flex lg:w-3/4">
-                  <item-view class="md:h-44 md:w-44 h-32 w-32" :base64="item.value.inItemImage"></item-view>
+                  <item-view class="md:h-44 md:w-44 h-32 w-32" :base64="item.inItemImage"></item-view>
                   <div class="flex-1 px-4 relative">
                     <div class="flex-auto lg:flex justify-between leading-normal lg:space-y-0 space-y-4 gap-6">
                       <div class="break-all">
                         <div class="w-full">
-                          <h3 class="text-xl font-bold font-heading" v-if="item.value.makerName">{{ item.value.makerName }}</h3>
-                          <p class="text-md font-bold font-heading" v-if="item.value.itemName">{{ item.value.itemName }}</p>
-                          <p class="text-gray-500" v-if="item.value.itemCode">{{ item.value.itemCode }}</p>
-                          <p class="text-gray-500" v-if="item.value.itemStandard">{{ item.value.itemStandard }}</p>
-                          <p class="text-gray-500" v-if="item.value.distributorName">{{ item.value.distributorName }}</p>
+                          <h3 class="text-xl font-bold font-heading" v-if="item.makerName">{{ item.makerName }}</h3>
+                          <p class="text-md font-bold font-heading" v-if="item.itemName">{{ item.itemName }}</p>
+                          <p class="text-gray-500" v-if="item.itemCode">{{ item.itemCode }}</p>
+                          <p class="text-gray-500" v-if="item.itemStandard">{{ item.itemStandard }}</p>
+                          <p class="text-gray-500" v-if="item.distributorName">{{ item.distributorName }}</p>
                         </div>
                         <div class="w-full text-lg font-bold font-heading flex gap-6">
-                          <span class="text-xl text-orange-600 font-bold font-heading">&yen; {{ numberFormat(item.value.price) }}/{{ item.value.itemUnit }}</span>
-                          <blowing :message="item.value.priceNotice" title="金額管理備考" v-if="item.value.priceNotice != ''"></blowing>
+                          <span class="text-xl text-orange-600 font-bold font-heading">&yen; {{ numberFormat(item.price) }}/{{ item.itemUnit }}</span>
+                          <blowing :message="item.priceNotice" title="金額管理備考" v-if="item.priceNotice != ''"></blowing>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="flex-initial lg:flex gap-6 lg:w-1/4 items-end flex-row-reverse">
-                  <v-input-number :rules="{ between: [-99999 , 99999] }" :name="`orderItems[${idx}].orderUnitQuantity`" label="発注数（個数）" :unit="item.value.itemUnit" :step="1" :title="`発注数（個数）/${item.value.quantity}${ item.value.quantityUnit }入り`"></v-input-number>
+                  <v-input-number :rules="{ between: [-99999 , 99999] }" :name="`payoutItems[${idx}].orderUnitQuantity`" label="発注数（個数）" :unit="item.itemUnit" :step="1" :title="`発注数（個数）/${item.quantity}${ item.quantityUnit }入り`"></v-input-number>
                 </div>
               </div>
               <div class="mt-4 flex">
                 <v-button-danger type="button" @click.native="remove(idx)">削除</v-button-danger>
                 <div class="flex-1 items-center ">
-                  <p class="text-xl text-gray-800 font-bold font-heading text-right">&yen; {{ numberFormat(orderPrice(idx) ) }} ( {{ item.value.orderUnitQuantity }}{{ item.value.itemUnit }} )</p>
+                  <p class="text-xl text-gray-800 font-bold font-heading text-right">&yen; {{ numberFormat(orderPrice(idx) ) }} ( {{ item.orderUnitQuantity }}{{ item.itemUnit }} )</p>
                 </div>
               </div>
               <div class="pt-4 pb-2 w-full">
                 <div class="border-t border-gray-200"></div>
               </div> 
             </div>
-          </transition-group>
+            */ ?>
         </div>
       </div>
     </div>
@@ -187,10 +242,11 @@
         isSubmitting
       } = useForm({
         initialValues: {
-          orderItems: [],
-          divisionId: "",
+          sourceDivisionId: "",
+          targetDivisionId: "",
+          payoutItems: [],
           barcode: "",
-          orderDate: yyyy + '-' + mm + '-' + dd,
+          payoutDate: yyyy + '-' + mm + '-' + dd,
         },
         validateOnMount: false
       });
@@ -200,9 +256,9 @@
         fields,
         update,
         replace
-      } = useFieldArray('orderItems', control);
+      } = useFieldArray('payoutItems', control);
     
-      const integrate = ref(localStorage.joypla_unorder_slip_integrate === 'true');
+      const labelCreate = ref(localStorage.joypla_payoutLabelCreate === 'true');
 
       const alertModel = reactive({
         message: "",
@@ -224,38 +280,37 @@
       });
 
       const breadcrumbs = [{
-          text: '発注・入荷メニュー',
+          text: '払出メニュー',
           disabled: false,
-          href: _ROOT + '&path=/order',
+          href: _ROOT + '&path=/payout',
         },
         {
-          text: '個別発注',
+          text: '出庫・払出登録',
           disabled: true,
         }
       ];
 
       const createOrderModel = (values) => {
-        let items = values.orderItems;
-        let orderItems = [];
+        let items = values.payoutItems;
+        let payoutItems = [];
         items.forEach(function(item, idx) {
           if (item.orderUnitQuantity != 0) {
-            orderItems.push({
+            payoutItems.push({
               'inHospitalItemId': item.inHospitalItemId,
               'orderUnitQuantity': parseInt(item.orderUnitQuantity),
-              'divisionId': values.divisionId,
             })
           }
         });
-        return orderItems;
+        return payoutItems;
       };
 
       const orderPrice = (idx) => {
-        return values.orderItems[idx].price * parseInt(values.orderItems[idx].orderUnitQuantity);
+        return values.payoutItems[idx].price * parseInt(values.payoutItems[idx].orderUnitQuantity);
       };
 
       const totalAmount = () => {
         let num = 0;
-        values.orderItems.forEach((v, idx) => {
+        values.payoutItems.forEach((v, idx) => {
           num += orderPrice(idx);
         });
         return num;
@@ -263,7 +318,7 @@
 
       const itemCount = () => {
         let num = 0;
-        values.orderItems.forEach((v, idx) => {
+        values.payoutItems.forEach((v, idx) => {
           num += (v.orderUnitQuantity > 0) ? 1 : 0;
         });
         return num;
@@ -329,9 +384,8 @@
           params.append("path", "/api/order/register");
           params.append("_method", 'post');
           params.append("_csrf", _CSRF);
-          params.append("orderDate", values.orderDate);
-          params.append("integrate", integrate.value);
-          params.append("orderItems", JSON.stringify(encodeURIToObject(orderModels)));
+          params.append("payoutDate", values.payoutDate);
+          params.append("payoutItems", JSON.stringify(encodeURIToObject(orderModels)));
 
           const res = await axios.post(_APIURL, params);
 
@@ -368,19 +422,27 @@
         item = JSON.parse(JSON.stringify(item));
         item.orderUnitQuantity = (item.orderUnitQuantity) ? item.orderUnitQuantity : 1;
         let checked = false;
-        if (Array.isArray(values.orderItems)) {
-          values.orderItems.forEach((v, idx) => {
-            if (v.inHospitalItemId === item.inHospitalItemId) {
-              checked = true;
-              v.orderUnitQuantity++;
-            }
-          });
-        }
-        if (!values.orderItems) {
-          values.orderItems = [];
+        if (!values.payoutItems) {
+          values.payoutItems = [];
         }
         if (!checked) {
           item.priceNotice = (item.priceNotice) ? item.priceNotice : "";
+          item._payout = [];
+          item._payout.push({
+            count : 0,
+            lotNumber : '',
+            lotDate : '',
+          })
+          item._payout.push({
+            count : 0,
+            lotNumber : '',
+            lotDate : '',
+          })
+          item._payout.push({
+            count : 0,
+            lotNumber : '',
+            lotDate : '',
+          })
           insert(0, item);
         }
       };
@@ -393,8 +455,8 @@
           }
 
           let exist = false;
-          if (Array.isArray(values.orderItems)) {
-            values.orderItems.forEach((v, idx) => {
+          if (Array.isArray(values.payoutItems)) {
+            values.payoutItems.forEach((v, idx) => {
               if (v.inHospitalItemId === elm.inHospitalItemId) {
                 exist = true;
                 let quantity = (elm.orderableQuantity > 0) ? parseInt(elm.orderableQuantity) : 0;
@@ -403,8 +465,8 @@
             });
           }
 
-          if (!values.orderItems) {
-            values.orderItems = [];
+          if (!values.payoutItems) {
+            values.payoutItems = [];
           }
 
           if (!exist) {
@@ -485,12 +547,19 @@
         }
       }
 
+      const isRequired = (idx) => {
+        if (fields.value[idx].lotManagement == "1") {
+          return true;
+        }
+        return false;
+      };
       return {
+        isRequired,
         values,
         openModal,
         selectInHospitalItems,
         addItemByBarcode,
-        integrate,
+        labelCreate,
         loading, 
         start, 
         complete,
@@ -517,9 +586,9 @@
       isSubmitting() {
         this.loading = this.isSubmitting;
       },
-      integrate(bool) {
-        console.log(this.integrate);
-        localStorage.joypla_unorder_slip_integrate = bool;
+      labelCreate(bool) {
+        console.log(this.labelCreate);
+        localStorage.joypla_payoutLabelCreate = bool;
       },
       fields: {
         async handler(val, oldVal) {
