@@ -14,6 +14,8 @@ class AccountantItemRepository implements AccountantItemRepositoryInterface
     {
         $accountantInstance = ModelRepository::getAccountantItemViewInstance()
             ->where('hospitalId', $hospitalId->value())
+            ->orWhere('isDeleted', 'f')
+            ->orWhereNull('isDeleted')
             ->orderBy($search->sortColumn, $search->sortDirection);
 
         if (is_array($search->divisionIds) && count($search->divisionIds) > 0) {
@@ -108,6 +110,8 @@ class AccountantItemRepository implements AccountantItemRepositoryInterface
     {
         $accountantInstance = ModelRepository::getAccountantItemViewInstance()
             ->where('hospitalId', $hospitalId->value())
+            ->orWhere('isDeleted', 'f')
+            ->orWhereNull('isDeleted')
             ->orderBy($search->sortColumn, $search->sortDirection);
 
         if (is_array($search->divisionIds) && count($search->divisionIds) > 0) {
@@ -242,6 +246,8 @@ class AccountantItemRepository implements AccountantItemRepositoryInterface
     ) {
         $accountantInstance = ModelRepository::getAccountantItemViewInstance()
             ->where('hospitalId', $hospitalId->value())
+            ->orWhere('isDeleted', 'f')
+            ->orWhereNull('isDeleted')
             ->orderBy($search->sortColumn, $search->sortDirection);
 
         if (is_array($search->divisionIds) && count($search->divisionIds) > 0) {

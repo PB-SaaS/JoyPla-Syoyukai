@@ -39,6 +39,8 @@ class AccountantRepository implements AccountantRepositoryInterface
     {
         $accountantInstance = ModelRepository::getAccountantInstance()
             ->where('hospitalId', $hospitalId->value())
+            ->orWhere('isDeleted', 'f')
+            ->orWhereNull('isDeleted')
             ->orderBy('id', 'desc');
 
         if (is_array($search->divisionIds) && count($search->divisionIds) > 0) {
@@ -157,6 +159,8 @@ class AccountantRepository implements AccountantRepositoryInterface
         $accountant = ModelRepository::getAccountantInstance()
             ->where('hospitalId', $hospitalId->value())
             ->where('accountantId', $accountantId->value())
+            ->orWhere('isDeleted', 'f')
+            ->orWhereNull('isDeleted')
             ->get();
 
         $accountant = $accountant->first();
@@ -351,6 +355,16 @@ class AccountantRepository implements AccountantRepositoryInterface
                 $itemUpsert
             );
         }
+    }
+
+    public function delete(AccountantId $accountantId)
+    {
+        ModelRepository::getAccountantInstance()
+            ->where('accountantId', $accountantId->value())
+            ->update([
+                'updateTime' => 'now',
+                'isDeleted' => 't',
+            ]);
     }
 
     public function saveItemLog(array $logs)

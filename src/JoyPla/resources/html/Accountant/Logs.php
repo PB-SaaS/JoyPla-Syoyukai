@@ -35,7 +35,7 @@
           {{ (totalCount == 0)? 0 : ( parseInt(values.search.perPage) * ( values.search.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.search.perPage) * values.search.currentPage )  < totalCount ) ?  parseInt(values.search.perPage) * values.search.currentPage : totalCount  }}件 / 全 {{ totalCount }}件
         </div>
         <div class="mt-4">
-          <table-component table-id="accountant_items_table" :headers="headers" :rows-data="rowsData" :sort-direction="values.search.sortDirection" :sort-columns="values.search.sortColumns" @request-sort="handleSortRequest" />
+          <table-component table-id="accountant_logs_table" :headers="headers" :rows-data="rowsData" :sort-direction="values.search.sortDirection" :sort-columns="values.search.sortColumns" @request-sort="handleSortRequest" />
         </div>
         <v-pagination
         :show-pages="showPages"
@@ -187,17 +187,18 @@ var JoyPlaApp = Vue.createApp({
         const showPages = ref(5);
         const totalCount = ref(0);
 
-        const pagetitle = "AccountantItemsIndex";
+        const pagetitle = "AccountantLogs";
 
-        const getParam = (name) => {
+        const getParam = (name, defaultValue) => {
             let url = window.location.href;
             name = name.replace(/[\[\]]/g, "\\$&");
 
             if(getCache() === "true")
             {
                 let obj = sessionStorage.getItem(pagetitle);
-                if(obj===null){ return "" }
-                return (JSON.parse(obj))[name];
+                if(obj===null){ return defaultValue ?? "" }
+                console.log(obj);
+                return (JSON.parse(obj))[name] ?? defaultValue;
             }
 
             var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
@@ -224,20 +225,19 @@ var JoyPlaApp = Vue.createApp({
             url.searchParams.set('distributorIds',values.distributorIds);
             history.pushState({}, '', url);
         }
-
         const { handleSubmit , control, meta , validate , values , isSubmitting } = useForm({
             initialValues: {
                 search: {
-                    sortColumn  : (getParam("sortColumn")) ? getParam("sortColumn") : "id",
-                    sortDirection  : (getParam("sortDirection")) ? getParam("sortDirection") : "desc",
-                    itemName  : (getParam("itemName")) ? getParam("itemName") : "",
-                    makerName : (getParam("makerName")) ? getParam("makerName") : "",
-                    itemCode : (getParam("itemCode")) ? getParam("itemCode") : "",
-                    itemStandard : (getParam("itemStandard")) ? getParam("itemStandard") : "",
-                    itemJANCode : (getParam("itemJANCode")) ? getParam("itemJANCode") : "",
-                    yearMonth: (getParam("yearMonth")) ? getParam("yearMonth") : "",
-                    perPage: (Number.isInteger(getParam("perPage"))) ? getParam("perPage") : "10",
-                    currentPage : (Number.isInteger(parseInt(getParam("currentPage")))) ? parseInt(getParam("currentPage")) : 1,
+                    sortColumn  : getParam("sortColumn","id"),
+                    sortDirection  :getParam("sortDirection","desc"),
+                    itemName  : getParam("itemName"),
+                    makerName :  getParam("makerName"),
+                    itemCode : getParam("itemCode"),
+                    itemStandard : getParam("itemStandard"),
+                    itemJANCode : getParam("itemJANCode"),
+                    yearMonth: getParam("yearMonth"),
+                    perPage: getParam("perPage" , '10'),
+                    currentPage : parseInt(getParam("currentPage",1)),
                     divisionIds: (getParam("divisionIds")) ? ( Array.isArray(getParam("divisionIds"))? getParam("divisionIds") : (getParam("divisionIds")).split(',') ) : [],
                     distributorIds: (getParam("distributorIds")) ? ( Array.isArray(getParam("distributorIds"))? getParam("distributorIds") : (getParam("distributorIds")).split(',') ) : [],
                 }
@@ -333,6 +333,7 @@ var JoyPlaApp = Vue.createApp({
             const res = await getData();
             createRowData(res.data);
             totalCount.value = parseInt(res.count);
+            setParam(values.search);
             completeLoading();
         };
 

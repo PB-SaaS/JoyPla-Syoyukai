@@ -126,18 +126,21 @@ class AccountantController extends Controller
         $inputPort->handle($inputData);
     }
 
-    public function delete($vars)
+    public function delete($vars, AccountantUpdateInputPortInterface $inputPort)
     {
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
 
         $accountantId = $vars['accountantId'];
 
-        ModelRepository::getAccountantInstance()
-            ->where('accountantId', $accountantId)
-            ->where('hospitalId', $this->request->user()->hospitalId)
-            ->delete();
-        echo (new ApiResponse('', 1, 200, 'deleted', []))->toJson();
+        $inputData = new AccountantUpdateInputData(
+            $this->request->user(),
+            $accountantId,
+            [],
+            true
+        );
+
+        $inputPort->handle($inputData);
     }
 
     public function totalPrice($vars)

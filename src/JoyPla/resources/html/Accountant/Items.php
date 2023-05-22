@@ -187,17 +187,18 @@ var JoyPlaApp = Vue.createApp({
         const showPages = ref(5);
         const totalCount = ref(0);
 
-        const pagetitle = "AccountantItemsIndex";
+        const pagetitle = "AccountantItems";
 
-        const getParam = (name) => {
+        const getParam = (name, defaultValue) => {
             let url = window.location.href;
             name = name.replace(/[\[\]]/g, "\\$&");
 
             if(getCache() === "true")
             {
                 let obj = sessionStorage.getItem(pagetitle);
-                if(obj===null){ return "" }
-                return (JSON.parse(obj))[name];
+                if(obj===null){ return defaultValue ?? "" }
+                console.log(obj);
+                return (JSON.parse(obj))[name] ?? defaultValue;
             }
 
             var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
@@ -206,6 +207,7 @@ var JoyPlaApp = Vue.createApp({
             if (!results[2]) return '';
             return decodeURIComponent(results[2].replace(/\+/g, " "));
         }
+
 
         const setParam = (values) => {
             sessionStorage.setItem(pagetitle,JSON.stringify(values));
@@ -225,19 +227,21 @@ var JoyPlaApp = Vue.createApp({
             history.pushState({}, '', url);
         }
 
+        console.log(getParam("perPage"));
+
         const { handleSubmit , control, meta , validate , values , isSubmitting } = useForm({
             initialValues: {
                 search: {
-                    sortColumn  : (getParam("sortColumn")) ? getParam("sortColumn") : "id",
-                    sortDirection  : (getParam("sortDirection")) ? getParam("sortDirection") : "desc",
-                    itemName  : (getParam("itemName")) ? getParam("itemName") : "",
-                    makerName : (getParam("makerName")) ? getParam("makerName") : "",
-                    itemCode : (getParam("itemCode")) ? getParam("itemCode") : "",
-                    itemStandard : (getParam("itemStandard")) ? getParam("itemStandard") : "",
-                    itemJANCode : (getParam("itemJANCode")) ? getParam("itemJANCode") : "",
-                    yearMonth: (getParam("yearMonth")) ? getParam("yearMonth") : "",
-                    perPage: (Number.isInteger(getParam("perPage"))) ? getParam("perPage") : "10",
-                    currentPage : (Number.isInteger(parseInt(getParam("currentPage")))) ? parseInt(getParam("currentPage")) : 1,
+                    sortColumn  : getParam("sortColumn","id"),
+                    sortDirection  :getParam("sortDirection","desc"),
+                    itemName  : getParam("itemName"),
+                    makerName :  getParam("makerName"),
+                    itemCode : getParam("itemCode"),
+                    itemStandard : getParam("itemStandard"),
+                    itemJANCode : getParam("itemJANCode"),
+                    yearMonth: getParam("yearMonth"),
+                    perPage: getParam("perPage" , '10'),
+                    currentPage : parseInt(getParam("currentPage",1)),
                     divisionIds: (getParam("divisionIds")) ? ( Array.isArray(getParam("divisionIds"))? getParam("divisionIds") : (getParam("divisionIds")).split(',') ) : [],
                     distributorIds: (getParam("distributorIds")) ? ( Array.isArray(getParam("distributorIds"))? getParam("distributorIds") : (getParam("distributorIds")).split(',') ) : [],
                 }
@@ -332,6 +336,7 @@ var JoyPlaApp = Vue.createApp({
             const res = await getData();
             createRowData(res.data);
             totalCount.value = parseInt(res.count);
+            setParam(values.search);
             completeLoading();
         };
 

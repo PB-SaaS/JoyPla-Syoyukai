@@ -447,12 +447,12 @@ class SpiralManager
 
             // Append the page data to the total data
             $data = array_merge($data, $pageData);
-            $availablePages = intdiv($response->getTotal(), $limit);
+            $availablePages = ceil($response->getTotal() / $limit);
 
             // Update the total pages
             $totalPages++;
             $page++;
-        } while ($totalPages < $maxPages && $page < $availablePages);
+        } while ($totalPages <= $maxPages && $page <= $availablePages);
 
         // Return the data
         return collect($data);
@@ -478,7 +478,7 @@ class SpiralManager
             $pageData = $response->getData()->all(); // Assuming 'data' holds the actual data
             $availableCount = $response->getTotal(); // Update available count
 
-            $availablePages = intdiv($response->getTotal(), $limit);
+            $availablePages = ceil($response->getTotal() / $limit);
 
             // If the offset is not zero and we are on the first page, trim the array to start from the offset
             if ($offset > 0 && $totalCount == 0) {
@@ -493,8 +493,8 @@ class SpiralManager
             $page++;
         } while (
             $totalCount < $maxCount &&
-            $totalCount < $availableCount &&
-            $page < $availablePages
+            $totalCount <= $availableCount &&
+            $page <= $availablePages
         );
 
         // Trim the data array if it exceeds the maxCount

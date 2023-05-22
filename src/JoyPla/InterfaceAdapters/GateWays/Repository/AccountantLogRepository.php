@@ -408,7 +408,6 @@ class AccountantLogRepository implements AccountantLogRepositoryInterface
         return $data;
     }
 }
-
 interface AccountantLogRepositoryInterface
 {
 }

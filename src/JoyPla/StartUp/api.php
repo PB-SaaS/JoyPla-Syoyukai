@@ -280,7 +280,7 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
     Router::map('delete', '/api/accountant/:accountantId/delete', [
         AccountantController::class,
         'delete',
-    ]);
+    ])->service($useCaseProvider->getAccountantUpdateInteractor());
 
     Router::map('get', '/api/accountant/items/download', [
         AccountantController::class,

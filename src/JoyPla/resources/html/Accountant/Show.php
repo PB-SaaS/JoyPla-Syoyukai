@@ -484,7 +484,7 @@ var JoyPlaApp = Vue.createApp({
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
           }).then( async (result) => {
-            try {
+            if(result.isConfirmed){
               startLoading();
               let params = new URLSearchParams();
               params.append("path", "/api/accountant/"+accountantId+"/delete");
@@ -492,7 +492,7 @@ var JoyPlaApp = Vue.createApp({
               params.append("_csrf", _CSRF);
 
               const res = await axios.post(_APIURL, params);
-
+              completeLoading();
               if (res.data.code != 200) {
                 throw new Error(res.data.message)
               }
@@ -505,15 +505,13 @@ var JoyPlaApp = Vue.createApp({
               });
 
               return true;
-            } catch (error) {
-              Swal.fire({
-                icon: 'error',
-                title: 'システムエラー',
-                text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
-              });
-            } finally {
-              completeLoading();
             }
+          }).catch((error) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'システムエラー',
+              text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+            });
           });
         };
 

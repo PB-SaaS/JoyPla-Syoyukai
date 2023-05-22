@@ -1147,6 +1147,7 @@ class ModelRepository
             'orderNumber',
             'receivingNumber',
             'totalAmount',
+            'isDeleted',
         ]);
     }
 
@@ -1202,6 +1203,7 @@ class ModelRepository
             'action',
             'method',
             'index',
+            'isDeleted',
         ]);
     }
 
@@ -1234,6 +1236,7 @@ class ModelRepository
             'method',
             'index',
             'userId',
+            'isDeleted',
         ]);
     }
 

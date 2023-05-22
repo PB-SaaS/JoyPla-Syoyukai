@@ -88,9 +88,15 @@ namespace JoyPla\Application\Interactors\Api\Accountant {
                 $inputData->user->id
             );
 
-            $this->repositoryProvider
-                ->getAccountantRepository()
-                ->save($accountant);
+            if ($inputData->isDeleted === true) {
+                $this->repositoryProvider
+                    ->getAccountantRepository()
+                    ->delete($accountantId);
+            } else {
+                $this->repositoryProvider
+                    ->getAccountantRepository()
+                    ->save($accountant);
+            }
 
             $this->repositoryProvider
                 ->getAccountantRepository()
@@ -119,14 +125,17 @@ namespace JoyPla\Application\InputPorts\Api\Accountant {
         public Auth $user;
         public string $accountantId;
         public array $items;
+        public bool $isDeleted = false;
 
         public function __construct(
             Auth $user,
             string $accountantId,
-            array $items = []
+            array $items = [],
+            bool $isDeleted = false
         ) {
             $this->user = $user;
             $this->accountantId = $accountantId;
+            $this->isDeleted = $isDeleted;
 
             $this->items = array_map(function ($item) {
                 return [

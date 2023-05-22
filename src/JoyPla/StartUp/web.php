@@ -8,6 +8,7 @@ require_once 'JoyPla/require.php';
 
 use framework\Http\Request;
 use framework\Routing\Router;
+use JoyPla\InterfaceAdapters\Controllers\Web\PayoutController;
 use JoyPla\InterfaceAdapters\Controllers\Web\AccountantController;
 use JoyPla\InterfaceAdapters\Controllers\Web\AgreeFormController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ConsumptionController;
@@ -286,6 +287,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
     Router::map('GET', '/accountant/:accountantId/print', [
         AccountantController::class,
         'print',
+    ]);
+
+    Router::map('GET', '/payout/register', [
+        PayoutController::class,
+        'register',
     ]);
 });
 
