@@ -39,6 +39,8 @@ class AccountantRepository implements AccountantRepositoryInterface
     {
         $accountantInstance = ModelRepository::getAccountantInstance()
             ->where('hospitalId', $hospitalId->value())
+            ->orWhere('isDeleted', 'f')
+            ->orWhereNull('isDeleted')
             ->orderBy('id', 'desc');
 
         if (is_array($search->divisionIds) && count($search->divisionIds) > 0) {
@@ -157,17 +159,31 @@ class AccountantRepository implements AccountantRepositoryInterface
         $accountant = ModelRepository::getAccountantInstance()
             ->where('hospitalId', $hospitalId->value())
             ->where('accountantId', $accountantId->value())
+            ->orWhere('isDeleted', 'f')
+            ->orWhereNull('isDeleted')
             ->get();
 
         $accountant = $accountant->first();
+        $division = null;
+        $distributor = null;
 
-        $division = ModelRepository::getDivisionInstance()
-            ->where('divisionId', $accountant->divisionId)
-            ->where('hospitalId', $hospitalId->value())
-            ->get()
-            ->first();
-        $distributor = ModelRepository::getDistributorInstance()
-            ->where('distributorId', $accountant->distributorId)
+        if ($accountant->divisionId) {
+            $division = ModelRepository::getDivisionInstance()
+                ->where('divisionId', $accountant->divisionId)
+                ->where('hospitalId', $hospitalId->value())
+                ->get()
+                ->first();
+        }
+
+        if ($accountant->distributorId) {
+            $distributor = ModelRepository::getDistributorInstance()
+                ->where('distributorId', $accountant->distributorId)
+                ->where('hospitalId', $hospitalId->value())
+                ->get()
+                ->first();
+        }
+
+        $hospital = ModelRepository::getHospitalInstance()
             ->where('hospitalId', $hospitalId->value())
             ->get()
             ->first();
@@ -190,6 +206,7 @@ class AccountantRepository implements AccountantRepositoryInterface
 
         $accountant->_division = $division;
         $accountant->_distributor = $distributor;
+        $accountant->_hospital = $hospital;
 
         $items = ModelRepository::getAccountantItemInstance()
             ->where('accountantId', $accountantId->value())
@@ -338,6 +355,16 @@ class AccountantRepository implements AccountantRepositoryInterface
                 $itemUpsert
             );
         }
+    }
+
+    public function delete(AccountantId $accountantId)
+    {
+        ModelRepository::getAccountantInstance()
+            ->where('accountantId', $accountantId->value())
+            ->update([
+                'updateTime' => 'now',
+                'isDeleted' => 't',
+            ]);
     }
 
     public function saveItemLog(array $logs)

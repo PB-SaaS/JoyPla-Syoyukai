@@ -1147,6 +1147,7 @@ class ModelRepository
             'orderNumber',
             'receivingNumber',
             'totalAmount',
+            'isDeleted',
         ]);
     }
 
@@ -1171,6 +1172,71 @@ class ModelRepository
             'action',
             'method',
             'index',
+        ]);
+    }
+
+    public static function getAccountantItemViewInstance()
+    {
+        return SpiralDB::title('accountantItems')->value([
+            'id',
+            'registTime',
+            'updateTime',
+            'hospitalId',
+            'divisionId',
+            'distributorId',
+            'accountantId',
+            'accountantDate',
+            'orderNumber',
+            'receivingNumber',
+            'totalAmount',
+            'itemId',
+            'itemName',
+            'makerName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'count',
+            'unit',
+            'price',
+            'taxrate',
+            'accountantItemId',
+            'action',
+            'method',
+            'index',
+            'isDeleted',
+        ]);
+    }
+
+    public static function getAccountantLogViewInstance()
+    {
+        return SpiralDB::title('accountantLog')->value([
+            'id',
+            'registTime',
+            'kinds',
+            'hospitalId',
+            'divisionId',
+            'distributorId',
+            'accountantId',
+            'accountantDate',
+            'orderNumber',
+            'receivingNumber',
+            'totalAmount',
+            'itemId',
+            'itemName',
+            'makerName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'count',
+            'unit',
+            'price',
+            'taxrate',
+            'accountantItemId',
+            'action',
+            'method',
+            'index',
+            'userId',
+            'isDeleted',
         ]);
     }
 

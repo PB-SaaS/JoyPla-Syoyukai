@@ -67,6 +67,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
             $orderItems = $this->repositoryProvider
                 ->getOrderRepository()
                 ->findByInHospitalItem($hospitalId, $inputData->orderItems);
+
             $historyOrders = [];
             if ($inputData->integrate) {
                 $historyOrders = $this->repositoryProvider

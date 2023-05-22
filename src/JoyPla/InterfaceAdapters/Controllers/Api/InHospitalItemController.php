@@ -15,13 +15,13 @@ class InHospitalItemController extends Controller
         $vars,
         InHospitalItemIndexInputPortInterface $inputPort
     ) {
-        global $SPIRAL;
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
 
         $inputData = new InHospitalItemIndexInputData(
             $this->request->user()->hospitalId,
-            $this->request->get('search')
+            $this->request->get('search'),
+            $this->request->get('divisionId')
         );
         $inputPort->handle($inputData);
     }

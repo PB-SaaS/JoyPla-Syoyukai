@@ -58,6 +58,38 @@ class StockRepository implements StockRepositoryInterface
         //TODO
     }
 
+    public function getInHospitalItemIdsAndDivisionId(HospitalId $hospitalId , DivisionId $divisionId , array $inHospitalItemIds) 
+    {
+        $inHospitalItemIds = array_map(function (
+            InHospitalItemId $inHospitalItemId
+        ) {
+            return $inHospitalItemId;
+        },
+        $inHospitalItemIds);
+
+        $stockInstance = ModelRepository::getStockViewInstance()->where(
+            'hospitalId',
+            $hospitalId->value()
+        )->where(
+            'divisionId',
+            $divisionId->value()
+        )->resetValue([
+            'hospitalId',
+            'divisionId',
+            'inHospitalItemId',
+            'stockQuantity',
+        ]);
+
+        foreach ($inHospitalItemIds as $inHospitalItemId) {
+            $stockInstance->orWhere(
+                'inHospitalItemId',
+                $inHospitalItemId->value()
+            );
+        }
+
+        return $stockInstance->get();
+    }
+
     public function getStockByDivisionIdAndInHospitalItemIds(
         HospitalId $hospitalId,
         array $divisionIds,

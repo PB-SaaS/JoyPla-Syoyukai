@@ -6,7 +6,7 @@ Vue.component('searchable-select', {
     <div class="uk-inline uk-width-1-1">
       <input type="hidden" :name='name' v-model="inputValue" :readonly="disabled">
 	  <input class="uk-input" :class="{error: error}" @focus="showDropdown" readonly="true" v-model="inputValueText">
-      <div v-if="dropdownVisible" class="uk-dropdown uk-width-1-1 uk-padding-remove" uk-dropdown='mode: click; pos: bottom-justify'>
+      <div v-if="dropdownVisible" class="uk-dropdown uk-width-1-1 uk-padding-remove uk-overflow-auto uk-height-max-medium" uk-dropdown='mode: click; pos: bottom-justify'>
         <input type="text" class="uk-input" v-model="searchText" placeholder="検索...">
         <ul class="uk-nav uk-dropdown-nav">
           <li v-for="option in filteredOptions" @click="selectOption(option)" class="uk-padding-small uk-link hover-bg-gray-200 uk-transition-toggle">

@@ -6,10 +6,10 @@ use DateTime;
 use Exception;
 use stdClass;
 
-class SiValidator {
-
-    private static string $language = "ja";
-    private static array $defineRules = [] ;
+class SiValidator
+{
+    private static string $language = 'ja';
+    private static array $defineRules = [];
     private static array $errorMessages = [];
     private static array $values = [];
     private static array $labels = [];
@@ -17,17 +17,15 @@ class SiValidator {
 
     public function __construct($result = [])
     {
-        $this->result = array_map(function(SiValidateResult $r){
+        $this->result = array_map(function (SiValidateResult $r) {
             return $r;
-        },$result);
+        }, $result);
     }
 
     public function isError()
     {
-        foreach($this->result as $r)
-        {
-            if(! $r->isValid())
-            {
+        foreach ($this->result as $r) {
+            if (!$r->isValid()) {
                 return true;
             }
         }
@@ -37,10 +35,12 @@ class SiValidator {
 
     public function getResults()
     {
-        return array_map(function($r){ return $r->toArray(); },$this->result);
+        return array_map(function ($r) {
+            return $r->toArray();
+        }, $this->result);
     }
 
-    public static function make($values , $rules , $labels = [] , $messages = [] )
+    public static function make($values, $rules, $labels = [], $messages = [])
     {
         $result = [];
 
@@ -49,10 +49,9 @@ class SiValidator {
         self::$values = $values;
         self::$labels = $labels;
 
-        foreach($values as $key => $value)
-        {
-            $label = (isset($labels[$key]))? $labels[$key] : $key;
-            $result[$key] = self::validate($value, $label , $rules[$key]);
+        foreach ($values as $key => $value) {
+            $label = isset($labels[$key]) ? $labels[$key] : $key;
+            $result[$key] = self::validate($value, $label, $rules[$key]);
         }
 
         return new SiValidator($result);
@@ -63,82 +62,106 @@ class SiValidator {
         self::$language = $lang;
     }
 
-    private static function of($value ,array $rules)
+    private static function of($value, array $rules)
     {
-        $ruleName = self::isValid($value , $rules);
-        return ($ruleName === "");
+        $ruleName = self::isValid($value, $rules);
+        return $ruleName === '';
     }
 
-    
-    private static function isValid($value , $rule)
+    private static function isValid($value, $rule)
     {
-        if(self::processable($rule))
-        {
-            if(! self::exec($value , $rule))
-            {
+        if (self::processable($rule)) {
+            if (!self::exec($value, $rule)) {
                 return false;
             }
         }
         return true;
     }
-    
-    public static function validate($value , $label , array $rules)
+
+    private static function hasRequiredRule(array $rules)
     {
-        $result = new SiValidateResult(true , '' , $value);
-        foreach($rules as $rule)
-        {
-            if( $rule instanceof SiRule )
-            {
+        foreach ($rules as $rule) {
+            if ($rule === 'required') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static function isValueEmpty($value)
+    {
+        return $value === '' || is_null($value);
+    }
+
+    public static function validate($value, $label, array $rules)
+    {
+        $result = new SiValidateResult(true, '', $value);
+        $isRequired = self::hasRequiredRule($rules);
+        foreach ($rules as $rule) {
+            if (!$isRequired && self::isValueEmpty($value)) {
+                continue;
+            }
+            $result = new SiValidateResult(true, '', $value);
+            if ($rule instanceof SiRule) {
                 self::errorMessages($rule->message());
                 $result = $rule->processable($value);
-                $message = (! $result )? $rule->message()[self::$language][ $rule->name() ] : "";
-                $message = self::messageReplace($message , $label);
-                $result = new SiValidateResult($result , $message , $value);
-            } else if(  ! is_string($rule) && is_callable($rule))
-            {
-                $message = $rule($value, $label );
-                $result = new SiValidateResult( ($message == '') , $message , $value);
+                $message = !$result
+                    ? $rule->message()[self::$language][$rule->name()]
+                    : '';
+                $message = self::messageReplace($message, $label);
+                $result = new SiValidateResult($result, $message, $value);
+            } elseif (!is_string($rule) && is_callable($rule)) {
+                $message = $rule($value, $label);
+                $result = new SiValidateResult(
+                    $message == '',
+                    $message,
+                    $value
+                );
             } else {
-                //return ($rule !== '')? self::errorMessage( $rule , $field) : "";
-                $message = (! self::isValid($value , $rule))? self::errorMessage( $rule , $label) : "";
-                $result = new SiValidateResult( ($message == '') , $message , $value);
+                $message = !self::isValid($value, $rule)
+                    ? self::errorMessage($rule, $label)
+                    : '';
+                $result = new SiValidateResult(
+                    $message == '',
+                    $message,
+                    $value
+                );
             }
-            if(!$result->isValid())
-            {
+            if (!$result->isValid()) {
                 return $result;
             }
         }
-        return $result;
+        return new SiValidateResult(true, '', $value);
     }
 
-    private static function exec($value , $validateRule)
+    private static function exec($value, $validateRule)
     {
-        return self::$defineRules[ self::getRuleName($validateRule) ]( $value , self::param($validateRule) , self::$values);
+        return self::$defineRules[self::getRuleName($validateRule)](
+            $value,
+            self::param($validateRule),
+            self::$values
+        );
     }
 
     private static function getRuleName(string $validateRule)
     {
-        foreach(self::$defineRules as $ruleName => $defineRule)
-        {
+        foreach (self::$defineRules as $ruleName => $defineRule) {
             $rule = $ruleName;
-            if(self::startsWith($rule , ':'))
-            {
-                $rule = explode(":", $rule)[0];
-                $validateRule = explode(":", $validateRule)[0];
+            if (self::startsWith($rule, ':')) {
+                $rule = explode(':', $rule)[0];
+                $validateRule = explode(':', $validateRule)[0];
             }
-            if($rule === $validateRule)
-            {
+            if ($rule === $validateRule) {
                 return $ruleName;
             }
         }
         return null;
     }
 
-
     private static function processable(string $validateRule)
     {
         $ruleName = self::getRuleName($validateRule);
-        if($ruleName !== null){
+        if ($ruleName !== null) {
             return true;
         }
         return false;
@@ -147,62 +170,69 @@ class SiValidator {
     private static function param(string $validateRule)
     {
         $ruleName = self::getRuleName($validateRule);
-        if($ruleName !== null){
-            $rules = explode(":", $ruleName);
-            $validateRule = explode(":", $validateRule);
+        if ($ruleName !== null) {
+            $rules = explode(':', $ruleName);
+            $validateRule = explode(':', $validateRule);
 
-            if(isset($rules[1]) && isset($validateRule[1])){
-                $paramKeys = explode(",", $rules[1]);
-                $params = explode(",", $validateRule[1]);
-                if(count( $paramKeys ) !== count( $params ))
-                {
-                    throw new Exception('The number of parameters does not match');
+            if (isset($rules[1]) && isset($validateRule[1])) {
+                $paramKeys = explode(',', $rules[1]);
+                $params = explode(',', $validateRule[1]);
+                if (count($paramKeys) !== count($params)) {
+                    throw new Exception(
+                        'The number of parameters does not match'
+                    );
                 }
-                return array_combine($paramKeys , $params);
+                return array_combine($paramKeys, $params);
             }
         }
         return [];
     }
 
-    public static function defineRule($ruleName , callable $func)
+    public static function defineRule($ruleName, callable $func)
     {
-        self::$defineRules[ $ruleName ] = $func;
+        self::$defineRules[$ruleName] = $func;
     }
 
-    public static function errorMessages( array $errorMessages )
+    public static function errorMessages(array $errorMessages)
     {
-        self::$errorMessages = array_replace_recursive(self::$errorMessages , $errorMessages) ;
+        self::$errorMessages = array_replace_recursive(
+            self::$errorMessages,
+            $errorMessages
+        );
     }
 
-    public static function startsWith($haystack, $needle) {
-        return (strpos($haystack, $needle) !== false);
+    public static function startsWith($haystack, $needle)
+    {
+        return strpos($haystack, $needle) !== false;
     }
 
-    private static function errorMessage($validateRule , $field)
-    { 
+    private static function errorMessage($validateRule, $field)
+    {
         $ruleName = self::getRuleName($validateRule);
         $param = self::param($validateRule);
         $message = self::getErrorMessage($ruleName);
-        return self::messageReplace($message , $field , $param);
+        return self::messageReplace($message, $field, $param);
     }
 
     private static function getErrorMessage($ruleName)
     {
-       return self::$errorMessages[self::$language][ $ruleName ];
+        return self::$errorMessages[self::$language][$ruleName];
     }
 
-    private static function messageReplace($message , $field , $param = [])
+    private static function messageReplace($message, $field, $param = [])
     {
-        $message = str_replace('{field}', $field , $message);
+        $message = str_replace('{field}', $field, $message);
 
-        if(isset($param['other']) && isset(self::$labels[$param['other']] ))
-        {
-            $message = str_replace('{other}', self::$labels[$param['other']] , $message);
+        if (isset($param['other']) && isset(self::$labels[$param['other']])) {
+            $message = str_replace(
+                '{other}',
+                self::$labels[$param['other']],
+                $message
+            );
         }
 
-        foreach($param as $key => $v)
-        {
-            $message = str_replace("{{$key}}", $v , $message);
+        foreach ($param as $key => $v) {
+            $message = str_replace("{{$key}}", $v, $message);
         }
 
         return $message;
@@ -211,16 +241,17 @@ class SiValidator {
     public static function help()
     {
         $help = [];
-        foreach(self::$defineRules as $ruleName => $func)
-        {
+        foreach (self::$defineRules as $ruleName => $func) {
             $errorMessage = [];
 
-            foreach(self::$errorMessages as $lang => $message)
-            {
+            foreach (self::$errorMessages as $lang => $message) {
                 $errorMessage[$lang] = $message[$ruleName];
             }
 
-            $help[] = [ 'rule_name' => $ruleName , 'errorMessage' => $errorMessage ];
+            $help[] = [
+                'rule_name' => $ruleName,
+                'errorMessage' => $errorMessage,
+            ];
         }
 
         print_r($help);
@@ -232,13 +263,13 @@ class SiValidator {
     }
 }
 
-class SiValidateResult { 
-
+class SiValidateResult
+{
     private bool $result = true;
     private string $message = '';
     private string $value = '';
 
-    public function __construct(bool $result , string $message = "" , $value = "")
+    public function __construct(bool $result, string $message = '', $value = '')
     {
         $this->result = $result;
         $this->message = $message;
