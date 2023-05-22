@@ -62,7 +62,25 @@ VeeValidate.defineRule('lotdate', value => {
   return false;
 });
 
+//２フィールド間同一値をNGとする
+const notTwoFieldSameAsValidator =  (value, params , ctx) => {
+      
+      const { targetField, targetValue } = getTwoFieldRequiredParam(params);
+      if (Array.isArray(value)) {
+          return value.every(val => !!twoFieldRequiredValidator(val, { targetField, targetValue }));
+      }
 
+      let isEmpty1 = ( !value || !value.length );
+      let isEmpty2 = ( !targetValue || !targetValue);
+
+      if( value != targetValue){
+        return true;
+      }
+
+      return `${targetField}と異なる値にしてください`;
+};
+
+VeeValidate.defineRule('notTwoFieldSameAs',notTwoFieldSameAsValidator);
 VeeValidate.defineRule('twoFieldRequired',twoFieldRequiredValidator);
 VeeValidate.defineRule('strlen',strlen);
 
@@ -85,3 +103,4 @@ VeeValidate.configure({
     },
   }),
 });
+

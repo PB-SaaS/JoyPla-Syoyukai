@@ -14,6 +14,9 @@
           <v-button-danger type="button" class="md:w-1/6 w-full" @click.native="slipDelete">
             会計伝票を削除
           </v-button-danger>
+          <v-button-default type="button" class="md:w-1/6 w-full"  @click.native="openPrint(values.accountant?.accountantId)">
+            印刷
+          </v-button-default>
         </div>
         <div class="p-4 text-base bg-gray-100 border border-gray-400">
           <div class="flex w-full gap-6">
@@ -34,11 +37,15 @@
           </div>
           <div class="flex w-full gap-6">
             <div class="flex-initial lg:w-1/6 w-1/3">発注番号</div>
-            <div class="flex-auto">{{ values.accountant?.orderId }}</div>
+            <div class="flex-auto">
+              <a class="no-underline hover:underline" :href="_ROOT + '&path=/order/' + values.accountant?.orderId">{{ values.accountant?.orderId }}</a>
+            </div>
           </div>
           <div class="flex w-full gap-6">
             <div class="flex-initial lg:w-1/6 w-1/3">検収番号</div>
-            <div class="flex-auto">{{ values.accountant?.receivedId }}</div>
+            <div class="flex-auto">
+              <a class="no-underline hover:underline" :href="_ROOT + '&path=/received/' + values.accountant?.receivedId">{{ values.accountant?.receivedId }}</a>
+            </div>
           </div>
         </div>
         <hr>
@@ -477,7 +484,7 @@ var JoyPlaApp = Vue.createApp({
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
           }).then( async (result) => {
-            try {
+            if(result.isConfirmed){
               startLoading();
               let params = new URLSearchParams();
               params.append("path", "/api/accountant/"+accountantId+"/delete");
@@ -485,7 +492,7 @@ var JoyPlaApp = Vue.createApp({
               params.append("_csrf", _CSRF);
 
               const res = await axios.post(_APIURL, params);
-
+              completeLoading();
               if (res.data.code != 200) {
                 throw new Error(res.data.message)
               }
@@ -498,15 +505,13 @@ var JoyPlaApp = Vue.createApp({
               });
 
               return true;
-            } catch (error) {
-              Swal.fire({
-                icon: 'error',
-                title: 'システムエラー',
-                text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
-              });
-            } finally {
-              completeLoading();
             }
+          }).catch((error) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'システムエラー',
+              text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+            });
           });
         };
 
@@ -793,7 +798,13 @@ var JoyPlaApp = Vue.createApp({
             }
           };
       };
+
+    const openPrint = ( id ) => {
+      location.href = _ROOT + "&path=/accountant/" + id + "/print";    
+    }
+
     return {
+      openPrint,
       slipDelete,
       itemRegister,
       loadCsvFile,

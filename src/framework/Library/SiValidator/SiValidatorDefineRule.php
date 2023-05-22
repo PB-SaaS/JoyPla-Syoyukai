@@ -1,12 +1,11 @@
 <?php
 
 use framework\Library\SiValidator;
+use framework\SpiralConnecter\SpiralDB;
 
 SiValidator::defineRule('accepted', function ($value) {
     $validate = ['yes', 'on', '1', 1, true, 'true', 'はい'];
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
+
     if (in_array($value, $validate, true)) {
         return true;
     }
@@ -19,9 +18,7 @@ SiValidator::defineRule('accepted_if:other,operator,if_value', function (
     $values
 ) {
     $validate = ['yes', 'on', '1', 1, true, 'true', 'はい'];
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
+
     if ($values[$param['other']] != '' && !is_null($values[$param['other']])) {
         if ($param['operator'] === '==') {
             if (!($values[$param['other']] == $param['if_value'])) {
@@ -51,9 +48,7 @@ SiValidator::defineRule('accepted_if:other,operator,if_value', function (
 
 SiValidator::defineRule('declined', function ($value) {
     $validate = ['no', 'off', '0', 0, false, 'false', 'いいえ'];
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
+
     if (in_array($value, $validate, true)) {
         return true;
     }
@@ -66,9 +61,6 @@ SiValidator::defineRule('declined_if:other,operator,if_value', function (
     $values
 ) {
     $validate = ['no', 'off', '0', 0, false, 'false', 'いいえ'];
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
     if ($values[$param['other']] != '' && !is_null($values[$param['other']])) {
         if ($param['operator'] === '==') {
             if (!($values[$param['other']] == $param['if_value'])) {
@@ -100,11 +92,6 @@ SiValidator::defineRule('after:other', function (
     array $param,
     $values
 ) {
-    $date = '';
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
-
     $changeDate = function ($v) {
         $FORMAT_DELIMITER_SLASH =
             '/^[0-9]{4}\/([1-9]|0[1-9]|1[0-2])\/([1-9]|0[1-9]|[12][0-9]|3[01])$/';
@@ -143,11 +130,6 @@ SiValidator::defineRule('after:other', function (
 });
 
 SiValidator::defineRule('date_equals:date', function ($value, array $param) {
-    $date = '';
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
-
     $changeDate = function ($v) {
         $FORMAT_DELIMITER_SLASH =
             '/^[0-9]{4}\/([1-9]|0[1-9]|1[0-2])\/([1-9]|0[1-9]|[12][0-9]|3[01])$/';
@@ -185,11 +167,6 @@ SiValidator::defineRule('before:other', function (
     array $param,
     $values
 ) {
-    $date = '';
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
-
     $changeDate = function ($v) {
         $FORMAT_DELIMITER_SLASH =
             '/^[0-9]{4}\/([1-9]|0[1-9]|1[0-2])\/([1-9]|0[1-9]|[12][0-9]|3[01])$/';
@@ -228,10 +205,6 @@ SiValidator::defineRule('before:other', function (
 });
 
 SiValidator::defineRule('date', function ($value) {
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
-
     $changeDate = function ($v) {
         $FORMAT_DELIMITER_SLASH =
             '/^[0-9]{4}\/([1-9]|0[1-9]|1[0-2])\/([1-9]|0[1-9]|[12][0-9]|3[01])$/';
@@ -260,10 +233,6 @@ SiValidator::defineRule('date', function ($value) {
 });
 
 SiValidator::defineRule('date_format:format', function ($value, array $param) {
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
-
     $date = DateTime::createFromFormat($param['format'], $value)
         ? DateTime::createFromFormat($param['format'], $value)
         : null;
@@ -282,18 +251,12 @@ SiValidator::defineRule('required', function ($value) {
 });
 
 SiValidator::defineRule('min:min', function ($value, array $param) {
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
     if ((int) $value >= (int) $param['min']) {
         return true;
     }
     return false;
 });
 SiValidator::defineRule('between:min,max', function ($value, array $param) {
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
     $num = 0;
     if (is_int($value)) {
         $num = (int) $value;
@@ -310,38 +273,30 @@ SiValidator::defineRule('between:min,max', function ($value, array $param) {
     return false;
 });
 SiValidator::defineRule('alpha', function ($value) {
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
     if (preg_match('/^[a-zA-Z]+$/', $value)) {
         return true;
     }
     return false;
 });
 SiValidator::defineRule('alpha_dash', function ($value) {
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
     if (preg_match('/^[-_a-zA-Z]+$/', $value)) {
         return true;
     }
     return false;
 });
 SiValidator::defineRule('alpha_num', function ($value) {
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
     if (preg_match('/^[0-9a-zA-Z]+$/', $value)) {
         return true;
     }
     return false;
 });
 
+SiValidator::defineRule('numeric', function ($value, $params, $values) {
+    return is_numeric($value);
+});
+
 SiValidator::defineRule('boolean', function ($value) {
     $validate = ['1', '0', 1, 0, true, false, 'true', 'false'];
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
     if (in_array($value, $validate, true)) {
         return true;
     }
@@ -349,9 +304,6 @@ SiValidator::defineRule('boolean', function ($value) {
 });
 
 SiValidator::defineRule('confirmed:other', function ($value, $param, $ctx) {
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
     if (
         $ctx[$param['other']] != '' &&
         !is_null($ctx[$param['other']]) &&
@@ -362,9 +314,6 @@ SiValidator::defineRule('confirmed:other', function ($value, $param, $ctx) {
     return false;
 });
 SiValidator::defineRule('different:value', function ($value, $param, $ctx) {
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
     if ($param['value'] != $value) {
         return true;
     }
@@ -372,18 +321,9 @@ SiValidator::defineRule('different:value', function ($value, $param, $ctx) {
 });
 
 SiValidator::defineRule('digits:num', function ($value, $param, $ctx) {
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
-
     $digit = function ($number) {
-        $digit = 0;
-
-        while (1 <= $number) {
-            $number /= 10;
-            $digit++;
-        }
-        return $digit;
+        $number = (string) $number; // 数値を文字列に変換
+        return strlen($number);
     };
 
     if (is_numeric($value) && $digit($value) == $param['num']) {
@@ -393,10 +333,6 @@ SiValidator::defineRule('digits:num', function ($value, $param, $ctx) {
 });
 
 SiValidator::defineRule('digits_between:min,max', function ($value, $param) {
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
-
     if (
         is_numeric($value) &&
         ((float) $param['min'] <= (float) $value &&
@@ -410,24 +346,7 @@ SiValidator::defineRule('digits_between:min,max', function ($value, $param) {
 SiValidator::defineRule('email', function ($value) {
     $format =
         '/^[a-zA-Z0-9_+-]+(.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/';
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
-    if (
-        preg_match($format, $value) &&
-        filter_var($value, FILTER_VALIDATE_EMAIL)
-    ) {
-        return true;
-    }
-    return false;
-});
 
-SiValidator::defineRule('unique:', function ($value) {
-    $format =
-        '/^[a-zA-Z0-9_+-]+(.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/';
-    if ($value == '' || is_null($value)) {
-        return true;
-    }
     if (
         preg_match($format, $value) &&
         filter_var($value, FILTER_VALIDATE_EMAIL)
@@ -443,9 +362,69 @@ SiValidator::defineRule('maxword:max', function ($value, $param) {
     return (int) $param['max'] >= $length;
 });
 
+SiValidator::defineRule('not_regex:pattern', function ($value, $param) {
+    if (!preg_match($param['pattern'], $value)) {
+        return true;
+    }
+    return false;
+});
+
+SiValidator::defineRule('regex:pattern', function ($value, $param) {
+    if (preg_match($param['pattern'], $value)) {
+        return true;
+    }
+    return false;
+});
+
+SiValidator::defineRule('size:value', function ($value, $param) {
+    if (
+        is_string($value) &&
+        shiftjis_strlen($value) === (int) $param['value']
+    ) {
+        return true;
+    }
+    if (is_numeric($value) && (float) $value === (float) $param['value']) {
+        return true;
+    }
+    return false;
+});
+
+SiValidator::defineRule('string', function ($value) {
+    if (is_string($value)) {
+        return true;
+    }
+    return false;
+});
+
+SiValidator::defineRule('timezone', function ($value) {
+    if (in_array($value, timezone_identifiers_list())) {
+        return true;
+    }
+    return false;
+});
+
+SiValidator::defineRule('unique:table,column', function ($value, array $param) {
+    $result = SpiralDB::title($param['table'])
+        ->where($param['column'], $value)
+        ->get();
+
+    if ((int) $result->count() === 0) {
+        return true;
+    }
+    return false;
+});
+
+SiValidator::defineRule('url', function ($value) {
+    if (filter_var($value, FILTER_VALIDATE_URL)) {
+        return true;
+    }
+    return false;
+});
+
 SiValidator::language('ja');
 SiValidator::errorMessages([
     'ja' => [
+        'numeric' => '{field} は数字でなければなりません。',
         'date_format:format' =>
             '{field}が {format} の日付フォーマットと一致しません',
         'date_equals:date' => '{field}が {date} の日付と一致しません',
@@ -476,5 +455,23 @@ SiValidator::errorMessages([
         'email' => '{field}は有効なメールアドレスではありません',
         'maxword:max' =>
             '{field}は半角{max}文字以内で入力してください（全角は半分の文字数以内で入力してください）',
+        'not_regex:pattern' => '{field}に使用できない文字が含まれています。',
+        'regex:pattern' => '{field}が正しくありません。',
+        'size:value' => '{field}は{value}文字で入力してください。',
+        'string' => '{field}は文字列である必要があります。',
+        'timezone' => '{field}が正しくありません。',
+        'unique:table,column' => '{field}はすでに使用されています。',
+        'url' => '{field}が正しくありません。',
+    ],
+    'en' => [
+        'required' => '{field} is required.',
+        'maxword:max' => '{field} must be no more than {max} characters.',
+        'not_regex:pattern' => '{field} contains invalid characters.',
+        'regex:pattern' => '{field} is not valid.',
+        'size:value' => '{field} must be {value} characters.',
+        'string' => '{field} must be a string.',
+        'timezone' => '{field} is invalid.',
+        'unique:table,column' => '{field} has already been taken.',
+        'url' => '{field} is invalid.',
     ],
 ]);

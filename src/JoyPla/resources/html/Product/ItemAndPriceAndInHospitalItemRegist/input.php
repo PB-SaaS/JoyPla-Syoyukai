@@ -155,10 +155,12 @@ if ($validate) {
                                     value="<?php echo html(
                                         $val['itemJANCode']['value']
                                     ); ?>">
-                                    <span class="text-red-500"><?php
-                                    echo html($val['itemJANCode']['message']);
-                                    echo html($duplicate['message']);
-                                    ?></span>
+                                    <span class="text-red-500"><?php echo html(
+                                        $val['itemJANCode']['message']
+                                    ); ?></span><br>
+                                    <span class="text-red-500"><?php echo html(
+                                        $val['janTenantId']['message']
+                                    ); ?></span>
                                 </div>
                             </div>
                             <div class="cf mt-4">

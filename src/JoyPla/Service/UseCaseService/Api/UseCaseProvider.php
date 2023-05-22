@@ -3,6 +3,8 @@
 namespace JoyPla\Service\UseCase\Api;
 
 use JoyPla\Application\Interactors\Api\Accountant\AccountantIndexInteractor;
+use JoyPla\Application\Interactors\Api\Accountant\AccountantItemsIndexInteractor;
+use JoyPla\Application\Interactors\Api\Accountant\AccountantLogsIndexInteractor;
 use JoyPla\Application\Interactors\Api\Accountant\AccountantRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Accountant\AccountantShowInteractor;
 use JoyPla\Application\Interactors\Api\Accountant\AccountantUpdateInteractor;
@@ -659,6 +661,36 @@ class UseCaseProvider
             $this->repositoryProvider,
             $this->presenterProvider
         ) extends AccountantIndexInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getAccountantItemsIndexInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends AccountantItemsIndexInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getAccountantLogsIndexInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends AccountantLogsIndexInteractor {
             public function __construct(
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider

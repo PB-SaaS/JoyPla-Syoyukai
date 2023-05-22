@@ -68,6 +68,11 @@ const SearchableDropdown = {
       type: Boolean,
       required: false,
       default: true,
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
     }
   },
   data() {
@@ -117,6 +122,7 @@ const SearchableDropdown = {
       meta,
       successClassName: ["text-gray-700", "border-gray-300"],
       errorClassName: ["text-red-500", "border-red-500"],
+      disabledClassName: ["bg-slate-50", "text-slate-500","border-slate-200","shadow-none"],
       errorMessage,
     };
   },
@@ -149,9 +155,9 @@ const SearchableDropdown = {
   template: `
     <v-text class="relative" :title="title" :isRequired="isRequired()">
     <div 
-      @click="isOpen = !isOpen"
-      class="relative appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border"
-      :class="[( ! meta.valid && meta.validated == true) ? errorClassName : successClassName , changeClass]">
+      @click="(disabled !== true)? isOpen = !isOpen : false"
+      class="relative appearance-none w-full py-2 px-3 leading-tight text-left flex-initial border disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none"
+      :class="[( ! meta.valid && meta.validated == true) ? errorClassName : successClassName , changeClass, (disabled)? disabledClassName : {}]">
       {{ selectedOption.label }}
       
       <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
@@ -183,6 +189,7 @@ const SearchableDropdown = {
       </div>
     </div>
     <input type="hidden" :name="name" :value="this.selectedOption.value">
+    <span class="text-red-500">{{ errorMessage }}</span>
   </v-text>
   `,
 };
@@ -225,6 +232,11 @@ const SearchableDropdownForForm = {
       type: String,
       required: false,
       default: '',
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
     }
   },
   data() {
@@ -248,6 +260,7 @@ const SearchableDropdownForForm = {
       isRequired,
       successClassName: ["text-gray-700", "border-gray-300"],
       errorClassName: ["text-red-500", "border-red-500"],
+      disabledClassName: ["bg-slate-50", "text-slate-500","border-slate-200","shadow-none"],
     };
   },
   watch: {
@@ -292,9 +305,10 @@ const SearchableDropdownForForm = {
   },
   template: `
     <div 
-      @click="isOpen = !isOpen"
-      class="relative appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border"
-      :class="[( error ) ? errorClassName : successClassName , changeClass]">
+      @click="(disabled !== true)? isOpen = !isOpen : false"
+      class="relative appearance-none w-full py-2 px-3 leading-tight text-left flex-initial border"
+      :disabled="disabled"
+      :class="[( error ) ? errorClassName : successClassName , changeClass , (disabled)? disabledClassName : {}]">
       {{ selectedOption.label }}
       <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
           <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -916,6 +930,80 @@ const vCheckbox = {
     <span class="text-red-500">{{ errorMessage }}</span>
     `,
 };
+
+const vRadio = {
+  setup(props) {
+    const { toRef } = Vue;
+    const { useField } = VeeValidate;
+    // Must use `toRef` to make the radio buttons names reactive
+    const { checked, handleChange, value, errorMessage } = useField(
+      toRef(props, "name"),
+      toRef(props, "rules"),
+      {
+        label: props.label,
+        type: "radio",
+        checkedValue: props.value,
+      }
+    );
+
+    return {
+      checked, // readonly
+      handleChange,
+      errorMessage,
+    };
+  },
+  props: {
+    modelValue: {
+      type: null,
+    },
+    // Field's own value
+    value: {
+      type: null,
+    },
+    name: {
+      type: String,
+    },
+    rules: {
+      type: Object,
+      default: {},
+    },
+    label: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    title: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    id: {
+      type: String,
+      required: true,
+    },
+    labelClass: {
+      type: [String, Object],
+      required: false,
+      default: "",
+    },
+  },
+  template: `
+    <label :class="labelClass">
+      <input
+        type="radio"
+        @input="handleChange(value)"
+        class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-full bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain cursor-pointer"
+        :value="value"
+        :name="name"
+        :id="id"
+        :checked="checked"
+      />
+      <slot></slot>
+    </label><br>
+    <span class="text-red-500">{{ errorMessage }}</span>
+    `,
+};
+
 const vButtonPrimary = {
   props: {
     type: {

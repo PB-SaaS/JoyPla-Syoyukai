@@ -155,6 +155,7 @@ class RepositoryProvider
     {
         return new AccountantLogRepository();
     }
+
     public function getItemListRepository()
     {
         return new ItemListRepository();

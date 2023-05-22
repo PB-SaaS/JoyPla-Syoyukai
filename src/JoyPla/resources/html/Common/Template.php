@@ -4,7 +4,7 @@
     <title>JoyPla <?php echo $title; ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://i02.smp.ne.jp/u/joypla/new/favicon.ico">
-    <?php echo $head ?>
+    <?php echo $head; ?>
     <?php echo $style; ?>
     <!-- <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/animsition.min.css"> -->
     <!-- <script type="text/javascript" src="https://i02.smp.ne.jp/u/joypla/new/js/animsition.min.js"></script> -->
@@ -24,6 +24,8 @@
 	
     <script src="https://i02.smp.ne.jp/u/joypla_developer/340/micromodal.min.js"></script>
     <script src="https://i02.smp.ne.jp/u/joypla_developer/340/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla_developer/340/scroll-hint.css">
+    <script src="https://i02.smp.ne.jp/u/joypla_developer/340/scroll-hint.min.js"></script>
     <script>
     // import all the rules that come with vee-validate
     Object.keys(VeeValidateRules.default).forEach(rule => {
@@ -82,26 +84,24 @@
             return result;
         };
         
-        const _CSRF = "<?php echo Csrf::generate(16) ?>";
+        const _CSRF = "<?php echo Csrf::generate(16); ?>";
         const _APIURL = "%url/rel:mpgt:ApiRoot%";
         const _ROOT = "%url/rel:mpgt:Root%";
     </script>
 
     <script>
         <?php
-        require_once "JoyPla/resources/parts/component/form-components.php";
-        require_once "JoyPla/resources/parts/component/components.php";
-        require_once "JoyPla/resources/parts/component/v-loading.php";
-        require_once "JoyPla/resources/parts/component/v-breadcrumbs.php";
-        require_once "JoyPla/resources/parts/component/customVeeValidate.php";
-        require_once "JoyPla/resources/parts/component/db-select-components.php";
+        require_once 'JoyPla/resources/parts/component/form-components.php';
+        require_once 'JoyPla/resources/parts/component/components.php';
+        require_once 'JoyPla/resources/parts/component/v-loading.php';
+        require_once 'JoyPla/resources/parts/component/v-breadcrumbs.php';
+        require_once 'JoyPla/resources/parts/component/customVeeValidate.php';
+        require_once 'JoyPla/resources/parts/component/db-select-components.php';
         ?>
     </script>
 
     <style>
-    <?php 
-    require_once "JoyPla/resources/parts/output.css.php"; 
-    ?>
+    <?php require_once 'JoyPla/resources/parts/output.css.php'; ?>
     
     [v-cloak] {
       display: none;
@@ -110,8 +110,9 @@
     <?php echo $script; ?>
 </head>
 <body>
-    <?php echo $body ?>
-    <?php /*
+    <?php echo $body; ?>
+    <?php
+/*
     <div class="h-screen ">
         <v-loading :show="loading" id="joypla"></v-loading>
         <?php echo $header ?> 
@@ -122,6 +123,7 @@
             </div>
         </div>
     </div>
-    */ ?>
+    */
+?>
 </body>
 </html>

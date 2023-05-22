@@ -52,6 +52,7 @@ class OrderRepository extends ModelRepository implements
             'hospitalId',
             $hospitalId->value()
         );
+
         foreach ($orderItems as $item) {
             $inHospitalItem->orWhere(
                 'inHospitalItemId',
@@ -70,13 +71,13 @@ class OrderRepository extends ModelRepository implements
                 $item->divisionId,
                 collect_column($division, 'divisionId')
             );
-            $distributor_find_key = array_search(
-                $item->distributorId,
-                collect_column($distributor, 'distributorId')
-            );
             $inHospitalItem_find_key = array_search(
                 $item->inHospitalItemId,
                 collect_column($inHospitalItem, 'inHospitalItemId')
+            );
+            $distributor_find_key = array_search(
+                $inHospitalItem[$inHospitalItem_find_key]->distributorId,
+                collect_column($distributor, 'distributorId')
             );
             $result[] = new OrderItem(
                 new OrderId(''),

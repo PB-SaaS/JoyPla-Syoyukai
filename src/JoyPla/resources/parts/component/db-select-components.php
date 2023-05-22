@@ -292,6 +292,11 @@ const vInHospitalItemModal = {
       required: true,
       default: "1",
     },
+    divisionId: {
+      type: String,
+      required: false,
+      default: "",
+    }
   },
   setup(props, context) {
     const { ref, toRef, toRefs, reactive, onMounted } = Vue;
@@ -394,6 +399,7 @@ const vInHospitalItemModal = {
       let params = new URLSearchParams();
       params.append("path", "/api/inHospitalItem/index");
       params.append("search", JSON.stringify(encodeURIToObject(values)));
+      params.append("divisionId", props.divisionId);
       params.append("_csrf", _CSRF);
 
       start();
@@ -629,6 +635,7 @@ const vInHospitalItemModal = {
 </teleport>
 `,
 };
+
 
 const vOrderItemModal = {
   setup(props, context) {
@@ -995,6 +1002,222 @@ const vOrderItemModal = {
 </teleport>
 `,
 };
+
+const downloadModal = {
+  setup(props, context) {
+    const { ref, toRef, toRefs, reactive, onMounted } = Vue;
+    const { useForm } = VeeValidate;
+
+    const getCurrentTimestamp = () => {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+
+      return `${year}${month}${day}_${hours}${minutes}${seconds}`;
+    }
+
+    const { meta, validate, values, setFieldValue } = useForm({
+      initialValues: {
+        'download-file-mame': getCurrentTimestamp(),
+        'download-file-extensions': "tab-txt",
+        'download-range-type': 0,
+        'download-start-record': 1,
+        'download-max-record': 10000,
+        'download-start-page': 1,
+        'download-max-page': 1,
+      },
+    });
+
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      showCloseButton: true,
+      didOpen: (toast) => {
+        toast.addEventListener("mouseenter", Swal.stopTimer);
+        toast.addEventListener("mouseleave", Swal.resumeTimer);
+      },
+    });
+
+    const loading = ref(false);
+    const start = () => {
+      loading.value = true;
+    };
+
+    const complete = () => {
+      loading.value = false;
+    };
+
+    const fileExtensions = [
+      {
+        label: ".txt（タブ区切りファイル）",
+        value: "tab-txt",
+        extension : ".txt"
+      },
+      {
+        label: ".tsv（タブ区切りファイル）",
+        value: "tsv",
+        extension : ".tsv"
+      },
+      {
+        label: ".txt（カンマ区切りファイル）",
+        value: "csv-txt",
+        extension : ".txt"
+      },
+      {
+        label: ".csv（カンマ区切りファイル）",
+        value: "csv",
+        extension : ".csv"
+      },
+    ];
+
+    const utf8_to_b64 = (str) => {
+      return window.btoa(unescape(encodeURIComponent(str)));
+    }
+
+    // Decode from Base64
+    const b64_to_utf8 = (str) => {
+      return decodeURIComponent(escape(window.atob(str)));
+    }
+
+    const download = (base64) => {
+
+      let file = fileExtensions.find(file => file.value === values['download-file-extensions'])
+
+      // Decode the base64 string
+      let decodedString = b64_to_utf8(base64);
+
+      // Create a Blob object from the decoded string
+      let blob = new Blob([decodedString], {type: "text/plain"});
+
+      // Create a URL from the Blob
+      let url = URL.createObjectURL(blob);
+
+      // Create a link element
+      let link = document.createElement("a");
+      link.href = url;
+      link.download = values['download-file-mame'] + file.extension;
+
+      // Append the link to the body
+      document.body.appendChild(link);
+
+      // Simulate a click on the link
+      link.click();
+
+      // Remove the link from the body
+      document.body.removeChild(link);
+    }
+
+    const onDownload = async () =>{
+      const { valid, errors } = await validate();
+      if(!valid){
+        Swal.fire({
+          icon: 'error',
+          title: '入力エラー',
+          text: '入力エラーがございます。ご確認ください',
+        })
+      } else {
+        let params = new URLSearchParams();
+        params.append("path", props.downloadPath);values
+        params.append("search", JSON.stringify(encodeURIToObject(props.search)));
+        params.append("download_setting", JSON.stringify(encodeURIToObject(values)));
+        params.append("_csrf", _CSRF);
+        start();
+
+        const res = await axios.post(_APIURL,params);
+        complete();
+        if(res.data.code != 200) {
+          Swal.fire({
+            icon: 'error',
+            title: 'システムエラー',
+            text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+          });
+        }
+
+        download(res.data.data);
+
+        return true ;
+      }
+    }
+
+    return {
+      loading,
+      onDownload,
+      values,
+      fileExtensions,
+    };
+  },
+  props: {
+    search: {
+      type: Object,
+      required: false,
+      default: false,
+    },
+    downloadPath: {
+      type: String,
+      required: true,
+      default: '',
+    }
+  },
+  components: {
+    "v-loading": vLoading,
+    "v-button-primary": vButtonPrimary,
+    "v-open-modal": vOpenModal,
+    "v-input": vInput,
+    "v-radio": vRadio,
+    "v-select": vSelect,
+  },
+  template: `
+<v-loading :show="loading"></v-loading>
+<teleport to="body">
+  <v-open-modal id="downloadModal" headtext="検索結果データダウンロード">
+    <div class="flex flex-col" style="max-height: 68vh;">
+      <div class="w-full overflow-y-auto lg:w-2/3 mx-auto" style="max-height: 85vh;">
+        <div class="flex flex-wrap">
+          <div class="w-full px-3 my-6 md:mb-0">
+            <div class="mx-auto mb-4">
+              <v-input type="text" name="download-file-mame" title="ファイル名"></v-input>
+            </div>
+            <div class="mx-auto mb-4">
+              <v-select name="download-file-extensions" :options="fileExtensions" title="出力形式"></v-select>
+            </div>
+          </div>
+        </div>
+        <hr>
+        <div class="my-6 px-3">
+          <p>ダウンロード範囲（最大10,000件まで）</p>
+          <v-radio type="radio" name="download-range-type" :value="0" label-class="flex gap-4 p-3 my-2 w-full bg-white border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 place-items-center">
+            <div class="mx-auto w-1/2 px-4">
+              <v-input type="text" name="download-start-record" suffix="" prefix="件目から"></v-input>
+            </div>
+            <div class="mx-auto w-1/2 px-4">
+              <v-input type="number" name="download-max-record" suffix="最大" prefix="件分" label="最大レコード数" :min="1" :max="10000" :rules="{ between: [1 , 10000] }"></v-input>
+            </div>
+          </v-radio>
+          <v-radio type="radio" name="download-range-type" :value="1" label-class="flex gap-4 p-3 my-2 w-full bg-white border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 place-items-center">
+            <div class="mx-auto w-1/2 px-4">
+              <v-input type="text" name="download-start-page" suffix="" prefix="ページ目から"></v-input>
+            </div>
+            <div class="mx-auto w-1/2 px-4">
+              <v-input type="number" name="download-max-page" suffix="最大" prefix="ページ分" label="最大ページ" :min="1" :max="( 10000 / search.perPage )" :rules="{ between: [1 , ( 10000 / search.perPage )] }"></v-input>
+            </div>
+          </v-radio>
+        </div>
+        <div class="text-center">
+          <v-button-primary type="button" class="flex-none" @click.native="onDownload">ダウンロード</v-button-primary>
+        </div>
+      </div>
+    </div>
+  </v-open-modal>
+</teleport>
+`,
+}
 
 const vBarcodeSearch = {
   setup(props, { emit }) {
@@ -1637,7 +1860,7 @@ const vConsumptionHistoryModalForItemRequest = {
                                     <p class="text-gray-500">{{ consumptionItem.quantity.quantityNum }}{{ consumptionItem.quantity.quantityUnit }} 入り</p>
                                   </div>
                                   <div class="w-auto">
-                                    <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-2 rounded dark:bg-blue-200 dark:text-blue-800">
+                                    <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-2 rounded">
                                       消費数
                                       <span class="font-bold text-base px-1">{{ consumptionItem.consumptionQuantity }}</span>
                                       {{ consumptionItem.quantity.quantityUnit }}
@@ -2096,4 +2319,138 @@ const vMultipleSelectDivisionV2 = {
   template: `
 <v-multiple-select :name="name" :title="title" :options="options" :id="id" />
 `,
+};
+
+const tableComponent = {
+  props: {
+    tableId: {
+      type: String,
+      required: true
+    },
+    headers: {
+      type: Array,
+      required: true
+    },
+    rowsData: {
+      type: Array,
+      required: true
+    },
+    sortColumn: {
+      type: String,
+      required: true
+    },
+    sortDirection: {
+      type: String,
+      required: true
+    },
+  },
+  setup(props, { emit }) {
+    const { ref, toRefs, onMounted, watchEffect } = Vue;
+    const propsRefs = toRefs(props);
+    const sortColumn = ref(props.sortColumn);
+    const sortDirection = ref(props.sortDirection);
+    const checkedColumns = ref(propsRefs.headers.value.map(() => true));
+      
+    const requestSort = (columnName) => {
+      if (!columnName) {
+        return false;
+      }
+      if (sortColumn.value === columnName) {
+        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortColumn.value = columnName;
+        sortDirection.value = 'asc';
+      }
+      emit('requestSort', { column: sortColumn.value, direction: sortDirection.value });
+    };
+
+
+    onMounted(() => {
+      const savedColumns = localStorage.getItem(propsRefs.tableId.value);
+      if (savedColumns) {
+        checkedColumns.value = JSON.parse(savedColumns);
+      }
+
+      window.addEventListener('DOMContentLoaded', function() {
+        new ScrollHint('#' + propsRefs.tableId.value, {
+          scrollHintIconAppendClass: 'scroll-hint-icon-white',
+          applyToParents: true,
+          i18n: {
+            scrollable: 'スクロールできます'
+          }
+        });
+      });
+
+      watchEffect(() => {
+        localStorage.setItem(propsRefs.tableId.value, JSON.stringify(checkedColumns.value));
+      });
+    });
+
+    return {
+      ...propsRefs,
+      checkedColumns,
+      sortColumn,
+      sortDirection,
+      requestSort
+    };
+  },
+  components : {
+    'v-open-modal': vOpenModal,
+    'v-button-default': vButtonDefault,
+  },
+  template: `
+  <div>
+    <div class="md:w-1/4 my-2">
+      <v-button-default type="button" data-micromodal-trigger="displayColumns" class="w-full">表示項目設定</v-button-default>
+    </div>
+    <teleport to="body">
+      <v-open-modal id="displayColumns" headtext="表示項目設定" @show="listGet">
+        <div class="px-4 py-2">
+          <div v-for="(header, index) in headers" :key="index">
+            <div v-show="header.name != ''">
+              <label>
+                <input
+                  type="checkbox" 
+                  v-model="checkedColumns[index]"
+                  class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain mr-2 cursor-pointer"
+                />{{ header.text }}
+              </label>
+            </div>
+          </div>
+          <div class="md:w-1/4 mx-auto text-center">
+            <v-button-default type="button" aria-label="Close modal" data-micromodal-close class="w-full">閉じる</v-button-default>
+          </div>
+        </div>
+      </v-open-modal>
+    </teleport>
+    <div class="my-2">
+      <table class="table-auto w-full text-sm whitespace-nowrap" :id="tableId">
+        <thead>
+          <tr>
+            <th v-for="(header, index) in headers" :key="index" v-show="checkedColumns[index]" class="border-b font-medium p-4 pr-8 pt-0 pb-3 text-left">
+              <template v-if="! header.name">
+                {{ header.text }}
+              </template>
+              <template v-if="!! header.name">
+                <a href="#" class="hover:underline" @click="requestSort(header.name)">
+                  {{ header.text }}
+                  <span v-if="sortColumn === header.name">
+                    <span v-if="sortDirection === 'asc'">▲</span>
+                    <span v-if="sortDirection === 'desc'">▼</span>
+                  </span>
+                </a>
+              </template>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(row, rowIndex) in rowsData" :key="rowIndex">
+            <td v-for="(cell, index) in row" :key="index" v-show="checkedColumns[index]" v-html="cell" class="border-b border-slate-100 p-4 pr-8 text-slate-500">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  `
 };
