@@ -8,6 +8,7 @@ require_once 'JoyPla/require.php';
 
 use framework\Http\Request;
 use framework\Routing\Router;
+use JoyPla\InterfaceAdapters\Controllers\Web\PayoutController;
 use JoyPla\InterfaceAdapters\Controllers\Web\AccountantController;
 use JoyPla\InterfaceAdapters\Controllers\Web\AgreeFormController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ConsumptionController;
@@ -21,7 +22,7 @@ use JoyPla\InterfaceAdapters\Controllers\Web\ReturnController;
 use JoyPla\InterfaceAdapters\Controllers\Web\StocktakingController;
 use JoyPla\InterfaceAdapters\Controllers\Web\TopController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ItemRequestController;
-use JoyPla\InterfaceAdapters\Controllers\Web\ItemListController; //商品一覧表用
+use JoyPla\InterfaceAdapters\Controllers\Web\ItemListController;
 use JoyPla\InterfaceAdapters\GateWays\Middleware\PersonalInformationConsentMiddleware;
 use JoyPla\InterfaceAdapters\GateWays\Middleware\UnorderDataExistMiddleware;
 use JoyPla\JoyPlaApplication;
@@ -269,9 +270,29 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'index',
     ]);
 
+    Router::map('GET', '/accountant/items', [
+        AccountantController::class,
+        'items',
+    ]);
+
+    Router::map('GET', '/accountant/logs', [
+        AccountantController::class,
+        'logs',
+    ]);
+
     Router::map('GET', '/accountant/:accountantId', [
         AccountantController::class,
         'show',
+    ]);
+
+    Router::map('GET', '/accountant/:accountantId/print', [
+        AccountantController::class,
+        'print',
+    ]);
+
+    Router::map('GET', '/payout/register', [
+        PayoutController::class,
+        'register',
     ]);
 
     Router::map('GET', '/product/itemList/index', [

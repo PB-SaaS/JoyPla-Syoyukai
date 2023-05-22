@@ -2,6 +2,8 @@
 
 namespace JoyPla\Service\Repository;
 
+use JoyPla\InterfaceAdapters\GateWays\Repository\AccountantItemRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\AccountantLogRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\AccountantRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\BarcodeRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\CardRepository;
@@ -13,7 +15,7 @@ use JoyPla\InterfaceAdapters\GateWays\Repository\HospitalRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\InHospitalItemRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ItemAndPriceAndInHospitalItemRepository;
-use JoyPla\InterfaceAdapters\GateWays\Repository\ItemListRepository; //商品一覧表用
+use JoyPla\InterfaceAdapters\GateWays\Repository\ItemListRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRequestRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\NotificationRepository;
@@ -144,6 +146,15 @@ class RepositoryProvider
         return new AccountantRepository();
     }
 
+    public function getAccountantItemRepository()
+    {
+        return new AccountantItemRepository();
+    }
+
+    public function getAccountantLogRepository()
+    {
+        return new AccountantLogRepository();
+    }
     public function getItemListRepository()
     {
         return new ItemListRepository();

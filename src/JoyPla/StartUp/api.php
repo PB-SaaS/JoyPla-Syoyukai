@@ -23,6 +23,7 @@ use JoyPla\InterfaceAdapters\Controllers\Api\ReferenceController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ItemRequestController;
 use JoyPla\InterfaceAdapters\Controllers\Api\PayoutController;
 use JoyPla\InterfaceAdapters\Controllers\Api\AccountantController;
+use JoyPla\InterfaceAdapters\Controllers\Api\AccountantLogController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ItemListController; //商品一覧表用
 use JoyPla\JoyPlaApplication;
 use JoyPla\Service\Presenter\Api\PresenterProvider;
@@ -262,6 +263,16 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'index',
     ])->service($useCaseProvider->getAccountantIndexInteractor());
 
+    Router::map('GET', '/api/accountant/items', [
+        AccountantController::class,
+        'items',
+    ])->service($useCaseProvider->getAccountantItemsIndexInteractor());
+
+    Router::map('GET', '/api/accountant/logs', [
+        AccountantLogController::class,
+        'logs',
+    ])->service($useCaseProvider->getAccountantLogsIndexInteractor());
+
     Router::map('GET', '/api/accountant/:accountantId', [
         AccountantController::class,
         'show',
@@ -275,6 +286,26 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
     Router::map('delete', '/api/accountant/:accountantId/delete', [
         AccountantController::class,
         'delete',
+    ])->service($useCaseProvider->getAccountantUpdateInteractor());
+
+    Router::map('get', '/api/accountant/items/download', [
+        AccountantController::class,
+        'itemsDownload',
+    ]);
+
+    Router::map('get', '/api/accountant/items/totalPrice', [
+        AccountantController::class,
+        'totalPrice',
+    ]);
+
+    Router::map('get', '/api/accountant/logs/download', [
+        AccountantLogController::class,
+        'itemsDownload',
+    ]);
+
+    Router::map('get', '/api/accountant/logs/totalPrice', [
+        AccountantLogController::class,
+        'totalPrice',
     ]);
 
     Router::map('GET', '/api/product/itemList/index', [
