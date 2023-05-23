@@ -1317,7 +1317,7 @@ const vBarcodeSearch = {
       <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
     </svg>
   </div>
-  <v-input name="barcode" label="バーコード" type="text" title="" class="flex-1 w-5/6" autocomplete="false" @keypress.enter.native="onEnter"></v-input>
+  <v-input name="barcode" label="バーコード" type="text" title="" class="flex-1 w-5/6" autocomplete="false" @keypress.enter.native="onEnter" :disabled="disabled"></v-input>
   <v-button-primary type="button" class="flex-none" @click.native="onEnter">検索</v-button-primary>
 </fieldset>
 `,

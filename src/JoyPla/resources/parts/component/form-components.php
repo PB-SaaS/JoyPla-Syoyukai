@@ -126,7 +126,18 @@ const SearchableDropdown = {
       errorMessage,
     };
   },
+  mounted() {
+    document.addEventListener('click', this.closeDropdownOutside);
+  },
+  beforeDestroy() {
+    document.removeEventListener('click', this.closeDropdownOutside);
+  },
   methods: {
+    closeDropdownOutside(e) {
+      if (!this.$el.contains(e.target)) {
+        this.isOpen = false;
+      }
+    },
     filterOptions() {
       this.filteredOptions = this.options.filter((option) =>
         option.label.toLowerCase().includes(this.searchText.toLowerCase())
@@ -247,6 +258,12 @@ const SearchableDropdownForForm = {
       filteredOptions: this.options,
     };
   },
+  mounted() {
+    document.addEventListener('click', this.closeDropdownOutside);
+  },
+  beforeDestroy() {
+    document.removeEventListener('click', this.closeDropdownOutside);
+  },
   setup(props) {
 
     const { ref } = Vue;
@@ -278,6 +295,11 @@ const SearchableDropdownForForm = {
     },
   },
   methods: {
+    closeDropdownOutside(e) {
+      if (!this.$el.contains(e.target)) {
+        this.isOpen = false;
+      }
+    },
     filterOptions() {
       this.filteredOptions = this.options.filter((option) =>
         option.label.toLowerCase().includes(this.searchText.toLowerCase())

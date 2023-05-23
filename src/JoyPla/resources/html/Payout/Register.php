@@ -13,22 +13,22 @@
               <v-input type="date" name="receivedDate" :rules="{}" title="払出日指定" label="払出日指定"></v-input>
             </div>
             <div class="mb-2 lg:w-1/3">
-              <v-select-division :is-only-use-data="true" name="sourceDivisionId" label="払出元部署" :rules="{ required : true ,  notTwoFieldSameAs : [ '払出先部署', `@targetDivisionId`] }" title="払出元部署指定" :disabled="values.divisionId != '' && fields.length > 0" :is-only-my-division="<?php var_export(
+              <v-select-division :is-only-use-data="true" name="sourceDivisionId" label="払出元部署" :rules="{ required : true ,  notTwoFieldSameAs : [ '払出先部署', `@targetDivisionId`] }" title="払出元部署指定" :disabled="fields.length > 0" :is-only-my-division="<?php var_export(
                   gate('register_of_unordered_slips')->isOnlyMyDivision()
               ); ?>" />
             </div>
             <div class="mb-2 lg:w-1/3">
-              <v-select-division :is-only-use-data="true" name="targetDivisionId" label="払出先部署" :rules="{ required : true ,  notTwoFieldSameAs : [ '払出元部署', `@sourceDivisionId`] }" title="払出先部署指定" :disabled="values.divisionId != '' && fields.length > 0" />
+              <v-select-division :is-only-use-data="true" name="targetDivisionId" label="払出先部署" :rules="{ required : true ,  notTwoFieldSameAs : [ '払出元部署', `@sourceDivisionId`] }" title="払出先部署指定" :disabled="fields.length > 0" />
             </div>
           </div>
           <div class="lg:flex lg:flex-row gap-4">
             <div class="my-4 w-1/3 lg:w-1/6">
-              <v-button-default class="w-full" type="button" data-micromodal-trigger="inHospitalItemModal" :disabled="values.sourceDivisionId == ''">商品検索</v-button-default>
-              <v-in-hospital-item-modal v-on:additem="additem" :division-id="values.sourceDivisionId">
+              <v-button-default class="w-full" type="button" data-micromodal-trigger="inHospitalItemModal" :disabled="values.targetDivisionId == values.sourceDivisionId || (values.targetDivisionId == '' || values.sourceDivisionId == '')">商品検索</v-button-default>
+              <v-in-hospital-item-modal v-on:additem="additem" :division-id="values.sourceDivisionId" :unit-price-use="payoutUnitPriceUseFlag">
               </v-in-hospital-item-modal>
             </div>
             <div class="my-4 w-1/3 lg:w-1/6">
-              <v-button-default class="w-full" type="button" :disabled="values.targetDivisionId == ''" data-micromodal-trigger="consumptionHistoryModalForOrder">伝票検索</v-button-default>
+              <v-button-default class="w-full" type="button" :disabled="values.targetDivisionId == values.sourceDivisionId || (values.targetDivisionId == '' || values.sourceDivisionId == '')" data-micromodal-trigger="consumptionHistoryModalForOrder">伝票検索</v-button-default>
               <v-consumption-history-modal-for-order v-on:addconsumptions="addconsumptions" :division-id="values.targetDivisionId">
               </v-consumption-history-modal-for-order>
             </div>
@@ -52,88 +52,63 @@
               <v-button-primary type="button" class="w-full lg:w-1/2" @click.native="onSubmit">出庫登録</v-button-primary>
             </div>
           </div>
-          <table>
+          <table class="w-full">
+            <thead class="bg-gray-50 whitespace-nowrap text-sm font-medium text-gray-700 text-center border">
               <tr>
-                <th class="text-center">No</th>
-                <th class="text-center">商品情報</th>
-                <th class="text-center">払出元在庫数</th>
-                <th class="text-center">ロット番号</th>
-                <th class="text-center">使用期限</th>
-                <th class="text-center">カード番号</th>
-                <th class="text-center">払出数</th>
-                <th class="text-center">合計払出数</th>
-                <th class="text-center">合計金額</th>
-                <th class="text-center"></th>
-                <th class="text-center"></th>
+                <th class="px-2 py-4 border w-10">No</th>
+                <th class="min-w-[225px] px-6 py-4 border">商品情報</th>
+                <th class="px-2 py-4 border">払出元在庫数</th>
+                <th class="px-2 py-4 border">ロット番号</th>
+                <th class="px-2 py-4 border">使用期限</th>
+                <th class="px-2 py-4 border w-[120px]">カード番号</th>
+                <th class="px-2 py-4 border">払出数</th>
+                <th class="tpx-2 py-4 border">合計払出数</th>
+                <th class="px-2 py-4 border">合計金額</th>
+                <th class="px-2 py-4 border"></th>
+                <th class="px-2 py-4 border"></th>
               </tr>
-              <template v-for="(item, idx) in values.payoutItems">
-                <template v-for="(_payout, pid) in item._payout">
-                  <tr class="my-2" :key="item.key + '/' + pid">
-                    <template v-if="pid == 0">
-                      <td class="text-center" :rowspan="item._payout.length">{{ idx + 1 }}</td>
-                      <td class="text-left" :rowspan="item._payout.length">
-                        <p class="text-gray-500" v-if="item.makerName">{{ item.makerName }}</h3>
-                        <p class="text-gray-500" v-if="item.itemName">{{ item.itemName }}</p>
-                        <p class="text-gray-500" v-if="item.itemCode">{{ item.itemCode }}</p>
-                        <p class="text-gray-500" v-if="item.itemStandard">{{ item.itemStandard }}</p>
-                        <p class="text-gray-500" v-if="item.itemJANCode">{{ item.itemJANCode }}</p>
-                        <p class="text-gray-500">&yen;{{ numberFormat(item.unitPrice) }} / {{ numberFormat(item.quantity) }}{{ item.quantityUnit }}</p>
-                      </td>
-                      <td class="text-center" :rowspan="item._payout.length">{{ numberFormat(item._stock.stockQuantity) }}{{ item.quantityUnit }}</td>
-                    </template>
-                    <td class="text-center">
-                      <v-input 
-                          v-model="_payout.lotNumber"
-                           :name="`payoutItems[${idx}]._payout[${pid}].lotNumber`" label="ロット番号" :rules="{ required : isRequired(idx) ,lotnumber: true , twoFieldRequired : [ '使用期限', `@payoutItems[${idx}]._payout[${pid}].lotDate`]  }" type="text" change-class-name="inputChange" title="ロット番号"></v-input>
+            </thead>
+            <tbody class="text-sm font-medium text-gray-700 border">
+            <template v-for="(item, idx) in values.payoutItems">
+              <template v-for="(_payout, pid) in item._payout">
+                <tr class="my-2" :key="item.key + '/' + pid">
+                  <template v-if="pid == 0">
+                    <td class="text-center px-3 py-4 border" :rowspan="item._payout.length">{{ idx + 1 }}</td>
+                    <td class="text-left px-3 py-4 border" :rowspan="item._payout.length">
+                      <p class="text-gray-500" v-if="item.makerName">{{ item.makerName }}</h3>
+                      <p class="text-gray-500" v-if="item.itemName">{{ item.itemName }}</p>
+                      <p class="text-gray-500" v-if="item.itemCode">{{ item.itemCode }}</p>
+                      <p class="text-gray-500" v-if="item.itemStandard">{{ item.itemStandard }}</p>
+                      <p class="text-gray-500" v-if="item.itemJANCode">{{ item.itemJANCode }}</p>
+                      <p class="text-gray-500">&yen;{{ numberFormat(item.unitPrice) }} / {{ numberFormat(item.quantity) }}{{ item.quantityUnit }}</p>
                     </td>
-                    <td class="text-center">
-                      <v-input 
-                          v-model="_payout.lotDate"
-                          :name="`payoutItems[${idx}]._payout[${pid}].lotDate`" label="使用期限" :rules="{ required : isRequired(idx) ,lotdate: true , twoFieldRequired : [ 'ロット番号', `@payoutItems[${idx}]._payout[${pid}].lotNumber`]  }" type="date" change-class-name="inputChange" title="使用期限"></v-input>
-                    </td>
-                    <td class="text-center">{{ item._payout }}</td>
-                    <td class="text-center">{{ item._payout }}</td>
-                  </tr>
-                </template>
+                    <td class="text-center" :rowspan="item._payout.length">{{ numberFormat(item._stock.stockQuantity) }}{{ item.quantityUnit }}</td>
+                  </template>
+                  <td class="px-3 py-4 border">
+                    <v-input 
+                        v-model="_payout.lotNumber"
+                          :name="`payoutItems[${idx}]._payout[${pid}].lotNumber`" label="ロット番号" :rules="{ required : isRequired(idx) ,lotnumber: true , twoFieldRequired : [ '使用期限', `@payoutItems[${idx}]._payout[${pid}].lotDate`]  }" type="text" change-class-name="inputChange" title="ロット番号"></v-input>
+                  </td>
+                  <td class="px-3 py-4 border">
+                    <v-input 
+                        v-model="_payout.lotDate"
+                        :name="`payoutItems[${idx}]._payout[${pid}].lotDate`" label="使用期限" :rules="{ required : isRequired(idx) ,lotdate: true , twoFieldRequired : [ 'ロット番号', `@payoutItems[${idx}]._payout[${pid}].lotNumber`]  }" type="date" change-class-name="inputChange" title="使用期限"></v-input>
+                  </td>
+                  <td class="text-center px-3 py-4 border">{{ _payout.card }}</td>
+                  <td class="text-center px-3 py-4 border w-1/6">
+                    <v-input-number :rules="{ between: [0 , 99999] }" :name="`payoutItems[${idx}]._payout[${pid}].count`" label="払出数" :min="0" :unit="item.quantityUnit" :step="1" title="払出数"></v-input-number>
+                  </td>
+                  <template v-if="pid == 0">
+                    <td class="text-center px-3 py-4 border" :rowspan="item._payout.length">{{ numberFormat(totalCount(item)) }}{{item.quantityUnit}}</td>
+                    <td class="text-center px-3 py-4 border" :rowspan="item._payout.length">&yen;{{ numberFormat(totalPrice(item)) }}</td>
+                  </template>
+                  <td class="px-3 py-4 border"><v-button-primary type="button" @click.native="onSubmit">複製</v-button-primary></td>
+                  <td class="px-3 py-4 border"><v-button-danger type="button" @click.native="onSubmit">削除</v-button-danger></td>
+                </tr> 
               </template>
-            </table>
-            <?php /*
-              <div class="w-full lg:flex mt-3">
-                <div class="flex-auto lg:flex-1 flex lg:w-3/4">
-                  <item-view class="md:h-44 md:w-44 h-32 w-32" :base64="item.inItemImage"></item-view>
-                  <div class="flex-1 px-4 relative">
-                    <div class="flex-auto lg:flex justify-between leading-normal lg:space-y-0 space-y-4 gap-6">
-                      <div class="break-all">
-                        <div class="w-full">
-                          <h3 class="text-xl font-bold font-heading" v-if="item.makerName">{{ item.makerName }}</h3>
-                          <p class="text-md font-bold font-heading" v-if="item.itemName">{{ item.itemName }}</p>
-                          <p class="text-gray-500" v-if="item.itemCode">{{ item.itemCode }}</p>
-                          <p class="text-gray-500" v-if="item.itemStandard">{{ item.itemStandard }}</p>
-                          <p class="text-gray-500" v-if="item.distributorName">{{ item.distributorName }}</p>
-                        </div>
-                        <div class="w-full text-lg font-bold font-heading flex gap-6">
-                          <span class="text-xl text-orange-600 font-bold font-heading">&yen; {{ numberFormat(item.price) }}/{{ item.itemUnit }}</span>
-                          <blowing :message="item.priceNotice" title="金額管理備考" v-if="item.priceNotice != ''"></blowing>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="flex-initial lg:flex gap-6 lg:w-1/4 items-end flex-row-reverse">
-                  <v-input-number :rules="{ between: [-99999 , 99999] }" :name="`payoutItems[${idx}].orderUnitQuantity`" label="発注数（個数）" :unit="item.itemUnit" :step="1" :title="`発注数（個数）/${item.quantity}${ item.quantityUnit }入り`"></v-input-number>
-                </div>
-              </div>
-              <div class="mt-4 flex">
-                <v-button-danger type="button" @click.native="remove(idx)">削除</v-button-danger>
-                <div class="flex-1 items-center ">
-                  <p class="text-xl text-gray-800 font-bold font-heading text-right">&yen; {{ numberFormat(orderPrice(idx) ) }} ( {{ item.orderUnitQuantity }}{{ item.itemUnit }} )</p>
-                </div>
-              </div>
-              <div class="pt-4 pb-2 w-full">
-                <div class="border-t border-gray-200"></div>
-              </div> 
-            </div>
-            */ ?>
+            </template>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -206,6 +181,8 @@
         useFieldArray,
         useForm
       } = VeeValidate;
+      
+      const payoutUnitPriceUseFlag = "<?php echo $payoutUnitPriceUseFlag; ?>";
 
       const loading = ref(false);
       const start = () => {
@@ -420,29 +397,46 @@
 
       const additem = (item) => {
         item = JSON.parse(JSON.stringify(item));
+        
+        item._payout = [];
+        item._payout.push({
+          count : 0,
+          lotNumber : item.lotNumber ?? '',
+          lotDate : item.lotDate ?? '',
+          cardId : '',
+        })
+
         item.orderUnitQuantity = (item.orderUnitQuantity) ? item.orderUnitQuantity : 1;
+        
         let checked = false;
+        if (Array.isArray(values.payoutItems)) {
+          values.payoutItems.forEach((v, idx) => {
+            if (
+              v.inHospitalItemId === item.inHospitalItemId
+            ) {
+
+              let lotCheck = false;
+              v._payout.forEach((payout) => {
+                if (
+                  payout.lotNumber === item._payout[0].lotNumber &&
+                  payout.lotDate === item._payout[0].lotDate
+                ) {
+                  lotCheck = true;
+                }
+              });
+              if (!lotCheck) {
+                v._payout.push(item._payout[0]);
+              }
+              
+              checked = true;
+            }
+          });
+        }
         if (!values.payoutItems) {
           values.payoutItems = [];
         }
         if (!checked) {
           item.priceNotice = (item.priceNotice) ? item.priceNotice : "";
-          item._payout = [];
-          item._payout.push({
-            count : 0,
-            lotNumber : '',
-            lotDate : '',
-          })
-          item._payout.push({
-            count : 0,
-            lotNumber : '',
-            lotDate : '',
-          })
-          item._payout.push({
-            count : 0,
-            lotNumber : '',
-            lotDate : '',
-          })
           insert(0, item);
         }
       };
@@ -548,11 +542,30 @@
       }
 
       const isRequired = (idx) => {
-        if (fields.value[idx].lotManagement == "1") {
+        if (fields.value[idx].value.lotManagement == "1") {
           return true;
         }
         return false;
       };
+
+      const totalCount = (item) => {
+        let count = 0;
+
+        if(item._payout){
+          item._payout.forEach((x, id) => {
+            count += x.count;
+          }) 
+        }
+
+        return count;
+      }
+      
+      const totalPrice = (item) => {
+        let count = totalCount(item);
+
+        return item.unitPrice * count;
+      }
+
       return {
         isRequired,
         values,
@@ -579,7 +592,10 @@
         fields,
         remove,
         validate,
-        addconsumptions
+        addconsumptions,
+        totalPrice,
+        totalCount,
+        payoutUnitPriceUseFlag
       };
     },
     watch: {

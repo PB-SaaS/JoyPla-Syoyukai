@@ -1105,6 +1105,10 @@ video {
   width: 20%;
 }
 
+.w-1\/6 {
+  width: 16.666667%;
+}
+
 .w-10 {
   width: 2.5rem;
 }
@@ -1183,6 +1187,10 @@ video {
 
 .w-8 {
   width: 2rem;
+}
+
+.w-\[120px\] {
+  width: 120px;
 }
 
 .w-\[30px\] {
