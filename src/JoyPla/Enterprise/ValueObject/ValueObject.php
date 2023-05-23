@@ -1775,4 +1775,25 @@ namespace JoyPla\Enterprise\Models {
             return false;
         }
     }
+
+    class ItemListId //商品一覧表ID
+    {
+        use ValueObjectTrait;
+
+        public function __construct(string $value = '')
+        {
+            $this->value = $value;
+        }
+    }
+
+    class ItemListRowId //商品一覧表項目ID
+    {
+        use ValueObjectTrait;
+
+        public function __construct(?string $value = '')
+        {
+            $this->value = $value;
+        }
+    }
+
 }

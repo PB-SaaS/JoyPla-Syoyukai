@@ -55,6 +55,34 @@ class InHospitalItemRepository implements InHospitalItemRepositoryInterface
         return $result;
     }
 
+    public function getInHospitalItemViewByInHospitalItemIds(
+        HospitalId $hospitalId,
+        array $inHospitalItemIds
+    ) {
+        $inHospitalItemIds = array_map(function (
+            InHospitalItemId $inHospitalItemId
+        ) {
+            return $inHospitalItemId;
+        },
+        $inHospitalItemIds);
+
+        $inHospitalItems = ModelRepository::getInHospitalItemViewInstance()->where(
+            'hospitalId',
+            $hospitalId->value()
+        );
+
+        foreach ($inHospitalItemIds as $inHospitalItemId) {
+            $inHospitalItems->orWhere(
+                'inHospitalItemId',
+                $inHospitalItemId->value()
+            );
+        }
+
+        $result = $inHospitalItems->get()->all();
+
+        return $result;
+    }
+
     public function searchByJanCode(HospitalId $hospitalId, string $jancode)
     {
         $instance = ModelRepository::getInHospitalItemViewInstance()->where(

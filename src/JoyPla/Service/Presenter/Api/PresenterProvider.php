@@ -11,6 +11,7 @@ use JoyPla\InterfaceAdapters\Presenters\Api\Distributor\DistributorIndexPresente
 use JoyPla\InterfaceAdapters\Presenters\Api\Division\DivisionIndexPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\InHospitalItem\InHospitalItemIndexPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\InHospitalItem\InHospitalItemRegisterPresenter;
+use JoyPla\InterfaceAdapters\Presenters\Api\InHospitalItem\InHospitalItemShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Item\ItemRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Item\ItemShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest\ItemRequestDeletePresenter;
@@ -171,6 +172,11 @@ class PresenterProvider
     public function getInHospitalItemRegisterPresenter()
     {
         return new InHospitalItemRegisterPresenter();
+    }
+
+    public function getInHospitalItemShowPresenter()
+    {
+        return new InHospitalItemShowPresenter();
     }
 
     public function getItemRequestDeletePresenter()
