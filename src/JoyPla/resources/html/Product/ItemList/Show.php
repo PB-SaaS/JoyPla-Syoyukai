@@ -17,6 +17,9 @@
           <v-button-default type="button" class="md:w-1/6 w-full" @click.native="openPrint( values.itemList?.itemListId )">
             商品リストを印刷
           </v-button-default>
+          <v-button-primary type="button" class="md:w-1/6 w-full" @click.native="downloadList">
+            商品リストをダウンロード
+          </v-button-primary>
         </div>
         <div class="p-4 text-base bg-gray-100 border border-gray-400">
           <div class="flex w-full gap-6">
@@ -134,25 +137,6 @@
     </div>
   </div>
 </div>
-<style>
-  @media screen{
-    #printpage{
-      display: none;
-    }
-  }
-  @media print{
-    #content, nav, .md\:px-10.px-\[15px\].mt-5.mb-5{
-      display: none !important;
-    }
-    @page{
-      size: A4;
-      margin: 0;
-    }
-    #printpage{
-      margin: 5px;
-    }
-  }
-</style>
 <script>
 
 const itemListId = '<?php echo $itemListId; ?>';
@@ -705,6 +689,21 @@ var JoyPlaApp = Vue.createApp({
         location.href = _ROOT + "&path=/product/itemList/" + url + "/print";    
       }
 
+      const downloadList = handleSubmit(async(values) => {
+        let content = '院内商品ID\t商品名\t製品コード\t規格\tJANコード\t入数\t入数単位\t個数単位\t卸業者\r\n';
+        for (const key of values.items) {
+          content += key.inHospitalItemId + "\t" + key.itemName + "\t" + key.itemCode + "\t" + key.itemStandard + "\t" + key.itemJANCode + "\t" + key.quantity.toString() + "\t" + key.quantityUnit + "\t" + key.itemUnit + "\t" + key.distributorName + "\r\n" ;
+        }
+        let blob = new Blob([content], {type: "text/plain"});
+        let blobUrl = window.URL.createObjectURL(blob);
+        let obj = document.createElement("a");
+        obj.href = blobUrl;
+        obj.download = values.itemListName+".txt";
+        document.body.appendChild(obj);
+        obj.click();
+        obj.parentNode.removeChild(obj);
+      })
+
     return {
       slipDelete,
       itemRegister,
@@ -725,6 +724,7 @@ var JoyPlaApp = Vue.createApp({
       completeLoading,
       makeLabelBarcode,
       openPrint,
+      downloadList,
     };
   },
 }).mount("#top");
