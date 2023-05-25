@@ -50,9 +50,13 @@
 
 				<?php if(!empty($notInventoriedDivisions)){ ?>
 				<div class="uk-margin">
-					<p class="uk-text-bold" style="font-size: 32px">棚卸未入力部署　<?php echo count($notInventoriedDivisions) ;?>部署</p>
+					<p class="uk-text-bold" style="font-size: 24px">棚卸未入力部署</p>
+					<p style="font-size: 1rem; border-bottom: 1px solid #e5e5e5; display: flex;" class="uk-width-1-4">
+						<span style="padding:16px 12px; flex:auto;">未入力部署数</span>
+						<span style="padding:16px 12px; flex:auto; text-align:right;"><?php echo count($notInventoriedDivisions) ;?></span>
+					</p>
 					<div style="margin-bottom:50px;">
-						<table style="font-size: 20px;" id="notInventoriedDivisions">
+						<table class="uk-width-1-4" id="notInventoriedDivisions">
 							<thead>
 								<tr>
 									<th>No.</th>
@@ -64,7 +68,7 @@
 								$num = 1;
 								foreach ($notInventoriedDivisions as $record) {
 									echo <<< EOF
-									<tr style="border-bottom:1px;">
+									<tr>
 										<td>{$num}</td>
 										<td>{$record['divisionName']}</td>
 									</tr>
@@ -82,15 +86,18 @@
 	</div>
 	<style>
 		#notInventoriedDivisions{
-			width: 25%;
+			border-collapse: collapse;
 		}
 		#notInventoriedDivisions tr th{
-			border-bottom: 1px solid #000;
+			border-bottom: 1px solid #e5e5e5;
+			font-size: 1.0em;
+			padding: 15px;
 			text-align: left;
 		}
 		#notInventoriedDivisions tr td{
-			border-bottom: 1px solid #000;
-			padding: 10px;
+			border-bottom: 1px solid #e5e5e5;
+			font-size: 1.0em;
+			padding: 15px;
 			text-align: left;
 		}
 	</style>
