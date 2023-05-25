@@ -2541,3 +2541,48 @@ class PayScheduleItemsView extends Model
         ],
     ];
 }
+
+class inventoryByDiv extends Model
+{
+    public const CREATED_AT = 'registrationTime';
+    public const UPDATED_AT = 'updateTime';
+    public const DELETED_AT = '';
+
+    public static $spiral_db_name = 'inventoryByDiv';
+    public static $guarded = ['id'];
+    public static $primary_key = 'id';
+    public static $fillable = [
+        'registrationTime',
+        'updateTime',
+        'inventoryHId',
+        'inventoryEndId',
+        'hospitalId',
+        'divisionId',
+        'itemsNumber',
+        'totalAmount',
+        'divisionName',
+        'divisionType',
+        'deleteFlag',
+        'invHAuthKey',
+        'inventoryHStatus',
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [
+        'divisionType' => [
+            '1' => '大倉庫',
+            '2' => '部署',
+        ],
+        'deleteFlag' => [
+            '0' => 'いいえ',
+            '1' => '削除',
+        ],
+        'inventoryHStatus' => [
+            '1' => '一時保存',
+            '2' => '完了',
+        ],
+    ];
+}
+
