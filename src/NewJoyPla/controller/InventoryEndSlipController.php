@@ -1,6 +1,7 @@
 <?php
 namespace App\Controller;
 
+use Collection;
 use View;
 use Controller;
 use SpiralApiRequest;
@@ -19,6 +20,7 @@ use App\Model\StockTakingTransaction;
 use App\Model\StockView;
 use App\Model\Lot;
 use App\Model\InventoryAdjustmentTransaction;
+use App\Model\inventoryByDiv;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -80,6 +82,23 @@ class InventoryEndSlipController extends Controller
                             $in_hospital_item_ids
                         )->count(),
                     ]);
+
+                //追加ここから
+                $notInventoriedDivisions = []; //null対策
+                //実施中の部署情報取得
+                $inventoryByDivs = inventoryByDiv::where('inventoryEndId', $end_slip->inventoryEndId)->get()->data->all();
+
+                //未実施の部署情報取得
+                $divs = Division::where('hospitalId', $user_info->getHospitalId());
+                foreach($inventoryByDivs as $inventoryByDivId){
+                    $divs->where('divisionId', $inventoryByDivId->divisionId, '!=');
+                }
+                $divs = $divs->get()->data->all();
+                foreach($divs as $div){
+                    $notInventoriedDivisions[] = ["divisionId" => $div->divisionId, "divisionName" => $div->divisionName];
+                }
+                //追加ここまで
+
             }
 
             $link = '%url/rel:mpgt:Inventory%&Action=inventoryEndList';
@@ -93,6 +112,8 @@ class InventoryEndSlipController extends Controller
                     'link' => $link,
                     'end_flg' => $end_slip->inventoryStatus == 2,
                     'csrf_token' => Csrf::generate(16),
+                    'notInventoriedDivisions' => $notInventoriedDivisions,
+                    'divArr' => $divArr, //後で消す
                 ],
                 false
             );

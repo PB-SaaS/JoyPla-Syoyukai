@@ -97,6 +97,7 @@
                 label="部署" 
                 title="部署指定"
                 :absolute="false"
+                :rules="{ required : true}"
                 :is-only-my-division="<?php var_export(
                     gate('list_of_itemList_slips')->isOnlyMyDivision()
                 ); ?>"
@@ -107,6 +108,7 @@
                 name="register.usableStatus"
                 label="使用権限" 
                 title="使用権限設定"
+                :rules="{ required : true}"
                 :absolute="true"
                 :options="[{ label: '全体', value: 0 },{ label: '部署限定', value: 1 }]"
               ></v-select>
@@ -117,6 +119,7 @@
                 type="text"
                 label="商品リスト名称"
                 title="商品リスト名称"
+                :rules="{ required : true}"
                 ></v-input>
             </div>
             <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
@@ -421,44 +424,57 @@ var JoyPlaApp = Vue.createApp({
           });
       }
 
-      const createItemList = () => {
-        let params = new URLSearchParams();
-        params.append("divisionId", values.register.divisionId);
-        params.append("usableStatus", values.register.usableStatus);
-        params.append("itemListName", encodeURI(values.register.itemListName));
-        params.append("_csrf", _CSRF);
-        params.append("_method", 'post');
-        params.append("path", "/api/product/itemList/register");
+      const createItemList = async () => {
+        const {
+          valid,
+          errors
+        } = await validate();
 
-        start();
-
-        axios.post(_APIURL,params)
-        .then( (response) => {
-          if(response.data.code != 200){
+        if (!valid) {
+          Swal.fire({
+            icon: 'error',
+            title: '入力エラー',
+            text: '入力エラーがございます。ご確認ください',
+          })
+        }else{
+          let params = new URLSearchParams();
+          params.append("divisionId", values.register.divisionId);
+          params.append("usableStatus", values.register.usableStatus);
+          params.append("itemListName", encodeURI(values.register.itemListName));
+          params.append("_csrf", _CSRF);
+          params.append("_method", 'post');
+          params.append("path", "/api/product/itemList/register");
+  
+          start();
+  
+          axios.post(_APIURL,params)
+          .then( (response) => {
+            if(response.data.code != 200){
+              Swal.fire({
+                icon: 'error',
+                title: 'システムエラー',
+                text: '商品リストの作成に失敗しました。\r\nしばらく経ってから再度送信してください。',
+              });
+              return '';
+            }
+            Swal.fire({
+              icon: 'success',
+              title: '商品リストの作成が完了しました。',
+            }).then( () => {
+              location.reload();
+            })
+          }) 
+          .catch((error) => {
             Swal.fire({
               icon: 'error',
               title: 'システムエラー',
               text: '商品リストの作成に失敗しました。\r\nしばらく経ってから再度送信してください。',
             });
-            return '';
-          }
-          Swal.fire({
-            icon: 'success',
-            title: '商品リストの作成が完了しました。',
-          }).then( () => {
-            location.reload();
           })
-        }) 
-        .catch((error) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'システムエラー',
-            text: '商品リストの作成に失敗しました。\r\nしばらく経ってから再度送信してください。',
+          .then(() => {
+            complete();
           });
-        })
-        .then(() => {
-          complete();
-        });
+        }
       }
 
       return {
