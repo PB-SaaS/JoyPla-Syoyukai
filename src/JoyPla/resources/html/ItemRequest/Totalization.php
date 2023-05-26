@@ -731,8 +731,8 @@
                         payouts.push({
                             'recordId': item.recordId,
                             'inHospitalItemId': item.inHospitalItemId,
-                            'targetDivisionId': item.targetDivisionId,
-                            'sourceDivisionId': item.sourceDivisionId,
+                            'targetDivisionId': item.sourceDivisionId, //請求画面のtargetと、払出のtargetは逆
+                            'sourceDivisionId': item.targetDivisionId,
                             'payoutQuantity': item.payoutQuantity,
                             'lotNumber': item.lotNumber,
                             'lotDate': item.lotDate,

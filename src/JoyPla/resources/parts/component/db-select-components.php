@@ -1303,7 +1303,13 @@ const vBarcodeSearch = {
     "v-text": vText,
     "v-loading": vLoading,
   },
-  props: {},
+  props: {
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    }
+  },
   methods: {
     onEnter: function () {
       this.getInHospitalItem();

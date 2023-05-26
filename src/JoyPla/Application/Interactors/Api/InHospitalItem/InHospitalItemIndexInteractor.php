@@ -50,7 +50,9 @@ namespace JoyPla\Application\Interactors\Api\InHospitalItem {
                     $inputData->search
                 );
 
+                /*
                 $stocks = [];
+            
             if($inputData->divisionId){
                 $inHospitalItemIds = array_map(function($inHospitalItem){
                     return new InHospitalItemId($inHospitalItem->inHospitalItemId);
@@ -74,6 +76,7 @@ namespace JoyPla\Application\Interactors\Api\InHospitalItem {
 
                 $inHospitalItem[$key]->_stock = $stock;
             }
+            */
 
             $this->presenterProvider
                 ->getInHospitalItemIndexPresenter()

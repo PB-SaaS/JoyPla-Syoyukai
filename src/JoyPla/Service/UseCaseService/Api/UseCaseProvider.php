@@ -2,6 +2,7 @@
 
 namespace JoyPla\Service\UseCase\Api;
 
+use JoyPla\Application\Interactors\Api\Acceptance\AcceptanceRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Accountant\AccountantIndexInteractor;
 use JoyPla\Application\Interactors\Api\Accountant\AccountantItemsIndexInteractor;
 use JoyPla\Application\Interactors\Api\Accountant\AccountantLogsIndexInteractor;
@@ -751,6 +752,21 @@ class UseCaseProvider
             $this->repositoryProvider,
             $this->presenterProvider
         ) extends ItemListRegisterInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getAcceptanceRegisterInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends AcceptanceRegisterInteractor {
             public function __construct(
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider

@@ -6,12 +6,13 @@ use Csrf;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Routing\Router;
-use JoyPla\Application\InputPorts\Api\Payout\PayoutRegisterInputData;
-use JoyPla\Application\InputPorts\Api\Payout\PayoutRegisterInputPortInterface;
+use JoyPla\Application\InputPorts\Api\Acceptance\AcceptanceRegisterInputData;
+use JoyPla\Application\InputPorts\Api\Acceptance\AcceptanceRegisterInputPortInterface;
 
-class PayoutController extends Controller
+class AcceptanceController extends Controller
 {
-    public function register($vars, PayoutRegisterInputPortInterface $inputPort)
+    
+    public function register($vars, AcceptanceRegisterInputPortInterface $inputPort)
     {
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
@@ -22,19 +23,17 @@ class PayoutController extends Controller
 
         $gate = Gate::getGateInstance('register_of_payouts');
 
-        $isOnlyPayout = ( $this->request->get('isOnlyPayout') === 'true' );
+        //$isOnlyPayout = ( $this->request->get('isOnlyPayout') === 'true' );
 
-        $payoutItems = $this->request->get('payoutItems');
+        $acceptanceItems = $this->request->get('acceptanceItems');
 
         $user = $this->request->user();
 
-        $inputData = new PayoutRegisterInputData(
+        $inputData = new AcceptanceRegisterInputData(
             $user,
-            $payoutItems,
+            $acceptanceItems,
             $gate->isOnlyMyDivision(),
-            $isOnlyPayout
         );
         $inputPort->handle($inputData);
     }
-
 }

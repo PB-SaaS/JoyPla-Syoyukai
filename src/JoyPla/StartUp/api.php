@@ -9,6 +9,7 @@ require_once 'JoyPla/require.php';
 use App\Http\Middleware\VerifyCsrfTokenMiddleware;
 use framework\Http\Request;
 use framework\Routing\Router;
+use JoyPla\InterfaceAdapters\Controllers\Api\AcceptanceController;
 use JoyPla\InterfaceAdapters\Controllers\Api\BarcodeController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ConsumptionController;
 use JoyPla\InterfaceAdapters\Controllers\Api\DistributorController;
@@ -25,6 +26,7 @@ use JoyPla\InterfaceAdapters\Controllers\Api\PayoutController;
 use JoyPla\InterfaceAdapters\Controllers\Api\AccountantController;
 use JoyPla\InterfaceAdapters\Controllers\Api\AccountantLogController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ItemListController; //商品一覧表用
+use JoyPla\InterfaceAdapters\Controllers\Api\StockController;
 use JoyPla\JoyPlaApplication;
 use JoyPla\Service\Presenter\Api\PresenterProvider;
 use JoyPla\Service\Repository\QueryProvider;
@@ -252,6 +254,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         PayoutController::class,
         'register',
     ])->service($useCaseProvider->getPayoutRegisterInteractor());
+    
+    Router::map('POST', '/api/acceptance/register', [
+        AcceptanceController::class,
+        'register',
+    ])->service($useCaseProvider->getAcceptanceRegisterInteractor());
 
     Router::map('POST', '/api/accountant/register', [
         AccountantController::class,
@@ -332,6 +339,13 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         ItemListController::class,
         'delete',
     ]);
+
+    
+    Router::map('GET', '/api/stock/:divisionId/:inHospitalItemId', [
+        StockController::class,
+        'stock',
+    ]);
+
 
 });
 

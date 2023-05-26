@@ -4,7 +4,7 @@
   <v-breadcrumbs :items="breadcrumbs"></v-breadcrumbs>
   <div id="content" class="flex h-full px-1">
     <div class="flex-auto">
-      <div class="index container mx-auto mb-96">
+      <div class="index container mx-auto">
         <h1 class="text-2xl mb-2">出庫・払出登録</h1>
         <hr>
         <div>
@@ -21,94 +21,111 @@
               <v-select-division :is-only-use-data="true" name="targetDivisionId" label="払出先部署" :rules="{ required : true ,  notTwoFieldSameAs : [ '払出元部署', `@sourceDivisionId`] }" title="払出先部署指定" :disabled="fields.length > 0" />
             </div>
           </div>
-          <div class="lg:flex lg:flex-row gap-4">
-            <div class="my-4 w-1/3 lg:w-1/6">
-              <v-button-default class="w-full" type="button" data-micromodal-trigger="inHospitalItemModal" :disabled="values.targetDivisionId == values.sourceDivisionId || (values.targetDivisionId == '' || values.sourceDivisionId == '')">商品検索</v-button-default>
-              <v-in-hospital-item-modal v-on:additem="additem" :division-id="values.sourceDivisionId" :unit-price-use="payoutUnitPriceUseFlag">
-              </v-in-hospital-item-modal>
-            </div>
-            <div class="my-4 w-1/3 lg:w-1/6">
-              <v-button-default class="w-full" type="button" :disabled="values.targetDivisionId == values.sourceDivisionId || (values.targetDivisionId == '' || values.sourceDivisionId == '')" data-micromodal-trigger="consumptionHistoryModalForOrder">伝票検索</v-button-default>
-              <v-consumption-history-modal-for-order v-on:addconsumptions="addconsumptions" :division-id="values.targetDivisionId">
-              </v-consumption-history-modal-for-order>
-            </div>
-          </div>
-          <div class="my-4 lg:w-1/3 items-center">
-            <v-switch id="labelCreate" v-model="labelCreate" :message="(labelCreate)? 'ラベル発行をする' : 'ラベル発行をしない'"></v-switch>
-          </div>
-          <div class="p-2 bg-gray-300">
-            <v-barcode-search @additem="addItemByBarcode"></v-barcode-search>
-          </div>
-          <div class="my-2" v-if="fields.length == 0">
-            <div class="max-h-full h-full grid place-content-center w-full lg:flex border border-sushi-600 bg-white mt-3">
-              <div class="flex-1 p-4 relative text-center">商品を選択または、バーコードを読み取ってください</div>
-            </div>
-          </div>
-          <div class="mt-4 p-4 shadow-md drop-shadow-md" v-if="fields.length > 0">
-            <p class=" text-xl">登録アイテム数: {{ numberFormat(itemCount()) }} アイテム</p>
-            <p class=" text-xl">合計金額: &yen; {{ numberFormat(totalAmount()) }} </p>
+          <div class="sticky top-0 bg-white" style="z-index: 2;">
             <div class="lg:flex lg:flex-row gap-4">
-              <v-button-primary type="button" class="w-full lg:w-1/2" @click.native="onSubmit">払出登録</v-button-primary>
-              <v-button-primary type="button" class="w-full lg:w-1/2" @click.native="onSubmit">出庫登録</v-button-primary>
+              <div class="my-4 w-1/3 lg:w-1/6">
+                <v-button-default class="w-full" type="button" data-micromodal-trigger="inHospitalItemModal" :disabled="values.targetDivisionId == values.sourceDivisionId || (values.targetDivisionId == '' || values.sourceDivisionId == '')">商品検索</v-button-default>
+                <v-in-hospital-item-modal v-on:additem="additem" :division-id="values.sourceDivisionId" :unit-price-use="payoutUnitPriceUseFlag">
+                </v-in-hospital-item-modal>
+              </div>
+              <div class="my-4 w-1/3 lg:w-1/6">
+                <v-button-default class="w-full" type="button" :disabled="values.targetDivisionId == values.sourceDivisionId || (values.targetDivisionId == '' || values.sourceDivisionId == '')" data-micromodal-trigger="consumptionHistoryModalForOrder">伝票検索</v-button-default>
+                <v-consumption-history-modal-for-item-request v-on:addconsumptions="additemsForSlip" :source-division-id="values.targetDivisionId">
+                </v-consumption-history-modal-for-item-request>
+              </div>
+              <div class="my-4 items-center">
+                <v-switch id="labelCreate" v-model="labelCreate" :message="(labelCreate)? 'ラベル発行をする' : 'ラベル発行をしない'"></v-switch>
+              </div>
+            </div>
+            <div class="p-2 bg-gray-300">
+              <v-barcode-search @additem="addItemByBarcode" :disabled="values.targetDivisionId == values.sourceDivisionId || (values.targetDivisionId == '' || values.sourceDivisionId == '')"></v-barcode-search>
+            </div>
+            <div class="my-2" v-if="fields.length == 0">
+              <div class="max-h-full h-full grid place-content-center w-full lg:flex border border-sushi-600 bg-white mt-3">
+                <div class="flex-1 p-4 relative text-center">商品を選択または、バーコードを読み取ってください</div>
+              </div>
+            </div>
+            <div class="mt-4 p-4 shadow-md drop-shadow-md" v-if="fields.length > 0">
+              <p class=" text-xl">登録アイテム数: {{ numberFormat(totalItemCount()) }} アイテム</p>
+              <p class=" text-xl">合計金額: &yen; {{ numberFormat(totalAmount()) }} </p>
+              <div class="lg:flex lg:flex-row gap-4">
+                <v-button-primary type="button" class="w-full lg:w-1/2" @click.native="onSubmit">払出登録</v-button-primary>
+                <v-button-primary type="button" class="w-full lg:w-1/2" @click.native="onAcceptanceRegisterSubmit">出庫登録</v-button-primary>
+              </div>
             </div>
           </div>
-          <table class="w-full">
-            <thead class="bg-gray-50 whitespace-nowrap text-sm font-medium text-gray-700 text-center border">
-              <tr>
-                <th class="px-2 py-4 border w-10">No</th>
-                <th class="min-w-[225px] px-6 py-4 border">商品情報</th>
-                <th class="px-2 py-4 border">払出元在庫数</th>
-                <th class="px-2 py-4 border">ロット番号</th>
-                <th class="px-2 py-4 border">使用期限</th>
-                <th class="px-2 py-4 border w-[120px]">カード番号</th>
-                <th class="px-2 py-4 border">払出数</th>
-                <th class="tpx-2 py-4 border">合計払出数</th>
-                <th class="px-2 py-4 border">合計金額</th>
-                <th class="px-2 py-4 border"></th>
-                <th class="px-2 py-4 border"></th>
-              </tr>
-            </thead>
-            <tbody class="text-sm font-medium text-gray-700 border">
-            <template v-for="(item, idx) in values.payoutItems">
-              <template v-for="(_payout, pid) in item._payout">
-                <tr class="my-2" :key="item.key + '/' + pid">
-                  <template v-if="pid == 0">
-                    <td class="text-center px-3 py-4 border" :rowspan="item._payout.length">{{ idx + 1 }}</td>
-                    <td class="text-left px-3 py-4 border" :rowspan="item._payout.length">
-                      <p class="text-gray-500" v-if="item.makerName">{{ item.makerName }}</h3>
-                      <p class="text-gray-500" v-if="item.itemName">{{ item.itemName }}</p>
-                      <p class="text-gray-500" v-if="item.itemCode">{{ item.itemCode }}</p>
-                      <p class="text-gray-500" v-if="item.itemStandard">{{ item.itemStandard }}</p>
-                      <p class="text-gray-500" v-if="item.itemJANCode">{{ item.itemJANCode }}</p>
-                      <p class="text-gray-500">&yen;{{ numberFormat(item.unitPrice) }} / {{ numberFormat(item.quantity) }}{{ item.quantityUnit }}</p>
-                    </td>
-                    <td class="text-center" :rowspan="item._payout.length">{{ numberFormat(item._stock.stockQuantity) }}{{ item.quantityUnit }}</td>
+          <div style="z-index: 1;" class="height-[80vh]">
+            <table class="w-full" id="payoutTable">
+              <thead class="bg-gray-50 whitespace-nowrap text-sm font-medium text-gray-700 text-center border">
+                <tr>
+                  <th class="px-2 py-4 border w-10">No</th>
+                  <th class="min-w-[225px] px-6 py-4 border">商品情報</th>
+                  <th class="px-2 py-4 border">払出元在庫数</th>
+                  <th class="px-2 py-4 border">ロット番号</th>
+                  <th class="px-2 py-4 border">使用期限</th>
+                  <th class="px-2 py-4 border w-[120px]">カード番号</th>
+                  <th class="px-2 py-4 border">払出数<br><v-button-default type="button" @click.native="toQuantity">入数を反映</v-button-default></th>
+                  <th class="tpx-2 py-4 border">合計払出数</th>
+                  <th class="px-2 py-4 border">合計金額</th>
+                  <th class="px-2 py-4 border"></th>
+                </tr>
+              </thead>
+              <tbody class="text-sm font-medium text-gray-700 border">
+                <template v-for="(item, idx) in values.payoutItems">
+                  <template v-for="(_payout, pid) in item._payout">
+                    <tr class="my-2" :key="item.key + '/' + pid">
+                      <template v-if="pid == 0">
+                        <td class="text-center px-3 py-4 border" :rowspan="item._payout.length">{{ idx + 1 }}</td>
+                        <td class="text-left px-3 py-4 border" :rowspan="item._payout.length">
+                          <p class="text-gray-500" v-if="item.makerName">{{ item.makerName }}</h3>
+                          <p class="text-gray-500" v-if="item.itemName">{{ item.itemName }}</p>
+                          <p class="text-gray-500" v-if="item.itemCode">{{ item.itemCode }}</p>
+                          <p class="text-gray-500" v-if="item.itemStandard">{{ item.itemStandard }}</p>
+                          <p class="text-gray-500" v-if="item.itemJANCode">{{ item.itemJANCode }}</p>
+                          <p class="text-gray-500">&yen;{{ numberFormat(item.unitPrice) }} / {{ numberFormat(item.quantity) }}{{ item.quantityUnit }}</p>
+                        </td>
+                        <td class="text-center px-3 py-4 border" :rowspan="item._payout.length">{{ numberFormat(item?._stock?.stockQuantity) }}{{ item.quantityUnit }}</td>
+                      </template>
+                      <td class="px-3 py-4 border">
+                        <v-input 
+                            v-model="_payout.lotNumber"
+                              :name="`payoutItems[${idx}]._payout[${pid}].lotNumber`" label="ロット番号" :rules="{ required : isRequired(idx) ,lotnumber: true , twoFieldRequired : [ '使用期限', `@payoutItems[${idx}]._payout[${pid}].lotDate`]  }" type="text" change-class-name="inputChange" title="ロット番号"></v-input>
+                      </td>
+                      <td class="px-3 py-4 border">
+                        <v-input 
+                            v-model="_payout.lotDate"
+                            :name="`payoutItems[${idx}]._payout[${pid}].lotDate`" label="使用期限" :rules="{ required : isRequired(idx) ,lotdate: true , twoFieldRequired : [ 'ロット番号', `@payoutItems[${idx}]._payout[${pid}].lotNumber`]  }" type="date" change-class-name="inputChange" title="使用期限"></v-input>
+                      </td>
+                      <td class="text-center px-3 py-4 border">{{ _payout.cardId }}</td>
+                      <td class="text-center px-3 py-4 border">
+                        <v-input-number 
+                          :rules="{ between: [0 , 99999] }" 
+                          :name="`payoutItems[${idx}]._payout[${pid}].count`" 
+                          label="払出数" 
+                          :min="0" 
+                          :unit="item.quantityUnit" 
+                          :step="1" 
+                          title="払出数" 
+                          class=" w-[240px]" 
+                          change-class-name="inputChange">
+                        </v-input-number>
+                      </td>
+                      <template v-if="pid == 0">
+                        <td class="text-center px-3 py-4 border" :rowspan="item._payout.length">{{ numberFormat(totalCount(item)) }}{{item.quantityUnit}}</td>
+                        <td class="text-center px-3 py-4 border" :rowspan="item._payout.length">&yen;{{ numberFormat(totalPrice(item)) }}</td>
+                      </template>
+                      <td class="px-3 py-4 border">
+                        <div class="flex gap-4">
+                        <v-button-primary type="button" @click.native="clonePayout(idx,pid)">複製</v-button-primary>
+                        <v-button-danger type="button" @click.native="deletePayout(idx,pid)">削除</v-button-danger>
+                        </div>
+                      </td>
+                    </tr> 
                   </template>
-                  <td class="px-3 py-4 border">
-                    <v-input 
-                        v-model="_payout.lotNumber"
-                          :name="`payoutItems[${idx}]._payout[${pid}].lotNumber`" label="ロット番号" :rules="{ required : isRequired(idx) ,lotnumber: true , twoFieldRequired : [ '使用期限', `@payoutItems[${idx}]._payout[${pid}].lotDate`]  }" type="text" change-class-name="inputChange" title="ロット番号"></v-input>
-                  </td>
-                  <td class="px-3 py-4 border">
-                    <v-input 
-                        v-model="_payout.lotDate"
-                        :name="`payoutItems[${idx}]._payout[${pid}].lotDate`" label="使用期限" :rules="{ required : isRequired(idx) ,lotdate: true , twoFieldRequired : [ 'ロット番号', `@payoutItems[${idx}]._payout[${pid}].lotNumber`]  }" type="date" change-class-name="inputChange" title="使用期限"></v-input>
-                  </td>
-                  <td class="text-center px-3 py-4 border">{{ _payout.card }}</td>
-                  <td class="text-center px-3 py-4 border w-1/6">
-                    <v-input-number :rules="{ between: [0 , 99999] }" :name="`payoutItems[${idx}]._payout[${pid}].count`" label="払出数" :min="0" :unit="item.quantityUnit" :step="1" title="払出数"></v-input-number>
-                  </td>
-                  <template v-if="pid == 0">
-                    <td class="text-center px-3 py-4 border" :rowspan="item._payout.length">{{ numberFormat(totalCount(item)) }}{{item.quantityUnit}}</td>
-                    <td class="text-center px-3 py-4 border" :rowspan="item._payout.length">&yen;{{ numberFormat(totalPrice(item)) }}</td>
-                  </template>
-                  <td class="px-3 py-4 border"><v-button-primary type="button" @click.native="onSubmit">複製</v-button-primary></td>
-                  <td class="px-3 py-4 border"><v-button-danger type="button" @click.native="onSubmit">削除</v-button-danger></td>
-                </tr> 
-              </template>
-            </template>
-            </tbody>
-          </table>
+                </template>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -267,36 +284,60 @@
         }
       ];
 
-      const createOrderModel = (values) => {
+      const createPayoutModel = (values) => {
         let items = values.payoutItems;
         let payoutItems = [];
         items.forEach(function(item, idx) {
-          if (item.orderUnitQuantity != 0) {
-            payoutItems.push({
-              'inHospitalItemId': item.inHospitalItemId,
-              'orderUnitQuantity': parseInt(item.orderUnitQuantity),
-            })
-          }
+          item._payout.forEach(function(payout, pidx) {
+            if (payout.count != 0) {
+              payoutItems.push({
+                'inHospitalItemId': item.inHospitalItemId,
+                'payoutQuantity': parseInt(payout.count),
+                'targetDivisionId' : values.targetDivisionId,
+                'sourceDivisionId' : values.sourceDivisionId,
+                'lotNumber' : payout.lotNumber,
+                'lotDate' : payout.lotDate,
+                'card' : payout.cardId,
+              })
+            }
+          })
         });
         return payoutItems;
       };
 
-      const orderPrice = (idx) => {
-        return values.payoutItems[idx].price * parseInt(values.payoutItems[idx].orderUnitQuantity);
+      const createAcceptanceModel = (values) => {
+        let items = values.payoutItems;
+        let payoutItems = [];
+        items.forEach(function(item, idx) {
+          item._payout.forEach(function(payout, pidx) {
+            if (payout.count != 0) {
+              payoutItems.push({
+                'inHospitalItemId': item.inHospitalItemId,
+                'acceptanceQuantity': parseInt(payout.count),
+                'targetDivisionId' : values.targetDivisionId,
+                'sourceDivisionId' : values.sourceDivisionId,
+                'lotNumber' : payout.lotNumber,
+                'lotDate' : payout.lotDate,
+                'card' : payout.cardId,
+              })
+            }
+          })
+        });
+        return payoutItems;
       };
 
       const totalAmount = () => {
         let num = 0;
         values.payoutItems.forEach((v, idx) => {
-          num += orderPrice(idx);
+          num += totalPrice(v);
         });
         return num;
       };
 
-      const itemCount = () => {
+      const totalItemCount = () => {
         let num = 0;
         values.payoutItems.forEach((v, idx) => {
-          num += (v.orderUnitQuantity > 0) ? 1 : 0;
+          num += ( totalCount(v) > 0) ? 1 : 0;
         });
         return num;
       };
@@ -328,7 +369,7 @@
           })
         } else {
           Swal.fire({
-            title: '発注登録を行います。',
+            title: '払出登録を行います。',
             text: "よろしいですか？",
             icon: 'info',
             showCancelButton: true,
@@ -338,17 +379,47 @@
             confirmButtonText: 'OK'
           }).then((result) => {
             if (result.isConfirmed) {
-              orderRegister();
+              payoutRegister();
             }
           })
         }
       };
 
-      const orderRegister = handleSubmit(async (values) => {
+      
+      const onAcceptanceRegisterSubmit = async () => {
+        const {
+          valid,
+          errors
+        } = await validate();
+
+        if (!valid) {
+          Swal.fire({
+            icon: 'error',
+            title: '入力エラー',
+            text: '入力エラーがございます。ご確認ください',
+          })
+        } else {
+          Swal.fire({
+            title: '出荷登録を行います。',
+            text: "よろしいですか？",
+            icon: 'info',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'OK'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              acceptanceRegister();
+            }
+          })
+        }
+      };
+      
+      const acceptanceRegister = handleSubmit(async (values) => {
         try {
-              
-          const orderModels = createOrderModel(values);
-          if (orderModels.length === 0) {
+          const acceptanceModels = createAcceptanceModel(values);
+          if (acceptanceModels.length === 0) {
             Swal.fire({
               icon: 'error',
               title: '登録する商品がありませんでした。',
@@ -358,11 +429,11 @@
           }
           
           let params = new URLSearchParams();
-          params.append("path", "/api/order/register");
+          params.append("path", "/api/acceptance/register");
           params.append("_method", 'post');
           params.append("_csrf", _CSRF);
-          params.append("payoutDate", values.payoutDate);
-          params.append("payoutItems", JSON.stringify(encodeURIToObject(orderModels)));
+          params.append("isOnlyPayout", 'true');
+          params.append("acceptanceItems", JSON.stringify(encodeURIToObject(acceptanceModels)));
 
           const res = await axios.post(_APIURL, params);
 
@@ -373,7 +444,50 @@
           Swal.fire({
             icon: 'success',
             title: '登録が完了しました。',
-            text: 'メールに登録・追加した発注番号を記載しています',
+          }).then((result) => {
+            let tmp = [];
+            replace(tmp);
+          });
+          return true;
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'システムエラー',
+            text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+          });
+        }
+
+      });
+
+      const payoutRegister = handleSubmit(async (values) => {
+        try {
+          const payoutModels = createPayoutModel(values);
+          if (payoutModels.length === 0) {
+            Swal.fire({
+              icon: 'error',
+              title: '登録する商品がありませんでした。',
+              text: '内容を確認の上、再送信をしてください。',
+            })
+            return false;
+          }
+          
+          let params = new URLSearchParams();
+          params.append("path", "/api/payout/register");
+          params.append("_method", 'post');
+          params.append("_csrf", _CSRF);
+          params.append("isOnlyPayout", 'true');
+          params.append("payoutDate", values.payoutDate);
+          params.append("payoutItems", JSON.stringify(encodeURIToObject(payoutModels)));
+
+          const res = await axios.post(_APIURL, params);
+
+          if (res.data.code != 200) {
+            throw new Error(res.data.message)
+          }
+
+          Swal.fire({
+            icon: 'success',
+            title: '登録が完了しました。',
           }).then((result) => {
             let tmp = [];
             replace(tmp);
@@ -390,21 +504,32 @@
       });
 
       const updateItem = (idx, key, value) => {
-        let object = JSON.parse(JSON.stringify(fields[idx].value));
+        let object = JSON.parse(JSON.stringify(fields.value[idx].value));
         object[key] = value;
         update(idx, object);
       };
 
-      const additem = (item) => {
+      const getStockCount = (inHospitalItemId) => {
+    
+        let params = new URLSearchParams();
+        params.append("path", "/api/stock/"+ values.sourceDivisionId + "/" + inHospitalItemId);
+        params.append("_method", 'get');
+        params.append("_csrf", _CSRF);
+
+        return axios.post(_APIURL, params);
+
+      }
+
+
+      const additem = async(item) => {
         item = JSON.parse(JSON.stringify(item));
         
-        item._payout = [];
-        item._payout.push({
+        item._payout = (item._payout)? item._payout : [{
           count : 0,
           lotNumber : item.lotNumber ?? '',
           lotDate : item.lotDate ?? '',
           cardId : '',
-        })
+        }];
 
         item.orderUnitQuantity = (item.orderUnitQuantity) ? item.orderUnitQuantity : 1;
         
@@ -418,8 +543,10 @@
               let lotCheck = false;
               v._payout.forEach((payout) => {
                 if (
-                  payout.lotNumber === item._payout[0].lotNumber &&
-                  payout.lotDate === item._payout[0].lotDate
+                  (
+                    payout.lotNumber === item._payout[0].lotNumber &&
+                    payout.lotDate === item._payout[0].lotDate 
+                  ) && payout.cardId === ""
                 ) {
                   lotCheck = true;
                 }
@@ -432,61 +559,90 @@
             }
           });
         }
+
         if (!values.payoutItems) {
           values.payoutItems = [];
         }
+
         if (!checked) {
           item.priceNotice = (item.priceNotice) ? item.priceNotice : "";
-          insert(0, item);
+          insert(values.payoutItems.length, item);
+
+          await getStockCount(item.inHospitalItemId).then((res) => {
+            if (res.data.code != 200) {
+              throw new Error(res.data.message)
+            }
+
+            let itemIndex = values.payoutItems.findIndex((v) => v.inHospitalItemId === item.inHospitalItemId);
+
+            updateItem(itemIndex, "_stock", res.data.data);
+          })
         }
+
       };
 
-      const addconsumptions = (consumptions) => {
-        consumptions = JSON.parse(JSON.stringify(consumptions));
-        consumptions.forEach((elm, index) => {
-          if ((typeof elm.orderableQuantity !== "undefined") && (parseInt(elm.orderableQuantity) < 1)) {
-            return;
-          }
+      
+      const addPayout = (item , type) => {
+        item = JSON.parse(JSON.stringify(item));
 
-          let exist = false;
-          if (Array.isArray(values.payoutItems)) {
-            values.payoutItems.forEach((v, idx) => {
-              if (v.inHospitalItemId === elm.inHospitalItemId) {
+        let itemCheck = false;
+
+        if (Array.isArray(values.payoutItems)) {
+          values.payoutItems.forEach((v, idx) => {
+            if (
+              v.inHospitalItemId === item.inHospitalItemId
+            ) {
+              itemCheck = true;
+              let payoutCheck = false;
+              v._payout.forEach((payout) => {
+                if (
+                  payout.count === 0 && payoutCheck === false
+                ) {
+                  payoutCheck = true;
+                  payout.count = item.payoutCount;
+                  payout.cardId = (type === 'card')? item.barcode : '';
+                }
+              });
+              if (!payoutCheck) {
+                v._payout.push({
+                  count : item.payoutCount,
+                  lotNumber : '',
+                  lotDate : '',
+                  cardId : (type === 'card')? item.barcode : '',
+                });
+              }
+            }
+          });
+        }
+        if(!itemCheck)
+        {
+          item._payout = [];
+          item._payout.push({
+            count : item.payoutCount,
+            lotNumber : '',
+            lotDate : '',
+            cardId : (type === 'card')? item.barcode : '',
+          });
+          additem(item);
+        }
+      }
+    
+      const searchCardId = (cardId) => {
+        let exist = false;
+        if (Array.isArray(values.payoutItems)) {
+          values.payoutItems.forEach((v, idx) => {
+            v._payout.forEach((payout) => {
+              if (
+                payout.cardId == cardId
+              ) {
                 exist = true;
-                let quantity = (elm.orderableQuantity > 0) ? parseInt(elm.orderableQuantity) : 0;
-                v.orderUnitQuantity += quantity;
               }
             });
-          }
+          });
+        }
+        return exist;
+      }
 
-          if (!values.payoutItems) {
-            values.payoutItems = [];
-          }
-
-          if (!exist) {
-            let orderItem = new Object();
-            orderItem.orderUnitQuantity = (elm.orderableQuantity && elm.orderableQuantity > 0) ? parseInt(elm.orderableQuantity) : 0;
-            orderItem.makerName = (elm.item.makerName) ? elm.item.makerName : "";
-            orderItem.itemName = (elm.item.itemName) ? elm.item.itemName : "";
-            orderItem.itemCode = (elm.item.itemCode) ? elm.item.itemCode : "";
-            orderItem.itemStandard = (elm.item.itemStandard) ? elm.item.itemStandard : "";
-            orderItem.itemJANCode = (elm.itemJANCode) ? elm.itemJANCode : "";
-            orderItem.quantity = (elm.quantity.quantityNum) ? parseInt(elm.quantity.quantityNum) : 0;
-            orderItem.price = (elm.price) ? parseInt(elm.price) : 0;
-            orderItem.quantityUnit = (elm.quantity.quantityUnit) ? elm.quantity.quantityUnit : "";
-            orderItem.itemUnit = (elm.quantity.itemUnit) ? elm.quantity.itemUnit : "";
-            orderItem.cardId = (elm.cardId) ? elm.cardId : "";
-            orderItem.itemId = (elm.item.itemId) ? elm.item.itemId : "";
-            orderItem.inHospitalItemId = (elm.inHospitalItemId) ? elm.inHospitalItemId : "";
-            orderItem.serialNo = (elm.item.serialNo) ? elm.item.serialNo : "";
-            orderItem.catalogNo = (elm.item.catalogNo) ? elm.item.catalogNo : "";
-            orderItem.inItemImage = (elm.itemImage) ? elm.itemImage : "";
-            orderItem.priceNotice = (elm.priceNotice) ? elm.priceNotice : "";
-            insert(0, orderItem);
-          }
-        });
-      };
-    
       const openModal = ref();
       const selectInHospitalItems = ref([]);
       const addItemByBarcode = (items) => {
@@ -498,7 +654,7 @@
           });
           return false;
         }
-
+/*
         if (items.type == "received") {
           items.item.forEach((x, id) => {
             items.item[id].orderUnitQuantity = 1;
@@ -520,10 +676,48 @@
             items.item[id].orderUnitQuantity = Math.ceil(parseInt(items.item[id].customQuantity) / parseInt(items.item[id].quantity));
           });
         }
+        */
+        if (items.type == "received") {
+          items.item.forEach((x, id) => {
+            items.item[id].payoutCount = 1;
+          });
+        }
+        
+        if (items.type == "payout") {
+          items.item.forEach((x, id) => {
+            items.item[id].payoutCount = items.item[id].payoutQuantity
+          });
+        }
+        if (items.type == "card") {
+          items.item.forEach((x, id) => {
+            items.item[id].payoutCount = items.item[id].cardQuantity
+          });
+        }
+        if (items.type == "customlabel") {
+          items.item.forEach((x, id) => {
+            items.item[id].payoutCount = items.item[id].customQuantity
+          });
+        }
 
         if (items.item.length === 1) {
           if (items.item[0].divisionId) {
-            if (values.divisionId !== items.item[0].divisionId) {
+            if(values.targetDivisionId === items.item[0].divisionId){
+              if(items.type == "card" && searchCardId(items.item[0].barcode ))
+              {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'エラー',
+                    text: 'すでに読み込まれたカードです。',
+                  });
+                return false;
+              }
+              // 払出先のカードを紐づける
+              addPayout(items.item[0] , items.type)
+              return true;
+            } else if(values.sourceDivisionId === items.item[0].divisionId)
+            {
+              additem(items.item[0]);
+            } else {
               Swal.fire({
                 icon: 'error',
                 title: 'エラー',
@@ -531,8 +725,10 @@
               });
               return false;
             }
+          } else {
+            items.item[0].divisionId = values.targetDivisionId
+            addPayout(items.item[0] , items.type)
           }
-          additem(items.item[0]);
         } else {
           selectInHospitalItems.value = items.item;
           openModal
@@ -553,7 +749,7 @@
 
         if(item._payout){
           item._payout.forEach((x, id) => {
-            count += x.count;
+            count += parseInt(x.count);
           }) 
         }
 
@@ -562,10 +758,101 @@
       
       const totalPrice = (item) => {
         let count = totalCount(item);
-
         return item.unitPrice * count;
       }
 
+      const clonePayout = (item_id , payout_id) => {
+        let tmp = values.payoutItems[item_id];
+        tmp = JSON.parse(JSON.stringify(tmp));
+        tmp._payout.push({
+          count : 0,
+          lotNumber : tmp._payout[payout_id].lotNumber,
+          lotDate : tmp._payout[payout_id].lotDate,
+          cardId :'',
+        })
+        update(item_id , tmp)
+      }
+
+      const deletePayout = (item_id , payout_id) => {
+        let tmp = values.payoutItems[item_id];
+        tmp = JSON.parse(JSON.stringify(tmp));
+
+        tmp._payout.splice(payout_id , 1);
+
+        update(item_id , tmp)
+        
+        if( values.payoutItems[item_id]._payout.length === 0 )
+        {
+          remove(item_id);
+        }
+      }
+
+      const toQuantity = () => {
+        Swal.fire({
+            title: '一括入数反映',
+            text: "払出数が0の情報に対して入数を反映してよろしいですか？",
+            icon: 'info',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'OK'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              if (Array.isArray(values.payoutItems)) {
+                values.payoutItems.forEach((v, idx) => {
+                    let lotCheck = false;
+                    v._payout.forEach((payout) => {
+                    if (
+                        payout.count == 0
+                      ){
+                        payout.count = v.quantity
+                    }
+                  });
+                });
+              }
+            }
+          })
+      }
+      const formatNumber = (num) => {
+          if (num >= 9999) {
+              return '9999';
+          } else {
+              return num.toString().padStart(4, '0');
+          }
+      }
+      const additemsForSlip =  (items) => {
+        items = JSON.parse(JSON.stringify(items));
+        items.forEach(async (elm, index) => {
+            let exist = false;
+            await searchInHospitalItem("inHPItem"+ elm.inHospitalItemId + formatNumber(elm.consumptionQuantity))
+              .then((response) => {
+                complete();
+                addItemByBarcode(response.data.data);
+              })
+              .catch((error) => {
+                complete();
+                Swal.fire({
+                  icon: "error",
+                  title: "検索に失敗しました。再度お試しください。",
+                });
+              });
+        });
+      }
+
+      const searchInHospitalItem = (barcode) => {
+        if (!barcode) {
+          return false;
+        }
+        let params = new URLSearchParams();
+        params.append("path", "/api/barcode/search");
+        params.append("barcode", barcode);
+        params.append("_csrf", _CSRF);
+        start();
+
+        return axios
+          .post(_APIURL, params)
+      }
       return {
         isRequired,
         values,
@@ -576,11 +863,10 @@
         loading, 
         start, 
         complete,
-        itemCount,
+        totalItemCount,
         isSubmitting,
         alert,
         confirm,
-        orderPrice,
         totalAmount,
         additem,
         onSubmit,
@@ -592,10 +878,15 @@
         fields,
         remove,
         validate,
-        addconsumptions,
         totalPrice,
         totalCount,
-        payoutUnitPriceUseFlag
+        payoutUnitPriceUseFlag,
+        getStockCount,
+        deletePayout,
+        clonePayout,
+        toQuantity,
+        onAcceptanceRegisterSubmit,
+        additemsForSlip
       };
     },
     watch: {
@@ -635,7 +926,18 @@
       'v-in-hospital-item-modal': vInHospitalItemModal,
       'header-navi': headerNavi,
       'blowing': blowing,
-      'v-consumption-history-modal-for-order': vConsumptionHistoryModalForOrder
+      'v-consumption-history-modal-for-item-request': vConsumptionHistoryModalForItemRequest
     },
   }).mount('#top');
 </script> 
+<script>
+    window.addEventListener('DOMContentLoaded', function() {
+        new ScrollHint('#payoutTable', {
+            scrollHintIconAppendClass: 'scroll-hint-icon-white', // white-icon will appear
+            applyToParents: true,
+            i18n: {
+                scrollable: 'スクロールできます'
+            }
+        });
+    });
+</script>

@@ -17,6 +17,7 @@ class ConsumptionItemForReference
     private int $consumptionQuantity;
     private string $itemImage;
     private string $priceNotice;
+    private bool $lotManagement = false;
 
     public function __construct(
         ConsumptionId $consumptionId,
@@ -29,7 +30,8 @@ class ConsumptionItemForReference
         UnitPrice $unitPrice,
         int $consumptionQuantity,
         $itemImage = "",
-        $priceNotice = ""
+        $priceNotice = "",
+        $lotManagement = ""
     ) {
         $this->consumptionId = $consumptionId;
         $this->inHospitalItemId = $inHospitalItemId;
@@ -42,6 +44,7 @@ class ConsumptionItemForReference
         $this->consumptionQuantity = $consumptionQuantity;
         $this->itemImage = ($itemImage) ? $itemImage : "";
         $this->priceNotice = ($priceNotice) ? $priceNotice : "";
+        $this->lotManagement = ($lotManagement) ? $lotManagement : "";
     }
 
     public static function create(Collection $input)
@@ -57,7 +60,8 @@ class ConsumptionItemForReference
             (new UnitPrice($input->unitPrice)),
             (int)$input->billingQuantity,
             $input->inItemImage,
-            $input->priceNotice
+            $input->priceNotice,
+            $input->lotManagement == '1'
         );
     }
 
@@ -106,7 +110,8 @@ class ConsumptionItemForReference
             'consumptionQuantity' => $this->consumptionQuantity,
             'consumptionPrice' => $this->price(),
             'itemImage' => $this->itemImage,
-            'priceNotice' => $this->priceNotice
+            'priceNotice' => $this->priceNotice,
+            'lotManagement' => $this->lotManagement
         ];
     }
 }

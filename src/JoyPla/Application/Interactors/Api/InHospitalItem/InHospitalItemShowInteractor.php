@@ -41,6 +41,7 @@ namespace JoyPla\Application\Interactors\Api\InHospitalItem {
             $inHospitalItemIds = array_map(function($inHospitalItemId){
                 return new InHospitalItemId($inHospitalItemId);
             }, $inHospitalItemIds);
+            
             $InHospitalItems = $this->repositoryProvider
                 ->getInHospitalItemRepository()
                 ->getInHospitalItemViewByInHospitalItemIds(

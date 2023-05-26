@@ -604,6 +604,7 @@ class PayoutView extends Model
         'payoutId',
         'inHospitalItemId',
         'hospitalId',
+
         'sourceDivisionId',
         'targetDivisionId',
         'quantity',
