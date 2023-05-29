@@ -38,6 +38,7 @@
                                         <th class="border border-slate-600 w-10 p-1">No.</th>
                                         <th class="border border-slate-600 w-48 p-1">商品情報</th>
                                         <th class="border border-slate-600 w-20 p-1">入数</th>
+                                        <th class="border border-slate-600 w-20 p-1">卸業者</th>
                                         <th class="border border-slate-600 w-36 p-1">バーコード</th>
                                         <th class="border border-slate-600 w-auto p-1">備考</th>
                                     </tr>
@@ -57,6 +58,7 @@
                                         <td class="border border-slate-600 p-1">
                                             <p class="truncat">{{ itemListRow.quantity }}{{ itemListRow.quantityUnit }} / {{ itemListRow.itemUnit }}</p>
                                         </td>
+                                        <td class="border border-slate-600 p-1">{{ itemListRow.distributorName }}</td>
                                         <td class="border border-slate-600 py-1 px-3">
                                             <img class="mx-auto" :src="itemListRow.janCodeImg" />
                                         </td>
