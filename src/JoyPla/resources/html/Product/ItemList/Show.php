@@ -51,13 +51,12 @@
                     <tr>
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">No</th>
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">商品名</th>
+                      <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">メーカー名</th>
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">製品コード</th>
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">規格</th>
+                      <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">JANコード</th>
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">卸業者</th>
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">入数</th>
-                      <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">入数単位</th>
-                      <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">個数単位</th>
-                      <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">バーコード</th>
                       <th></th>
                       <th></th>
                     </tr>
@@ -75,15 +74,12 @@
                       >
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ index + 1 }}</td>
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.itemName }}</td>
+                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.makerName }}</td>
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.itemCode }}</td>
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.itemStandard }}</td>
+                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.itemJANCode }}</td>
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.distributorName }}</td>
-                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.quantity }}</td>
-                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.quantityUnit }}</td>
-                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.itemUnit }}</td>
-                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">
-                        <v-barcode :value="item.itemLabelBarcode" :options="{format:'CODE128', textmargin:'0', fontoptions:'bold'}"></v-barcode>
-                      </td>
+                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.quantity }}{{ item.quantityUnit }}/{{ item.itemUnit }}</td>
                       <td class="border-b border-slate-100">
                         <v-button-primary type="button" @click.native="copyItem(index)">複製</v-button-primary>
                       </td>
@@ -692,9 +688,11 @@ var JoyPlaApp = Vue.createApp({
       }
 
       const downloadList = handleSubmit(async(values) => {
-        let content = '院内商品ID\t商品名\t製品コード\t規格\tJANコード\t入数\t入数単位\t個数単位\t卸業者\r\n';
+        let content = 'No.\t院内商品ID\t商品名\tメーカー名\t製品コード\t規格\tJANコード\t入数\t入数単位\t個数単位\t卸業者\r\n';
+        let rowNum = 0;
         for (const key of values.items) {
-          content += key.inHospitalItemId + "\t" + key.itemName + "\t" + key.itemCode + "\t" + key.itemStandard + "\t" + key.itemJANCode + "\t" + key.quantity.toString() + "\t" + key.quantityUnit + "\t" + key.itemUnit + "\t" + key.distributorName + "\r\n" ;
+          rowNum++;
+          content += rowNum + "\t" + key.inHospitalItemId + "\t" + key.itemName + "\t" + key.makerName + "\t" + key.itemCode + "\t" + key.itemStandard + "\t" + key.itemJANCode + "\t" + key.quantity.toString() + "\t" + key.quantityUnit + "\t" + key.itemUnit + "\t" + key.distributorName + "\r\n" ;
         }
         let blob = new Blob([content], {type: "text/plain"});
         let blobUrl = window.URL.createObjectURL(blob);

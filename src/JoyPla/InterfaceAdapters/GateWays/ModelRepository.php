@@ -692,6 +692,8 @@ class ModelRepository
             'notice',
             'notUsedFlag',
             'requestId',
+            'distributorMCode',
+            'unitPrice',
         ]);
     }
 
@@ -1403,6 +1405,7 @@ class ModelRepository
             'quantityUnit',
             'itemUnit',
             'labelId',
+            'makerName',
         ]);
     }
 

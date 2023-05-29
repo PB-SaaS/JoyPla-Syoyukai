@@ -35,8 +35,9 @@
                             <table class="border-collapse border border-slate-500 w-full" id="itemListRow">
                                 <thead class="text-xs">
                                     <tr class="bg-gray-100">
-                                        <th class="border border-slate-600 w-10 p-1"></th>
+                                        <th class="border border-slate-600 w-10 p-1">No.</th>
                                         <th class="border border-slate-600 w-48 p-1">商品情報</th>
+                                        <th class="border border-slate-600 w-20 p-1">入数</th>
                                         <th class="border border-slate-600 w-20 p-1">卸業者</th>
                                         <th class="border border-slate-600 w-36 p-1">バーコード</th>
                                         <th class="border border-slate-600 w-auto p-1">備考</th>
@@ -48,14 +49,16 @@
                                         <td class="border border-slate-600 p-1">
                                             <p class="w-64">
                                                 {{ itemListRow.itemName }}<br>
+                                                {{ itemListRow.makerName }}<br>
                                                 {{ itemListRow.itemCode }}<br>
                                                 {{ itemListRow.itemStandard }}<br>
-                                                {{ itemListRow.quantity }} / {{ itemListRow.quantityUnit }} / {{ itemListRow.itemUnit }}<br>
+                                                {{ itemListRow.itemJANCode }}<br>
                                             </p>
                                         </td>
                                         <td class="border border-slate-600 p-1">
-                                            <p class="truncat">{{ itemListRow.distributorName }}</p>
+                                            <p class="truncat">{{ itemListRow.quantity }}{{ itemListRow.quantityUnit }} / {{ itemListRow.itemUnit }}</p>
                                         </td>
+                                        <td class="border border-slate-600 p-1">{{ itemListRow.distributorName }}</td>
                                         <td class="border border-slate-600 py-1 px-3">
                                             <img class="mx-auto" :src="itemListRow.janCodeImg" />
                                         </td>
@@ -94,13 +97,13 @@
             };
             const printSplitter = (array) => {
                 let itemLists = [];
-                let length = array.length > 11 ? 1 + Math.ceil((array.length - 11) / 13) : 1;
+                let length = array.length > 10 ? 1 + Math.ceil((array.length - 10) / 11) : 1;
                 for(let i = 0; i < length; i++){
                     if(i === 0)
                     {
-                        itemLists.push(array.slice(0,11));
+                        itemLists.push(array.slice(0,10));
                     }else{
-                        itemLists.push(array.slice(11+((i-1)*13), 11+(i*13)));
+                        itemLists.push(array.slice(10+((i-1)*11), 10+(i*11)));
                     }
                 }
                 return itemLists;
