@@ -27,6 +27,7 @@ use JoyPla\InterfaceAdapters\GateWays\Repository\ReceivedRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\RequestItemCountRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ReturnRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\StockRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\StocktakingListRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\TotalizationRepository;
 
 class RepositoryProvider
@@ -159,6 +160,11 @@ class RepositoryProvider
     public function getItemListRepository()
     {
         return new ItemListRepository();
+    }
+
+    public function getStocktakingListRepository()
+    {
+        return new StocktakingListRepository();
     }
 
 }

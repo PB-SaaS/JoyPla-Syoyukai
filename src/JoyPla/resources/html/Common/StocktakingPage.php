@@ -26,6 +26,11 @@
                 <path stroke-linecap="round" class="stroke-pine-green-700" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </card-button>
+          <card-button main-color="bg-pine-green-500" text-color="text-pine-green-50" sub-color="bg-pine-green-600" label-text="棚卸商品管理表"  path="/stocktaking/stocktakingList/index">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" class="stroke-pine-green-700" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </card-button>
         </div>
       </div>
     </div>
