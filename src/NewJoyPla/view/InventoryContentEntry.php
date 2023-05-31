@@ -119,6 +119,7 @@
 					<button class="uk-button uk-button-primary" v-on:click="sendInventory" :disabled="isTemporaryData" v-if="!isTemporaryData">一時保存</button>
 					<button class="uk-button uk-button-primary" v-on:click="sendInventory" :disabled="!isTemporaryData" v-if="isTemporaryData">上書き保存</button>
 					<button class="uk-button uk-button-primary" v-on:click="getLotAndStock" v-bind:disabled="lists.length > 0">理論在庫から表を作成</button>
+					<button class="uk-button uk-button-primary" v-on:click="getStocktakingList" v-bind:disabled="lists.length > 0">理論在庫と棚卸商品管理表から表を作成</button>
 				</div>
 			</div>
 
@@ -135,6 +136,9 @@
 							<th class="uk-text-nowrap">id</th>
 							<th class="uk-table-expand">
 								<a href="#" @click="sortBy('rackName')" :class="addClass('rackName')">棚名</a>
+							</th>
+							<th class="uk-table-expand">
+								<a href="#" @click="sortBy('mandatoryFlag')" :class="addClass('mandatoryFlag')">棚卸必須</a>
 							</th>
 							<th class="uk-table-expand">
 								<a href="#" @click="sortBy('maker')" :class="addClass('maker')">メーカー</a>
@@ -183,6 +187,9 @@
 						<tr v-for="(list, key) in sort_lists" :id="'tr_' + key" v-bind:class="list.class">
 							<td></td>
 							<td>{{list.rackName}}</td>
+							<td>
+								<span v-if="list.mandatoryFlag==1">必須</span>
+							</td>
 							<td>{{list.maker}}</td>
 							<td>{{list.shouhinName}}</td>
 							<td>{{list.code}}</td>
@@ -236,27 +243,30 @@
 							<td>&emsp;</td>
 							<td>&emsp;</td>
 							<td>&emsp;</td>
-						</tr>
-						<tr>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
 							<td>&emsp;</td>
 						</tr>
 						<tr>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+						</tr>
+						<tr>
+							<td>&emsp;</td>
 							<td>&emsp;</td>
 							<td>&emsp;</td>
 							<td>&emsp;</td>
@@ -441,6 +451,7 @@ $defaultDivisionId = $user_info->isUser() ? $user_info->getDivisionId() : '';
 				if (rackName) {
 					object.rackName = rackName.rackName;
 				}
+				object.mandatoryFlag = ((object.mandatoryFlag == null) ? 0 : object.mandatoryFlag);
 				this.lists.push(object);
 			},
 			copyList: function(key) {
@@ -823,6 +834,52 @@ $defaultDivisionId = $user_info->isUser() ? $user_info->getDivisionId() : '';
 							data: {
 								_csrf: "<?php echo $csrf_token; ?>", // CSRFトークンを送信
 								Action: "getLotAndStockApi",
+								divisionId: app.divisionId,
+							},
+							dataType: 'json'
+						})
+						// Ajaxリクエストが成功した時発動
+						.done((data) => {
+							if (data.code == '1') {
+								UIkit.modal.alert(data.message);
+								return false;
+							}
+							if (!data.result) {
+								UIkit.modal.alert("取得に失敗しました");
+								return false;
+							}
+							if (data.count > 0) {
+								data.data.forEach(function(elem, index) {
+									app.addList(elem);
+								});
+							} else {
+								UIkit.modal.alert("データがありませんでした");
+							}
+						})
+						// Ajaxリクエストが失敗した時発動
+						.fail((data) => {
+							UIkit.modal.alert("取得に失敗しました");
+						})
+						// Ajaxリクエストが成功・失敗どちらでも発動
+						.always((data) => {
+							loading_remove();
+						});
+				});
+			},
+
+			//棚卸商品管理表から取得
+			getStocktakingList: function() {
+				UIkit.modal.confirm('在庫表、ロット一覧、棚卸商品管理表から理論在庫を取得します').then(function() {
+					if (!app.divisionCheck()) {
+						return false;
+					}
+					$.ajax({
+							async: false,
+							url: "<?php echo $api_url; ?>",
+							type: 'POST',
+							data: {
+								_csrf: "<?php echo $csrf_token; ?>", // CSRFトークンを送信
+								Action: "getStocktakingListApi",
 								divisionId: app.divisionId,
 							},
 							dataType: 'json'

@@ -15,6 +15,8 @@ use App\Model\InventoryEnd;
 use App\Model\InventoryHistory;
 use App\Model\InventoryItemView;
 use App\Model\StockView;
+use App\Model\StocktakingList;
+use App\Model\StocktakingListRowView;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use stdClass;
@@ -46,6 +48,19 @@ class InventoryDivisionSlipController extends Controller
 
             $inventory_items = InventoryItemView::where('hospitalId', $user_info->getHospitalId())->where('inventoryHId', $division_history_slip->inventoryHId)->get();
             $inventory_items = $inventory_items->data->all();
+
+            $divisionId = $division_history_slip->divisionId; //これで棚卸商品管理表を検索
+            $stocktakingList_slip = StocktakingList::where('hospitalId', $user_info->getHospitalId())->where('divisionId', $divisionId)->get();
+            $stocktakingList_items = [];
+            if($stocktakingList_slip->count > 0){
+                $stocktakingList_slip = $stocktakingList_slip->data->get(0);
+                $stockListId = $stocktakingList_slip->stockListId;
+                $stocktakingListRows = StocktakingListRowView::where('hospitalId', $user_info->getHospitalId())->where('stockListId', $stockListId)->get();
+                $stocktakingListRows = $stocktakingListRows->data->all();
+                foreach($stocktakingListRows as $stocktakingListRow){
+                    $stocktakingList_items[] = $stocktakingListRow; //これで画面に表示させるデータと突合させ棚卸必須フラグを反映
+                }
+            }
 
             $inventory_remake_items = [];
             /*
@@ -162,6 +177,16 @@ class InventoryDivisionSlipController extends Controller
 
             if (count($inventory_remake_items) != 0) {
                 array_multisort(array_column($inventory_remake_items, 'inHospitalItemId'), SORT_ASC, $inventory_remake_items);
+            }
+
+            //突合ここから
+            foreach($inventory_remake_items as $item){
+                foreach($stocktakingList_items as $row){
+                    if($row->inHospitalItemId == $item->inHospitalItemId){
+                        $inventory_remake_items[$item->inHospitalItemId]->mandatoryFlag = $row->mandatoryFlag;
+                        break;
+                    }
+                }
             }
 
             $hospital_data = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
@@ -230,6 +255,19 @@ class InventoryDivisionSlipController extends Controller
             $inventory_items = InventoryItemView::where('hospitalId', $user_info->getHospitalId())->where('inventoryHId', $division_history_slip->inventoryHId)->get();
             $inventory_items = $inventory_items->data->all();
 
+            $divisionId = $division_history_slip->divisionId; //これで棚卸商品管理表を検索
+            $stocktakingList_slip = StocktakingList::where('hospitalId', $user_info->getHospitalId())->where('divisionId', $divisionId)->get();
+            $stocktakingList_items = [];
+            if($stocktakingList_slip->count > 0){
+                $stocktakingList_slip = $stocktakingList_slip->data->get(0);
+                $stockListId = $stocktakingList_slip->stockListId;
+                $stocktakingListRows = StocktakingListRowView::where('hospitalId', $user_info->getHospitalId())->where('stockListId', $stockListId)->get();
+                $stocktakingListRows = $stocktakingListRows->data->all();
+                foreach($stocktakingListRows as $stocktakingListRow){
+                    $stocktakingList_items[] = $stocktakingListRow; //これで画面に表示させるデータと突合させ棚卸必須フラグを反映
+                }
+            }
+
             $inventory_remake_items = [];
             /*
             $stock = StockView::where('hospitalId',$user_info->getHospitalId())->where('divisionId',$division_history_slip->divisionId);
@@ -344,6 +382,16 @@ class InventoryDivisionSlipController extends Controller
 
             if (count($inventory_remake_items) != 0) {
                 array_multisort(array_column($inventory_remake_items, 'inHospitalItemId'), SORT_ASC, $inventory_remake_items);
+            }
+
+            //突合ここから
+            foreach($inventory_remake_items as $item){
+                foreach($stocktakingList_items as $row){
+                    if($row->inHospitalItemId == $item->inHospitalItemId){
+                        $inventory_remake_items[$item->inHospitalItemId]->mandatoryFlag = $row->mandatoryFlag;
+                        break;
+                    }
+                }
             }
 
             $hospital_data = Hospital::where('hospitalId', $user_info->getHospitalId())->get();
