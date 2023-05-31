@@ -26,7 +26,7 @@ use JoyPla\InterfaceAdapters\Controllers\Api\PayoutController;
 use JoyPla\InterfaceAdapters\Controllers\Api\AccountantController;
 use JoyPla\InterfaceAdapters\Controllers\Api\AccountantLogController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ItemListController; //商品一覧表用
-use JoyPla\InterfaceAdapters\Controllers\Api\StockController;
+use JoyPla\InterfaceAdapters\Controllers\Api\StocktakingListController; //棚卸商品管理表用
 use JoyPla\JoyPlaApplication;
 use JoyPla\Service\Presenter\Api\PresenterProvider;
 use JoyPla\Service\Repository\QueryProvider;
@@ -372,9 +372,30 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'stock',
     ]);
 
-    
+    Router::map('GET', '/api/stocktaking/stocktakingList/index', [
+        StocktakingListController::class,
+        'index',
+    ])->service($useCaseProvider->getStocktakingListIndexInteractor());
 
+    Router::map('POST', '/api/stocktaking/stocktakingList/register', [
+        StocktakingListController::class,
+        'register',
+    ])->service($useCaseProvider->getStocktakingListRegisterInteractor());
 
+    Router::map('GET', '/api/stocktaking/stocktakingList/:stockListId', [
+        StocktakingListController::class,
+        'show',
+    ])->service($useCaseProvider->getStocktakingListShowInteractor());
+
+    Router::map('patch', '/api/stocktaking/stocktakingList/:stockListId/update', [
+        StocktakingListController::class,
+        'update',
+    ])->service($useCaseProvider->getStocktakingListUpdateInteractor());
+
+    Router::map('delete', '/api/stocktaking/stocktakingList/:stockListId/delete', [
+        StocktakingListController::class,
+        'delete',
+    ]);
 });
 
 $router = new Router();

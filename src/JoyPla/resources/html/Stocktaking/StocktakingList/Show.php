@@ -5,39 +5,26 @@
   <div id="content" class="flex h-full px-1">
     <div class="flex-auto w-full">
       <div class="index px-1 w-full mx-auto mb-96">
-        <h1 class="text-2xl mb-2">商品リストの詳細</h1>
+        <h1 class="text-2xl mb-2">棚卸商品管理表の詳細</h1>
         <hr>
         <div class="p-4 text-base bg-gray-100 border border-gray-400 flex flex-col md:flex-row md:gap-6 gap-4 mb-6">
           <v-button-primary type="button" class="md:w-1/6 w-full" @click.native="itemRegister">
-            商品リストを更新
+            棚卸商品管理表を更新
           </v-button-primary>
           <v-button-danger type="button" class="md:w-1/6 w-full" @click.native="slipDelete">
-            商品リストを削除
+            棚卸商品管理表を削除
           </v-button-danger>
-          <v-button-default type="button" class="md:w-1/6 w-full" @click.native="openPrint( values.itemList?.itemListId )">
-            商品リストを印刷
+          <v-button-default type="button" class="md:w-1/6 w-full" @click.native="openPrint( values.stocktakingList?.stocktakingListId )">
+            棚卸商品管理表を印刷
           </v-button-default>
           <v-button-primary type="button" class="md:w-1/6 w-full" @click.native="downloadList">
-            商品リストをダウンロード
+            棚卸商品管理表をダウンロード
           </v-button-primary>
         </div>
         <div class="p-4 text-base bg-gray-100 border border-gray-400">
           <div class="flex w-full gap-6">
-            <div class="flex-initial lg:w-1/6 w-1/3">商品リストID</div>
-            <div class="flex-auto">{{ values.itemList?.itemListId }}</div>
-          </div>
-          <div class="flex w-full gap-6">
-            <div class="flex-initial lg:w-1/6 w-1/3">商品リスト名称</div>
-            <div class="flex-auto">
-              <v-input
-                name="itemListName"
-                type="text"
-                ></v-input>
-            </div>
-          </div>
-          <div class="flex w-full gap-6">
             <div class="flex-initial lg:w-1/6 w-1/3">部署</div>
-            <div class="flex-auto">{{ values.itemList?._division?.divisionName }}</div>
+            <div class="flex-auto">{{ values.stocktakingList?._division?.divisionName }}</div>
           </div>
         </div>
         <hr>
@@ -56,7 +43,10 @@
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">規格</th>
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">JANコード</th>
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">卸業者</th>
+                      <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">単価</th>
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">入数</th>
+                      <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">在庫数</th>
+                      <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">棚卸必須</th>
                       <th></th>
                       <th></th>
                     </tr>
@@ -79,9 +69,17 @@
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.itemStandard }}</td>
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.itemJANCode }}</td>
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.distributorName }}</td>
-                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.quantity }}{{ item.quantityUnit }}/{{ item.itemUnit }}</td>
-                      <td class="border-b border-slate-100">
-                        <v-button-primary type="button" @click.native="copyItem(index)">複製</v-button-primary>
+                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">
+                        <span v-if="item.stocktakingUnitPrice==null">更新後に再計算します</span>
+                        <span v-else>￥{{ item.stocktakingUnitPrice }}</span>
+                      </td>
+                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.quantity }}{{ item.quantityUnit }}</td>
+                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">
+                        <span v-if="item.stockQuantity">{{ item.stockQuantity }}</span>
+                        <span v-else>0</span>
+                      </td>
+                      <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">
+                        <input type="checkbox" v-model="item.mandatoryFlag" true-value="1" false-value="0" class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain mr-2 cursor-pointer">
                       </td>
                       <td class="border-b border-slate-100">
                         <v-button-danger type="button" @click.native="deleteItem(index)">削除</v-button-danger>
@@ -135,7 +133,7 @@
 </div>
 <script>
 
-const itemListId = '<?php echo $itemListId; ?>';
+const stocktakingListId = '<?php echo $stockListId; ?>';
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const vBarcode = {
     //vue-barcodeを参考に作成
@@ -189,6 +187,7 @@ var JoyPlaApp = Vue.createApp({
       'v-button-primary' : vButtonPrimary,
       'v-in-hospital-item-modal': vInHospitalItemModal,
       'v-barcode' : vBarcode,
+      'v-checkbox': vCheckbox,
     },
     setup(){
       const {ref , onCreated , onMounted} = Vue;
@@ -210,7 +209,6 @@ var JoyPlaApp = Vue.createApp({
               price : 0,
             },
             items : [],
-            itemListName : "",
           },
           validateOnMount : false
       });
@@ -239,27 +237,27 @@ var JoyPlaApp = Vue.createApp({
 
       const breadcrumbs = [
         {
-          text: '商品メニュー',
+          text: '棚卸メニュー',
           disabled: false,
-          href: _ROOT+'&path=/product',
+          href: _ROOT+'&path=/stocktaking',
         },
         {
-          text: '商品リスト',
+          text: '棚卸商品管理表',
           disabled: false,
-          href: _ROOT+'&path=/product/itemList/index&isCache=true',
+          href: _ROOT+'&path=/stocktaking/stocktakingList/index&isCache=true',
         },
         {
-          text: '商品リストの詳細',
+          text: '棚卸商品管理表の詳細',
           disabled: true,
         }
       ];
 
-      const getSlipData = async ( itemListId ) => 
+      const getSlipData = async ( stocktakingListId ) => 
       {
         startLoading();
         
         let params = new URLSearchParams();
-        params.append("path", "/api/product/itemList/"+itemListId);
+        params.append("path", "/api/stocktaking/stocktakingList/"+stocktakingListId);
         params.append("_method", 'get');
         params.append("_csrf", _CSRF);
 
@@ -275,9 +273,8 @@ var JoyPlaApp = Vue.createApp({
 
       const fetchData = async () => {
         startLoading();
-        const response = await getSlipData(itemListId);
-        values.itemList = response.data;
-        values.itemListName = response.data.itemListName;
+        const response = await getSlipData(stocktakingListId);
+        values.stocktakingList = response.data;
         replace(response.data.items);
         completeLoading();
       };
@@ -295,11 +292,16 @@ var JoyPlaApp = Vue.createApp({
       const insertItem = (item) => {
         if (!values.items) {
             values.items = [];
-          }
+        }
+
+        //重複不可
+        if(values.items.some((obj) => obj.inHospitalItemId == item.inHospitalItemId)){
+          return false;
+        }
 
         insert(fields.value.length, {
           index: fields.value.length,
-          itemListRowId: (typeof(item.itemListRowId) ? null : item.itemListRowId),
+          stocktakingListRowId: (typeof(item.stocktakingListRowId) ? null : item.stocktakingListRowId),
           itemId: item.itemId,
           inHospitalItemId: item.inHospitalItemId,
           itemName: item.itemName,
@@ -313,6 +315,8 @@ var JoyPlaApp = Vue.createApp({
           itemLabelBarcode: item.itemLabelBarcode,
           distributorId: item.distributorId,
           distributorName: item.distributorName,
+          rackName: item.rackName,
+          mandatoryFlag: item.mandatoryFlag,
         });
       }
 
@@ -349,7 +353,7 @@ var JoyPlaApp = Vue.createApp({
 
       const slipDelete = () => {
           Swal.fire({
-            title: '商品リストを削除',
+            title: '棚卸商品管理表を削除',
             text: "削除後は元に戻せません。\r\nよろしいですか？",
             icon: 'warning',
             confirmButtonText: '削除します',
@@ -362,7 +366,7 @@ var JoyPlaApp = Vue.createApp({
               try {
                 startLoading();
                 let params = new URLSearchParams();
-                params.append("path", "/api/product/itemList/"+itemListId+"/delete");
+                params.append("path", "/api/stocktaking/stocktakingList/"+stocktakingListId+"/delete");
                 params.append("_method", 'delete');
                 params.append("_csrf", _CSRF);
   
@@ -376,7 +380,7 @@ var JoyPlaApp = Vue.createApp({
                   icon: 'success',
                   title: '削除が完了しました。',
                 }).then((result) => {
-                  location.href = _ROOT+'&path=/product/itemList/index&isCache=true';
+                  location.href = _ROOT+'&path=/stocktaking/stocktakingList/index&isCache=true';
                 });
   
                 return true;
@@ -397,14 +401,13 @@ var JoyPlaApp = Vue.createApp({
         try {
           startLoading();
           let params = new URLSearchParams();
-          params.append("path", "/api/product/itemList/"+itemListId+"/update");
+          params.append("path", "/api/stocktaking/stocktakingList/"+stocktakingListId+"/update");
           params.append("_method", 'patch');
           params.append("_csrf", _CSRF);
-          params.append("itemList", JSON.stringify(encodeURIToObject(
+          params.append("stocktakingList", JSON.stringify(encodeURIToObject(
             {
               'items' : values.items ?? []
             })));
-          params.append("itemListName", encodeURI(values.itemListName));
 
           const res = await axios.post(_APIURL, params);
 
@@ -503,7 +506,7 @@ var JoyPlaApp = Vue.createApp({
       };
 
       const loadCsvFile = (e) => {
-          const headers = ['院内商品ID'];
+          const headers = ['院内商品ID', '棚卸必須フラグ'];
 
           let file = e
               .target
@@ -649,6 +652,11 @@ var JoyPlaApp = Vue.createApp({
                   let inHospitalItems = res.data.data;
                   inHospitalItems.forEach(function(line, index){
                     line.itemLabelBarcode = makeLabelBarcode(line.labelId, line.quantity);
+                    linesArr.forEach(function (line2 , index2) {
+                      if(line2['data'][0] == line.inHospitalItemId){
+                        line.mandatoryFlag = (line2['data'][1] == null || line2['data'][1] == 0) ? 0 : 1;
+                      }
+                    });
                     insertItem(line);
                   });
 
@@ -684,21 +692,21 @@ var JoyPlaApp = Vue.createApp({
       };
 
       const openPrint = ( url ) => {
-        location.href = _ROOT + "&path=/product/itemList/" + url + "/print";    
+        location.href = _ROOT + "&path=/stocktaking/stocktakingList/" + url + "/print";
       }
 
       const downloadList = handleSubmit(async(values) => {
-        let content = 'No.\t院内商品ID\t商品名\tメーカー名\t製品コード\t規格\tJANコード\t入数\t入数単位\t個数単位\t卸業者\r\n';
+        let content = 'No.\t院内商品ID\t商品名\tメーカー名\t製品コード\t規格\tJANコード\t卸業者\t単価\t入数\t入数単位\t在庫数\t棚卸必須フラグ\r\n';
         let rowNum = 0;
         for (const key of values.items) {
           rowNum++;
-          content += rowNum + "\t" + key.inHospitalItemId + "\t" + key.itemName + "\t" + key.makerName + "\t" + key.itemCode + "\t" + key.itemStandard + "\t" + key.itemJANCode + "\t" + key.quantity.toString() + "\t" + key.quantityUnit + "\t" + key.itemUnit + "\t" + key.distributorName + "\r\n" ;
+          content += rowNum + "\t" + key.inHospitalItemId + "\t" + key.itemName + "\t" + key.makerName + "\t" + key.itemCode + "\t" + key.itemStandard + "\t" + key.itemJANCode + "\t" + key.distributorName + "\t" + key.stocktakingUnitPrice + "\t" + key.quantity.toString() + "\t" + key.quantityUnit + "\t" + ((key.stockQuantity)? key.stockQuantity : 0) + "\t" + ((key.mandatoryFlag == "1") ? "必須" : "任意") + "\r\n" ;
         }
         let blob = new Blob([content], {type: "text/plain"});
         let blobUrl = window.URL.createObjectURL(blob);
         let obj = document.createElement("a");
         obj.href = blobUrl;
-        obj.download = values.itemListName+".txt";
+        obj.download = "在庫商品管理表（"+values.stocktakingList?._division?.divisionName+"）.txt";
         document.body.appendChild(obj);
         obj.click();
         obj.parentNode.removeChild(obj);

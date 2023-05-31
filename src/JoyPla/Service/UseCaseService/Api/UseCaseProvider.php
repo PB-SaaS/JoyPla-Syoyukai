@@ -51,6 +51,10 @@ use JoyPla\Application\Interactors\Api\Received\ReceivedReturnRegisterInteractor
 use JoyPla\Application\Interactors\Api\Received\ReceivedShowInteractor;
 use JoyPla\Application\Interactors\Api\ReceivedReturn\ReturnShowInteractor;
 use JoyPla\Application\Interactors\Api\Reference\ConsumptionHistoryShowInteractor;
+use JoyPla\Application\Interactors\Api\StocktakingList\StocktakingListIndexInteractor;
+use JoyPla\Application\Interactors\Api\StocktakingList\StocktakingListRegisterInteractor;
+use JoyPla\Application\Interactors\Api\StocktakingList\StocktakingListShowInteractor;
+use JoyPla\Application\Interactors\Api\StocktakingList\StocktakingListUpdateInteractor;
 use JoyPla\Service\Presenter\Api\PresenterProvider;
 use JoyPla\Service\Repository\QueryProvider;
 use JoyPla\Service\Repository\RepositoryProvider;
@@ -797,6 +801,66 @@ class UseCaseProvider
             $this->repositoryProvider,
             $this->presenterProvider
         ) extends ItemListUpdateInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getStocktakingListIndexInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends StocktakingListIndexInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getStocktakingListRegisterInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends StocktakingListRegisterInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getStocktakingListShowInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends StocktakingListShowInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getStocktakingListUpdateInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends StocktakingListUpdateInteractor {
             public function __construct(
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider

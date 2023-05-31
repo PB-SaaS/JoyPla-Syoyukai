@@ -1868,4 +1868,25 @@ namespace JoyPla\Enterprise\Models {
             return new self($id);
         }
     }
+
+    class StocktakingListId //在庫管理表ID
+    {
+        use ValueObjectTrait;
+
+        public function __construct(string $value = '')
+        {
+            $this->value = $value;
+        }
+    }
+
+    class StocktakingListRowId //在庫管理表項目ID
+    {
+        use ValueObjectTrait;
+
+        public function __construct(?string $value = '')
+        {
+            $this->value = $value;
+        }
+    }
+
 }

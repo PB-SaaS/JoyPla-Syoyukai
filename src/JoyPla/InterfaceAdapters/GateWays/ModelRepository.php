@@ -693,6 +693,8 @@ class ModelRepository
             'notice',
             'notUsedFlag',
             'requestId',
+            'distributorMCode',
+            'unitPrice',
         ]);
     }
 
@@ -1441,6 +1443,90 @@ class ModelRepository
             'quantityUnit',
             'itemUnit',
             'labelId',
+            'makerName',
+        ]);
+    }
+
+    public static function getStocktakingListTableInstance()
+    {
+        return SpiralDB::title('NJ_StockList')->value([ //棚卸商品管理表DB
+            'id',
+            'registrationTime',
+            'updateTime',
+            'stockListId', //機能名とフィールドタイトルが違うため注意
+            'stockListName', //機能名とフィールドタイトルが違うため注意
+            'hospitalId',
+            'divisionId',
+            'itemsNumber',
+        ]);
+    }
+
+    public static function getStocktakingListRowsInstance()
+    {
+        return SpiralDB::title('NJ_StockListRows')->value([ //棚卸商品管理表項目DB
+            'id',
+            'registrationTime',
+            'updateTime',
+            'stockListId', //機能名とフィールドタイトルが違うため注意
+            'stockListRowId', //機能名とフィールドタイトルが違うため注意
+            'hospitalId',
+            'divisionId',
+            'inHospitalItemId',
+            'itemId',
+            'distributorId',
+            'rackName',
+            'mandatoryFlag',
+            'index',
+        ]);
+    }
+
+    public static function getStocktakingListTableViewInstance()
+    {
+        return SpiralDB::title('StockListView')->value([ //棚卸商品管理表仮想DB-画面表示に使うかもしれないやつ
+            'id',
+            'registrationTime',
+            'updateTime',
+            'stockListId', //機能名とフィールドタイトルが違うため注意
+            'stockListName', //機能名とフィールドタイトルが違うため注意
+            'hospitalId',
+            'divisionId',
+            'itemsNumber',
+            'divisionName',
+            'hospitalName',
+        ]);
+    }
+
+    public static function getStocktakingListRowsViewInstance()
+    {
+        return SpiralDB::title('StockListRowView')->value([ //棚卸商品管理表項目仮想DB-画面表示に使うかもしれないやつ
+            'id',
+            'registrationTime',
+            'updateTime',
+            'stockListId', //機能名とフィールドタイトルが違うため注意
+            'stockListRowId', //機能名とフィールドタイトルが違うため注意
+            'hospitalId',
+            'divisionId',
+            'inHospitalItemId',
+            'itemId',
+            'distributorId',
+            'rackName',
+            'mandatoryFlag',
+            'index',
+            'distributorName',
+            'hospitalName',
+            'divisionName',
+            'itemName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'quantity',
+            'quantityUnit',
+            'itemUnit',
+            'labelId',
+            'price',
+            'priceId',
+            'invUnitPrice',
+            'makerName',
         ]);
     }
 

@@ -1,10 +1,10 @@
 <div id="top" v-cloak>
-    <template v-if="itemListRows.length > 0">
-        <template v-for="(itemListRowsArray , key) in printSplitter(itemListRows)">
+    <template v-if="stocktakingListRows.length > 0">
+        <template v-for="(stocktakingListRowsArray , key) in printSplitter(stocktakingListRows)">
             <div class="paper A4 ">
                 <!-- here -->
                 <div class="p-6 relative">
-                    <header class="text-center text-2xl">{{itemList.itemListName}}</header>
+                    <header class="text-center text-xl">棚卸商品管理表</header>
                     <main class="mt-6">
                         <template v-if="key === 0">
                             <div class="flex">
@@ -15,12 +15,8 @@
                                             <div class="flex-auto w-2/3"><?php echo date('Y年m月d日'); ?></div>
                                         </div>
                                         <div class="flex ">
-                                            <div class="flex-auto w-1/3">商品リスト番号</div>
-                                            <div class="flex-auto w-2/3">{{ itemList.itemListId }}</div>
-                                        </div>
-                                        <div class="flex ">
                                             <div class="flex-auto w-1/3">部署</div>
-                                            <div class="flex-auto w-2/3">{{ itemList.divisionName }}</div>
+                                            <div class="flex-auto w-2/3">{{ stocktakingList.divisionName }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -32,35 +28,48 @@
                             </div>
                         </template>
                         <div class="mt-4">
-                            <table class="border-collapse border border-slate-500 w-full" id="itemListRow">
+                            <table class="border-collapse border border-slate-500 w-full" id="stocktakingListRow">
                                 <thead class="text-xs">
                                     <tr class="bg-gray-100">
-                                        <th class="border border-slate-600 w-10 p-1">No.</th>
-                                        <th class="border border-slate-600 w-48 p-1">商品情報</th>
-                                        <th class="border border-slate-600 w-20 p-1">入数</th>
-                                        <th class="border border-slate-600 w-20 p-1">卸業者</th>
-                                        <th class="border border-slate-600 w-36 p-1">バーコード</th>
-                                        <th class="border border-slate-600 w-auto p-1">備考</th>
+                                        <th class="border border-slate-600 text-xxs w-5 p-1">No.</th>
+                                        <th class="border border-slate-600 text-xxs w-48 p-1">商品情報</th>
+                                        <th class="border border-slate-600 text-xxs w-20 p-1">卸業者</th>
+                                        <th class="border border-slate-600 text-xxs w-36 p-1">バーコード</th>
+                                        <th class="border border-slate-600 text-xxs w-10 p-1">単価</th>
+                                        <th class="border border-slate-600 text-xxs w-20 p-1">入数</th>
+                                        <th class="border border-slate-600 text-xxs w-10 p-1">在庫数</th>
+                                        <th class="border border-slate-600 text-xxs w-14 p-1">棚卸必須</th>
+                                        <th class="border border-slate-600 text-xxs w-auto p-1">備考</th>
                                     </tr>
                                 </thead>
                                 <tbody class="text-xxs">
-                                    <tr class="bg-white" v-for="( itemListRow, index ) in itemListRowsArray">
+                                    <tr class="bg-white" v-for="( stocktakingListRow, index ) in stocktakingListRowsArray">
                                         <td class="border border-slate-600 p-1">{{ index + 1 }}</td>
                                         <td class="border border-slate-600 p-1">
-                                            <p class="w-64">
-                                                {{ itemListRow.itemName }}<br>
-                                                {{ itemListRow.makerName }}<br>
-                                                {{ itemListRow.itemCode }}<br>
-                                                {{ itemListRow.itemStandard }}<br>
-                                                {{ itemListRow.itemJANCode }}<br>
+                                            <p class="w-44">
+                                                {{ stocktakingListRow.itemName }}<br>
+                                                {{ stocktakingListRow.makerName }}<br>
+                                                {{ stocktakingListRow.itemCode }}<br>
+                                                {{ stocktakingListRow.itemStandard }}<br>
+                                                {{ stocktakingListRow.itemJANCode }}<br>
                                             </p>
                                         </td>
                                         <td class="border border-slate-600 p-1">
-                                            <p class="truncat">{{ itemListRow.quantity }}{{ itemListRow.quantityUnit }} / {{ itemListRow.itemUnit }}</p>
+                                            <p class="truncat">{{ stocktakingListRow.distributorName }}</p>
                                         </td>
-                                        <td class="border border-slate-600 p-1">{{ itemListRow.distributorName }}</td>
                                         <td class="border border-slate-600 py-1 px-3">
-                                            <img class="mx-auto" :src="itemListRow.janCodeImg" />
+                                            <img class="mx-auto" :src="stocktakingListRow.janCodeImg" />
+                                        </td>
+                                        <td class="border border-slate-600 p-1">￥{{ stocktakingListRow.stocktakingUnitPrice }}</td>
+                                        <td class="border border-slate-600 p-1">
+                                            {{ stocktakingListRow.quantity }}{{ stocktakingListRow.quantityUnit }}/{{ stocktakingListRow.itemUnit }}
+                                        </td>
+                                        <td class="border border-slate-600 p-1">
+                                            <p class="truncat" v-if="stocktakingListRow.stockQuantity">{{ stocktakingListRow.stockQuantity }}</p>
+                                            <p class="truncat" v-else>0</p>
+                                        </td>
+                                        <td class="border border-slate-600 p-1">
+                                            <span v-if="stocktakingListRow.mandatoryFlag=='1'">必須</span>
                                         </td>
                                         <td class="border border-slate-600 p-1 text-right"></td>
                                     </tr>
@@ -74,18 +83,18 @@
     </template>
 </div>
 <style>
-    #itemListRow tr td{
+    #stocktakingListRow tr td{
         page-break-inside: avoid;
     }
     @media print{
-        #itemListRow thead{
+        #stocktakingListRow thead{
             margin-top: 10px;
         }
     }
 </style>
 <script>
-    const itemList = <?php echo json_encode($itemList, true); ?>;
-    let itemListRows = <?php echo json_encode($itemListRows, true); ?>;
+    const stocktakingList = <?php echo json_encode($stocktakingList, true); ?>;
+    let stocktakingListRows = <?php echo json_encode($stocktakingListRows, true); ?>;
     var JoyPlaApp = Vue.createApp({
         components: {},
         setup() {
@@ -96,17 +105,17 @@
                 return new Intl.NumberFormat('ja-JP').format(value);
             };
             const printSplitter = (array) => {
-                let itemLists = [];
+                let stocktakingLists = [];
                 let length = array.length > 10 ? 1 + Math.ceil((array.length - 10) / 11) : 1;
                 for(let i = 0; i < length; i++){
                     if(i === 0)
                     {
-                        itemLists.push(array.slice(0,10));
+                        stocktakingLists.push(array.slice(0,10));
                     }else{
-                        itemLists.push(array.slice(10+((i-1)*11), 10+(i*11)));
+                        stocktakingLists.push(array.slice(10+((i-1)*11), 10+(i*11)));
                     }
                 }
-                return itemLists;
+                return stocktakingLists;
             }
             return {
                 numberFormat,
@@ -117,8 +126,8 @@
             return {
                 barcode_src: "",
                 qr_src: "",
-                itemList: itemList,
-                itemListRows: itemListRows,
+                stocktakingList: stocktakingList,
+                stocktakingListRows: stocktakingListRows,
             };
         },
         async created() {
@@ -130,7 +139,7 @@
                 try {
                     bwipjs.toCanvas(canvas, {
                         bcid: 'code128', // Barcode type
-                        text: this.itemList.itemListId, // Text to encode
+                        text: this.stocktakingList.stockListId, // Text to encode
                         scale: 3, // 3x scaling factor
                         height: 5, // Bar height, in millimeters
                         includetext: true, // Show human-readable text
@@ -140,14 +149,14 @@
 
                     bwipjs.toCanvas(canvas, {
                         bcid: 'qrcode',
-                        text: 'https://' + location.host + _ROOT + '&path=/itemList/' + this.itemList.itemListId, // Text to encode
+                        text: 'https://' + location.host + _ROOT + '&path=/stocktakingList/' + this.stocktakingList.stockListId, // Text to encode
                     });
 
                     this.qr_src = canvas.toDataURL();
                     let labelBarcode = '';
                     let quantityNum = '';
 
-                    this.itemListRows.forEach(async(x, xkey) => {
+                    this.stocktakingListRows.forEach(async(x, xkey) => {
                         let canvas = await document.createElement("canvas");
                         labelBarcode = '';
                         quantityNum = '';
@@ -170,7 +179,7 @@
                             includetext: true, // Show human-readable text
                             textxalign: 'center', // Always good to set this
                         });
-                        this.itemListRows[xkey].janCodeImg = canvas.toDataURL();
+                        this.stocktakingListRows[xkey].janCodeImg = canvas.toDataURL();
                     });
                 } catch (e) {
                     console.error(e);

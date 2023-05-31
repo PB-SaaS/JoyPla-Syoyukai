@@ -631,5 +631,23 @@ class JoyPlaApplication extends Application
             return new GatePermissionModel(true, false);
         });
 
+        Gate::define('list_of_stocktakingList_slips', function (Auth $auth) {
+            //棚卸商品管理表
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
+        Gate::define('register_of_stocktakingList', function (Auth $auth) {
+            //棚卸商品管理表-詳細
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
     }
 }
