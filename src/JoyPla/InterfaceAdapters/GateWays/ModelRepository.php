@@ -642,6 +642,7 @@ class ModelRepository
             'targetDivision',
             'itemsNumber',
             'totalAmount',
+            'updateTime',
         ]);
     }
 
@@ -1151,6 +1152,43 @@ class ModelRepository
         ]);
     }
 
+    
+    public static function getAcceptanceInstance()
+    {
+        return SpiralDB::title('NJ_Acceptance')->value([
+            'id',
+            'registTime',
+            'updateTime',
+            'acceptanceId',
+            'hospitalId',
+            'sourceDivisionId',
+            'targetDivisionId',
+            'acceptanceDate',
+            'isComplete',
+        ]);
+    }
+    
+    public static function getAcceptanceItemInstance()
+    {
+        return SpiralDB::title('NJ_AcceptItem')->value([
+            'id',
+            'registrationTime',
+            'updateTime',
+            'acceptanceId',
+            'acceptanceItemId',
+            'inHospitalItemId',
+            'lotNumber',
+            'lotDate',
+            'quantity',
+            'quantityUnit',
+            'itemUnit',
+            'price',
+            'unitPrice',
+            'acceptanceCount',
+            'payoutCount',
+        ]);
+    }
+
     public static function getAccountantItemInstance()
     {
         return SpiralDB::title('NJ_AccountantI')->value([
@@ -1403,6 +1441,45 @@ class ModelRepository
             'quantityUnit',
             'itemUnit',
             'labelId',
+        ]);
+    }
+
+    
+    public static function getAcceptanceItemViewInstance()
+    {
+        return SpiralDB::title('acceptanceItem')->value([
+            'id',
+            'registrationTime',
+            'updateTime',
+            'acceptanceId',
+            'acceptanceItemId',
+            'inHospitalItemId',
+            'lotNumber',
+            'lotDate',
+            'quantity',
+            'quantityUnit',
+            'itemUnit',
+            'price',
+            'unitPrice',
+            'acceptanceCount',
+            'payoutCount',
+            'sourceDivisionId',
+            'targetDivisionId',
+            'hospitalId',
+            'acceptanceDate',
+            'isComplete',
+            'authKey',
+            'distributorId',
+            'catalogNo',
+            'serialNo',
+            'medicineCategory',
+            'homeCategory',
+            'notUsedFlag',
+            'itemId',
+            'itemName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
         ]);
     }
 

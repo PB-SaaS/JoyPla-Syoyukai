@@ -14,57 +14,95 @@ class PayoutRepository implements PayoutRepositoryInterface
         }, $payouts);
 
         $histories = [];
-        $items = [];
+        $insertItems = [];
+        $updateItems = [];
 
         foreach ($payouts as $payout) {
             $payoutToArray = $payout->toArray();
 
             $histories[] = [
-                'payoutHistoryId' => (string) $payoutToArray['payoutHId'],
+                'updateTime'=> 'now',
+                'payoutDate' =>  (string) $payoutToArray['payoutDate'],
+                'payoutHistoryId' => (string) $payoutToArray['payoutHistoryId'],
                 'hospitalId' =>
-                    (string) $payoutToArray['hospital']['hospitalId'],
+                    (string) $payoutToArray['hospitalId'],
                 'sourceDivisionId' =>
-                    (string) $payoutToArray['sourceDivision']['divisionId'],
+                    (string) $payoutToArray['sourceDivisionId'],
                 'sourceDivision' =>
-                    (string) $payoutToArray['sourceDivision']['divisionName'],
+                    (string) $payoutToArray['sourceDivisionName'],
                 'targetDivisionId' =>
-                    (string) $payoutToArray['targetDivision']['divisionId'],
+                    (string) $payoutToArray['targetDivisionId'],
                 'targetDivision' =>
-                    (string) $payoutToArray['targetDivision']['divisionName'],
+                    (string) $payoutToArray['targetDivisionName'],
                 'itemsNumber' => (string) $payoutToArray['itemCount'],
                 'totalAmount' => (string) $payoutToArray['totalAmount'],
             ];
 
             foreach ($payoutToArray['payoutItems'] as $payoutItem) {
-                $items[] = [
-                    'payoutHistoryId' => (string) $payoutToArray['payoutHId'],
-                    'hospitalId' => (string) $payoutItem['hospitalId'],
-                    'itemId' => (string) $payoutItem['item']['itemId'],
-                    'inHospitalItemId' =>
-                        (string) $payoutItem['inHospitalItemId'],
-                    'sourceDivisionId' =>
-                        (string) $payoutItem['sourceDivision']['divisionId'],
-                    'targetDivisionId' =>
-                        (string) $payoutItem['targetDivision']['divisionId'],
-                    'payoutQuantity' => (string) $payoutItem['payoutQuantity'],
-                    'quantity' =>
-                        (string) $payoutItem['quantity']['quantityNum'],
-                    'quantityUnit' =>
-                        (string) $payoutItem['quantity']['quantityUnit'],
-                    'itemUnit' => (string) $payoutItem['quantity']['itemUnit'],
-                    'price' => (string) $payoutItem['price'],
-                    'unitPrice' => (string) $payoutItem['unitPrice'],
-                    'lotNumber' => (string) $payoutItem['lot']['lotNumber'],
-                    'lotDate' => (string) $payoutItem['lot']['lotDate'],
-                    'cardId' => (string) $payoutItem['card'],
-                    'payoutType' => '2',
-                    'payoutAmount' => (string) $payoutItem['payoutAmount'],
-                ];
+                if($payoutItem['payoutItemId'] == ''){
+                    $insertItems[] = [
+                        'registrationTime' => (string) $payoutToArray['payoutDate'],
+                        'payoutHistoryId' => (string) $payoutToArray['payoutHistoryId'],
+                        'hospitalId' => (string) $payoutToArray['hospitalId'],
+                        'itemId' => (string) $payoutItem['itemId'],
+                        'inHospitalItemId' =>
+                            (string) $payoutItem['inHospitalItemId'],
+                        'sourceDivisionId' =>
+                            (string) $payoutToArray['sourceDivisionId'],
+                        'targetDivisionId' =>
+                            (string) $payoutToArray['targetDivisionId'],
+                        'payoutQuantity' => (string) $payoutItem['payoutQuantity'],
+                        'quantity' =>
+                            (string) $payoutItem['quantityNum'],
+                        'quantityUnit' =>
+                            (string) $payoutItem['quantityUnit'],
+                        'itemUnit' => (string) $payoutItem['itemUnit'],
+                        'price' => (string) $payoutItem['price'],
+                        'unitPrice' => (string) $payoutItem['unitPrice'],
+                        'lotNumber' => (string) $payoutItem['lotNumber'],
+                        'lotDate' => (string) $payoutItem['lotDate'],
+                        'cardId' => (string) $payoutItem['card'],
+                        'payoutType' => '2',
+                        'payoutAmount' => (string) $payoutItem['payoutAmount'],
+                    ];
+                } else {
+                    $updateItems[] = [
+                        'updateTime' => 'now',
+                        'payoutHistoryId' => (string) $payoutToArray['payoutHistoryId'],
+                        'payoutId' => (string) $payoutItem['payoutItemId'],
+                        'hospitalId' => (string) $payoutItem['hospitalId'],
+                        'itemId' => (string) $payoutItem['itemId'],
+                        'inHospitalItemId' =>
+                            (string) $payoutItem['inHospitalItemId'],
+                        'sourceDivisionId' =>
+                            (string) $payoutToArray['sourceDivisionId'],
+                        'targetDivisionId' =>
+                            (string) $payoutToArray['targetDivisionId'],
+                        'payoutQuantity' => (string) $payoutItem['payoutQuantity'],
+                        'quantity' =>
+                            (string) $payoutItem['quantityNum'],
+                        'quantityUnit' =>
+                            (string) $payoutItem['quantityUnit'],
+                        'itemUnit' => (string) $payoutItem['itemUnit'],
+                        'price' => (string) $payoutItem['price'],
+                        'unitPrice' => (string) $payoutItem['unitPrice'],
+                        'lotNumber' => (string) $payoutItem['lotNumber'],
+                        'lotDate' => (string) $payoutItem['lotDate'],
+                        'cardId' => (string) $payoutItem['card'],
+                        'payoutType' => '2',
+                        'payoutAmount' => (string) $payoutItem['payoutAmount'],
+                    ];
+                }
             }
         }
 
-        ModelRepository::getPayoutInstance()->insert($histories);
-        ModelRepository::getPayoutItemInstance()->insert($items);
+        ModelRepository::getPayoutInstance()->upsertBulk('payoutHistoryId',$histories);
+        if(!empty($updateItems)){
+            ModelRepository::getPayoutItemInstance()->updateBulk('payoutId',$updateItems);
+        }
+        if(!empty($insertItems)){
+            ModelRepository::getPayoutItemInstance()->insert($insertItems);
+        }
 
         return $payouts;
     }

@@ -746,6 +746,10 @@ video {
   margin: 0px;
 }
 
+.m-12 {
+  margin: 3rem;
+}
+
 .m-8 {
   margin: 2rem;
 }
@@ -831,6 +835,10 @@ video {
 
 .-ml-1 {
   margin-left: -0.25rem;
+}
+
+.-mr-1 {
+  margin-right: -0.25rem;
 }
 
 .mb-0 {
@@ -1089,6 +1097,10 @@ video {
   min-height: 80px;
 }
 
+.w-0 {
+  width: 0px;
+}
+
 .w-1 {
   width: 0.25rem;
 }
@@ -1175,6 +1187,10 @@ video {
 
 .w-5\/6 {
   width: 83.333333%;
+}
+
+.w-56 {
+  width: 14rem;
 }
 
 .w-6 {
@@ -1304,6 +1320,14 @@ video {
 
 .border-collapse {
   border-collapse: collapse;
+}
+
+.origin-top-left {
+  transform-origin: top left;
+}
+
+.origin-top-right {
+  transform-origin: top right;
 }
 
 .-translate-x-1 {
@@ -2831,6 +2855,16 @@ video {
   outline-style: solid;
 }
 
+.ring-1 {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.ring-opacity-5 {
+  --tw-ring-opacity: 0.05;
+}
+
 .blur {
   --tw-blur: blur(8px);
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
@@ -3175,6 +3209,11 @@ input[aria-invalid="true"] {
   background-color: rgb(229 231 235 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-red-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 226 226 / var(--tw-bg-opacity));
+}
+
 .hover\:bg-red-400:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(248 113 113 / var(--tw-bg-opacity));
@@ -3203,6 +3242,16 @@ input[aria-invalid="true"] {
 .hover\:text-gray-800:hover {
   --tw-text-opacity: 1;
   color: rgb(31 41 55 / var(--tw-text-opacity));
+}
+
+.hover\:text-gray-900:hover {
+  --tw-text-opacity: 1;
+  color: rgb(17 24 39 / var(--tw-text-opacity));
+}
+
+.hover\:text-red-900:hover {
+  --tw-text-opacity: 1;
+  color: rgb(127 29 29 / var(--tw-text-opacity));
 }
 
 .hover\:text-white:hover {
@@ -3276,6 +3325,11 @@ input[aria-invalid="true"] {
 .disabled\:bg-slate-50:disabled {
   --tw-bg-opacity: 1;
   background-color: rgb(248 250 252 / var(--tw-bg-opacity));
+}
+
+.disabled\:text-gray-400:disabled {
+  --tw-text-opacity: 1;
+  color: rgb(156 163 175 / var(--tw-text-opacity));
 }
 
 .disabled\:text-slate-500:disabled {

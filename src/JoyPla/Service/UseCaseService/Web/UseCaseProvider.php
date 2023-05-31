@@ -208,7 +208,7 @@ class UseCaseProvider
                 PresenterProvider $presenterProvider
             ) {
                 parent::__construct(
-                    $presenterProvider->getItemListShowPresenter(),
+                    $presenterProvider,
                     $repositoryProvider
                 );
             }

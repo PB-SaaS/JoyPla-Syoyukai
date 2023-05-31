@@ -5,21 +5,16 @@
  */
 
 namespace JoyPla\Application\Interactors\Api\Payout {
-    use App\Model\InHospitalItem as ModelInHospitalItem;
     use Exception;
     use JoyPla\Application\InputPorts\Api\Payout\PayoutRegisterInputPortInterface;
     use JoyPla\Application\InputPorts\Api\Payout\PayoutRegisterInputData;
     use JoyPla\Application\OutputPorts\Api\Payout\PayoutRegisterOutputData;
-    use JoyPla\Enterprise\Models\Card;
-    use JoyPla\Enterprise\Models\PayoutHId;
     use JoyPla\Enterprise\Models\Payout;
-    use JoyPla\Enterprise\Models\DateYearMonthDayHourMinutesSecond;
     use JoyPla\Enterprise\Models\Hospital;
     use JoyPla\Enterprise\Models\HospitalId;
-    use JoyPla\Enterprise\Models\HospitalName;
     use JoyPla\Enterprise\Models\RequestItemCount;
-    use JoyPla\Enterprise\Models\Pref;
     use JoyPla\Enterprise\Models\CardId;
+    use JoyPla\Enterprise\Models\DateYearMonthDay;
     use JoyPla\Enterprise\Models\Division;
     use JoyPla\Enterprise\Models\InHospitalItem;
     use JoyPla\Enterprise\Models\InHospitalItemId;
@@ -27,7 +22,9 @@ namespace JoyPla\Application\Interactors\Api\Payout {
     use JoyPla\Enterprise\Models\Lot;
     use JoyPla\Enterprise\Models\LotDate;
     use JoyPla\Enterprise\Models\LotNumber;
+    use JoyPla\Enterprise\Models\PayoutHistoryId;
     use JoyPla\Enterprise\Models\PayoutItem;
+    use JoyPla\Enterprise\Models\PayoutItemId;
     use JoyPla\Enterprise\Models\PayoutQuantity;
     use JoyPla\Enterprise\Models\UnitPrice;
     use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
@@ -128,8 +125,8 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                         $sourceDivision
                     ) {
                         return $value->equalDivisions(
-                            $sourceDivision,
-                            $targetDivision
+                            $sourceDivision->getDivisionId(),
+                            $targetDivision->getDivisionId()
                         );
                     })
                 ) {
@@ -137,12 +134,13 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                 }
 
                 $payouts[] = new Payout(
-                    PayoutHId::generate(),
-                    new DateYearMonthDayHourMinutesSecond(''),
-                    [],
-                    $hospital,
-                    $sourceDivision,
-                    $targetDivision
+                    new DateYearMonthDay($inputData->payoutDate ?? 'now'),
+                    PayoutHistoryId::generate(),
+                    $hospital->getHospitalId(),
+                    $sourceDivision->getDivisionId(),
+                    $sourceDivision->getDivisionName()->value(),
+                    $targetDivision->getDivisionId(),
+                    $targetDivision->getDivisionName()->value(),
                 );
             }
 
@@ -197,26 +195,28 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                 foreach ($payouts as &$payout) {
                     if (
                         $payout->equalDivisions(
-                            $sourceDivision,
-                            $targetDivision
+                            $sourceDivision->getDivisionId(),
+                            $targetDivision->getDivisionId()
                         )
                     ) {
+                        $lot = new Lot(
+                            new LotNumber($payoutItem->lotNumber),
+                            new LotDate($payoutItem->lotDate)
+                        );
                         $item = new PayoutItem(
-                            $payout->getPayoutHId(),
-                            '',
+                            $payout->getPayoutHistoryId(),
+                            new PayoutItemId(''),
                             $inHospitalItem->getInHospitalItemId(),
-                            $inHospitalItem->getItem(),
-                            $hospitalId,
-                            $sourceDivision,
-                            $targetDivision,
-                            $inHospitalItem->getQuantity(),
+                            $inHospitalItem->getItem()->getItemId(),
+                            $hospital->getHospitalId(),
+                            $inHospitalItem->getQuantity()->getQuantityNum(),
+                            $inHospitalItem->getQuantity()->getQuantityUnit(),
+                            $inHospitalItem->getQuantity()->getItemUnit(),
                             $inHospitalItem->getPrice(),
                             new UnitPrice($unitprice),
                             new PayoutQuantity($payoutItem->payoutQuantity),
-                            new Lot(
-                                new LotNumber($payoutItem->lotNumber),
-                                new LotDate($payoutItem->lotDate)
-                            ),
+                            $lot->getLotDate(),
+                            $lot->getLotNumber(),
                             $inHospitalItem->isLotManagement(),
                             new CardId($payoutItem->card)
                         );
@@ -235,12 +235,11 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                     $stockViewInstance->orWhere(
                         'divisionId',
                         $payout
-                            ->getSourceDivision()
-                            ->getDivisionId()
+                            ->getSourceDivisionId()
                             ->value()
                     );
 
-                    foreach ($payout->getPayoutItems() as $payoutItem) {
+                    foreach ($payout->getItems() as $payoutItem) {
                         $stockViewInstance->orWhere(
                             'inHospitalItemId',
                             $payoutItem->getInHospitalItemId()->value()
@@ -255,13 +254,12 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                 }
 
                 foreach ($payouts as $payout) {
-                    foreach ($payout->getPayoutItems() as $item) {
+                    foreach ($payout->getItems() as $item) {
                         $stock = array_find($stocks->all(), function ($stock) use (
-                            $item
+                            $item , $payout
                         ) {
-                            return $item
-                                ->getSourceDivision()
-                                ->getDivisionId()
+                            return $payout
+                                ->getSourceDivisionId()
                                 ->value() === $stock->divisionId &&
                                 $item->getInHospitalItemId()->value() ===
                                     $stock->inHospitalItemId;
@@ -275,10 +273,10 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                             $stock->recordId,
                             $hospitalId,
                             $item->getInHospitalItemId(),
-                            $item->getItem()->getItemId(),
+                            $item->getItemId(),
                             (int) $item->getPayoutQuantity()->value() * -1,
-                            $payout->getTargetDivision()->getDivisionId(),
-                            $payout->getSourceDivision()->getDivisionId()
+                            $payout->getTargetDivisionId(),//請求元＝払出先
+                            $payout->getSourceDivisionId()//請求先＝払出元
                         );
                     }
                 }
@@ -286,23 +284,29 @@ namespace JoyPla\Application\Interactors\Api\Payout {
 
             $inventoryCalculations = [];
             foreach ($payouts as $payout) {
-                foreach ($payout->getPayoutItems() as $item) {
+                foreach ($payout->getItems() as $item) {
                     $inventoryCalculations[] = new InventoryCalculation(
                         $item->getHospitalId(),
-                        $item->getSourceDivision()->getDivisionId(),
+                        $payout->getSourceDivisionId(),
                         $item->getInHospitalItemId(),
                         0,
                         4,
-                        $item->getLot(),
+                        new Lot(
+                            $item->getLotNumber(),
+                            $item->getLotDate()
+                        ),
                         $item->getPayoutQuantity()->value() * -1
                     );
                     $inventoryCalculations[] = new InventoryCalculation(
                         $item->getHospitalId(),
-                        $item->getTargetDivision()->getDivisionId(),
+                        $payout->getTargetDivisionId(),
                         $item->getInHospitalItemId(),
                         0,
                         5,
-                        $item->getLot(),
+                        new Lot(
+                            $item->getLotNumber(),
+                            $item->getLotDate()
+                        ),
                         $item->getPayoutQuantity()->value()
                     );
                 }
@@ -365,7 +369,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
             $this->presenterProvider->getPayoutRegisterPresenter()->output(
                 new PayoutRegisterOutputData(
                     array_map(function (Payout $payout) {
-                        return $payout->getPayoutHId()->value();
+                        return $payout->getPayoutHistoryId()->value();
                     }, $payouts)
                 )
             );
@@ -388,6 +392,7 @@ namespace JoyPla\Application\InputPorts\Api\Payout {
     class PayoutRegisterInputData
     {
         public Auth $user;
+        public string $payoutDate;
         public array $payoutItems;
         public bool $isOnlyMyDivision;
         public bool $isOnlyPayout = false;
@@ -395,10 +400,12 @@ namespace JoyPla\Application\InputPorts\Api\Payout {
         public function __construct(
             Auth $user,
             array $payoutItems,
+            string $payoutDate,
             bool $isOnlyMyDivision,
             bool $isOnlyPayout = false
         ) {
             $this->user = $user;
+            $this->payoutDate = $payoutDate;
             $this->payoutItems = array_map(function ($v) {
                 $object = new stdClass();
                 //$object->recordId = $v['recordId'];

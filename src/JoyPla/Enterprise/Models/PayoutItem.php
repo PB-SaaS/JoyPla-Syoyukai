@@ -7,76 +7,58 @@ use Exception;
 
 class PayoutItem
 {
-    private PayoutHId $payoutHId;
-    private string $payoutId;
+    private PayoutHistoryId $payoutHistoryId;
+    private PayoutItemId $payoutItemId;
     private InHospitalItemId $inHospitalItemId;
-    private Item $item;
+    private ItemId $itemId;
     private HospitalId $hospitalId;
-    private Division $sourceDivision;
-    private Division $targetDivision;
-    private Quantity $quantity;
+    private int $quantity;
+    private string $quantityUnit;
+    private string $itemUnit;
     private Price $price;
     private UnitPrice $unitPrice;
     private PayoutQuantity $payoutQuantity;
-    private Lot $lot;
+    private LotDate $lotDate;
+    private LotNumber $lotNumber;
     private bool $lotManagement;
     private CardId $cardId;
 
     public function __construct(
-        PayoutHId $payoutHId,
-        string $payoutId,
+        PayoutHistoryId $payoutHistoryId,
+        PayoutItemId $payoutItemId,
         InHospitalItemId $inHospitalItemId,
-        Item $item,
+        ItemId $itemId,
         HospitalId $hospitalId,
-        Division $sourceDivision,
-        Division $targetDivision,
-        Quantity $quantity,
+        int $quantity,
+        string $quantityUnit,
+        string $itemUnit,
         Price $price,
         UnitPrice $unitPrice,
         PayoutQuantity $payoutQuantity,
-        Lot $lot,
+        LotDate $lotDate,
+        LotNumber $lotNumber,
         bool $lotManagement,
         CardId $cardId
     ) {
-        $this->payoutHId = $payoutHId;
-        $this->payoutId = $payoutId;
+        $this->payoutHistoryId = $payoutHistoryId;
+        $this->payoutItemId = $payoutItemId;
         $this->inHospitalItemId = $inHospitalItemId;
-        $this->item = $item;
+        $this->itemId = $itemId;
         $this->hospitalId = $hospitalId;
-        $this->sourceDivision = $sourceDivision;
-        $this->targetDivision = $targetDivision;
         $this->quantity = $quantity;
+        $this->quantityUnit = $quantityUnit;
+        $this->itemUnit = $itemUnit;
         $this->price = $price;
         $this->unitPrice = $unitPrice;
         $this->payoutQuantity = $payoutQuantity;
-        $this->lot = $lot;
+        $this->lotDate = $lotDate;
+        $this->lotNumber = $lotNumber;
         $this->lotManagement = $lotManagement;
         $this->cardId = $cardId;
     }
-
-    public static function create(Collection $input)
+    public function getItemId()
     {
-        return new PayoutItem(
-            new PayoutHId($input->payoutHId),
-            $input->payoutId,
-            new InHospitalItemId($input->inHospitalItemId),
-            Item::create($input),
-            new HospitalId($input->hospitalId),
-            Division::create($input->sourceDivision),
-            Division::create($input->targetDivision),
-            Quantity::create($input),
-            new Price($input->price),
-            new UnitPrice($input->unitPrice),
-            new PayoutQuantity((int) $input->payoutQuantity),
-            Lot::create($input),
-            (int) $input->lotManagement,
-            new CardId((string) $input->cardId)
-        );
-    }
-
-    public function getItem()
-    {
-        return $this->item;
+        return $this->itemId;
     }
 
     public function getHospitalId()
@@ -89,19 +71,9 @@ class PayoutItem
         return $this->price;
     }
 
-    public function getPayoutId()
+    public function getPayoutItemId()
     {
-        return $this->payoutId;
-    }
-
-    public function getSourceDivision()
-    {
-        return $this->sourceDivision;
-    }
-
-    public function getTargetDivision()
-    {
-        return $this->targetDivision;
+        return $this->payoutItemId;
     }
 
     public function getQuantity()
@@ -109,39 +81,26 @@ class PayoutItem
         return $this->quantity;
     }
 
-    public function equalDivisions(
-        Division $sourceDivision,
-        Division $targetDivision
-    ) {
-        return $this->sourceDivision->getDivisionId()->value() ===
-            $sourceDivision->getDivisionId()->value() &&
-            $this->targetDivision->getDivisionId()->value() ===
-                $targetDivision->getDivisionId()->value();
+    public function getQuantityUnit()
+    {
+        return $this->quantityUnit;
     }
+
+    public function getItemUnit()
+    {
+        return $this->itemUnit;
+    }
+
 
     public function getCardId()
     {
         return $this->cardId;
     }
 
-    public function setPayoutId(string $payoutId)
+    public function setPayoutId(PayoutItemId $payoutItemId)
     {
-        return new PayoutItem(
-            $this->payoutHId,
-            $payoutId,
-            $this->inHospitalItemId,
-            $this->item,
-            $this->hospitalId,
-            $this->sourceDivision,
-            $this->targetDivision,
-            $this->quantity,
-            $this->price,
-            $this->unitPrice,
-            $this->payoutQuantity,
-            $this->lot,
-            $this->lotManagement,
-            $this->cardId
-        );
+        $this->payoutItemId = $payoutItemId;
+        return $this;
     }
 
     public function price()
@@ -160,10 +119,15 @@ class PayoutItem
         return $this->payoutQuantity;
     }
 
-    public function getLot()
+    public function getLotDate()
     {
-        return $this->lot;
+        return $this->lotDate;
     }
+    public function getLotNumber()
+    {
+        return $this->lotNumber;
+    }
+
 
     public function getLotManagement(): bool
     {
@@ -177,22 +141,8 @@ class PayoutItem
 
     public function setPayoutQuantity(PayoutQuantity $payoutQuantity)
     {
-        return new PayoutItem(
-            $this->payoutHId,
-            $this->payoutId,
-            $this->inHospitalItemId,
-            $this->item,
-            $this->hospitalId,
-            $this->sourceDivision,
-            $this->targetDivision,
-            $this->quantity,
-            $this->price,
-            $this->unitPrice,
-            $payoutQuantity,
-            $this->lot,
-            $this->lotManagement,
-            $this->cardId
-        );
+        $this->payoutQuantity = $payoutQuantity;
+        return $this;
     }
 
     public function addPayoutQuantity(PayoutQuantity $quantity)
@@ -203,21 +153,22 @@ class PayoutItem
     public function toArray()
     {
         return [
-            'payoutHId' => $this->payoutHId->value(),
-            'payoutId' => $this->payoutId,
+            'payoutHistoryId' => $this->payoutHistoryId->value(),
+            'payoutItemId' => $this->payoutItemId->value(),
             'inHospitalItemId' => $this->inHospitalItemId->value(),
-            'item' => $this->item->toArray(),
+            'itemId' => $this->itemId->value(),
             'hospitalId' => $this->hospitalId->value(),
-            'sourceDivision' => $this->sourceDivision->toArray(),
-            'targetDivision' => $this->targetDivision->toArray(),
-            'quantity' => $this->quantity->toArray(),
+            'quantity' => $this->quantity,
+            'quantityUnit' => $this->quantityUnit,
+            'itemUnit' => $this->itemUnit,
             'price' => $this->price->value(),
             'unitPrice' => $this->unitPrice->value(),
             'payoutQuantity' => $this->payoutQuantity->value(),
             'payoutAmount' => $this->price(),
-            'lot' => $this->lot->toArray(),
+            'lotDate' => $this->lotDate->value(),
+            'lotNumber' => $this->lotNumber->value(),
             'lotManagement' => $this->lotManagement,
-            'card' => $this->cardId->value(),
+            'cardId' => $this->cardId->value(),
         ];
     }
 }

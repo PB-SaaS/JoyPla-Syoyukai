@@ -260,6 +260,32 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'register',
     ])->service($useCaseProvider->getAcceptanceRegisterInteractor());
 
+    
+    Router::map('GET', '/api/acceptance/index', [
+        AcceptanceController::class,
+        'index',
+    ]);
+    
+    Router::map('GET', '/api/acceptance/:acceptanceId', [
+        AcceptanceController::class,
+        'show',
+    ]);
+    
+    Router::map('Patch', '/api/acceptance/:acceptanceId', [
+        AcceptanceController::class,
+        'update',
+    ]);
+    
+    Router::map('POST', '/api/acceptance/:acceptanceId/payout', [
+        AcceptanceController::class,
+        'payoutRegister',
+    ]);
+
+    Router::map('Delete', '/api/acceptance/:acceptanceId', [
+        AcceptanceController::class,
+        'delete',
+    ]);
+
     Router::map('POST', '/api/accountant/register', [
         AccountantController::class,
         'register',
@@ -345,6 +371,8 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         StockController::class,
         'stock',
     ]);
+
+    
 
 
 });

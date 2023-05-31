@@ -10,7 +10,7 @@
         <div>
           <div class="lg:flex lg:flex-row gap-4">
             <div class="mb-2 lg:w-1/3">
-              <v-input type="date" name="receivedDate" :rules="{}" title="払出日指定" label="払出日指定"></v-input>
+              <v-input type="date" name="payoutDate" :rules="{}" title="払出日指定" label="払出日指定"></v-input>
             </div>
             <div class="mb-2 lg:w-1/3">
               <v-select-division :is-only-use-data="true" name="sourceDivisionId" label="払出元部署" :rules="{ required : true ,  notTwoFieldSameAs : [ '払出先部署', `@targetDivisionId`] }" title="払出元部署指定" :disabled="fields.length > 0" :is-only-my-division="<?php var_export(
@@ -107,6 +107,7 @@
                           :step="1" 
                           title="払出数" 
                           class=" w-[240px]" 
+                          :disabled="_payout.cardId != ''"
                           change-class-name="inputChange">
                         </v-input-number>
                       </td>
@@ -400,7 +401,7 @@
           })
         } else {
           Swal.fire({
-            title: '出荷登録を行います。',
+            title: '出庫登録を行います。',
             text: "よろしいですか？",
             icon: 'info',
             showCancelButton: true,
@@ -432,7 +433,7 @@
           params.append("path", "/api/acceptance/register");
           params.append("_method", 'post');
           params.append("_csrf", _CSRF);
-          params.append("isOnlyPayout", 'true');
+          params.append("isOnlyAcceptance", 'true');
           params.append("acceptanceItems", JSON.stringify(encodeURIToObject(acceptanceModels)));
 
           const res = await axios.post(_APIURL, params);
@@ -654,29 +655,6 @@
           });
           return false;
         }
-/*
-        if (items.type == "received") {
-          items.item.forEach((x, id) => {
-            items.item[id].orderUnitQuantity = 1;
-          });
-        }
-        
-        if (items.type == "payout") {
-          items.item.forEach((x, id) => {
-            items.item[id].orderUnitQuantity = Math.ceil(parseInt(items.item[id].payoutQuantity) / parseInt(items.item[id].quantity));
-          });
-        }
-        if (items.type == "card") {
-          items.item.forEach((x, id) => {
-            items.item[id].orderUnitQuantity = Math.ceil(parseInt(items.item[id].cardQuantity) / parseInt(items.item[id].quantity));
-          });
-        }
-        if (items.type == "customlabel") {
-          items.item.forEach((x, id) => {
-            items.item[id].orderUnitQuantity = Math.ceil(parseInt(items.item[id].customQuantity) / parseInt(items.item[id].quantity));
-          });
-        }
-        */
         if (items.type == "received") {
           items.item.forEach((x, id) => {
             items.item[id].payoutCount = 1;

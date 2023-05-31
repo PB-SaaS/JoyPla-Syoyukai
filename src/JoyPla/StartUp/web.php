@@ -8,6 +8,7 @@ require_once 'JoyPla/require.php';
 
 use framework\Http\Request;
 use framework\Routing\Router;
+use JoyPla\InterfaceAdapters\Controllers\Web\AcceptanceController;
 use JoyPla\InterfaceAdapters\Controllers\Web\PayoutController;
 use JoyPla\InterfaceAdapters\Controllers\Web\AccountantController;
 use JoyPla\InterfaceAdapters\Controllers\Web\AgreeFormController;
@@ -23,6 +24,7 @@ use JoyPla\InterfaceAdapters\Controllers\Web\StocktakingController;
 use JoyPla\InterfaceAdapters\Controllers\Web\TopController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ItemRequestController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ItemListController;
+use JoyPla\InterfaceAdapters\Controllers\Web\LabelController;
 use JoyPla\InterfaceAdapters\GateWays\Middleware\PersonalInformationConsentMiddleware;
 use JoyPla\InterfaceAdapters\GateWays\Middleware\UnorderDataExistMiddleware;
 use JoyPla\JoyPlaApplication;
@@ -310,6 +312,28 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'print',
     ])/* ->service($useCaseProvider->getItemListPrintInteractor()) */;
 
+    
+    Router::map('GET', 'acceptance', [
+        AcceptanceController::class,
+        'index',
+    ]);
+
+    Router::map('GET', 'acceptance/:acceptanceId', [
+        AcceptanceController::class,
+        'show',
+    ]);
+
+    Router::map('GET', '/label/payout/:payoutId', [
+        LabelController::class,
+        'payoutLabelPrint',
+    ]);
+    
+    Router::map('GET', '/label/acceptance/:acceptanceId', [
+        LabelController::class,
+        'payoutLabelPrintForAcceptance',
+    ]);
+    
+    
 });
 
 $router = new Router();

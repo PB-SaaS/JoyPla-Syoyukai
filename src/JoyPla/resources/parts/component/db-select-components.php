@@ -226,9 +226,14 @@ const vMultipleSelectDivision = {
       required: true,
       default: "",
     },
+    id : {
+      type: String,
+      required: false,
+      default: "multipleDivision",
+    }
   },
   template: `
-<v-multiple-select :name="name" :title="title" :options="options" id="multipleDivision" />
+<v-multiple-select :name="name" :title="title" :options="options" :id="id" />
 `,
 };
 

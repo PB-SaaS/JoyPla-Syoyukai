@@ -486,6 +486,9 @@ const vInputNumber = {
     };
 
     const increment = () => {
+      if( props.disabled ){
+        return false;
+      }
       let num = parseInt(value.value) + props.step;
       if (num > props.max) {
         return;
@@ -493,6 +496,9 @@ const vInputNumber = {
       value.value = num;
     };
     const decrement = () => {
+      if( props.disabled ){
+        return false;
+      }
       let num = parseInt(value.value) - props.step;
       if (num < props.min) {
         return;
@@ -1044,6 +1050,8 @@ const vButtonPrimary = {
   disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
   hover:border-sushi-700 text-sushi-50 py-2 px-4 border border-sushi-200 bg-sushi-500 hover:bg-sushi-400" :disabled="disabled"><slot></slot></button>`,
 };
+
+
 const vButtonDefault = {
   props: {
     type: {
@@ -1076,11 +1084,101 @@ const vButtonDanger = {
       values: [],
     };
   },
+
   methods: {},
   template: `<button :type="type" class="
   disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
   hover:border-red-700 text-white py-2 px-4 border border-red-200 bg-red-500 hover:bg-red-400" :disabled="disabled"><slot></slot></button>`,
 };
+
+
+const vPullDownButton = {
+  setup(props, { emit }) {
+    const { ref, onMounted , onUnmounted } = Vue;
+    const dropdown = ref(null)
+    const open = ref(false)
+
+    const checkIfClickedOutside = (e) => {
+      if (open.value && !dropdown.value.contains(e.target)) {
+        open.value = false
+      }
+    }
+
+    const toggleDropdown = () => {
+      open.value = !open.value
+    }
+
+    onMounted(() => {
+      document.addEventListener('click', checkIfClickedOutside)
+    })
+
+    onUnmounted(() => {
+      document.removeEventListener('click', checkIfClickedOutside)
+    })
+
+    return { dropdown, open, toggleDropdown }
+  },
+  components: {
+    'v-button-danger' : vButtonDanger,
+    'v-button-primary' : vButtonPrimary,
+    'v-button-default' : vButtonDefault,
+  },
+  props: {
+    variant: String,
+    selects : Array,
+  },
+  data() {
+    return {
+      values: [],
+    };
+  },
+  methods: {},
+  template: `
+    <div class="relative inline-block text-left" ref="dropdown">
+      <div>
+        <v-button-default v-if="variant == 'default'" type="button" class="w-full" @click.native="toggleDropdown">
+          <div class="inline-flex place-items-center">
+            <slot></slot>
+            <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </v-button-default>
+        <v-button-primary v-if="variant == 'primary'" type="button" class="w-full" @click.native="toggleDropdown">
+          <div class="inline-flex place-items-center">
+            <slot></slot>
+            <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </v-button-primary>
+        <v-button-danger v-if="variant == 'danger'" type="button" class="w-full" @click.native="toggleDropdown">
+          <div class="inline-flex place-items-center">
+            <slot></slot>
+            <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </v-button-danger>
+      </div>
+      <div v-if="open" class="origin-top-left absolute left-0 w-56 rounded-md shadow-lg bg-white border" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+        <div class="py-1" role="none">
+          <template v-for="sel in selects" >
+            <template v-if="sel.variant === 'border'" >
+              <hr>
+            </template>
+            <template v-if="sel.variant === 'danger'" >
+              <button @click="sel.onclick" class="text-left w-full px-4 py-2 text-sm text-red-700 hover:bg-red-100 hover:text-red-900 disabled:text-gray-400" role="menuitem" :disabled="sel.disabled">{{ sel.text }}</button>
+            </template>
+            <template v-if="sel.variant === 'default'" >
+              <button @click="sel.onclick" class="text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 disabled:text-gray-400" role="menuitem" :disabled="sel.disabled">{{ sel.text }}</button>
+            </template>
+          </template>
+        </div>
+      </div>
+    </div>
+  `
+}
 
 const vAlert = {
   setup(props, { emit }) {

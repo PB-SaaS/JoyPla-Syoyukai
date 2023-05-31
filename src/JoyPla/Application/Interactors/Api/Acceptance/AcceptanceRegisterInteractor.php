@@ -6,15 +6,28 @@
 
 namespace JoyPla\Application\Interactors\Api\Acceptance {
 
+    use ApiResponse;
     use Exception;
     use JoyPla\Application\InputPorts\Api\Acceptance\AcceptanceRegisterInputData;
     use JoyPla\Application\InputPorts\Api\Acceptance\AcceptanceRegisterInputPortInterface;
+    use JoyPla\Enterprise\Models\Acceptance;
+    use JoyPla\Enterprise\Models\AcceptanceId;
+    use JoyPla\Enterprise\Models\AcceptanceItem;
+    use JoyPla\Enterprise\Models\AcceptanceItemId;
+    use JoyPla\Enterprise\Models\DateYearMonthDay;
     use JoyPla\Enterprise\Models\Division;
     use JoyPla\Enterprise\Models\Hospital;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\Enterprise\Models\InHospitalItem;
     use JoyPla\Enterprise\Models\InHospitalItemId;
     use JoyPla\Enterprise\Models\InventoryCalculation;
+    use JoyPla\Enterprise\Models\Lot;
+    use JoyPla\Enterprise\Models\LotDate;
+    use JoyPla\Enterprise\Models\LotNumber;
+    use JoyPla\Enterprise\Models\RequestItemCount;
+    use JoyPla\Enterprise\Models\UnitPrice;
+    use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
+    use JoyPla\InterfaceAdapters\GateWays\Repository\RequestItemCountRepository;
     use JoyPla\Service\Presenter\Api\PresenterProvider;
     use JoyPla\Service\Repository\RepositoryProvider;
 
@@ -105,15 +118,15 @@ namespace JoyPla\Application\Interactors\Api\Acceptance {
                     return $value->getDivisionId()->value() ===
                         $targetDivisionId;
                 });
-/*
+
                 if (
                     !!array_find($acceptances, function (Acceptance $value) use (
                         $targetDivision,
                         $sourceDivision
                     ) {
                         return $value->equalDivisions(
-                            $sourceDivision,
-                            $targetDivision
+                            $sourceDivision->getDivisionId(),
+                            $targetDivision->getDivisionId()
                         );
                     })
                 ) {
@@ -121,18 +134,13 @@ namespace JoyPla\Application\Interactors\Api\Acceptance {
                 }
 
                 $acceptances[] = new Acceptance(
-                    AcceptanceHId::generate(),
-                    new DateYearMonthDayHourMinutesSecond(''),
-                    [],
-                    $hospital,
-                    $sourceDivision,
-                    $targetDivision
+                    AcceptanceId::generate(),
+                    new DateYearMonthDay('now'),
+                    $hospital->getHospitalId(),
+                    $sourceDivision->getDivisionId(),
+                    $targetDivision->getDivisionId(),
                 );
-                */
             }
-
-/*
-            $cards = [];
 
             foreach ($inputData->acceptanceItems as $acceptanceItem) {
                 if ((int) $acceptanceItem->acceptanceQuantity < 1) {
@@ -165,7 +173,7 @@ namespace JoyPla\Application\Interactors\Api\Acceptance {
 
                 $unitprice = $inHospitalItem->getUnitPrice()->value();
 
-                if ($hospitalRow->acceptanceUnitPrice !== '1') {
+                if ($hospitalRow->payoutUnitPrice !== '1') {
                     if (
                         $inHospitalItem->getQuantity()->getQuantityNum() != 0 &&
                         $inHospitalItem->getPrice()->value() != 0
@@ -180,39 +188,38 @@ namespace JoyPla\Application\Interactors\Api\Acceptance {
                     }
                 }
 
-                foreach ($acceptances as &$acceptance) {
+                foreach ($acceptances as $key => $acceptance) {
                     if (
                         $acceptance->equalDivisions(
-                            $sourceDivision,
-                            $targetDivision
+                            $sourceDivision->getDivisionId(),
+                            $targetDivision->getDivisionId(),
                         )
                     ) {
+                        $lot = new Lot(
+                            new LotNumber($acceptanceItem->lotNumber),
+                            new LotDate($acceptanceItem->lotDate)
+                        );
                         $item = new AcceptanceItem(
-                            $acceptance->getAcceptanceHId(),
-                            '',
+                            $acceptance->getAcceptanceId(),
+                            AcceptanceItemId::generate(),
                             $inHospitalItem->getInHospitalItemId(),
-                            $inHospitalItem->getItem(),
-                            $hospitalId,
-                            $sourceDivision,
-                            $targetDivision,
-                            $inHospitalItem->getQuantity(),
+                            $lot->getLotDate(),
+                            $lot->getLotNumber(),
+                            $inHospitalItem->getQuantity()->getQuantityNum(),
+                            $inHospitalItem->getQuantity()->getQuantityUnit(),
+                            $inHospitalItem->getQuantity()->getItemUnit(),
                             $inHospitalItem->getPrice(),
                             new UnitPrice($unitprice),
-                            new AcceptanceQuantity($acceptanceItem->acceptanceQuantity),
-                            new Lot(
-                                new LotNumber($acceptanceItem->lotNumber),
-                                new LotDate($acceptanceItem->lotDate)
-                            ),
-                            $inHospitalItem->isLotManagement(),
-                            new CardId($acceptanceItem->card)
+                            $acceptanceItem->acceptanceQuantity,
+                            0
                         );
-                        $acceptance = $acceptance->addAcceptanceItem($item);
+                        $acceptances[$key]->addItem($item);
                     }
                 }
             }
 
             if(!$inputData->isOnlyAcceptance){
-                $stockViewInstance = ModelRepository::getStockViewInstance()->where(
+                $stockViewInstance = ModelRepository::getStockItemViewInstance()->where(
                     'hospitalId',
                     $hospitalId->value()
                 );
@@ -221,12 +228,11 @@ namespace JoyPla\Application\Interactors\Api\Acceptance {
                     $stockViewInstance->orWhere(
                         'divisionId',
                         $acceptance
-                            ->getSourceDivision()
-                            ->getDivisionId()
+                            ->getSourceDivisionId()
                             ->value()
                     );
 
-                    foreach ($acceptance->getAcceptanceItems() as $acceptanceItem) {
+                    foreach ($acceptance->getItems() as $acceptanceItem) {
                         $stockViewInstance->orWhere(
                             'inHospitalItemId',
                             $acceptanceItem->getInHospitalItemId()->value()
@@ -241,13 +247,12 @@ namespace JoyPla\Application\Interactors\Api\Acceptance {
                 }
 
                 foreach ($acceptances as $acceptance) {
-                    foreach ($acceptance->getAcceptanceItems() as $item) {
+                    foreach ($acceptance->getItems() as $item) {
                         $stock = array_find($stocks->all(), function ($stock) use (
                             $item
                         ) {
                             return $item
-                                ->getSourceDivision()
-                                ->getDivisionId()
+                                ->getSourceDivisionId()
                                 ->value() === $stock->divisionId &&
                                 $item->getInHospitalItemId()->value() ===
                                     $stock->inHospitalItemId;
@@ -261,58 +266,46 @@ namespace JoyPla\Application\Interactors\Api\Acceptance {
                             $stock->recordId,
                             $hospitalId,
                             $item->getInHospitalItemId(),
-                            $item->getItem()->getItemId(),
-                            (int) $item->getAcceptanceQuantity()->value() * -1,
-                            $acceptance->getTargetDivision()->getDivisionId(),
-                            $acceptance->getSourceDivision()->getDivisionId()
+                            $stock->itemId,
+                            (int) $item->getAcceptanceQuantity() * -1,
+                            $acceptance->getTargetDivisionId(),//請求元＝払出先
+                            $acceptance->getSourceDivisionId()//請求先＝払出元
                         );
                     }
                 }
             }
 
-            */
             $inventoryCalculations = [];
             foreach ($acceptances as $acceptance) {
-                foreach ($acceptance->getAcceptanceItems() as $item) {
+                foreach ($acceptance->getItems() as $item) {
                     $inventoryCalculations[] = new InventoryCalculation(
-                        $item->getHospitalId(),
-                        $item->getSourceDivision()->getDivisionId(),
+                        $acceptance->getHospitalId(),
+                        $acceptance->getSourceDivisionId(),
                         $item->getInHospitalItemId(),
                         0,
                         4,
-                        $item->getLot(),
-                        $item->getAcceptanceQuantity()->value() * -1
+                        new Lot(
+                            $item->getLotNumber(),
+                            $item->getLotDate()
+                        ),
+                        $item->getAcceptanceQuantity() * -1
                     );
-                    /*
-                    $inventoryCalculations[] = new InventoryCalculation(
-                        $item->getHospitalId(),
-                        $item->getTargetDivision()->getDivisionId(),
-                        $item->getInHospitalItemId(),
-                        0,
-                        5,
-                        $item->getLot(),
-                        $item->getAcceptanceQuantity()->value()
-                    );
-                    */
                 }
             }
-            var_dump($inHospitalItems);
-/*
-            $this->repositoryProvider
-                ->getAcceptanceRepository()
-                ->saveToArray($acceptances);
+
+            if(!$inputData->isOnlyAcceptance){
+                $this->repositoryProvider
+                    ->getRequestItemCountRepository()
+                    ->saveToArray($requestItemCounts);
+            }
+
+            $this->repositoryProvider->getAcceptanceRepository()->saveToArray($acceptances);
 
             $this->repositoryProvider
                 ->getInventoryCalculationRepository()
                 ->saveToArray($inventoryCalculations);
 
-            if (!empty($updateCards)) {
-                $this->repositoryProvider
-                    ->getCardRepository()
-                    ->update($hospitalId, $updateCards);
-            }
-            */
-
+            echo (new ApiResponse([], count($acceptances), 200 , 'success' , []))->toJson();
         }
     }
 }
@@ -334,11 +327,13 @@ namespace JoyPla\Application\InputPorts\Api\Acceptance {
         public Auth $user;
         public array $acceptanceItems;
         public bool $isOnlyMyDivision;
+        public bool $isOnlyAcceptance = false;
 
         public function __construct(
             Auth $user,
             array $acceptanceItems,
-            bool $isOnlyMyDivision
+            bool $isOnlyMyDivision,
+            bool $isOnlyAcceptance = false
         ) {
             $this->user = $user;
             $this->acceptanceItems = array_map(function ($v) {
@@ -347,7 +342,7 @@ namespace JoyPla\Application\InputPorts\Api\Acceptance {
                 $object->inHospitalItemId = $v['inHospitalItemId'];
                 $object->acceptanceSourceDivisionId = $v['sourceDivisionId'];
                 $object->acceptanceTargetDivisionId = $v['targetDivisionId'];
-                $object->acceptanceQuantity = $v['AcceptanceQuantity'];
+                $object->acceptanceQuantity = $v['acceptanceQuantity'];
                 $object->lotNumber = $v['lotNumber'];
                 $object->lotDate = $v['lotDate'];
                 $object->card = $v['card'];
@@ -355,6 +350,7 @@ namespace JoyPla\Application\InputPorts\Api\Acceptance {
             }, $acceptanceItems);
 
             $this->isOnlyMyDivision = $isOnlyMyDivision;
+            $this->isOnlyAcceptance = $isOnlyAcceptance;
         }
     }
 

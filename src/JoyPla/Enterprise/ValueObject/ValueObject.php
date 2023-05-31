@@ -1621,7 +1621,7 @@ namespace JoyPla\Enterprise\Models {
         }
     }
 
-    class PayoutHId
+    class PayoutHistoryId
     {
         use ValueObjectTrait;
 
@@ -1635,6 +1635,30 @@ namespace JoyPla\Enterprise\Models {
         public static function generate()
         {
             $id = uniqid('05');
+            if (in_array($id, self::$values, true)) {
+                return self::generate();
+            }
+            self::$values[] = $id;
+
+            usleep(1000);
+            return new self($id);
+        }
+    }
+    
+    class PayoutItemId
+    {
+        use ValueObjectTrait;
+
+        private static array $values = [];
+        private static int $count = 0;
+        public function __construct(string $value = '')
+        {
+            $this->value = $value;
+        }
+
+        public static function generate()
+        {
+            $id = uniqid('payout_');
             if (in_array($id, self::$values, true)) {
                 return self::generate();
             }
@@ -1809,7 +1833,32 @@ namespace JoyPla\Enterprise\Models {
 
         public static function generate()
         {
-            $id = uniqid('07');
+            $id = uniqid('40');
+            if (in_array($id, self::$values, true)) {
+                return self::generate();
+            }
+            self::$values[] = $id;
+
+            usleep(1000);
+            return new self($id);
+        }
+    }
+
+    
+    class AcceptanceItemId
+    {
+        use ValueObjectTrait;
+
+        private static array $values = [];
+        private static int $count = 0;
+        public function __construct(string $value = '')
+        {
+            $this->value = $value;
+        }
+
+        public static function generate()
+        {
+            $id = uniqid('41');
             if (in_array($id, self::$values, true)) {
                 return self::generate();
             }

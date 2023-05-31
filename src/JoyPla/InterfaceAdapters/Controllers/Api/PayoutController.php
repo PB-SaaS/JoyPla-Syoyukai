@@ -25,16 +25,17 @@ class PayoutController extends Controller
         $isOnlyPayout = ( $this->request->get('isOnlyPayout') === 'true' );
 
         $payoutItems = $this->request->get('payoutItems');
+        $payoutDate = $this->request->get('payoutDate' , 'now');
 
         $user = $this->request->user();
 
         $inputData = new PayoutRegisterInputData(
             $user,
             $payoutItems,
+            $payoutDate,
             $gate->isOnlyMyDivision(),
             $isOnlyPayout
         );
         $inputPort->handle($inputData);
     }
-
 }

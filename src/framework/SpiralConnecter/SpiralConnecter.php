@@ -35,15 +35,16 @@ class SpiralConnecter implements SpiralConnecterInterface
         );
 
         if ($response->get('code') != 0) {
+            
+            $logs = [];
+            $logs[] = $this->logObject($header, $httpRequestParameter, $response);
+            $this->logging($logs);
+
             throw new Exception(
                 $response->get('message'),
                 $response->get('code')
             );
         }
-
-        $logs = [];
-        $logs[] = $this->logObject($header, $httpRequestParameter, $response);
-        $this->logging($logs);
 
         return $response->entrySet();
     }

@@ -7,52 +7,42 @@ use Exception;
 
 class Payout
 {
-    private PayoutHId $payoutHId;
-    private DateYearMonthDayHourMinutesSecond $registrationTime;
-    private array $payoutItems;
-    private Hospital $hospital;
-    private Division $sourceDivision;
-    private Division $targetDivision;
+    private PayoutHistoryId $payoutHistoryId;
+    private DateYearMonthDay $payoutDate;
+    private array $items = [];
+    private HospitalId $hospitalId;
+    private DivisionId $sourceDivisionId;
+    private DivisionId $targetDivisionId;
+    private string $sourceDivisionName;
+    private string $targetDivisionName;
 
     public function __construct(
-        PayoutHId $payoutHId,
-        DateYearMonthDayHourMinutesSecond $registrationTime,
-        array $payoutItems,
-        Hospital $hospital,
-        Division $sourceDivision,
-        Division $targetDivision
+        DateYearMonthDay $payoutDate,
+        PayoutHistoryId $payoutHistoryId,
+        HospitalId $hospitalId,
+        DivisionId $sourceDivisionId,
+        string $sourceDivisionName,
+        DivisionId $targetDivisionId,
+        string $targetDivisionName
     ) {
-        $this->payoutHId = $payoutHId;
-        $this->registrationTime = $registrationTime;
-        $this->payoutItems = array_map(function (PayoutItem $v) {
-            return $v;
-        }, $payoutItems);
-        $this->hospital = $hospital;
-        $this->sourceDivision = $sourceDivision;
-        $this->targetDivision = $targetDivision;
+        $this->payoutDate = $payoutDate;
+        $this->payoutHistoryId = $payoutHistoryId;
+        $this->hospitalId = $hospitalId;
+        $this->sourceDivisionId = $sourceDivisionId;
+        $this->targetDivisionId = $targetDivisionId;
+        $this->sourceDivisionName = $sourceDivisionName;
+        $this->targetDivisionName = $targetDivisionName;
     }
 
-    public static function create(Collection $input)
+    public function getHospitalId()
     {
-        return new Payout(
-            (new PayoutHId($input->payoutHId)),
-            (new DateYearMonthDayHourMinutesSecond($input->registrationTime)),
-            [],
-            (Hospital::create($input)),
-            (Division::create($input->sourceDivision)),
-            (Division::create($input->targetDivision))
-        );
+        return $this->hospitalId;
     }
 
-    public function getHospital()
+    public function isExistPayoutItemId(PayoutItemId $payoutItemId)
     {
-        return $this->hospital;
-    }
-
-    public function isExistPayoutItemId(string $payoutId)
-    {
-        foreach ($this->payoutItems as $item) {
-            if ($item->getPayoutId()->equal($payoutId)) {
+        foreach ($this->items as $item) {
+            if ($item->getPayoutItemId()->equal($payoutItemId->value())) {
                 return true;
             }
         }
@@ -60,15 +50,15 @@ class Payout
         return false;
     }
 
-    public function getPayoutHId()
+    public function getPayoutHistoryId()
     {
-        return $this->payoutHId;
+        return $this->payoutHistoryId;
     }
 
-    public function searchPayoutItem(string $payoutId)
+    public function searchPayoutItem(PayoutItemId $payoutItemId)
     {
-        foreach ($this->payoutItems as $item) {
-            if ($item->getPayoutId()->equal($payoutId)) {
+        foreach ($this->items as $item) {
+            if ($item->getPayoutItemId()->equal($payoutItemId->value())) {
                 return $item;
             }
         }
@@ -76,41 +66,44 @@ class Payout
         return null;
     }
 
-    public function getPayoutItems()
+    public function getItems()
     {
-        return $this->payoutItems;
+        return $this->items;
     }
 
-    public function getSourceDivision()
+    public function getSourceDivisionId()
     {
-        return $this->sourceDivision;
+        return $this->sourceDivisionId;
     }
 
-    public function getTargetDivision()
+    public function getTargetDivisionId()
     {
-        return $this->targetDivision;
+        return $this->targetDivisionId;
     }
-
-    public function equalDivisions(Division $sourceDivision, Division $targetDivision)
-    {
-        return (($this->sourceDivision->getDivisionId()->value() === $sourceDivision->getDivisionId()->value()) &&
-            ($this->targetDivision->getDivisionId()->value() === $targetDivision->getDivisionId()->value()));
+    public function equalDivisions(
+        DivisionId $sourceDivisionId,
+        DivisionId $targetDivisionId
+    ) {
+        return $this->sourceDivisionId->value() ===
+            $sourceDivisionId->value() &&
+            $this->targetDivisionId->value() ===
+                $targetDivisionId->value();
     }
 
     public function totalAmount()
     {
         $num = 0;
-        foreach ($this->payoutItems as $item) {
+        foreach ($this->items as $item) {
             $num += $item->price();
         }
         return $num;
     }
 
-    public function deleteItem(string $payoutId)
+    public function deleteItem(PayoutItemId $payoutItemId)
     {
-        $tmp = $this->payoutItems;
+        $tmp = $this->items;
         foreach ($tmp as $key => $payoutItem) {
-            if ($payoutItem->getPayoutId()->equal($payoutId)) {
+            if ($payoutItem->getPayoutId()->equal($payoutItemId->value())) {
                 unset($tmp[$key]);
                 break;
             }
@@ -121,47 +114,50 @@ class Payout
     public function itemCount()
     {
         $array = [];
-        foreach ($this->payoutItems as $item) {
+        foreach ($this->items as $item) {
             $array[] = $item->getInHospitalItemId()->value();
         }
         return count(array_unique($array));
     }
 
-    public function addPayoutItem(PayoutItem $item)
+    public function addPayoutItem(PayoutItem $item , $integrated = true)
     {
-        $itemLot = $item->getLot()->toArray();
-        $itemLotNumber = $itemLot['lotNumber'];
-        $itemLotDate = $itemLot['lotDate'];
-        $items = $this->payoutItems;
-        $flag = false;
+        if($integrated){
+            $itemLotNumber = $item->getLotNumber()->value();
+            $itemLotDate = $item->getLotDate()->value();
+            $items = $this->items;
+            $flag = false;
 
-        foreach ($items as $key => $payoutItem) {
-            $lot = $payoutItem->getLot()->toArray();
-            $lotNumber = $lot['lotNumber'];
-            $lotDate = $lot['lotDate'];
-            $card = $payoutItem->getCard()->value();
-            if (!$card) {
-                if (($payoutItem->getInHospitalItemId()->equal($item->getInHospitalItemId()->value())) &&
-                    ($itemLotNumber === $lotNumber) && ($itemLotDate === $lotDate)
-                ) {
-                    $flag = true;
-                    $items[$key] = $payoutItem->addPayoutQuantity($item->getPayoutQuantity());
-                    break;
+            foreach ($items as $key => $payoutItem) {
+                $lotNumber = $payoutItem->getLotNumber()->value();
+                $lotDate = $payoutItem->getLotDate()->value();
+                $card = $payoutItem->getCard()->value();
+                if (!$card) {
+                    if (($payoutItem->getInHospitalItemId()->equal($item->getInHospitalItemId()->value())) &&
+                        ($itemLotNumber === $lotNumber) && ($itemLotDate === $lotDate)
+                    ) {
+                        $flag = true;
+                        $items[$key] = $payoutItem->addPayoutQuantity($item->getPayoutQuantity());
+                        break;
+                    }
                 }
             }
-        }
 
-        if (!$flag) {
+            if (!$flag) {
+                $items[] = $item;
+            }
+        } else {
+            $items = $this->items;
             $items[] = $item;
         }
         return $this->setPayoutItems($items);
     }
 
-    public function addPayoutItemQuantity(string $payoutId, PayoutQuantity $payoutQuantity)
+    public function addPayoutItemQuantity(PayoutItemId $payoutItemId, PayoutQuantity $payoutQuantity)
     {
-        $tmp = $this->payoutItems;
+        $tmp = $this->items;
         foreach ($tmp as $key => $val) {
-            if ($val->getPayoutItemId()->equal($payoutId)) {
+            if ($val->getPayoutItemId()->equal($payoutItemId->value())) {
                 $tmp[$key] = $val->addPayoutQuantity($payoutQuantity);
                 break;
             }
@@ -175,28 +171,23 @@ class Payout
         $payoutItems = array_map(function (PayoutItem $v) {
             return $v;
         }, $payoutItems);
-
-        return new Payout(
-            $this->payoutHId,
-            $this->registrationTime,
-            $payoutItems,
-            $this->hospital,
-            $this->sourceDivision,
-            $this->targetDivision,
-        );
+        $this->items = $payoutItems;
+        return $this;
     }
 
     public function toArray()
     {
         return [
-            'payoutHId' => $this->payoutHId->value(),
-            'registrationTime' => $this->registrationTime->value(),
+            'payoutHistoryId' => $this->payoutHistoryId->value(),
+            'payoutDate' => $this->payoutDate->value(),
             'payoutItems' => array_map(function (PayoutItem $v) {
                 return $v->toArray();
-            }, $this->payoutItems),
-            'hospital' => $this->hospital->toArray(),
-            'sourceDivision' => $this->sourceDivision->toArray(),
-            'targetDivision' => $this->targetDivision->toArray(),
+            }, $this->items),
+            'hospitalId' => $this->hospitalId->value(),
+            'sourceDivisionName' => $this->sourceDivisionName,
+            'targetDivisionName' => $this->targetDivisionName,
+            'sourceDivisionId' => $this->sourceDivisionId->value(),
+            'targetDivisionId' => $this->targetDivisionId->value(),
             'totalAmount' => $this->totalAmount(),
             'itemCount' => $this->itemCount()
         ];

@@ -2,6 +2,7 @@
 
 namespace JoyPla\Service\Repository;
 
+use JoyPla\InterfaceAdapters\GateWays\Repository\AcceptanceRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\AccountantItemRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\AccountantLogRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\AccountantRepository;
@@ -159,6 +160,11 @@ class RepositoryProvider
     public function getItemListRepository()
     {
         return new ItemListRepository();
+    }
+
+    public function getAcceptanceRepository()
+    {
+        return new AcceptanceRepository();
     }
 
 }

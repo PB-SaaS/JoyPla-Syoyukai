@@ -300,6 +300,7 @@ class AccountantRepository implements AccountantRepositoryInterface
 
         foreach ($accountants as $accountant) {
             $accountantToArray = $accountant->toArray();
+            $itemInstance->orWhere('accountantId', $accountantToArray['accountantId'], '=');
             $upsertHistory[] = [
                 'hospitalId' => $accountantToArray['hospitalId'],
                 'divisionId' => $accountantToArray['divisionId'],
@@ -335,7 +336,6 @@ class AccountantRepository implements AccountantRepositoryInterface
                 ];
 
                 $itemInstance
-                    ->orWhere('accountantId', $item['accountantId'], '=')
                     ->where(
                         'accountantItemId',
                         $item['accountantItemId'],
