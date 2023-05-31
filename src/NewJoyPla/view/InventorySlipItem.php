@@ -106,6 +106,7 @@
                                             <th class="uk-table-expand">JANコード</th>
                                             <th class="uk-text-nowrap">購買価格</th>
                                             <th class="uk-text-nowrap">単価</th>
+                                            <th class="uk-text-nowrap">棚卸必須</th>
                                             <th class="uk-text-nowrap">計算上在庫</th>
                                             <th class="uk-text-nowrap">棚卸数量</th>
                                             <th class="uk-text-nowrap">棚卸金額</th>
@@ -126,6 +127,7 @@
                             echo "<td>".$record->itemJANCode."</td>";
                             echo "<td>￥".number_format_jp($record->price)."</td>";
                             echo "<td>￥".number_format_jp($record->unitPrice)."</td>";
+                            echo "<td>".(($record->mandatoryFlag == "1") ? "必須" : "任意")."</td>";
                             //echo "<td>".(int)$record->stockQuantity."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
                             echo "<td>".number_format_jp((int)$record->calculatingStock)."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
                             echo "<td>".number_format_jp($record->inventryNum)."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
@@ -161,6 +163,7 @@
                                         <th class="uk-table-expand">JANコード</th>
                                         <th class="uk-text-nowrap">購買価格</th>
                                         <th class="uk-text-nowrap">単価</th>
+                                        <th class="uk-text-nowrap">棚卸必須</th>
                                         <th class="uk-text-nowrap">計算上在庫</th>
                                         <th class="uk-text-nowrap">棚卸数量</th>
                                         <th class="uk-text-nowrap">棚卸金額</th>
@@ -181,6 +184,7 @@
                             echo "<td>".$record->itemJANCode."</td>";
                             echo "<td>￥".number_format_jp($record->price)."</td>";
                             echo "<td>￥".number_format_jp($record->unitPrice)."</td>";
+                            echo "<td>".(($record->mandatoryFlag == "1") ? "必須" : "任意")."</td>";
                             //echo "<td>".(int)$record->stockQuantity."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
                             echo "<td>".number_format_jp((int)$record->calculatingStock)."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
                             echo "<td>".number_format_jp($record->inventryNum)."<span class='uk-text-small'>".$record->quantityUnit."</span></td>";
