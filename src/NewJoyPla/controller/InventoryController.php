@@ -908,6 +908,33 @@ class InventoryController extends Controller
                 );
             }
 
+            $inventoryEnd = InventoryEnd::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )
+                ->where('inventoryStatus', '1')
+                ->value('inventoryEndId')
+                ->plain()
+                ->get();
+            if ($inventoryEnd->count != 0) {
+                $invEndId = $inventoryEnd->data->get(0)->inventoryEndId;
+                $inventoryHistory = InventoryHistory::where(
+                    'hospitalId',
+                    $user_info->getHospitalId()
+                )
+                    ->where('divisionId', $divisionId)
+                    ->where('inventoryEndId', $invEndId)
+                    ->value('inventoryHStatus')
+                    ->plain()
+                    ->get();
+                if ($inventoryHistory->count != 0) {
+                    throw new Exception(
+                        'すでに登録された棚卸情報があるため、取得しませんでした',
+                        1
+                    );
+                }
+            }
+
             $stocktakingList = StocktakingList::where(
                 'hospitalId',
                 $user_info->getHospitalId()
