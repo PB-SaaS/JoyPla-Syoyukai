@@ -185,7 +185,7 @@
 					</thead>
 					<tbody>
 						<tr v-for="(list, key) in sort_lists" :id="'tr_' + key" v-bind:class="list.class">
-							<td></td>
+							<td class="uk-text-nowrap"></td>
 							<td>{{list.rackName}}</td>
 							<td>
 								<span v-if="list.mandatoryFlag==1">必須</span>
