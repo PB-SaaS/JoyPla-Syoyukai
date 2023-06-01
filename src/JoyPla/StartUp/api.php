@@ -84,6 +84,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'delete',
     ])->service($useCaseProvider->getConsumptionDeleteInteractor());
 
+    Router::map('DELETE', '/api/consumption/:consumptionId/item/delete', [
+        ConsumptionController::class,
+        'deleteItem',
+    ]);
+
     Router::map('POST', '/api/order/register', [
         OrderController::class,
         'register',

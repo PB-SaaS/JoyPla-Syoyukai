@@ -93,6 +93,7 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
             }
 
             $result[] = new ConsumptionItem(
+                $item->id,
                 new ConsumptionId(''),
                 new InHospitalItemId(
                     $inHospitalItem[$inHospitalItem_find_key]->inHospitalItemId
@@ -127,8 +128,10 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
 
         $history = [];
         $items = [];
+        $consumptionItemInstance = ModelRepository::getConsumptionItemInstance();
 
         foreach ($consumptions as $consumption) {
+
             $consumptionToArray = $consumption->toArray();
 
             $history[] = [
@@ -145,6 +148,8 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
                 'totalAmount' => $consumptionToArray['totalAmount'],
                 'billingStatus' => $consumptionToArray['consumptionStatus'],
             ];
+
+            $consumptionItemInstance->orWhere('billingNumber',$consumptionToArray['consumptionId']);
 
             foreach (
                 $consumptionToArray['consumptionItems']
@@ -178,7 +183,11 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
                 ];
             }
         }
-        ModelRepository::getConsumptionInstance()->insert($history);
+        
+        ModelRepository::getConsumptionInstance()->upsertBulk('billingNumber',$history);
+
+        $consumptionItemInstance->delete();
+
         ModelRepository::getConsumptionItemInstance()->insert($items);
 
         return $consumptions;
@@ -349,6 +358,7 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
             ->where('billingNumber', $consumptionId->value())
             ->delete();
     }
+
 }
 
 interface ConsumptionRepositoryInterface

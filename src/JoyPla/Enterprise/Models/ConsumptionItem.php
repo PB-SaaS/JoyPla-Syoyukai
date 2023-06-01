@@ -5,6 +5,7 @@ namespace JoyPla\Enterprise\Models;
 use Collection;
 class ConsumptionItem 
 {
+    private int $id;
     private ConsumptionId $consumptionId;
     private InHospitalItemId $inHospitalItemId;
     private Item $item;
@@ -19,6 +20,7 @@ class ConsumptionItem
     private string $itemImage;
 
     public function __construct(
+        int $id,
         ConsumptionId $consumptionId,
         InHospitalItemId $inHospitalItemId,
         Item $item,
@@ -33,6 +35,7 @@ class ConsumptionItem
         $itemImage = ""
         )
     {
+        $this->id = $id;
         $this->consumptionId = $consumptionId;
         $this->inHospitalItemId = $inHospitalItemId;
         $this->item = $item;
@@ -50,6 +53,7 @@ class ConsumptionItem
     public static function create( Collection $input )
     {
         return new ConsumptionItem(
+            $input->id,
             (new ConsumptionId($input->billingNumber) ),
             (new InHospitalItemId($input->inHospitalItemId) ),
             (Item::create($input) ),
@@ -64,6 +68,10 @@ class ConsumptionItem
             $input->inItemImage,
         );
     }
+
+    public function getId(): int {
+        return $this->id;
+     }
 
     public function getDivision()
     {
@@ -101,6 +109,7 @@ class ConsumptionItem
     public function toArray()
     {
         return [
+            'id' => $this->id,
             'consumptionId' => $this->consumptionId->value(),
             'inHospitalItemId' => $this->inHospitalItemId->value(),
             'item' => $this->item->toArray(),

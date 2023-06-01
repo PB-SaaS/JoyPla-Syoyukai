@@ -17,7 +17,7 @@ define("SENDFILE", "JoyPlaOrderData_");
 ----------------------------*/
 define("LINES_PER_PAGE", 1000);
 define("SETTING_DB", "NJ_medicodeDB");
-define("ORDER_ITEM_DB", "340_orderItem");
+define("ORDER_ITEM_DB", "362_orderItem");
 define("MEDICODELOG_TRDB", "MedicodeLogTRDB");
 
 /* NOTIFICATION

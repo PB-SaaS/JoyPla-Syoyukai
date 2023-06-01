@@ -141,8 +141,8 @@ require_once('JoyPla/InterfaceAdapters/Controllers/Api/ReferenceController.php')
 require_once('JoyPla/InterfaceAdapters/Controllers/Api/ReturnController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Api/StockController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Api/StocktakingController.php');
-require_once('JoyPla/InterfaceAdapters/Controllers/Web/AcceptanceController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Api/StocktakingListController.php');
+require_once('JoyPla/InterfaceAdapters/Controllers/Web/AcceptanceController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/AccountantController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/AgreeFormController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/ConsumptionController.php');

@@ -67,6 +67,11 @@
                         <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(consumptionItem.consumptionPrice) }}</span>
                         <span class="text-sm text-gray-900">( &yen; {{ numberFormat(consumptionItem.unitPrice) }} / {{ consumptionItem.quantity.quantityUnit }} )</span>
                       </p>
+                      <?php if (gate('cancellation_of_consumption_slips')->can()): ?>
+                      <div class="mt-3">
+                        <v-button-danger @click.native="deleteItem(consumption.consumptionId , consumptionItem.id)">削除</v-button-danger>
+                      </div>
+                      <?php endif; ?>
                     </div>
                   </div>
                 </div>
@@ -184,6 +189,60 @@ var JoyPlaApp = Vue.createApp({
         location.href = _ROOT + "&path=/consumption/" + url + "/print";    
       }
 
+      const deleteItem = (consumptionId , id) => {
+          Swal.fire({
+            title: '消費商品を削除',
+            text: "削除後は元に戻せません。\r\nよろしいですか？",
+            icon: 'warning',
+            confirmButtonText: '削除します',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+          }).then( async (result) => {
+            if(result.isConfirmed){
+              start();
+              
+              let params = new URLSearchParams();
+              params.append("path", "/api/consumption/"+consumptionId+"/item/delete");
+              params.append("_method", 'delete');
+              params.append("deleteItemId", id);
+              params.append("_csrf", _CSRF);
+
+              const res = await axios.post(_APIURL,params);
+              
+              complete();
+              if(res.data.code != 200 && res.data.code != 201) {
+                throw new Error(res.data.message)
+              }
+              if(res.data.code == 201){
+                Swal.fire({
+                    icon: 'success',
+                    title: '消費伝票の削除が完了しました。',
+                    text: "商品がすべて削除されたので伝票も削除しました。",
+                }).then((result) => {
+                  location.href = _ROOT+'&path=/consumption/index&isCache=true';
+                });
+                return true ;
+              } else {
+                Swal.fire({
+                    icon: 'success',
+                    title: '消費商品の削除が完了しました。',
+                }).then((result) => {
+                  location.reload();
+                });
+                return true ;
+              }
+            }
+          }).catch((error) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'システムエラー',
+              text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+            });
+          });
+      }
+
       return {
         openPrint,
         deleteSlip,
@@ -192,7 +251,8 @@ var JoyPlaApp = Vue.createApp({
         breadcrumbs,
         loading, 
         start, 
-        complete
+        complete,
+        deleteItem
       }
   },
   watch: {

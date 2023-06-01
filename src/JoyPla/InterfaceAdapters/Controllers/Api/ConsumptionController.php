@@ -2,6 +2,7 @@
 
 namespace JoyPla\InterfaceAdapters\Controllers\Api;
 
+use ApiResponse;
 use Csrf;
 use framework\Facades\Gate;
 use framework\Http\Controller;
@@ -12,6 +13,10 @@ use JoyPla\Application\InputPorts\Api\Consumption\ConsumptionRegisterInputData;
 use JoyPla\Application\InputPorts\Api\Consumption\ConsumptionRegisterInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Consumption\ConsumptionIndexInputData;
 use JoyPla\Application\InputPorts\Api\Consumption\ConsumptionIndexInputPortInterface;
+use JoyPla\Enterprise\Models\ConsumptionId;
+use JoyPla\Enterprise\Models\HospitalId;
+use JoyPla\Enterprise\Models\InventoryCalculation;
+use JoyPla\Service\Repository\RepositoryProvider;
 
 class ConsumptionController extends Controller
 {
@@ -93,5 +98,70 @@ class ConsumptionController extends Controller
             $gate->isOnlyMyDivision()
         );
         $inputPort->handle($inputData);
+    }
+
+    public function deleteItem($vars){
+        
+        $token = $this->request->get('_csrf');
+        Csrf::validate($token, true);
+
+        if (Gate::denies('cancellation_of_consumption_slips')) {
+            Router::abort(403);
+        }
+
+        $gate = Gate::getGateInstance('cancellation_of_consumption_slips');
+
+        $deleteItemId = $this->request->get('deleteItemId', '');
+
+        $consumptionId = $vars['consumptionId'];
+        $hospitalId = new HospitalId($this->request->user()->hospitalId);
+
+        $repository = new RepositoryProvider();
+        $consumption = $repository->getConsumptionRepository()
+            ->find(
+                $hospitalId ,
+                new ConsumptionId($consumptionId)
+            );
+
+        if($gate->isOnlyMyDivision() && $consumption->getDivision()->getDivisionId()->value() === $this->request->user()->divisionId){
+            Router::abort(403);
+        }
+        $items = [];
+        $inventoryCalculations = [];
+
+        foreach( $consumption->getConsumptionItems() as $item)
+        {
+            if($deleteItemId != $item->getId())
+            {
+                $items[] = $item;
+            } else {
+                $inventoryCalculations[] = new InventoryCalculation(
+                    $item->getHospitalId(),
+                    $item->getDivision()->getDivisionId(),
+                    $item->getInHospitalItemId(),
+                    0,
+                    1,
+                    $item->getLot(),
+                    $item->getConsumptionQuantity() //消費の取り消しなので増やす
+                );
+            }
+        }
+
+        $consumption = $consumption->setConsumptionItems($items);
+        
+        if(count( $inventoryCalculations) > 0){
+            $repository
+                ->getInventoryCalculationRepository()
+                ->saveToArray($inventoryCalculations);
+        }
+        if(count($consumption->getConsumptionItems()) === 0 ){
+            $repository->getConsumptionRepository()
+                ->delete($hospitalId , $consumption->getConsumptionId());
+            echo (new ApiResponse([$consumption->getConsumptionId()->value()] , 1 , 201 , 'slipDeleted', []))->toJson();
+        } else {
+            $repository->getConsumptionRepository()
+                ->saveToArray([$consumption]);
+            echo (new ApiResponse([$consumption->getConsumptionId()->value()] , 1 , 200 , 'success', []))->toJson();
+        }
     }
 }

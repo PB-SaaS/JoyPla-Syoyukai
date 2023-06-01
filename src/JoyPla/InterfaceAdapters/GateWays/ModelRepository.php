@@ -178,6 +178,7 @@ class ModelRepository
             'deleteFlag',
             'authkey',
             'deliveryDestCode',
+            'subSendCode'
         ]);
     }
 
@@ -239,6 +240,7 @@ class ModelRepository
             'medicodeStatus',
             'medicodeSentDate',
             'deliveryDestCode',
+            'subSendCode'
         ]);
     }
 
