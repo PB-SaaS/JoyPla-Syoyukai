@@ -2587,3 +2587,80 @@ class inventoryByDiv extends Model
     ];
 }
 
+class StocktakingList extends Model
+{
+    public const CREATED_AT = 'registrationTime';
+    public const UPDATED_AT = 'updateTime';
+    public const DELETED_AT = '';
+
+    public static $spiral_db_name = 'NJ_StockList';
+    public static $guarded = ['id'];
+    public static $primary_key = 'stockListId';
+    public static $fillable = [
+        'registrationTime',
+        'updateTime',
+        'stockListId',
+        'stockListName',
+        'hospitalId',
+        'divisionId',
+        'itemsNumber',
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
+
+class StocktakingListRowView extends Model
+{
+    public const CREATED_AT = 'registrationTime';
+    public const UPDATED_AT = 'updateTime';
+    public const DELETED_AT = '';
+
+    public static $spiral_db_name = 'StockListRowView';
+    public static $guarded = ['id'];
+    public static $primary_key = 'id';
+    public static $fillable = [
+        'registrationTime',
+        'updateTime',
+        'stockListId',
+        'stockListRowId',
+        'hospitalId',
+        'divisionId',
+        'inHospitalItemId',
+        'itemId',
+        'distributorId',
+        'rackName',
+        'mandatoryFlag',
+        'index',
+        'distributorName',
+        'hospitalName',
+        'divisionName',
+        'itemName',
+        'itemCode',
+        'itemStandard',
+        'itemJANCode',
+        'quantity',
+        'quantityUnit',
+        'itemUnit',
+        'labelId',
+        'price',
+        'priceId',
+        'invUnitPrice',
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [
+        'mandatoryFlag' => [
+            '0' => '任意',
+            '1' => '必須',
+        ],
+        'invUnitPrice' => [
+            '0' => 'いいえ',
+            '1' => 'はい',
+        ],
+    ];
+}

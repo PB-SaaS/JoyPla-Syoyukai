@@ -17,6 +17,9 @@ use App\Model\InventoryHistory;
 use App\Model\StockTakingTransaction;
 use App\Model\StockView;
 use App\Model\Lot;
+use App\Model\StocktakingList;
+use App\Model\StocktakingListRowView;
+use App\Model\Price;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use App\Model\Billing;
@@ -867,6 +870,322 @@ class InventoryController extends Controller
                 $ex->getCode(),
                 $ex->getMessage(),
                 ['getLotAndStockApi']
+            );
+            $content = $content->toJson();
+        } finally {
+            return $this->view(
+                'NewJoyPla/view/template/ApiResponse',
+                [
+                    'content' => $content,
+                ],
+                false
+            );
+        }
+    }
+
+    public function getStocktakingListApi()
+    {
+        global $SPIRAL;
+        try {
+            $token = !isset($_POST['_csrf']) ? '' : $_POST['_csrf'];
+            Csrf::validate($token, true);
+
+            $user_info = new UserInfo($SPIRAL);
+
+            if ($user_info->isDistributorUser()) {
+                throw new Exception(
+                    FactoryApiErrorCode::factory(191)->getMessage(),
+                    FactoryApiErrorCode::factory(191)->getCode()
+                );
+            }
+
+            $divisionId = $SPIRAL->getParam('divisionId');
+
+            if ($divisionId == '') {
+                throw new Exception(
+                    FactoryApiErrorCode::factory(191)->getMessage(),
+                    FactoryApiErrorCode::factory(191)->getCode()
+                );
+            }
+
+            $inventoryEnd = InventoryEnd::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )
+                ->where('inventoryStatus', '1')
+                ->value('inventoryEndId')
+                ->plain()
+                ->get();
+            if ($inventoryEnd->count != 0) {
+                $invEndId = $inventoryEnd->data->get(0)->inventoryEndId;
+                $inventoryHistory = InventoryHistory::where(
+                    'hospitalId',
+                    $user_info->getHospitalId()
+                )
+                    ->where('divisionId', $divisionId)
+                    ->where('inventoryEndId', $invEndId)
+                    ->value('inventoryHStatus')
+                    ->plain()
+                    ->get();
+                if ($inventoryHistory->count != 0) {
+                    throw new Exception(
+                        'すでに登録された棚卸情報があるため、取得しませんでした',
+                        1
+                    );
+                }
+            }
+
+            $stocktakingList = StocktakingList::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )
+                ->where('divisionId', $divisionId)
+                ->value('stockListId')
+                ->plain()
+                ->get();
+            if($stocktakingList->count != 0){
+                $stockListId = $stocktakingList->data->get(0)->stockListId;
+                $StocktakingListRow = StocktakingListRowView::where(
+                    'hospitalId',
+                    $user_info->getHospitalId()
+                )
+                    ->where('divisionId', $divisionId)
+                    ->where('stockListId', $stockListId)
+                    ->plain()
+                    ->get();
+            }else{
+                throw new Exception(
+                    '棚卸商品管理表が存在しないため、取得しませんでした',
+                    1
+                );
+            }
+            if($StocktakingListRow->count == 0){
+                throw new Exception(
+                    '棚卸商品管理表に院内商品が存在しないため、取得しませんでした',
+                    1
+                );
+            }
+            $StocktakingListRowItems = $StocktakingListRow->data->all();
+
+            $lot = Lot::where('hospitalId', $user_info->getHospitalId())
+                ->where('divisionId', $divisionId)
+                ->where('stockQuantity', 0, '>')
+                ->plain()
+                ->get();
+            $stock = StockView::where('hospitalId', $user_info->getHospitalId())
+                ->where('divisionId', $divisionId)
+                ->where('stockQuantity', 0, '>')
+                ->plain()
+                ->get();
+
+            $list = [];
+
+            $in_hospital_item = InHospitalItemView::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )
+                ->plain()
+                ->value('inHospitalItemId')
+                ->value('lotManagement');
+
+            foreach ($StocktakingListRowItems as $list_item) {
+                $in_hospital_item->orWhere(
+                    'inHospitalItemId',
+                    $list_item->inHospitalItemId
+                );
+            }
+            foreach ($stock->data->all() as $stock_item) {
+                $in_hospital_item->orWhere(
+                    'inHospitalItemId',
+                    $stock_item->inHospitalItemId
+                );
+            }
+            foreach ($lot->data->all() as $lot_item) {
+                $in_hospital_item->orWhere(
+                    'inHospitalItemId',
+                    $lot_item->inHospitalItemId
+                );
+            }
+
+            $in_hospital_item = $in_hospital_item->get();
+            $data = [];
+            foreach ($stock->data->all() as $stock_item) {
+                $stockQuantity = (int) $stock_item->stockQuantity;
+                $lotManagement = 0;
+                foreach ($in_hospital_item->data->all() as $in_hp_item) {
+                    if (
+                        $in_hp_item->inHospitalItemId ==
+                        $stock_item->inHospitalItemId
+                    ) {
+                        $lotManagement = $in_hp_item->lotManagement;
+                        break;
+                    }
+                }
+
+                //棚卸商品管理表から棚卸必須フラグの紐づけ
+                $mandatoryFlag = "";
+                foreach($StocktakingListRowItems as $row){
+                    if (
+                        $row->inHospitalItemId ==
+                        $stock_item->inHospitalItemId
+                    ) {
+                        $mandatoryFlag = $row->mandatoryFlag;
+                        break;
+                    }
+                }
+
+                foreach ($lot->data->all() as $lot_item) {
+                    if (
+                        $lot_item->inHospitalItemId ==
+                        $stock_item->inHospitalItemId
+                    ) {
+                        $stockQuantity =
+                            $stockQuantity - (int) $lot_item->stockQuantity;
+                        $data[] = [
+                            'divisionId' => '',
+                            'maker' => $stock_item->makerName,
+                            'shouhinName' => $stock_item->itemName,
+                            'code' => $stock_item->itemCode,
+                            'kikaku' => $stock_item->itemStandard,
+                            'irisu' => $stock_item->quantity,
+                            'kakaku' => $stock_item->price,
+                            'jan' => $stock_item->itemJANCode,
+                            'oroshi' => $stock_item->distributorName,
+                            'recordId' => $stock_item->inHospitalItemId,
+                            'unit' => $stock_item->quantityUnit,
+                            'itemUnit' => $stock_item->itemUnit,
+                            'distributorId' => $stock_item->distributorId,
+                            'count' => (int) $lot_item->stockQuantity,
+                            'countNum' => (int) $lot_item->stockQuantity,
+                            'labelId' => $stock_item->labelId,
+                            'unitPrice' => $stock_item->unitPrice,
+                            'lotNumber' => $lot_item->lotNumber,
+                            'lotDate' => \App\Lib\changeDateFormat(
+                                'Y年m月d日',
+                                $lot_item->lotDate,
+                                'Y-m-d'
+                            ),
+                            'lotFlag' => $lotManagement == 1 ? 'はい' : '',
+                            'lotFlagBool' => $lotManagement,
+                            'mandatoryFlag' => $mandatoryFlag, //棚卸必須フラグ
+                        ];
+                    }
+                }
+
+                if ($stockQuantity != 0) {
+                    $data[] = [
+                        'divisionId' => '',
+                        'maker' => $stock_item->makerName,
+                        'shouhinName' => $stock_item->itemName,
+                        'code' => $stock_item->itemCode,
+                        'kikaku' => $stock_item->itemStandard,
+                        'irisu' => $stock_item->quantity,
+                        'kakaku' => $stock_item->price,
+                        'jan' => $stock_item->itemJANCode,
+                        'oroshi' => $stock_item->distributorName,
+                        'recordId' => $stock_item->inHospitalItemId,
+                        'unit' => $stock_item->quantityUnit,
+                        'itemUnit' => $stock_item->itemUnit,
+                        'distributorId' => $stock_item->distributorId,
+                        'count' => (int) $stockQuantity,
+                        'countNum' => (int) $stockQuantity,
+                        'labelId' => $stock_item->labelId,
+                        'unitPrice' => $stock_item->unitPrice, //単価
+                        'lotNumber' => '',
+                        'lotDate' => '',
+                        'lotFlag' => $lotManagement == 1 ? 'はい' : '',
+                        'lotFlagBool' => $lotManagement,
+                        'mandatoryFlag' => $mandatoryFlag, //棚卸必須フラグ
+                    ];
+                }
+            }
+
+            //理論在庫には載ってないけど在庫商品管理表には載っている院内商品の対応。
+            $stockedInHospitalItemIds = array_column($data, 'recordId'); //理論在庫の院内商品ID
+            $priceIds = array_column($StocktakingListRowItems, "priceId");//棚卸商品管理表の金額管理ID もしかしたらforeachまわしてそのまま検索かも
+
+            $hospital_data = Hospital::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )->get();
+            $hospital_data = $hospital_data->data->all();
+            $useUnitPrice = $hospital_data[0]->invUnitPrice;
+
+            $price_data = Price::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            );
+
+            foreach($priceIds as $priceId){
+                $price_data->orWhere("priceId", $priceId);
+            }
+            $price_data = $price_data->plain()->get()->data->all();
+
+            foreach($StocktakingListRowItems as $list_item){
+                if(in_array($list_item->inHospitalItemId, $stockedInHospitalItemIds)){
+                    continue; //理論在庫に載っていたら対象外のためスキップ
+                }
+
+                $lotManagement = 0;
+                $unitPrice = 0;
+                foreach ($in_hospital_item->data->all() as $in_hp_item) {
+                    if (
+                        $in_hp_item->inHospitalItemId ==
+                        $list_item->inHospitalItemId
+                    ) {
+                        $lotManagement = $in_hp_item->lotManagement;
+                    }
+
+                    //フラグによる単価紐づけ or 計算（価格/入数）
+                    if($useUnitPrice == '1'){
+                        foreach($price_data as $price){
+                            if($price->priceId == $list_item->priceId){
+                                $unitPrice = $price->unitPrice;
+                            }
+                        }
+                    }else{
+                        $unitPrice = (int)$list_item->price / (int)$list_item->quantity;
+                    }
+
+                    $data[] = [
+                        'divisionId' => '',
+                        'maker' => $list_item->makerName,
+                        'shouhinName' => $list_item->itemName,
+                        'code' => $list_item->itemCode,
+                        'kikaku' => $list_item->itemStandard,
+                        'irisu' => $list_item->quantity,
+                        'kakaku' => $list_item->price,
+                        'jan' => $list_item->itemJANCode,
+                        'oroshi' => $list_item->distributorName,
+                        'recordId' => $list_item->inHospitalItemId,
+                        'unit' => $list_item->quantityUnit,
+                        'itemUnit' => $list_item->itemUnit,
+                        'distributorId' => $list_item->distributorId,
+                        'count' => 0, //理論在庫がない=在庫0
+                        'countNum' => 0, //理論在庫がない=在庫0
+                        'labelId' => $list_item->labelId,
+                        'unitPrice' => $unitPrice,
+                        'lotNumber' => '',
+                        'lotDate' => '',
+                        'lotFlag' => $lotManagement == 1 ? 'はい' : '',
+                        'lotFlagBool' => $lotManagement,
+                        'mandatoryFlag' => $list_item->mandatoryFlag,
+                    ];
+                    break;
+                }
+            }
+
+            $content = new ApiResponse($data, count($data), 0, 'OK', [
+                'getStocktakingListApi',
+            ]);
+            $content = $content->toJson();
+        } catch (Exception $ex) {
+            $content = new ApiResponse(
+                [],
+                0,
+                $ex->getCode(),
+                $ex->getMessage(),
+                ['getStocktakingListApi']
             );
             $content = $content->toJson();
         } finally {
@@ -2379,6 +2698,8 @@ if ($action === 'inventoryRegistApi') {
     echo $InventoryController->getTemporaryData()->render();
 } elseif ($action === 'getLotAndStockApi') {
     echo $InventoryController->getLotAndStockApi()->render();
+} elseif ($action === 'getStocktakingListApi') { //棚卸商品管理表機能からの取得
+    echo $InventoryController->getStocktakingListApi()->render();
 } elseif ($action === 'inventoryEndList') {
     echo $InventoryController->inventoryEndList()->render();
 } elseif ($action === 'inventoryMovement') {
