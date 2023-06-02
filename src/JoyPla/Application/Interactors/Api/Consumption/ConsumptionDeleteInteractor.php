@@ -73,6 +73,9 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
 
             $inventoryCalculations = [];
             foreach ($consumption->getConsumptionItems() as $item) {
+                if($consumption->getConsumptionStatus()->value() == ConsumptionStatus::Borrowing){
+                    continue;
+                }
                 $inventoryCalculations[] = new InventoryCalculation(
                     $item->getHospitalId(),
                     $item->getDivision()->getDivisionId(),
@@ -88,9 +91,11 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
                 ->getConsumptionRepository()
                 ->delete($hospitalId, $consumption->getConsumptionId());
 
-            $this->repositoryProvider
+            if(count($inventoryCalculations) > 0){
+                $this->repositoryProvider
                 ->getInventoryCalculationRepository()
                 ->saveToArray($inventoryCalculations);
+            }
 
             $this->presenterProvider
                 ->getConsumptionDeletePresenter()

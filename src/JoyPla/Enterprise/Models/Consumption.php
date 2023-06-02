@@ -52,6 +52,10 @@ class Consumption
     {
         return $this->consumptionDate;
     }
+
+    public function getConsumptionStatus(){
+        return $this->consumptionStatus;
+    }
     
     public function getConsumptionItems()
     {

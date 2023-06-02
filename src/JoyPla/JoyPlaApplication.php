@@ -121,6 +121,13 @@ class JoyPlaApplication extends Application
             return false;
         });
 
+        Gate::define('is_use_billing_type', function(){
+            if(defined('IS_USE_BILLING_CONSUME') && IS_USE_BILLING_CONSUME){
+                return true;
+            }
+            return false;
+        });
+
         Gate::define('register_of_consumption_slips', function (Auth $auth) {
             //消費伝票登録
             if ($auth->userPermission == '2') {

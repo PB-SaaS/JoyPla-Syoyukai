@@ -58,12 +58,13 @@ class ConsumptionController extends Controller
 
         $consumptionItems = $this->request->get('consumptionItems');
         $consumptionDate = $this->request->get('consumptionDate');
-
+        $consumptionType = $this->request->get('consumptionType' , '1');
         $user = $this->request->user();
 
         $inputData = new ConsumptionRegisterInputData(
             $user,
             $consumptionDate,
+            (int)$consumptionType,
             $consumptionItems,
             $gate->isOnlyMyDivision()
         );
