@@ -120,7 +120,9 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
                         ''
                     ),
                     $i->getDivision(),
-                    new ConsumptionStatus(ConsumptionStatus::Consumption)
+                    new ConsumptionStatus(
+                        ($inputData->consumptionType === 1) ? ConsumptionStatus::Consumption : ConsumptionStatus::Borrowing
+                    )
                 );
             }
             $this->repositoryProvider
@@ -141,6 +143,9 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
 
             $inventoryCalculations = [];
             foreach ($result as $r) {
+                if($r->getConsumptionStatus()->value() == ConsumptionStatus::Borrowing) {
+                    continue;
+                }
                 foreach ($r->getConsumptionItems() as $item) {
                     $inventoryCalculations[] = new InventoryCalculation(
                         $item->getHospitalId(),
@@ -154,9 +159,11 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
                 }
             }
 
-            $this->repositoryProvider
-                ->getInventoryCalculationRepository()
-                ->saveToArray($inventoryCalculations);
+            if(count($inventoryCalculations) > 0){
+                $this->repositoryProvider
+                    ->getInventoryCalculationRepository()
+                    ->saveToArray($inventoryCalculations);
+            }
 
             $this->presenterProvider
                 ->getConsumptionRegisterPresenter()
@@ -180,16 +187,19 @@ namespace JoyPla\Application\InputPorts\Api\Consumption {
     {
         public Auth $user;
         public string $consumeDate;
+        public int $consumptionType;
         public array $consumptionItems;
         public bool $isOnlyMyDivision;
 
         public function __construct(
             Auth $user,
             string $consumeDate,
+            int $consumptionType,
             array $consumptionItems,
             bool $isOnlyMyDivision
         ) {
             $this->user = $user;
+            $this->consumptionType = $consumptionType;
             $this->consumeDate = $consumeDate;
             $this->consumptionItems = array_map(function ($v) use (
                 $isOnlyMyDivision,
