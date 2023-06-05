@@ -93,7 +93,7 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
             }
 
             $result[] = new ConsumptionItem(
-                $item->id,
+                $item->id ?? 0,
                 new ConsumptionId(''),
                 new InHospitalItemId(
                     $inHospitalItem[$inHospitalItem_find_key]->inHospitalItemId
@@ -156,6 +156,7 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
                 as $consumptionItem
             ) {
                 $items[] = [
+                    'consumeItemId' => $consumptionItem['id'] === 0 ? '' : $consumptionItem['id'],
                     'registrationTime' => $consumption
                         ->getConsumptionDate()
                         ->isToday()
@@ -188,7 +189,7 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
 
         $consumptionItemInstance->delete();
 
-        ModelRepository::getConsumptionItemInstance()->insert($items);
+        ModelRepository::getConsumptionItemInstance()->upsertBulk('consumeItemId',$items);
 
         return $consumptions;
     }

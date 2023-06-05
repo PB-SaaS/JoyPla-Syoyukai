@@ -53,7 +53,7 @@ class ConsumptionItem
     public static function create( Collection $input )
     {
         return new ConsumptionItem(
-            $input->id,
+            $input->id ?? 0,
             (new ConsumptionId($input->billingNumber) ),
             (new InHospitalItemId($input->inHospitalItemId) ),
             (Item::create($input) ),
@@ -95,6 +95,13 @@ class ConsumptionItem
     public function getConsumptionQuantity()
     {
         return $this->consumptionQuantity;
+    }
+
+    
+    public function setConsumptionQuantity(int $quantity)
+    {
+        $this->consumptionQuantity = $quantity;
+        return $this;
     }
     
     public function getInHospitalItemId(){

@@ -78,6 +78,67 @@ class ConsumptionController extends Controller
 
     public function update($vars)
     {
+        $token = $this->request->get('_csrf');
+        Csrf::validate($token, true);
+
+        if (Gate::denies('update_of_consumption_slips')) {
+            Router::abort(403);
+        }
+
+        $gate = Gate::getGateInstance('update_of_consumption_slips');
+
+        $updateItems = $this->request->get('items', []);
+
+        $consumptionId = $vars['consumptionId'];
+        $hospitalId = new HospitalId($this->request->user()->hospitalId);
+
+        $repository = new RepositoryProvider();
+        $consumption = $repository->getConsumptionRepository()
+            ->find(
+                $hospitalId ,
+                new ConsumptionId($consumptionId)
+            );
+
+        if($gate->isOnlyMyDivision() && $consumption->getDivision()->getDivisionId()->value() === $this->request->user()->divisionId){
+            Router::abort(403);
+        }
+        $items = [];
+        $inventoryCalculations = [];
+
+        foreach( $consumption->getConsumptionItems() as $item)
+        {
+            $temp = $item;
+            foreach($updateItems as $updateItem)
+            {
+                if($updateItem['id'] == $item->getId())
+                {
+                    $original = $item->getConsumptionQuantity();
+                    $inventoryCalculationQuantity = $original - $updateItem['quantity'];
+                    $temp = $item->setConsumptionQuantity($updateItem['quantity']);
+                    $inventoryCalculations[] = new InventoryCalculation(
+                        $item->getHospitalId(),
+                        $item->getDivision()->getDivisionId(),
+                        $item->getInHospitalItemId(),
+                        0,
+                        1,
+                        $item->getLot(),
+                        $inventoryCalculationQuantity //減少した分のみ増やす
+                    );
+                }
+            }
+            $items[] = $temp;
+        }
+
+        $consumption = $consumption->setConsumptionItems($items);
+        
+        if(count( $inventoryCalculations) > 0){
+            $repository
+                ->getInventoryCalculationRepository()
+                ->saveToArray($inventoryCalculations);
+        }
+        $repository->getConsumptionRepository()
+            ->saveToArray([$consumption]);
+        echo (new ApiResponse([$consumption->getConsumptionId()->value()] , 1 , 200 , 'success', []))->toJson();
     }
 
     public function delete(

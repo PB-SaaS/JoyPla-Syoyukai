@@ -7,6 +7,9 @@
     <?php echo $script; ?>
     <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla_developer/340/scroll-hint.css">
     <script src="https://i02.smp.ne.jp/u/joypla_developer/340/scroll-hint.min.js"></script>
+
+    <script src="https://i02.smp.ne.jp/u/joypla/new/js/vue-multiselect.min.js"></script>
+    <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/vue-multiselect.min.css">
     <style>
     
 .absolute {

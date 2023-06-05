@@ -95,6 +95,10 @@
 	.desc::after {
 		content: "▼";
 	}
+	.multiselect__tags {
+		border-radius: 0px !important; 
+		height:40px !important;
+	}
 </style>
 <div id="app" class="animsition" uk-height-viewport="expand: true">
 	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
@@ -128,6 +132,49 @@
 					<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力..." name="barcode" autocomplete="off">
 					<button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
 				</form>
+			</div>
+			<div class="uk-width-2-3 uk-margin-auto uk-margin-top">
+				<ul uk-accordion>
+					<li>
+						<a class="uk-accordion-title" href="#">絞り込み</a>
+						<div class="uk-accordion-content">
+							<form class="uk-form-stacked">
+								<div class="uk-margin">
+									<label class="uk-form-label" for="form-itemName-text">商品名</label>
+									<div class="uk-form-controls">
+										<input class="uk-input" id="form-itemName-text" v-model="search.itemName" type="text" placeholder="Some text...">
+									</div>
+								</div>
+								<div class="uk-margin">
+									<label class="uk-form-label" for="form-makerName-text">メーカー名</label>
+									<div class="uk-form-controls">
+										<input class="uk-input" id="form-makerName-text" v-model="search.makerName" type="text" placeholder="Some text...">
+									</div>
+								</div>
+								
+								<div class="uk-margin">
+									<label class="uk-form-label" for="form-makerName-text">卸業者名</label>
+									<div class="uk-form-controls">
+										<multiselect :multiple='true' :close-on-select="false" :clear-on-select="false" v-model="search.distributorIds" label="text" track-by="value" name="filter-distributor" :options="distributors">
+											<template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }} options selected</span></template>
+										</multiselect>
+									</div>
+								</div>
+
+
+								<div class="uk-margin">
+									<div class="uk-form-label">棚卸必須</div>
+									<div class="uk-form-controls">
+										<label><input class="uk-checkbox" type="checkbox" name="check1" value="t" v-model="search.mandatory"> 必須</label><br>
+										<label><input class="uk-checkbox" type="checkbox" name="check1" value="f" v-model="search.mandatory"> 任意</label>
+									</div>
+								</div>
+
+							</form>
+						</div>
+					</li>
+				</ul>
+				
 			</div>
 			<div class="shouhin-table uk-width-expand uk-overflow-auto">
 				<table class="uk-table uk-table-striped">
@@ -371,30 +418,63 @@ $defaultDivisionId = $user_info->isUser() ? $user_info->getDivisionId() : '';
 ?>
 	var app = new Vue({
 		el: '#app',
+		components: {
+			Multiselect: window.VueMultiselect.default
+		},
 		data: {
 			lists: [],
 			isTemporaryData: false,
         	divisionOptions: <?php echo json_encode($options); ?>,
+        	distributors: <?php echo json_encode($distributorOptions); ?>,
 			divisionId: "<?php echo $defaultDivisionId; ?>",
 			rackNames: [],
+			search: {
+				makerName : '',
+				itemName: '',
+				distributorIds: [],
+				mandatory: [],
+			},
 			sort_key: "",
 			sort_asc: true,
 			useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
 		},
 		computed: {
 			sort_lists() {
+				let temp = this.lists;
 				if (this.sort_key != "") {
 					let set = 1;
 					this.sort_asc ? (set = 1) : (set = -1);
-					this.lists.sort((a, b) => {
+					temp.sort((a, b) => {
 						if (a[this.sort_key] < b[this.sort_key]) return -1 * set;
 						if (a[this.sort_key] > b[this.sort_key]) return 1 * set;
 						return 0;
 					});
-					return this.lists;
-				} else {
-					return this.lists;
 				}
+
+				if(this.search.itemName != ''){
+					let lowerCaseSearchText = this.search.itemName.toLowerCase();
+					temp = temp.filter(item => item.shouhinName.toLowerCase().includes(lowerCaseSearchText));
+				}
+				
+				if(this.search.makerName != ''){
+					let lowerCaseSearchText = this.search.makerName.toLowerCase();
+					temp = temp.filter(item => item.maker.toLowerCase().includes(lowerCaseSearchText));
+				}
+
+				if(this.search.distributorIds.length > 0){
+					let searchTerms = this.search.distributorIds.map(item => item.value);
+					temp = temp.filter(item => searchTerms.includes(item.distributorId));
+				}
+
+				if(this.search.mandatory.length === 1 && this.search.mandatory.includes('t')){
+					temp = temp.filter(item => item.mandatoryFlag == '1');
+				}
+				
+				if(this.search.mandatory.length === 1 && this.search.mandatory.includes('f')){
+					temp = temp.filter(item => item.mandatoryFlag == '0');
+				}
+
+				return temp;
 			},
 		},
 		filters: {

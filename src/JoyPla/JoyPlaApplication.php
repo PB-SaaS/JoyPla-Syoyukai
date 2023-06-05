@@ -169,6 +169,21 @@ class JoyPlaApplication extends Application
             return new GatePermissionModel(true, false);
         });
 
+        Gate::define('update_of_consumption_slips', function (
+            Auth $auth
+        ) {
+            //
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            if ($auth->userPermission == '3') {
+                //承認者
+                return new GatePermissionModel(false, false);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
         Gate::define('cancellation_of_consumption_slips', function (
             Auth $auth
         ) {
