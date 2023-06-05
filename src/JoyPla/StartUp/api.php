@@ -70,6 +70,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'index',
     ])->service($useCaseProvider->getConsumptionIndexInteractor());
 
+    Router::map('PATCH', '/api/consumption/:consumptionId', [
+        ConsumptionController::class,
+        'update',
+    ]);
+
     Router::map('DELETE', '/api/consumption/:consumptionId/delete', [
         ConsumptionController::class,
         'delete',

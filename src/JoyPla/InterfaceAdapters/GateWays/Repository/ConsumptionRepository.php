@@ -93,6 +93,7 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
             }
 
             $result[] = new ConsumptionItem(
+                $item->id ?? 0,
                 new ConsumptionId(''),
                 new InHospitalItemId(
                     $inHospitalItem[$inHospitalItem_find_key]->inHospitalItemId
@@ -127,8 +128,10 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
 
         $history = [];
         $items = [];
+        $consumptionItemInstance = ModelRepository::getConsumptionItemInstance();
 
         foreach ($consumptions as $consumption) {
+
             $consumptionToArray = $consumption->toArray();
 
             $history[] = [
@@ -146,11 +149,14 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
                 'billingStatus' => $consumptionToArray['consumptionStatus'],
             ];
 
+            $consumptionItemInstance->orWhere('billingNumber',$consumptionToArray['consumptionId']);
+
             foreach (
                 $consumptionToArray['consumptionItems']
                 as $consumptionItem
             ) {
                 $items[] = [
+                    'consumeItemId' => $consumptionItem['id'] === 0 ? '' : $consumptionItem['id'],
                     'registrationTime' => $consumption
                         ->getConsumptionDate()
                         ->isToday()
@@ -178,8 +184,12 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
                 ];
             }
         }
-        ModelRepository::getConsumptionInstance()->insert($history);
-        ModelRepository::getConsumptionItemInstance()->insert($items);
+        
+        ModelRepository::getConsumptionInstance()->upsertBulk('billingNumber',$history);
+
+        $consumptionItemInstance->delete();
+
+        ModelRepository::getConsumptionItemInstance()->upsertBulk('consumeItemId',$items);
 
         return $consumptions;
     }
@@ -349,6 +359,7 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
             ->where('billingNumber', $consumptionId->value())
             ->delete();
     }
+
 }
 
 interface ConsumptionRepositoryInterface
