@@ -79,21 +79,20 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'index',
     ])->service($useCaseProvider->getConsumptionIndexInteractor());
 
-    Router::map('DELETE', '/api/consumption/:consumptionId/delete', [
-        ConsumptionController::class,
-        'delete',
-    ])->service($useCaseProvider->getConsumptionDeleteInteractor());
-
     Router::map('PATCH', '/api/consumption/:consumptionId', [
         ConsumptionController::class,
         'update',
     ]);
 
+    Router::map('DELETE', '/api/consumption/:consumptionId/delete', [
+        ConsumptionController::class,
+        'delete',
+    ])->service($useCaseProvider->getConsumptionDeleteInteractor());
+    
     Router::map('DELETE', '/api/consumption/:consumptionId/item/delete', [
         ConsumptionController::class,
         'deleteItem',
     ]);
-
     Router::map('POST', '/api/order/register', [
         OrderController::class,
         'register',

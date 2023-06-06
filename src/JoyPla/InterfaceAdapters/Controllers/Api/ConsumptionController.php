@@ -14,6 +14,7 @@ use JoyPla\Application\InputPorts\Api\Consumption\ConsumptionRegisterInputPortIn
 use JoyPla\Application\InputPorts\Api\Consumption\ConsumptionIndexInputData;
 use JoyPla\Application\InputPorts\Api\Consumption\ConsumptionIndexInputPortInterface;
 use JoyPla\Enterprise\Models\ConsumptionId;
+use JoyPla\Enterprise\Models\ConsumptionStatus;
 use JoyPla\Enterprise\Models\HospitalId;
 use JoyPla\Enterprise\Models\InventoryCalculation;
 use JoyPla\Service\Repository\RepositoryProvider;
@@ -64,6 +65,11 @@ class ConsumptionController extends Controller
         $consumptionItems = $this->request->get('consumptionItems');
         $consumptionDate = $this->request->get('consumptionDate');
         $consumptionType = $this->request->get('consumptionType' , '1');
+
+        if($consumptionType == '2'){
+            Router::abort(403);
+        }
+
         $user = $this->request->user();
 
         $inputData = new ConsumptionRegisterInputData(
@@ -76,8 +82,8 @@ class ConsumptionController extends Controller
         $inputPort->handle($inputData);
     }
 
-    public function update($vars)
-    {
+    public function update($vars){
+
         $token = $this->request->get('_csrf');
         Csrf::validate($token, true);
 
@@ -99,9 +105,19 @@ class ConsumptionController extends Controller
                 new ConsumptionId($consumptionId)
             );
 
-        if($gate->isOnlyMyDivision() && $consumption->getDivision()->getDivisionId()->value() === $this->request->user()->divisionId){
+        if($consumption->getConsumptionStatus()->value() === 2)
+        {
             Router::abort(403);
         }
+
+        if($gate->isOnlyMyDivision() && $consumption->getDivision()->getDivisionId()->value() !== $this->request->user()->divisionId){
+            Router::abort(403);
+        }
+
+        if(gate('is_user') && $consumption->getConsumptionStatus()->value() === 3){
+            Router::abort(403);
+        }
+
         $items = [];
         $inventoryCalculations = [];
 
@@ -115,6 +131,9 @@ class ConsumptionController extends Controller
                     $original = $item->getConsumptionQuantity();
                     $inventoryCalculationQuantity = $original - $updateItem['quantity'];
                     $temp = $item->setConsumptionQuantity($updateItem['quantity']);
+                    if($consumption->getConsumptionStatus()->value() == ConsumptionStatus::DirectDelivery){
+                        continue;
+                    }
                     $inventoryCalculations[] = new InventoryCalculation(
                         $item->getHospitalId(),
                         $item->getDivision()->getDivisionId(),
@@ -151,6 +170,7 @@ class ConsumptionController extends Controller
         if (Gate::denies('cancellation_of_consumption_slips')) {
             Router::abort(403);
         }
+        
 
         $gate = Gate::getGateInstance('cancellation_of_consumption_slips');
 
@@ -161,6 +181,7 @@ class ConsumptionController extends Controller
         );
         $inputPort->handle($inputData);
     }
+    
 
     public function deleteItem($vars){
         
@@ -185,9 +206,19 @@ class ConsumptionController extends Controller
                 new ConsumptionId($consumptionId)
             );
 
-        if($gate->isOnlyMyDivision() && $consumption->getDivision()->getDivisionId()->value() === $this->request->user()->divisionId){
+        if($consumption->getConsumptionStatus()->value() === 2)
+        {
             Router::abort(403);
         }
+
+        if($gate->isOnlyMyDivision() && $consumption->getDivision()->getDivisionId()->value() !== $this->request->user()->divisionId){
+            Router::abort(403);
+        }
+        
+        if(gate('is_user') && $consumption->getConsumptionStatus()->value() === 3){
+            Router::abort(403);
+        }
+        
         $items = [];
         $inventoryCalculations = [];
 
@@ -197,6 +228,9 @@ class ConsumptionController extends Controller
             {
                 $items[] = $item;
             } else {
+                if($consumption->getConsumptionStatus()->value() == ConsumptionStatus::DirectDelivery){
+                    continue;
+                }
                 $inventoryCalculations[] = new InventoryCalculation(
                     $item->getHospitalId(),
                     $item->getDivision()->getDivisionId(),

@@ -1266,6 +1266,7 @@ namespace JoyPla\Enterprise\Models {
 
         public const Consumption = 1; //通常消費
         public const Borrowing = 2; //貸出品
+        public const DirectDelivery = 3; //直納処理
 
         public function __construct(string $value = self::Consumption)
         {
@@ -1277,6 +1278,11 @@ namespace JoyPla\Enterprise\Models {
                 case self::Borrowing:
                     $this->value = self::Borrowing;
                     break;
+                    
+                case self::DirectDelivery:
+                    $this->value = self::DirectDelivery;
+                    break;
+
                 default:
                     $this->value = self::Consumption;
                     break;
@@ -1288,14 +1294,15 @@ namespace JoyPla\Enterprise\Models {
             switch ($this->value) {
                 case self::Consumption:
                     return '通常消費';
-                    break;
 
                 case self::Borrowing:
                     return '貸出品';
-                    break;
+
+                case self::DirectDelivery:
+                    return '直納処理';
+
                 default:
                     return '';
-                    break;
             }
         }
     }

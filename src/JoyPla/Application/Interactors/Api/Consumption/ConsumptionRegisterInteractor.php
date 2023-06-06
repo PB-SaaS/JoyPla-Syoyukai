@@ -120,9 +120,7 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
                         ''
                     ),
                     $i->getDivision(),
-                    new ConsumptionStatus(
-                        ($inputData->consumptionType === 1) ? ConsumptionStatus::Consumption : ConsumptionStatus::Borrowing
-                    )
+                    new ConsumptionStatus($inputData->consumptionType)
                 );
             }
             $this->repositoryProvider
@@ -143,7 +141,7 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
 
             $inventoryCalculations = [];
             foreach ($result as $r) {
-                if($r->getConsumptionStatus()->value() == ConsumptionStatus::Borrowing) {
+                if($r->getConsumptionStatus()->value() == ConsumptionStatus::DirectDelivery) {
                     continue;
                 }
                 foreach ($r->getConsumptionItems() as $item) {

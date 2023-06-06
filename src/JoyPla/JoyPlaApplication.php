@@ -121,8 +121,8 @@ class JoyPlaApplication extends Application
             return false;
         });
 
-        Gate::define('is_use_billing_type', function(){
-            if(defined('IS_USE_BILLING_CONSUME') && IS_USE_BILLING_CONSUME){
+        Gate::define('is_use_direct_delivery', function(){
+            if(defined('IS_USE_DIRECT_DELIVERY') && IS_USE_DIRECT_DELIVERY){
                 return true;
             }
             return false;
@@ -270,6 +270,21 @@ class JoyPlaApplication extends Application
             if ($auth->userPermission == '2') {
                 //担当者
                 return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
+        Gate::define('update_of_consumption_slips', function (
+            Auth $auth
+        ) {
+            //
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            if ($auth->userPermission == '3') {
+                //承認者
+                return new GatePermissionModel(false, false);
             }
             return new GatePermissionModel(true, false);
         });
