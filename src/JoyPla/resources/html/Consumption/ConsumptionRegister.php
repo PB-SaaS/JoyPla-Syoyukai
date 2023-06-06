@@ -29,6 +29,17 @@
             ); ?>"
             />
           </div>
+          <?php if(gate('is_use_billing_type')): ?>
+          <div class="mb-2 lg:w-1/3">
+            <v-select 
+            name="type" 
+            label="消費タイプ指定" 
+            :rules="{ required : false }"
+            title="消費タイプ指定"
+            :options="consumeTypes"
+            />
+          </div>
+          <?php endif; ?>
           <div class="my-4 grid grid-cols-3 gap-4 lg:w-1/3">
             <v-button-default type="button" data-micromodal-trigger="inHospitalItemModal">商品検索</v-button-default>
             <v-in-hospital-item-modal v-on:additem="additem" :unit-price-use="consumptionUnitPriceUseFlag">
@@ -222,6 +233,7 @@ var JoyPlaApp = Vue.createApp({
           consumeItems: [],
           divisionId: "",
           consumeDate: yyyy+'-'+mm+'-'+dd,
+          type : '1',
         },
         validateOnMount : false
       });
@@ -328,9 +340,13 @@ var JoyPlaApp = Vue.createApp({
         } 
         else 
         {
+          text = '消費登録を行います。よろしいですか？';
+          if(values.type === '2'){
+            text = '貸出品登録を行います。よろしいですか？<br>※貸出品は在庫変動しません';
+          }
           Swal.fire({
             title: '確認',
-            text: "消費登録を行います。よろしいですか？",
+            html: text,
             icon: 'info',
             showCancelButton: true,
             reverseButtons: true,
@@ -362,6 +378,7 @@ var JoyPlaApp = Vue.createApp({
             params.append("path", "/api/consumption/register");
             params.append("_method", 'post');
             params.append("_csrf", _CSRF);
+            params.append("consumptionType", values.type);
             params.append("consumptionDate", values.consumeDate);
             params.append("consumptionItems", JSON.stringify(encodeURIToObject(consumptionModels)));
 
@@ -492,7 +509,13 @@ var JoyPlaApp = Vue.createApp({
         }
       }
 
+      const consumeTypes =  [
+        { label: "通常消費", value: "1" },
+        { label: "貸出品消費", value: "2" }
+      ];
+
       return {
+        consumeTypes,
         values,
         addItemByBarcode,
         selectInHospitalItems,
@@ -532,6 +555,8 @@ var JoyPlaApp = Vue.createApp({
         deep: true
       },
     },
+
+
     components: {
       'v-barcode-search' : vBarcodeSearch,
       'v-loading' : vLoading,

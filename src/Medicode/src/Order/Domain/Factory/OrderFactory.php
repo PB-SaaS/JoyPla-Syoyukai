@@ -14,6 +14,7 @@ final class OrderFactory
         $orderCNumber = '';
         $orderNumber = '';
         $hospitalCode = '';
+        $subSendCode = '';
         $distributorCode = '';
         $JANCode = '';
         $quantity = 0;
@@ -47,11 +48,15 @@ final class OrderFactory
             $quantity = (int)$values['orderQuantity'];
         }
 
-
         if (array_key_exists('deliveryDestCode', $values)) {
             $deliveryDestCode = (string)$values['deliveryDestCode'];
         }
 
-        return new Order($id, $orderCNumber, $orderNumber, $hospitalCode, $distributorCode, $JANCode, $quantity, $deliveryDestCode);
+
+        if (array_key_exists('subSendCode', $values)) {
+            $subSendCode = (string)$values['subSendCode'];
+        }
+
+        return new Order($id, $orderCNumber, $orderNumber, $hospitalCode, $distributorCode, $JANCode, $quantity, $deliveryDestCode ,$subSendCode);
     }
 }

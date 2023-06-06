@@ -72,7 +72,6 @@ Vue.component('searchable-select', {
   },
 });
 
-
 $(function(){
 	
   $('input[type="number"]').not('.joypla-333').on('change', function(e){

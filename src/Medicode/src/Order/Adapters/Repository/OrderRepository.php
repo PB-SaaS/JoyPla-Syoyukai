@@ -29,7 +29,7 @@ class OrderRepository implements IOrderRepository
         $param = [
             'db_title' => ORDER_ITEM_DB,
             'lines_per_page' => LINES_PER_PAGE,
-            'select_columns' => ['recordId', 'orderCNumber', 'orderNumber', 'hospitalCode', 'distributorCode', 'itemJANCode', 'orderQuantity', 'deliveryDestCode'],
+            'select_columns' => ['recordId', 'orderCNumber', 'orderNumber', 'hospitalCode', 'distributorCode', 'itemJANCode', 'orderQuantity', 'deliveryDestCode' , 'subSendCode'],
             'sort' => [['name' => 'registrationTime', 'order' => 'asc']],
             'search_condition' => [
                 ['name' => 'useMedicode', 'value' => 1],

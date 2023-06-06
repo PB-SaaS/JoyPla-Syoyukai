@@ -76,6 +76,19 @@ class InventoryController extends Controller
                     ->get();
             }
 
+            $distributors = Distributor::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )->plain()->get()->data->all();
+
+            $distributorOptions = [];
+            foreach( $distributors as  $distributor){
+                $distributorOptions[] = [
+                    'value' => $distributor->distributorId,
+                    'text' => $distributor->distributorName,
+                ];
+            }
+
             $hospital_data = Hospital::where(
                 'hospitalId',
                 $user_info->getHospitalId()
@@ -91,6 +104,7 @@ class InventoryController extends Controller
                     'api_url' => $api_url,
                     'user_info' => $user_info,
                     'division' => $division,
+                    'distributorOptions' => $distributorOptions,
                     'useUnitPrice' => $useUnitPrice,
                     'csrf_token' => Csrf::generate(16),
                 ],

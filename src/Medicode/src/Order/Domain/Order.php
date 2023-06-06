@@ -14,6 +14,7 @@ class Order
     private string $JANCode;
     private int $quantity;
     private string $deliveryDestCode;
+    private string $subSendCode;
     private bool $isValid = true;
 
     /**
@@ -25,6 +26,7 @@ class Order
      * @param string $orderNumber
      * @param string $JANCode
      * @param string $deliveryDestCode
+     * @param string $subSendCode
      * @param int $quantity
      */
     public function __construct(
@@ -35,7 +37,8 @@ class Order
         string $distributorCode,
         string $JANCode,
         int $quantity,
-        string $deliveryDestCode
+        string $deliveryDestCode,
+        string $subSendCode
     ) {
         $this->id = $id;
         $this->orderCNumber = $orderCNumber;
@@ -45,6 +48,7 @@ class Order
         $this->JANCode = $JANCode;
         $this->quantity = $quantity;
         $this->deliveryDestCode = $deliveryDestCode;
+        $this->subSendCode = $subSendCode;
         $this->isValid = $this->checkIsValid();
     }
 
@@ -69,6 +73,10 @@ class Order
 
         if (!$this->quantity || !$this->checkQuntity($this->quantity)) {
             return false;
+        }
+
+        if (!$this->checkCode( !empty($this->subSendCode) ? $this->subSendCode : $this->hospitalCode, 10)) {
+            return false; 
         }
 
         if (!$this->checkDeliveryDestCode($this->deliveryDestCode)) {
@@ -133,6 +141,14 @@ class Order
         return $this->hospitalCode;
     }
 
+
+    /**
+     * @return string
+     */
+    public function getSubSendCode(): string
+    {
+        return $this->subSendCode;
+    }
 
     /**
      * @return string

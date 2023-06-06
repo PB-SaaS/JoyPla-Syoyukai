@@ -28,7 +28,7 @@ class MedicodeSendOrderFormatter
                         128,
                         128,
                         self::formatRecordId($order->getId()),
-                        self::formatHospitalCode($order->getHospitalCode()),
+                        self::formatSubSendCode( ( !empty($order->getSubSendCode()) ) ? $order->getSubSendCode() : $order->getHospitalCode()),
                         str_pad('', 63)
                     ];
                     $SEQNO++;
@@ -65,14 +65,14 @@ class MedicodeSendOrderFormatter
                 str_pad('', 113)
             ];
         }
+        
 
         $stringData = self::sendDataToString($sendData);
-
         return self::makePostFields($stringData);
     }
 
 
-    private function sendDataToString(array $sendData): string
+    private static function sendDataToString(array $sendData): string
     {
         $stringData = '';
 
@@ -148,6 +148,15 @@ class MedicodeSendOrderFormatter
         return str_pad($code, 10, '0', STR_PAD_LEFT);
     }
 
+
+    /**
+     * @param string $code
+     * @return string
+     */
+    private static function formatSubSendCode(string $code): string
+    {
+        return str_pad($code, 10, '0', STR_PAD_LEFT);
+    }
 
     /**
      * @param string $code

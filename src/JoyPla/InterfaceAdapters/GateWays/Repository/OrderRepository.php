@@ -145,6 +145,7 @@ class OrderRepository extends ModelRepository implements
             ];
 
             $receivingDivisionCode = '';
+            $subSendCode = '';
             if (
                 $order->getOrderStatus()->value() ===
                 OrderStatus::OrderCompletion
@@ -159,6 +160,7 @@ class OrderRepository extends ModelRepository implements
 
                     $receivingDivisionCode = $division->first()
                         ->deliveryDestCode;
+                    $subSendCode = '';
                 }
                 if ($order->getReceivedTarget() === 2) {
                     // 部署
@@ -175,6 +177,8 @@ class OrderRepository extends ModelRepository implements
 
                     $receivingDivisionCode = $division->first()
                         ->deliveryDestCode;
+                    $subSendCode = $division->first()
+                        ->subSendCode;
                 }
             }
 
@@ -201,6 +205,8 @@ class OrderRepository extends ModelRepository implements
                     'itemUnit' => (string) $orderItem['quantity']['itemUnit'],
                     'lotManagement' => (string) $orderItem['lotManagement'],
                     'itemId' => (string) $orderItem['item']['itemId'],
+                    'deliveryDestCode' => '',
+                    'subSendCode' => '',
                 ];
 
                 if (isset($attr['isReceived']) === true) {
@@ -213,6 +219,7 @@ class OrderRepository extends ModelRepository implements
                     ((bool) $orderItem['useMedicode'])
                 ) {
                     $item['deliveryDestCode'] = (string) $receivingDivisionCode;
+                    $item['subSendCode'] = (string) $subSendCode;
                 }
                 $items[] = $item;
             }
