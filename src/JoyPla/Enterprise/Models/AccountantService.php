@@ -130,6 +130,69 @@ class AccountantService
         return $accountant;
     }
 
+    public static function LateReceivedToAccountant(Received $received, DateYearMonthDay $accountantDate)
+    {
+        $accountant = Accountant::init(
+            $accountantDate ? $accountantDate->value() : date('Y-m-d'),
+            $received
+                ->getHospital()
+                ->getHospitalId()
+                ->value(),
+            $received
+                ->getDivision()
+                ->getDivisionId()
+                ->value(),
+            $received
+                ->getDistributor()
+                ->getDistributorId()
+                ->value(),
+            $received->getOrderId()->value(), //nullかもしれない。
+            $received->getReceivedId()->value()
+        );
+
+        foreach ($received->getReceivedItems() as $index => $item) {
+            $accountantItem = AccountantItem::init(
+                $index,
+                $accountant->getAccountantId()->value(),
+                '自動',
+                '入荷',
+                AccountantItemId::generate()->value(),
+                $item
+                    ->getItem()
+                    ->getItemId()
+                    ->value(),
+                $item
+                    ->getItem()
+                    ->getMakerName()
+                    ->value(),
+                $item
+                    ->getItem()
+                    ->getItemName()
+                    ->value(),
+                $item
+                    ->getItem()
+                    ->getItemCode()
+                    ->value(),
+                $item
+                    ->getItem()
+                    ->getItemStandard()
+                    ->value(),
+                $item
+                    ->getItem()
+                    ->getItemJANCode()
+                    ->value(),
+                $item->getReceivedQuantity()->value(),
+                $item->getQuantity()->getItemUnit(),
+                $item->getPrice()->value(),
+                0
+            );
+
+            $accountant->addItem($accountantItem);
+        }
+
+        return $accountant;
+    }
+
     public static function isChangeAccountantItem(
         AccountantItem $newItem,
         AccountantItem $oldItem

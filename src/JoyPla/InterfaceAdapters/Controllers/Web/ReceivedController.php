@@ -51,6 +51,15 @@ class ReceivedController extends Controller
         echo view('html/Common/Template', compact('body'), false)->render();
     }
 
+    public function lateRegister($vars)
+    {
+        if (Gate::denies('late_receipt')) {
+            Router::abort(403);
+        }
+        $body = View::forge('html/Received/LateRegister', [], false)->render();
+        echo view('html/Common/Template', compact('body'), false)->render();
+    }
+
     public function show($vars)
     {
         if (Gate::denies('list_of_acceptance_inspection_slips')) {
