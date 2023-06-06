@@ -173,6 +173,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'register',
     ]);
 
+    Router::map('GET', '/received/lateRegister', [
+        ReceivedController::class,
+        'lateRegister',
+    ]);
+
     Router::map('GET', '/received/:receivedId', [
         ReceivedController::class,
         'index',

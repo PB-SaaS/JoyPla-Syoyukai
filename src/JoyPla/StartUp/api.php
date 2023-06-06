@@ -185,6 +185,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'register',
     ])->service($useCaseProvider->getReceivedRegisterInteractor());
 
+    Router::map('POST', '/api/received/lateRegister', [
+        ReceivedController::class,
+        'lateRegister',
+    ])->service($useCaseProvider->getReceivedLateRegisterInteractor());
+
     Router::map('GET', '/api/return/show', [
         ReturnController::class,
         'show',

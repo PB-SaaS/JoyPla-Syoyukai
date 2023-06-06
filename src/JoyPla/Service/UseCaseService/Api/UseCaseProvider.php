@@ -47,6 +47,7 @@ use JoyPla\Application\Interactors\Api\Price\PriceRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Price\PriceShowInteractor;
 use JoyPla\Application\Interactors\Api\Received\ReceivedRegisterByOrderSlipInteractor;
 use JoyPla\Application\Interactors\Api\Received\ReceivedRegisterInteractor;
+use JoyPla\Application\Interactors\Api\Received\ReceivedLateRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Received\ReceivedReturnRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Received\ReceivedShowInteractor;
 use JoyPla\Application\Interactors\Api\ReceivedReturn\ReturnShowInteractor;
@@ -411,6 +412,21 @@ class UseCaseProvider
             $this->repositoryProvider,
             $this->presenterProvider
         ) extends ReceivedRegisterInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getReceivedLateRegisterInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends ReceivedLateRegisterInteractor {
             public function __construct(
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider

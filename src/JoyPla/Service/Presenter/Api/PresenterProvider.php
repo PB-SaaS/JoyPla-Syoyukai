@@ -37,6 +37,7 @@ use JoyPla\InterfaceAdapters\Presenters\Api\Payout\PayoutRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Price\PriceRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedRegisterByOrderSlipPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedRegisterPresenter;
+use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedLateRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedReturnRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\ReceivedReturn\ReturnShowPresenter;
@@ -152,6 +153,11 @@ class PresenterProvider
     public function getReceivedRegisterPresenter()
     {
         return new ReceivedRegisterPresenter();
+    }
+
+    public function getReceivedLateRegisterPresenter() //必要？
+    {
+        return new ReceivedLateRegisterPresenter();
     }
 
     public function getBarcodeOrderSearchPresenter()

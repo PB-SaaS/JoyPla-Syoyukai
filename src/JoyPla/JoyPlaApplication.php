@@ -287,6 +287,15 @@ class JoyPlaApplication extends Application
             return new GatePermissionModel(true, false);
         });
 
+        Gate::define('late_receipt', function (Auth $auth) {
+            //あとから入庫
+            if ($auth->userPermission != '1') {
+                //管理者以外
+                return new GatePermissionModel(false, false);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
         Gate::define('fixed_quantity_order_slips', function (Auth $auth) {
             //定数発注
             if ($auth->userPermission == '2') {

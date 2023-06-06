@@ -50,6 +50,7 @@ require_once('JoyPla/Application/Interactors/Api/Order/OrderUnapprovedUpdateInte
 require_once('JoyPla/Application/Interactors/Api/Payout/PayoutRegisterInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Price/PriceRegisterInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Price/PriceShowInteractor.php');
+require_once('JoyPla/Application/Interactors/Api/Received/ReceivedLateRegisterInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Received/ReceivedRegisterByOrderSlipInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Received/ReceivedRegisterInteractor.php');
 require_once('JoyPla/Application/Interactors/Api/Received/ReceivedReturnRegisterInteractor.php');
@@ -141,8 +142,8 @@ require_once('JoyPla/InterfaceAdapters/Controllers/Api/ReferenceController.php')
 require_once('JoyPla/InterfaceAdapters/Controllers/Api/ReturnController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Api/StockController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Api/StocktakingController.php');
-require_once('JoyPla/InterfaceAdapters/Controllers/Web/AcceptanceController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Api/StocktakingListController.php');
+require_once('JoyPla/InterfaceAdapters/Controllers/Web/AcceptanceController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/AccountantController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/AgreeFormController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/ConsumptionController.php');
@@ -225,6 +226,7 @@ require_once('JoyPla/InterfaceAdapters/Presenters/Api/Price/PriceRegisterPresent
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Price/PriceShowPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Product/ItemRegisterPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Product/ItemShowPresenter.php');
+require_once('JoyPla/InterfaceAdapters/Presenters/Api/Received/ReceivedLateRegisterPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Received/ReceivedRegisterByOrderSlipPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Received/ReceivedRegisterPresenter.php');
 require_once('JoyPla/InterfaceAdapters/Presenters/Api/Received/ReceivedReturnRegisterPresenter.php');
