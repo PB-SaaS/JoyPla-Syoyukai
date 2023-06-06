@@ -121,8 +121,8 @@ class JoyPlaApplication extends Application
             return false;
         });
 
-        Gate::define('is_use_billing_type', function(){
-            if(defined('IS_USE_BILLING_CONSUME') && IS_USE_BILLING_CONSUME){
+        Gate::define('is_use_direct_delivery', function(){
+            if(defined('IS_USE_DIRECT_DELIVERY') && IS_USE_DIRECT_DELIVERY){
                 return true;
             }
             return false;

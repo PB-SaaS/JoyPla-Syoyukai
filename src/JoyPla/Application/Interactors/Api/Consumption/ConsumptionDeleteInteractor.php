@@ -7,6 +7,7 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
     use App\Model\Division;
     use Exception;
     use framework\Exception\NotFoundException;
+    use framework\Routing\Router;
     use JoyPla\Application\InputPorts\Api\Consumption\ConsumptionDeleteInputPortInterface;
     use JoyPla\Application\InputPorts\Api\Consumption\ConsumptionDeleteInputData;
     use JoyPla\Application\OutputPorts\Api\Consumption\ConsumptionDeleteOutputData;
@@ -61,6 +62,15 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
                 throw new NotFoundException('not found.', 404);
             }
 
+            if($consumption->getConsumptionStatus()->value() == 2){
+                Router::abort('402');
+            }
+
+            
+            if(gate('is_user') && $consumption->getConsumptionStatus()->value() == 3){
+                Router::abort('402');
+            }
+
             if (
                 $inputData->isOnlyMyDivision &&
                 !$consumption
@@ -73,7 +83,7 @@ namespace JoyPla\Application\Interactors\Api\Consumption {
 
             $inventoryCalculations = [];
             foreach ($consumption->getConsumptionItems() as $item) {
-                if($consumption->getConsumptionStatus()->value() == ConsumptionStatus::Borrowing){
+                if($consumption->getConsumptionStatus()->value() == ConsumptionStatus::DirectDelivery){
                     continue;
                 }
                 $inventoryCalculations[] = new InventoryCalculation(

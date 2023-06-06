@@ -8,12 +8,14 @@
         <h1 class="text-2xl mb-2">消費伝票の詳細</h1>
         <hr>
         <div class="p-4 text-base bg-gray-100 border border-gray-400 flex flex-col md:flex-row md:gap-6 gap-4 mb-6">
-          <?php if (gate('update_of_consumption_slips')->can()): ?>
+          <?php if (gate('update_of_consumption_slips')->can() && $viewModel->consumption['consumptionStatus'] != 2 && 
+          ! ( gate('is_user') && $viewModel->consumption['consumptionStatus'] == 3) ): ?>
           <v-button-primary type="button" class="md:w-1/6 w-full" @click.native="updateSlip( consumption.consumptionId )" >
             消費伝票を更新
           </v-button-primary>
           <?php endif; ?>
-          <?php if (gate('cancellation_of_consumption_slips')->can()): ?>
+          <?php if (gate('cancellation_of_consumption_slips')->can() && $viewModel->consumption['consumptionStatus'] != 2 && 
+          ! ( gate('is_user') && $viewModel->consumption['consumptionStatus'] == 3) ): ?>
           <v-button-danger type="button" class="md:w-1/6 w-full" @click.native="deleteSlip( consumption.consumptionId )" >
             消費伝票を削除
           </v-button-danger>
@@ -33,7 +35,13 @@
           </div>
           <div class="flex w-full gap-6">
             <div class="flex-initial lg:w-1/6 w-1/3">消費タイプ</div>
-            <div class="flex-auto">{{ ( consumption.consumptionStatus === 1)? "通常消費" : "貸出品" }}</div>
+            <div class="flex-auto">
+              {{ 
+                ( consumption.consumptionStatus === 1) && "通常消費" ||
+                ( consumption.consumptionStatus === 2) && "貸出品" ||
+                ( consumption.consumptionStatus === 3) && "直納処理"
+              }}
+            </div>
           </div>
           <div class="flex w-full gap-6">
             <div class="flex-initial lg:w-1/6 w-1/3">消費部署</div>
@@ -65,12 +73,21 @@
                       <p class="text-md text-gray-900" v-if="( consumptionItem.lot.lotNumber != '' && consumptionItem.lot.lotDate != '' )">
                       ロット情報：{{ consumptionItem.lot.lotNumber }} / {{ consumptionItem.lot.lotDate }}
                       </p>
-                      <?php if (gate('update_of_consumption_slips')->can()): ?>
+                      <?php if (gate('update_of_consumption_slips')->can() && $viewModel->consumption['consumptionStatus'] == 1 ): ?>
                         <v-input-number
-                            :rules="{ between: [0 , consumptionItem.consumptionOriginalQuantity] }" 
+                            :rules="{ between:  [0 , consumptionItem.consumptionOriginalQuantity] }" 
                             :name="`consumptionItems[${idx}].consumptionQuantity`" 
                             label="消費数（入数）" 
+                            :unit="consumptionItem.quantity.quantityUnit" 
                             :min="0"
+                            :step="1"
+                            title="消費数（入数）"
+                          ></v-input-number>
+                      <?php elseif (gate('update_of_consumption_slips')->can() && $viewModel->consumption['consumptionStatus'] == 3 && ! gate('is_user')): ?>
+                        <v-input-number
+                            :rules="{ between:  [-99999 , 99999] }" 
+                            :name="`consumptionItems[${idx}].consumptionQuantity`" 
+                            label="消費数（入数）" 
                             :unit="consumptionItem.quantity.quantityUnit" 
                             :step="1"
                             title="消費数（入数）"
@@ -84,7 +101,10 @@
                         <span class="text-blue-700 text-lg mr-4">&yen; {{ numberFormat(consumptionItem.consumptionPrice) }}</span>
                         <span class="text-sm text-gray-900">( &yen; {{ numberFormat(consumptionItem.unitPrice) }} / {{ consumptionItem.quantity.quantityUnit }} )</span>
                       </p>
-                      <?php if (gate('cancellation_of_consumption_slips')->can()): ?>
+                      <?php if (
+                        ( gate('cancellation_of_consumption_slips')->can() && $viewModel->consumption['consumptionStatus'] != 2 ) &&
+                        ! ( gate('is_user') && $viewModel->consumption['consumptionStatus'] == 3 )
+                        ): ?>
                       <div class="mt-3">
                         <v-button-danger @click.native="deleteItem(consumption.consumptionId , consumptionItem.id)">削除</v-button-danger>
                       </div>
@@ -277,7 +297,16 @@ var JoyPlaApp = Vue.createApp({
           });
       }
 
-      const updateSlip = (consumptionId) => {
+      const updateSlip = async (consumptionId) => {
+          const { valid, errors } = await validate();
+          if(!valid){
+              Swal.fire({
+                  icon: 'error',
+                  title: '入力エラー',
+                  text: '入力エラーがございます。ご確認ください',
+              })
+              return false;
+          } 
           Swal.fire({
             title: '消費伝票を更新',
             text: "消費伝票を更新します。\r\nよろしいですか？",
