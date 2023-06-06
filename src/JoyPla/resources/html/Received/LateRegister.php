@@ -438,8 +438,8 @@
         }];
 
         let checked = false;
-        if (Array.isArray(values.receiveds)) {
-          values.receiveds.forEach((v, idx) => {
+        if (Array.isArray(values.receivedItems)) {
+          values.receivedItems.forEach((v, idx) => {
             if (
               v.inHospitalItemId === item.inHospitalItemId
             ) {
@@ -461,8 +461,8 @@
             }
           });
         }
-        if( !values.receiveds ){
-          values.receiveds = [];
+        if( !values.receivedItems ){
+          values.receivedItems = [];
         }
         if (!checked) {
           insert(0,item);
