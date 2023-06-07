@@ -307,7 +307,7 @@ var JoyPlaApp = Vue.createApp({
                 obj[key].kinds,
                 obj[key].userName,
                 obj[key].accountantDate,
-                "<a class='text-blue-600 hover:underline' href='"+_ROOT+"&path=/accountant/"+ obj[key].accountantId + "'>"+obj[key].accountantId+"</a>",
+                obj[key].isDeleted ? obj[key].accountantId : "<a class='text-blue-600 hover:underline' href='"+_ROOT+"&path=/accountant/"+ obj[key].accountantId + "'>"+obj[key].accountantId+"</a>",
                 obj[key].accountantItemId,
                 obj[key]._division?.divisionName,
                 obj[key]._distributor?.distributorName,
