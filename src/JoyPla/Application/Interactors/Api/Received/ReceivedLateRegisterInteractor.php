@@ -177,7 +177,7 @@ namespace JoyPla\Application\Interactors\Api\Received {
                         $distributor[$distributorIdsByInHospitalId[$inHpItemId]], //distributor
                         $quantityByInHospitalId[$inHpItemId], //quantity
                         $priceByInHospitalId[$inHpItemId], //price
-                        new OrderQuantity(0), //orderQuantity
+                        new OrderQuantity($received['receivedQuantity']), //orderQuantity
                         new ReceivedQuantity($received['receivedQuantity']), //receivedQuantity
                         new DateYearMonthDay(''), //dueDate
                         '', //distributorManagerCode
