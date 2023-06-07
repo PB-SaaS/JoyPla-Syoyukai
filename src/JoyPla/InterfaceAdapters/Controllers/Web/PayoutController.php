@@ -15,7 +15,7 @@ class PayoutController extends Controller
 {
     public function register($vars)
     {
-        if (Gate::denies('register_of_payout')) {
+        if (Gate::denies('register_of_payouts')) {
             Router::abort(403);
         }
 

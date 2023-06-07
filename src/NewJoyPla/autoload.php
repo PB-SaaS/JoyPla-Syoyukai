@@ -46,14 +46,6 @@ function number_format_jp($num)
 }
 
 /** 初期実行しなければならない処理 */
-ApiSpiral::$logger = new Logger(
-    new Spiralv2LogginObject(
-        LoggingConfig::SPIRALV2_API_KEY,
-        LoggingConfig::LOGGING_APP_TITLE,
-        LoggingConfig::SPIRAL_API_LOGGING_DB_TITLE,
-        LoggingConfig::LOG_LEVEL
-    )
-);
 ApiResponse::$logger = new Logger(
     new Spiralv2LogginObject(
         LoggingConfig::SPIRALV2_API_KEY,

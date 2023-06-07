@@ -104,6 +104,9 @@ class AcceptanceController extends Controller
     }
 
     public function update($vars){
+        if(gate('is_approver')){
+            Router::abort(403);
+        }
         $hospitalId = new HospitalId($this->request->user()->hospitalId);
         $acceptanceId = new AcceptanceId($vars['acceptanceId']);
         $updateItems = $this->request->get( 'updateItems' , []);
@@ -156,6 +159,10 @@ class AcceptanceController extends Controller
     }
 
     public function payoutRegister($vars){
+        if(gate('is_approver')){
+            Router::abort(403);
+        }
+
         $hospitalId = new HospitalId($this->request->user()->hospitalId);
         $acceptanceId = new AcceptanceId($vars['acceptanceId']);
 
@@ -360,6 +367,9 @@ class AcceptanceController extends Controller
     }
 
     public function delete($vars){
+        if(gate('is_approver')){
+            Router::abort(403);
+        }
         $hospitalId = new HospitalId($this->request->user()->hospitalId);
         $acceptanceId = new AcceptanceId($vars['acceptanceId']);
 

@@ -54,11 +54,13 @@
                     出庫伝票を表示
                   </v-button-default>
                 </div>
+                <?php if(!gate('is_approver')): ?>
                 <div class="flex flex-col gap-3 mb-3" v-if="!isUser || (isUser && userDivisionId === acceptance?._targetDivision?.divisionId)">
                   <v-button-primary type="button" class="w-full" @click.native="onPayoutAllUpdate( acceptance.acceptanceId )">
                     一括入庫登録
                   </v-button-primary>
                 </div>
+                <?php endif; ?>
                 <div class="flex flex-col gap-3 mb-3" v-if="!isUser || (isUser && userDivisionId === acceptance?._targetDivision?.divisionId)">
                   <v-button-default type="button" class="w-full" @click.native="openPrint( acceptance.acceptanceId )">
                     出荷伝票を印刷
