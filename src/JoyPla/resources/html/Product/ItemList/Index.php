@@ -374,6 +374,7 @@ var JoyPlaApp = Vue.createApp({
         values.yearMonth = '';
         values.divisionIds = [];
         values.distributorIds = [];
+        values.itemListName = '';
         listGet();
       };
 
