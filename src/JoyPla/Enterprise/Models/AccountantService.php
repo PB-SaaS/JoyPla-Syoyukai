@@ -67,10 +67,10 @@ class AccountantService
         return $logItems;
     }
 
-    public static function ReceivedToAccountant(Received $received)
+    public static function ReceivedToAccountant(Received $received, DateYearMonthDay $accountantDate)
     {
         $accountant = Accountant::init(
-            date('Y-m-d'),
+            $accountantDate ? $accountantDate->value() : date('Y-m-d'),
             $received
                 ->getHospital()
                 ->getHospitalId()
