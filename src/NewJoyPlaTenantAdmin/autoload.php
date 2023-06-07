@@ -59,14 +59,6 @@ function number_format_jp($num)
     return preg_replace('/\.?0+$/', '', number_format($num, 2));
 }
 
-ApiSpiral::$logger = new Logger(
-    new Spiralv2LogginObject(
-        LoggingConfig::SPIRALV2_API_KEY,
-        LoggingConfig::LOGGING_APP_TITLE,
-        LoggingConfig::SPIRAL_API_LOGGING_DB_TITLE,
-        LoggingConfig::LOG_LEVEL
-    )
-);
 ApiResponse::$logger = new Logger(
     new Spiralv2LogginObject(
         LoggingConfig::SPIRALV2_API_KEY,

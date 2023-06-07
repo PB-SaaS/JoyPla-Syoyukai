@@ -56,7 +56,7 @@ class ApiResponse
 
         */
         if ($this::$logger) {
-            if ($this->code != 200) {
+            if ($this->code != 200 && $this->code != 191) {
                 $body = [
                     'execTime' => Logger::getTime(),
                     'AccountId' => $SPIRAL->getAccountId(),
