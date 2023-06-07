@@ -17,6 +17,7 @@
           </div>
           <div class="my-4 lg:w-1/2 ">
             <v-input type="date" name="receivedDate" :rules="{}" title="入荷日指定" label="入荷日指定"></v-input>
+            <v-input type="date" name="accountantDate" :rules="{}" title="会計日指定" label="会計日指定"></v-input>
           </div>
           <div class="p-2 bg-gray-300">
             <v-barcode-search-for-order-data @additem="addItemByBarcode"></v-barcode-search-for-order-data>
@@ -239,6 +240,7 @@
         isSubmitting
       } = useForm({
         initialValues: {
+          accountantDate: '',
           receivedDate: '',
           receivedItems: [],
           barcode: "",
@@ -393,6 +395,7 @@
           params.append("_method", 'post');
 
           params.append("_csrf", _CSRF);
+          params.append("accountantDate", values.accountantDate);
           params.append("receivedItems", JSON.stringify(encodeURIToObject(receivedModels)));
           params.append("receivedDate", values.receivedDate);
 

@@ -9,6 +9,7 @@
                 <hr>
                 <div class="py-5">
                     <v-input type="date" name="receivedDate" :rules="{}" title="入荷日指定" label="入荷日指定"></v-input>
+                    <v-input type="date" name="accountantDate" :rules="{}" title="会計日指定" label="会計日指定"></v-input>
                 </div>
                 <div class="py-5">
                     <v-button-primary type="button" :disabled="! isChange" @click.native="onRegister">入荷照合確定</v-button-primary>
@@ -302,6 +303,7 @@
                     isSubmitting
                 } = useForm({
                     initialValues: {
+                        'accountantDate' : '',
                         'receivedDate' : '',
                         'orderId': order.orderId,
                         'adjustment': order.adjustment,
@@ -417,6 +419,7 @@
                                         params.append("path", "/api/" + values.orderId + "/received/register");
                                         params.append("_method", 'post');
                                         params.append("_csrf", _CSRF);
+                                        params.append("accountantDate", values.accountantDate);
                                         params.append("registerModel", JSON.stringify(encodeURIToObject(registerModel)));
                                         params.append("receivedDate", values.receivedDate);
                                         

@@ -66,12 +66,14 @@ class ReceivedController extends Controller
 
         $registerModel = $this->request->get('registerModel');
         $receivedDate = $this->request->get('receivedDate');
+        $accountantDate = $this->request->get('accountantDate');
         $inputData = new ReceivedRegisterByOrderSlipInputData(
             $this->request->user(),
             $vars['orderId'],
             $registerModel,
             $gate->isOnlyMyDivision(),
-            $receivedDate
+            $receivedDate,
+            $accountantDate
         );
         $inputPort->handle($inputData);
     }
@@ -91,11 +93,13 @@ class ReceivedController extends Controller
 
         $receivedItems = $this->request->get('receivedItems');
         $receivedDate = $this->request->get('receivedDate');
+        $accountantDate = $this->request->get('accountantDate');
         $inputData = new ReceivedRegisterInputData(
             $this->request->user(),
             $receivedItems,
             $gate->isOnlyMyDivision(),
-            $receivedDate
+            $receivedDate,
+            $accountantDate
         );
         $inputPort->handle($inputData);
     }
