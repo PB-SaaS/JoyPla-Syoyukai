@@ -42,6 +42,8 @@
                   <v-button-default type="button" class="w-full" @click.native="openSlip( payout.payoutHistoryId )">
                     払出伝票を表示
                   </v-button-default>
+                </div>
+                <div class="flex flex-col gap-3 mb-3">
                   <v-button-default type="button" class="w-full" @click.native="openPrint(payout.payoutHistoryId)">
                       払出伝票印刷
                   </v-button-default>

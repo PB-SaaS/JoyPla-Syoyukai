@@ -305,7 +305,11 @@ namespace JoyPla\Application\Interactors\Api\Acceptance {
                 ->getInventoryCalculationRepository()
                 ->saveToArray($inventoryCalculations);
 
-            echo (new ApiResponse([], count($acceptances), 200 , 'success' , []))->toJson();
+
+            $ids = array_map(function($item){
+                return $item->getAcceptanceId()->value();
+            },$acceptances);
+            echo (new ApiResponse($ids, count($acceptances), 200 , 'success' , []))->toJson();
         }
     }
 }

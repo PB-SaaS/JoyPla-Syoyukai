@@ -49,14 +49,19 @@
                     入庫済み
                   </span>
                 </p>
+                <div class="flex flex-col gap-3 mb-3">
+                  <v-button-default type="button" class="w-full" @click.native="openSlip( acceptance.acceptanceId )">
+                    出庫伝票を表示
+                  </v-button-default>
+                </div>
                 <div class="flex flex-col gap-3 mb-3" v-if="!isUser || (isUser && userDivisionId === acceptance?._targetDivision?.divisionId)">
                   <v-button-primary type="button" class="w-full" @click.native="onPayoutAllUpdate( acceptance.acceptanceId )">
                     一括入庫登録
                   </v-button-primary>
                 </div>
-                <div class="flex flex-col gap-3 mb-3">
-                  <v-button-default type="button" class="w-full" @click.native="openSlip( acceptance.acceptanceId )">
-                    出庫伝票を表示
+                <div class="flex flex-col gap-3 mb-3" v-if="!isUser || (isUser && userDivisionId === acceptance?._targetDivision?.divisionId)">
+                  <v-button-default type="button" class="w-full" @click.native="openPrint( acceptance.acceptanceId )">
+                    出荷伝票を印刷
                   </v-button-default>
                 </div>
               </div>
@@ -406,8 +411,9 @@ var JoyPlaApp = Vue.createApp({
       const openSlip = ( url ) => {
         location.href = _ROOT + "&path=/acceptance/" + url;    
       }
-      const openPrint = ( url ) => {
-        location.href = _ROOT + "&path=/acceptance/" + url + "/print";    
+      const openPrint = ( id ) => {
+        let url = _ROOT + "&path=/acceptance/" + id + "/print";  
+        window.open(url, '_blank')   
       }
       
       const registerAllPayout = (acceptanceId) => {

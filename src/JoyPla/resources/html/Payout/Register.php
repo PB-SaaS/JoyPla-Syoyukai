@@ -448,6 +448,10 @@
           }).then((result) => {
             let tmp = [];
             replace(tmp);
+            if(labelCreate.value && res.data.data[0]){
+              const url = _ROOT + '&path=/label/acceptance/' + res.data.data[0];
+              window.open(url, '_blank')
+            }
           });
           return true;
         } catch (error) {
@@ -492,6 +496,10 @@
           }).then((result) => {
             let tmp = [];
             replace(tmp);
+            if(labelCreate.value && res.data.data[0]){
+              const url = _ROOT + '&path=/label/payout/' + res.data.data[0];
+              window.open(url, '_blank')
+            }
           });
           return true;
         } catch (error) {
@@ -872,7 +880,6 @@
         this.loading = this.isSubmitting;
       },
       labelCreate(bool) {
-        console.log(this.labelCreate);
         localStorage.joypla_payoutLabelCreate = bool;
       },
       fields: {
