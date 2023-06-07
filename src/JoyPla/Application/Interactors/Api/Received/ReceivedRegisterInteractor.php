@@ -13,6 +13,7 @@ namespace JoyPla\Application\Interactors\Api\Received {
     use JoyPla\Application\OutputPorts\Api\Received\ReceivedRegisterOutputPortInterface;
     use JoyPla\Enterprise\Models\Accountant;
     use JoyPla\Enterprise\Models\AccountantService;
+    use JoyPla\Enterprise\Models\DateYearMonthDay;
     use JoyPla\Enterprise\Models\DateYearMonthDayHourMinutesSecond;
     use JoyPla\Enterprise\Models\OrderId;
     use JoyPla\Enterprise\Models\HospitalId;
@@ -64,6 +65,9 @@ namespace JoyPla\Application\Interactors\Api\Received {
         public function handle(ReceivedRegisterInputData $inputData)
         {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
+            $accountantDate = new DateYearMonthDay(
+                $inputData->accountantDate ?? 'now'
+            );
 
             $orders = $this->repositoryProvider
                 ->getOrderRepository()
@@ -218,7 +222,8 @@ namespace JoyPla\Application\Interactors\Api\Received {
             $accountantLogs = [];
             foreach ($receiveds as $received) {
                 $accountant = AccountantService::ReceivedToAccountant(
-                    $received
+                    $received,
+                    $accountantDate
                 );
                 $oldaccountant = clone $accountant;
                 $oldaccountant->setItems([]);
@@ -277,12 +282,13 @@ namespace JoyPla\Application\InputPorts\Api\Received {
         public array $receivedItems;
         public bool $isOnlyMyDivision;
         public string $receivedDate;
-
+        public string $accountantDate;
         public function __construct(
             Auth $user,
             array $receivedItems,
             bool $isOnlyMyDivision,
-            string $receivedDate
+            string $receivedDate,
+            string $accountantDate
         ) {
             $this->user = $user;
             $this->receivedItems = array_map(function ($item) {
@@ -301,6 +307,7 @@ namespace JoyPla\Application\InputPorts\Api\Received {
             $this->receivedDate = $receivedDate
                 ? $receivedDate . ' 00:00:00'
                 : 'now';
+            $this->accountantDate = $accountantDate ? $accountantDate : 'now';
         }
     }
 
