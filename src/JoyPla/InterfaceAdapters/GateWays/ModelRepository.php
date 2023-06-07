@@ -644,6 +644,7 @@ class ModelRepository
             'targetDivision',
             'itemsNumber',
             'totalAmount',
+            'payoutDate',
             'updateTime',
         ]);
     }
@@ -675,6 +676,53 @@ class ModelRepository
             'unitPrice',
             'cardId',
             'itemId',
+        ]);
+    }
+
+    
+    public static function getPayoutViewItemInstance()
+    {
+        return SpiralDB::title('T_PayoutItems')->value([
+            'id',
+            'registrationTime',
+            'updateTime',
+            'payoutHistoryId',
+            'payoutId',
+            'inHospitalItemId',
+            'hospitalId',
+            'sourceDivisionId',
+            'targetDivisionId',
+            'quantity',
+            'quantityUnit',
+            'itemUnit',
+            'price',
+            'payoutQuantity',
+            'payoutAmount',
+            'payoutCount',
+            'payoutLabelCount',
+            'adjAmount',
+            'priceAfterAdj',
+            'lotNumber',
+            'lotDate',
+            'unitPrice',
+            'cardId',
+            'itemId',
+            'hospitalName',
+            'itemName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'makerName',
+            'officialFlag',
+            'tenantId',
+            'category',
+            'sourceDivision',
+            'targetDivision',
+            'smallCategory',
+            'payoutType',
+            'catalogNo',
+            'officialprice',
+            'distributorName',
         ]);
     }
 

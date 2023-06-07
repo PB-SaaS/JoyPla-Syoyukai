@@ -70,6 +70,7 @@ require_once('JoyPla/Application/Interactors/Web/Received/OrderReceivedSlipIndex
 require_once('JoyPla/Application/Interactors/Web/Received/ReceivedIndexInteractor.php');
 require_once('JoyPla/Application/Interactors/Web/Received/ReceivedLabelInteractor.php');
 require_once('JoyPla/Application/LoggingObject/Spiralv2LogginObject.php');
+require_once('JoyPla/Batch/PayoutCorrection.php');
 require_once('JoyPla/Batch/ReservationPriceBatch.php');
 require_once('JoyPla/Service/Functions/FunctionService.php');
 require_once('JoyPla/Service/Presenter/Api/PresenterProvider.php');

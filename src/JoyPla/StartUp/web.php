@@ -303,6 +303,21 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'register',
     ]);
 
+    Router::map('GET', '/payout/index', [
+        PayoutController::class,
+        'index',
+    ]);
+
+    Router::map('GET', '/payout/:payoutHistoryId', [
+        PayoutController::class,
+        'show',
+    ]);
+    
+    Router::map('GET', '/payout/:payoutHistoryId/print', [
+        PayoutController::class,
+        'print',
+    ]);
+
     Router::map('GET', '/product/itemList/index', [
         ItemListController::class,
         'index',
@@ -328,6 +343,12 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'show',
     ]);
 
+
+    Router::map('GET', '/acceptance/:acceptanceId/print', [
+        AcceptanceController::class,
+        'print',
+    ]);
+    
     Router::map('GET', '/label/payout/:payoutId', [
         LabelController::class,
         'payoutLabelPrint',

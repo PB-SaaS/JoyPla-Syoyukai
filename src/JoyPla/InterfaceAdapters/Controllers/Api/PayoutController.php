@@ -2,12 +2,20 @@
 
 namespace JoyPla\InterfaceAdapters\Controllers\Api;
 
+use ApiResponse;
 use Csrf;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Routing\Router;
 use JoyPla\Application\InputPorts\Api\Payout\PayoutRegisterInputData;
 use JoyPla\Application\InputPorts\Api\Payout\PayoutRegisterInputPortInterface;
+use JoyPla\Enterprise\Models\HospitalId;
+use JoyPla\Enterprise\Models\InventoryCalculation;
+use JoyPla\Enterprise\Models\Lot;
+use JoyPla\Enterprise\Models\PayoutHistoryId;
+use JoyPla\Enterprise\Models\PayoutQuantity;
+use JoyPla\Service\Repository\RepositoryProvider;
+use stdClass;
 
 class PayoutController extends Controller
 {
@@ -37,5 +45,176 @@ class PayoutController extends Controller
             $isOnlyPayout
         );
         $inputPort->handle($inputData);
+    }
+    
+    public function index()
+    {
+        $token = $this->request->get('_csrf');
+        Csrf::validate($token, true);
+
+        $searchRequest = $this->request->get('search');
+        $search = new stdClass();
+        $search->sortColumn = $searchRequest['sortColumn'] ?? 'id';
+        $search->sortDirection = $searchRequest['sortDirection'] ?? 'desc';
+        $search->itemName = $searchRequest['itemName'] ?? '';
+        $search->makerName = $searchRequest['makerName'] ?? '';
+        $search->itemCode = $searchRequest['itemCode'] ?? '';
+        $search->itemStandard = $searchRequest['itemStandard'] ?? '';
+        $search->itemJANCode = $searchRequest['itemJANCode'] ?? '';
+        $search->yearMonth = $searchRequest['yearMonth'] ?? '';
+        $search->sourceDivisionIds = $searchRequest['sourceDivisionIds'] ?? '';
+        $search->targetDivisionIds = $searchRequest['targetDivisionIds'] ?? '';
+        $search->perPage = $searchRequest['perPage'] ?? 1;
+        $search->currentPage = $searchRequest['currentPage'] ?? 1;
+
+        $repositoryProvider = new RepositoryProvider();
+        [ $payouts , $totalCount ] = $repositoryProvider
+            ->getPayoutRepository()
+            ->search(
+                new HospitalId($this->request->user()->hospitalId),
+                $search
+            );
+
+        echo (new ApiResponse($payouts, $totalCount, 200, 'payouts', []))->toJson();
+    }
+
+    public function show($vars){
+        $payoutHistoryId = new PayoutHistoryId($vars['payoutHistoryId']);
+        $hospitalId = new HospitalId($this->request->user()->hospitalId);
+        
+        $repositoryProvider = new RepositoryProvider();
+        $payout = $repositoryProvider
+            ->getPayoutRepository()
+            ->findByPayoutHistoryId(
+                $hospitalId,
+                $payoutHistoryId
+            );
+            
+        echo (new ApiResponse($payout, 1, 200, 'payout', []))->toJson();
+    }
+
+    public function update($vars)
+    {
+        $payoutHistoryId = new PayoutHistoryId($vars['payoutHistoryId']);
+        $hospitalId = new HospitalId($this->request->user()->hospitalId);
+        
+        $repositoryProvider = new RepositoryProvider();
+        $payout = $repositoryProvider
+            ->getPayoutRepository()
+            ->find(
+                $hospitalId,
+                $payoutHistoryId
+            );
+
+        $updateItems = $this->request->get('updateItems' , []);
+
+        $items = [];
+        $inventoryCalculations = [];
+        foreach($payout->getItems() as $key => $item){
+            $updateItem = array_find($updateItems , function($updateItem) use ($item){
+                return $item->getPayoutItemId()->value() === $updateItem['payoutItemId'];
+            });
+
+            if($updateItem){
+                $quantity = $item->getPayoutQuantity()->value() - (int)$updateItem['payoutQuantity'];
+
+                $inventoryCalculations[] = new InventoryCalculation(
+                    $item->getHospitalId(),
+                    $payout->getSourceDivisionId(),
+                    $item->getInHospitalItemId(),
+                    0,
+                    4,
+                    new Lot(
+                        $item->getLotNumber(),
+                        $item->getLotDate()
+                    ),
+                    $quantity
+                );
+                $inventoryCalculations[] = new InventoryCalculation(
+                    $item->getHospitalId(),
+                    $payout->getTargetDivisionId(),
+                    $item->getInHospitalItemId(),
+                    0,
+                    5,
+                    new Lot(
+                        $item->getLotNumber(),
+                        $item->getLotDate()
+                    ),
+                    $quantity * -1
+                );
+                
+                $item = $item->setPayoutQuantity(new PayoutQuantity($updateItem['payoutQuantity']));
+            }
+            $items[] = $item;
+        }
+
+        $payout = $payout->setPayoutItems($items);
+        $repositoryProvider
+        ->getPayoutRepository()
+        ->saveToArray([$payout]);
+
+        if(!empty($inventoryCalculations)){
+            $repositoryProvider
+            ->getInventoryCalculationRepository()
+            ->saveToArray($inventoryCalculations);
+        }
+
+        echo (new ApiResponse($payout, 1, 200, 'payout', []))->toJson();
+    }
+
+    public function delete($vars)
+    {
+        $payoutHistoryId = new PayoutHistoryId($vars['payoutHistoryId']);
+        $hospitalId = new HospitalId($this->request->user()->hospitalId);
+        
+        $repositoryProvider = new RepositoryProvider();
+        $payout = $repositoryProvider
+            ->getPayoutRepository()
+            ->find(
+                $hospitalId,
+                $payoutHistoryId
+            );
+
+        $items = [];
+        $inventoryCalculations = [];
+        foreach($payout->getItems() as $key => $item){
+            $inventoryCalculations[] = new InventoryCalculation(
+                $item->getHospitalId(),
+                $payout->getSourceDivisionId(),
+                $item->getInHospitalItemId(),
+                0,
+                4,
+                new Lot(
+                    $item->getLotNumber(),
+                    $item->getLotDate()
+                ),
+                $item->getPayoutQuantity()->value() 
+            );
+            $inventoryCalculations[] = new InventoryCalculation(
+                $item->getHospitalId(),
+                $payout->getTargetDivisionId(),
+                $item->getInHospitalItemId(),
+                0,
+                5,
+                new Lot(
+                    $item->getLotNumber(),
+                    $item->getLotDate()
+                ),
+                $item->getPayoutQuantity()->value()* -1
+            );
+            
+        }
+
+        $repositoryProvider
+            ->getPayoutRepository()
+            ->delete($hospitalId , $payoutHistoryId);
+
+        if(!empty($inventoryCalculations)){
+            $repositoryProvider
+            ->getInventoryCalculationRepository()
+            ->saveToArray($inventoryCalculations);
+        }
+
+        echo (new ApiResponse($payout, 1, 200, 'payout', []))->toJson();
     }
 }

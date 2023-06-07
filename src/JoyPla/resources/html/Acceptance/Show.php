@@ -17,7 +17,7 @@
             <v-button-default @click.native="openLabelPage" class="md:w-1/6 w-full">
                 払出ラベル発行
             </v-button-default>
-            <v-button-default class="md:w-1/6 w-full">
+            <v-button-default @click.native="openPrintPage" class="md:w-1/6 w-full">
                 出庫伝票印刷
             </v-button-default>
         </div>
@@ -131,7 +131,7 @@
                                 <p class="text-gray-500" v-if="elem.itemCode">{{ elem.itemCode }}</p>
                                 <p class="text-gray-500" v-if="elem.itemStandard">{{ elem.itemStandard }}</p>
                                 <p class="text-gray-500" v-if="elem.itemJANCode">{{ elem.itemJANCode }}</p>
-                                <p class="text-gray-500">&yen;{{ numberFormat(acceptanceItem.unitPrice) }} / {{ numberFormat(acceptanceItem.quantity) }}{{ acceptanceItem.quantityUnit }}</p>
+                                <p class="text-gray-500">&yen;{{ numberFormat(acceptanceItem.unitPrice) }} / {{ acceptanceItem.quantityUnit }}</p>
                               </td>
                               <td class="text-left px-3 py-4 border" v-if="payoutIndex === 0" :rowspan="acceptanceItem._payouts.length">{{ acceptanceItem.lotNumber }}</td>
                               <td class="text-left px-3 py-4 border" v-if="payoutIndex === 0" :rowspan="acceptanceItem._payouts.length">{{ acceptanceItem.lotDate }}</td>
@@ -768,6 +768,10 @@ var JoyPlaApp = Vue.createApp({
           const url = _ROOT + '&path=/label/acceptance/' + acceptanceId;
           window.open(url, '_blank')
       }
+      const openPrintPage = () => {
+          const url = _ROOT + '&path=/acceptance/' + acceptanceId + '/print';
+          window.open(url, '_blank')
+      }
 
       const status = (item) => {
         const payoutCount = parseInt(item.payoutCount)
@@ -797,7 +801,8 @@ var JoyPlaApp = Vue.createApp({
         breadcrumbs,
         loading, 
         values,
-        pulldownSelect
+        pulldownSelect,
+        openPrintPage
       }
   },
   watch: {

@@ -631,6 +631,15 @@ class JoyPlaApplication extends Application
             }
             return new GatePermissionModel(true, false);
         });
+        
+        Gate::define('list_of_payout_slips', function (Auth $auth) {
+            //払出登録
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
 
         Gate::define('list_of_accountant_slips', function (Auth $auth) {
             //会計一覧

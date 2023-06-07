@@ -26,6 +26,7 @@ use JoyPla\InterfaceAdapters\Controllers\Api\PayoutController;
 use JoyPla\InterfaceAdapters\Controllers\Api\AccountantController;
 use JoyPla\InterfaceAdapters\Controllers\Api\AccountantLogController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ItemListController; //商品一覧表用
+use JoyPla\InterfaceAdapters\Controllers\Api\StockController;
 use JoyPla\InterfaceAdapters\Controllers\Api\StocktakingListController; //棚卸商品管理表用
 use JoyPla\JoyPlaApplication;
 use JoyPla\Service\Presenter\Api\PresenterProvider;
@@ -268,7 +269,27 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         PayoutController::class,
         'register',
     ])->service($useCaseProvider->getPayoutRegisterInteractor());
+
+    Router::map('GET', '/api/payout/index', [
+        PayoutController::class,
+        'index',
+    ]);
     
+    Router::map('GET', '/api/payout/:payoutHistoryId', [
+        PayoutController::class,
+        'show',
+    ]);
+
+    Router::map('PATCH', '/api/payout/:payoutHistoryId', [
+        PayoutController::class,
+        'update',
+    ]);
+    
+    Router::map('DELETE', '/api/payout/:payoutHistoryId', [
+        PayoutController::class,
+        'delete',
+    ]);
+
     Router::map('POST', '/api/acceptance/register', [
         AcceptanceController::class,
         'register',
