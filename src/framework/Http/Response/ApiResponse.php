@@ -72,22 +72,6 @@ class ApiResponse
                     ),
                 ];
                 $this::$logger->out($body);
-            } elseif ($this::$logger->getLevel() >= 3) {
-                $body = [
-                    'execTime' => Logger::getTime(),
-                    'AccountId' => $SPIRAL->getAccountId(),
-                    'status' => 'DEBUG',
-                    'message' => json_encode(
-                        [
-                            'count' => $this->count,
-                            'code' => $this->code,
-                            'message' => $this->message,
-                            'header' => $this->header,
-                        ],
-                        JSON_UNESCAPED_SLASHES
-                    ),
-                ];
-                $this::$logger->out($body);
             }
         }
     }
