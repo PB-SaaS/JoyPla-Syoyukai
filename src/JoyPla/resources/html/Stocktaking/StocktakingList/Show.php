@@ -315,8 +315,8 @@ var JoyPlaApp = Vue.createApp({
           itemLabelBarcode: item.itemLabelBarcode,
           distributorId: item.distributorId,
           distributorName: item.distributorName,
-          rackName: item.rackName,
-          mandatoryFlag: item.mandatoryFlag,
+          rackName: (typeof(item.rackName) ? null : item.rackName),
+          mandatoryFlag: (typeof(item.mandatoryFlag) ? null : item.mandatoryFlag),
         });
       }
 
