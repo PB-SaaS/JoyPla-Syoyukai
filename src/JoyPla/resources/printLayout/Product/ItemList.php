@@ -45,7 +45,7 @@
                                 </thead>
                                 <tbody class="text-xxs">
                                     <tr class="bg-white" v-for="( itemListRow, index ) in itemListRowsArray">
-                                        <td class="border border-slate-600 p-1">{{ index + 1 }}</td>
+                                        <td class="border border-slate-600 p-1">{{key <= 1 ? (key * 10) + index + 1 : (key * 11) + index }}</td>
                                         <td class="border border-slate-600 p-1">
                                             <p class="w-64">
                                                 {{ itemListRow.itemName }}<br>
