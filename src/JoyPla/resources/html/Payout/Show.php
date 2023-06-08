@@ -294,9 +294,10 @@ var JoyPlaApp = Vue.createApp({
       const slipUpdate = handleSubmit(async (values) => {
         const updateModels = createPayoutUpdateModel(values);
         const res = await updatePayout(updateModels);
-        if(res.data.code != 200) {
+        if(res.data.code != 200 && res.data.code != 201) {
           throw new Error(res.data.message)
         }
+        return res.data
       });
 
       const slipDelete = handleSubmit(async (values) => {
@@ -332,14 +333,26 @@ var JoyPlaApp = Vue.createApp({
             }).then(async (result) => {
                 if (result.isConfirmed) {
                   startLoading();
-                  await slipUpdate();
-                  completeLoading();
-                  await Swal.fire({
-                    icon: 'success',
-                    title: '更新が完了しました',
-                  }).then((result) => {
-                      location.reload();
-                  });
+                  slipUpdate().then(async data => {
+
+                    completeLoading();
+                    if(data.code == '200'){
+                      await Swal.fire({
+                        icon: 'success',
+                        title: '更新が完了しました',
+                      }).then((result) => {
+                          location.reload();
+                      });
+                    } else {
+                      await Swal.fire({
+                        icon: 'success',
+                        title: '更新が完了しました',
+                        text: '商品情報がなくなったため、伝票も削除されました'
+                      }).then((result) => {
+                          location.href = _ROOT + '&path=/payout/index&isCache=true';
+                      });
+                    }
+                  })
                 }
             }).catch((error) => {
               completeLoading();

@@ -374,6 +374,12 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         StocktakingListController::class,
         'print',
     ]);
+    
+    Router::map('GET', '/error',function(){
+        echo view('html/Common/Error-js');
+    });
+
+    https://i02.smp.ne.jp/u/joypla/new/js/createPage-dev.js
 });
 
 $router = new Router();

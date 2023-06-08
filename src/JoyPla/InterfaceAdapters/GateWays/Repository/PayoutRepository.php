@@ -33,9 +33,11 @@ class PayoutRepository implements PayoutRepositoryInterface
         $insertItems = [];
         $updateItems = [];
 
+        $undeleteItems = [];
+        $payoutIds = [];
         foreach ($payouts as $payout) {
             $payoutToArray = $payout->toArray();
-
+            $payoutIds[] = $payoutToArray['payoutHistoryId'];
             $histories[] = [
                 'updateTime'=> 'now',
                 'payoutDate' =>  (string) $payoutToArray['payoutDate'],
@@ -82,6 +84,7 @@ class PayoutRepository implements PayoutRepositoryInterface
                         'payoutAmount' => (string) $payoutItem['payoutAmount'],
                     ];
                 } else {
+                    $undeleteItems[] = $payoutItem['payoutItemId'];
                     $updateItems[] = [
                         'updateTime' => 'now',
                         'payoutHistoryId' => (string) $payoutToArray['payoutHistoryId'],
@@ -112,6 +115,10 @@ class PayoutRepository implements PayoutRepositoryInterface
             }
         }
 
+        if(!$undeleteItems && !empty($payoutIds)){
+            ModelRepository::getPayoutItemInstance()->whereIn('payoutHistoryId',$payoutIds)->orWhereNotIn('payoutId',$undeleteItems)->delete();
+        }
+        
         ModelRepository::getPayoutInstance()->upsertBulk('payoutHistoryId',$histories);
         if(!empty($updateItems)){
             ModelRepository::getPayoutItemInstance()->updateBulk('payoutId',$updateItems);

@@ -170,24 +170,43 @@ class PayoutController extends Controller
                     ),
                     $quantity * -1
                 );
-                
-                $item = $item->setPayoutQuantity(new PayoutQuantity($updateItem['payoutQuantity']));
+                if((int) $updateItem['payoutQuantity'] != 0){
+                    $item = $item->setPayoutQuantity(new PayoutQuantity($updateItem['payoutQuantity']));
+                    $items[] = $item;
+                }
+            } else {
+                $items[] = $item;
             }
-            $items[] = $item;
         }
 
-        $payout = $payout->setPayoutItems($items);
-        $repositoryProvider
-        ->getPayoutRepository()
-        ->saveToArray([$payout]);
-
-        if(!empty($inventoryCalculations)){
+        if(empty($items)){
+            
             $repositoryProvider
-            ->getInventoryCalculationRepository()
-            ->saveToArray($inventoryCalculations);
-        }
+                ->getPayoutRepository()
+                ->delete($hospitalId , $payoutHistoryId);
 
-        echo (new ApiResponse($payout, 1, 200, 'payout', []))->toJson();
+            if(!empty($inventoryCalculations)){
+                $repositoryProvider
+                ->getInventoryCalculationRepository()
+                ->saveToArray($inventoryCalculations);
+            }
+    
+            echo (new ApiResponse($payout, 1, 201, 'payout', []))->toJson();
+        } else {
+            
+            $payout = $payout->setPayoutItems($items);
+            $repositoryProvider
+                ->getPayoutRepository()
+                ->saveToArray([$payout]);
+
+            if(!empty($inventoryCalculations)){
+                $repositoryProvider
+                ->getInventoryCalculationRepository()
+                ->saveToArray($inventoryCalculations);
+            }
+    
+            echo (new ApiResponse($payout, 1, 200, 'payout', []))->toJson();
+         }
     }
 
     public function delete($vars)

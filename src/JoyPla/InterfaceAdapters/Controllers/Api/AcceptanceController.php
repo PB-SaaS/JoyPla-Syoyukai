@@ -146,7 +146,9 @@ class AcceptanceController extends Controller
         $items = [];
         $inventoryCalculations = [];
 
+        $tmpItem = null;
         foreach($acceptance->getItems() as $item){
+            $tmpItem = $item;
             foreach($updateItems as $requestItem){
                 if($item->getAcceptanceItemId()->value() == $requestItem['acceptanceItemId']){
                     $inventoryCalculations[] = new InventoryCalculation(
@@ -161,22 +163,42 @@ class AcceptanceController extends Controller
                         ),
                         $item->getAcceptanceQuantity() - (int)$requestItem['acceptanceCount'] //減少した分戻す
                     );
-                    $item = $item->changeAcceptanceCount((int)$requestItem['acceptanceCount']);
+                    $tmpItem = null;
+                    if((int)$requestItem['acceptanceCount'] != 0){
+                        $tmpItem = $item->changeAcceptanceCount((int)$requestItem['acceptanceCount']);
+                    }
                 }
             }
-            $items[] = $item;
+            if(!empty($tmpItem)){
+                $items[] = $tmpItem;
+            }
         }
 
-        $acceptance = $acceptance->setItems($items);
-
-        $repositoryProvider->getAcceptanceRepository()->saveToArray([$acceptance]);
-
-        if(count($inventoryCalculations) > 0){
+        if(empty($items)){
             $repositoryProvider
-                ->getInventoryCalculationRepository()
-                ->saveToArray($inventoryCalculations);
+                ->getAcceptanceRepository()
+                ->delete(
+                    $acceptanceId
+                );
+            if(count($inventoryCalculations) > 0){
+                $repositoryProvider
+                    ->getInventoryCalculationRepository()
+                    ->saveToArray($inventoryCalculations);
+            }
+            echo (new ApiResponse($acceptance->toArray(), 1, 201, 'acceptance', []))->toJson();
+        } else {
+            $acceptance = $acceptance->setItems($items);
+
+            $repositoryProvider->getAcceptanceRepository()->saveToArray([$acceptance]);
+    
+            if(count($inventoryCalculations) > 0){
+                $repositoryProvider
+                    ->getInventoryCalculationRepository()
+                    ->saveToArray($inventoryCalculations);
+            }
+            echo (new ApiResponse($acceptance->toArray(), 1, 200, 'acceptance', []))->toJson();
         }
-        echo (new ApiResponse($acceptance->toArray(), 1, 200, 'acceptance', []))->toJson();
+
     }
 
     public function payoutRegister($vars){
