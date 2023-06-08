@@ -7,13 +7,17 @@
       <div class="index mx-auto mb-96">
         <h1 class="text-2xl mb-2">出庫伝票</h1>
         <hr>
+        <?php if($isPayoutSuccess && !gate('is_approver')): ?>
         <div class="mb-2 lg:w-1/3">
             <v-input type="date" name="payoutDate" :rules="{}" title="払出日指定" label="払出日指定"></v-input>
         </div>
+        <?php endif; ?>
         <div class="p-4 text-base bg-gray-100 border border-gray-400 flex flex-col md:flex-row md:gap-6 gap-4 mb-6">
+            <?php if(!gate('is_approver')): ?>
             <v-pulldown-button class="md:w-1/6 w-full" variant="primary" :selects="pulldownSelect" v-if="pulldownSelect.length !== 0">
                 入庫アクション選択
             </v-pulldown-button>
+            <?php endif; ?>
             <v-button-default @click.native="openLabelPage" class="md:w-1/6 w-full">
                 払出ラベル発行
             </v-button-default>
@@ -73,13 +77,13 @@
                   <th class="border-b font-medium p-4 pr-8 text-left border">使用期限</th>
                   <th class="border-b font-medium p-4 pr-8 text-left border">出庫数</th>
                   <th class="border-b font-medium p-4 pr-8 text-left border">入庫済み数</th>
-                  <?php if ($isPayoutSuccess): ?>
+                  <?php if ($isPayoutSuccess && !gate('is_approver')): ?>
                   <th class="border-b font-medium p-4 pr-8 text-left border">カード番号</th>
                   <th class="border-b font-medium p-4 pr-8 text-left border">入庫数</th>
                   <th class="border-b font-medium p-4 pr-8 text-left border">合計金額</th>
                   <?php endif; ?>
                   <th class="border-b font-medium p-4 pr-8 text-left border">ステータス</th>
-                  <?php if ($isPayoutSuccess): ?>
+                  <?php if ($isPayoutSuccess && !gate('is_approver')): ?>
                   <th class="border-b font-medium p-4 pr-8 text-left border" colspan=2></th>
                   <?php endif; ?>
                 </tr>
@@ -104,7 +108,7 @@
                               </td>
                               <td class="text-left px-3 py-4 border">{{ acceptanceItem.payoutCount }}{{ acceptanceItem.quantityUnit }}</td>
                               
-                              <?php if ($isPayoutSuccess): ?>
+                              <?php if ($isPayoutSuccess && !gate('is_approver')): ?>
                               <td class="text-left px-3 py-4 border"></td>
                               <td class="text-left px-3 py-4 border"></td>
                               <td class="text-left px-3 py-4 border"></td>
@@ -114,7 +118,7 @@
                                   入庫済み
                                 </span>
                               </td>
-                              <?php if ($isPayoutSuccess): ?>
+                              <?php if ($isPayoutSuccess && !gate('is_approver')): ?>
                               <td class="text-center px-3 py-4 border">
                               </td>
                               <td class="text-center px-3 py-4 border">
@@ -136,7 +140,7 @@
                               <td class="text-left px-3 py-4 border" v-if="payoutIndex === 0" :rowspan="acceptanceItem._payouts.length">{{ acceptanceItem.lotNumber }}</td>
                               <td class="text-left px-3 py-4 border" v-if="payoutIndex === 0" :rowspan="acceptanceItem._payouts.length">{{ acceptanceItem.lotDate }}</td>
                               <td class="text-left px-3 py-4 border" v-if="payoutIndex === 0" :rowspan="acceptanceItem._payouts.length">
-                                <?php if ($isUpdateSuccess): ?>
+                                <?php if ($isUpdateSuccess && !gate('is_approver')): ?>
                                 <v-input-number
                                   :rules="{ between: [ parseInt(acceptanceItem.payoutCount) , Math.max(0 , acceptanceItem.acceptanceCount) ] }" 
                                   :name="`acceptance._inHospitalItems[${index}]._acceptanceItems[${acceptanceIndex}].acceptanceChangeCount`" 
@@ -153,7 +157,7 @@
                               </td>
                               <td class="text-left px-3 py-4 border" v-if="payoutIndex === 0" :rowspan="acceptanceItem._payouts.length">{{ acceptanceItem.payoutCount }}{{ acceptanceItem.quantityUnit }}</td>
                               
-                              <?php if ($isPayoutSuccess): ?>
+                              <?php if ($isPayoutSuccess && !gate('is_approver')): ?>
                               <td class="text-left px-3 py-4 border">{{ payout.cardId }}</td>
                               <td class="text-left px-3 py-4 border">
                                 <v-input-number
@@ -181,7 +185,7 @@
                                   入庫済み
                                 </span>
                               </td>
-                              <?php if ($isPayoutSuccess): ?>
+                              <?php if ($isPayoutSuccess && !gate('is_approver')): ?>
                               <td class="text-center px-3 py-4 border">
                                 <v-button-default @click.native="copy(index,acceptanceIndex)">複製</v-button-default>
                               </td>

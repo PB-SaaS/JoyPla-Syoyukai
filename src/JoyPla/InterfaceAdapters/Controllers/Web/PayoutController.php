@@ -39,7 +39,9 @@ class PayoutController extends Controller
 
         $gate = Gate::getGateInstance('list_of_payout_slips');
 
-        $body = View::forge('html/Payout/Index', [], false)->render();
+        $body = View::forge('html/Payout/Index', [
+            'userDivisionId' => $this->request->user()->divisionId
+        ], false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
     }
 
@@ -53,12 +55,17 @@ class PayoutController extends Controller
 
         $payout = ModelRepository::getPayoutInstance()->where('payoutHistoryId' , $vars['payoutHistoryId'])->where('hospitalId', $this->request->user()->hospitalId)->get()->first();
 
-        if(empty($payout) || ( $gate->isOnlyMyDivision() && $payout->targetDivisionId !== $this->request->user()->divisionId)){
+        if(empty($payout) || ( $gate->isOnlyMyDivision() && 
+        ( 
+            $payout->sourceDivisionId !== $this->request->user()->divisionId &&
+            $payout->targetDivisionId !== $this->request->user()->divisionId
+        ))){
             Router::abort(403);
         }
 
         $body = View::forge('html/Payout/Show', [
-            'payoutHistoryId' => $payout->payoutHistoryId
+            'payoutHistoryId' => $payout->payoutHistoryId,
+            'userDivisionId' => $this->request->user()->divisionId
         ], false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
     }
@@ -79,6 +86,14 @@ class PayoutController extends Controller
 
         if (!$payout) {
             Router::abort(404);
+        }
+        
+        $gate = Gate::getGateInstance('list_of_payout_slips');
+
+        if(empty($payout) || ( $gate->isOnlyMyDivision() && 
+        $payout->sourceDivisionId !== $this->request->user()->divisionId &&
+        $payout->targetDivisionId !== $this->request->user()->divisionId)){
+            Router::abort(403);
         }
 
         $items = [[]];

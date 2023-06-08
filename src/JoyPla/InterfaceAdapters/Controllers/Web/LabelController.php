@@ -4,6 +4,7 @@ namespace JoyPla\InterfaceAdapters\Controllers\Web;
 
 use framework\Http\Controller;
 use framework\Http\View;
+use framework\Routing\Router;
 use JoyPla\Enterprise\Models\DivisionId;
 use JoyPla\Enterprise\Models\HospitalId;
 use JoyPla\Enterprise\Models\InHospitalItemId;
@@ -19,6 +20,13 @@ class LabelController extends Controller
         $request = $this->request->get('request' , []);
         $acceptance = ModelRepository::getAcceptanceInstance()->where('hospitalId',$this->request->user()->hospitalId)->where('acceptanceId', $acceptanceId)->get()->first();
         
+        if(
+            gate('is_user') &&
+            $acceptance->sourceDivisionId !== $this->request->user()->divisionId &&
+            $acceptance->targetDivisionId !== $this->request->user()->divisionId
+        ){
+            Router::abort(403);
+        }
         $sourceDivisionId = new DivisionId($acceptance->sourceDivisionId);
         $divisionId = new DivisionId($acceptance->targetDivisionId);
 
@@ -137,6 +145,14 @@ class LabelController extends Controller
         $request = $this->request->get('request' , []);
 
         $payout = ModelRepository::getPayoutInstance()->where('hospitalId',$this->request->user()->hospitalId)->where('payoutHistoryId', $payoutId)->get()->first();
+
+        if(
+            gate('is_user') &&
+            $payout->sourceDivisionId !== $this->request->user()->divisionId &&
+            $payout->targetDivisionId !== $this->request->user()->divisionId
+        ){
+            Router::abort(403);
+        }
 
         $sourceDivisionId = new DivisionId($payout->sourceDivisionId);
         $divisionId = new DivisionId($payout->targetDivisionId);

@@ -75,7 +75,20 @@ class PayoutController extends Controller
                 $search
             );
 
-        echo (new ApiResponse($payouts, $totalCount, 200, 'payouts', []))->toJson();
+        $result = [];
+        foreach($payouts as $payout){
+            if(
+                gate('is_user') && 
+                $this->request->user()->divisionId !== $payout->sourceDivisionId &&
+                $this->request->user()->divisionId !== $payout->targetDivisionId 
+                )
+            {
+                $payout->_items = [];
+            }
+            $result[] = $payout;
+        }
+
+        echo (new ApiResponse($result, $totalCount, 200, 'payouts', []))->toJson();
     }
 
     public function show($vars){
@@ -90,6 +103,12 @@ class PayoutController extends Controller
                 $payoutHistoryId
             );
             
+        $gate = Gate::getGateInstance('list_of_payout_slips');
+        if(empty($payout) || ( $gate->isOnlyMyDivision() && 
+        $payout->sourceDivisionId !== $this->request->user()->divisionId &&
+        $payout->targetDivisionId !== $this->request->user()->divisionId )){
+            Router::abort(403);
+        }
         echo (new ApiResponse($payout, 1, 200, 'payout', []))->toJson();
     }
 
@@ -110,6 +129,12 @@ class PayoutController extends Controller
             );
 
         $updateItems = $this->request->get('updateItems' , []);
+
+        $gate = Gate::getGateInstance('list_of_payout_slips');
+
+        if(empty($payout) || ( $gate->isOnlyMyDivision() && $payout->getSourceDivisionId()->value() !== $this->request->user()->divisionId)){
+            Router::abort(403);
+        }
 
         $items = [];
         $inventoryCalculations = [];
@@ -180,6 +205,11 @@ class PayoutController extends Controller
                 $hospitalId,
                 $payoutHistoryId
             );
+            
+        $gate = Gate::getGateInstance('list_of_payout_slips');
+        if(empty($payout) || ( $gate->isOnlyMyDivision() && $payout->getSourceDivisionId()->value() !== $this->request->user()->divisionId)){
+            Router::abort(403);
+        }
 
         $items = [];
         $inventoryCalculations = [];

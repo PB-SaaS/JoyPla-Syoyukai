@@ -78,14 +78,26 @@ class AcceptanceController extends Controller
         $search->currentPage = $searchRequest['currentPage'] ?? 1;
 
         $repositoryProvider = new RepositoryProvider();
-        [ $acceptance , $totalCount ] = $repositoryProvider
+        [ $acceptances , $totalCount ] = $repositoryProvider
             ->getAcceptanceRepository()
             ->search(
                 new HospitalId($this->request->user()->hospitalId),
                 $search
             );
 
-        echo (new ApiResponse($acceptance, $totalCount, 200, 'acceptance', []))->toJson();
+        $result = [];
+        foreach($acceptances as $acceptance){
+            if(
+                gate('is_user') && 
+                $this->request->user()->divisionId !== $acceptance->sourceDivisionId &&
+                $this->request->user()->divisionId !== $acceptance->targetDivisionId 
+                )
+            {
+                $acceptance->_items = [];
+            }
+            $result[] = $acceptance;
+        }
+        echo (new ApiResponse($result, $totalCount, 200, 'acceptance', []))->toJson();
     }
 
     public function show($vars){
@@ -99,6 +111,15 @@ class AcceptanceController extends Controller
                 $hospitalId,
                 $acceptanceId
             );
+            
+        if(empty($acceptance) || ( gate('is_user') && 
+        ( 
+            $acceptance->sourceDivisionId !== $this->request->user()->divisionId &&
+            $acceptance->targetDivisionId !== $this->request->user()->divisionId
+        ))){
+            Router::abort(403);
+        }
+
             
         echo (new ApiResponse($acceptance, 1, 200, 'acceptance', []))->toJson();
     }
