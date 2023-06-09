@@ -60,22 +60,6 @@ class JoyPlaApplication extends Application
         Request::setPathKey('path');
 
         /** logger 設定 */
-        SpiralConnecter::$logger = new Logger(
-            new Spiralv2LogginObject(
-                LoggingConfig::SPIRALV2_API_KEY,
-                LoggingConfig::LOGGING_APP_TITLE,
-                LoggingConfig::SPIRAL_API_LOGGING_DB_TITLE,
-                LoggingConfig::LOG_LEVEL
-            )
-        );
-        ApiSpiral::$logger = new Logger(
-            new Spiralv2LogginObject(
-                LoggingConfig::SPIRALV2_API_KEY,
-                LoggingConfig::LOGGING_APP_TITLE,
-                LoggingConfig::SPIRAL_API_LOGGING_DB_TITLE,
-                LoggingConfig::LOG_LEVEL
-            )
-        );
         ApiResponse::$logger = new Logger(
             new Spiralv2LogginObject(
                 LoggingConfig::SPIRALV2_API_KEY,
@@ -629,6 +613,10 @@ class JoyPlaApplication extends Application
                 //担当者
                 return new GatePermissionModel(true, true);
             }
+            if ($auth->userPermission == '3') {
+                //承認者
+                return new GatePermissionModel(false, false);
+            }
             return new GatePermissionModel(true, false);
         });
         
@@ -652,15 +640,6 @@ class JoyPlaApplication extends Application
 
         Gate::define('register_of_accountant', function (Auth $auth) {
             //会計一覧
-            if ($auth->userPermission == '2') {
-                //担当者
-                return new GatePermissionModel(true, true);
-            }
-            return new GatePermissionModel(true, false);
-        });
-
-        Gate::define('register_of_payout', function (Auth $auth) {
-            //払出
             if ($auth->userPermission == '2') {
                 //担当者
                 return new GatePermissionModel(true, true);

@@ -92,7 +92,7 @@ class SpiralConnecter implements SpiralConnecterInterface
     public function logging($bodys)
     {
         if ($this::$logger) {
-            $this::$logger->outBulk($bodys);
+            //$this::$logger->outBulk($bodys);
         }
     }
 }

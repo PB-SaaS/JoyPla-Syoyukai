@@ -78,14 +78,26 @@ class AcceptanceController extends Controller
         $search->currentPage = $searchRequest['currentPage'] ?? 1;
 
         $repositoryProvider = new RepositoryProvider();
-        [ $acceptance , $totalCount ] = $repositoryProvider
+        [ $acceptances , $totalCount ] = $repositoryProvider
             ->getAcceptanceRepository()
             ->search(
                 new HospitalId($this->request->user()->hospitalId),
                 $search
             );
 
-        echo (new ApiResponse($acceptance, $totalCount, 200, 'acceptance', []))->toJson();
+        $result = [];
+        foreach($acceptances as $acceptance){
+            if(
+                gate('is_user') && 
+                $this->request->user()->divisionId !== $acceptance->sourceDivisionId &&
+                $this->request->user()->divisionId !== $acceptance->targetDivisionId 
+                )
+            {
+                $acceptance->_items = [];
+            }
+            $result[] = $acceptance;
+        }
+        echo (new ApiResponse($result, $totalCount, 200, 'acceptance', []))->toJson();
     }
 
     public function show($vars){
@@ -100,10 +112,22 @@ class AcceptanceController extends Controller
                 $acceptanceId
             );
             
+        if(empty($acceptance) || ( gate('is_user') && 
+        ( 
+            $acceptance->sourceDivisionId !== $this->request->user()->divisionId &&
+            $acceptance->targetDivisionId !== $this->request->user()->divisionId
+        ))){
+            Router::abort(403);
+        }
+
+            
         echo (new ApiResponse($acceptance, 1, 200, 'acceptance', []))->toJson();
     }
 
     public function update($vars){
+        if(gate('is_approver')){
+            Router::abort(403);
+        }
         $hospitalId = new HospitalId($this->request->user()->hospitalId);
         $acceptanceId = new AcceptanceId($vars['acceptanceId']);
         $updateItems = $this->request->get( 'updateItems' , []);
@@ -122,7 +146,9 @@ class AcceptanceController extends Controller
         $items = [];
         $inventoryCalculations = [];
 
+        $tmpItem = null;
         foreach($acceptance->getItems() as $item){
+            $tmpItem = $item;
             foreach($updateItems as $requestItem){
                 if($item->getAcceptanceItemId()->value() == $requestItem['acceptanceItemId']){
                     $inventoryCalculations[] = new InventoryCalculation(
@@ -137,25 +163,49 @@ class AcceptanceController extends Controller
                         ),
                         $item->getAcceptanceQuantity() - (int)$requestItem['acceptanceCount'] //減少した分戻す
                     );
-                    $item = $item->changeAcceptanceCount((int)$requestItem['acceptanceCount']);
+                    $tmpItem = null;
+                    if((int)$requestItem['acceptanceCount'] != 0){
+                        $tmpItem = $item->changeAcceptanceCount((int)$requestItem['acceptanceCount']);
+                    }
                 }
             }
-            $items[] = $item;
+            if(!empty($tmpItem)){
+                $items[] = $tmpItem;
+            }
         }
 
-        $acceptance = $acceptance->setItems($items);
-
-        $repositoryProvider->getAcceptanceRepository()->saveToArray([$acceptance]);
-
-        if(count($inventoryCalculations) > 0){
+        if(empty($items)){
             $repositoryProvider
-                ->getInventoryCalculationRepository()
-                ->saveToArray($inventoryCalculations);
+                ->getAcceptanceRepository()
+                ->delete(
+                    $acceptanceId
+                );
+            if(count($inventoryCalculations) > 0){
+                $repositoryProvider
+                    ->getInventoryCalculationRepository()
+                    ->saveToArray($inventoryCalculations);
+            }
+            echo (new ApiResponse($acceptance->toArray(), 1, 201, 'acceptance', []))->toJson();
+        } else {
+            $acceptance = $acceptance->setItems($items);
+
+            $repositoryProvider->getAcceptanceRepository()->saveToArray([$acceptance]);
+    
+            if(count($inventoryCalculations) > 0){
+                $repositoryProvider
+                    ->getInventoryCalculationRepository()
+                    ->saveToArray($inventoryCalculations);
+            }
+            echo (new ApiResponse($acceptance->toArray(), 1, 200, 'acceptance', []))->toJson();
         }
-        echo (new ApiResponse($acceptance->toArray(), 1, 200, 'acceptance', []))->toJson();
+
     }
 
     public function payoutRegister($vars){
+        if(gate('is_approver')){
+            Router::abort(403);
+        }
+
         $hospitalId = new HospitalId($this->request->user()->hospitalId);
         $acceptanceId = new AcceptanceId($vars['acceptanceId']);
 
@@ -360,6 +410,9 @@ class AcceptanceController extends Controller
     }
 
     public function delete($vars){
+        if(gate('is_approver')){
+            Router::abort(403);
+        }
         $hospitalId = new HospitalId($this->request->user()->hospitalId);
         $acceptanceId = new AcceptanceId($vars['acceptanceId']);
 

@@ -37,7 +37,7 @@
                   払出先部署：{{ acceptance?._targetDivision?.divisionName }}<br>
                   合計金額：&yen; {{ numberFormat( acceptance.acceptancePrice) }}<br>
                 </p>
-                <p class="text-md my-2">
+                <p class="text-md my-2" v-if="!isUser || (isUser && ( userDivisionId === acceptance?._targetDivision?.divisionId || userDivisionId === acceptance?._sourceDivision?.divisionId ))">
                   ステータス：
                   <span class="bg-red-100 text-red-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded" v-if="acceptance.payoutTotalCount == 0 && acceptance.acceptanceTotalCount > 0">
                     未入庫
@@ -49,23 +49,28 @@
                     入庫済み
                   </span>
                 </p>
-                <div class="flex flex-col gap-3 mb-3">
+                <div class="flex flex-col gap-3 mb-3" v-if="!isUser || (isUser && ( userDivisionId === acceptance?._targetDivision?.divisionId || userDivisionId === acceptance?._sourceDivision?.divisionId ))">
                   <v-button-default type="button" class="w-full" @click.native="openSlip( acceptance.acceptanceId )">
                     出庫伝票を表示
                   </v-button-default>
                 </div>
+                <?php if(!gate('is_approver')): ?>
                 <div class="flex flex-col gap-3 mb-3" v-if="!isUser || (isUser && userDivisionId === acceptance?._targetDivision?.divisionId)">
                   <v-button-primary type="button" class="w-full" @click.native="onPayoutAllUpdate( acceptance.acceptanceId )">
                     一括入庫登録
                   </v-button-primary>
                 </div>
-                <div class="flex flex-col gap-3 mb-3" v-if="!isUser || (isUser && userDivisionId === acceptance?._targetDivision?.divisionId)">
+                <?php endif; ?>
+                <div class="flex flex-col gap-3 mb-3" v-if="!isUser || (isUser && ( userDivisionId === acceptance?._targetDivision?.divisionId || userDivisionId === acceptance?._sourceDivision?.divisionId ))">
                   <v-button-default type="button" class="w-full" @click.native="openPrint( acceptance.acceptanceId )">
                     出荷伝票を印刷
                   </v-button-default>
                 </div>
               </div>
               <div class="lg:w-4/5 p-2">
+                <template v-if="isUser && acceptance._items.length === 0">
+                  <p>閲覧権限がありません</p>
+                </template>
                 <div class="w-full lg:flex mt-3" v-for="(acceptanceItem) in acceptance._items">
                   <div class="lg:flex-1 flex lg:w-3/4">
                     <div class="flex-1 pl-4 lg:flex gap-6 break-all">

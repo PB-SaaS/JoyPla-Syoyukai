@@ -56,27 +56,11 @@ class ApiResponse
 
         */
         if ($this::$logger) {
-            if ($this->code != 200) {
+            if ( !( $this->code >= 200 && $this->code <= 299 )  && $this->code != 191 && $this->code != 404) {
                 $body = [
                     'execTime' => Logger::getTime(),
                     'AccountId' => $SPIRAL->getAccountId(),
                     'status' => 'ERROR',
-                    'message' => json_encode(
-                        [
-                            'count' => $this->count,
-                            'code' => $this->code,
-                            'message' => $this->message,
-                            'header' => $this->header,
-                        ],
-                        JSON_UNESCAPED_SLASHES
-                    ),
-                ];
-                $this::$logger->out($body);
-            } elseif ($this::$logger->getLevel() >= 3) {
-                $body = [
-                    'execTime' => Logger::getTime(),
-                    'AccountId' => $SPIRAL->getAccountId(),
-                    'status' => 'DEBUG',
                     'message' => json_encode(
                         [
                             'count' => $this->count,

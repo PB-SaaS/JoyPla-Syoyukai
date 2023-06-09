@@ -99,9 +99,9 @@ class Acceptance
         if($acceptanceCount > 0 && $payoutCount === 0)
         {
             return 1;//未入庫
-        } else if($acceptanceCount > 0 && $acceptanceCount === $payoutCount){
+        } else if($acceptanceCount === $payoutCount){
             return 3;//入庫
-        }else if($acceptanceCount > 0 && $acceptanceCount !== $payoutCount){
+        }else if($acceptanceCount !== $payoutCount){
             return 2;//一部入庫
         }
     }

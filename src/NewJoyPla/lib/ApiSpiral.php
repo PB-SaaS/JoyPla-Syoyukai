@@ -79,7 +79,6 @@ use Logger;
         $spiralv2->setDbId(LogConfig::SPIRAL_API_LOGGING_DB_TITLE);
 
         $logger = new Logger($spiralv2);
-		*/
 		if( $this::$logger )
 		{
 			$body = [
@@ -93,6 +92,7 @@ use Logger;
 
 			$this::$logger->out($body);
 		}
+		*/
 	}
 	
 	/**

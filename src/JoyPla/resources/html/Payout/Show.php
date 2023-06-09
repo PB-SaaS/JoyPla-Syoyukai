@@ -8,12 +8,16 @@
         <h1 class="text-2xl mb-2">払出伝票</h1>
         <hr>
         <div class="p-4 text-base bg-gray-100 border border-gray-400 flex flex-col md:flex-row md:gap-6 gap-4 mb-6">
-            <v-button-primary class="md:w-1/6 w-full" @click.native="onPayoutUpdate()">
+          <?php if( !gate('is_approver')) : ?>
+            <v-button-primary class="md:w-1/6 w-full" @click.native="onPayoutUpdate()" v-if="!isUser || (isUser && userDivisionId === values.payout.sourceDivisionId )">
                 更新
             </v-button-primary>
-            <v-button-danger class="md:w-1/6 w-full" @click.native="onDelete()">
+          <?php endif; ?>
+          <?php if( !gate('is_approver')) : ?>
+            <v-button-danger class="md:w-1/6 w-full" @click.native="onDelete()" v-if="!isUser || (isUser && userDivisionId === values.payout.sourceDivisionId )">
                 削除
             </v-button-danger>
+          <?php endif; ?>
             <v-button-default class="md:w-1/6 w-full" @click.native="openLabelPage()">
                 払出ラベル発行
             </v-button-default>
@@ -75,17 +79,26 @@
                               <td class="text-left px-3 py-4 border">{{ payoutItem.lotDate }}</td>
                               <td class="text-left px-3 py-4 border">{{ payoutItem.cardId }}</td>
                               <td class="text-left px-3 py-4 border">
-                                <v-input-number
-                                  :rules="{ between: [0 , Math.max(0 , payoutItem.payoutQuantity) ] }" 
-                                  :name="`payout._inHospitalItems[${index}]._payoutItems[${payoutIndex}].payoutChangeQuantity`" 
-                                  label="払出数" 
-                                  :min="0" 
-                                  :unit="payoutItem.quantityUnit" 
-                                  :step="1" 
-                                  title="払出数" 
-                                  :disabled="payoutItem.cardId != ''"
-                                  class=" w-[240px]" >
-                                </v-input-number>
+                                <?php if( !gate('is_approver')) : ?>
+                                <template v-if="!isUser || (isUser && userDivisionId === values.payout.sourceDivisionId )">
+                                  <v-input-number
+                                    :rules="{ between: [0 , Math.max(0 , payoutItem.payoutQuantity) ] }" 
+                                    :name="`payout._inHospitalItems[${index}]._payoutItems[${payoutIndex}].payoutChangeQuantity`" 
+                                    label="払出数" 
+                                    :min="0" 
+                                    :unit="payoutItem.quantityUnit" 
+                                    :step="1" 
+                                    title="払出数" 
+                                    :disabled="payoutItem.cardId != ''"
+                                    class=" w-[240px]" >
+                                  </v-input-number>
+                                </template>
+                                <template v-if="!( !isUser || (isUser && userDivisionId === values.payout.sourceDivisionId ) )">
+                                  {{ numberFormat(payoutItem.payoutQuantity) }}{{payoutItem.quantityUnit}}
+                                </template>
+                                <?php else: ?>
+                                  {{ numberFormat(payoutItem.payoutQuantity) }}{{payoutItem.quantityUnit}}
+                                <?php endif; ?>
                               </td>
                               <td class="text-left px-3 py-4 border" v-if="payoutIndex === 0" :rowspan="elem._payoutItems.length">&yen;{{ numberFormat(priceCalc(elem)) }}</td>
                             </tr>
@@ -166,6 +179,10 @@ var JoyPlaApp = Vue.createApp({
         await sleepCompleteLoading();
         await fetchData();
       });
+      
+      const isUser = <?php echo (gate('is_user'))? 'true' : 'false' ?>;
+      const userDivisionId = '<?php echo $userDivisionId ?>';
+      
       const breadcrumbs = [
           {
             text: '払出メニュー',
@@ -277,9 +294,10 @@ var JoyPlaApp = Vue.createApp({
       const slipUpdate = handleSubmit(async (values) => {
         const updateModels = createPayoutUpdateModel(values);
         const res = await updatePayout(updateModels);
-        if(res.data.code != 200) {
+        if(res.data.code != 200 && res.data.code != 201) {
           throw new Error(res.data.message)
         }
+        return res.data
       });
 
       const slipDelete = handleSubmit(async (values) => {
@@ -315,14 +333,26 @@ var JoyPlaApp = Vue.createApp({
             }).then(async (result) => {
                 if (result.isConfirmed) {
                   startLoading();
-                  await slipUpdate();
-                  completeLoading();
-                  await Swal.fire({
-                    icon: 'success',
-                    title: '更新が完了しました',
-                  }).then((result) => {
-                      location.reload();
-                  });
+                  slipUpdate().then(async data => {
+
+                    completeLoading();
+                    if(data.code == '200'){
+                      await Swal.fire({
+                        icon: 'success',
+                        title: '更新が完了しました',
+                      }).then((result) => {
+                          location.reload();
+                      });
+                    } else {
+                      await Swal.fire({
+                        icon: 'success',
+                        title: '更新が完了しました',
+                        text: '商品情報がなくなったため、伝票も削除されました'
+                      }).then((result) => {
+                          location.href = _ROOT + '&path=/payout/index&isCache=true';
+                      });
+                    }
+                  })
                 }
             }).catch((error) => {
               completeLoading();
@@ -415,7 +445,9 @@ var JoyPlaApp = Vue.createApp({
         totalPrice,
         onPayoutUpdate,
         onDelete,
-        openPrintPage
+        openPrintPage,
+        userDivisionId,
+        isUser,
       }
   },
   watch: {

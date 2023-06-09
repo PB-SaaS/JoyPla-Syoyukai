@@ -30,6 +30,14 @@ class AcceptanceController extends Controller
         }
 
         $acceptance = $acceptance->first();
+        
+        if(empty($acceptance) || ( gate('is_user') && 
+        ( 
+            $acceptance->sourceDivisionId !== $this->request->user()->divisionId &&
+            $acceptance->targetDivisionId !== $this->request->user()->divisionId
+        ))){
+            Router::abort(403);
+        }
 
         $isUnitPrice = ModelRepository::getHospitalInstance()->where('hospitalId',$this->request->user()->hospitalId)->resetValue('payoutUnitPrice')->get()->first();
 
@@ -60,6 +68,14 @@ class AcceptanceController extends Controller
 
         if (!$acceptance) {
             Router::abort(404);
+        }
+        
+        if(empty($acceptance) || ( gate('is_user') && 
+        ( 
+            $acceptance->sourceDivisionId !== $this->request->user()->divisionId &&
+            $acceptance->targetDivisionId !== $this->request->user()->divisionId
+        ))){
+            Router::abort(403);
         }
 
         $items = [[]];

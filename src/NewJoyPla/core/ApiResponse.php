@@ -49,7 +49,7 @@ class ApiResponse
     {
         global $SPIRAL;
         if ($this::$logger) {
-            if ($this->code != 0 && $this->code != 1) {
+            if ($this->code != 0 && $this->code != 1 && $this->code != 191 && $this->code != 404) {
                 $body = [
                     'execTime' => Logger::getTime(),
                     'AccountId' => $SPIRAL->getAccountId(),

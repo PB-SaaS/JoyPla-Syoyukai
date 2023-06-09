@@ -1900,7 +1900,6 @@ const vConsumptionHistoryModalForItemRequest = {
       <v-input type="hidden" name="currentPage"></v-input>
       <v-input type="hidden" name="perPage"></v-input>
     </div>
-    </div>
   </v-open-modal>
 </teleport>
 `,

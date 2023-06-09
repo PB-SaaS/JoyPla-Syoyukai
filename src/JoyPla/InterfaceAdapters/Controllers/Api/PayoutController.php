@@ -75,7 +75,20 @@ class PayoutController extends Controller
                 $search
             );
 
-        echo (new ApiResponse($payouts, $totalCount, 200, 'payouts', []))->toJson();
+        $result = [];
+        foreach($payouts as $payout){
+            if(
+                gate('is_user') && 
+                $this->request->user()->divisionId !== $payout->sourceDivisionId &&
+                $this->request->user()->divisionId !== $payout->targetDivisionId 
+                )
+            {
+                $payout->_items = [];
+            }
+            $result[] = $payout;
+        }
+
+        echo (new ApiResponse($result, $totalCount, 200, 'payouts', []))->toJson();
     }
 
     public function show($vars){
@@ -90,11 +103,20 @@ class PayoutController extends Controller
                 $payoutHistoryId
             );
             
+        $gate = Gate::getGateInstance('list_of_payout_slips');
+        if(empty($payout) || ( $gate->isOnlyMyDivision() && 
+        $payout->sourceDivisionId !== $this->request->user()->divisionId &&
+        $payout->targetDivisionId !== $this->request->user()->divisionId )){
+            Router::abort(403);
+        }
         echo (new ApiResponse($payout, 1, 200, 'payout', []))->toJson();
     }
 
     public function update($vars)
     {
+        if(gate('is_approver')){
+            Router::abort(403);
+        }
         $payoutHistoryId = new PayoutHistoryId($vars['payoutHistoryId']);
         $hospitalId = new HospitalId($this->request->user()->hospitalId);
         
@@ -107,6 +129,12 @@ class PayoutController extends Controller
             );
 
         $updateItems = $this->request->get('updateItems' , []);
+
+        $gate = Gate::getGateInstance('list_of_payout_slips');
+
+        if(empty($payout) || ( $gate->isOnlyMyDivision() && $payout->getSourceDivisionId()->value() !== $this->request->user()->divisionId)){
+            Router::abort(403);
+        }
 
         $items = [];
         $inventoryCalculations = [];
@@ -142,28 +170,50 @@ class PayoutController extends Controller
                     ),
                     $quantity * -1
                 );
-                
-                $item = $item->setPayoutQuantity(new PayoutQuantity($updateItem['payoutQuantity']));
+                if((int) $updateItem['payoutQuantity'] != 0){
+                    $item = $item->setPayoutQuantity(new PayoutQuantity($updateItem['payoutQuantity']));
+                    $items[] = $item;
+                }
+            } else {
+                $items[] = $item;
             }
-            $items[] = $item;
         }
 
-        $payout = $payout->setPayoutItems($items);
-        $repositoryProvider
-        ->getPayoutRepository()
-        ->saveToArray([$payout]);
-
-        if(!empty($inventoryCalculations)){
+        if(empty($items)){
+            
             $repositoryProvider
-            ->getInventoryCalculationRepository()
-            ->saveToArray($inventoryCalculations);
-        }
+                ->getPayoutRepository()
+                ->delete($hospitalId , $payoutHistoryId);
 
-        echo (new ApiResponse($payout, 1, 200, 'payout', []))->toJson();
+            if(!empty($inventoryCalculations)){
+                $repositoryProvider
+                ->getInventoryCalculationRepository()
+                ->saveToArray($inventoryCalculations);
+            }
+    
+            echo (new ApiResponse($payout, 1, 201, 'payout', []))->toJson();
+        } else {
+            
+            $payout = $payout->setPayoutItems($items);
+            $repositoryProvider
+                ->getPayoutRepository()
+                ->saveToArray([$payout]);
+
+            if(!empty($inventoryCalculations)){
+                $repositoryProvider
+                ->getInventoryCalculationRepository()
+                ->saveToArray($inventoryCalculations);
+            }
+    
+            echo (new ApiResponse($payout, 1, 200, 'payout', []))->toJson();
+         }
     }
 
     public function delete($vars)
     {
+        if(gate('is_approver')){
+            Router::abort(403);
+        }
         $payoutHistoryId = new PayoutHistoryId($vars['payoutHistoryId']);
         $hospitalId = new HospitalId($this->request->user()->hospitalId);
         
@@ -174,6 +224,11 @@ class PayoutController extends Controller
                 $hospitalId,
                 $payoutHistoryId
             );
+            
+        $gate = Gate::getGateInstance('list_of_payout_slips');
+        if(empty($payout) || ( $gate->isOnlyMyDivision() && $payout->getSourceDivisionId()->value() !== $this->request->user()->divisionId)){
+            Router::abort(403);
+        }
 
         $items = [];
         $inventoryCalculations = [];

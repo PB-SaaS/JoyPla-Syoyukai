@@ -7,13 +7,17 @@
       <div class="index mx-auto mb-96">
         <h1 class="text-2xl mb-2">出庫伝票</h1>
         <hr>
+        <?php if($isPayoutSuccess && !gate('is_approver')): ?>
         <div class="mb-2 lg:w-1/3">
             <v-input type="date" name="payoutDate" :rules="{}" title="払出日指定" label="払出日指定"></v-input>
         </div>
+        <?php endif; ?>
         <div class="p-4 text-base bg-gray-100 border border-gray-400 flex flex-col md:flex-row md:gap-6 gap-4 mb-6">
+            <?php if(!gate('is_approver')): ?>
             <v-pulldown-button class="md:w-1/6 w-full" variant="primary" :selects="pulldownSelect" v-if="pulldownSelect.length !== 0">
                 入庫アクション選択
             </v-pulldown-button>
+            <?php endif; ?>
             <v-button-default @click.native="openLabelPage" class="md:w-1/6 w-full">
                 払出ラベル発行
             </v-button-default>
@@ -73,13 +77,13 @@
                   <th class="border-b font-medium p-4 pr-8 text-left border">使用期限</th>
                   <th class="border-b font-medium p-4 pr-8 text-left border">出庫数</th>
                   <th class="border-b font-medium p-4 pr-8 text-left border">入庫済み数</th>
-                  <?php if ($isPayoutSuccess): ?>
+                  <?php if ($isPayoutSuccess && !gate('is_approver')): ?>
                   <th class="border-b font-medium p-4 pr-8 text-left border">カード番号</th>
                   <th class="border-b font-medium p-4 pr-8 text-left border">入庫数</th>
                   <th class="border-b font-medium p-4 pr-8 text-left border">合計金額</th>
                   <?php endif; ?>
                   <th class="border-b font-medium p-4 pr-8 text-left border">ステータス</th>
-                  <?php if ($isPayoutSuccess): ?>
+                  <?php if ($isPayoutSuccess && !gate('is_approver')): ?>
                   <th class="border-b font-medium p-4 pr-8 text-left border" colspan=2></th>
                   <?php endif; ?>
                 </tr>
@@ -104,7 +108,7 @@
                               </td>
                               <td class="text-left px-3 py-4 border">{{ acceptanceItem.payoutCount }}{{ acceptanceItem.quantityUnit }}</td>
                               
-                              <?php if ($isPayoutSuccess): ?>
+                              <?php if ($isPayoutSuccess && !gate('is_approver')): ?>
                               <td class="text-left px-3 py-4 border"></td>
                               <td class="text-left px-3 py-4 border"></td>
                               <td class="text-left px-3 py-4 border"></td>
@@ -114,7 +118,7 @@
                                   入庫済み
                                 </span>
                               </td>
-                              <?php if ($isPayoutSuccess): ?>
+                              <?php if ($isPayoutSuccess && !gate('is_approver')): ?>
                               <td class="text-center px-3 py-4 border">
                               </td>
                               <td class="text-center px-3 py-4 border">
@@ -136,7 +140,7 @@
                               <td class="text-left px-3 py-4 border" v-if="payoutIndex === 0" :rowspan="acceptanceItem._payouts.length">{{ acceptanceItem.lotNumber }}</td>
                               <td class="text-left px-3 py-4 border" v-if="payoutIndex === 0" :rowspan="acceptanceItem._payouts.length">{{ acceptanceItem.lotDate }}</td>
                               <td class="text-left px-3 py-4 border" v-if="payoutIndex === 0" :rowspan="acceptanceItem._payouts.length">
-                                <?php if ($isUpdateSuccess): ?>
+                                <?php if ($isUpdateSuccess && !gate('is_approver')): ?>
                                 <v-input-number
                                   :rules="{ between: [ parseInt(acceptanceItem.payoutCount) , Math.max(0 , acceptanceItem.acceptanceCount) ] }" 
                                   :name="`acceptance._inHospitalItems[${index}]._acceptanceItems[${acceptanceIndex}].acceptanceChangeCount`" 
@@ -153,7 +157,7 @@
                               </td>
                               <td class="text-left px-3 py-4 border" v-if="payoutIndex === 0" :rowspan="acceptanceItem._payouts.length">{{ acceptanceItem.payoutCount }}{{ acceptanceItem.quantityUnit }}</td>
                               
-                              <?php if ($isPayoutSuccess): ?>
+                              <?php if ($isPayoutSuccess && !gate('is_approver')): ?>
                               <td class="text-left px-3 py-4 border">{{ payout.cardId }}</td>
                               <td class="text-left px-3 py-4 border">
                                 <v-input-number
@@ -181,9 +185,9 @@
                                   入庫済み
                                 </span>
                               </td>
-                              <?php if ($isPayoutSuccess): ?>
+                              <?php if ($isPayoutSuccess && !gate('is_approver')): ?>
                               <td class="text-center px-3 py-4 border">
-                                <v-button-default @click.native="copy(index,acceptanceIndex)">複製</v-button-default>
+                                <v-button-default @click.native="copy(index,acceptanceIndex,payoutIndex)">複製</v-button-default>
                               </td>
                               <td class="text-center px-3 py-4 border">
                                 <v-button-danger v-if="payout.isDeleteButton" @click.native="removeItem(index,acceptanceIndex,payoutIndex)">削除</v-button-danger>
@@ -385,10 +389,11 @@ var JoyPlaApp = Vue.createApp({
       };
       
       
-      const copy = (idx,pIdx) => {
+      const copy = (idx,pIdx,payoutIndex) => {
+          let test = values.acceptance._inHospitalItems[idx]._acceptanceItems[pIdx]._payouts[payoutIndex];
           values.acceptance._inHospitalItems[idx]._acceptanceItems[pIdx]._payouts.push({
-              count: 0 ,
-              cardId: '' ,
+              count: test.count,
+              cardId: '',
               isDeleteButton : true
           });
       }
@@ -423,11 +428,21 @@ var JoyPlaApp = Vue.createApp({
             ) {
               itemCheck = true;
               inHospitalItem._acceptanceItems.forEach((acceptanceItem) => {
-                acceptanceItem._payouts.push({
-                  count : item.payoutCount,
-                  cardId : (type === 'card')? item.barcode : '',
-                  isDeleteButton: true
-                });
+                let flg = false
+                acceptanceItem._payouts.forEach((payoutItem , index) => {
+                  if(!flg && payoutItem.count === 0){
+                    acceptanceItem._payouts[index].count = item.payoutCount;
+                    acceptanceItem._payouts[index].cardId = (type === 'card')? item.barcode : '';
+                    flg = true;
+                  }
+                })
+                if(!flg){
+                  acceptanceItem._payouts.push({
+                    count : item.payoutCount,
+                    cardId : (type === 'card')? item.barcode : '',
+                    isDeleteButton: true
+                  });
+                }
               });
             }
           });
@@ -562,9 +577,10 @@ var JoyPlaApp = Vue.createApp({
       const slipUpdate = handleSubmit(async (values) => {
         const updateModels = createAcceptanceUpdateModel(values);
         const res = await updateAcceptance(updateModels);
-        if(res.data.code != 200) {
+        if(res.data.code != 200 && res.data.code != 201) {
           throw new Error(res.data.message)
         }
+        return res.data;
       });
 
       const payoutReg = handleSubmit(async (values) => {
@@ -573,6 +589,7 @@ var JoyPlaApp = Vue.createApp({
         if(res.data.code != 200) {
           throw new Error(res.data.message)
         }
+        return res.data;
       });
 
       const payoutAllReg = handleSubmit(async (values) => {
@@ -616,14 +633,25 @@ var JoyPlaApp = Vue.createApp({
             }).then(async (result) => {
                 if (result.isConfirmed) {
                   startLoading();
-                  await slipUpdate();
-                  completeLoading();
-                  await Swal.fire({
-                    icon: 'success',
-                    title: '更新が完了しました',
-                  }).then((result) => {
-                      location.reload();
-                  });
+                  slipUpdate().then(async(data) => {
+                    completeLoading();
+                    if(data.code == 200){
+                      await Swal.fire({
+                        icon: 'success',
+                        title: '更新が完了しました',
+                      }).then((result) => {
+                          location.reload();
+                      });
+                    } else {
+                      await Swal.fire({
+                        icon: 'success',
+                        title: '更新が完了しました',
+                        text: '商品情報がなくなったため、伝票も削除されました'
+                      }).then((result) => {
+                        location.href = _ROOT + '&path=/acceptance&isCache=true';
+                      });
+                    }
+                  })
                 }
             }).catch((error) => {
               completeLoading();
@@ -663,8 +691,34 @@ var JoyPlaApp = Vue.createApp({
                 if (result.isConfirmed) {
                   startLoading();
                   <?php if ($isUpdateSuccess): ?>
-                  await slipUpdate();
-                  <?php endif;?>
+                  slipUpdate().then(async(data) => {
+                    completeLoading();
+                    if(data.code == 200){
+                      await Swal.fire({
+                        icon: 'success',
+                        title: '更新が完了しました',
+                      }).then(async (result) => {
+                        startLoading();
+                        await payoutReg();
+                        completeLoading();
+                        await Swal.fire({
+                          icon: 'success',
+                          title: '入庫登録が完了しました',
+                        }).then((result) => {
+                            location.reload();
+                        });
+                      });
+                    } else {
+                      await Swal.fire({
+                        icon: 'success',
+                        title: '更新が完了しました',
+                        text: '商品情報がなくなったため、伝票も削除されました'
+                      }).then((result) => {
+                        location.href = _ROOT + '&path=/acceptance&isCache=true';
+                      });
+                    }
+                  })
+                  <?php else: ?>
                   await payoutReg();
                   completeLoading();
                   await Swal.fire({
@@ -673,6 +727,7 @@ var JoyPlaApp = Vue.createApp({
                   }).then((result) => {
                       location.reload();
                   });
+                  <?php endif; ?>
                 }
             }).catch((error) => {
               completeLoading();

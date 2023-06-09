@@ -29,7 +29,7 @@
                 </v-in-hospital-item-modal>
               </div>
               <div class="my-4 w-1/3 lg:w-1/6">
-                <v-button-default class="w-full" type="button" :disabled="values.targetDivisionId == values.sourceDivisionId || (values.targetDivisionId == '' || values.sourceDivisionId == '')" data-micromodal-trigger="consumptionHistoryModalForOrder">伝票検索</v-button-default>
+                <v-button-default class="w-full" type="button" :disabled="values.targetDivisionId == values.sourceDivisionId || (values.targetDivisionId == '' || values.sourceDivisionId == '')" data-micromodal-trigger="consumptionHistoryModalForItemRequest">伝票検索</v-button-default>
                 <v-consumption-history-modal-for-item-request v-on:addconsumptions="additemsForSlip" :source-division-id="values.targetDivisionId">
                 </v-consumption-history-modal-for-item-request>
               </div>
@@ -751,7 +751,7 @@
         let tmp = values.payoutItems[item_id];
         tmp = JSON.parse(JSON.stringify(tmp));
         tmp._payout.push({
-          count : 0,
+          count : tmp._payout[payout_id].count,
           lotNumber : tmp._payout[payout_id].lotNumber,
           lotDate : tmp._payout[payout_id].lotDate,
           cardId :'',

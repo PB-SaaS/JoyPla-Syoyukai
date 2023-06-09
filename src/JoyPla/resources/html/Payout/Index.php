@@ -38,18 +38,21 @@
                   払出先部署：{{ payout?._targetDivision?.divisionName }}<br>
                   合計金額：&yen; {{ numberFormat( payout.totalAmount) }}<br>
                 </p>
-                <div class="flex flex-col gap-3 mb-3">
+                <div class="flex flex-col gap-3 mb-3" v-if="!isUser || ( isUser && (userDivisionId === payout.sourceDivisionId || userDivisionId === payout.targetDivisionId) )">
                   <v-button-default type="button" class="w-full" @click.native="openSlip( payout.payoutHistoryId )">
                     払出伝票を表示
                   </v-button-default>
                 </div>
-                <div class="flex flex-col gap-3 mb-3">
+                <div class="flex flex-col gap-3 mb-3" v-if="!isUser || ( isUser && ( userDivisionId === payout.sourceDivisionId || userDivisionId === payout.targetDivisionId ) )">
                   <v-button-default type="button" class="w-full" @click.native="openPrint(payout.payoutHistoryId)">
                       払出伝票印刷
                   </v-button-default>
                 </div>
               </div>
               <div class="lg:w-4/5 p-2">
+                <template v-if="isUser && payout._items.length === 0">
+                  <p>閲覧権限がありません</p>
+                </template>
                 <div class="w-full lg:flex mt-3" v-for="(payoutItem) in payout._items">
                   <div class="lg:flex-1 flex lg:w-3/4">
                     <div class="flex-1 pl-4 lg:flex gap-6 break-all">
@@ -62,7 +65,7 @@
                       </div>
                       <div class="flex-auto lg:w-2/3 w-full">
                         <p class="text-md text-gray-900" v-if="( payoutItem.lotNumber != '' && payoutItem.lotDate != '' )">
-                        ロット情報 : {{ payoutItem.lotNumber }} / {{ payoutItem.lotDate }} 
+                          ロット情報 : {{ payoutItem.lotNumber }} / {{ payoutItem.lotDate }} 
                         </p>
                         <p class="text-base text-gray-900">
                           払出数 : {{ numberFormat(payoutItem.payoutQuantity) }}{{ payoutItem.quantityUnit }}

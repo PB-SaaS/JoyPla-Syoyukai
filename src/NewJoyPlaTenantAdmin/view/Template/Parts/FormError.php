@@ -15,11 +15,11 @@
     <div class="uk-card-footer">
         <p class="uk-background-muted uk-width-middle uk-text-bold uk-text-left uk-padding-small">お問合せ</p>
         <p class="uk-text-left">
-            株式会社パイプドビッツ<br>
-            ホスピタルソリューション事業部<br>
+            スパイラル株式会社<br>
+            ホスピタルソリューション部<br>
             TEL 03-5575-6601<br>
             Mail JoyPla-spd@pi-pe.co.jp<br>
-            URL https://www.pi-pe.co.jp<br></p>
+            URL https://www.spiral-platform.co.jp/<br></p>
     </div>
 </div>
 <script>
