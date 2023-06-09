@@ -120,10 +120,10 @@
 				<div class="" uk-margin>
 					<button class="uk-button uk-button-default" v-on:click="sanshouClick">商品マスタを開く</button>
 					<button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
-					<button class="uk-button uk-button-primary" v-on:click="sendInventory" :disabled="isTemporaryData" v-if="!isTemporaryData">一時保存</button>
-					<button class="uk-button uk-button-primary" v-on:click="sendInventory" :disabled="!isTemporaryData" v-if="isTemporaryData">上書き保存</button>
-					<button class="uk-button uk-button-primary" v-on:click="getLotAndStock" v-bind:disabled="lists.length > 0">理論在庫から表を作成</button>
-					<button class="uk-button uk-button-primary" v-on:click="getStocktakingList" v-bind:disabled="lists.length > 0">理論在庫と棚卸商品管理表から表を作成</button>
+					<button class="uk-button uk-button-primary" v-on:click="sendInventory" :disabled="isTemporaryData || !isEmpty(search)" v-if="!isTemporaryData">一時保存</button>
+					<button class="uk-button uk-button-primary" v-on:click="sendInventory" :disabled="!isTemporaryData || !isEmpty(search)" v-if="isTemporaryData">上書き保存</button>
+					<button class="uk-button uk-button-primary" v-on:click="getLotAndStock" v-bind:disabled="lists.length > 0|| !isEmpty(search)">理論在庫から表を作成</button>
+					<button class="uk-button uk-button-primary" v-on:click="getStocktakingList" v-bind:disabled="lists.length > 0|| !isEmpty(search)">理論在庫と棚卸商品管理表から表を作成</button>
 				</div>
 			</div>
 
@@ -439,6 +439,7 @@ $defaultDivisionId = $user_info->isUser() ? $user_info->getDivisionId() : '';
 			useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
 		},
 		computed: {
+			
 			sort_lists() {
 				let temp = this.lists;
 				if (this.sort_key != "") {
@@ -504,6 +505,18 @@ $defaultDivisionId = $user_info->isUser() ? $user_info->getDivisionId() : '';
 			}
 		},
 		methods: {
+			isEmpty(obj) {
+				for (let key in obj) {
+					if (typeof obj[key] === 'object' && obj[key] !== null) {
+						if (!this.isEmpty(obj[key])) {
+							return false;
+						}
+					} else if (obj[key] !== '') {
+						return false;
+					}
+				}
+				return true;
+			},
 			addClass(key) {
 				return {
 					asc: this.sort_key === key && this.sort_asc,
