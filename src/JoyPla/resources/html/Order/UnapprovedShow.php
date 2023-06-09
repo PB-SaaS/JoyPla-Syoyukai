@@ -250,7 +250,7 @@ var JoyPlaApp = Vue.createApp({
           return decodeURIComponent(results[2].replace(/\+/g, " "));
       }
 
-      const pagetitle = "ordershow";
+      const pagetitle = "unapprovedOrderShow";
 
       const getParam = (name) => {
           let url = window.location.href;
@@ -295,7 +295,7 @@ var JoyPlaApp = Vue.createApp({
           itemStandard : (getParam("itemStandard")) ? getParam("itemStandard") : "",
           itemJANCode : (getParam("itemJANCode")) ? getParam("itemJANCode") : "",
           registerDate: (getParam("registerDate")) ? getParam("registerDate") : "",
-          perPage: (Number.isInteger(getParam("perPage"))) ? getParam("perPage") : "10",
+          perPage: (Number.isInteger(parseInt(getParam("perPage")))) ? getParam("perPage") : "10",
           currentPage : (Number.isInteger(parseInt(getParam("currentPage")))) ? parseInt(getParam("currentPage")) : 1,
           divisionIds: (getParam("divisionIds")) ? ( Array.isArray(getParam("divisionIds"))? getParam("divisionIds") : (getParam("divisionIds")).split(',') ) : [],
           distributorIds: (getParam("distributorIds")) ? ( Array.isArray(getParam("distributorIds"))? getParam("distributorIds") : (getParam("distributorIds")).split(',') ) : [],
