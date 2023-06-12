@@ -177,7 +177,7 @@ body {
         setup() {
             const {ref , onCreated , onMounted} = Vue;
             const {useFieldArray, useForm} = VeeValidate;
-            let label_setting = JSON.parse(localStorage.getItem("joypla_LabelCreate"));
+            let label_setting = JSON.parse(localStorage.getItem("joypla_LabelCreate")) ?? [];
             const { handleSubmit , control, meta , validate , values , isSubmitting } = useForm({
                 initialValues: {
                     setting: {
