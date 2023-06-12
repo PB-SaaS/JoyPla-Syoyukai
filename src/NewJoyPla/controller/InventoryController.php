@@ -609,6 +609,27 @@ class InventoryController extends Controller
                 );
             }
 
+            $stocktakingList = StocktakingList::where(
+                'hospitalId',
+                $user_info->getHospitalId()
+            )
+                ->where('divisionId', $divisionId)
+                ->value('stockListId')
+                ->plain()
+                ->get();
+            if($stocktakingList->count != 0){
+                $stockListId = $stocktakingList->data->get(0)->stockListId;
+                $StocktakingListRow = StocktakingListRowView::where(
+                    'hospitalId',
+                    $user_info->getHospitalId()
+                )
+                    ->where('divisionId', $divisionId)
+                    ->where('stockListId', $stockListId)
+                    ->plain()
+                    ->get();
+            }
+            $StocktakingListRowItems = $StocktakingListRow->data->all();
+
             $inventory = InventoryItemView::where(
                 'hospitalId',
                 $user_info->getHospitalId()
@@ -652,6 +673,18 @@ class InventoryController extends Controller
                     }
                 }
 
+                //棚卸商品管理表から棚卸必須フラグの紐づけ
+                $mandatoryFlag = "";
+                foreach($StocktakingListRowItems as $row){
+                    if (
+                        $row->inHospitalItemId ==
+                        $item->inHospitalItemId
+                    ) {
+                        $mandatoryFlag = $row->mandatoryFlag;
+                        break;
+                    }
+                }
+
                 if ($inventryNum != 0) {
                     $data[] = [
                         'divisionId' => '',
@@ -679,6 +712,7 @@ class InventoryController extends Controller
                         ),
                         'lotFlag' => $lotManagement == 1 ? 'はい' : '',
                         'lotFlagBool' => $lotManagement,
+                        'mandatoryFlag' => $mandatoryFlag, //棚卸必須フラグ
                     ];
                 }
             }
@@ -991,8 +1025,6 @@ class InventoryController extends Controller
                 ->where('stockQuantity', 0, '>')
                 ->plain()
                 ->get();
-
-            $list = [];
 
             $in_hospital_item = InHospitalItemView::where(
                 'hospitalId',
