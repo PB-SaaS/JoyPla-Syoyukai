@@ -216,7 +216,7 @@ var JoyPlaApp = Vue.createApp({
 
     const { meta , validate , values , setFieldValue , resetForm} = useForm({
       initialValues: {
-        perPage: (Number.isInteger(getParam("perPage"))) ? getParam("perPage") : "10",
+        perPage: (Number.isInteger(parseInt(getParam("perPage")))) ? getParam("perPage") : "10",
         currentPage : (Number.isInteger(parseInt(getParam("currentPage")))) ? parseInt(getParam("currentPage")) : 1,
         divisionIds: (getParam("divisionIds")) ? ( Array.isArray(getParam("divisionIds"))? getParam("divisionIds") : (getParam("divisionIds")).split(',') ) : [],
         register : {

@@ -287,7 +287,7 @@ var JoyPlaApp = Vue.createApp({
           itemJANCode : (getParam("itemJANCode")) ? getParam("itemJANCode") : "",
           yearMonth: (getParam("yearMonth")) ? getParam("yearMonth") : "",
           acceptanceDate: (getParam("acceptanceDate")) ? getParam("acceptanceDate") : "",
-          perPage: (getParam("perPage")) ? getParam("perPage") : "10",
+          perPage: (Number.isInteger(parseInt(getParam("perPage")))) ? getParam("perPage") : "10",
           currentPage : (Number.isInteger(parseInt(getParam("currentPage")))) ? parseInt(getParam("currentPage")) : 1,
           sourceDivisionIds: (getParam("sourceDivisionIds")) ? ( Array.isArray(getParam("sourceDivisionIds"))? getParam("sourceDivisionIds") : (getParam("sourceDivisionIds")).split(',') ) : [],
           targetDivisionIds: (getParam("targetDivisionIds")) ? ( Array.isArray(getParam("targetDivisionIds"))? getParam("targetDivisionIds") : (getParam("targetDivisionIds")).split(',') ) : [],
