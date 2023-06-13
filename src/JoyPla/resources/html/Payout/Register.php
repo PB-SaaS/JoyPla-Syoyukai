@@ -481,7 +481,7 @@
           params.append("_method", 'post');
           params.append("_csrf", _CSRF);
           params.append("isOnlyPayout", 'true');
-          params.append("payoutDate", values.payoutDate);
+          params.append("payoutDate", ( values.payoutDate === );
           params.append("payoutItems", JSON.stringify(encodeURIToObject(payoutModels)));
 
           const res = await axios.post(_APIURL, params);

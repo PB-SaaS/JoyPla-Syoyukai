@@ -63,7 +63,7 @@
                 <?php endif; ?>
                 <div class="flex flex-col gap-3 mb-3" v-if="!isUser || (isUser && ( userDivisionId === acceptance?._targetDivision?.divisionId || userDivisionId === acceptance?._sourceDivision?.divisionId ))">
                   <v-button-default type="button" class="w-full" @click.native="openPrint( acceptance.acceptanceId )">
-                    出荷伝票を印刷
+                    出庫伝票を印刷
                   </v-button-default>
                 </div>
               </div>
@@ -300,7 +300,7 @@ var JoyPlaApp = Vue.createApp({
             href: _ROOT + '&path=/payout',
           },
           {
-            text: '出荷一覧',
+            text: '出庫一覧',
             disabled: true, 
           }
         ];

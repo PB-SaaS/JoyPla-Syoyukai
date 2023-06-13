@@ -37,7 +37,7 @@
                             <img class="ml-auto h-6" src="https://i02.smp.ne.jp/u/joypla/images/logo_png.png" />
                         </div>
                         <div class="productsLabel mt-6">
-                            <img :src="barcode_src" alt="" class="w-2/3 ml-auto pb-4" />
+                            <!-- <img :src="barcode_src" alt="" class="w-2/3 ml-auto pb-4" /> -->
                             <!-- <img :src="qr_src" alt="" class="w-1/4 ml-auto pb-4"/> -->
                         </div>
                     </div>
