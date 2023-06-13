@@ -548,22 +548,7 @@
             if (
               v.inHospitalItemId === item.inHospitalItemId
             ) {
-
-              let lotCheck = false;
-              v._payout.forEach((payout) => {
-                if (
-                  (
-                    payout.lotNumber === item._payout[0].lotNumber &&
-                    payout.lotDate === item._payout[0].lotDate 
-                  ) && payout.card === ""
-                ) {
-                  lotCheck = true;
-                }
-              });
-              if (!lotCheck) {
-                v._payout.push(item._payout[0]);
-              }
-              
+              v._payout.push(item._payout[0]);
               checked = true;
             }
           });

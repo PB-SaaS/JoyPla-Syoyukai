@@ -100,6 +100,7 @@
                   label="部署" 
                   title="部署指定"
                   :absolute="false"
+                  :is-only-use-data="true"
                   :is-only-my-division="<?php var_export(
                       gate('register_of_accountant')->isOnlyMyDivision()
                   ); ?>"

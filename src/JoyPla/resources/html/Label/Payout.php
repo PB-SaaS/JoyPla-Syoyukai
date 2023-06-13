@@ -258,7 +258,7 @@ body {
                 } else {
                     style.innerHTML = style.innerHTML + `
                     #createLabel{
-                        width: `+ ( values.setting.labelwidth + ( values.setting.pagePadding * 2 ) ) +`mm;
+                        width: `+ ( parseInt(values.setting.labelwidth) + ( parseInt(values.setting.pagePadding) * 2 ) ) +`mm;
                     }
                     @media print{
                         #createLabel{

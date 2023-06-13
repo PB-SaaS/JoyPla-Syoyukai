@@ -307,7 +307,8 @@ class AcceptanceController extends Controller
                         $item->getLotDate(),
                         $item->getLotNumber(),
                         $inHospitalItem->isLotManagement(),
-                        new CardId($requestItem['card'])
+                        new CardId($requestItem['card']),
+                        1,
                     ), false);
                 }
             }
@@ -355,7 +356,8 @@ class AcceptanceController extends Controller
                         $item->getLotDate(),
                         $item->getLotNumber(),
                         $inHospitalItem->isLotManagement(),
-                        new CardId('')
+                        new CardId(''),
+                        1,
                     ), false);
                     $item = $item->addPayoutCount($count);
                 }
