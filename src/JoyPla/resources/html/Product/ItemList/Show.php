@@ -58,7 +58,6 @@
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">卸業者</th>
                       <th class="border-b font-medium p-2 pr-4 pt-0 pb-3 text-left">入数</th>
                       <th></th>
-                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -80,9 +79,6 @@
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.itemJANCode }}</td>
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.distributorName }}</td>
                       <td class="border-b border-slate-100 p-2 pr-4 text-slate-500">{{ item.quantity }}{{ item.quantityUnit }}/{{ item.itemUnit }}</td>
-                      <td class="border-b border-slate-100">
-                        <v-button-primary type="button" @click.native="copyItem(index)">複製</v-button-primary>
-                      </td>
                       <td class="border-b border-slate-100">
                         <v-button-danger type="button" @click.native="deleteItem(index)">削除</v-button-danger>
                       </td>
@@ -435,21 +431,6 @@ var JoyPlaApp = Vue.createApp({
         remove(index);
       }
 
-      const copyItem = (index) => {
-        const originalItem = values.items[index];
-        const copiedItem = JSON.parse(JSON.stringify({ ...originalItem, index: originalItem.index + 1 , accountantItemId: '' , method: "手動",}));
-
-        fields.value.forEach((field, idx) => {
-          if (field.value.index > fields.value[index].value.index) {
-            const updatedItem = { ...fields.value[idx].value, index: fields.value[idx].value.index + 1 };
-            update(idx, updatedItem);
-          }
-        });
-
-        // 新しいアイテムを挿入
-        insert(index + 1, copiedItem);
-      };
-
       const addInHospitalItem =  (elem) => {
         register = {
           itemId : elem.itemId,
@@ -712,7 +693,6 @@ var JoyPlaApp = Vue.createApp({
       dragHandlers,
       addInHospitalItem,
       openRegistPage,
-      copyItem,
       addItem: addItemHandler,
       deleteItem,
       values,
