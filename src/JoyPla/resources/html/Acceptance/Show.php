@@ -158,7 +158,7 @@
                               <td class="text-left px-3 py-4 border" v-if="payoutIndex === 0" :rowspan="acceptanceItem._payouts.length">{{ acceptanceItem.payoutCount }}{{ acceptanceItem.quantityUnit }}</td>
                               
                               <?php if ($isPayoutSuccess && !gate('is_approver')): ?>
-                              <td class="text-left px-3 py-4 border">{{ payout.cardId }}</td>
+                              <td class="text-left px-3 py-4 border">{{ payout.card }}</td>
                               <td class="text-left px-3 py-4 border">
                                 <v-input-number
                                   :rules="{ between: [0 , Math.max(0 , ( parseInt(acceptanceItem.acceptanceChangeCount) - parseInt(acceptanceItem.payoutCount) - ( payoutTotalCount(acceptanceItem) - payout.count ))) ] }" 
@@ -168,7 +168,7 @@
                                   :unit="acceptanceItem.quantityUnit" 
                                   :step="1" 
                                   title="入庫数" 
-                                  :disabled="payout.cardId != ''"
+                                  :disabled="payout.card != ''"
                                   class=" w-[240px]" >
                                 </v-input-number>
                               </td>
@@ -343,7 +343,7 @@ var JoyPlaApp = Vue.createApp({
                     {
                       item2._payouts.push({
                           count: 0 ,
-                          cardId: '' ,
+                          card: '' ,
                       });
                     }
                     if(isUnitPrice){
@@ -393,7 +393,7 @@ var JoyPlaApp = Vue.createApp({
           let test = values.acceptance._inHospitalItems[idx]._acceptanceItems[pIdx]._payouts[payoutIndex];
           values.acceptance._inHospitalItems[idx]._acceptanceItems[pIdx]._payouts.push({
               count: test.count,
-              cardId: '',
+              card: '',
               isDeleteButton : true
           });
       }
@@ -402,13 +402,13 @@ var JoyPlaApp = Vue.createApp({
         values.acceptance._inHospitalItems[idx]._acceptanceItems[pIdx]._payouts.splice( payoutIdx, 1 );
       }
 
-      const searchCardId = (cardId) => {
+      const searchCardId = (card) => {
         let exist = false;
         values.acceptance._inHospitalItems.forEach((inHospitalItem, idx) => {
           inHospitalItem._acceptanceItems.forEach((acceptanceItem) => {
             acceptanceItem._payouts.forEach((item) => {
               if (
-                item.cardId == cardId
+                item.card == card
               ) {
                 exist = true;
               }
@@ -432,14 +432,14 @@ var JoyPlaApp = Vue.createApp({
                 acceptanceItem._payouts.forEach((payoutItem , index) => {
                   if(!flg && payoutItem.count === 0){
                     acceptanceItem._payouts[index].count = item.payoutCount;
-                    acceptanceItem._payouts[index].cardId = (type === 'card')? item.barcode : '';
+                    acceptanceItem._payouts[index].card = (type === 'card')? item.barcode : '';
                     flg = true;
                   }
                 })
                 if(!flg){
                   acceptanceItem._payouts.push({
                     count : item.payoutCount,
-                    cardId : (type === 'card')? item.barcode : '',
+                    card : (type === 'card')? item.barcode : '',
                     isDeleteButton: true
                   });
                 }
@@ -564,7 +564,7 @@ var JoyPlaApp = Vue.createApp({
                 model.push({
                   'acceptanceItemId': acceptanceItem.acceptanceItemId,
                   'payoutCount': payoutItem.count,
-                  'cardId' : payoutItem.cardId,
+                  'card' : payoutItem.card,
                 })
               }
             })

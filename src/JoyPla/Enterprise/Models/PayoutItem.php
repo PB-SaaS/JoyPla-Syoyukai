@@ -22,6 +22,8 @@ class PayoutItem
     private LotNumber $lotNumber;
     private bool $lotManagement;
     private CardId $cardId;
+    
+    private int $payoutType = 1;
 
     public function __construct(
         PayoutHistoryId $payoutHistoryId,
@@ -38,7 +40,8 @@ class PayoutItem
         LotDate $lotDate,
         LotNumber $lotNumber,
         bool $lotManagement,
-        CardId $cardId
+        CardId $cardId,
+        int $payoutType
     ) {
         $this->payoutHistoryId = $payoutHistoryId;
         $this->payoutItemId = $payoutItemId;
@@ -55,6 +58,7 @@ class PayoutItem
         $this->lotNumber = $lotNumber;
         $this->lotManagement = $lotManagement;
         $this->cardId = $cardId;
+        $this->payoutType = $payoutType;
     }
     public function getItemId()
     {
@@ -169,6 +173,7 @@ class PayoutItem
             'lotNumber' => $this->lotNumber->value(),
             'lotManagement' => $this->lotManagement,
             'cardId' => $this->cardId->value(),
+            'payoutType'=>$this->payoutType
         ];
     }
 }

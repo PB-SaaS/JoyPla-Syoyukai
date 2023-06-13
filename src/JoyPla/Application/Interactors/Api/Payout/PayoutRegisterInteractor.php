@@ -191,7 +191,6 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                         $unitprice = 0;
                     }
                 }
-
                 foreach ($payouts as &$payout) {
                     if (
                         $payout->equalDivisions(
@@ -218,7 +217,8 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                             $lot->getLotDate(),
                             $lot->getLotNumber(),
                             $inHospitalItem->isLotManagement(),
-                            new CardId($payoutItem->card)
+                            new CardId($payoutItem->card),
+                            $inputData->payoutType
                         );
                         $payout = $payout->addPayoutItem($item);
                     }
@@ -397,12 +397,15 @@ namespace JoyPla\Application\InputPorts\Api\Payout {
         public bool $isOnlyMyDivision;
         public bool $isOnlyPayout = false;
 
+        public int $payoutType = 1;
+
         public function __construct(
             Auth $user,
             array $payoutItems,
             string $payoutDate,
             bool $isOnlyMyDivision,
-            bool $isOnlyPayout = false
+            bool $isOnlyPayout = false,
+            int $payoutType = 1
         ) {
             $this->user = $user;
             $this->payoutDate = $payoutDate;
@@ -421,6 +424,7 @@ namespace JoyPla\Application\InputPorts\Api\Payout {
 
             $this->isOnlyMyDivision = $isOnlyMyDivision;
             $this->isOnlyPayout = $isOnlyPayout;
+            $this->payoutType = $payoutType;
         }
     }
 

@@ -79,8 +79,8 @@ class PayoutRepository implements PayoutRepositoryInterface
                         'unitPrice' => (string) $payoutItem['unitPrice'],
                         'lotNumber' => (string) $payoutItem['lotNumber'],
                         'lotDate' => (string) $payoutItem['lotDate'],
-                        'cardId' => (string) $payoutItem['card'],
-                        'payoutType' => '2',
+                        'cardId' => (string) $payoutItem['cardId'],
+                        'payoutType' => (string) $payoutItem['payoutType'],
                         'payoutAmount' => (string) $payoutItem['payoutAmount'],
                     ];
                 } else {
@@ -107,8 +107,8 @@ class PayoutRepository implements PayoutRepositoryInterface
                         'unitPrice' => (string) $payoutItem['unitPrice'],
                         'lotNumber' => (string) $payoutItem['lotNumber'],
                         'lotDate' => (string) $payoutItem['lotDate'],
-                        'cardId' => (string) $payoutItem['card'],
-                        'payoutType' => '2',
+                        'cardId' => (string) $payoutItem['cardId'],
+                        'payoutType' =>  (string) $payoutItem['payoutType'],
                         'payoutAmount' => (string) $payoutItem['payoutAmount'],
                     ];
                 }
@@ -397,6 +397,7 @@ class PayoutRepository implements PayoutRepositoryInterface
                 new LotNumber($item->lotNumber),
                 ($inHospitalItem->lotManagement == '1') ? true : false,
                 new CardId($item->cardId),
+                (int)$item->payoutType
             );
         }
 

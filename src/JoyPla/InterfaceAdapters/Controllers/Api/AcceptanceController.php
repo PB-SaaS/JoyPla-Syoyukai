@@ -280,8 +280,8 @@ class AcceptanceController extends Controller
                         (int)$requestItem['payoutCount']
                     );
                     $item = $item->addPayoutCount((int)$requestItem['payoutCount']);
-                    if($requestItem['cardId'] != ''){
-                        $cardIds[] = new CardId($requestItem['cardId']);
+                    if($requestItem['card'] != ''){
+                        $cardIds[] = new CardId($requestItem['card']);
                     }
 
                     $inHospitalItem = array_find($inHospitalItems, function (
@@ -307,7 +307,7 @@ class AcceptanceController extends Controller
                         $item->getLotDate(),
                         $item->getLotNumber(),
                         $inHospitalItem->isLotManagement(),
-                        new CardId($requestItem['cardId'])
+                        new CardId($requestItem['card'])
                     ), false);
                 }
             }

@@ -29,6 +29,7 @@ class PayoutController extends Controller
         }
 
         $gate = Gate::getGateInstance('register_of_payouts');
+        $payoutType = (int)$this->request->get('payoutType' , 1);
 
         $isOnlyPayout = ( $this->request->get('isOnlyPayout') === 'true' );
 
@@ -42,7 +43,8 @@ class PayoutController extends Controller
             $payoutItems,
             $payoutDate,
             $gate->isOnlyMyDivision(),
-            $isOnlyPayout
+            $isOnlyPayout,
+            $payoutType
         );
         $inputPort->handle($inputData);
     }

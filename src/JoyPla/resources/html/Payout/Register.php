@@ -96,7 +96,7 @@
                             v-model="_payout.lotDate"
                             :name="`payoutItems[${idx}]._payout[${pid}].lotDate`" label="使用期限" :rules="{ required : isRequired(idx) ,lotdate: true , twoFieldRequired : [ 'ロット番号', `@payoutItems[${idx}]._payout[${pid}].lotNumber`]  }" type="date" change-class-name="inputChange" title="使用期限"></v-input>
                       </td>
-                      <td class="text-center px-3 py-4 border">{{ _payout.cardId }}</td>
+                      <td class="text-center px-3 py-4 border">{{ _payout.card }}</td>
                       <td class="text-center px-3 py-4 border">
                         <v-input-number 
                           :rules="{ between: [0 , 99999] }" 
@@ -107,7 +107,7 @@
                           :step="1" 
                           title="払出数" 
                           class=" w-[240px]" 
-                          :disabled="_payout.cardId != ''"
+                          :disabled="_payout.card != ''"
                           change-class-name="inputChange">
                         </v-input-number>
                       </td>
@@ -298,7 +298,7 @@
                 'sourceDivisionId' : values.sourceDivisionId,
                 'lotNumber' : payout.lotNumber,
                 'lotDate' : payout.lotDate,
-                'card' : payout.cardId,
+                'card' : payout.card,
               })
             }
           })
@@ -319,7 +319,7 @@
                 'sourceDivisionId' : values.sourceDivisionId,
                 'lotNumber' : payout.lotNumber,
                 'lotDate' : payout.lotDate,
-                'card' : payout.cardId,
+                'card' : payout.card,
               })
             }
           })
@@ -537,7 +537,7 @@
           count : 0,
           lotNumber : item.lotNumber ?? '',
           lotDate : item.lotDate ?? '',
-          cardId : '',
+          card : '',
         }];
 
         item.orderUnitQuantity = (item.orderUnitQuantity) ? item.orderUnitQuantity : 1;
@@ -555,7 +555,7 @@
                   (
                     payout.lotNumber === item._payout[0].lotNumber &&
                     payout.lotDate === item._payout[0].lotDate 
-                  ) && payout.cardId === ""
+                  ) && payout.card === ""
                 ) {
                   lotCheck = true;
                 }
@@ -609,7 +609,7 @@
                 ) {
                   payoutCheck = true;
                   payout.count = item.payoutCount;
-                  payout.cardId = (type === 'card')? item.barcode : '';
+                  payout.card = (type === 'card')? item.barcode : '';
                 }
               });
               if (!payoutCheck) {
@@ -617,7 +617,7 @@
                   count : item.payoutCount,
                   lotNumber : '',
                   lotDate : '',
-                  cardId : (type === 'card')? item.barcode : '',
+                  card : (type === 'card')? item.barcode : '',
                 });
               }
             }
@@ -630,19 +630,19 @@
             count : item.payoutCount,
             lotNumber : '',
             lotDate : '',
-            cardId : (type === 'card')? item.barcode : '',
+            card : (type === 'card')? item.barcode : '',
           });
           additem(item);
         }
       }
     
-      const searchCardId = (cardId) => {
+      const searchCardId = (card) => {
         let exist = false;
         if (Array.isArray(values.payoutItems)) {
           values.payoutItems.forEach((v, idx) => {
             v._payout.forEach((payout) => {
               if (
-                payout.cardId == cardId
+                payout.card == card
               ) {
                 exist = true;
               }
@@ -712,8 +712,8 @@
               return false;
             }
           } else {
-            items.item[0].divisionId = values.targetDivisionId
-            addPayout(items.item[0] , items.type)
+            items.item[0].divisionId = values.sourceDivisionId
+            additem(items.item[0])
           }
         } else {
           selectInHospitalItems.value = items.item;
@@ -754,7 +754,7 @@
           count : tmp._payout[payout_id].count,
           lotNumber : tmp._payout[payout_id].lotNumber,
           lotDate : tmp._payout[payout_id].lotDate,
-          cardId :'',
+          card :'',
         })
         update(item_id , tmp)
       }

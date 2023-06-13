@@ -926,6 +926,7 @@
                     params.append("path", "/api/payout/register");
                     params.append("_method", 'post');
                     params.append("_csrf", _CSRF);
+                    params.append("payoutType", 2);
                     params.append("payoutItems", JSON.stringify(encodeURIToObject(payoutModels)));
                     const res = await axios.post(_APIURL, params);
 
