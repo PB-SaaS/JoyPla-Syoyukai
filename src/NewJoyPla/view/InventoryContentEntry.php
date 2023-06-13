@@ -472,7 +472,7 @@ $defaultDivisionId = $user_info->isUser() ? $user_info->getDivisionId() : '';
 				}
 				
 				if(this.search.mandatory.length === 1 && this.search.mandatory.includes('f')){
-					temp = temp.filter(item => item.mandatoryFlag == '0');
+					temp = temp.filter(item => item.mandatoryFlag == '0' || item.mandatoryFlag == "");
 				}
 
 				return temp;
