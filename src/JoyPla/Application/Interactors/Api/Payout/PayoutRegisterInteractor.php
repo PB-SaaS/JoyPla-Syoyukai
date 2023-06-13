@@ -383,6 +383,8 @@ namespace JoyPla\Application\Interactors\Api\Payout {
 
 namespace JoyPla\Application\InputPorts\Api\Payout {
     use Auth;
+    use DateTime;
+    use DateTimeZone;
     use stdClass;
 
     /**
@@ -408,6 +410,7 @@ namespace JoyPla\Application\InputPorts\Api\Payout {
             int $payoutType = 1
         ) {
             $this->user = $user;
+
             $this->payoutDate = $payoutDate;
             $this->payoutItems = array_map(function ($v) {
                 $object = new stdClass();

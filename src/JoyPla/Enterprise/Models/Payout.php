@@ -4,6 +4,7 @@ namespace JoyPla\Enterprise\Models;
 
 use Collection;
 use Exception;
+use framework\Library\SiDateTime;
 
 class Payout
 {
@@ -26,6 +27,12 @@ class Payout
         string $targetDivisionName
     ) {
         $this->payoutDate = $payoutDate;
+
+        $datetime = new SiDateTime($payoutDate->value());
+        if($datetime->isToday()){
+            $this->payoutDate = new DateYearMonthDay('now');
+        }
+
         $this->payoutHistoryId = $payoutHistoryId;
         $this->hospitalId = $hospitalId;
         $this->sourceDivisionId = $sourceDivisionId;
