@@ -101,6 +101,7 @@
                 :is-only-my-division="<?php var_export(
                     gate('list_of_itemList_slips')->isOnlyMyDivision()
                 ); ?>"
+                :is-only-use-data="true"
               ></v-select-division>
             </div>
             <div class="my-4">
