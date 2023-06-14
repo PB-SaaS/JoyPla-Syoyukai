@@ -487,7 +487,7 @@
           return false;
         }
 
-        if (items.type != "gs1-128" && items.type != "jancode" && items.type != "customLabel") {
+        if (items.type != "gs1-128" && items.type != "jancode" && items.type != "customlabel") {
           Swal.fire({
             icon: 'error',
             title: 'エラー',
