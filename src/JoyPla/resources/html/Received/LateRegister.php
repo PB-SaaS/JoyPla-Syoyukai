@@ -16,7 +16,7 @@
           <div class="my-4 lg:w-1/2 ">
             <v-input type="date" name="receivedDate" :rules="{}" title="入荷日指定" label="入荷日指定"></v-input>
             <v-input type="date" name="accountantDate" :rules="{}" title="会計日指定" label="会計日指定"></v-input>
-            <v-select-division name="divisionId" :rules="{required:true}" title="入荷部署指定" label="入荷部署指定"></v-select-division>
+            <v-select-division name="divisionId" :rules="{required:true}" :is-only-use-data="true" title="入荷部署指定" label="入荷部署指定"></v-select-division>
           </div>
           <div class="p-2 bg-gray-300">
             <v-barcode-search @additem="addItemByBarcode"></v-barcode-search>
