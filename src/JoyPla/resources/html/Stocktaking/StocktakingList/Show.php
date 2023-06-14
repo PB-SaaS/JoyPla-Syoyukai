@@ -605,27 +605,10 @@ var JoyPlaApp = Vue.createApp({
               }
 
               let inHospitalItemIds = [];
-              linesArr.forEach(function (line , index) { //要修正：院内商品IDとAPIで関連付けるかもしれん。
+              linesArr.forEach(function (line , index) {
                 inHospitalItemIds.push(line['data'][0]);
-                /* 
-                                insertItem({
-                                  method: "手動",
-                                  itemId: '',
-                                  action: line['data'][0],
-                                  itemName: line['data'][1],
-                                  makerName: line['data'][2],
-                                  itemCode: line['data'][3],
-                                  itemStandard: line['data'][4],
-                                  itemJANCode: line['data'][5],
-                                  count: line['data'][6],
-                                  unit: line['data'][7],
-                                  price: line['data'][8],
-                                  taxrate: line['data'][9],
-                                });
-                 */
               });
 
-              //APIをたたく
               try {
                 startLoading();
                 let params = new URLSearchParams();
@@ -637,7 +620,6 @@ var JoyPlaApp = Vue.createApp({
                     'inHospitalItemIds' : inHospitalItemIds ?? []
                   })));
 
-//                const res = await axios.post(_APIURL, params);
                 axios.post(_APIURL, params).then((res) => {
                   console.log(res);
                   if (res.data.code != 200) {
@@ -662,7 +644,11 @@ var JoyPlaApp = Vue.createApp({
 
                 }).catch((err) => {
                   console.log(err);
-                  throw new Error(err);
+                  Swal.fire({
+                    icon: "error",
+                    title: "ファイルエラー",
+                    text: err.message,
+                  });
                 });
 
                 return true;
@@ -675,8 +661,6 @@ var JoyPlaApp = Vue.createApp({
               } finally {
                 completeLoading();
               }
-
-              //取得した院内商品情報をinsertItemに突っ込む
 
             } catch (error){
               Swal.fire({
