@@ -301,7 +301,7 @@ var JoyPlaApp = Vue.createApp({
 
         insert(fields.value.length, {
           index: fields.value.length,
-          stocktakingListRowId: (typeof(item.stocktakingListRowId) ? null : item.stocktakingListRowId),
+          stocktakingListRowId: (typeof(item.stocktakingListRowId) ? item.stocktakingListRowId : null),
           itemId: item.itemId,
           inHospitalItemId: item.inHospitalItemId,
           itemName: item.itemName,
@@ -315,8 +315,7 @@ var JoyPlaApp = Vue.createApp({
           itemLabelBarcode: item.itemLabelBarcode,
           distributorId: item.distributorId,
           distributorName: item.distributorName,
-          rackName: (typeof(item.rackName) ? null : item.rackName),
-          mandatoryFlag: (typeof(item.mandatoryFlag) ? null : item.mandatoryFlag),
+          mandatoryFlag: (typeof(item.mandatoryFlag) ? item.mandatoryFlag : null),
         });
       }
 
