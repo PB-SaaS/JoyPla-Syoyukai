@@ -767,7 +767,9 @@ var JoyPlaApp = Vue.createApp({
             }).then(async (result) => {
                 if (result.isConfirmed) {
                   startLoading();
+                  <?php if ($isUpdateSuccess): ?>
                   await slipUpdate();
+                  <?php endif; ?>
                   await payoutAllReg();
                   completeLoading();
                   await Swal.fire({
