@@ -142,7 +142,7 @@ class ReturnRepository implements ReturnRepositoryInterface
                     'returnHistoryID',
                     $item->returnHistoryID
                 );
-                $returnIds[] = $item->returnHistoryID;
+                $returnIds[] = $item->returnID;
             }
         }
 
