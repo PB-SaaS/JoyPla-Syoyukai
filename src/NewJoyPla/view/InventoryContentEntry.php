@@ -459,7 +459,7 @@ $defaultDivisionId = $user_info->isUser() ? $user_info->getDivisionId() : '';
 				
 				if(this.search.makerName != ''){
 					let lowerCaseSearchText = this.search.makerName.toLowerCase();
-					temp = temp.filter(item => item.maker.toLowerCase().includes(lowerCaseSearchText));
+					temp = temp.filter(item => (item.maker?item.maker:'').toLowerCase().includes(lowerCaseSearchText));
 				}
 
 				if(this.search.distributorIds.length > 0){
