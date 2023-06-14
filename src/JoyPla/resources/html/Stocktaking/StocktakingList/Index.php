@@ -95,6 +95,7 @@
                     gate('list_of_stocktakingList_slips')->isOnlyMyDivision()
                 ); ?>"
                 :rules="{ required : true,}"
+                :is-only-use-data="true"
               ></v-select-division>
             </div>
             <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
