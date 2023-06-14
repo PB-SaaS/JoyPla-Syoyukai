@@ -469,6 +469,7 @@ var JoyPlaApp = Vue.createApp({
           distributorId : elem.distributorId,
           distributorName : elem.distributorName,
           itemLabelBarcode : makeLabelBarcode(elem.labelId, elem.quantity),
+          mandatoryFlag : '0',
         }
         insertItem(register)
         MicroModal.close("inHospitalItemModal", {// モーダルを閉じる処理
