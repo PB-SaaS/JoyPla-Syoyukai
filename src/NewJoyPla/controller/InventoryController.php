@@ -617,6 +617,9 @@ class InventoryController extends Controller
                 ->value('stockListId')
                 ->plain()
                 ->get();
+
+            $StocktakingListRowItems = [];
+
             if($stocktakingList->count != 0){
                 $stockListId = $stocktakingList->data->get(0)->stockListId;
                 $StocktakingListRow = StocktakingListRowView::where(
@@ -627,8 +630,9 @@ class InventoryController extends Controller
                     ->where('stockListId', $stockListId)
                     ->plain()
                     ->get();
+                    
+                $StocktakingListRowItems = $StocktakingListRow->data->all();
             }
-            $StocktakingListRowItems = $StocktakingListRow->data->all();
 
             $inventory = InventoryItemView::where(
                 'hospitalId',
