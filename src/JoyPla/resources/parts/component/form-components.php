@@ -326,6 +326,7 @@ const SearchableDropdownForForm = {
     },
   },
   template: `
+  <div>
     <div 
       @click="(disabled !== true)? isOpen = !isOpen : false"
       class="relative appearance-none w-full py-2 px-3 leading-tight text-left flex-initial border"
@@ -361,6 +362,7 @@ const SearchableDropdownForForm = {
       </div>
     </div>
     <input type="hidden" :name="name" :value="this.selectedOption.value">
+  </div>
   `,
 };
 
