@@ -1170,12 +1170,10 @@ class InventoryController extends Controller
                 $price_data->orWhere("priceId", $priceId);
             }
             $price_data = $price_data->plain()->get()->data->all();
-
             foreach($StocktakingListRowItems as $list_item){
                 if(in_array($list_item->inHospitalItemId, $stockedInHospitalItemIds)){
                     continue; //理論在庫に載っていたら対象外のためスキップ
                 }
-
                 $lotManagement = 0;
                 $unitPrice = 0;
                 foreach ($in_hospital_item->data->all() as $in_hp_item) {
@@ -1184,47 +1182,45 @@ class InventoryController extends Controller
                         $list_item->inHospitalItemId
                     ) {
                         $lotManagement = $in_hp_item->lotManagement;
-                    }
 
-                    //フラグによる単価紐づけ or 計算（価格/入数）
-                    if($useUnitPrice == '1'){
-                        foreach($price_data as $price){
-                            if($price->priceId == $list_item->priceId){
-                                $unitPrice = $price->unitPrice;
+                        //フラグによる単価紐づけ or 計算（価格/入数）
+                        if($useUnitPrice == '1'){
+                            foreach($price_data as $price){
+                                if($price->priceId == $list_item->priceId){
+                                    $unitPrice = $price->unitPrice;
+                                }
                             }
+                        }else{
+                            $unitPrice = (int)$list_item->price / (int)$list_item->quantity;
                         }
-                    }else{
-                        $unitPrice = (int)$list_item->price / (int)$list_item->quantity;
-                    }
 
-                    $data[] = [
-                        'divisionId' => '',
-                        'maker' => $list_item->makerName,
-                        'shouhinName' => $list_item->itemName,
-                        'code' => $list_item->itemCode,
-                        'kikaku' => $list_item->itemStandard,
-                        'irisu' => $list_item->quantity,
-                        'kakaku' => $list_item->price,
-                        'jan' => $list_item->itemJANCode,
-                        'oroshi' => $list_item->distributorName,
-                        'recordId' => $list_item->inHospitalItemId,
-                        'unit' => $list_item->quantityUnit,
-                        'itemUnit' => $list_item->itemUnit,
-                        'distributorId' => $list_item->distributorId,
-                        'count' => 0, //理論在庫がない=在庫0
-                        'countNum' => 0, //理論在庫がない=在庫0
-                        'labelId' => $list_item->labelId,
-                        'unitPrice' => $unitPrice,
-                        'lotNumber' => '',
-                        'lotDate' => '',
-                        'lotFlag' => $lotManagement == 1 ? 'はい' : '',
-                        'lotFlagBool' => $lotManagement,
-                        'mandatoryFlag' => $list_item->mandatoryFlag,
-                    ];
-                    break;
+                        $data[] = [
+                            'divisionId' => '',
+                            'maker' => $list_item->makerName,
+                            'shouhinName' => $list_item->itemName,
+                            'code' => $list_item->itemCode,
+                            'kikaku' => $list_item->itemStandard,
+                            'irisu' => $list_item->quantity,
+                            'kakaku' => $list_item->price,
+                            'jan' => $list_item->itemJANCode,
+                            'oroshi' => $list_item->distributorName,
+                            'recordId' => $list_item->inHospitalItemId,
+                            'unit' => $list_item->quantityUnit,
+                            'itemUnit' => $list_item->itemUnit,
+                            'distributorId' => $list_item->distributorId,
+                            'count' => 0, //理論在庫がない=在庫0
+                            'countNum' => 0, //理論在庫がない=在庫0
+                            'labelId' => $list_item->labelId,
+                            'unitPrice' => $unitPrice,
+                            'lotNumber' => '',
+                            'lotDate' => '',
+                            'lotFlag' => $lotManagement == 1 ? 'はい' : '',
+                            'lotFlagBool' => $lotManagement,
+                            'mandatoryFlag' => $list_item->mandatoryFlag,
+                        ];
+                    }
                 }
             }
-
             $content = new ApiResponse($data, count($data), 0, 'OK', [
                 'getStocktakingListApi',
             ]);
