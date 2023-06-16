@@ -135,7 +135,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                 ) {
                     continue;
                 }
-
+                
                 $payouts[] = new Payout(
                     PayoutHId::generate(),
                     new DateYearMonthDayHourMinutesSecond(''),
@@ -156,7 +156,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                 $sourceDivision = array_find($divisions, function (
                     Division $value
                 ) use ($sourceDivisionId) {
-                    return $value->getDivisionId()->value() ===
+                    return $value->getDivisionId()->value() ==
                         $sourceDivisionId;
                 });
 
@@ -164,7 +164,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                 $targetDivision = array_find($divisions, function (
                     Division $value
                 ) use ($targetDivisionId) {
-                    return $value->getDivisionId()->value() ===
+                    return $value->getDivisionId()->value() ==
                         $targetDivisionId;
                 });
 
@@ -173,9 +173,13 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                 $inHospitalItem = array_find($inHospitalItems, function (
                     $value
                 ) use ($inHospitalItemId) {
-                    return $value->getInHospitalItemId()->value() ===
+                    return $value->getInHospitalItemId()->value() ==
                         $inHospitalItemId;
                 });
+
+                if(!$inHospitalItem){
+                    throw new Exception('inHospitalItem is not data' , 400 );
+                }
 
                 $unitprice = $inHospitalItem->getUnitPrice()->value();
 
@@ -194,7 +198,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                     }
                 }
 
-                foreach ($payouts as &$payout) {
+                foreach ($payouts as $key => $payout) {
                     if (
                         $payout->equalDivisions(
                             $sourceDivision,
@@ -220,7 +224,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                             $inHospitalItem->isLotManagement(),
                             new CardId($payoutItem->card)
                         );
-                        $payout = $payout->addPayoutItem($item);
+                        $payouts[$key] = $payout->addPayoutItem($item);
                     }
                 }
             }
@@ -261,15 +265,14 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                         return $item
                             ->getSourceDivision()
                             ->getDivisionId()
-                            ->value() === $stock->divisionId &&
-                            $item->getInHospitalItemId()->value() ===
+                            ->value() == $stock->divisionId &&
+                            $item->getInHospitalItemId()->value() ==
                                 $stock->inHospitalItemId;
                     });
 
                     if (!$stock) {
                         throw new Exception("Stocks don't exist.", 998);
                     }
-
                     $requestItemCounts[] = new RequestItemCount(
                         $stock->recordId,
                         $hospitalId,
@@ -281,7 +284,6 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                     );
                 }
             }
-
             $inventoryCalculations = [];
             foreach ($payouts as $payout) {
                 foreach ($payout->getPayoutItems() as $item) {
