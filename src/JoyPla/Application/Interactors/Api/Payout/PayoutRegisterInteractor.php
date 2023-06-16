@@ -191,7 +191,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                         $unitprice = 0;
                     }
                 }
-                foreach ($payouts as &$payout) {
+                foreach ($payouts as $key => $payout) {
                     if (
                         $payout->equalDivisions(
                             $sourceDivision->getDivisionId(),
@@ -220,7 +220,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                             new CardId($payoutItem->card),
                             $inputData->payoutType
                         );
-                        $payout = $payout->addPayoutItem($item);
+                        $payouts[$key] = $payout->addPayoutItem($item);
                     }
                 }
             }
@@ -261,7 +261,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                             return $payout
                                 ->getSourceDivisionId()
                                 ->value() === $stock->divisionId &&
-                                $item->getInHospitalItemId()->value() ===
+                                $item->getInHospitalItemId()->value() ==
                                     $stock->inHospitalItemId;
                         });
 
