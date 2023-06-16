@@ -70,7 +70,8 @@ class Acceptance
 
     public function equalDivisions(DivisionId $sourceDivisionId , DivisionId $targetDivisionId)
     {
-        return $sourceDivisionId->equal($sourceDivisionId->value()) && $targetDivisionId->equal($targetDivisionId->value());
+        return $this->sourceDivisionId->value() === $sourceDivisionId->value() && 
+        $this->targetDivisionId->value() === $targetDivisionId->value();
     }
 
     public function getAcceptanceId()

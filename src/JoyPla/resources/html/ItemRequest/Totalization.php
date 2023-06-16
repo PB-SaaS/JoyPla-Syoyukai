@@ -67,7 +67,7 @@
                                                             <v-button-primary type="button" class="w-full" @click.native="onAcceptanceSubmit" :disabled="(totalCount === 0)">出庫登録</v-button-primary>
                                                         </div>
                                                         <div class="my-4 items-center self-center">
-                                                            <v-switch id="labelCreate" v-model="labelCreate" :message="(labelCreate)? 'ラベル発行をする' : 'ラベル発行をしない'"></v-switch>
+                                                            <?php /*<v-switch id="labelCreate" v-model="labelCreate" :message="(labelCreate)? 'ラベル発行をする' : 'ラベル発行をしない'"></v-switch>*/?>
                                                         </div>
                                                     </div>
                                                 </th>
@@ -336,7 +336,8 @@
 
             start();
 
-            const labelCreate = ref(localStorage.joypla_payoutLabelCreate === 'true');
+            //const labelCreate = ref(localStorage.joypla_payoutLabelCreate === 'true');
+            const labelCreate = ref(false);
 
             const getCache = () => {
                 let url = window.location.href;

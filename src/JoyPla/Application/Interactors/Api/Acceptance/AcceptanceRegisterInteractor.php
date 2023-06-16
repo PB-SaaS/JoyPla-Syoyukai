@@ -107,7 +107,7 @@ namespace JoyPla\Application\Interactors\Api\Acceptance {
                 $sourceDivision = array_find($divisions, function (
                     Division $value
                 ) use ($sourceDivisionId) {
-                    return $value->getDivisionId()->value() ===
+                    return $value->getDivisionId()->value() ==
                         $sourceDivisionId;
                 });
 
@@ -115,12 +115,11 @@ namespace JoyPla\Application\Interactors\Api\Acceptance {
                 $targetDivision = array_find($divisions, function (
                     Division $value
                 ) use ($targetDivisionId) {
-                    return $value->getDivisionId()->value() ===
+                    return $value->getDivisionId()->value() ==
                         $targetDivisionId;
                 });
 
-                if (
-                    !!array_find($acceptances, function (Acceptance $value) use (
+                if (array_find($acceptances, function (Acceptance $value) use (
                         $targetDivision,
                         $sourceDivision
                     ) {
