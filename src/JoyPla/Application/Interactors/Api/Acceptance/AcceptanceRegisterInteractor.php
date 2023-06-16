@@ -21,6 +21,7 @@ namespace JoyPla\Application\Interactors\Api\Acceptance {
     use JoyPla\Enterprise\Models\InHospitalItem;
     use JoyPla\Enterprise\Models\InHospitalItemId;
     use JoyPla\Enterprise\Models\InventoryCalculation;
+    use JoyPla\Enterprise\Models\ItemId;
     use JoyPla\Enterprise\Models\Lot;
     use JoyPla\Enterprise\Models\LotDate;
     use JoyPla\Enterprise\Models\LotNumber;
@@ -218,7 +219,7 @@ namespace JoyPla\Application\Interactors\Api\Acceptance {
             }
 
             if(!$inputData->isOnlyAcceptance){
-                $stockViewInstance = ModelRepository::getStockItemViewInstance()->where(
+                $stockViewInstance = ModelRepository::getStockViewInstance()->where(
                     'hospitalId',
                     $hospitalId->value()
                 );
@@ -247,10 +248,20 @@ namespace JoyPla\Application\Interactors\Api\Acceptance {
 
                 foreach ($acceptances as $acceptance) {
                     foreach ($acceptance->getItems() as $item) {
+                        $inHospitalItemId = $item->getInHospitalItemId()->value();
+
+                        $inHospitalItem = array_find($inHospitalItems, function (
+                            $value
+                        ) use ($inHospitalItemId) {
+                            return $value->getInHospitalItemId()->value() ===
+                                $inHospitalItemId;
+                        });
+
                         $stock = array_find($stocks->all(), function ($stock) use (
-                            $item
+                            $item,
+                            $acceptance
                         ) {
-                            return $item
+                            return $acceptance
                                 ->getSourceDivisionId()
                                 ->value() === $stock->divisionId &&
                                 $item->getInHospitalItemId()->value() ===
@@ -260,13 +271,12 @@ namespace JoyPla\Application\Interactors\Api\Acceptance {
                         if (!$stock) {
                             throw new Exception("Stocks don't exist.", 998);
                         }
-
                         $requestItemCounts[] = new RequestItemCount(
                             $stock->recordId,
                             $hospitalId,
                             $item->getInHospitalItemId(),
-                            $stock->itemId,
-                            (int) $item->getAcceptanceQuantity() * -1,
+                            $inHospitalItem->getItem()->getItemId(),
+                            ((int) $item->getAcceptanceQuantity()) * -1,
                             $acceptance->getTargetDivisionId(),//請求元＝払出先
                             $acceptance->getSourceDivisionId()//請求先＝払出元
                         );

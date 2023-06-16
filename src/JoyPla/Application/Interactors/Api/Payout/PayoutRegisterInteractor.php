@@ -398,7 +398,6 @@ namespace JoyPla\Application\InputPorts\Api\Payout {
         public array $payoutItems;
         public bool $isOnlyMyDivision;
         public bool $isOnlyPayout = false;
-
         public int $payoutType = 1;
 
         public function __construct(

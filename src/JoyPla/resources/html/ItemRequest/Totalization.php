@@ -836,7 +836,6 @@
                     params.append("path", "/api/acceptance/register");
                     params.append("_method", 'post');
                     params.append("_csrf", _CSRF);
-                    params.append("isOnlyAcceptance", 'true');
                     params.append("acceptanceItems", JSON.stringify(encodeURIToObject(acceptanceModels)));
 
                     const res = await axios.post(_APIURL, params);

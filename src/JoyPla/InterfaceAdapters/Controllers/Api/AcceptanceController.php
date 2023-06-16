@@ -48,6 +48,7 @@ class AcceptanceController extends Controller
 
         $user = $this->request->user();
 
+
         $inputData = new AcceptanceRegisterInputData(
             $user,
             $acceptanceItems,
