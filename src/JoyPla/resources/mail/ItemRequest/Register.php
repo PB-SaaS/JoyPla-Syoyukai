@@ -1,15 +1,10 @@
+<?php echo $hospitalName . "\n" ?>
 <?php echo $name ?> 様
 
 JoyPla からお知らせです。
-
-請求書が作成されましたので、下記の通りお知らせします。
+<?php echo $requestUserName ?>より請求書が作成されましたので、下記の通りお知らせします。
 
 <?php
-
-echo "施設名: " . $hospitalName ." \n";
-echo "担当者: " . $requestUserName ." \n";
-echo " \n";
-echo " \n";
 foreach ($histories as $history) {
     echo "請求番号: " . $history["requestHId"] ." \n";
     echo "請求元部署名: " . $history["sourceDivisionName"] ." \n";

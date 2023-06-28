@@ -47,6 +47,8 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
         {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
             $requestType = new RequestType($inputData->requestType);
+            $hospital = $this->repositoryProvider->getHospitalRepository()->find($hospitalId);
+            $hospitalName = $hospital->getHospitalName()->value();
 
             $inputData->requestItems = array_map(function ($v) use (
                 $inputData
@@ -102,7 +104,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                     [$i],
                     new Hospital(
                         $hospitalId,
-                        new HospitalName('hoge'),
+                        new HospitalName($hospitalName),
                         '',
                         '',
                         new Pref(''),
