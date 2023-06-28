@@ -102,14 +102,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                     new DateYearMonthDayHourMinutesSecond(''),
                     new DateYearMonthDayHourMinutesSecond(''),
                     [$i],
-                    new Hospital(
-                        $hospitalId,
-                        new HospitalName($hospitalName),
-                        '',
-                        '',
-                        new Pref(''),
-                        ''
-                    ),
+                    $hospital,
                     $i->getSourceDivision(),
                     $i->getTargetDivision(),
                     $requestType,
