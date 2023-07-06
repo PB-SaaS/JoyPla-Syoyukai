@@ -136,20 +136,22 @@ class PayoutRepository implements PayoutRepositoryInterface
         $itemViewInstance = ModelRepository::getPayoutViewItemInstance()->where(
             'hospitalId',
             $hospitalId->value()
-        );
+        )->resetValue('payoutHistoryId');
 
         $historyViewInstance = ModelRepository::getPayoutInstance()->where(
             'hospitalId',
             $hospitalId->value()
         );
 
-        /*
+        $isSearch = false;
+
         if ($search->itemName) {
             $itemViewInstance->orWhere(
                 'itemName',
                 '%' . $search->itemName . '%',
                 'LIKE'
             );
+            $isSearch = true;
         }
         if ($search->makerName) {
             $itemViewInstance->orWhere(
@@ -157,6 +159,7 @@ class PayoutRepository implements PayoutRepositoryInterface
                 '%' . $search->makerName . '%',
                 'LIKE'
             );
+            $isSearch = true;
         }
         if ($search->itemCode) {
             $itemViewInstance->orWhere(
@@ -164,6 +167,7 @@ class PayoutRepository implements PayoutRepositoryInterface
                 '%' . $search->itemCode . '%',
                 'LIKE'
             );
+            $isSearch = true;
         }
         if ($search->itemStandard) {
             $itemViewInstance->orWhere(
@@ -171,6 +175,7 @@ class PayoutRepository implements PayoutRepositoryInterface
                 '%' . $search->itemStandard . '%',
                 'LIKE'
             );
+            $isSearch = true;
         }
         if ($search->itemJANCode) {
             $itemViewInstance->orWhere(
@@ -178,34 +183,51 @@ class PayoutRepository implements PayoutRepositoryInterface
                 '%' . $search->itemJANCode . '%',
                 'LIKE'
             );
+            $isSearch = true;
         }
 
         if (is_array($search->sourceDivisionIds) && count($search->sourceDivisionIds) > 0) {
             foreach ($search->sourceDivisionIds as $divisionId) {
                 $itemViewInstance->orWhere('sourceDivisionId', $divisionId);
+                $isSearch = true;
             }
         }
 
         if (is_array($search->targetDivisionIds) && count($search->targetDivisionIds) > 0) {
             foreach ($search->targetDivisionIds as $divisionId) {
                 $itemViewInstance->orWhere('targetDivisionId', $divisionId);
+                $isSearch = true;
             }
         }
 
         $receivingNumbers = [];
-        $items = $itemViewInstance->get();
+        if($isSearch){
+            $items = $itemViewInstance->get();
 
-        if ($items->count() == 0) {
-            return [[], 0];
-        }                  
-        foreach ($items->all() as $item) {
-            $historyViewInstance = $historyViewInstance->orWhere(
-                'payoutHistoryId',
-                $item->payoutHistoryId
-            );
+            if($items->count() === 0){
+                return [[], 0];
+            }
+
+            foreach ($items->all() as $item) {
+                $historyViewInstance = $historyViewInstance->orWhere(
+                    'payoutHistoryId',
+                    $item->payoutHistoryId
+                );
+            }
         }
 
-        */      
+        if (is_array($search->sourceDivisionIds) && count($search->sourceDivisionIds) > 0) {
+            foreach ($search->sourceDivisionIds as $divisionId) {
+                $historyViewInstance->orWhere('sourceDivisionId', $divisionId);
+            }
+        }
+
+        if (is_array($search->targetDivisionIds) && count($search->targetDivisionIds) > 0) {
+            foreach ($search->targetDivisionIds as $divisionId) {
+                $historyViewInstance->orWhere('targetDivisionId', $divisionId);
+            }
+        }
+
         if ($search->yearMonth) {
             $yearMonth = new DateYearMonth($search->yearMonth);
             $nextMonth = $yearMonth->nextMonth();
@@ -221,18 +243,6 @@ class PayoutRepository implements PayoutRepositoryInterface
             );
         }
 
-        if (is_array($search->sourceDivisionIds) && count($search->sourceDivisionIds) > 0) {
-            foreach ($search->sourceDivisionIds as $divisionId) {
-                $historyViewInstance->orWhere('sourceDivisionId', $divisionId);
-            }
-        }
-
-        if (is_array($search->targetDivisionIds) && count($search->targetDivisionIds) > 0) {
-            foreach ($search->targetDivisionIds as $divisionId) {
-                $historyViewInstance->orWhere('targetDivisionId', $divisionId);
-            }
-        }
-
         $historys = $historyViewInstance
             ->orderBy('id', 'desc')
             ->page($search->currentPage)
@@ -241,12 +251,17 @@ class PayoutRepository implements PayoutRepositoryInterface
         if (count($historys->getData()->all()) == 0) {
             return [[], 0];
         }
+        
+        $itemViewInstance = ModelRepository::getPayoutViewItemInstance()->where(
+            'hospitalId',
+            $hospitalId->value()
+        );
 
         foreach($historys->getData()->all() as $history)
         {
             $itemViewInstance->orWhere('payoutHistoryId',$history->payoutHistoryId);
         }
-
+        
         $viewItems = $itemViewInstance->get();
         $payouts = [];
 
