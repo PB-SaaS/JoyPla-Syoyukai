@@ -667,6 +667,7 @@
         if (items.type == "customlabel") {
           items.item.forEach((x, id) => {
             items.item[id].payoutCount = items.item[id].customQuantity
+            items.item[id].divisionId = values.targetDivisionId
           });
         }
 

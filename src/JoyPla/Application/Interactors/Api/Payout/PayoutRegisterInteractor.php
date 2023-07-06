@@ -220,7 +220,7 @@ namespace JoyPla\Application\Interactors\Api\Payout {
                             new CardId($payoutItem->card),
                             $inputData->payoutType
                         );
-                        $payouts[$key] = $payout->addPayoutItem($item);
+                        $payouts[$key] = $payout->addPayoutItem($item, false);
                     }
                 }
             }

@@ -103,6 +103,8 @@
                 title="払出年月"
                 ></v-input>
             </div>
+            <?php
+            /*
             <div class="my-4">
               <v-input
                 name="makerName"
@@ -143,6 +145,7 @@
                 title="JANコード"
                 ></v-input>
             </div>
+            */ ?>
             <div class="my-4">
               <v-multiple-select-division
                 name="sourceDivisionIds"

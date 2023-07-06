@@ -143,6 +143,7 @@ class PayoutRepository implements PayoutRepositoryInterface
             $hospitalId->value()
         );
 
+        /*
         if ($search->itemName) {
             $itemViewInstance->orWhere(
                 'itemName',
@@ -196,8 +197,7 @@ class PayoutRepository implements PayoutRepositoryInterface
 
         if ($items->count() == 0) {
             return [[], 0];
-        }
-
+        }                  
         foreach ($items->all() as $item) {
             $historyViewInstance = $historyViewInstance->orWhere(
                 'payoutHistoryId',
@@ -205,6 +205,7 @@ class PayoutRepository implements PayoutRepositoryInterface
             );
         }
 
+        */      
         if ($search->yearMonth) {
             $yearMonth = new DateYearMonth($search->yearMonth);
             $nextMonth = $yearMonth->nextMonth();
@@ -220,6 +221,18 @@ class PayoutRepository implements PayoutRepositoryInterface
             );
         }
 
+        if (is_array($search->sourceDivisionIds) && count($search->sourceDivisionIds) > 0) {
+            foreach ($search->sourceDivisionIds as $divisionId) {
+                $historyViewInstance->orWhere('sourceDivisionId', $divisionId);
+            }
+        }
+
+        if (is_array($search->targetDivisionIds) && count($search->targetDivisionIds) > 0) {
+            foreach ($search->targetDivisionIds as $divisionId) {
+                $historyViewInstance->orWhere('targetDivisionId', $divisionId);
+            }
+        }
+
         $historys = $historyViewInstance
             ->orderBy('id', 'desc')
             ->page($search->currentPage)
@@ -227,6 +240,11 @@ class PayoutRepository implements PayoutRepositoryInterface
 
         if (count($historys->getData()->all()) == 0) {
             return [[], 0];
+        }
+
+        foreach($historys->getData()->all() as $history)
+        {
+            $itemViewInstance->orWhere('payoutHistoryId',$history->payoutHistoryId);
         }
 
         $viewItems = $itemViewInstance->get();
