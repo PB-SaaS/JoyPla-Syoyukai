@@ -560,7 +560,9 @@
 
         if (!checked) {
           item.priceNotice = (item.priceNotice) ? item.priceNotice : "";
-          insert(values.payoutItems.length, item);
+          insert(0, item);
+
+          //values.payoutItems = [ item , ...values.payoutItems ]
 
           await getStockCount(item.inHospitalItemId).then((res) => {
             if (res.data.code != 200) {

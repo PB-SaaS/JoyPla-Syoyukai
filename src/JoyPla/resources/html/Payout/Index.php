@@ -27,9 +27,67 @@
         <div>
           {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.perPage) * values.currentPage )  < totalCount ) ?  parseInt(values.perPage) * values.currentPage : totalCount  }}件 / 全 {{ totalCount }}件
         </div>
+        <div class="relative overflow-x-auto sm:rounded-lg">
+          <table class="w-full text-sm text-left text-gray-500 ">
+              <thead class="text-xs text-gray-700 uppercase bg-gray-50 ">
+                  <tr>
+                      <th scope="col" class="px-6 py-3">
+                          払出日
+                      </th>
+                      <th scope="col" class="px-6 py-3">
+                      払出番号
+                      </th>
+                      <th scope="col" class="px-6 py-3">
+                      払出元部署
+                      </th>
+                      <th scope="col" class="px-6 py-3">
+                      払出先部署
+                      </th>
+                      <th scope="col" class="px-6 py-3">
+                      合計金額
+                      </th>
+                      <th scope="col">
+                      </th>
+                      <th scope="col">
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr class="bg-white border-b " v-for="(payout) in payouts">
+                      <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
+                      {{ payout.payoutDate }}
+                      </th>
+                      <td class="px-6 py-4">
+                      {{ payout?.payoutHistoryId }}
+                      </td>
+                      <td class="px-6 py-4">
+                      {{ payout?._sourceDivision?.divisionName }}
+                      </td>
+                      <td class="px-6 py-4">
+                      {{ payout?._targetDivision?.divisionName }}
+                      </td>
+                      <td class="px-6 py-4">
+                      &yen; {{ numberFormat( payout.totalAmount) }}
+                      </td>
+                      <td class="px-6 py-4">
+                        <v-button-default type="button" class="w-full" @click.native="openSlip( payout.payoutHistoryId )">
+                          払出伝票を表示
+                        </v-button-default>
+                      </td>
+                      <td class="px-6 py-4">
+                        <v-button-default type="button" class="w-full" @click.native="openPrint(payout.payoutHistoryId)">
+                            払出伝票印刷
+                        </v-button-default>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+        </div>
+          <?php /*
         <div class="pt-2 hover:bg-sushi-50" v-for="(payout) in payouts">
           <div class="border-b-2 border-solid border-gray-100 w-full">
             <div class="lg:flex lg:divide-x ">
+              
               <div class="lg:w-1/5 p-2">
                 <p class="text-md font-bold">払出日<br>{{ payout.payoutDate }}</p>
                 <p class="text-md">
@@ -81,6 +139,7 @@
             </div>
           </div>
         </div>
+          */ ?>
         <v-pagination
         :show-pages="showPages"
         v-model:current-page="values.currentPage"

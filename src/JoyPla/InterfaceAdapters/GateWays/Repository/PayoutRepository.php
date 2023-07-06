@@ -132,17 +132,18 @@ class PayoutRepository implements PayoutRepositoryInterface
 
     public function search(HospitalId $hospitalId , stdClass $search)
     {
-
+        /*
         $itemViewInstance = ModelRepository::getPayoutViewItemInstance()->where(
             'hospitalId',
             $hospitalId->value()
         )->resetValue('payoutHistoryId');
 
+        */
         $historyViewInstance = ModelRepository::getPayoutInstance()->where(
             'hospitalId',
             $hospitalId->value()
         );
-
+        /*
         $isSearch = false;
 
         if ($search->itemName) {
@@ -215,6 +216,7 @@ class PayoutRepository implements PayoutRepositoryInterface
                 );
             }
         }
+        */
 
         if (is_array($search->sourceDivisionIds) && count($search->sourceDivisionIds) > 0) {
             foreach ($search->sourceDivisionIds as $divisionId) {
@@ -251,7 +253,7 @@ class PayoutRepository implements PayoutRepositoryInterface
         if (count($historys->getData()->all()) == 0) {
             return [[], 0];
         }
-        
+        /*
         $itemViewInstance = ModelRepository::getPayoutViewItemInstance()->where(
             'hospitalId',
             $hospitalId->value()
@@ -263,6 +265,8 @@ class PayoutRepository implements PayoutRepositoryInterface
         }
         
         $viewItems = $itemViewInstance->get();
+        */
+        $viewItems = collect([]);
         $payouts = [];
 
         $divisionInstance = ModelRepository::getDivisionInstance();
