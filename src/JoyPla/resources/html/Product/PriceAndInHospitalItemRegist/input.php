@@ -444,11 +444,11 @@ const breadcrumbs = [
     }
 },
 components: {
-    'searchable-dropdown-for-form': SearchableDropdownForForm,  
+    'searchable-dropdown-for-form': SearchableDropdownForForm,
     'v-checkbox': vCheckbox,
     'v-loading': vLoading,
     'v-text': vText,
-    'v-input' : ,
+    'v-input' : vInput,
     'v-textarea' : vTextarea,
     'v-select': vSelect,
     'v-checkbox': vCheckbox,
