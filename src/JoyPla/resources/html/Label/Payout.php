@@ -67,21 +67,17 @@ body {
                                 <template v-for="(payout , pIdx) in inHospitalItem.payout">
                                     <template v-for="(print , printIdx) in payout.print">
                                         <tr>
-                                            <template v-if="pIdx === 0 && printIdx === 0">
-                                                <td class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="inHospitalItem.payout.length - 1 + payout.print.length">
-                                                    <div>
-                                                        <p>{{ inHospitalItem.itemName }}</p>
-                                                        <p>{{ inHospitalItem.itemCode }}</p>
-                                                        <p>{{ inHospitalItem.itemStandard }}</p>
-                                                        <p>{{ inHospitalItem.itemJANCode }}</p>
-                                                        <p>{{ (inHospitalItem.officialFlag == 1)? '償還品' : '' }}</p>
-                                                    </div>
-                                                </td>
-                                            </template>
-                                            <template v-if="printIdx === 0">
-                                                <td class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="payout.print.length">{{ payout.lotNumber }}</td>
-                                                <td class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="payout.print.length">{{ payout.lotDate }}</td>
-                                            </template>
+                                            <td v-if="pIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="calcRow(inHospitalItem.payout)">
+                                                <div>
+                                                    <p>{{ inHospitalItem.itemName }}</p>
+                                                    <p>{{ inHospitalItem.itemCode }}</p>
+                                                    <p>{{ inHospitalItem.itemStandard }}</p>
+                                                    <p>{{ inHospitalItem.itemJANCode }}</p>
+                                                    <p>{{ (inHospitalItem.officialFlag == 1)? '償還品' : '' }}</p>
+                                                </div>
+                                            </td>
+                                            <td v-if="printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="payout.print.length">{{ payout.lotNumber }}</td>
+                                            <td v-if="printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="payout.print.length">{{ payout.lotDate }}</td>
                                             <td class="border border-slate-100 p-4 pr-8 text-slate-500">
                                                 <v-input-number 
                                                 :name="`items[${idx}].payout[${pIdx}].print[${printIdx}].count`"
@@ -107,9 +103,7 @@ body {
                                                 <v-button-primary @click.native="copy(idx,pIdx)">複製</v-button-primary>
                                             </td>
                                             <td class="border border-slate-100 p-4 pr-8 text-slate-500 text-center">
-                                                <template v-if="print.isDeleteButton">
-                                                    <v-button-danger @click.native="removeItem(idx,pIdx,printIdx)">削除</v-button-danger>
-                                                </template>
+                                                <v-button-danger v-if="print.isDeleteButton" @click.native="removeItem(idx,pIdx,printIdx)">削除</v-button-danger>
                                             </td>
                                         </tr>
                                     </template>
@@ -358,13 +352,24 @@ body {
                     print: 0 ,
                     isDeleteButton : true
                 });
+                replace(values.items)
             }
             
             const removeItem = (idx,pIdx, printIdx) => {
                 values.items[idx].payout[pIdx].print.splice( printIdx, 1 );
+                replace(values.items)
+            }
+
+            const calcRow = (payouts) => {
+                let printCount = 0;
+                payouts.forEach(function(payout) {
+                    printCount += payout.print.length;
+                });
+                return printCount;
             }
 
             return {
+                calcRow,
                 copy,
                 removeItem,
                 values,

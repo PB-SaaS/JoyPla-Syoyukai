@@ -68,7 +68,7 @@ body {
                                     <template v-for="(print , printIdx) in payout.print">
                                         <tr>
                                             <template v-if="pIdx === 0 && printIdx === 0">
-                                                <td class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="inHospitalItem.payout.length - 1 + payout.print.length">
+                                                <td class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="calcRow(inHospitalItem.payout)">
                                                     <div>
                                                         <p>{{ inHospitalItem.itemName }}</p>
                                                         <p>{{ inHospitalItem.itemCode }}</p>
@@ -364,7 +364,17 @@ body {
                 values.items[idx].payout[pIdx].print.splice( printIdx, 1 );
             }
 
+
+            const calcRow = (payouts) => {
+                let printCount = 0;
+                payouts.forEach(function(payout) {
+                    printCount += payout.print.length;
+                });
+                return printCount;
+            }
+
             return {
+                calcRow,
                 copy,
                 removeItem,
                 values,

@@ -562,8 +562,6 @@
           item.priceNotice = (item.priceNotice) ? item.priceNotice : "";
           insert(0, item);
 
-          //values.payoutItems = [ item , ...values.payoutItems ]
-
           await getStockCount(item.inHospitalItemId).then((res) => {
             if (res.data.code != 200) {
               throw new Error(res.data.message)
