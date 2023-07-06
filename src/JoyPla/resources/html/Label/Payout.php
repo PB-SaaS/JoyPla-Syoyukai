@@ -67,7 +67,7 @@ body {
                                 <template v-for="(payout , pIdx) in inHospitalItem.payout">
                                     <template v-for="(print , printIdx) in payout.print">
                                         <tr>
-                                            <td v-if="pIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="calcRow(inHospitalItem.payout)">
+                                            <td v-if="pIdx === 0 && printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="calcRow(inHospitalItem.payout)">
                                                 <div>
                                                     <p>{{ inHospitalItem.itemName }}</p>
                                                     <p>{{ inHospitalItem.itemCode }}</p>
