@@ -287,8 +287,6 @@ var JoyPlaApp = Vue.createApp({
         pulldownSelect.value = [
           { onclick: () => onPayoutUpdate() , 'text': '入庫登録', variant : 'default' , disabled: false},
           { onclick: () => onPayoutAllUpdate() , 'text': '一括入庫登録', variant : 'default' , disabled: false},
-          { variant : 'border'},
-          { onclick: () => onDelete() , 'text': '削除', variant : 'danger' , disabled: ! (values.acceptance.payoutTotalCount == 0 && values.acceptance.acceptanceTotalCount > 0)},
         ];
         <?php endif; ?>
       });

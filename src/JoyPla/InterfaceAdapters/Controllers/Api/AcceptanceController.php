@@ -425,6 +425,11 @@ class AcceptanceController extends Controller
         if($acceptance->status() !== 1){
             throw new Exception("acceptance don't delete", 998);
         }
+
+        if((gate('is_user') && $this->request->user()->divisionId !== $acceptance->getSourceDivisionId()->value())){
+            throw new Exception("you don't have execute permission" , 500);
+        }
+
         $inventoryCalculations = [];
         foreach($acceptance->getItems() as $item){
             $inventoryCalculations[] = new InventoryCalculation(
