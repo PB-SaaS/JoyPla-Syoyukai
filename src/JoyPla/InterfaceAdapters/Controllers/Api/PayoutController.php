@@ -116,9 +116,6 @@ class PayoutController extends Controller
 
     public function update($vars)
     {
-        if(gate('is_approver')){
-            Router::abort(403);
-        }
         $payoutHistoryId = new PayoutHistoryId($vars['payoutHistoryId']);
         $hospitalId = new HospitalId($this->request->user()->hospitalId);
         
@@ -213,9 +210,6 @@ class PayoutController extends Controller
 
     public function delete($vars)
     {
-        if(gate('is_approver')){
-            Router::abort(403);
-        }
         $payoutHistoryId = new PayoutHistoryId($vars['payoutHistoryId']);
         $hospitalId = new HospitalId($this->request->user()->hospitalId);
         
