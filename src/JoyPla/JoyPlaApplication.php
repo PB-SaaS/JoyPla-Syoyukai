@@ -613,10 +613,6 @@ class JoyPlaApplication extends Application
                 //担当者
                 return new GatePermissionModel(true, true);
             }
-            if ($auth->userPermission == '3') {
-                //承認者
-                return new GatePermissionModel(false, false);
-            }
             return new GatePermissionModel(true, false);
         });
         

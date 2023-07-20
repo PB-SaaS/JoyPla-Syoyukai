@@ -8,16 +8,12 @@
         <h1 class="text-2xl mb-2">払出伝票</h1>
         <hr>
         <div class="p-4 text-base bg-gray-100 border border-gray-400 flex flex-col md:flex-row md:gap-6 gap-4 mb-6">
-          <?php if( !gate('is_approver')) : ?>
             <v-button-primary class="md:w-1/6 w-full" @click.native="onPayoutUpdate()" v-if="!isUser || (isUser && userDivisionId === values.payout.sourceDivisionId )">
                 更新
             </v-button-primary>
-          <?php endif; ?>
-          <?php if( !gate('is_approver')) : ?>
             <v-button-danger class="md:w-1/6 w-full" @click.native="onDelete()" v-if="!isUser || (isUser && userDivisionId === values.payout.sourceDivisionId )">
                 削除
             </v-button-danger>
-          <?php endif; ?>
             <v-button-default class="md:w-1/6 w-full" @click.native="openLabelPage()">
                 払出ラベル発行
             </v-button-default>
@@ -79,7 +75,6 @@
                               <td class="text-left px-3 py-4 border">{{ payoutItem.lotDate }}</td>
                               <td class="text-left px-3 py-4 border">{{ payoutItem.cardId }}</td>
                               <td class="text-left px-3 py-4 border">
-                                <?php if( !gate('is_approver')) : ?>
                                 <template v-if="!isUser || (isUser && userDivisionId === values.payout.sourceDivisionId )">
                                   <v-input-number
                                     :rules="{ between: [0 , Math.max(0 , payoutItem.payoutQuantity) ] }" 
@@ -96,9 +91,6 @@
                                 <template v-if="!( !isUser || (isUser && userDivisionId === values.payout.sourceDivisionId ) )">
                                   {{ numberFormat(payoutItem.payoutQuantity) }}{{payoutItem.quantityUnit}}
                                 </template>
-                                <?php else: ?>
-                                  {{ numberFormat(payoutItem.payoutQuantity) }}{{payoutItem.quantityUnit}}
-                                <?php endif; ?>
                               </td>
                               <td class="text-left px-3 py-4 border" v-if="payoutIndex === 0" :rowspan="elem._payoutItems.length">&yen;{{ numberFormat(priceCalc(elem)) }}</td>
                             </tr>

@@ -126,9 +126,6 @@ class AcceptanceController extends Controller
     }
 
     public function update($vars){
-        if(gate('is_approver')){
-            Router::abort(403);
-        }
         $hospitalId = new HospitalId($this->request->user()->hospitalId);
         $acceptanceId = new AcceptanceId($vars['acceptanceId']);
         $updateItems = $this->request->get( 'updateItems' , []);
@@ -203,9 +200,6 @@ class AcceptanceController extends Controller
     }
 
     public function payoutRegister($vars){
-        if(gate('is_approver')){
-            Router::abort(403);
-        }
 
         $hospitalId = new HospitalId($this->request->user()->hospitalId);
         $acceptanceId = new AcceptanceId($vars['acceptanceId']);
@@ -413,9 +407,6 @@ class AcceptanceController extends Controller
     }
 
     public function delete($vars){
-        if(gate('is_approver')){
-            Router::abort(403);
-        }
         $hospitalId = new HospitalId($this->request->user()->hospitalId);
         $acceptanceId = new AcceptanceId($vars['acceptanceId']);
 
@@ -434,6 +425,11 @@ class AcceptanceController extends Controller
         if($acceptance->status() !== 1){
             throw new Exception("acceptance don't delete", 998);
         }
+
+        if((gate('is_user') && $this->request->user()->divisionId !== $acceptance->getSourceDivisionId()->value())){
+            throw new Exception("you don't have execute permission" , 500);
+        }
+
         $inventoryCalculations = [];
         foreach($acceptance->getItems() as $item){
             $inventoryCalculations[] = new InventoryCalculation(
