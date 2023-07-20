@@ -77,6 +77,13 @@
                 </svg>
               </card-button>
               <?php endif; ?>
+              <?php if (gate('late_receipt')->can()): ?>
+              <card-button main-color="bg-scooter-500" text-color="text-scooter-50" sub-color="bg-scooter-600" label-text="あとから入荷" path="/received/lateRegister">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" class="stroke-scooter-700" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>  
+              </card-button>
+              <?php endif; ?>
             </div>
           </div>
         </div>
@@ -120,7 +127,7 @@ var JoyPlaApp = Vue.createApp({
       return { 
         breadcrumbs: [
             {
-              text: '発注メニュー',
+              text: '発注・入荷メニュー',
               disabled: true,
             }
         ],

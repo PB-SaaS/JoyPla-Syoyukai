@@ -444,7 +444,7 @@ class ItemRequestRepository implements ItemRequestRepositoryInterface
             $itemRequests[] = $itemRequest;
         }
 
-        return [$itemRequests, $histories->getData()->count()];
+        return [$itemRequests, $histories->getTotal()];
     }
 
     public function show(HospitalId $hospitalId, RequestHId $requestHId)

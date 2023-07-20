@@ -18,6 +18,20 @@ JoyPla からお知らせです。
 <?php echo $order['distributor']['prefectures']; ?> <?php echo $order[
      'distributor'
  ]['address']; ?> 
+<?php
+$order_methods = [
+    '1' => 'JoyPla',
+    '2' => 'メール',
+    '3' => 'FAX',
+    '4' => '電話',
+    '5' => '業者システム',
+];
+
+echo '発注方法: ' .
+    (isset($order_methods[$order['distributor']['orderMethod']])
+        ? $order_methods[$order['distributor']['orderMethod']]
+        : 'その他');
+?> 
 
 部署名 <?php echo $order['division']['divisionName']; ?> 
 

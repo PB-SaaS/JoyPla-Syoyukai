@@ -1,5 +1,77 @@
 
-<script> 
+<script>
+Vue.component('searchable-select', {
+  props: ['options', 'value', 'disabled' ,'name' , 'default' , 'error'],
+  template: `
+    <div class="uk-inline uk-width-1-1">
+      <input type="hidden" :name='name' v-model="inputValue" :readonly="disabled">
+	  <input class="uk-input" :class="{error: error}" @focus="showDropdown" readonly="true" v-model="inputValueText">
+      <div v-if="dropdownVisible" class="uk-dropdown uk-width-1-1 uk-padding-remove uk-overflow-auto uk-height-max-medium" uk-dropdown='mode: click; pos: bottom-justify'>
+        <input type="text" class="uk-input" v-model="searchText" placeholder="検索...">
+        <ul class="uk-nav uk-dropdown-nav">
+          <li v-for="option in filteredOptions" @click="selectOption(option)" class="uk-padding-small uk-link hover-bg-gray-200 uk-transition-toggle">
+            <a href="#" class="uk-text-emphasis">{{ option.text }}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  `,
+  data() {
+    return {
+		inputValueText: '',
+		inputValue: '',
+		searchText: '',
+		dropdownVisible: false,
+    };
+  },
+  computed: {
+    filteredOptions() {
+      return this.options.filter(option =>
+        option.text.toUpperCase().includes(this.searchText.toUpperCase())
+      );
+    },
+  },
+  mounted(){
+	const selectedOption = this.options.find(option => option.value === (this.default ?? this.value ) ?? '');
+	this.inputValue = selectedOption.value;
+	this.inputValueText = selectedOption.text;
+  },
+  methods: {
+    showDropdown() {
+      if (!this.disabled) {
+        this.dropdownVisible = true;
+      }
+    },
+    hideDropdown() {
+      this.dropdownVisible = false;
+    },
+    selectOption(option) {
+      this.inputValue = option.value;
+	  this.inputValueText = option.text;
+      this.$emit('input', option.value);
+      this.dropdownVisible = false;
+    },
+  },
+  watch: {
+    value(val) {
+      const selectedOption = this.options.find(option => option.value === val);
+      this.inputValue = selectedOption ? selectedOption.value : '';
+    },
+    options: {
+      handler(newOptions) {
+        if(newOptions.length === 1)
+        {
+          this.selectOption(newOptions[0]);
+        } else {
+          this.selectOption(newOptions.find(option => option.value === this.value));
+        }
+        this.filteredOptions = newOptions;
+      },
+      deep: true,
+    },
+  },
+});
+
 $(function(){
 	
   $('input[type="number"]').not('.joypla-333').on('change', function(e){
@@ -360,15 +432,15 @@ function check_gs1128(code){
 		return result;
 	}
 	
-	let custom_loading = false;
+	let custom_loading2 = false;
 	$("#content").ajaxStart(function() {
-		if(custom_loading !== true){
+		if(custom_loading2 !== true){
 			loading();
 		}
 	});
 	
 	$("#content").ajaxComplete(function() {
-		if(custom_loading !== true){
+		if(custom_loading2 !== true){
 			loading_remove();
 		}
 	});

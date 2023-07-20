@@ -17,43 +17,24 @@ use LoggingConfig;
 
 class JoyPlaApplication extends Application
 {
+    private ?Auth $auth = null;
+
     public function __construct()
     {
         config_path('JoyPla/Config/app');
+        $this->auth = self::initAuth();
         $this->boot();
     }
 
-    public function boot()
+    public function getAuth()
     {
-        Request::setPathKey('path');
+        return $this->auth;
+    }
 
-        /** logger 設定 */
-        SpiralConnecter::$logger = new Logger(
-            new Spiralv2LogginObject(
-                LoggingConfig::SPIRALV2_API_KEY,
-                LoggingConfig::LOGGING_APP_TITLE,
-                LoggingConfig::SPIRAL_API_LOGGING_DB_TITLE,
-                LoggingConfig::LOG_LEVEL
-            )
-        );
-        ApiSpiral::$logger = new Logger(
-            new Spiralv2LogginObject(
-                LoggingConfig::SPIRALV2_API_KEY,
-                LoggingConfig::LOGGING_APP_TITLE,
-                LoggingConfig::SPIRAL_API_LOGGING_DB_TITLE,
-                LoggingConfig::LOG_LEVEL
-            )
-        );
-        ApiResponse::$logger = new Logger(
-            new Spiralv2LogginObject(
-                LoggingConfig::SPIRALV2_API_KEY,
-                LoggingConfig::LOGGING_APP_TITLE,
-                LoggingConfig::JOYPLA_API_LOGGING_DB_TITLE,
-                LoggingConfig::LOG_LEVEL
-            )
-        );
-
-        $auth = new Auth('NJ_HUserDB', [
+    public static function initAuth()
+    {
+        return new Auth('NJ_HUserDB', [
+            'id',
             'registrationTime',
             'updateTime',
             'authKey',
@@ -72,6 +53,23 @@ class JoyPlaApplication extends Application
             'hospitalAuthKey',
             'userCheck',
         ]);
+    }
+
+    public function boot()
+    {
+        Request::setPathKey('path');
+
+        /** logger 設定 */
+        ApiResponse::$logger = new Logger(
+            new Spiralv2LogginObject(
+                LoggingConfig::SPIRALV2_API_KEY,
+                LoggingConfig::LOGGING_APP_TITLE,
+                LoggingConfig::JOYPLA_API_LOGGING_DB_TITLE,
+                LoggingConfig::LOG_LEVEL
+            )
+        );
+
+        $auth = $this->auth;
 
         $tenant = ModelRepository::getTenantInstance()
             ->where('tenantId', $auth->tenantId)
@@ -102,6 +100,13 @@ class JoyPlaApplication extends Application
 
         Gate::define('is_approver', function (Auth $auth) {
             if ($auth->userPermission == '3') {
+                return true;
+            }
+            return false;
+        });
+
+        Gate::define('is_use_direct_delivery', function(){
+            if(defined('IS_USE_DIRECT_DELIVERY') && IS_USE_DIRECT_DELIVERY){
                 return true;
             }
             return false;
@@ -144,6 +149,21 @@ class JoyPlaApplication extends Application
             if ($auth->userPermission == '2') {
                 //担当者
                 return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
+        Gate::define('update_of_consumption_slips', function (
+            Auth $auth
+        ) {
+            //
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            if ($auth->userPermission == '3') {
+                //承認者
+                return new GatePermissionModel(false, false);
             }
             return new GatePermissionModel(true, false);
         });
@@ -220,11 +240,35 @@ class JoyPlaApplication extends Application
             return new GatePermissionModel(true, false);
         });
 
+        Gate::define('delete_of_order_slips', function (Auth $auth) {
+            //発注削除
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(false, false);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
         Gate::define('list_of_order_slips', function (Auth $auth) {
             //発注伝票一覧
             if ($auth->userPermission == '2') {
                 //担当者
                 return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
+        Gate::define('update_of_consumption_slips', function (
+            Auth $auth
+        ) {
+            //
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            if ($auth->userPermission == '3') {
+                //承認者
+                return new GatePermissionModel(false, false);
             }
             return new GatePermissionModel(true, false);
         });
@@ -259,6 +303,15 @@ class JoyPlaApplication extends Application
             }
             if ($auth->userPermission == '3') {
                 //承認者
+                return new GatePermissionModel(false, false);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
+        Gate::define('late_receipt', function (Auth $auth) {
+            //あとから入庫
+            if ($auth->userPermission != '1') {
+                //管理者以外
                 return new GatePermissionModel(false, false);
             }
             return new GatePermissionModel(true, false);
@@ -545,6 +598,15 @@ class JoyPlaApplication extends Application
             return new GatePermissionModel(true, false);
         });
 
+        Gate::define('item_request_bulk', function (Auth $auth) {
+            //請求商品一覧
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(false, false);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
         Gate::define('register_of_payouts', function (Auth $auth) {
             //払出登録
             if ($auth->userPermission == '2') {
@@ -553,5 +615,69 @@ class JoyPlaApplication extends Application
             }
             return new GatePermissionModel(true, false);
         });
+        
+        Gate::define('list_of_payout_slips', function (Auth $auth) {
+            //払出登録
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
+        Gate::define('list_of_accountant_slips', function (Auth $auth) {
+            //会計一覧
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
+        Gate::define('register_of_accountant', function (Auth $auth) {
+            //会計一覧
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
+        Gate::define('list_of_itemList_slips', function (Auth $auth) {
+            //商品リスト
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
+        Gate::define('register_of_itemList', function (Auth $auth) {
+            //商品リスト-詳細
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
+        Gate::define('list_of_stocktakingList_slips', function (Auth $auth) {
+            //棚卸商品管理表
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
+        Gate::define('register_of_stocktakingList', function (Auth $auth) {
+            //棚卸商品管理表-詳細
+            if ($auth->userPermission == '2') {
+                //担当者
+                return new GatePermissionModel(true, true);
+            }
+            return new GatePermissionModel(true, false);
+        });
+
     }
 }

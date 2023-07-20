@@ -67,6 +67,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
             $orderItems = $this->repositoryProvider
                 ->getOrderRepository()
                 ->findByInHospitalItem($hospitalId, $inputData->orderItems);
+
             $historyOrders = [];
             if ($inputData->integrate) {
                 $historyOrders = $this->repositoryProvider
@@ -127,7 +128,9 @@ namespace JoyPla\Application\Interactors\Api\Order {
                     new TextArea512Bytes(''),
                     new TextArea512Bytes(''),
                     $inputData->user->name,
-                    1
+                    1,
+                    $i->getDistributor()->getOrderMethod() == '1' ||
+                        $i->getDistributor()->getOrderMethod() == '2'
                 );
             }
 

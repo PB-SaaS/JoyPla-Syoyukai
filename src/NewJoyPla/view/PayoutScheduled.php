@@ -108,26 +108,7 @@
 					<div class="uk-width-1-3@m">
 						<label class="uk-form-label" > </label>
 						<div class="uk-form-controls">
-							<select class="uk-select" v-model="source_division" v-bind:disabled="lists.length > 0">
-								<option value="">----- 部署選択 -----</option>
-								<?php
-									foreach($source_division->data as $data)
-									{
-										if($data->divisionType === '1')
-										{
-											echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
-											echo '<option value="" disabled>--------------------</option>';
-										}
-									}
-									foreach($source_division->data as $data)
-									{
-										if($data->divisionType === '2')
-										{
-											echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
-										}
-									}
-								?>
-							</select>
+							<searchable-select name="sourceDivision" v-model="source_division" id="sourceDivisionId" v-bind:disabled="lists.length > 0" :options="sourceDivisionOptions"></searchable-select>
 						</div>
 						<span class="uk-text-danger"> </span>
 					</div>
@@ -188,25 +169,7 @@
 									<span v-else>{{(list.kakaku / list.irisu)| number_format}}</span>
 								</td>
 								<td class="uk-text-nowrap">
-									<select class="uk-select" v-model="list.target_division"  v-bind:class="{'change':list.change_class.target_division, 'error':list.error_class.target_division}" v-on:change="list.change_class.target_division = true;list.error_class.target_division = false" v-bind:disabled="list.exist_card">
-										<option value="">----- 払出先選択 -----</option>
-										<?php
-											foreach($target_division->data as $data)
-											{
-												if($data->divisionType === '1')
-												{
-													echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
-												}
-											}
-											foreach($target_division->data as $data)
-											{
-												if($data->divisionType === '2')
-												{
-													echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
-												}
-											}
-										?>
-									</select>
+									<searchable-select name="targetDivision" v-model="list.target_division" id="targetDDivisionId" v-bind:disabled="lists.length > 0" :options="targetDivisionOptions" v-bind:class="{'change':list.change_class.target_division, 'error':list.error_class.target_division}" v-on:change="list.change_class.target_division = true;list.error_class.target_division = false" v-bind:disabled="list.exist_card"></searchable-select>
 								</td>
 								<td class="uk-text-nowrap">
 									<input type="number" class="uk-input uk-width-small" min="0" style="width: 96px" v-model="list.payoutCount" v-bind:class="{'change':list.change_class.payout_count, 'error':list.error_class.payout_count }" v-on:change="list.change_class.payout_count = true;list.error_class.payout_count = false" v-bind:disabled="list.exist_card">
@@ -240,7 +203,7 @@
 		</div>
 	</div>
 	
-	<form action="<?php echo $api_url ?>&Action=payoutLabel" target="_blank" method="post" class="uk-hidden" name="LabelCreate">
+	<form action="<?php echo $api_url; ?>&Action=payoutLabel" target="_blank" method="post" class="uk-hidden" name="LabelCreate">
 		<input type="hidden" value="" name="payoutHistoryId" id="payoutHistoryId">
 		<input type="hidden" value="payout" name="pattern">
 	</form>
@@ -292,13 +255,65 @@
 	</div>
 <script>
 
+<?php
+$source_options = [
+    [
+        'value' => '',
+        'text' => '----- 部署を選択してください -----',
+    ],
+];
+foreach ($source_division->data as $data) {
+    if ($data->divisionType === '1') {
+        $source_options[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+foreach ($source_division->data as $data) {
+    if ($data->divisionType === '2') {
+        $source_options[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+$defaultSourceDivisionId = $user_info->isUser()
+    ? $user_info->getDivisionId()
+    : '';
+
+$target_options = [
+    [
+        'value' => '',
+        'text' => '----- 部署を選択してください -----',
+    ],
+];
+foreach ($target_division->data as $data) {
+    if ($data->divisionType === '1') {
+        $target_options[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+foreach ($target_division->data as $data) {
+    if ($data->divisionType === '2') {
+        $target_options[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+?>
 var app = new Vue({
 	el: '#app',
 	data: {
 		lists: [],
+		sourceDivisionOptions: <?php echo json_encode($source_options); ?>,
+		targetDivisionOptions: <?php echo json_encode($target_options); ?>,
 		change_class: {'payout_count':false,'target_division':false},
 		error_class: {'payout_count':false,'target_division':false},
-		source_division: "<?php echo ($user_info->isUser())? $user_info->getDivisionId() : "" ; ?>",
+		source_division: "<?php echo $defaultSourceDivisionId; ?>",
 		payout_schedule : '',
 		payout_schedule_class : {'error': false},
         useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
@@ -436,11 +451,11 @@ var app = new Vue({
 				
 				loading();
 				$.ajax({
-	                url: "<?php echo $api_url ?>",
+	                url: "<?php echo $api_url; ?>",
 					type:'POST',
 					data:{
 	                	Action : 'regPayoutScheduledApi',
-						_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+						_csrf: "<?php echo $csrf_token; ?>",  // CSRFトークンを送信
 	                	items : JSON.stringify( objectValueToURIencode(app.lists) ),
 					},
 					dataType: 'json'
@@ -495,7 +510,7 @@ var app = new Vue({
                 url:'%url/rel:mpgt:labelBarcodeSAPI%',
                 type:'POST',
                 data:{
-					_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+					_csrf: "<?php echo $csrf_token; ?>",  // CSRFトークンを送信
                 	divisionId : app.source_division,
                 	barcode : barcode,
                 },

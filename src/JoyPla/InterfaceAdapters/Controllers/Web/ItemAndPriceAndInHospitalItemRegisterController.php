@@ -56,27 +56,27 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
         'smallCategory' => ['maxword:128'],
         'itemCode' => ['maxword:128'],
         'itemStandard' => ['maxword:128'],
-        'itemJANCode' => ['required', 'digits:13'],
+        'itemJANCode' => ['required', 'numeric', 'digits:13'],
         'makerName' => ['maxword:128'],
         'catalogNo' => ['maxword:128'],
         'serialNo' => ['maxword:128'],
         'lotManagement' => [],
         'officialFlag' => [],
-        'officialprice' => ['min:0'],
-        'officialpriceOld' => ['min:0'],
-        'quantity' => ['required', 'min:1'],
+        'officialprice' => ['min:0', 'numeric'],
+        'officialpriceOld' => ['min:0', 'numeric'],
+        'quantity' => ['required', 'min:1', 'numeric'],
         'quantityUnit' => ['required'],
         'itemUnit' => ['required'],
-        'minPrice' => ['min:0'],
+        'minPrice' => ['min:0', 'numeric'],
         'distributorId' => ['required'],
         'distributorMCode' => ['maxword:128'],
-        'price' => ['required', 'min:0'],
-        'unitPrice' => ['required', 'min:0'],
+        'price' => ['required', 'min:0', 'numeric'],
+        'unitPrice' => ['required', 'min:0', 'numeric'],
         'medicineCategory' => ['maxword:512'],
         'homeCategory' => ['maxword:512'],
         'measuringInst' => ['maxword:128'],
         'notice' => ['maxword:512'],
-        'janTenantId' => ['janTenantUnique'],
+        'janTenantId' => ['unique:NJ_itemDB,janTenantId'],
     ];
 
     private array $labels = [
@@ -123,10 +123,11 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
             $validate = SiValidator::make($input, $this->rules, $this->labels);
         }
 
+        /*
         $duplicate = SiValidator::validate($input['janTenantId'], 'JANコード', [
             SpiralDbUniqueRule::unique('NJ_itemDB', 'janTenantId'),
         ]);
-
+        */
         $distributor = SpiralDB::title('NJ_distributorDB')
             ->where('hospitalId', $this->request->user()->hospitalId)
             ->value(['distributorId', 'distributorName'])
@@ -138,7 +139,7 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
                 'html/Product/ItemAndPriceAndInHospitalItemRegist/input',
                 [
                     'distributor' => $distributor,
-                    'duplicate' => $duplicate->toArray(),
+                    //'duplicate' => $duplicate->toArray(),
                     'input' => $this->request->all(),
                     'validate' => $validate,
                     'csrf' => Csrf::generate(),
@@ -164,12 +165,13 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
         $this->request->session()->put($this->formName, $input);
 
         $validate = SiValidator::make($input, $this->rules, $this->labels);
-
+        /*
         $duplicate = SiValidator::validate($input['janTenantId'], 'JANコード', [
             SpiralDbUniqueRule::unique('NJ_itemDB', 'janTenantId'),
         ]);
-
-        if ($validate->isError() || !$duplicate->isValid()) {
+*/
+        // if ($validate->isError() || !$duplicate->isValid()) {
+        if ($validate->isError()) {
             $this->request->set('confirm', true);
             Router::redirect(
                 '/product/ItemAndPriceAndInHospitalRegist/input',
@@ -214,16 +216,17 @@ class ItemAndPriceAndInHospitalItemRegisterController extends Controller
         $this->request->merge($input);
 
         $validate = SiValidator::make($input, $this->rules, $this->labels);
-
+        /*
         $duplicate = SiValidator::validate($input['janTenantId'], 'JANコード', [
             SpiralDbUniqueRule::unique('NJ_itemDB', 'janTenantId'),
         ]);
-
         if (
             $this->request->formBack ||
             $validate->isError() ||
             !$duplicate->isValid()
         ) {
+*/
+        if ($this->request->formBack || $validate->isError()) {
             $this->request->set('confirm', true);
             Router::redirect(
                 '/product/ItemAndPriceAndInHospitalRegist/input',

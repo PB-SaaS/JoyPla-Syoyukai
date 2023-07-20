@@ -23,6 +23,7 @@ class ReceivedRepository implements ReceivedRepositoryInterface
         foreach ($receiveds as $key => $received) {
             $receivedToArray = $received->toArray();
             $history[] = [
+                'registrationTime' => $receivedToArray['registDate'],
                 'receivingHId' => $receivedToArray['receivedId'],
                 'distributorId' =>
                     $receivedToArray['distributor']['distributorId'],
@@ -37,6 +38,7 @@ class ReceivedRepository implements ReceivedRepositoryInterface
 
             foreach ($receivedToArray['receivedItems'] as $receivedItem) {
                 $items[] = [
+                    'registrationTime' => $receivedToArray['registDate'],
                     'orderCNumber' => $receivedItem['orderItemId'],
                     'receivingCount' => $receivedItem['receivedQuantity'],
                     'receivingHId' => $receivedItem['receivedId'],
@@ -224,7 +226,7 @@ class ReceivedRepository implements ReceivedRepositoryInterface
             $receiveds[] = $received;
         }
 
-        return [$receiveds, $historys->getData()->count()];
+        return [$receiveds, $historys->getTotal()];
     }
 
     public function index(HospitalId $hospitalId, ReceivedId $receivedId)

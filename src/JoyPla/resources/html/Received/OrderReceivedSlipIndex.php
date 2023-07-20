@@ -8,6 +8,10 @@
                 <h1 class="text-2xl mb-2">入荷登録</h1>
                 <hr>
                 <div class="py-5">
+                    <v-input type="date" name="receivedDate" :rules="{}" title="入荷日指定" label="入荷日指定"></v-input>
+                    <v-input type="date" name="accountantDate" :rules="{}" title="会計日指定" label="会計日指定"></v-input>
+                </div>
+                <div class="py-5">
                     <v-button-primary type="button" :disabled="! isChange" @click.native="onRegister">入荷照合確定</v-button-primary>
                     <v-button-primary type="button" class="mx-4" @click.native="reflect">入荷可能数を反映</v-button-primary>
                 </div>
@@ -299,6 +303,8 @@
                     isSubmitting
                 } = useForm({
                     initialValues: {
+                        'accountantDate' : '',
+                        'receivedDate' : '',
                         'orderId': order.orderId,
                         'adjustment': order.adjustment,
                         'orderItems': order
@@ -348,7 +354,7 @@
                     sleepComplate();
                 });
                 const breadcrumbs = [{
-                    text: '発注メニュー',
+                    text: '発注・入荷メニュー',
                     disabled: false,
                     href: _ROOT + '&path=/order'
                 }, {
@@ -413,8 +419,10 @@
                                         params.append("path", "/api/" + values.orderId + "/received/register");
                                         params.append("_method", 'post');
                                         params.append("_csrf", _CSRF);
+                                        params.append("accountantDate", values.accountantDate);
                                         params.append("registerModel", JSON.stringify(encodeURIToObject(registerModel)));
-
+                                        params.append("receivedDate", values.receivedDate);
+                                        
                                         const res = await axios.post(_APIURL, params);
                                         complete();
                                         if (res.data.code != 200) {

@@ -52,6 +52,7 @@ class ModelRepository
             'authKey',
             'vendorFlag',
             'distCommonId',
+            'orderMethod',
         ]);
     }
 
@@ -112,6 +113,8 @@ class ModelRepository
             'receivingTarget',
             'adjustment',
             'distrComment',
+            'orderMethod',
+            'sentFlag',
         ]);
     }
 
@@ -159,6 +162,7 @@ class ModelRepository
             'distributorCode',
             'medicodeStatus',
             'medicodeSentDate',
+            'orderMethod',
         ]);
     }
 
@@ -174,6 +178,7 @@ class ModelRepository
             'deleteFlag',
             'authkey',
             'deliveryDestCode',
+            'subSendCode'
         ]);
     }
 
@@ -199,6 +204,7 @@ class ModelRepository
             'staffName',
             'adjustment',
             'distrComment',
+            'sentFlag',
         ]);
     }
 
@@ -234,6 +240,7 @@ class ModelRepository
             'medicodeStatus',
             'medicodeSentDate',
             'deliveryDestCode',
+            'subSendCode'
         ]);
     }
 
@@ -637,6 +644,8 @@ class ModelRepository
             'targetDivision',
             'itemsNumber',
             'totalAmount',
+            'payoutDate',
+            'updateTime',
         ]);
     }
 
@@ -670,6 +679,53 @@ class ModelRepository
         ]);
     }
 
+    
+    public static function getPayoutViewItemInstance()
+    {
+        return SpiralDB::title('T_PayoutItems')->value([
+            'id',
+            'registrationTime',
+            'updateTime',
+            'payoutHistoryId',
+            'payoutId',
+            'inHospitalItemId',
+            'hospitalId',
+            'sourceDivisionId',
+            'targetDivisionId',
+            'quantity',
+            'quantityUnit',
+            'itemUnit',
+            'price',
+            'payoutQuantity',
+            'payoutAmount',
+            'payoutCount',
+            'payoutLabelCount',
+            'adjAmount',
+            'priceAfterAdj',
+            'lotNumber',
+            'lotDate',
+            'unitPrice',
+            'cardId',
+            'itemId',
+            'hospitalName',
+            'itemName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'makerName',
+            'officialFlag',
+            'tenantId',
+            'category',
+            'sourceDivision',
+            'targetDivision',
+            'smallCategory',
+            'payoutType',
+            'catalogNo',
+            'officialprice',
+            'distributorName',
+        ]);
+    }
+
     public static function getPriceInstance()
     {
         return SpiralDB::title('NJ_PriceDB')->value([
@@ -687,6 +743,8 @@ class ModelRepository
             'notice',
             'notUsedFlag',
             'requestId',
+            'distributorMCode',
+            'unitPrice',
         ]);
     }
 
@@ -1037,6 +1095,31 @@ class ModelRepository
         ]);
     }
 
+    public static function getStockItemViewInstance()
+    {
+        return SpiralDB::title('340_stock')->value([
+            'id',
+            'inHospitalItemId',
+            'rackName',
+            'itemId',
+            'itemName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'makerName',
+            'quantity',
+            'quantityUnit',
+            'itemUnit',
+            'stockQuantity',
+            'hospitalName',
+            'divisionName',
+            'hospitalId',
+            'divisionId',
+            'constantByDiv',
+            'distributorName',
+        ]);
+    }
+
     public static function getTenantInstance()
     {
         return SpiralDB::title('NJ_TenantAdminDB')->value([
@@ -1102,4 +1185,438 @@ class ModelRepository
             'measuringInst',
         ]);
     }
+
+    public static function getAccountantInstance()
+    {
+        return SpiralDB::title('NJ_Accountant')->value([
+            'id',
+            'registTime',
+            'updateTime',
+            'hospitalId',
+            'divisionId',
+            'distributorId',
+            'accountantId',
+            'accountantDate',
+            'orderNumber',
+            'receivingNumber',
+            'totalAmount',
+            'isDeleted',
+        ]);
+    }
+
+    
+    public static function getAcceptanceInstance()
+    {
+        return SpiralDB::title('NJ_Acceptance')->value([
+            'id',
+            'registTime',
+            'updateTime',
+            'acceptanceId',
+            'hospitalId',
+            'sourceDivisionId',
+            'targetDivisionId',
+            'acceptanceDate',
+            'isComplete',
+        ]);
+    }
+    
+    public static function getAcceptanceItemInstance()
+    {
+        return SpiralDB::title('NJ_AcceptItem')->value([
+            'id',
+            'registrationTime',
+            'updateTime',
+            'acceptanceId',
+            'acceptanceItemId',
+            'inHospitalItemId',
+            'lotNumber',
+            'lotDate',
+            'quantity',
+            'quantityUnit',
+            'itemUnit',
+            'price',
+            'unitPrice',
+            'acceptanceCount',
+            'payoutCount',
+        ]);
+    }
+
+    public static function getAccountantItemInstance()
+    {
+        return SpiralDB::title('NJ_AccountantI')->value([
+            'id',
+            'registTime',
+            'updateTime',
+            'accountantId',
+            'itemId',
+            'itemName',
+            'makerName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'count',
+            'unit',
+            'price',
+            'taxrate',
+            'accountantItemId',
+            'action',
+            'method',
+            'index',
+        ]);
+    }
+
+    public static function getAccountantItemViewInstance()
+    {
+        return SpiralDB::title('accountantItems')->value([
+            'id',
+            'registTime',
+            'updateTime',
+            'hospitalId',
+            'divisionId',
+            'distributorId',
+            'accountantId',
+            'accountantDate',
+            'orderNumber',
+            'receivingNumber',
+            'totalAmount',
+            'itemId',
+            'itemName',
+            'makerName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'count',
+            'unit',
+            'price',
+            'taxrate',
+            'accountantItemId',
+            'action',
+            'method',
+            'index',
+            'isDeleted',
+        ]);
+    }
+
+    public static function getAccountantLogViewInstance()
+    {
+        return SpiralDB::title('accountantLog')->value([
+            'id',
+            'registTime',
+            'kinds',
+            'hospitalId',
+            'divisionId',
+            'distributorId',
+            'accountantId',
+            'accountantDate',
+            'orderNumber',
+            'receivingNumber',
+            'totalAmount',
+            'itemId',
+            'itemName',
+            'makerName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'count',
+            'unit',
+            'price',
+            'taxrate',
+            'accountantItemId',
+            'action',
+            'method',
+            'index',
+            'userId',
+            'isDeleted',
+        ]);
+    }
+
+    public static function getAccountantItemLogInstance()
+    {
+        return SpiralDB::title('NJ_AItemLog')->value([
+            'id',
+            'registTime',
+            'accountantId',
+            'itemId',
+            'itemName',
+            'makerName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'count',
+            'unit',
+            'price',
+            'taxrate',
+            'accountantItemId',
+            'action',
+            'method',
+            'index',
+            'kinds',
+            'userId',
+        ]);
+    }
+
+    public static function getReservationPriceInstance()
+    {
+        return SpiralDB::title('NJ_Reservation')->value([
+            'id',
+            'registrationTime',
+            'updateTime',
+            'reservationTime',
+            'priceId',
+            'hospitalId',
+            'itemId',
+            'distributorId',
+            'distributorMCode',
+            'quantity',
+            'itemUnit',
+            'unitPrice',
+            'price',
+            'notice',
+            'isActive',
+            'recordId',
+        ]);
+    }
+
+    public static function getReservationPriceViewInstance()
+    {
+        return SpiralDB::title('reservationPrice')->value([
+            'id',
+            'registrationTime',
+            'updateTime',
+            'reservationTime',
+            'priceId',
+            'hospitalId',
+            'itemId',
+            'distributorId',
+            'distributorMCode',
+            'quantity',
+            'quantityUnit',
+            'itemUnit',
+            'unitPrice',
+            'price',
+            'notice',
+            'isActive',
+            'authKey',
+        ]);
+    }
+
+    public static function getPriceUpsertTransactionInstance()
+    {
+        return SpiralDB::title('T_Price')->value([
+            'id',
+            'registrationTime',
+            'priceId',
+            'itemId',
+            'itemsAuthKey',
+            'hospitalId',
+            'distributorId',
+            'quantity',
+            'itemUnit',
+            'price',
+            'notice',
+            'unitPrice',
+            'distributorMCode',
+        ]);
+    }
+
+    public static function getItemListTableInstance()
+    {
+        return SpiralDB::title('NJ_ItemListTbl')->value([ //商品リストDB
+            'id',
+            'registrationTime',
+            'updateTime',
+            'itemListId',
+            'itemListName',
+            'hospitalId',
+            'divisionId',
+            'itemsNumber',
+            'usableStatus',
+        ]);
+    }
+
+    public static function getItemListRowsInstance()
+    {
+        return SpiralDB::title('NJ_ItemListRows')->value([ //商品リスト項目DB
+            'id',
+            'registrationTime',
+            'updateTime',
+            'itemListId',
+            'itemListRowId',
+            'hospitalId',
+            'divisionId',
+            'inHospitalItemId',
+            'itemId',
+            'distributorId',
+            'index',
+        ]);
+    }
+
+    public static function getItemListTableViewInstance()
+    {
+        return SpiralDB::title('itemListTblView')->value([ //商品リスト仮想DB-画面表示に使うかもしれないやつ
+            'id',
+            'registrationTime',
+            'updateTime',
+            'itemListId',
+            'itemListName',
+            'hospitalId',
+            'divisionId',
+            'itemsNumber',
+            'usableStatus',
+            'hospitalName',
+            'divisionName',
+        ]);
+    }
+
+    public static function getItemListRowsViewInstance()
+    {
+        return SpiralDB::title('itemListRowsView')->value([ //商品リスト項目仮想DB-画面表示に使うかもしれないやつ
+            'id',
+            'registrationTime',
+            'updateTime',
+            'itemListId',
+            'itemListRowId',
+            'hospitalId',
+            'divisionId',
+            'inHospitalItemId',
+            'itemId',
+            'distributorId',
+            'index',
+            'distributorName',
+            'hospitalName',
+            'divisionName',
+            'itemName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'quantity',
+            'quantityUnit',
+            'itemUnit',
+            'labelId',
+            'makerName',
+        ]);
+    }
+
+    public static function getStocktakingListTableInstance()
+    {
+        return SpiralDB::title('NJ_StockList')->value([ //棚卸商品管理表DB
+            'id',
+            'registrationTime',
+            'updateTime',
+            'stockListId', //機能名とフィールドタイトルが違うため注意
+            'stockListName', //機能名とフィールドタイトルが違うため注意
+            'hospitalId',
+            'divisionId',
+            'itemsNumber',
+        ]);
+    }
+
+    public static function getStocktakingListRowsInstance()
+    {
+        return SpiralDB::title('NJ_StockListRows')->value([ //棚卸商品管理表項目DB
+            'id',
+            'registrationTime',
+            'updateTime',
+            'stockListId', //機能名とフィールドタイトルが違うため注意
+            'stockListRowId', //機能名とフィールドタイトルが違うため注意
+            'hospitalId',
+            'divisionId',
+            'inHospitalItemId',
+            'itemId',
+            'distributorId',
+            'rackName',
+            'mandatoryFlag',
+            'index',
+        ]);
+    }
+
+    public static function getStocktakingListTableViewInstance()
+    {
+        return SpiralDB::title('StockListView')->value([ //棚卸商品管理表仮想DB-画面表示に使うかもしれないやつ
+            'id',
+            'registrationTime',
+            'updateTime',
+            'stockListId', //機能名とフィールドタイトルが違うため注意
+            'stockListName', //機能名とフィールドタイトルが違うため注意
+            'hospitalId',
+            'divisionId',
+            'itemsNumber',
+            'divisionName',
+            'hospitalName',
+        ]);
+    }
+
+    public static function getStocktakingListRowsViewInstance()
+    {
+        return SpiralDB::title('StockListRowView')->value([ //棚卸商品管理表項目仮想DB-画面表示に使うかもしれないやつ
+            'id',
+            'registrationTime',
+            'updateTime',
+            'stockListId', //機能名とフィールドタイトルが違うため注意
+            'stockListRowId', //機能名とフィールドタイトルが違うため注意
+            'hospitalId',
+            'divisionId',
+            'inHospitalItemId',
+            'itemId',
+            'distributorId',
+            'rackName',
+            'mandatoryFlag',
+            'index',
+            'distributorName',
+            'hospitalName',
+            'divisionName',
+            'itemName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'quantity',
+            'quantityUnit',
+            'itemUnit',
+            'labelId',
+            'price',
+            'priceId',
+            'invUnitPrice',
+            'makerName',
+        ]);
+    }
+
+    
+    public static function getAcceptanceItemViewInstance()
+    {
+        return SpiralDB::title('acceptanceItem')->value([
+            'id',
+            'registrationTime',
+            'updateTime',
+            'acceptanceId',
+            'acceptanceItemId',
+            'inHospitalItemId',
+            'lotNumber',
+            'lotDate',
+            'quantity',
+            'quantityUnit',
+            'itemUnit',
+            'price',
+            'unitPrice',
+            'acceptanceCount',
+            'payoutCount',
+            'sourceDivisionId',
+            'targetDivisionId',
+            'hospitalId',
+            'acceptanceDate',
+            'isComplete',
+            'authKey',
+            'distributorId',
+            'catalogNo',
+            'serialNo',
+            'medicineCategory',
+            'homeCategory',
+            'notUsedFlag',
+            'itemId',
+            'itemName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+        ]);
+    }
+
 }

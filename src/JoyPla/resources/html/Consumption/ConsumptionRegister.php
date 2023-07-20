@@ -29,6 +29,17 @@
             ); ?>"
             />
           </div>
+          <?php if(gate('is_use_direct_delivery')): ?>
+          <div class="mb-2 lg:w-1/3">
+            <v-select 
+            name="type" 
+            label="消費タイプ指定" 
+            :rules="{ required : false }"
+            title="消費タイプ指定"
+            :options="consumeTypes"
+            />
+          </div>
+          <?php endif; ?>
           <div class="my-4 grid grid-cols-3 gap-4 lg:w-1/3">
             <v-button-default type="button" data-micromodal-trigger="inHospitalItemModal">商品検索</v-button-default>
             <v-in-hospital-item-modal v-on:additem="additem" :unit-price-use="consumptionUnitPriceUseFlag">
@@ -91,10 +102,10 @@
                   <div class="lg:flex gap-6">
                     <div class="lg:w-1/2">
                       <v-input-number 
-                      :rules="{ between: [0 , 99999] }" 
+                      :rules="{ between: (values.type === '1') && [0 , 99999] || (values.type === '3') && [-99999 , 99999] }" 
                       :name="`consumeItems[${idx}].consumeUnitQuantity`"
+                      :min="(values.type === '1') && 0 || (values.type === '3') && -99999"
                       label="消費数（個数）" 
-                      :min="0" 
                       :unit="item.value.itemUnit" 
                       :step="1" 
                       :title="`消費数（個数）/${item.value.quantity}${ item.value.quantityUnit }入り`" 
@@ -102,10 +113,10 @@
                     </div>
                     <div class="lg:w-1/2">
                       <v-input-number 
-                      :rules="{ between: [0 , 99999] }" 
+                      :rules="{ between:  (values.type === '1') && [0 , 99999] || (values.type === '3') && [-99999 , 99999] }" 
                       :name="`consumeItems[${idx}].consumeQuantity`" 
                       label="消費数（入数）" 
-                      :min="0" 
+                      :min="(values.type === '1') && 0 || (values.type === '3') && -99999"
                       :unit="item.value.quantityUnit" 
                       :step="1"
                       title="消費数（入数）" ></v-input-number>
@@ -222,6 +233,7 @@ var JoyPlaApp = Vue.createApp({
           consumeItems: [],
           divisionId: "",
           consumeDate: yyyy+'-'+mm+'-'+dd,
+          type : '1',
         },
         validateOnMount : false
       });
@@ -255,7 +267,7 @@ var JoyPlaApp = Vue.createApp({
         let items = values.consumeItems;
         let consumeItems = [];
         items.forEach(function(item, idx){
-          if( consumeQuantity(idx) > 0 ){ consumeItems.push({
+          if( consumeQuantity(idx) !== 0 ){ consumeItems.push({
             'inHospitalItemId': item.inHospitalItemId,
             'consumeLotDate': item.consumeLotDate,
             'consumeLotNumber': item.consumeLotNumber,
@@ -328,9 +340,13 @@ var JoyPlaApp = Vue.createApp({
         } 
         else 
         {
+          text = '消費登録を行います。よろしいですか？';
+          if(values.type === '3'){
+            text = '直納処理を行います。よろしいですか？<br>※直納処理は在庫変動しません';
+          }
           Swal.fire({
             title: '確認',
-            text: "消費登録を行います。よろしいですか？",
+            html: text,
             icon: 'info',
             showCancelButton: true,
             reverseButtons: true,
@@ -362,6 +378,7 @@ var JoyPlaApp = Vue.createApp({
             params.append("path", "/api/consumption/register");
             params.append("_method", 'post');
             params.append("_csrf", _CSRF);
+            params.append("consumptionType", values.type);
             params.append("consumptionDate", values.consumeDate);
             params.append("consumptionItems", JSON.stringify(encodeURIToObject(consumptionModels)));
 
@@ -492,7 +509,13 @@ var JoyPlaApp = Vue.createApp({
         }
       }
 
+      const consumeTypes =  [
+        { label: "通常消費", value: "1" },
+        { label: "直納処理", value: "3" }
+      ];
+
       return {
+        consumeTypes,
         values,
         addItemByBarcode,
         selectInHospitalItems,
@@ -532,6 +555,8 @@ var JoyPlaApp = Vue.createApp({
         deep: true
       },
     },
+
+
     components: {
       'v-barcode-search' : vBarcodeSearch,
       'v-loading' : vLoading,

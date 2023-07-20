@@ -151,6 +151,7 @@ class OrderMRController extends Controller
         $total_amount = 0;
     
         OrderedItemView::where('hospitalId',$user_info->getHospitalId())->where('orderStatus','1','!=');
+        OrderedItemView::where('orderCNumber', 'BO%', 'LIKE'); //BOで先頭一致はあとから入荷以外のため。
         if ($startMonth) { OrderedItemView::where('orderTime', $startMonth, '>='); }
         if ($endMonth) { OrderedItemView::where('orderTime', (date('Y-m-d', strtotime($endMonth . '+1 day'))), '<='); }
         if ($divisionId) { OrderedItemView::where('divisionId', $divisionId); }

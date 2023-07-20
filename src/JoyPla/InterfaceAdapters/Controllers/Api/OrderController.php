@@ -2,7 +2,9 @@
 
 namespace JoyPla\InterfaceAdapters\Controllers\Api;
 
+use ApiResponse;
 use Csrf;
+use Exception;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Routing\Router;
@@ -20,6 +22,8 @@ use JoyPla\Application\InputPorts\Api\Order\OrderUnapprovedUpdateInputData;
 use JoyPla\Application\InputPorts\Api\Order\OrderUnapprovedUpdateInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Order\FixedQuantityOrderInputData;
 use JoyPla\Application\InputPorts\Api\Order\FixedQuantityOrderInputPortInterface;
+use JoyPla\Application\InputPorts\Api\Order\OrderDeleteInputData;
+use JoyPla\Application\InputPorts\Api\Order\OrderDeleteInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Order\OrderItemBulkUpdateInputData;
 use JoyPla\Application\InputPorts\Api\Order\OrderItemBulkUpdateInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Order\OrderUnReceivedShowInputData;
@@ -29,6 +33,7 @@ use JoyPla\Application\InputPorts\Api\Order\OrderRevisedInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Order\OrderUnapprovedApprovalAllInputData;
 use JoyPla\Application\InputPorts\Api\Order\OrderUnapprovedApprovalAllInputPortInterface;
 use JoyPla\Enterprise\Models\OrderStatus;
+use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
 
 class OrderController extends Controller
 {
@@ -284,7 +289,8 @@ class OrderController extends Controller
 
         $inputData = new OrderUnapprovedApprovalAllInputData(
             $this->request->user(),
-            $gate->isOnlyMyDivision()
+            $gate->isOnlyMyDivision(),
+            $this->request->get('orderIds', [])
         );
         $inputPort->handle($inputData);
     }
@@ -354,7 +360,53 @@ class OrderController extends Controller
         $inputPort->handle($inputData);
     }
 
-    public function delete($vars)
+    public function delete($vars, OrderDeleteInputPortInterface $inputPort)
     {
+        $token = $this->request->get('_csrf');
+        Csrf::validate($token, true);
+
+        if (Gate::allows('is_user')) {
+            throw new Exception('can not delete');
+        }
+
+        $inputData = new OrderDeleteInputData(
+            $this->request->user(),
+            $vars['orderId']
+        );
+
+        $inputPort->handle($inputData);
+    }
+
+    public function sent($vars)
+    {
+        $token = $this->request->get('_csrf');
+        Csrf::validate($token, true);
+
+        $order = ModelRepository::getOrderInstance()
+            ->where('hospitalId', $this->request->user()->hospitalId)
+            ->where('orderNumber', $vars['orderId'])
+            ->get();
+
+        $order = $order->first();
+
+        if (empty($order) || $order->sentFlag == '1') {
+            echo (new ApiResponse([], 1, 200, 'success', []))->toJson();
+        }
+
+        if (
+            Gate::allows('is_user') &&
+            $order->divisionId !== $this->request->user()->divisionId
+        ) {
+            throw new Exception('can not delete');
+        }
+
+        $result = ModelRepository::getOrderInstance()
+            ->where('hospitalId', $this->request->user()->hospitalId)
+            ->where('orderNumber', $vars['orderId'])
+            ->update([
+                'sentFlag' => 't',
+            ]);
+
+        echo (new ApiResponse([$result], 1, 200, 'success', []))->toJson();
     }
 }

@@ -88,6 +88,7 @@ class Division extends Model
 
     //デフォルト値
     public static $attributes = [];
+    public static $search = [];
 }
 
 class Billing extends Model
@@ -603,6 +604,7 @@ class PayoutView extends Model
         'payoutId',
         'inHospitalItemId',
         'hospitalId',
+
         'sourceDivisionId',
         'targetDivisionId',
         'quantity',
@@ -2292,6 +2294,38 @@ class DistributorAndHospitalDB extends Model
 
     public static $select = [];
 }
+
+class ReservationPriceDB extends Model
+{
+    public const CREATED_AT = 'registrationTime';
+    public const UPDATED_AT = '';
+    public const DELETED_AT = '';
+
+    public static $spiral_db_name = 'NJ_Reservation';
+    public static $guarded = ['id'];
+    public static $primary_key = 'id';
+    public static $fillable = [
+        'registrationTime',
+        'updateTime',
+        'reservationTime',
+        'priceId',
+        'hospitalId',
+        'itemId',
+        'distributorId',
+        'distributorMCode',
+        'quantity',
+        'itemUnit',
+        'unitPrice',
+        'price',
+        'notice',
+        'isActive',
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
 class DistributorUpsertDB extends Model
 {
     public const CREATED_AT = 'registrationTime';
@@ -2312,6 +2346,7 @@ class DistributorUpsertDB extends Model
         'phoneNumber',
         'faxNumber',
         'vendorFlag',
+        'orderMethod',
         'hospitalId',
     ];
 
@@ -2504,6 +2539,128 @@ class PayScheduleItemsView extends Model
             '1' => '未チェック',
             '2' => '払出可能',
             '3' => '欠品',
+        ],
+    ];
+}
+
+class inventoryByDiv extends Model
+{
+    public const CREATED_AT = 'registrationTime';
+    public const UPDATED_AT = 'updateTime';
+    public const DELETED_AT = '';
+
+    public static $spiral_db_name = 'inventoryByDiv';
+    public static $guarded = ['id'];
+    public static $primary_key = 'id';
+    public static $fillable = [
+        'registrationTime',
+        'updateTime',
+        'inventoryHId',
+        'inventoryEndId',
+        'hospitalId',
+        'divisionId',
+        'itemsNumber',
+        'totalAmount',
+        'divisionName',
+        'divisionType',
+        'deleteFlag',
+        'invHAuthKey',
+        'inventoryHStatus',
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [
+        'divisionType' => [
+            '1' => '大倉庫',
+            '2' => '部署',
+        ],
+        'deleteFlag' => [
+            '0' => 'いいえ',
+            '1' => '削除',
+        ],
+        'inventoryHStatus' => [
+            '1' => '一時保存',
+            '2' => '完了',
+        ],
+    ];
+}
+
+class StocktakingList extends Model
+{
+    public const CREATED_AT = 'registrationTime';
+    public const UPDATED_AT = 'updateTime';
+    public const DELETED_AT = '';
+
+    public static $spiral_db_name = 'NJ_StockList';
+    public static $guarded = ['id'];
+    public static $primary_key = 'stockListId';
+    public static $fillable = [
+        'registrationTime',
+        'updateTime',
+        'stockListId',
+        'stockListName',
+        'hospitalId',
+        'divisionId',
+        'itemsNumber',
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [];
+}
+
+class StocktakingListRowView extends Model
+{
+    public const CREATED_AT = 'registrationTime';
+    public const UPDATED_AT = 'updateTime';
+    public const DELETED_AT = '';
+
+    public static $spiral_db_name = 'StockListRowView';
+    public static $guarded = ['id'];
+    public static $primary_key = 'id';
+    public static $fillable = [
+        'registrationTime',
+        'updateTime',
+        'stockListId',
+        'stockListRowId',
+        'hospitalId',
+        'divisionId',
+        'inHospitalItemId',
+        'itemId',
+        'distributorId',
+        'rackName',
+        'mandatoryFlag',
+        'index',
+        'distributorName',
+        'hospitalName',
+        'divisionName',
+        'itemName',
+        'itemCode',
+        'itemStandard',
+        'itemJANCode',
+        'quantity',
+        'quantityUnit',
+        'itemUnit',
+        'labelId',
+        'price',
+        'priceId',
+        'invUnitPrice',
+    ];
+
+    //デフォルト値
+    public static $attributes = [];
+
+    public static $select = [
+        'mandatoryFlag' => [
+            '0' => '任意',
+            '1' => '必須',
+        ],
+        'invUnitPrice' => [
+            '0' => 'いいえ',
+            '1' => 'はい',
         ],
     ];
 }

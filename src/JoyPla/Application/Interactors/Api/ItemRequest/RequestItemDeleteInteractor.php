@@ -71,7 +71,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                 'hospitalId',
                 $hospitalId->value()
             );
-            $stockViewInstance->Where(
+            $stockViewInstance->where(
                 'divisionId',
                 $itemRequest
                     ->getTargetDivision()
@@ -80,7 +80,7 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
             );
             foreach ($itemRequest->getRequestItems() as $requestItem) {
                 if ($requestItem->getRequestId()->equal($requestId->value())) {
-                    $stockViewInstance->Where(
+                    $stockViewInstance->where(
                         'inHospitalItemId',
                         $requestItem->getInHospitalItemId()->value()
                     );
@@ -114,7 +114,6 @@ namespace JoyPla\Application\Interactors\Api\ItemRequest {
                     );
                 }
             }
-
             $this->repositoryProvider
                 ->getRequestItemCountRepository()
                 ->saveToArray($requestItemCounts);

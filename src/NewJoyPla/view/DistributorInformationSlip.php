@@ -3,34 +3,34 @@
 		<div class="uk-container uk-container-expand">
 			<ul class="uk-breadcrumb no_print">
 				<li><a href="%url/rel:mpg:top%">TOP</a></li>
-				<?php if($isOldTopPage): ?>
+				<?php if ($isOldTopPage): ?>
 				<li><a href="%url/rel:mpg:top%&page=page8">ユーザー管理</a></li>
 				<?php else: ?>
 				<li><a href="%url/rel:mpg:top%&path=user">ユーザーメニュー</a></li>
 				<?php endif; ?>
-				<li><a href="<?php echo $link ?>&table_cache=true">卸業者一覧</a>
+				<li><a href="<?php echo $link; ?>&table_cache=true">卸業者一覧</a>
 				</li>
 				<li><span>卸業者情報詳細</span></li>
 			</ul>
 			<div class="no_print uk-margin">
 				<input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー"
 					onclick="window.print();return false;">
-				<?php if(($user_info->isAdmin()) || ($user_info->isApprover())): ?>
+				<?php if ($user_info->isAdmin() || $user_info->isApprover()): ?>
 				<input class="print_hidden uk-button uk-button-primary" type="submit" value="卸業者情報変更"
 					onclick="document.distributorChang.submit()">
-				<form action="<?php echo $api_url ?>" method="post"
+				<form action="<?php echo $api_url; ?>" method="post"
 					name="distributorChang" class="uk-hidden">
 					<input type="hidden" name="Action" value="updateDistributor">
 				</form>
-				<?php endif ?>
-				<?php if(($user_info->isAdmin()) || ($user_info->isApprover())): ?>
+				<?php endif; ?>
+				<?php if ($user_info->isAdmin() || $user_info->isApprover()): ?>
 				<input class="print_hidden uk-button uk-button-primary" type="submit" value="卸業者ユーザー招待"
 					onclick="document.distributorUserReg.submit()">
-				<form action="<?php echo $api_url ?>" method="post"
+				<form action="<?php echo $api_url; ?>" method="post"
 					class="uk-hidden" name="distributorUserReg">
 					<input type="hidden" name="Action" value="distributorUserReg">
 				</form>
-				<?php endif ?>
+				<?php endif; ?>
 			</div>
 
 
@@ -70,6 +70,10 @@
 						<th>FAX番号</th>
 						<td colspan="3">%val:usr:faxNumber%</td>
 					</tr>
+					<tr>
+						<th>発注方法</th>
+						<td colspan="5">%val:usr:orderMethod%</td>
+					</tr>
 				</table>
 			</div>
 			<div uk-grid>
@@ -78,11 +82,11 @@
 				</div>
 			</div>
 			<div class="uk-width-1-1 uk-margin-top">
-				<?php if(($user_info->isAdmin()) || ($user_info->isApprover())): ?>
+				<?php if ($user_info->isAdmin() || $user_info->isApprover()): ?>
 				%sf:usr:search14:mstfilter:table%
 				<?php else: ?>
 				%sf:usr:search16:mstfilter:table%
-				<?php endif ?>
+				<?php endif; ?>
 			</div>
 		</div>
 	</div>

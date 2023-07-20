@@ -1,11 +1,11 @@
 <?php
 /*
 exec('yarn install');
+ */
 
 exec(
     'npx tailwindcss -i src/JoyPla/resources/parts/input.css.php -o src/JoyPla/resources/parts/output.css.php'
 );
-*/
 
 $outputtext = '<?php' . PHP_EOL;
 $outputtext .= "require_once('LoggingConfig.php');" . PHP_EOL;
@@ -27,6 +27,10 @@ foreach (scanDirctory('src/JoyPla/Domain/ValueObject') as $file) {
     $outputtext .= "require_once('$file');" . PHP_EOL;
 }
 foreach (scanDirctory('src/JoyPla/Application') as $file) {
+    $file = str_replace('src/', '', $file);
+    $outputtext .= "require_once('$file');" . PHP_EOL;
+}
+foreach (scanDirctory('src/JoyPla/Batch') as $file) {
     $file = str_replace('src/', '', $file);
     $outputtext .= "require_once('$file');" . PHP_EOL;
 }

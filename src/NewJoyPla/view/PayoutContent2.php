@@ -108,26 +108,7 @@
 							<div class="uk-width-1-2">
 								<label class="uk-form-label">払出元部署</label>
 								<div class="uk-form-controls">
-									<select class="uk-width-4-5 uk-select uk-inline" v-model="sourceDivision" name="sourceDivision" v-bind:disabled="lists.length > 0">
-										<option value="">----- 部署選択 -----</option>
-										<?php
-										foreach($source_division->data as $data)
-										{
-											if($data->divisionType === '1')
-											{
-												echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
-												echo '<option value="" disabled>--------------------</option>';
-											}
-										}
-										foreach($source_division->data as $data)
-										{
-											if($data->divisionType === '2')
-											{
-												echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
-											}
-										}
-										?>
-									</select>
+									<searchable-select name="sourceDivision" v-model="sourceDivision" id="sourceDivisionId" v-bind:disabled="lists.length > 0" :options="sourceDivisionOptions"></searchable-select>
 								</div>
 								<form action='#' method="post" onsubmit="app.barcodeSearch($('input[name=barcode]').val() , '' ,'' ,true);$('input[name=barcode]').val('') ; $('input[name=barcode]').focus();return false;">
 									<input type="text" class="uk-input uk-width-4-5" placeholder="バーコード入力...(GS1-128も可能)" autofocus="true" name="barcode" autocomplete="off">  
@@ -137,26 +118,8 @@
 							<div class="uk-width-1-2">
 								<label class="uk-form-label" >払出先部署</label>
 								<div class="uk-form-controls">
-								   <select class="uk-select uk-width-4-5" v-model="targetDivision" name="targetDivision" v-bind:disabled="lists.length > 0">
-										<option value="">----- 部署選択 -----</option>
-										<?php
-										foreach($target_division->data as $data)
-										{
-											if($data->divisionType === '1')
-											{
-												echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
-												echo '<option value="" disabled>--------------------</option>';
-											}
-										}
-										foreach($target_division->data as $data)
-										{
-											if($data->divisionType === '2')
-											{
-												echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
-											}
-										}
-										?>
-									</select>	
+									<searchable-select name="targetDivision" v-model="targetDivision" id="targetDDivisionId" v-bind:disabled="lists.length > 0" :options="targetDivisionOptions"></searchable-select>
+								
 								</div>
 								<form action='#' method="post" onsubmit="app.cardSearch($('input[name=barcode2]').val()); $('input[name=barcode2]').val('') ; $('input[name=barcode2]').focus(); return false;">
 									<input type="text" class="uk-input uk-width-4-5" placeholder="カードまたは払出ラベルのバーコード入力..." autofocus="true" name="barcode2" autocomplete="off">  
@@ -272,7 +235,7 @@
 		</div>
 	</div>
 	
-	<form action="<?php echo $api_url ?>&Action=payoutLabel" target="_blank" method="post" class="uk-hidden" name="LabelCreate">
+	<form action="<?php echo $api_url; ?>&Action=payoutLabel" target="_blank" method="post" class="uk-hidden" name="LabelCreate">
 		<input type="hidden" value="" name="payoutHistoryId" id="payoutHistoryId">
 		<input type="hidden" value="payout" name="pattern">
 	</form>
@@ -329,12 +292,64 @@
 	</div>
 <script>
 
+<?php
+$source_options = [
+    [
+        'value' => '',
+        'text' => '----- 部署を選択してください -----',
+    ],
+];
+foreach ($source_division->data as $data) {
+    if ($data->divisionType === '1') {
+        $source_options[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+foreach ($source_division->data as $data) {
+    if ($data->divisionType === '2') {
+        $source_options[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+$defaultSourceDivisionId = $user_info->isUser()
+    ? $user_info->getDivisionId()
+    : '';
+
+$target_options = [
+    [
+        'value' => '',
+        'text' => '----- 部署を選択してください -----',
+    ],
+];
+foreach ($target_division->data as $data) {
+    if ($data->divisionType === '1') {
+        $target_options[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+foreach ($target_division->data as $data) {
+    if ($data->divisionType === '2') {
+        $target_options[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+?>
 var app = new Vue({
 	el: '#app',
 	data: {
 		lists: [],
-		sourceDivision: "<?php echo ($user_info->isUser())? $user_info->getDivisionId() : "" ; ?>",
+		sourceDivisionOptions: <?php echo json_encode($source_options); ?>,
+		sourceDivision: "<?php echo $defaultSourceDivisionId; ?>",
 		targetDivision: '',
+		targetDivisionOptions: <?php echo json_encode($target_options); ?>,
 		useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
 	},
 	filters: {
@@ -436,17 +451,17 @@ var app = new Vue({
 				loading();
 				$.ajax({
 					async: false,
-					url: "<?php echo $api_url ?>",
+					url: "<?php echo $api_url; ?>",
 					type:'POST',
 					data:{
-						_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+						_csrf: "<?php echo $csrf_token; ?>",  // CSRFトークンを送信
 						payoutDate : $('input[name=payoutDate]').val(),
 						Action : 'payoutRegistApi',
 						payout : JSON.stringify( objectValueToURIencode(app.lists) ),
 						sourceDivisionId : app.sourceDivision,
-						sourceDivisionName : encodeURI($('select[name="sourceDivision"] option:selected').text()),
+                		sourceDivisionName : encodeURI(app.sourceDivisionOptions.find(val => val.value === app.sourceDivision).text),
 						targetDivisionId : app.targetDivision,
-						targetDivisionName : encodeURI($('select[name="targetDivision"] option:selected').text()),
+                		targetDivisionName : encodeURI(app.targetDivisionOptions.find(val => val.value === app.targetDivision).text),
 					},
 					dataType: 'json'
 				})
@@ -722,7 +737,7 @@ var app = new Vue({
 				url:'%url/rel:mpgt:labelBarcodeSAPI%',
 				type:'POST',
 				data:{
-					_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+					_csrf: "<?php echo $csrf_token; ?>",  // CSRFトークンを送信
 					divisionId : app.targetDivision,
 					barcode : barcode,
 				},
@@ -801,7 +816,7 @@ var app = new Vue({
 				url:'%url/rel:mpgt:labelBarcodeSAPI%',
 				type:'POST',
 				data:{
-					_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+					_csrf: "<?php echo $csrf_token; ?>",  // CSRFトークンを送信
 					divisionId : app.sourceDivision,
 					barcode : barcode,
 				},

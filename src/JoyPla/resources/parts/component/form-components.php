@@ -3,15 +3,15 @@ const vText = {
     console.log(props);
   },
   props: {
-    title : {
-        type: String, 
-        required: false,
-        default: ""
+    title: {
+      type: String,
+      required: false,
+      default: "",
     },
     isRequired: {
-        type: String, 
-        required: false,
-        default: false
+      type: String,
+      required: false,
+      default: false,
     },
   },
   template: `
@@ -23,173 +23,542 @@ const vText = {
         <slot></slot>
     </div>
   </fieldset>
-  ` 
-}
+  `,
+};
 
-const vInput = {
+const SearchableDropdown = {
   components: {
-    'v-text' : vText
+    "v-text": vText,
+  },
+  props: {
+    options: {
+      type: Array,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    rules: {
+      type: Object,
+      required: false,
+      default: {},
+    },
+    label: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    title: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    changeClassName: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    isRequired: {
+      type: String,
+      required: false,
+      default: false,
+    },
+    absolute: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    }
+  },
+  data() {
+    return {
+      searchText: "",
+      isOpen: false,
+      selectedOption: this.options.find(option => option.value === ''),
+      filteredOptions: this.options,
+    };
+  },
+  watch: {
+    options: {
+      handler(newOptions) {
+        if(newOptions.length === 1)
+        {
+          this.selectOption(newOptions[0]);
+        } else {
+          this.selectOption(newOptions.find(option => option.value === ''));
+        }
+        this.filteredOptions = newOptions;
+      },
+      deep: true,
+    },
   },
   setup(props) {
+
     // a simple `name` field with basic required validator
     const { ref } = Vue;
-    const { value, errorMessage , meta , validate } = VeeValidate.useField(
-      Vue.toRef(props, 'name'),
-      Vue.toRef(props, 'rules') ,
-       {label : props.label });
+    const { value, errorMessage, meta, validate } = VeeValidate.useField(
+      Vue.toRef(props, "name"),
+      Vue.toRef(props, "rules"),
+      { label: props.label }
+    );
 
     const valid = meta.valid;
     const validated = meta.validated;
 
     const isRequired = () => {
       return props.rules.required;
-    }
+    };
 
     const changeClass = ref({});
     return {
-      changeClass, 
+      changeClass,
       isRequired,
       value,
       meta,
-      successClassName: ['text-gray-700', 'border-gray-300'],
-      errorClassName: ['text-red-500', 'border-red-500'],
+      successClassName: ["text-gray-700", "border-gray-300"],
+      errorClassName: ["text-red-500", "border-red-500"],
+      disabledClassName: ["bg-slate-50", "text-slate-500","border-slate-200","shadow-none"],
       errorMessage,
     };
   },
+  mounted() {
+    document.addEventListener('click', this.closeDropdownOutside);
+  },
+  beforeDestroy() {
+    document.removeEventListener('click', this.closeDropdownOutside);
+  },
+  methods: {
+    closeDropdownOutside(e) {
+      if (!this.$el.contains(e.target)) {
+        this.isOpen = false;
+      }
+    },
+    filterOptions() {
+      this.filteredOptions = this.options.filter((option) =>
+        option.label.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+    },
+    selectOption(option) {
+      this.selectedOption = option;
+      this.$emit("input", option.value);
+      this.value = option.value;
+      this.isOpen = false;
+    },
+    closeDropdown() {
+      setTimeout(() => {
+        this.isOpen = false;
+      }, 200);
+    },
+    value(newValue) {
+      this.changeClass = {
+        [this.changeClassName]: true,
+      };
+      if (this.$attrs.onChange) {
+        this.$attrs.onChange();
+      }
+    },
+  },
+  template: `
+    <v-text class="relative" :title="title" :isRequired="isRequired()">
+    <div 
+      @click="(disabled !== true)? isOpen = !isOpen : false"
+      class="relative appearance-none w-full py-2 px-3 leading-tight text-left flex-initial border disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none"
+      :class="[( ! meta.valid && meta.validated == true) ? errorClassName : successClassName , changeClass, (disabled)? disabledClassName : {}]">
+      {{ selectedOption.label }}
+      
+      <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+          <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+          </svg>
+      </div>
+    </div>
+    <div
+      v-if="isOpen"
+      class="z-10 w-full overflow-y-auto bg-white border border-gray-300 rounded shadow max-h-60"
+      :class="[( ! meta.valid && meta.validated == true) ? errorClassName : successClassName , changeClass , absolute ? 'absolute' : '']"
+    >
+      <input
+        type="text"
+        v-model="searchText"
+        @input="filterOptions"
+        @blur="closeDropdown"
+        placeholder="検索..."
+        class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border"
+      />
+      <div
+        v-for="(option, index) in filteredOptions"
+        :key="index"
+        @click="selectOption(option)"
+        class="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+      >
+        {{ option.label }}
+      </div>
+    </div>
+    <input type="hidden" :name="name" :value="this.selectedOption.value">
+    <span class="text-red-500">{{ errorMessage }}</span>
+  </v-text>
+  `,
+};
+
+
+const SearchableDropdownForForm = {
+  components: {
+    "v-text": vText,
+  },
   props: {
-    label: {
-        type: String, 
-        required: false,
-        default: "", 
+    options: {
+      type: Array,
+      required: true,
     },
-    type: { 
-        type: String, 
-        required: true 
-    },
-    name: { 
-        type: String, 
-        required: true 
-    },
-    placeholder: { 
-        type: String, 
-        required: false 
-    },
-    rules: {
-        type: Object, 
-        required: false, 
-        default: {}
-    },
-    title: {
-        type: String, 
-        required: false,
-        default : ""
+    name: {
+      type: String,
+      required: true,
     },
     changeClassName: {
       type: String,
       required: false,
-      default : ""
+      default: "",
     },
-    disabled :{
+    isRequired: {
+      type: String,
+      required: false,
+      default: false,
+    },
+    error: {
       type: Boolean,
       required: false,
-      default : false
+      default: false,
+    },
+    absolute: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    selected: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
     }
   },
+  data() {
+    return {
+      searchText: "",
+      isOpen: false,
+      selectedOption: this.options.find(option => option.value === this.selected),
+      filteredOptions: this.options,
+    };
+  },
+  mounted() {
+    document.addEventListener('click', this.closeDropdownOutside);
+  },
+  beforeDestroy() {
+    document.removeEventListener('click', this.closeDropdownOutside);
+  },
+  setup(props) {
+
+    const { ref } = Vue;
+    const isRequired = () => {
+      return props.isRequired;
+    };
+
+    const changeClass = ref({});
+    return {
+      changeClass,
+      isRequired,
+      successClassName: ["text-gray-700", "border-gray-300"],
+      errorClassName: ["text-red-500", "border-red-500"],
+      disabledClassName: ["bg-slate-50", "text-slate-500","border-slate-200","shadow-none"],
+    };
+  },
   watch: {
-    value(){
+    options: {
+      handler(newOptions) {
+        if(newOptions.length === 1)
+        {
+          this.selectOption(newOptions[0]);
+        } else {
+          this.selectOption(newOptions.find(option => option.value === ''));
+        }
+        this.filteredOptions = newOptions;
+      },
+      deep: true,
+    },
+  },
+  methods: {
+    closeDropdownOutside(e) {
+      if (!this.$el.contains(e.target)) {
+        this.isOpen = false;
+      }
+    },
+    filterOptions() {
+      this.filteredOptions = this.options.filter((option) =>
+        option.label.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+    },
+    selectOption(option) {
+      this.selectedOption = option;
+      this.$emit("input", option.value);
+      this.value = option.value;
+      this.isOpen = false;
+    },
+    closeDropdown() {
+      setTimeout(() => {
+        this.isOpen = false;
+      }, 200);
+    },
+    value(newValue) {
       this.changeClass = {
-        [this.changeClassName] : true
+        [this.changeClassName]: true,
       };
-    }
+      if (this.$attrs.onChange) {
+        this.$attrs.onChange();
+      }
+    },
+  },
+  template: `
+  <div>
+    <div 
+      @click="(disabled !== true)? isOpen = !isOpen : false"
+      class="relative appearance-none w-full py-2 px-3 leading-tight text-left flex-initial border"
+      :disabled="disabled"
+      :class="[( error ) ? errorClassName : successClassName , changeClass , (disabled)? disabledClassName : {}]">
+      {{ selectedOption.label }}
+      <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+          <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+          </svg>
+      </div>
+    </div>
+    <div
+      v-if="isOpen"
+      class="z-10 w-full overflow-y-auto bg-white border border-gray-300 rounded shadow max-h-60"
+      :class="[( error ) ? errorClassName : successClassName , changeClass , absolute ? 'absolute' : '']"
+    >
+      <input
+        type="text"
+        v-model="searchText"
+        @input="filterOptions"
+        @blur="closeDropdown"
+        placeholder="検索..."
+        class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border"
+      />
+      <div
+        v-for="(option, index) in filteredOptions"
+        :key="index"
+        @click="selectOption(option)"
+        class="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+      >
+        {{ option.label }}
+      </div>
+    </div>
+    <input type="hidden" :name="name" :value="this.selectedOption.value">
+  </div>
+  `,
+};
+
+
+const vInput = {
+  components: {
+    "v-text": vText,
+  },
+  setup(props) {
+    const { ref, watchEffect } = Vue;
+    const { value, errorMessage, meta, validate } = VeeValidate.useField(
+      Vue.toRef(props, "name"),
+      Vue.toRef(props, "rules"),
+      { label: props.label }
+    );
+
+    const valid = meta.valid;
+    const validated = meta.validated;
+
+    const isRequired = () => {
+      return props.rules.required;
+    };
+
+    const changeClass = ref({});
+    watchEffect(() => {
+      changeClass.value = {
+        [props.changeClassName]: true,
+      };
+    });
+
+    return {
+      changeClass,
+      isRequired,
+      value,
+      meta,
+      successClassName: ["text-gray-700", "border-gray-300"],
+      errorClassName: ["text-red-500", "border-red-500"],
+      errorMessage,
+    };
+  },
+  props: {
+    suffix: String,
+    prefix: String,
+    label: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    placeholder: {
+      type: String,
+      required: false,
+    },
+    rules: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
+    title: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    changeClassName: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   template: `
     <v-text :title="title" :isRequired="isRequired()">
-      <input
-      
-            :type="type"
-            :placeholder="placeholder"
-            v-model="value"
-            autocomplete="off"
-            class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border"
-            :class="[ ( ! meta.valid && meta.validated == true) ? errorClassName : successClassName , changeClass]"
-            :disabled="disabled"
-        />
-        <span class="text-red-500">{{ errorMessage }}</span>
+      <div class="flex gap-1">
+        <div class="flex-none flex items-center" v-if="!!suffix">
+          {{ suffix }}
+        </div>
+        <input
+                :type="type"
+                :placeholder="placeholder"
+                v-model="value"
+                autocomplete="off"
+                class="grow appearance-none w-full py-2 px-3 leading-tight flex-initial bg-white border min-w-[4rem] disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none"
+                :class="[ ( ! meta.valid && meta.validated == true) ? errorClassName : successClassName, (type !== 'number')? 'text-left' : 'text-right' , changeClass  ]"
+                :disabled="disabled"
+            />
+        <div class="flex-none flex items-center" v-if="!!prefix">
+          {{ prefix }}
+        </div>
+      </div>
+      <span class="text-red-500">{{ errorMessage }}</span>
     </v-text>
-     `
+     `,
 };
+
 const vInputNumber = {
   components: {
-    'v-text' : vText
+    "v-text": vText,
   },
   setup(props) {
     // a simple `name` field with basic required validator
-    const { ref , onMounted } = Vue;
-    const {  value, errorMessage , resetField , handleChange} = VeeValidate.useField(
-      Vue.toRef(props, 'name'),
-      Vue.toRef(props, 'rules') , 
-      { label : props.label });
+    const { ref, onMounted } = Vue;
+    const { value, errorMessage, resetField, handleChange } =
+      VeeValidate.useField(
+        Vue.toRef(props, "name"),
+        Vue.toRef(props, "rules"),
+        { label: props.label }
+      );
 
     const updateValue = (e) => {
-      let num = ( ! e.target.value )? 0 : parseInt(e.target.value) ;
+      let num = !e.target.value ? 0 : parseInt(e.target.value);
       value.value = num;
     };
 
     const increment = () => {
+      if( props.disabled ){
+        return false;
+      }
       let num = parseInt(value.value) + props.step;
-      if( num > props.max ){ return }
+      if (num > props.max) {
+        return;
+      }
       value.value = num;
     };
     const decrement = () => {
+      if( props.disabled ){
+        return false;
+      }
       let num = parseInt(value.value) - props.step;
-      if( num < props.min ){ return }
+      if (num < props.min) {
+        return;
+      }
       value.value = num;
     };
     const isRequired = () => {
       return props.rules.required;
-    }
+    };
     const changeClass = ref({});
 
     const incrementDom = ref(null);
     const decrementDom = ref(null);
 
     onMounted(() => {
-
-      decrementDom.value.addEventListener('pointerdown', () => {
+      decrementDom.value.addEventListener("pointerdown", () => {
         decrement();
         let count = 0;
         let timer;
         const longPushSecond = 1;
-        const intervalId = setInterval(function(){
+        const intervalId = setInterval(function () {
           count++;
-          if((count / 10) > longPushSecond){
+          if (count / 10 > longPushSecond) {
             decrement();
           }
         }, 100);
 
-        document.addEventListener('pointerup', () => {   
-          count = 0;     
-          clearInterval(intervalId)
-        }, { once: true })
+        document.addEventListener(
+          "pointerup",
+          () => {
+            count = 0;
+            clearInterval(intervalId);
+          },
+          { once: true }
+        );
       });
 
-      incrementDom.value.addEventListener('pointerdown', () => {
+      incrementDom.value.addEventListener("pointerdown", () => {
         increment();
         let count = 0;
         let timer;
         const longPushSecond = 1;
-        const intervalId = setInterval(function(){
+        const intervalId = setInterval(function () {
           count++;
-          if((count / 10) > longPushSecond){
+          if (count / 10 > longPushSecond) {
             increment();
           }
         }, 100);
 
-        document.addEventListener('pointerup', () => {   
-          count = 0;     
-          clearInterval(intervalId)
-        }, { once: true })
-      })
+        document.addEventListener(
+          "pointerup",
+          () => {
+            count = 0;
+            clearInterval(intervalId);
+          },
+          { once: true }
+        );
+      });
     });
     return {
       incrementDom,
@@ -205,86 +574,83 @@ const vInputNumber = {
   },
   props: {
     label: {
-        type: String, 
-        required: false,
-        default: "", 
+      type: String,
+      required: false,
+      default: "",
     },
     rules: {
-        type: Object, 
-        required: false, 
-        default: {}
+      type: Object,
+      required: false,
+      default: {},
     },
     name: {
-        type: String, 
-        required: true 
+      type: String,
+      required: true,
     },
-    max: { 
-        type: Number, 
-        required: false 
+    max: {
+      type: Number,
+      required: false,
     },
-    min: { 
-        type: Number, 
-        required: false 
+    min: {
+      type: Number,
+      required: false,
     },
-    step: { 
-        type: Number, 
-        required: false ,
-        default : 1
+    step: {
+      type: Number,
+      required: false,
+      default: 1,
     },
-    unit: { 
-        type: String, 
-        required: false ,
-        default : ""
+    unit: {
+      type: String,
+      required: false,
+      default: "",
     },
     title: {
-        type: String, 
-        required: false,
-        default : ""
+      type: String,
+      required: false,
+      default: "",
     },
     changeClassName: {
       type: String,
       required: false,
-      default : ""
+      default: "",
     },
-    disabled :{
+    disabled: {
       type: Boolean,
       required: false,
-      default : false
-    }
+      default: false,
+    },
   },
-  computed: {
-  },
-  data(){
+  computed: {},
+  data() {
     return {
-      'classobj' : this.getClass()
+      classobj: this.getClass(),
     };
   },
-  emits: ['update:current'],
+  emits: ["update:current"],
   methods: {
-    getClass()
-    {
-      return  {
-            'text-red-500' : !! this.errorMessage,
-            'border-red-500' : !! this.errorMessage,
-            'border-gray-300' : !this.errorMessage,
-            'text-gray-700' : !this.errorMessage,
-          };
-    }
+    getClass() {
+      return {
+        "text-red-500": !!this.errorMessage,
+        "border-red-500": !!this.errorMessage,
+        "border-gray-300": !this.errorMessage,
+        "text-gray-700": !this.errorMessage,
+      };
+    },
   },
   watch: {
     value(newValue) {
       this.changeClass = {
-        [this.changeClassName] : true
+        [this.changeClassName]: true,
       };
-      if(this.$attrs.onChange){
+      if (this.$attrs.onChange) {
         this.$attrs.onChange();
-      };
-      this.$emit('update:current', newValue);
+      }
+      this.$emit("update:current", newValue);
     },
     errorMessage() {
-      this.classobj = this.getClass()
-    }
-
+      this.classobj = this.getClass();
+    },
   },
   template: `
     <v-text :title="title" :isRequired="isRequired()">
@@ -334,37 +700,38 @@ const vInputNumber = {
       </div>
       <span class="text-red-500">{{ errorMessage }}</span>
     </v-text>
-    ` 
+    `,
 };
 
 const vTextarea = {
   components: {
-    'v-text' : vText
+    "v-text": vText,
   },
   setup(props) {
     // a simple `name` field with basic required validator
     const { ref } = Vue;
-    const { value, errorMessage , meta , validate } = VeeValidate.useField(
-      Vue.toRef(props, 'name'),
-      Vue.toRef(props, 'rules') ,
-       {label : props.label });
+    const { value, errorMessage, meta, validate } = VeeValidate.useField(
+      Vue.toRef(props, "name"),
+      Vue.toRef(props, "rules"),
+      { label: props.label }
+    );
 
     const valid = meta.valid;
     const validated = meta.validated;
 
     const isRequired = () => {
       return props.rules.required;
-    }
+    };
 
     const changeClass = ref({});
 
     const textcount = () => {
       let len = 0;
       for (let i = 0; i < value.value.length; i++) {
-        (value.value[i].match(/[ -~]/)) ? len += 1 : len += 2;
+        value.value[i].match(/[ -~]/) ? (len += 1) : (len += 2);
       }
-      return len ;
-    }
+      return len;
+    };
 
     return {
       textcount,
@@ -372,51 +739,51 @@ const vTextarea = {
       isRequired,
       value,
       meta,
-      successClassName: ['text-gray-700', 'border-gray-300'],
-      errorClassName: ['text-red-500', 'border-red-500'],
+      successClassName: ["text-gray-700", "border-gray-300"],
+      errorClassName: ["text-red-500", "border-red-500"],
       errorMessage,
     };
   },
   props: {
     label: {
-        type: String, 
-        required: false,
-        default: "", 
+      type: String,
+      required: false,
+      default: "",
     },
-    type: { 
-        type: String, 
-        required: true 
+    type: {
+      type: String,
+      required: true,
     },
-    name: { 
-        type: String, 
-        required: true 
+    name: {
+      type: String,
+      required: true,
     },
-    placeholder: { 
-        type: String, 
-        required: false 
+    placeholder: {
+      type: String,
+      required: false,
     },
     rules: {
-        type: Object, 
-        required: false, 
-        default: {}
+      type: Object,
+      required: false,
+      default: {},
     },
     title: {
-        type: String, 
-        required: false,
-        default : ""
+      type: String,
+      required: false,
+      default: "",
     },
     changeClassName: {
       type: String,
       required: false,
-      default : ""
-    }
+      default: "",
+    },
   },
   watch: {
-    value(){
+    value() {
       this.changeClass = {
-        [this.changeClassName] : true
+        [this.changeClassName]: true,
       };
-    }
+    },
   },
   template: `
     <v-text :title="title" :isRequired="isRequired()">
@@ -432,24 +799,25 @@ const vTextarea = {
       </div>
         <span class="text-red-500">{{ errorMessage }}</span>
     </v-text>
-     `
+     `,
 };
 
 const vSelect = {
   components: {
-    'v-text' : vText,
+    "v-text": vText,
   },
   setup(props) {
     // a simple `name` field with basic required validator]
-    const { ref , onMounted } = Vue;
-    const { value, errorMessage , meta , validate } = VeeValidate.useField(
-    Vue.toRef(props, 'name'),
-    Vue.toRef(props, 'rules') ,
-    {label : props.label });
+    const { ref, onMounted } = Vue;
+    const { value, errorMessage, meta, validate } = VeeValidate.useField(
+      Vue.toRef(props, "name"),
+      Vue.toRef(props, "rules"),
+      { label: props.label }
+    );
 
     const isRequired = () => {
       return props.rules.required;
-    }
+    };
 
     const changeClass = ref({});
     return {
@@ -457,59 +825,56 @@ const vSelect = {
       isRequired,
       value,
       meta,
-      successClassName: ['text-gray-700', 'border-gray-300'],
-      errorClassName: ['text-red-500', 'border-red-500'],
+      successClassName: ["text-gray-700", "border-gray-300"],
+      errorClassName: ["text-red-500", "border-red-500"],
       errorMessage,
     };
   },
   props: {
-    options: { 
-        type: Array, 
-        required: true 
+    options: {
+      type: Array,
+      required: true,
     },
-    name: { 
-        type: String, 
-        required: true 
+    name: {
+      type: String,
+      required: true,
     },
     rules: {
-        type: Object, 
-        required: false, 
-        default: {}
+      type: Object,
+      required: false,
+      default: {},
     },
-    label : {
-        type: String, 
-        required: false,
-        default: ""
+    label: {
+      type: String,
+      required: false,
+      default: "",
     },
-    title : {
-        type: String, 
-        required: false,
-        default: ""
+    title: {
+      type: String,
+      required: false,
+      default: "",
     },
     changeClassName: {
       type: String,
       required: false,
-      default : ""
-    }
+      default: "",
+    },
   },
-  mounted() {
-  },
-  methods: {
-  },
+  mounted() {},
+  methods: {},
   watch: {
     options() {
-      if(this.options.length === 1)
-      {
+      if (this.options.length === 1) {
         this.value = this.options[0].value;
       }
     },
     value(newValue) {
       this.changeClass = {
-        [this.changeClassName] : true
+        [this.changeClassName]: true,
       };
-      if(this.$attrs.onChange){
+      if (this.$attrs.onChange) {
         this.$attrs.onChange();
-      };
+      }
     },
   },
   template: `
@@ -533,21 +898,22 @@ const vSelect = {
     </div>
     <span class="text-red-500">{{ errorMessage }}</span>
   </v-text>
-  ` 
+  `,
 };
 const vCheckbox = {
   setup(props) {
     const { toRef } = Vue;
     const { useField } = VeeValidate;
     // Must use `toRef` to make the checkboxes names reactive
-    const { checked, handleChange , value, errorMessage } = useField(
-      toRef(props, 'name'),
-      toRef(props, 'rules'), 
+    const { checked, handleChange, value, errorMessage } = useField(
+      toRef(props, "name"),
+      toRef(props, "rules"),
       {
-        label : props.label,
-        type: 'checkbox',
+        label: props.label,
+        type: "checkbox",
         checkedValue: props.value,
-      });
+      }
+    );
 
     return {
       checked, // readonly
@@ -570,16 +936,16 @@ const vCheckbox = {
       type: Object,
       default: {},
     },
-    label : {
-        type: String, 
-        required: false,
-        default: ""
+    label: {
+      type: String,
+      required: false,
+      default: "",
     },
-    title : {
-        type: String, 
-        required: false,
-        default: ""
-    }
+    title: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   template: `
     <label>
@@ -592,73 +958,236 @@ const vCheckbox = {
       />{{ title }}
     </label><br>
     <span class="text-red-500">{{ errorMessage }}</span>
-    ` 
+    `,
 };
+
+const vRadio = {
+  setup(props) {
+    const { toRef } = Vue;
+    const { useField } = VeeValidate;
+    // Must use `toRef` to make the radio buttons names reactive
+    const { checked, handleChange, value, errorMessage } = useField(
+      toRef(props, "name"),
+      toRef(props, "rules"),
+      {
+        label: props.label,
+        type: "radio",
+        checkedValue: props.value,
+      }
+    );
+
+    return {
+      checked, // readonly
+      handleChange,
+      errorMessage,
+    };
+  },
+  props: {
+    modelValue: {
+      type: null,
+    },
+    // Field's own value
+    value: {
+      type: null,
+    },
+    name: {
+      type: String,
+    },
+    rules: {
+      type: Object,
+      default: {},
+    },
+    label: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    title: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    id: {
+      type: String,
+      required: true,
+    },
+    labelClass: {
+      type: [String, Object],
+      required: false,
+      default: "",
+    },
+  },
+  template: `
+    <label :class="labelClass">
+      <input
+        type="radio"
+        @input="handleChange(value)"
+        class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-full bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain cursor-pointer"
+        :value="value"
+        :name="name"
+        :id="id"
+        :checked="checked"
+      />
+      <slot></slot>
+    </label><br>
+    <span class="text-red-500">{{ errorMessage }}</span>
+    `,
+};
+
 const vButtonPrimary = {
   props: {
-    type: { 
-        type: String, 
-        required: true ,
-        disabled: false
+    type: {
+      type: String,
+      required: true,
+      disabled: false,
     },
   },
   data() {
     return {
-      values: []
+      values: [],
     };
   },
-  methods: {
-  },
+  methods: {},
   template: `<button :type="type" class="
   disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-  hover:border-sushi-700 text-sushi-50 py-2 px-4 border border-sushi-200 bg-sushi-500 hover:bg-sushi-400" :disabled="disabled"><slot></slot></button>`
+  hover:border-sushi-700 text-sushi-50 py-2 px-4 border border-sushi-200 bg-sushi-500 hover:bg-sushi-400" :disabled="disabled"><slot></slot></button>`,
 };
+
+
 const vButtonDefault = {
   props: {
-    type: { 
-        type: String, 
-        required: true ,
-        disabled: false
+    type: {
+      type: String,
+      required: true,
+      disabled: false,
     },
   },
   data() {
     return {
-      values: []
+      values: [],
     };
   },
-  methods: {
-  },
+  methods: {},
   template: `<button :type="type" class="
   disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-  bg-white hover:border-gray-400 text-gray-700 py-2 px-4 border border-gray-300" :disabled="disabled"><slot></slot></button>`
+  bg-white hover:border-gray-400 text-gray-700 py-2 px-4 border border-gray-300" :disabled="disabled"><slot></slot></button>`,
 };
 
 const vButtonDanger = {
   props: {
-    type: { 
-        type: String, 
-        required: true,
-        disabled: false
+    type: {
+      type: String,
+      required: true,
+      disabled: false,
     },
   },
   data() {
     return {
-      values: []
+      values: [],
     };
   },
-  methods: {
-  },
+
+  methods: {},
   template: `<button :type="type" class="
   disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-  hover:border-red-700 text-white py-2 px-4 border border-red-200 bg-red-500 hover:bg-red-400" :disabled="disabled"><slot></slot></button>`
+  hover:border-red-700 text-white py-2 px-4 border border-red-200 bg-red-500 hover:bg-red-400" :disabled="disabled"><slot></slot></button>`,
 };
 
+
+const vPullDownButton = {
+  setup(props, { emit }) {
+    const { ref, onMounted , onUnmounted } = Vue;
+    const dropdown = ref(null)
+    const open = ref(false)
+
+    const checkIfClickedOutside = (e) => {
+      if (open.value && !dropdown.value.contains(e.target)) {
+        open.value = false
+      }
+    }
+
+    const toggleDropdown = () => {
+      open.value = !open.value
+    }
+
+    onMounted(() => {
+      document.addEventListener('click', checkIfClickedOutside)
+    })
+
+    onUnmounted(() => {
+      document.removeEventListener('click', checkIfClickedOutside)
+    })
+
+    return { dropdown, open, toggleDropdown }
+  },
+  components: {
+    'v-button-danger' : vButtonDanger,
+    'v-button-primary' : vButtonPrimary,
+    'v-button-default' : vButtonDefault,
+  },
+  props: {
+    variant: String,
+    selects : Array,
+  },
+  data() {
+    return {
+      values: [],
+    };
+  },
+  methods: {},
+  template: `
+    <div class="relative inline-block text-left" ref="dropdown">
+      <div>
+        <v-button-default v-if="variant == 'default'" type="button" class="w-full" @click.native="toggleDropdown">
+          <div class="inline-flex place-items-center">
+            <slot></slot>
+            <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </v-button-default>
+        <v-button-primary v-if="variant == 'primary'" type="button" class="w-full" @click.native="toggleDropdown">
+          <div class="inline-flex place-items-center">
+            <slot></slot>
+            <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </v-button-primary>
+        <v-button-danger v-if="variant == 'danger'" type="button" class="w-full" @click.native="toggleDropdown">
+          <div class="inline-flex place-items-center">
+            <slot></slot>
+            <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </v-button-danger>
+      </div>
+      <div v-if="open" class="origin-top-left absolute left-0 w-56 rounded-md shadow-lg bg-white border" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+        <div class="py-1" role="none">
+          <template v-for="sel in selects" >
+            <template v-if="sel.variant === 'border'" >
+              <hr>
+            </template>
+            <template v-if="sel.variant === 'danger'" >
+              <button @click="sel.onclick" class="text-left w-full px-4 py-2 text-sm text-red-700 hover:bg-red-100 hover:text-red-900 disabled:text-gray-400" role="menuitem" :disabled="sel.disabled">{{ sel.text }}</button>
+            </template>
+            <template v-if="sel.variant === 'default'" >
+              <button @click="sel.onclick" class="text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 disabled:text-gray-400" role="menuitem" :disabled="sel.disabled">{{ sel.text }}</button>
+            </template>
+          </template>
+        </div>
+      </div>
+    </div>
+  `
+}
+
 const vAlert = {
-  setup(props,{emit}){
+  setup(props, { emit }) {
     const { onMounted } = Vue;
     onMounted(() => {
       MicroModal.init({
-          disableScroll: true
+        disableScroll: true,
       });
     });
     const open = () => {
@@ -670,34 +1199,34 @@ const vAlert = {
 
     const ok = () => {
       close();
-      emit('ok')
+      emit("ok");
     };
 
     return {
       open,
       ok,
-    }
+    };
   },
   components: {
-    'v-button-default': vButtonDefault,
-    'v-button-primary': vButtonPrimary,
+    "v-button-default": vButtonDefault,
+    "v-button-primary": vButtonPrimary,
   },
   props: {
-    id: { 
-        type: String, 
-        required: true 
+    id: {
+      type: String,
+      required: true,
     },
-    headtext: { 
-        type: String, 
-        required: false,
-        default: "" 
+    headtext: {
+      type: String,
+      required: false,
+      default: "",
     },
-    message: { 
-        type: String, 
-        required: true 
+    message: {
+      type: String,
+      required: true,
     },
   },
-  template : `
+  template: `
   <div class="modal micromodal-slide" :id="id">
     <div class="modal__overlay z-10">
       <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-alert-title">
@@ -719,11 +1248,11 @@ const vAlert = {
     `,
 };
 const vConfirm = {
-  setup(props,{emit}){
+  setup(props, { emit }) {
     const { onMounted } = Vue;
     onMounted(() => {
       MicroModal.init({
-          disableScroll: true
+        disableScroll: true,
       });
     });
     const open = () => {
@@ -735,40 +1264,40 @@ const vConfirm = {
 
     const cancel = () => {
       close();
-      emit('cancel')
+      emit("cancel");
     };
 
     const ok = () => {
       close();
-      emit('ok')
+      emit("ok");
     };
 
     return {
       open,
       cancel,
       ok,
-    }
+    };
   },
   components: {
-    'v-button-default': vButtonDefault,
-    'v-button-primary': vButtonPrimary,
+    "v-button-default": vButtonDefault,
+    "v-button-primary": vButtonPrimary,
   },
   props: {
-    id: { 
-        type: String, 
-        required: true 
+    id: {
+      type: String,
+      required: true,
     },
-    headtext: { 
-        type: String, 
-        required: false,
-        default: "" 
+    headtext: {
+      type: String,
+      required: false,
+      default: "",
     },
-    message: { 
-        type: String, 
-        required: true 
+    message: {
+      type: String,
+      required: true,
     },
   },
-  template : `
+  template: `
   <div class="modal micromodal-slide" :id="id">
     <div class="modal__overlay z-10">
       <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-confirm-title">
@@ -792,16 +1321,16 @@ const vConfirm = {
 };
 
 const vOpenModal = {
-  setup(props,{emit}){
+  setup(props, { emit }) {
     const { onMounted } = Vue;
 
     const onShow = () => {
-      emit('show');
-    }
+      emit("show");
+    };
     onMounted(() => {
       MicroModal.init({
-          onShow: onShow,
-          disableScroll: true
+        onShow: onShow,
+        disableScroll: true,
       });
     });
 
@@ -815,22 +1344,22 @@ const vOpenModal = {
 
     return {
       open,
-      close
-    }
+      close,
+    };
   },
-  emits: ['show'],
+  emits: ["show"],
   props: {
-    id: { 
-        type: String, 
-        required: true 
+    id: {
+      type: String,
+      required: true,
     },
-    headtext: { 
-        type: String, 
-        required: false,
-        default: "" 
+    headtext: {
+      type: String,
+      required: false,
+      default: "",
     },
   },
-  template : `
+  template: `
   <div class="modal micromodal-slide" :id="id">
     <div class="modal__overlay z-10">
       <div class="bg-white py-7 px-4 lg:px-7 rounded overflow-y-auto box-border lg:w-2/3 w-full max-w-none" role="dialog" aria-modal="true" aria-labelledby="modal-title">
@@ -849,70 +1378,69 @@ const vOpenModal = {
     </div>
   </div>
     `,
-  methods :{
-    clickEvent: function(){
-      this.$emit('from-child')
-     },
-    stopEvent: function(){
-      event.stopPropagation()
-    }    
-  }
+  methods: {
+    clickEvent: function () {
+      this.$emit("from-child");
+    },
+    stopEvent: function () {
+      event.stopPropagation();
+    },
+  },
 };
 
 const vTab = {
-  setup(props,{ emit }){
+  setup(props, { emit }) {
     const setTab = (tab) => {
-      emit('update:currentTab', tab);
+      emit("update:currentTab", tab);
     };
 
     return {
-      setTab
-    }
+      setTab,
+    };
   },
   props: {
-    currentTab: { 
-        type: String,
-        required: true 
+    currentTab: {
+      type: String,
+      required: true,
     }, //現在のページ
-    tabs: { 
-        type: Array, 
-        required: true 
+    tabs: {
+      type: Array,
+      required: true,
     },
   },
-  computed: {
-  },
-  data(){
-    return{
-      noActiveClass : {
-        'inline-block': true,
-        'px-4': true,
-        'py-2': true,
-        'rounded-t-lg': true,
-        'border-b-2': true,
-        'border-transparent' : true,
-        'hover:text-gray-600' : true ,
-        'hover:border-gray-300' : true
+  computed: {},
+  data() {
+    return {
+      noActiveClass: {
+        "inline-block": true,
+        "px-4": true,
+        "py-2": true,
+        "rounded-t-lg": true,
+        "border-b-2": true,
+        "border-transparent": true,
+        "hover:text-gray-600": true,
+        "hover:border-gray-300": true,
       },
-      activeClass : {
-        'inline-block': true,
-        'px-4': true,
-        'py-2': true,
-        'text-blue-600' : true,
-        'border-blue-600' : true,
-        'rounded-t-lg': true,
-        'border-b-2': true,
+      activeClass: {
+        "inline-block": true,
+        "px-4": true,
+        "py-2": true,
+        "text-blue-600": true,
+        "border-blue-600": true,
+        "rounded-t-lg": true,
+        "border-b-2": true,
       },
-      disabledClass : {
-        'inline-block': true,
-        'px-4': true,
-        'py-2': true,
-        'text-gray-400': true,
-        'rounded-t-lg': true,
-        'cursor-not-allowed' : true
-      }
-    }
+      disabledClass: {
+        "inline-block": true,
+        "px-4": true,
+        "py-2": true,
+        "text-gray-400": true,
+        "rounded-t-lg": true,
+        "cursor-not-allowed": true,
+      },
+    };
   },
-  template : `
+  template: `
   <div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200">
       <ul class="flex flex-wrap -mb-px">
           <li class="mr-2" v-for="(elem , key ) in tabs">
@@ -923,30 +1451,29 @@ const vTab = {
       </ul>
   </div>
     `,
-  mounted() {
-  },
+  mounted() {},
 };
 
 const vPagination = {
   props: {
-    showPages: { 
-        type: Number, 
-        required: true 
+    showPages: {
+      type: Number,
+      required: true,
     }, //ページネーションを何件表示するか
-    currentPage: { 
-        type: Number, 
-        required: true 
+    currentPage: {
+      type: Number,
+      required: true,
     }, //現在のページ
-    totalCount: { 
-        type: Number, 
-        required: true 
-    },//総件数
-    perPage: { 
-        type: Number, 
-        required: true 
+    totalCount: {
+      type: Number,
+      required: true,
+    }, //総件数
+    perPage: {
+      type: Number,
+      required: true,
     }, //1ページあたりの表示件数
   },
-  data(){
+  data() {
     return {
       perPageEdited: Number,
       totalCountEdited: Number,
@@ -989,16 +1516,16 @@ const vPagination = {
     this.perPageEdited = this.perPage;
     this.totalCountEdited = this.totalCount;
     this.currentPageEdited = this.currentPage;
-    this.totalPages = Math.ceil( this.totalCountEdited / this.perPageEdited );
+    this.totalPages = Math.ceil(this.totalCountEdited / this.perPageEdited);
   },
   watch: {
     perPage(val) {
       this.perPageEdited = this.perPage;
-      this.totalPages = Math.ceil( this.totalCountEdited / this.perPageEdited );
+      this.totalPages = Math.ceil(this.totalCountEdited / this.perPageEdited);
     },
     currentPageEdited(val) {
       //親コンポーネントに現在のページを送る
-      this.$emit('update:currentPage', val);
+      this.$emit("update:currentPage", val);
     },
     //ページネーションを複数設置したときの対応
     currentPage(val) {
@@ -1006,10 +1533,10 @@ const vPagination = {
     },
     totalCount(val) {
       this.totalCountEdited = this.totalCount;
-      this.totalPages = Math.ceil( this.totalCountEdited / this.perPageEdited );
-    }
+      this.totalPages = Math.ceil(this.totalCountEdited / this.perPageEdited);
+    },
   },
-  emits: ['update:currentPage'],
+  emits: ["update:currentPage"],
   methods: {
     //何ページ目を表示するか
     setPage(page) {
@@ -1026,7 +1553,7 @@ const vPagination = {
       }
     },
   },
-  template : `
+  template: `
   <div class="flex justify-center py-2" v-if="totalPages">
     <nav aria-label="Page navigation">
       <ul class="flex list-style-none gap-3">
@@ -1072,20 +1599,20 @@ const vPagination = {
     `,
 };
 
-
 const vMultipleSelect = {
   components: {
-    'v-text' : vText,
-    'v-open-modal' : vOpenModal,
-    'v-button-default': vButtonDefault,
+    "v-text": vText,
+    "v-open-modal": vOpenModal,
+    "v-button-default": vButtonDefault,
   },
   setup(props) {
     // a simple `name` field with basic required validator]
-    const { ref , onMounted } = Vue;
-    const { value, errorMessage , meta , validate } = VeeValidate.useField(
-    Vue.toRef(props, 'name'),
-    Vue.toRef(props, 'rules') ,
-    {label : props.label });
+    const { ref, onMounted } = Vue;
+    const { value, errorMessage, meta, validate } = VeeValidate.useField(
+      Vue.toRef(props, "name"),
+      Vue.toRef(props, "rules"),
+      { label: props.label }
+    );
 
     const valid = meta.valid;
     const validated = meta.validated;
@@ -1095,63 +1622,55 @@ const vMultipleSelect = {
 
     const setBadges = (el) => {
       if (el) {
-        refBadges.value.push(el)
+        refBadges.value.push(el);
       }
     };
-    
-    const isSelected = (v) =>
-    {
+
+    const isSelected = (v) => {
       let result = null;
-      value.value.forEach(function(i){
-        if(i == v){
+      value.value.forEach(function (i) {
+        if (i == v) {
           result = i;
         }
       });
-      return (result != null);
+      return result != null;
     };
 
-    
-    const findOptionOfValue = (v) =>
-    {
+    const findOptionOfValue = (v) => {
       let result = "";
-      props.options.forEach(function(i){
-        if(i.value == v){
+      props.options.forEach(function (i) {
+        if (i.value == v) {
           result = i;
         }
       });
       return result;
     };
 
-    const selectedRemove = (v) =>
-    {
-      value.value.some(function(d, i){
-          if (d == v) value.value.splice(i,1);
+    const selectedRemove = (v) => {
+      value.value.some(function (d, i) {
+        if (d == v) value.value.splice(i, 1);
       });
     };
-    
-    const propSelected = (v) =>
-    {
-      if(isSelected(v)){
+
+    const propSelected = (v) => {
+      if (isSelected(v)) {
         selectedRemove(v);
       } else {
         value.value.push(v);
       }
     };
 
-    const open = () =>
-    {
+    const open = () => {
       multiSelectModal.value.open();
     };
 
-    const close = () =>
-    {
+    const close = () => {
       multiSelectModal.value.close();
-    }
+    };
 
     const isRequired = () => {
       return props.rules.required;
-    }
-
+    };
 
     return {
       open,
@@ -1163,48 +1682,57 @@ const vMultipleSelect = {
       meta,
       findOptionOfValue,
       selectedRemove,
-      successClassName: ['text-gray-700', 'border-gray-300'],
-      errorClassName: ['text-red-500', 'border-red-500'],
+      successClassName: ["text-gray-700", "border-gray-300"],
+      errorClassName: ["text-red-500", "border-red-500"],
       errorMessage,
       isSelected,
     };
   },
   props: {
-    options: { 
-        type: Array, 
-        required: true 
+    options: {
+      type: Array,
+      required: true,
     },
-    name: { 
-        type: String, 
-        required: true 
+    name: {
+      type: String,
+      required: true,
     },
     label: {
-        type: String, 
-        required: false,
-        default: "", 
+      type: String,
+      required: false,
+      default: "",
     },
     rules: {
-        type: Object, 
-        required: false, 
-        default: {}
+      type: Object,
+      required: false,
+      default: {},
     },
     title: {
-        type: String, 
-        required: false,
-        default: "", 
+      type: String,
+      required: false,
+      default: "",
     },
     id: {
-        type: String, 
-        required: false,
-        default: "", 
-    }
+      type: String,
+      required: false,
+      default: "",
+    },
   },
-  mounted() {
-  },
-  beforeDestroy() {
-    window.removeEventListener('click', this._onBlurHandler);
+  data() {
+    return {
+      filteredOptions: this.options,
+    };
   },
   methods: {
+    filterOptions() {
+      this.filteredOptions = this.options.filter((option) =>
+        option.label.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+    },
+  },
+  mounted() {},
+  beforeDestroy() {
+    window.removeEventListener("click", this._onBlurHandler);
   },
   template: `
   <v-text :title="title" :isRequired="isRequired()">
@@ -1220,9 +1748,16 @@ const vMultipleSelect = {
       </div>
     </div>
     <v-open-modal ref="multiSelectModal" :id="id" headtext="複数選択">
+      <input
+        type="text"
+        v-model="searchText"
+        @input="filterOptions"
+        placeholder="検索..."
+        class="appearance-none w-full mt-2 py-2 px-3 leading-tight h-full text-left flex-initial bg-white border"
+      />
       <div class="flex flex-col" style="max-height: 68vh;">
         <div class="overflow-y-scroll my-6">
-          <template v-for="(option, index) in options" >
+          <template v-for="(option, index) in filteredOptions" >
             <div v-on:click="propSelected(option.value)" class="px-4 py-2 cursor-pointer" :class="{ 'hover:bg-gray-200 ' : (! isSelected(option.value) ) , 'bg-sushi-300 ' : isSelected(option.value)  }">
               <template v-if="isSelected(option.value)">
                 <div 
@@ -1249,30 +1784,28 @@ const vMultipleSelect = {
       </div>
     </v-open-modal>
   </v-text>
-    ` 
+    `,
 };
 
-const vSwitch = 
-{
-  setup(props){
+const vSwitch = {
+  setup(props) {
     const { ref } = Vue;
-    const isCheck = ref(props.modelValue); 
+    const isCheck = ref(props.modelValue);
 
     return {
       isCheck,
     };
   },
-  emits: ['update:modelValue'],
+  emits: ["update:modelValue"],
   props: {
     modelValue: Boolean,
-    message : String,
-    id: String
+    message: String,
+    id: String,
   },
   watch: {
-    isCheck(val)
-    {
-      this.$emit('update:modelValue', val);
-    }
+    isCheck(val) {
+      this.$emit("update:modelValue", val);
+    },
   },
   template: `
   <label 
@@ -1294,90 +1827,90 @@ const vSwitch =
     {{ message }}
     </div>
   </label>
-  `
-
+  `,
 };
 
-      const vInputv2 = {
-      components: {
-      'v-text' : vText
-      },
-      setup(props) {
-      // a simple `name` field with basic required validator
-      const { ref } = Vue;
-      const { value, errorMessage , meta , validate } = VeeValidate.useField(
-      Vue.toRef(props, 'name'),
-      Vue.toRef(props, 'rules') ,
-      {label : props.label });
+const vInputv2 = {
+  components: {
+    "v-text": vText,
+  },
+  setup(props) {
+    // a simple `name` field with basic required validator
+    const { ref } = Vue;
+    const { value, errorMessage, meta, validate } = VeeValidate.useField(
+      Vue.toRef(props, "name"),
+      Vue.toRef(props, "rules"),
+      { label: props.label }
+    );
 
-      const valid = meta.valid;
-      const validated = meta.validated;
+    const valid = meta.valid;
+    const validated = meta.validated;
 
-      const isRequired = () => {
+    const isRequired = () => {
       return props.rules.required;
-      }
+    };
 
-      const changeClass = ref({});
-      return {
+    const changeClass = ref({});
+    return {
       changeClass,
       isRequired,
       value,
       meta,
-      successClassName: ['text-gray-700', 'border-gray-300'],
-      errorClassName: ['text-red-500', 'border-red-500'],
+      successClassName: ["text-gray-700", "border-gray-300"],
+      errorClassName: ["text-red-500", "border-red-500"],
       errorMessage,
-      };
-      },
-      props: {
-      label: {
+    };
+  },
+  props: {
+    label: {
       type: String,
       required: false,
       default: "",
-      },
-      type: {
+    },
+    type: {
       type: String,
-      required: true
-      },
-      name: {
+      required: true,
+    },
+    name: {
       type: String,
-      required: true
-      },
-      placeholder: {
+      required: true,
+    },
+    placeholder: {
       type: String,
-      required: false
-      },
-      rules: {
+      required: false,
+    },
+    rules: {
       type: Object,
       required: false,
-      default: {}
-      },
-      title: {
+      default: {},
+    },
+    title: {
       type: String,
       required: false,
-      default : ""
-      },
-      changeClassName: {
+      default: "",
+    },
+    changeClassName: {
       type: String,
       required: false,
-      default : ""
-      },
-      readonly: {
+      default: "",
+    },
+    readonly: {
       type: Boolean,
       required: false,
       default: false,
-      }
-      },
-      watch: {
-      value(){
+    },
+  },
+  watch: {
+    value() {
       this.changeClass = {
-      [this.changeClassName] : true
+        [this.changeClassName]: true,
       };
-      }
-      },
-      template: `
+    },
+  },
+  template: `
       <v-text :title="title" :isRequired="isRequired()">
-        <input :readonly="readonly" :type=" type" :placeholder="placeholder" v-model="value" autocomplete="off" class="appearance-none w-full py-2 px-3 leading-tight h-full text-left flex-initial bg-white border" :class="[ ( ! meta.valid && meta.validated == true) ? errorClassName : successClassName , changeClass]" />
+        <input :readonly="readonly" :type=" type" :placeholder="placeholder" v-model="value" autocomplete="off" class="appearance-none w-full py-2 px-3 leading-tight text-left flex-initial bg-white border" :class="[ ( ! meta.valid && meta.validated == true) ? errorClassName : successClassName , changeClass]" />
         <span class="text-red-500">{{ errorMessage }}</span>
       </v-text>
-      `
-      };
+      `,
+};

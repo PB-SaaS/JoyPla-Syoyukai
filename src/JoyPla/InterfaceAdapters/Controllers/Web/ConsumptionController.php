@@ -23,6 +23,7 @@ class ConsumptionController extends Controller
             ->value('billingUnitPrice')
             ->get()
             ->first();
+
         $consumptionUnitPriceUseFlag =
             $consumptionUnitPriceUseFlag->billingUnitPrice;
         $body = View::forge(

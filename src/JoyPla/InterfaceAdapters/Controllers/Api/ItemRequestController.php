@@ -6,6 +6,8 @@ use Csrf;
 use framework\Facades\Gate;
 use framework\Http\Controller;
 use framework\Routing\Router;
+use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestBulkUpdateInputData;
+use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestBulkUpdateInputPortInterface;
 use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestRegisterInputData;
 use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestRegisterInputPortInterface;
 use JoyPla\Application\InputPorts\Api\ItemRequest\ItemRequestDeleteInputData;
@@ -173,6 +175,25 @@ class ItemRequestController extends Controller
         }
 
         $inputData = new TotalizationInputData($user, $search);
+        $inputPort->handle($inputData);
+    }
+
+    public function itemBulk(
+        $vars,
+        ItemRequestBulkUpdateInputPortInterface $inputPort
+    ) {
+        $token = $this->request->get('_csrf');
+        Csrf::validate($token, true);
+
+        if (Gate::denies('item_request_bulk')) {
+            Router::abort(403);
+        }
+
+        $items = $this->request->get('items');
+
+        $user = $this->request->user();
+
+        $inputData = new ItemRequestBulkUpdateInputData($user, $items);
         $inputPort->handle($inputData);
     }
 }

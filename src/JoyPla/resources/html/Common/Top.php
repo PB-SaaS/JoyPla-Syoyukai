@@ -18,7 +18,7 @@
                         </svg>
                     </card-button>
                     <card-button main-color="bg-scooter-500" text-color="text-scooter-50" sub-color="bg-scooter-600"
-                        label-text="発注" label-sub-text="Order" path="/order">
+                        label-text="発注・入荷" label-sub-text="Order" path="/order">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" class="stroke-scooter-700" stroke-linejoin="round"
                                 d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -102,6 +102,14 @@
                     </card-button>
                 </div>
                 <div class="md:grid md:grid-cols-4 md:gap-10">
+                    <card-button main-color="bg-ochre-500" text-color="text-ochre-50"
+                        sub-color="bg-ochre-600" label-text="会計" label-sub-text="Accountant"
+                        path="accountant">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" class="stroke-ochre-700" stroke-linejoin="round"
+                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </card-button>
                     <card-button main-color="bg-san-juan-500" text-color="text-san-juan-50" sub-color="bg-san-juan-600"
                         label-text="ユーザー" label-sub-text="User" path="/user">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

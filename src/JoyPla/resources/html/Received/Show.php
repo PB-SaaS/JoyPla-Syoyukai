@@ -31,7 +31,7 @@
           <div class="border-b-2 border-solid border-gray-100 w-full">
             <div class="lg:flex lg:divide-x ">
               <div class="lg:w-1/5 p-2">
-                <p class="text-md font-bold">登録日時<br>{{ received.registDate }}</p>
+                <p class="text-md font-bold">入荷日<br>{{ received.registDate }}</p>
                 <p class="text-md">
                   発注番号：{{ received.orderId }}<br>
                   検収番号：{{ received.receivedId }}<br>
@@ -146,14 +146,16 @@
                 title="JANコード"
                 ></v-input>
             </div>
-            <?php if(! gate('list_of_acceptance_inspection_slips')->isOnlyMyDivision()): ?>
+            <?php if (
+                !gate('list_of_acceptance_inspection_slips')->isOnlyMyDivision()
+            ): ?>
             <div class="my-4">
               <v-multiple-select-division
                 name="divisionIds"
                 title="発注書元部署名"
                 ></v-multiple-select-division>
             </div>
-            <?php endif ?>
+            <?php endif; ?>
             <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
               <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
               <v-button-primary type="button" @click.native="searchExec">絞り込み</v-button-primary>
@@ -254,14 +256,14 @@ var JoyPlaApp = Vue.createApp({
           itemJANCode : (getParam("itemJANCode")) ? getParam("itemJANCode") : "",
           registerDate: (getParam("registerDate")) ? getParam("registerDate") : "",
           receivedDate: (getParam("receivedDate")) ? getParam("receivedDate") : "",
-          perPage: (getParam("perPage")) ? getParam("perPage") : "10",
+          perPage: (Number.isInteger(parseInt(getParam("perPage")))) ? getParam("perPage") : "10",
           currentPage : (Number.isInteger(parseInt(getParam("currentPage")))) ? parseInt(getParam("currentPage")) : 1,
           divisionIds: (getParam("divisionIds")) ? ( Array.isArray(getParam("divisionIds"))? getParam("divisionIds") : (getParam("divisionIds")).split(',') ) : [],
         },
       });
       const breadcrumbs = [
           {
-            text: '発注メニュー',
+            text: '発注・入荷メニュー',
             disabled: false,
             href: _ROOT + '&path=/order',
           },
@@ -367,18 +369,14 @@ var JoyPlaApp = Vue.createApp({
       const searchClear = () =>
       {
         values.currentPage = 1;
-        resetForm({
-          itemName  : "",
-          makerName : "",
-          itemCode : "",
-          itemStandard :  "",
-          itemJANCode :  "",
-          registerDate: "",
-          receivedDate: "",
-          divisionIds: [],
-          currentPage : 1,
-          perPage: values.perPage,
-        });
+        values.itemName = '';
+        values.makerName = '';
+        values.itemCode = '';
+        values.itemStandard = '';
+        values.itemJANCode = '';
+        values.registerDate = '';
+        values.receivedDate = '';
+        values.divisionIds = [];
         listGet();
       };
 

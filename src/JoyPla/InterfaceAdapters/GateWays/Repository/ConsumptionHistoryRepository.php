@@ -118,6 +118,7 @@ class ConsumptionHistoryRepository implements
                     $tmp->makerName = $item->makerName;
                     $tmp->serialNo = $item->serialNo;
                     $tmp->catalogNo = $item->catalogNo;
+                    $tmp->lotManagement = $item->lotManagement;
                     $tmp->priceNotice = $price[$price_fkey]->notice;
                     $merging[] = $tmp;
                 }
@@ -143,7 +144,7 @@ class ConsumptionHistoryRepository implements
             $consumptions[] = $consumption;
         }
 
-        return [$consumptions, $histories->getData()->count()];
+        return [$consumptions, $histories->getTotal()];
     }
 }
 

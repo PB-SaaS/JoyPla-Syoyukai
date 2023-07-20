@@ -11,6 +11,7 @@ use JoyPla\Application\Interactors\Web\Order\UnapprovedOrderIndexInteractor;
 use JoyPla\Application\Interactors\Web\Received\OrderReceivedSlipIndexInteractor;
 use JoyPla\Application\Interactors\Web\Received\ReceivedIndexInteractor;
 use JoyPla\Application\Interactors\Web\Received\ReceivedLabelInteractor;
+use JoyPla\Application\Interactors\Web\Product\ItemList\ItemListShowInteractor;
 use JoyPla\Service\Presenter\Web\PresenterProvider;
 use JoyPla\Service\Repository\QueryProvider;
 use JoyPla\Service\Repository\RepositoryProvider;
@@ -192,6 +193,24 @@ class UseCaseProvider
                 PresenterProvider $presenterProvider
             ) {
                 parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getItemListPrintInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends ItemListShowInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct(
+                    $presenterProvider,
+                    $repositoryProvider
+                );
             }
         };
     }

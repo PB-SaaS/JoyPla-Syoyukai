@@ -44,7 +44,6 @@ namespace JoyPla\Application\Interactors\Api\Order {
             $orders = $this->repositoryProvider
                 ->getOrderRepository()
                 ->getOrderByOrderItemId($hospitalId, $orderItemIds);
-
             foreach ($orders as $order) {
                 if (
                     $order->getOrderStatus()->value() !== OrderStatus::UnOrdered

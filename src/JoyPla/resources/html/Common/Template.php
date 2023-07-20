@@ -4,7 +4,7 @@
     <title>JoyPla <?php echo $title; ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://i02.smp.ne.jp/u/joypla/new/favicon.ico">
-    <?php echo $head ?>
+    <?php echo $head; ?>
     <?php echo $style; ?>
     <!-- <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/animsition.min.css"> -->
     <!-- <script type="text/javascript" src="https://i02.smp.ne.jp/u/joypla/new/js/animsition.min.js"></script> -->
@@ -24,6 +24,112 @@
 	
     <script src="https://i02.smp.ne.jp/u/joypla_developer/340/micromodal.min.js"></script>
     <script src="https://i02.smp.ne.jp/u/joypla_developer/340/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla_developer/340/scroll-hint.css">
+    <script src="https://i02.smp.ne.jp/u/joypla_developer/340/scroll-hint.min.js"></script>
+    
+	<link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/uikit.min.css" />
+	<script src="https://i02.smp.ne.jp/u/joypla/new/js/uikit.min.js"></script>
+	<script src="https://i02.smp.ne.jp/u/joypla/new/js/uikit-icons.min.js"></script>
+    <style>
+    @media print{
+        .no_print{
+            display: none;
+        }
+        .printarea{
+            page-break-after: always;
+            font-size: 12px;
+        }
+    }
+    .uk-input[type="number"]{
+        text-align: right;
+    }
+    table.uk-table-divider tr:last-of-type{
+    border-bottom: 1px solid #e5e5e5;
+    }
+    table#tbl-Items tr td{
+        padding: 12px 0px 12px 12px !important;
+    }
+    .uk-navbar-container{
+        border-bottom : solid 2px #98CB00;
+    }
+    .bk-application-color{
+        background : #98CB00;
+    }
+
+    table td.active{
+        background-color: #AACC44 !important;
+    }
+    table td{
+        vertical-align: middle !important;
+    }
+    table.uk-table td, table.uk-table th{
+        font-size: 1.0em;
+    }
+
+    .uk-navbar-container{
+        border-bottom : solid 2px #98CB00;
+    }
+    .bk-application-color{
+        background : #98CB00;
+    }
+
+    .uk-table th{
+        text-transform: none !important;
+    }
+
+    .resultarea{
+        display:none;
+    }
+
+    /*
+    * Primary
+    */
+    .uk-button-primary {
+        background-color: #7AAE36;
+        color: #fff;
+        border: 1px solid transparent;
+    }
+    .uk-text-primary {
+        color: #7AAE36 !important;
+    }
+    /* Hover + Focus */
+    .uk-button-primary:hover,
+    .uk-button-primary:focus {
+        background-color: #93BD5B;
+        color: #fff;
+    }
+    .uk-button-primary:disabled:hover,
+    .uk-button-primary:disabled:focus {
+        background-color: transparent;
+        color: #999;
+    }
+    /* OnClick + Active */
+    .uk-button-primary:active,
+    .uk-button-primary.uk-active {
+        background-color: #B2D08B;
+        color: #fff;
+    }
+    /*
+    * Success
+    */
+    .uk-label-success {
+        background-color: #7AAE36;
+        color: #fff;
+    }
+
+    .uk-table tr:last-child{
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    .uk-table tr.tr-gray{
+        background: #e5e5e5;
+    }
+
+    .title_spacing {
+        letter-spacing : 1em;	
+        text-indent: 1em;
+    }
+    </style>
     <script>
     // import all the rules that come with vee-validate
     Object.keys(VeeValidateRules.default).forEach(rule => {
@@ -82,26 +188,24 @@
             return result;
         };
         
-        const _CSRF = "<?php echo Csrf::generate(16) ?>";
+        const _CSRF = "<?php echo Csrf::generate(16); ?>";
         const _APIURL = "%url/rel:mpgt:ApiRoot%";
         const _ROOT = "%url/rel:mpgt:Root%";
     </script>
 
     <script>
         <?php
-        require_once "JoyPla/resources/parts/component/form-components.php";
-        require_once "JoyPla/resources/parts/component/components.php";
-        require_once "JoyPla/resources/parts/component/v-loading.php";
-        require_once "JoyPla/resources/parts/component/v-breadcrumbs.php";
-        require_once "JoyPla/resources/parts/component/customVeeValidate.php";
-        require_once "JoyPla/resources/parts/component/db-select-components.php";
+        require_once 'JoyPla/resources/parts/component/form-components.php';
+        require_once 'JoyPla/resources/parts/component/components.php';
+        require_once 'JoyPla/resources/parts/component/v-loading.php';
+        require_once 'JoyPla/resources/parts/component/v-breadcrumbs.php';
+        require_once 'JoyPla/resources/parts/component/customVeeValidate.php';
+        require_once 'JoyPla/resources/parts/component/db-select-components.php';
         ?>
     </script>
 
     <style>
-    <?php 
-    require_once "JoyPla/resources/parts/output.css.php"; 
-    ?>
+    <?php require_once 'JoyPla/resources/parts/output.css.php'; ?>
     
     [v-cloak] {
       display: none;
@@ -110,8 +214,9 @@
     <?php echo $script; ?>
 </head>
 <body>
-    <?php echo $body ?>
-    <?php /*
+    <?php echo $body; ?>
+    <?php
+/*
     <div class="h-screen ">
         <v-loading :show="loading" id="joypla"></v-loading>
         <?php echo $header ?> 
@@ -122,6 +227,7 @@
             </div>
         </div>
     </div>
-    */ ?>
+    */
+?>
 </body>
 </html>

@@ -11,6 +11,7 @@ use JoyPla\InterfaceAdapters\Presenters\Api\Distributor\DistributorIndexPresente
 use JoyPla\InterfaceAdapters\Presenters\Api\Division\DivisionIndexPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\InHospitalItem\InHospitalItemIndexPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\InHospitalItem\InHospitalItemRegisterPresenter;
+use JoyPla\InterfaceAdapters\Presenters\Api\InHospitalItem\InHospitalItemShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Item\ItemRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Item\ItemShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest\ItemRequestDeletePresenter;
@@ -36,6 +37,7 @@ use JoyPla\InterfaceAdapters\Presenters\Api\Payout\PayoutRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Price\PriceRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedRegisterByOrderSlipPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedRegisterPresenter;
+use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedLateRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedReturnRegisterPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\Received\ReceivedShowPresenter;
 use JoyPla\InterfaceAdapters\Presenters\Api\ReceivedReturn\ReturnShowPresenter;
@@ -153,6 +155,11 @@ class PresenterProvider
         return new ReceivedRegisterPresenter();
     }
 
+    public function getReceivedLateRegisterPresenter() //必要？
+    {
+        return new ReceivedLateRegisterPresenter();
+    }
+
     public function getBarcodeOrderSearchPresenter()
     {
         return new BarcodeOrderSearchPresenter();
@@ -171,6 +178,11 @@ class PresenterProvider
     public function getInHospitalItemRegisterPresenter()
     {
         return new InHospitalItemRegisterPresenter();
+    }
+
+    public function getInHospitalItemShowPresenter()
+    {
+        return new InHospitalItemShowPresenter();
     }
 
     public function getItemRequestDeletePresenter()

@@ -11,6 +11,9 @@ namespace JoyPla\Application\Interactors\Api\Received {
     use JoyPla\Application\InputPorts\Api\Received\ReceivedRegisterInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\Received\ReceivedRegisterOutputData;
     use JoyPla\Application\OutputPorts\Api\Received\ReceivedRegisterOutputPortInterface;
+    use JoyPla\Enterprise\Models\Accountant;
+    use JoyPla\Enterprise\Models\AccountantService;
+    use JoyPla\Enterprise\Models\DateYearMonthDay;
     use JoyPla\Enterprise\Models\DateYearMonthDayHourMinutesSecond;
     use JoyPla\Enterprise\Models\OrderId;
     use JoyPla\Enterprise\Models\HospitalId;
@@ -45,7 +48,6 @@ namespace JoyPla\Application\Interactors\Api\Received {
     class ReceivedRegisterInteractor implements
         ReceivedRegisterInputPortInterface
     {
-
         private PresenterProvider $presenterProvider;
         private RepositoryProvider $repositoryProvider;
 
@@ -63,6 +65,9 @@ namespace JoyPla\Application\Interactors\Api\Received {
         public function handle(ReceivedRegisterInputData $inputData)
         {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
+            $accountantDate = new DateYearMonthDay(
+                $inputData->accountantDate ?? 'now'
+            );
 
             $orders = $this->repositoryProvider
                 ->getOrderRepository()
@@ -90,7 +95,9 @@ namespace JoyPla\Application\Interactors\Api\Received {
                 $received = new Received(
                     $order->getOrderId(),
                     ReceivedId::generate(),
-                    new DateYearMonthDayHourMinutesSecond('now'),
+                    new DateYearMonthDayHourMinutesSecond(
+                        $inputData->receivedDate ?? 'now'
+                    ),
                     [],
                     $order->getHospital(),
                     $order->getDivision(),
@@ -144,7 +151,6 @@ namespace JoyPla\Application\Interactors\Api\Received {
                                     $storehouse = $this->repositoryProvider
                                         ->getDivisionRepository()
                                         ->getStorehouse($hospitalId);
-
 
                                     $inventoryCalculations[] = new InventoryCalculation(
                                         $receivedItem->getHospitalId(),
@@ -212,6 +218,35 @@ namespace JoyPla\Application\Interactors\Api\Received {
                 $receiveds[] = $received->setReceivedItems($receivedItems);
             }
 
+            $accountants = [];
+            $accountantLogs = [];
+            foreach ($receiveds as $received) {
+                $accountant = AccountantService::ReceivedToAccountant(
+                    $received,
+                    $accountantDate
+                );
+                $oldaccountant = clone $accountant;
+                $oldaccountant->setItems([]);
+
+                $accountantLogs = array_merge(
+                    $accountantLogs,
+                    AccountantService::checkAccountant(
+                        $accountant,
+                        $oldaccountant,
+                        $inputData->user->id
+                    )
+                );
+
+                $accountants[] = $accountant;
+            }
+            $this->repositoryProvider
+                ->getAccountantRepository()
+                ->saveToArray($accountants);
+
+            $this->repositoryProvider
+                ->getAccountantRepository()
+                ->saveItemLog($accountantLogs);
+
             $this->repositoryProvider
                 ->getOrderRepository()
                 ->saveToArray($hospitalId, $orders, [
@@ -243,10 +278,17 @@ namespace JoyPla\Application\InputPorts\Api\Received {
      */
     class ReceivedRegisterInputData
     {
+        public Auth $user;
+        public array $receivedItems;
+        public bool $isOnlyMyDivision;
+        public string $receivedDate;
+        public string $accountantDate;
         public function __construct(
             Auth $user,
             array $receivedItems,
-            bool $isOnlyMyDivision
+            bool $isOnlyMyDivision,
+            string $receivedDate,
+            string $accountantDate
         ) {
             $this->user = $user;
             $this->receivedItems = array_map(function ($item) {
@@ -262,6 +304,10 @@ namespace JoyPla\Application\InputPorts\Api\Received {
                 return $d;
             }, $receivedItems);
             $this->isOnlyMyDivision = $isOnlyMyDivision;
+            $this->receivedDate = $receivedDate
+                ? $receivedDate . ' 00:00:00'
+                : 'now';
+            $this->accountantDate = $accountantDate ? $accountantDate : 'now';
         }
     }
 

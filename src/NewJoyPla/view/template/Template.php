@@ -2,11 +2,14 @@
 <html lang="ja">
 <head>
     <title><?php echo $title; ?></title>
-    <?php echo $head ?>
+    <?php echo $head; ?>
     <?php echo $style; ?>
     <?php echo $script; ?>
     <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla_developer/340/scroll-hint.css">
     <script src="https://i02.smp.ne.jp/u/joypla_developer/340/scroll-hint.min.js"></script>
+
+    <script src="https://i02.smp.ne.jp/u/joypla/new/js/vue-multiselect.min.js"></script>
+    <link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla/new/css/vue-multiselect.min.css">
     <style>
     
 .absolute {
@@ -87,12 +90,13 @@
 </head>
 <body>
     <div>
-      <?php echo $header ?>
+      <?php echo $header; ?>
     </div>
     <div id="content">
       <?php echo $content; ?>
     </div>
-    <footer>
+    
+    <footer class="no_print">
       <?php echo $footer; ?>
     </footer>
     <?php echo $before_script; ?>

@@ -14,6 +14,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
     use JoyPla\Enterprise\Models\Lot;
     use JoyPla\Enterprise\Models\LotDate;
     use JoyPla\Enterprise\Models\LotNumber;
+    use JoyPla\Enterprise\Models\OrderId;
     use JoyPla\Enterprise\Models\OrderStatus;
     use JoyPla\Service\Presenter\Api\PresenterProvider;
     use JoyPla\Service\Repository\RepositoryProvider;
@@ -42,9 +43,13 @@ namespace JoyPla\Application\Interactors\Api\Order {
         {
             $hospitalId = new HospitalId($inputData->user->hospitalId);
 
+            $orderIds = array_map(function ($orderId) {
+                return new OrderId($orderId);
+            }, $inputData->orderIds);
+
             $orders = $this->repositoryProvider
                 ->getOrderRepository()
-                ->getOrder($hospitalId, [OrderStatus::UnOrdered]);
+                ->getOrder($hospitalId, [OrderStatus::UnOrdered], $orderIds);
 
             if (empty($orders)) {
                 throw new NotFoundException('Not Found.', 404);
@@ -140,11 +145,16 @@ namespace JoyPla\Application\InputPorts\Api\Order {
     {
         public Auth $user;
         public bool $isOnlyMyDivision;
+        public array $orderIds = [];
 
-        public function __construct(Auth $user, bool $isOnlyMyDivision)
-        {
+        public function __construct(
+            Auth $user,
+            bool $isOnlyMyDivision,
+            array $orderIds = []
+        ) {
             $this->user = $user;
             $this->isOnlyMyDivision = $isOnlyMyDivision;
+            $this->orderIds = $orderIds;
         }
     }
 

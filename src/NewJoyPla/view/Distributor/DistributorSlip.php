@@ -11,7 +11,7 @@
 			<div class="no_print uk-margin">
 				<input class="print_hidden uk-button uk-button-default" type="submit" value="印刷プレビュー" onclick="window.print();return false;">
 				
-				<?php if($user_info->isAdmin() && $tenant->tenantKind == '1') : ?>
+				<?php if ($user_info->isAdmin() && $tenant->tenantKind == '1'): ?>
 				<input class="print_hidden uk-button uk-button-primary" type="submit" value="卸業者情報変更" onclick="document.distributorChang.submit()">
 				<form action="/regist/is" method="post" name="distributorChang" target="_blank">
 					%SMPAREA%
@@ -38,34 +38,38 @@
 	    	</div>
 	    	<div class="uk-width-4-5@m uk-margin-auto uk-margin-remove-top">
 	    		<table class="uk-table uk-table-divider uk-table-responsive">
-				        <tr>
-				            <th>卸業者ID</th>
-				            <td colspan="3">%val:usr:distributorId%</td>
-				       </tr>
-				        <tr>
-				            <th>登録日時</th>
-				            <td>%val:usr:registrationTime%</td>
-				            <th>更新日時</th>
-				            <td colspan="3">%val:usr:updateTime%</td>
-				        </tr>
-				        <tr>
-				            <th>卸業者名</th>
-				            <td colspan="5">%val:usr:distributorName%</td>
-				        </tr>
-				        <tr>
-				            <th>郵便番号</th>
-				            <td>〒%val:usr:postalCode%</td>
-				            <th>都道府県</th>
-				            <td>%val:usr:prefectures%</td>
-				            <th>住所</th>
-				            <td>%val:usr:address%</td>
-				        </tr>
-				        <tr>
-				            <th>電話番号</th>
-				            <td>%val:usr:phoneNumber%</td>
-				            <th>FAX番号</th>
-				            <td colspan="3">%val:usr:faxNumber%</td>
-				        </tr>
+					<tr>
+						<th>卸業者ID</th>
+						<td colspan="3">%val:usr:distributorId%</td>
+					</tr>
+					<tr>
+						<th>登録日時</th>
+						<td>%val:usr:registrationTime%</td>
+						<th>更新日時</th>
+						<td colspan="3">%val:usr:updateTime%</td>
+					</tr>
+					<tr>
+						<th>卸業者名</th>
+						<td colspan="5">%val:usr:distributorName%</td>
+					</tr>
+					<tr>
+						<th>郵便番号</th>
+						<td>〒%val:usr:postalCode%</td>
+						<th>都道府県</th>
+						<td>%val:usr:prefectures%</td>
+						<th>住所</th>
+						<td>%val:usr:address%</td>
+					</tr>
+					<tr>
+						<th>電話番号</th>
+						<td>%val:usr:phoneNumber%</td>
+						<th>FAX番号</th>
+						<td colspan="3">%val:usr:faxNumber%</td>
+					</tr>
+					<tr>
+						<th>発注方法</th>
+						<td colspan="5">%val:usr:orderMethod%</td>
+					</tr>
 				</table>
 	    	</div>
 	    	<div uk-grid>
@@ -73,7 +77,7 @@
 	    			<h2>卸業者ユーザー情報</h2>
 				</div>
 	    		<div class="uk-width-1-4@m uk-width-3-3 uk-text-right@m">
-				<?php if($user_info->isAdmin()) : ?>
+				<?php if ($user_info->isAdmin()): ?>
 	    			<form action="/regist/is" target="_blank" method="post">
 	    				%SMPAREA%
 						<input type="hidden" name="SMPFORM" value="%smpform:OoroshiUserReg%">
@@ -86,11 +90,11 @@
 				</div>
 			</div>
 	    	<div class="uk-width-1-1 uk-margin-top">
-				<?php if($user_info->isAdmin()): ?>
+				<?php if ($user_info->isAdmin()): ?>
 	    		%sf:usr:search79:mstfilter:table%
 				<?php else: ?>
 				%sf:usr:oroshiUserList:mstfilter:table%
-				<?php endif ?>
+				<?php endif; ?>
            </div>
 		</div>
 	</div>

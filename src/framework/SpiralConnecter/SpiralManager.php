@@ -127,6 +127,12 @@ class SpiralManager
         return $this;
     }
 
+    public function orWhereNull(string $field)
+    {
+        $this->orWhere($field, '0', 'ISNULL');
+        return $this;
+    }
+
     public function whereNull(string $field)
     {
         $this->where($field, '0', 'ISNULL');
@@ -150,6 +156,22 @@ class SpiralManager
     {
         if (is_array($value)) {
             $this->fields = array_merge($this->fields, $value);
+        }
+
+        if (is_string($value)) {
+            $this->fields[] = $value;
+        }
+
+        $this->request->set('select_columns', $this->fields);
+
+        return $this;
+    }
+
+    public function resetValue($value)
+    {
+        $this->fields = [];
+        if (is_array($value)) {
+            $this->fields = $value;
         }
 
         if (is_string($value)) {
@@ -406,6 +428,82 @@ class SpiralManager
 
         $res = $this->combine($this->request->get('select_columns'), $res);
         return new Collection($res);
+    }
+
+    public function fetchPaginatedPagesWithLimit(
+        int $startPage,
+        int $limit,
+        int $maxPages
+    ) {
+        $data = [];
+        $totalPages = 0;
+        $page = $startPage;
+        $availablePages = 0;
+
+        do {
+            $this->page($page);
+            $response = $this->paginate($limit);
+            $pageData = $response->getData()->all(); // Assuming 'data' holds the actual data
+
+            // Append the page data to the total data
+            $data = array_merge($data, $pageData);
+            $availablePages = ceil($response->getTotal() / $limit);
+
+            // Update the total pages
+            $totalPages++;
+            $page++;
+        } while ($totalPages <= $maxPages && $page <= $availablePages);
+
+        // Return the data
+        return collect($data);
+    }
+
+    public function fetchPaginatedDataWithLimit(
+        int $startRecord,
+        int $limit,
+        int $maxCount
+    ) {
+        // Calculate the page number
+        $page = intdiv($startRecord, $limit) + 1;
+
+        // Calculate the offset within the page
+        $offset = ($startRecord - 1) % $limit;
+
+        $data = [];
+        $totalCount = 0;
+        $availableCount = 0;
+        do {
+            $this->page($page);
+            $response = $this->paginate($limit);
+            $pageData = $response->getData()->all(); // Assuming 'data' holds the actual data
+            $availableCount = $response->getTotal(); // Update available count
+
+            $availablePages = ceil($response->getTotal() / $limit);
+
+            // If the offset is not zero and we are on the first page, trim the array to start from the offset
+            if ($offset > 0 && $totalCount == 0) {
+                $pageData = array_slice($pageData, $offset);
+            }
+
+            // Append the page data to the total data
+            $data = array_merge($data, $pageData);
+
+            // Update the total count
+            $totalCount += count($pageData);
+            $page++;
+        } while (
+            $totalCount < $maxCount &&
+            $totalCount <= $availableCount &&
+            $page <= $availablePages
+        );
+
+        // Trim the data array if it exceeds the maxCount
+        if ($totalCount > $maxCount) {
+            $data = array_slice($data, 0, $maxCount);
+        }
+
+        // Return the data
+        return collect($data);
     }
 
     public function get(array $fields = [])

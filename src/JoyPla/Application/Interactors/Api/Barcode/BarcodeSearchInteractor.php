@@ -5,6 +5,7 @@
  */
 
 namespace JoyPla\Application\Interactors\Api\Barcode {
+
     use Exception;
     use framework\Facades\Gate;
     use framework\SpiralConnecter\SpiralDB;
@@ -15,9 +16,13 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
     use JoyPla\Enterprise\Models\HospitalId;
     use NGT\Barcode\GS1Decoder\Decoder;
     use Collection;
+    use JoyPla\Enterprise\Models\DivisionId;
+    use JoyPla\Enterprise\Models\InHospitalItemId;
+    use JoyPla\Enterprise\Models\Stock;
     use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
     use JoyPla\Service\Presenter\Api\PresenterProvider;
     use JoyPla\Service\Repository\RepositoryProvider;
+    use stdClass;
 
     /**
      * Class BarcodeSearchInteractor
@@ -130,7 +135,7 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                 }
             } elseif (
                 preg_match('/^30/', $inputData->barcode) &&
-                strlen($inputData->barcode) == 12
+                ( strlen($inputData->barcode) == 12 || strlen($inputData->barcode) == 16 )
             ) {
                 //payout
 
@@ -138,6 +143,15 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                 $type = 'payout';
                 //払出から発行されたラベル
                 $payout_num = substr($inputData->barcode, 2);
+
+
+                $custom_quantity = "";
+                if(strlen($inputData->barcode) == 16)
+                {
+                    $payout_num = substr($payout_num, 0, -4);
+                    $custom_quantity = substr($inputData->barcode, -4);
+                }
+
                 if (Gate::allows('is_admin')) {
                     $result = ModelRepository::getPayoutItemInstance()
                         ->where('payoutId', 'payout_' . $payout_num)
@@ -183,7 +197,74 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                     $inHospitalItems[$key]->set('lotDate', $record->lotDate);
                     $inHospitalItems[$key]->set(
                         'payoutQuantity',
-                        $record->payoutQuantity
+                        ($custom_quantity === "")? $record->payoutQuantity : $custom_quantity
+                    );
+                    $inHospitalItems[$key]->set(
+                        'divisionId',
+                        $record->targetDivisionId
+                    );
+                }
+            } elseif (
+                preg_match('/^41/', $inputData->barcode) &&
+                ( strlen($inputData->barcode) == 15 || strlen($inputData->barcode) == 19 )
+            ) {
+                //payout
+                //TODO Repository化は後でやる
+                $type = 'payout'; //Payoutとして扱う
+                //払出から発行されたラベル
+                $custom_quantity = "";
+                $acceptance_num = $inputData->barcode;
+                if(strlen($inputData->barcode) == 19)
+                {
+                    $acceptance_num = substr($inputData->barcode, 0, -4);
+                    $custom_quantity = substr($inputData->barcode, -4);
+                }
+
+                if (Gate::allows('is_admin')) {
+                    $result = ModelRepository::getAcceptanceItemInstance()
+                        ->where('acceptanceItemId', $acceptance_num)
+                        ->get();
+                } else {
+                    $result = ModelRepository::getAcceptanceItemInstance()
+                    ->where('acceptanceItemId', $acceptance_num)
+                        ->where(
+                            'sourceDivisionId',
+                            $inputData->user->divisionId
+                        )
+                        ->get();
+                }
+
+
+                if ($result->count() == 0) {
+                    throw new Exception('Not Payout Label');
+                }
+                
+                $record = $result->first();
+                $inHospitalItems = ModelRepository::getInHospitalItemViewInstance()
+                    ->where('notUsedFlag', '1', '!=')
+                    ->where('inHospitalItemId', $record->inHospitalItemId)
+                    ->where('hospitalId', $inputData->user->hospitalId)
+                    ->get();
+
+                if ($inHospitalItems->count() === 0) {
+                    throw new Exception('Not Payout Label');
+                }
+
+                $inHospitalItems = $inHospitalItems->all();
+                foreach ($inHospitalItems as $key => $v) {
+                    if ($record->lotDate != '') {
+                        $record->lotDate = (new DateYearMonthDay(
+                            $record->lotDate
+                        ))->format('Y-m-d');
+                    }
+                    $inHospitalItems[$key]->set(
+                        'lotNumber',
+                        $record->lotNumber
+                    );
+                    $inHospitalItems[$key]->set('lotDate', $record->lotDate);
+                    $inHospitalItems[$key]->set(
+                        'payoutQuantity',
+                        ($custom_quantity === "")? $record->acceptanceCount : $custom_quantity
                     );
                     $inHospitalItems[$key]->set(
                         'divisionId',
@@ -268,6 +349,35 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                         new HospitalId($inputData->user->hospitalId),
                         (string) $inputData->barcode
                     );
+            } elseif (
+                (preg_match('/^inHPItem/', $inputData->barcode))
+            ) {
+                //院内商品マスタ
+                $type = 'customlabel';
+                $barcode = substr($inputData->barcode, 8);
+                $custom_quantity = substr($barcode, -4);
+                
+                $label_id = substr($barcode, 0, -4);
+
+                $InHospitalItemView = ModelRepository::getInHospitalItemViewInstance()
+                    ->where('inHospitalItemId', $label_id)
+                    ->where('hospitalId', $inputData->user->hospitalId);
+
+                $result = $InHospitalItemView->get();
+                $count = $result->count();
+                if ($result->count() == '0') {
+                    throw new Exception('Not Received Label');
+                }
+
+                $inHospitalItems = $result->all();
+                foreach ($inHospitalItems as $key => $v) {
+                    $inHospitalItems[$key]->set('lotNumber', '');
+                    $inHospitalItems[$key]->set('lotDate', '');
+                    $inHospitalItems[$key]->set(
+                        'customQuantity',
+                        (int) $custom_quantity
+                    );
+                }
             } elseif (
                 (preg_match('/^1/', $inputData->barcode) &&
                     strlen($inputData->barcode) == 14) ||

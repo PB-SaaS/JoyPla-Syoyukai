@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="https://i02.smp.ne.jp/u/joypla_developer/340/scroll-hint.css">
-<script src="https://i02.smp.ne.jp/u/joypla_developer/340/scroll-hint.min.js"></script>
 <style>
     .scroll-hint-icon {
         top: 8%;
@@ -11,7 +9,7 @@
     <v-breadcrumbs :items="breadcrumbs"></v-breadcrumbs>
     <div id="content" class="h-full px-1">
         <div class="flex-auto">
-            <div class="index container mx-auto">
+            <div class="index mx-auto">
                 <h1 class="text-2xl mb-2">請求商品一覧</h1>
                 <hr>
                 <div class="w-full flex border-b-2 border-gray-200 py-4">
@@ -31,20 +29,6 @@
                     {{ (totalCount == 0)? 0 : ( parseInt(values.perPage) * ( values.currentPage - 1 ) ) + 1 }}件 - {{ (( parseInt(values.perPage) * values.currentPage ) < totalCount ) ? parseInt(values.perPage) * values.currentPage : totalCount }}件 / 全 {{ totalCount }}件
                 </div>
 
-                <div class="lg:flex lg:flex-row gap-4">
-                    <div class="my-4 w-1/5 lg:w-1/6">
-                        <form :action="_ROOT" method="POST" name="print" @submit="onPrintSubmit" target="_blank">
-                            <input type="hidden" :value="_CSRF" name="_token">
-                            <input type="hidden" value="post" name="_method">
-                            <input type="hidden" value="/itemrequest/pickingList" name="path">
-                            <input type="hidden" name="search" :value="pickingListSearch">
-                            <v-button-default class="w-full" type="submit" :disabled="(totalCount === 0)">印刷</v-button-default>
-                        </form>
-                    </div>
-                    <div class=" my-4 w-1/5 lg:w-1/6">
-                        <v-button-primary type="button" class="w-full" @click.native="onSubmit" :disabled="(totalCount === 0)">払出登録</v-button-primary>
-                    </div>
-                </div>
 
                 <div v-if="(totalCount !== 0)">
                     <div class="p-2 bg-gray-300">
@@ -65,7 +49,28 @@
                                     <table class="min-w-full text-center">
                                         <thead class="whitespace-nowrap">
                                             <tr>
-                                                <th scope="col" class="px-6 py-4" colspan="7"></th>
+                                                <th scope="col" class="px-6 py-4" colspan="7">
+                                                    <div class="lg:flex lg:flex-row gap-4">
+                                                        <div class="my-4 w-1/5 lg:w-1/6">
+                                                            <form :action="_ROOT" method="POST" name="print" @submit="onPrintSubmit" target="_blank">
+                                                                <input type="hidden" :value="_CSRF" name="_token">
+                                                                <input type="hidden" value="post" name="_method">
+                                                                <input type="hidden" value="/itemrequest/pickingList" name="path">
+                                                                <input type="hidden" name="search" :value="pickingListSearch">
+                                                                <v-button-default class="w-full" type="submit" :disabled="(totalCount === 0)">印刷</v-button-default>
+                                                            </form>
+                                                        </div>
+                                                        <div class=" my-4 w-1/5 lg:w-1/6">
+                                                            <v-button-primary type="button" class="w-full" @click.native="onSubmit" :disabled="(totalCount === 0)">払出登録</v-button-primary>
+                                                        </div>
+                                                        <div class=" my-4 w-1/5 lg:w-1/6">
+                                                            <v-button-primary type="button" class="w-full" @click.native="onAcceptanceSubmit" :disabled="(totalCount === 0)">出庫登録</v-button-primary>
+                                                        </div>
+                                                        <div class="my-4 items-center self-center">
+                                                            <?php /*<v-switch id="labelCreate" v-model="labelCreate" :message="(labelCreate)? 'ラベル発行をする' : 'ラベル発行をしない'"></v-switch>*/?>
+                                                        </div>
+                                                    </div>
+                                                </th>
                                                 <th scope="col" class="text-sm font-medium text-gray-900 px-2 py-4 text-center">
                                                     <v-button-default class="w-auto px-2" type="button" @click.native="reflectToPayout">請求数を反映</v-button-default>
                                                 </th>
@@ -302,7 +307,8 @@
             'v-checkbox': vCheckbox,
             'v-multiple-select-division-v2': vMultipleSelectDivisionV2,
             'v-input-number': vInputNumber,
-            'v-barcode-search': vBarcodeSearch
+            'v-barcode-search': vBarcodeSearch,
+            'v-switch' : vSwitch,
         },
         setup() {
             const {
@@ -310,7 +316,7 @@
                 toRef,
                 toRefs,
                 onMounted,
-                reactive
+                reactive,
             } = Vue;
 
             const {
@@ -329,6 +335,9 @@
             }
 
             start();
+
+            //const labelCreate = ref(localStorage.joypla_payoutLabelCreate === 'true');
+            const labelCreate = ref(false);
 
             const getCache = () => {
                 let url = window.location.href;
@@ -499,6 +508,12 @@
             }, {
                 label: "100件表示",
                 value: "100"
+            }, {
+                label: "500件表示",
+                value: "500"
+            }, {
+                label: "1000件表示",
+                value: "1000"
             }];
 
 
@@ -648,7 +663,7 @@
                         searchCount.value++;
                     });
             };
-
+            
             onMounted(() => {
                 listGet();
                 Toast.fire({
@@ -727,17 +742,37 @@
                         payouts.push({
                             'recordId': item.recordId,
                             'inHospitalItemId': item.inHospitalItemId,
-                            'targetDivisionId': item.targetDivisionId,
-                            'sourceDivisionId': item.sourceDivisionId,
+                            'targetDivisionId': item.sourceDivisionId, //請求画面のtargetと、払出のtargetは逆
+                            'sourceDivisionId': item.targetDivisionId,
                             'payoutQuantity': item.payoutQuantity,
                             'lotNumber': item.lotNumber,
                             'lotDate': item.lotDate,
-                            'card': item.card
+                            'card': item.card ?? ''
                         });
                     }
                 });
                 return payouts;
             };
+
+            const createAcceptanceModel = (values) => {
+                let items = values.totalizations;
+                let payouts = [];
+                items.forEach(function(item, idx) {
+                    if (item.payoutCheck === true && item.payoutQuantity > 0) {
+                        payouts.push({
+                            'inHospitalItemId': item.inHospitalItemId,
+                            'acceptanceQuantity': parseInt(item.payoutQuantity),
+                            'targetDivisionId' : item.sourceDivisionId, //請求画面のtargetと、払出のtargetは逆
+                            'sourceDivisionId' : item.targetDivisionId,
+                            'lotNumber' : item.lotNumber,
+                            'lotDate' : item.lotDate,
+                            'card' : item.cardId ?? '',
+                        })
+                    }
+                });
+                return payouts;
+            };
+            
 
             const onSubmit = async () => {
                 const {
@@ -784,6 +819,97 @@
                 }
             };
 
+            
+            const acceptanceRegister = handleSubmit(async (values) => {
+                try {
+                    const acceptanceModels = createAcceptanceModel(values);
+                    if (acceptanceModels.length === 0) {
+                        Swal.fire({
+                        icon: 'error',
+                        title: '登録する商品がありませんでした。',
+                        text: '内容を確認の上、再送信をしてください。',
+                        })
+                        return false;
+                    }
+                    
+                    let params = new URLSearchParams();
+                    params.append("path", "/api/acceptance/register");
+                    params.append("_method", 'post');
+                    params.append("_csrf", _CSRF);
+                    params.append("acceptanceItems", JSON.stringify(encodeURIToObject(acceptanceModels)));
+
+                    const res = await axios.post(_APIURL, params);
+
+                    if (res.data.code != 200) {
+                        throw new Error(res.data.message)
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: '登録が完了しました。',
+                    }).then((result) => {
+                        if(labelCreate.value && res.data.data[0]){
+                            const url = _ROOT + '&path=/label/acceptance/' + res.data.data[0];
+                            window.open(url, '_blank')
+                        }
+                        listGet();
+                    });
+                    return true;
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'システムエラー',
+                        text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
+                    });
+                }
+
+            });
+
+            const onAcceptanceSubmit = async () => {
+                const {
+                    valid,
+                    errors
+                } = await validate();
+
+                const validLot = checkLot();
+                const validPayout = checkPayout();
+
+                if (!valid) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '入力エラー',
+                        text: '入力エラーがございます。ご確認ください。',
+                    })
+                } else if (!validLot) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '入力エラー',
+                        text: 'ロット情報を正しく入力してください。'
+                    })
+                } else if (!validPayout) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '入力エラー',
+                        text: '請求数・在庫数をご確認の上、払出数を正しく入力してください。'
+                    })
+                } else {
+                    Swal.fire({
+                        title: '確認',
+                        text: "出庫登録を行います。よろしいですか？",
+                        icon: 'info',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            acceptanceRegister();
+                        }
+                    })
+                }
+            };
+
             const register = handleSubmit(async (values) => {
                 try {
                     const payoutModels = createPayoutModel(values);
@@ -800,6 +926,7 @@
                     params.append("path", "/api/payout/register");
                     params.append("_method", 'post');
                     params.append("_csrf", _CSRF);
+                    params.append("payoutType", 2);
                     params.append("payoutItems", JSON.stringify(encodeURIToObject(payoutModels)));
                     const res = await axios.post(_APIURL, params);
 
@@ -814,7 +941,11 @@
                         icon: 'success',
                         title: '登録が完了しました。',
                     }).then((result) => {
-                        location.reload();
+                        if(labelCreate.value && res.data.data[0]){
+                            const url = _ROOT + '&path=/label/payout/' + res.data.data[0];
+                            window.open(url, '_blank')
+                        }
+                        listGet();
                     });
                     return true;
                 } catch (error) {
@@ -1101,12 +1232,17 @@
                 copyItem,
                 deleteItem,
                 reflectToPayout,
-                changeCheck
+                changeCheck,
+                labelCreate,
+                onAcceptanceSubmit
             }
         },
         watch: {
             isSubmitting() {
                 this.loading = this.isSubmitting;
+            },
+            labelCreate(bool) {
+                localStorage.joypla_payoutLabelCreate = bool;
             },
             fields: {
                 async handler(val, oldVal) {

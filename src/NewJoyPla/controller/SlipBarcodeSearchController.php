@@ -141,6 +141,7 @@ class SlipBarcodeSearchController extends Controller
                   } 
                   else if(preg_match('/^05/', $search_value) && strlen($search_value) == 18)
                   {
+                        /*
                         //払出
                         $result = PayoutHistory::where('payoutHistoryId',$search_value)->where('hospitalId',$user_info->getHospitalId())->get();
 
@@ -153,6 +154,7 @@ class SlipBarcodeSearchController extends Controller
                         if(isset($this->card_title['05'])){
                               $card_title = $this->card_title['05'];
                         }
+                        */
                   }
                   else if(preg_match('/^08/', $search_value) && strlen($search_value) == 18)
                   {

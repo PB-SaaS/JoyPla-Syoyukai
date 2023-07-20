@@ -56,24 +56,8 @@
                             卸業者
                             <span class="need">必須</span>
                         </dt>
-                        <dd class="data ">
-
-                            <select
-                                name="distributorId"
-                                id="distributorId"
-                                class="uk-select $errorInputColor:distributorId$">
-                                <option value="">----- 選択してください -----</option>
-                                <?php 
-                                    foreach($distributors as $distributor){
-                                        $selected = '';
-                                        if($current_distributor_Id == $distributor->distributorId)
-                                        {
-                                            $selected = 'selected';
-                                        }
-                                        echo "<option value='".$distributor->distributorId."' ".$selected.">".$distributor->distributorName."</option>".PHP_EOL;
-                                    }
-                                ?>
-                            </select>
+                        <dd class="data " id="distributor">
+                            <searchable-select name="distributorId" :error="'$errorInputColor:distributorId$' == 'error'" v-model="distributorId" :default="distributorId" :options="distributorOptions"></searchable-select>
                             <br>
                             <span class="msg">$error:distributorId$</span>
                         </dd>
@@ -89,7 +73,8 @@
                                     type="datetime-local"
                                     name="quotePeriod"
                                     value="$quotePeriod$"
-                                    min="<?php echo date("Y-m-d")."T00:00" ?>">
+                                    min="<?php echo date('Y-m-d') .
+                                        'T00:00'; ?>">
                             <span class="msg">$error:quotePeriod$</span>
                         </dd>
                     </dl>
@@ -139,6 +124,28 @@
     </div>
 </div>
 <script>
+    <?php
+    $distributorOptions = [
+        [
+            'value' => '',
+            'text' => '----- 卸業者を選択してください -----',
+        ],
+    ];
+
+    foreach ($distributors as $data) {
+        $distributorOptions[] = [
+            'value' => $data->distributorId,
+            'text' => $data->distributorName,
+        ];
+    }
+    ?>
+var distributor = new Vue({
+    el: '#distributor',
+    data: {
+        distributorOptions: <?php echo json_encode($distributorOptions); ?>,
+        distributorId: "<?php echo $current_distributor_Id; ?>",
+    },
+});
     $(function () {
         $("form").addClass(
             "uk-form-horizontal uk-margin-large uk-text-center uk-margin-remove"

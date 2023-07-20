@@ -16,7 +16,6 @@ class InHospitalItemRepository implements InHospitalItemRepositoryInterface
             ->where('hospitalId', $hospitalId->value())
             ->get()
             ->all();
-
         $result = [];
         foreach ($inHospitalItems as $d) {
             $result[] = InHospitalItem::create($d);
@@ -52,6 +51,34 @@ class InHospitalItemRepository implements InHospitalItemRepositoryInterface
         foreach ($inHospitalItems->get()->all() as $d) {
             $result[] = InHospitalItem::create($d);
         }
+
+        return $result;
+    }
+
+    public function getInHospitalItemViewByInHospitalItemIds(
+        HospitalId $hospitalId,
+        array $inHospitalItemIds
+    ) {
+        $inHospitalItemIds = array_map(function (
+            InHospitalItemId $inHospitalItemId
+        ) {
+            return $inHospitalItemId;
+        },
+        $inHospitalItemIds);
+
+        $inHospitalItems = ModelRepository::getInHospitalItemViewInstance()->where(
+            'hospitalId',
+            $hospitalId->value()
+        );
+
+        foreach ($inHospitalItemIds as $inHospitalItemId) {
+            $inHospitalItems->orWhere(
+                'inHospitalItemId',
+                $inHospitalItemId->value()
+            );
+        }
+
+        $result = $inHospitalItems->get()->all();
 
         return $result;
     }
@@ -154,7 +181,7 @@ class InHospitalItemRepository implements InHospitalItemRepositoryInterface
             foreach ($inHospitalItems as $key => $item) {
                 $inHospitalItems[$key]->set('priceNotice', '');
             }
-            return [$inHospitalItems, $result->getData()->count()];
+            return [$inHospitalItems, $result->getTotal()];
         }
 
         $price = ModelRepository::getPriceInstance()->where(
@@ -179,7 +206,7 @@ class InHospitalItemRepository implements InHospitalItemRepositoryInterface
             );
         }
 
-        return [$inHospitalItems, $result->getData()->count()];
+        return [$inHospitalItems, $result->getTotal()];
     }
 
     public function saveToArray(

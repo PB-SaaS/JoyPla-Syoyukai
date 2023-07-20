@@ -102,4 +102,91 @@ class ItemRequestController extends Controller
         );
         $inputPort->handle($inputData);
     }
+
+    public function list($vars)
+    {
+        if (Gate::denies('item_request_bulk')) {
+            Router::abort(403);
+        }
+
+        $items = ModelRepository::getTotalRequestByDivisionInstance()
+            ->where('hospitalId', $this->request->user()->hospitalId)
+            ->where('requestQuantity', 0, '>')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $inItem = ModelRepository::getInHospitalItemViewInstance()->where(
+            'hospitalId',
+            $this->request->user()->hospitalId
+        );
+
+        $stock = ModelRepository::getStockInstance()->where(
+            'hospitalId',
+            $this->request->user()->hospitalId
+        );
+
+        $division = ModelRepository::getDivisionInstance()->where(
+            'hospitalId',
+            $this->request->user()->hospitalId
+        );
+
+        foreach ($items as $item) {
+            $inItem->orWhere('inHospitalItemId', $item->inHospitalItemId);
+            $division->orWhere('divisionId', $item->targetDivisionId);
+            $division->orWhere('divisionId', $item->sourceDivisionId);
+            $stock->orWhere('divisionId', $item->targetDivisionId);
+            $stock->orWhere('divisionId', $item->sourceDivisionId);
+            $stock->orWhere('inHospitalItemId', $item->inHospitalItemId);
+        }
+
+        $stock = $stock->get();
+        $division = $division->get();
+        $inItem = $inItem->get();
+
+        foreach ($items as &$item) {
+            $item->set(
+                '_item',
+                array_find($inItem, function ($s) use ($item) {
+                    return $s->inHospitalItemId == $item->inHospitalItemId;
+                })
+            );
+            $item->set(
+                '_targetDivision',
+                array_find($division, function ($s) use ($item) {
+                    return $s->divisionId == $item->targetDivisionId;
+                })
+            );
+            $item->set(
+                '_sourceDivision',
+                array_find($division, function ($s) use ($item) {
+                    return $s->divisionId == $item->sourceDivisionId;
+                })
+            );
+            $item->set(
+                '_targetStock',
+                array_find($stock, function ($s) use ($item) {
+                    return $s->divisionId == $item->targetDivisionId &&
+                        $s->inHospitalItemId == $item->inHospitalItemId;
+                })
+            );
+            $item->set(
+                '_sourceStock',
+                array_find($stock, function ($s) use ($item) {
+                    return $s->divisionId == $item->sourceDivisionId &&
+                        $s->inHospitalItemId == $item->inHospitalItemId;
+                })
+            );
+            $item->set('rowRequestQuantity', $item->requestQuantity);
+        }
+
+        $items = $items->all();
+
+        $gate = Gate::getGateInstance('item_request_bulk');
+        $body = View::forge(
+            'html/ItemRequest/Bulk',
+            compact('items'),
+            false
+        )->render();
+        echo view('html/Common/Template', compact('body'), false)->render();
+    }
 }

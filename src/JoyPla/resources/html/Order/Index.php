@@ -10,6 +10,23 @@
         <div class="p-4 text-base bg-gray-100 border border-gray-400 flex flex-col md:flex-row md:gap-6 gap-4 mb-6">
           <v-button-primary type="button" class="md:w-1/6 w-full" :disabled="! isChange" @click.native="onUpdate">内容を訂正</v-button-primary>
           <v-button-primary type="button" class="md:w-1/6 w-full" @click.native="openReceipt">入荷照合を開く</v-button-primary>
+          <v-button-default type="button" class="md:w-1/6 w-full inline-flex items-center relative" :disabled="order.sent.disabled" @click.native="sentSlip()">
+            <template v-if="order.sentFlag && ! order.sent.disabled">
+              <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-3 h-5 w-5 stroke-sushi-700 absolute" viewBox="0 96 960 960" width="48"><path d="M633 976 472 815l43-43 118 118 244-244 43 43-287 287ZM478 529l334-213H144l334 213Zm0 60L140 372v452h256l60 60H140q-24 0-42-18t-18-42V316q0-24 18-42t42-18h677q24 0 42 18t18 42v244l-60 60V372L478 589Zm1 9Zm-1-69Zm1 60Z"/></svg>
+              <p class="w-full">発注対応：完了</p>
+            </template>
+            <template v-if="! order.sentFlag && ! order.sent.disabled">
+              <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-3 h-5 w-5 stroke-sushi-700 absolute" viewBox="0 96 960 960" width="48"><path d="M140 896q-24 0-42-18t-18-42V316q0-24 18-42t42-18h680q24 0 42 18t18 42v520q0 24-18 42t-42 18H140Zm340-302L140 371v465h680V371L480 594Zm0-60 336-218H145l335 218ZM140 371v-55 520-465Z"/></svg>
+              <p class="w-full">発注対応：未完了<br>（クリックで完了します）</p>
+            </template>
+            <template v-if="order.sent.disabled">
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 stroke-sushi-700 absolute" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p class="w-full">お待ちください...</p>
+            </template>
+          </v-button-default>
         </div>
         <div class="p-4 text-base bg-gray-100 border border-gray-400">
           <v-text title="登録日" class="flex w-full gap-6">{{ order.registDate }}</v-text>
@@ -41,6 +58,7 @@
           <v-text title="入荷先部署" class="flex w-full gap-6">{{ order.receivedDivisionName }}</v-text>
           <v-text title="発注担当者" class="flex w-full gap-6">{{ order.orderUserName }}</v-text>
           <v-text title="卸業者" class="lg:flex w-full gap-6">{{ order.distributor.distributorName }}</v-text>
+          <v-text title="発注方法" class="lg:flex w-full gap-6">{{ order.distributor.orderMethod }}</v-text>
           <v-text title="発注タイプ" class="flex w-full gap-6">{{ order.adjustmentToString }}</v-text>
           <fieldset class="md:flex w-full gap-6">
             <div class="flex-initial lg:w-1/6 w-auto lg:whitespace-pre whitespace-normal" v-if="title != ''">
@@ -165,6 +183,7 @@ var JoyPlaApp = Vue.createApp({
       'v-select' : vSelect,
       'v-button-danger' : vButtonDanger,
       'v-button-primary' : vButtonPrimary,
+      'v-button-default' : vButtonDefault,
       'v-checkbox': vCheckbox,
       'v-loading' : vLoading,
       'header-navi' : headerNavi,
@@ -173,11 +192,11 @@ var JoyPlaApp = Vue.createApp({
       'v-input-number': vInputNumber
     },
     setup(){
-      const {ref , onCreated , onMounted} = Vue;
+      const {ref , onCreated , onMounted , reactive} = Vue;
       const { useFieldArray , useForm } = VeeValidate;
 
-
-      const order = PHPData.order;
+      const order =  reactive(PHPData.order);
+      order.sent = { disabled : false }
 
       const { handleSubmit , control, meta , validate , values , isSubmitting  } = useForm({
         initialValues: {
@@ -217,7 +236,7 @@ var JoyPlaApp = Vue.createApp({
       });
       const breadcrumbs = [
           {
-            text: '発注メニュー',
+            text: '発注・入荷メニュー',
             disabled: false,
             href: _ROOT + '&path=/order',
           },
@@ -307,8 +326,35 @@ var JoyPlaApp = Vue.createApp({
       const openReceipt = () => {
         location.href = _ROOT + "&path=/received/order/" + order.orderId;    
       }
+
+      const sentSlip = async() => 
+      {
+          if(order.sent.disabled){
+            return '';
+          }
+          if(order.sentFlag){
+            return '';
+          }
+
+          order.sent.disabled = true;
+
+          let params = new URLSearchParams();
+          params.append("path", "/api/order/"+order.orderId+"/sent");
+          params.append("_method", 'post');
+          params.append("_csrf", _CSRF);
+
+          const res = await axios.post(_APIURL,params);
+          
+          if(res.data.code != 200) {
+            order.sent.disabled = false;
+          }
+
+          order.sent.disabled = false;
+          order.sentFlag = true;
+      }
       
       return {
+        sentSlip,
         onUpdate,
         isChange,
         numberFormat,

@@ -15,6 +15,10 @@
             ); ?>">
             </v-order-item-modal>
           </div>
+          <div class="my-4 lg:w-1/2 ">
+            <v-input type="date" name="receivedDate" :rules="{}" title="入荷日指定" label="入荷日指定"></v-input>
+            <v-input type="date" name="accountantDate" :rules="{}" title="会計日指定" label="会計日指定"></v-input>
+          </div>
           <div class="p-2 bg-gray-300">
             <v-barcode-search-for-order-data @additem="addItemByBarcode"></v-barcode-search-for-order-data>
           </div>
@@ -73,7 +77,7 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> 
               </div>
               <div class="lg:flex-1 flex-col">
                 <div v-for="(received , rid) in item.value.receiveds">
@@ -85,7 +89,7 @@
                       <v-input :name="`receivedItems[${idx}].receiveds[${rid}].lotDate`" label="消費期限" :rules="{ required : isRequired(idx) , twoFieldRequired : [ 'ロット番号' , `@receivedItems[${idx}].receiveds[${rid}].lotNumber`] }" type="date" change-class-name="inputChange" title="消費期限"></v-input>
                     </div>
                     <div class="lg:w-1/3">
-                      <v-input-number :rules="{ required : true , between: ( (item.value.orderQuantity > 0)? [ 0 , item.value.orderQuantity - item.value.receivedQuantity ] : [ item.value.orderQuantity - item.value.receivedQuantity , 0 ] ) }" :name="`receivedItems[${idx}].receiveds[${rid}].receivedUnitQuantity`" label="入荷数（個数）" :unit="item.value.quantity.itemUnit" @change="receivedQuantitySum(idx)" change-class-name="inputChange" :step="1" :title="`入荷数（個数）/${item.value.quantity.quantityNum}${ item.value.quantity.quantityUnit }入り`"></v-input-number>
+                      <v-input-number :name="`receivedItems[${idx}].receiveds[${rid}].receivedUnitQuantity`" :rules="{ required : true , between: ( (item.value.orderQuantity > 0)? [ 0 , item.value.orderQuantity - item.value.receivedQuantity ] : [ item.value.orderQuantity - item.value.receivedQuantity , 0 ] ) }" label="入荷数（個数）" :unit="item.value.quantity.itemUnit" @change="receivedQuantitySum(idx)" change-class-name="inputChange" :step="1" :title="`入荷数（個数）/${item.value.quantity.quantityNum}${ item.value.quantity.quantityUnit }入り`"></v-input-number>
                     </div>
                     <div class="lg:mt-0 mt-2 flex justify-between gap-4">
                       <v-text title=" ">
@@ -236,6 +240,8 @@
         isSubmitting
       } = useForm({
         initialValues: {
+          accountantDate: '',
+          receivedDate: '',
           receivedItems: [],
           barcode: "",
           orderDate: yyyy + '-' + mm + '-' + dd,
@@ -270,7 +276,7 @@
       });
 
       const breadcrumbs = [{
-          text: '発注メニュー',
+          text: '発注・入荷メニュー',
           disabled: false,
           href: _ROOT + '&path=/order',
         },
@@ -389,7 +395,9 @@
           params.append("_method", 'post');
 
           params.append("_csrf", _CSRF);
+          params.append("accountantDate", values.accountantDate);
           params.append("receivedItems", JSON.stringify(encodeURIToObject(receivedModels)));
+          params.append("receivedDate", values.receivedDate);
 
           const res = await axios.post(_APIURL, params);
 
@@ -464,8 +472,7 @@
 
       const additem = (list, idx) => {
         list.orderItems[idx].orderDate = list.orderDate;
-        let item = list.orderItems[idx];
-        item = JSON.parse(JSON.stringify(item));
+        const item = JSON.parse(JSON.stringify(list.orderItems[idx]));
         item.sumReceivedQuantity = 1;
         item.receiveds = [{
           'lotNumber': (item.lotNumber) ? item.lotNumber : "",
@@ -523,7 +530,7 @@
           return false;
         }
 
-        if (items.type != "gs1-128" && items.type != "jancode" && items.type != "customLabel") {
+        if (items.type != "gs1-128" && items.type != "jancode" && items.type != "customlabel") {
           Swal.fire({
             icon: 'error',
             title: 'エラー',

@@ -36,7 +36,7 @@ namespace JoyPla\InterfaceAdapters\Presenters\Api\ItemRequest {
         public function __construct(RequestItemDeleteOutputData $source)
         {
             $this->data = $source->data;
-            $this->count = $source->count;
+            $this->count = 0;
             $this->code = 200;
             $this->message = 'success';
         }

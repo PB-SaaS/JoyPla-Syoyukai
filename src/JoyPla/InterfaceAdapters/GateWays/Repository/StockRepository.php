@@ -58,6 +58,38 @@ class StockRepository implements StockRepositoryInterface
         //TODO
     }
 
+    public function getInHospitalItemIdsAndDivisionId(HospitalId $hospitalId , DivisionId $divisionId , array $inHospitalItemIds) 
+    {
+        $inHospitalItemIds = array_map(function (
+            InHospitalItemId $inHospitalItemId
+        ) {
+            return $inHospitalItemId;
+        },
+        $inHospitalItemIds);
+
+        $stockInstance = ModelRepository::getStockViewInstance()->where(
+            'hospitalId',
+            $hospitalId->value()
+        )->where(
+            'divisionId',
+            $divisionId->value()
+        )->resetValue([
+            'hospitalId',
+            'divisionId',
+            'inHospitalItemId',
+            'stockQuantity',
+        ]);
+
+        foreach ($inHospitalItemIds as $inHospitalItemId) {
+            $stockInstance->orWhere(
+                'inHospitalItemId',
+                $inHospitalItemId->value()
+            );
+        }
+
+        return $stockInstance->get();
+    }
+
     public function getStockByDivisionIdAndInHospitalItemIds(
         HospitalId $hospitalId,
         array $divisionIds,
@@ -75,9 +107,20 @@ class StockRepository implements StockRepositoryInterface
             $hospitalId->value()
         );
 
-        $divisionIds = array_map(function (DivisionId $divisionId) {
-            return $divisionId;
-        }, $divisionIds);
+        $division = ModelRepository::getDivisionInstance()
+            ->where('hospitalId', $hospitalId->value())
+            ->orWhere('deleteFlag', 'f')
+            ->orWhereNull('deleteFlag');
+
+        foreach ($divisionIds as $divisionId) {
+            $division->orWhere('divisionId', $divisionId->value());
+        }
+
+        $divisions = $division->get();
+        $divisionIds = [];
+        foreach ($divisions as $division) {
+            $divisionIds[] = new DivisionId($division->divisionId);
+        }
 
         $stockInstance = ModelRepository::getStockViewInstance()->where(
             'hospitalId',
@@ -249,7 +292,7 @@ class StockRepository implements StockRepositoryInterface
         }
 
         $result = [];
-        $maxcount = $stocks->getData()->count();
+        $maxcount = $stocks->getTotal();
 
         foreach ($stocks->getData()->all() as $i) {
             $fkey = array_search(

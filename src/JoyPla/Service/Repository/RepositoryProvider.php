@@ -2,6 +2,10 @@
 
 namespace JoyPla\Service\Repository;
 
+use JoyPla\InterfaceAdapters\GateWays\Repository\AcceptanceRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\AccountantItemRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\AccountantLogRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\AccountantRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\BarcodeRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\CardRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ConsumptionHistoryRepository;
@@ -12,6 +16,7 @@ use JoyPla\InterfaceAdapters\GateWays\Repository\HospitalRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\InHospitalItemRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ItemAndPriceAndInHospitalItemRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\ItemListRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ItemRequestRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\NotificationRepository;
@@ -23,6 +28,7 @@ use JoyPla\InterfaceAdapters\GateWays\Repository\ReceivedRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\RequestItemCountRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\ReturnRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\StockRepository;
+use JoyPla\InterfaceAdapters\GateWays\Repository\StocktakingListRepository;
 use JoyPla\InterfaceAdapters\GateWays\Repository\TotalizationRepository;
 
 class RepositoryProvider
@@ -136,4 +142,34 @@ class RepositoryProvider
     {
         return new TotalizationRepository();
     }
+
+    public function getAccountantRepository()
+    {
+        return new AccountantRepository();
+    }
+
+    public function getAccountantItemRepository()
+    {
+        return new AccountantItemRepository();
+    }
+
+    public function getAccountantLogRepository()
+    {
+        return new AccountantLogRepository();
+    }
+
+    public function getItemListRepository()
+    {
+        return new ItemListRepository();
+    }
+
+    public function getAcceptanceRepository()
+    {
+        return new AcceptanceRepository();
+    }
+    public function getStocktakingListRepository()
+    {
+        return new StocktakingListRepository();
+    }
+
 }

@@ -95,6 +95,10 @@
 	.desc::after {
 		content: "▼";
 	}
+	.multiselect__tags {
+		border-radius: 0px !important; 
+		height:40px !important;
+	}
 </style>
 <div id="app" class="animsition" uk-height-viewport="expand: true">
 	<div class="uk-section uk-section-default uk-preserve-color uk-padding-remove uk-margin-top" id="page_top">
@@ -108,22 +112,7 @@
 			<hr>
 			<div class="uk-width-1-2@m">
 				<div class="uk-margin uk-flex">
-					<select class="uk-select" name="busyo" v-model="divisionId" v-bind:disabled="lists.length > 0">
-						<option value="">----- 部署選択 -----</option>
-						<?php
-						foreach ($division->data as $data) {
-							if ($data->divisionType === '1') {
-								echo '<option value="' . $data->divisionId . '">' . $data->divisionName . '(大倉庫)</option>';
-								echo '<option value="" disabled>--------------------</option>';
-							}
-						}
-						foreach ($division->data as $data) {
-							if ($data->divisionType === '2') {
-								echo '<option value="' . $data->divisionId . '">' . $data->divisionName . '</option>';
-							}
-						}
-						?>
-					</select>
+					<searchable-select name="busyo" v-model="divisionId" id="divisionId" v-bind:disabled="lists.length > 0" :options="divisionOptions"></searchable-select>
 					<button class="uk-button uk-button-default" style="white-space: nowrap;" v-on:click="getTemporaryData" v-bind:disabled="divisionId == '' || lists.length > 0">一時保存情報取得</button>
 				</div>
 			</div>
@@ -131,9 +120,10 @@
 				<div class="" uk-margin>
 					<button class="uk-button uk-button-default" v-on:click="sanshouClick">商品マスタを開く</button>
 					<button class="uk-button uk-button-default" type="submit" onclick="window.print();return false;">印刷プレビュー</button>
-					<button class="uk-button uk-button-primary" v-on:click="sendInventory" :disabled="isTemporaryData" v-if="!isTemporaryData">一時保存</button>
-					<button class="uk-button uk-button-primary" v-on:click="sendInventory" :disabled="!isTemporaryData" v-if="isTemporaryData">上書き保存</button>
-					<button class="uk-button uk-button-primary" v-on:click="getLotAndStock" v-bind:disabled="lists.length > 0">理論在庫から表を作成</button>
+					<button class="uk-button uk-button-primary" v-on:click="sendInventory" :disabled="isTemporaryData || !isEmpty(search)" v-if="!isTemporaryData">一時保存</button>
+					<button class="uk-button uk-button-primary" v-on:click="sendInventory" :disabled="!isTemporaryData || !isEmpty(search)" v-if="isTemporaryData">上書き保存</button>
+					<button class="uk-button uk-button-primary" v-on:click="getLotAndStock" v-bind:disabled="lists.length > 0|| !isEmpty(search)">理論在庫から表を作成</button>
+					<button class="uk-button uk-button-primary" v-on:click="getStocktakingList" v-bind:disabled="lists.length > 0|| !isEmpty(search)">理論在庫と棚卸商品管理表から表を作成</button>
 				</div>
 			</div>
 
@@ -143,6 +133,49 @@
 					<button class="uk-button uk-button-primary uk-float-right uk-width-1-5 uk-padding-remove" type="submit">検索</button>
 				</form>
 			</div>
+			<div class="uk-width-2-3 uk-margin-auto uk-margin-top">
+				<ul uk-accordion>
+					<li>
+						<a class="uk-accordion-title" href="#">絞り込み</a>
+						<div class="uk-accordion-content">
+							<form class="uk-form-stacked">
+								<div class="uk-margin">
+									<label class="uk-form-label" for="form-itemName-text">商品名</label>
+									<div class="uk-form-controls">
+										<input class="uk-input" id="form-itemName-text" v-model="search.itemName" type="text" placeholder="Some text...">
+									</div>
+								</div>
+								<div class="uk-margin">
+									<label class="uk-form-label" for="form-makerName-text">メーカー名</label>
+									<div class="uk-form-controls">
+										<input class="uk-input" id="form-makerName-text" v-model="search.makerName" type="text" placeholder="Some text...">
+									</div>
+								</div>
+								
+								<div class="uk-margin">
+									<label class="uk-form-label" for="form-makerName-text">卸業者名</label>
+									<div class="uk-form-controls">
+										<multiselect :multiple='true' :close-on-select="false" :clear-on-select="false" v-model="search.distributorIds" label="text" track-by="value" name="filter-distributor" :options="distributors">
+											<template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }} options selected</span></template>
+										</multiselect>
+									</div>
+								</div>
+
+
+								<div class="uk-margin">
+									<div class="uk-form-label">棚卸必須</div>
+									<div class="uk-form-controls">
+										<label><input class="uk-checkbox" type="checkbox" name="check1" value="t" v-model="search.mandatory"> 必須</label><br>
+										<label><input class="uk-checkbox" type="checkbox" name="check1" value="f" v-model="search.mandatory"> 任意</label>
+									</div>
+								</div>
+
+							</form>
+						</div>
+					</li>
+				</ul>
+				
+			</div>
 			<div class="shouhin-table uk-width-expand uk-overflow-auto">
 				<table class="uk-table uk-table-striped">
 					<thead>
@@ -150,6 +183,9 @@
 							<th class="uk-text-nowrap">id</th>
 							<th class="uk-table-expand">
 								<a href="#" @click="sortBy('rackName')" :class="addClass('rackName')">棚名</a>
+							</th>
+							<th class="uk-table-expand">
+								<a href="#" @click="sortBy('mandatoryFlag')" :class="addClass('mandatoryFlag')">棚卸必須</a>
 							</th>
 							<th class="uk-table-expand">
 								<a href="#" @click="sortBy('maker')" :class="addClass('maker')">メーカー</a>
@@ -196,8 +232,11 @@
 					</thead>
 					<tbody>
 						<tr v-for="(list, key) in sort_lists" :id="'tr_' + key" v-bind:class="list.class">
-							<td></td>
+							<td class="uk-text-nowrap"></td>
 							<td>{{list.rackName}}</td>
+							<td>
+								<span v-if="list.mandatoryFlag==1">必須</span>
+							</td>
 							<td>{{list.maker}}</td>
 							<td>{{list.shouhinName}}</td>
 							<td>{{list.code}}</td>
@@ -251,27 +290,30 @@
 							<td>&emsp;</td>
 							<td>&emsp;</td>
 							<td>&emsp;</td>
-						</tr>
-						<tr>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
-							<td>&emsp;</td>
 							<td>&emsp;</td>
 						</tr>
 						<tr>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+							<td>&emsp;</td>
+						</tr>
+						<tr>
+							<td>&emsp;</td>
 							<td>&emsp;</td>
 							<td>&emsp;</td>
 							<td>&emsp;</td>
@@ -348,31 +390,92 @@
 </div>
 
 <script>
+	
+<?php
+$options = [
+    [
+        'value' => '',
+        'text' => '----- 部署を選択してください -----',
+    ],
+];
+foreach ($division->data as $data) {
+    if ($data->divisionType === '1') {
+        $options[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+foreach ($division->data as $data) {
+    if ($data->divisionType === '2') {
+        $options[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+$defaultDivisionId = $user_info->isUser() ? $user_info->getDivisionId() : '';
+?>
 	var app = new Vue({
 		el: '#app',
+		components: {
+			Multiselect: window.VueMultiselect.default
+		},
 		data: {
 			lists: [],
 			isTemporaryData: false,
-			divisionId: "<?php echo ($user_info->isUser()) ? $user_info->getDivisionId() : ""; ?>",
+        	divisionOptions: <?php echo json_encode($options); ?>,
+        	distributors: <?php echo json_encode($distributorOptions); ?>,
+			divisionId: "<?php echo $defaultDivisionId; ?>",
 			rackNames: [],
+			search: {
+				makerName : '',
+				itemName: '',
+				distributorIds: [],
+				mandatory: [],
+			},
 			sort_key: "",
 			sort_asc: true,
 			useUnitPrice: parseInt(<?php echo json_encode($useUnitPrice); ?>),
 		},
 		computed: {
+			
 			sort_lists() {
+				let temp = this.lists;
 				if (this.sort_key != "") {
 					let set = 1;
 					this.sort_asc ? (set = 1) : (set = -1);
-					this.lists.sort((a, b) => {
+					temp.sort((a, b) => {
 						if (a[this.sort_key] < b[this.sort_key]) return -1 * set;
 						if (a[this.sort_key] > b[this.sort_key]) return 1 * set;
 						return 0;
 					});
-					return this.lists;
-				} else {
-					return this.lists;
 				}
+
+				if(this.search.itemName != ''){
+					let lowerCaseSearchText = this.search.itemName.toLowerCase();
+					temp = temp.filter(item => item.shouhinName.toLowerCase().includes(lowerCaseSearchText));
+				}
+				
+				if(this.search.makerName != ''){
+					let lowerCaseSearchText = this.search.makerName.toLowerCase();
+					temp = temp.filter(item => (item.maker?item.maker:'').toLowerCase().includes(lowerCaseSearchText));
+				}
+
+				if(this.search.distributorIds.length > 0){
+					let searchTerms = this.search.distributorIds.map(item => item.value);
+					temp = temp.filter(item => searchTerms.includes(item.distributorId));
+				}
+
+				if(this.search.mandatory.length === 1 && this.search.mandatory.includes('t')){
+					temp = temp.filter(item => item.mandatoryFlag == '1');
+				}
+				
+				if(this.search.mandatory.length === 1 && this.search.mandatory.includes('f')){
+					temp = temp.filter(item => item.mandatoryFlag == '0' || item.mandatoryFlag == "");
+				}
+
+				return temp;
 			},
 		},
 		filters: {
@@ -402,6 +505,18 @@
 			}
 		},
 		methods: {
+			isEmpty(obj) {
+				for (let key in obj) {
+					if (typeof obj[key] === 'object' && obj[key] !== null) {
+						if (!this.isEmpty(obj[key])) {
+							return false;
+						}
+					} else if (obj[key] !== '') {
+						return false;
+					}
+				}
+				return true;
+			},
 			addClass(key) {
 				return {
 					asc: this.sort_key === key && this.sort_asc,
@@ -429,6 +544,7 @@
 				if (rackName) {
 					object.rackName = rackName.rackName;
 				}
+				object.mandatoryFlag = ((object.mandatoryFlag == null) ? 0 : object.mandatoryFlag);
 				this.lists.push(object);
 			},
 			copyList: function(key) {
@@ -541,7 +657,7 @@
 						url: '%url/rel:mpgt:labelBarcodeSAPI%',
 						type: 'POST',
 						data: {
-							_csrf: "<?php echo $csrf_token ?>", // CSRFトークンを送信
+							_csrf: "<?php echo $csrf_token; ?>", // CSRFトークンを送信
 							divisionId: app.divisionId,
 							barcode: barcode,
 						},
@@ -715,10 +831,10 @@
 					}
 					$.ajax({
 							async: false,
-							url: "<?php echo $api_url ?>",
+							url: "<?php echo $api_url; ?>",
 							type: 'POST',
 							data: {
-								_csrf: "<?php echo $csrf_token ?>", // CSRFトークンを送信
+								_csrf: "<?php echo $csrf_token; ?>", // CSRFトークンを送信
 								Action: "inventoryRegistApi",
 								isTemporaryData: app.isTemporaryData,
 								inventory: JSON.stringify(objectValueToURIencode(app.lists)),
@@ -760,10 +876,10 @@
 					}
 					$.ajax({
 							async: false,
-							url: "<?php echo $api_url ?>",
+							url: "<?php echo $api_url; ?>",
 							type: 'POST',
 							data: {
-								_csrf: "<?php echo $csrf_token ?>", // CSRFトークンを送信
+								_csrf: "<?php echo $csrf_token; ?>", // CSRFトークンを送信
 								Action: "getTemporaryData",
 								divisionId: app.divisionId,
 							},
@@ -806,11 +922,57 @@
 					}
 					$.ajax({
 							async: false,
-							url: "<?php echo $api_url ?>",
+							url: "<?php echo $api_url; ?>",
 							type: 'POST',
 							data: {
-								_csrf: "<?php echo $csrf_token ?>", // CSRFトークンを送信
+								_csrf: "<?php echo $csrf_token; ?>", // CSRFトークンを送信
 								Action: "getLotAndStockApi",
+								divisionId: app.divisionId,
+							},
+							dataType: 'json'
+						})
+						// Ajaxリクエストが成功した時発動
+						.done((data) => {
+							if (data.code == '1') {
+								UIkit.modal.alert(data.message);
+								return false;
+							}
+							if (!data.result) {
+								UIkit.modal.alert("取得に失敗しました");
+								return false;
+							}
+							if (data.count > 0) {
+								data.data.forEach(function(elem, index) {
+									app.addList(elem);
+								});
+							} else {
+								UIkit.modal.alert("データがありませんでした");
+							}
+						})
+						// Ajaxリクエストが失敗した時発動
+						.fail((data) => {
+							UIkit.modal.alert("取得に失敗しました");
+						})
+						// Ajaxリクエストが成功・失敗どちらでも発動
+						.always((data) => {
+							loading_remove();
+						});
+				});
+			},
+
+			//棚卸商品管理表から取得
+			getStocktakingList: function() {
+				UIkit.modal.confirm('在庫表、ロット一覧、棚卸商品管理表から理論在庫を取得します').then(function() {
+					if (!app.divisionCheck()) {
+						return false;
+					}
+					$.ajax({
+							async: false,
+							url: "<?php echo $api_url; ?>",
+							type: 'POST',
+							data: {
+								_csrf: "<?php echo $csrf_token; ?>", // CSRFトークンを送信
+								Action: "getStocktakingListApi",
 								divisionId: app.divisionId,
 							},
 							dataType: 'json'
@@ -847,10 +1009,10 @@
 			getRackNames: function(divisionId) {
 				$.ajax({
 						async: false,
-						url: "<?php echo $api_url ?>",
+						url: "<?php echo $api_url; ?>",
 						type: 'POST',
 						data: {
-							_csrf: "<?php echo $csrf_token ?>", // CSRFトークンを送信
+							_csrf: "<?php echo $csrf_token; ?>", // CSRFトークンを送信
 							Action: "getRackNames",
 							divisionId: divisionId,
 						},

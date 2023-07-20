@@ -12,6 +12,8 @@ use JoyPla\Application\InputPorts\Api\Received\ReceivedRegisterByOrderSlipInputD
 use JoyPla\Application\InputPorts\Api\Received\ReceivedRegisterByOrderSlipInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Received\ReceivedRegisterInputData;
 use JoyPla\Application\InputPorts\Api\Received\ReceivedRegisterInputPortInterface;
+use JoyPla\Application\InputPorts\Api\Received\ReceivedLateRegisterInputData;
+use JoyPla\Application\InputPorts\Api\Received\ReceivedLateRegisterInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Received\ReceivedReturnRegisterInputData;
 use JoyPla\Application\InputPorts\Api\Received\ReceivedReturnRegisterInputPortInterface;
 use JoyPla\Application\InputPorts\Api\Received\ReceivedShowInputPortInterface;
@@ -63,11 +65,15 @@ class ReceivedController extends Controller
         $gate = Gate::getGateInstance('receipt');
 
         $registerModel = $this->request->get('registerModel');
+        $receivedDate = $this->request->get('receivedDate');
+        $accountantDate = $this->request->get('accountantDate');
         $inputData = new ReceivedRegisterByOrderSlipInputData(
             $this->request->user(),
             $vars['orderId'],
             $registerModel,
-            $gate->isOnlyMyDivision()
+            $gate->isOnlyMyDivision(),
+            $receivedDate,
+            $accountantDate
         );
         $inputPort->handle($inputData);
     }
@@ -86,10 +92,44 @@ class ReceivedController extends Controller
         $gate = Gate::getGateInstance('receipt');
 
         $receivedItems = $this->request->get('receivedItems');
+        $receivedDate = $this->request->get('receivedDate');
+        $accountantDate = $this->request->get('accountantDate');
         $inputData = new ReceivedRegisterInputData(
             $this->request->user(),
             $receivedItems,
-            $gate->isOnlyMyDivision()
+            $gate->isOnlyMyDivision(),
+            $receivedDate,
+            $accountantDate
+        );
+        $inputPort->handle($inputData);
+    }
+
+    public function lateRegister(
+        $vars,
+        ReceivedLateRegisterInputPortInterface $inputPort
+    ) {
+        $token = $this->request->get('_csrf');
+        Csrf::validate($token, true);
+
+        if (Gate::denies('late_receipt')) {
+            Router::abort(403);
+        }
+
+        $gate = Gate::getGateInstance('late_receipt');
+
+        $receivedItems = $this->request->get('receivedItems');
+        $receivedDate = $this->request->get('receivedDate');
+        $accountantDate = $this->request->get('accountantDate');
+        $divisionId = $this->request->get('divisionId');
+        $orderDate = $this->request->get('orderDate');
+        $inputData = new ReceivedLateRegisterInputData(
+            $this->request->user(),
+            $receivedItems,
+            $gate->isOnlyMyDivision(),
+            $receivedDate,
+            $accountantDate,
+            $divisionId,
+            $orderDate
         );
         $inputPort->handle($inputData);
     }

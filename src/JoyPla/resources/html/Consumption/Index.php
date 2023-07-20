@@ -34,7 +34,10 @@
                 <p class="text-xl font-bold">{{ consumption.consumptionDate }}</p>
                 <p class="text-md"> 
                   消費番号：{{ consumption.consumptionId }}<br>
-                  消費タイプ：{{ ( consumption.consumptionStatus === 1)? "通常消費" : "貸出品" }}<br>
+                  消費タイプ：
+                  {{ ( consumption.consumptionStatus === 1) && "通常消費" ||
+                   ( consumption.consumptionStatus === 2) && "貸出品" ||
+                   ( consumption.consumptionStatus === 3) && "直納処理"}}<br>
                   消費部署：{{ consumption.division.divisionName }}<br>
                   合計金額：&yen; {{ numberFormat( consumption.totalAmount) }}
                 </p>
@@ -48,7 +51,8 @@
                   <?php if (
                       gate('cancellation_of_consumption_slips')->can()
                   ): ?>
-                  <v-button-danger type="button" class="w-full" @click.native="deleteSlip( consumption.consumptionId )">
+                  <v-button-danger type="button" class="w-full" @click.native="deleteSlip( consumption.consumptionId )" 
+                  v-if="consumption.consumptionStatus != 2 && !(<?php echo gate('is_user') ? 'true' : 'false' ; ?> && consumption.consumptionStatus == 3 )">
                     消費伝票を削除
                   </v-button-danger>
                   <?php endif; ?>
@@ -374,17 +378,15 @@ var JoyPlaApp = Vue.createApp({
       const searchClear = () =>
       {
         values.currentPage = 1;
-        resetForm({
-          itemName  : "",
-          makerName : "",
-          itemCode : "",
-          itemStandard :  "",
-          itemJANCode :  "",
-          yearMonth: "",
-          divisionIds: [],
-          currentPage : 1,
-          perPage: values.perPage,
-        });
+        
+        values.itemName = '';
+        values.makerName = '';
+        values.itemCode = '';
+        values.itemStandard = '';
+        values.itemJANCode = '';
+        values.yearMonth = '';
+        values.divisionIds = [];
+        
         listGet();
       };
 

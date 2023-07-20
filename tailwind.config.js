@@ -1,20 +1,19 @@
 let colors = require("tailwindcss/colors");
-//https://javisperez.github.io/tailwindcolorshades/
-colors["sushi"] = {
-  50: "#f8fbf5",
-  100: "#f2f7eb",
-  200: "#deebcd",
-  300: "#cadfaf",
-  400: "#a2c672",
-  500: "#7aae36",
-  600: "#6e9d31",
-  700: "#5c8329",
-  800: "#496820",
-  900: "#3c551a",
-};
 
 /* No End In Sight Color Scheme */
 const No_EndIn_Sight_Color_Scheme = {
+  sushi: {
+    50: "#f8fbf5",
+    100: "#f2f7eb",
+    200: "#deebcd",
+    300: "#cadfaf",
+    400: "#a2c672",
+    500: "#7aae36",
+    600: "#6e9d31",
+    700: "#5c8329",
+    800: "#496820",
+    900: "#3c551a",
+  },
   "cerise-red": {
     DEFAULT: "#E53467",
     50: "#FAD7E1",
@@ -590,15 +589,6 @@ const Custom = {
   },
 };
 
-colors = {
-  ...colors,
-  ...SPINOSAURUS,
-  ...CUTE_BLUE_SEAL,
-  ...No_EndIn_Sight_Color_Scheme,
-  ...FUN_ROOM_FOR_BOYS,
-  ...ANALOGOUS,
-  ...Custom,
-};
 module.exports = {
   content: [
     "./src/**/*.{html,js,php,vue}",
@@ -608,7 +598,15 @@ module.exports = {
     //"./src/NewJoyPla/src/HeaderForMypage.php"
   ],
   theme: {
-    colors: colors,
+    colors: {
+      ...colors,
+      ...SPINOSAURUS,
+      ...CUTE_BLUE_SEAL,
+      ...No_EndIn_Sight_Color_Scheme,
+      ...FUN_ROOM_FOR_BOYS,
+      ...ANALOGOUS,
+      ...Custom,
+    },
   },
   plugins: [],
 };

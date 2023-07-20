@@ -33,6 +33,7 @@
           <v-text title="発注元部署" class="lg:flex w-full gap-6">{{ order.division.divisionName }}</v-text>
           <v-text title="発注担当者" class="lg:flex w-full gap-6">{{ order.orderUserName }}</v-text>
           <v-text title="卸業者" class="lg:flex w-full gap-6">{{ order.distributor.distributorName }}</v-text>
+          <v-text title="発注方法" class="lg:flex w-full gap-6">{{ order.distributor.orderMethod }}</v-text>
           <?php if (gate('revision_of_unordered_slips')->can()): ?>
           <v-select class="lg:flex w-full gap-6" @change="isChange = true" change-class-name="inputChange" :options="[{ label: '定数発注', value: 1 },{ label: '個別発注', value: 2 }]" name="adjustment" :rules="{required: true}" title="発注タイプ" label="発注タイプ"></v-select>
           <v-textarea title="備考" @change="isChange = true" change-class-name="inputChange" name="comment" :rules="{strlen: 512}" label="備考" class="lg:flex w-full gap-6 mt-4">
@@ -173,7 +174,7 @@ var JoyPlaApp = Vue.createApp({
       });
       const breadcrumbs = [
           {
-            text: '発注メニュー',
+            text: '発注・入荷メニュー',
             disabled: false,
             href: _ROOT + '&path=/order',
           },

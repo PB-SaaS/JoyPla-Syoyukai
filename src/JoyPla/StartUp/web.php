@@ -8,6 +8,9 @@ require_once 'JoyPla/require.php';
 
 use framework\Http\Request;
 use framework\Routing\Router;
+use JoyPla\InterfaceAdapters\Controllers\Web\AcceptanceController;
+use JoyPla\InterfaceAdapters\Controllers\Web\PayoutController;
+use JoyPla\InterfaceAdapters\Controllers\Web\AccountantController;
 use JoyPla\InterfaceAdapters\Controllers\Web\AgreeFormController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ConsumptionController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ItemAndPriceAndInHospitalItemRegisterController;
@@ -20,6 +23,9 @@ use JoyPla\InterfaceAdapters\Controllers\Web\ReturnController;
 use JoyPla\InterfaceAdapters\Controllers\Web\StocktakingController;
 use JoyPla\InterfaceAdapters\Controllers\Web\TopController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ItemRequestController;
+use JoyPla\InterfaceAdapters\Controllers\Web\ItemListController;
+use JoyPla\InterfaceAdapters\Controllers\Web\LabelController;
+use JoyPla\InterfaceAdapters\Controllers\Web\StocktakingListController;
 use JoyPla\InterfaceAdapters\GateWays\Middleware\PersonalInformationConsentMiddleware;
 use JoyPla\InterfaceAdapters\GateWays\Middleware\UnorderDataExistMiddleware;
 use JoyPla\JoyPlaApplication;
@@ -150,6 +156,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'index',
     ])->service($useCaseProvider->getOrderIndexInteractor());
 
+    Router::map('GET', '/order/unapproved/:orderId/print', [
+        OrderController::class,
+        'printOfUnapproved',
+    ])->service($useCaseProvider->getOrderPrintInteractor());
+
     Router::map('GET', '/order/:orderId/print', [
         OrderController::class,
         'print',
@@ -160,6 +171,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
     Router::map('GET', '/received/register', [
         ReceivedController::class,
         'register',
+    ]);
+
+    Router::map('GET', '/received/lateRegister', [
+        ReceivedController::class,
+        'lateRegister',
     ]);
 
     Router::map('GET', '/received/:receivedId', [
@@ -245,10 +261,125 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'pickingList',
     ])->service($useCaseProvider->getPickingListInteractor());
 
+    Router::map('GET', '/itemrequest/bulk', [
+        ItemRequestController::class,
+        'list',
+    ])->service($useCaseProvider->getPickingListInteractor());
+
     Router::map('GET', '/itemrequest/:requestHId', [
         ItemRequestController::class,
         'show',
     ])->service($useCaseProvider->getItemRequestShowInteractor());
+
+    Router::map('GET', '/accountant', [TopController::class, 'accountant']);
+
+    Router::map('GET', '/accountant/index', [
+        AccountantController::class,
+        'index',
+    ]);
+
+    Router::map('GET', '/accountant/items', [
+        AccountantController::class,
+        'items',
+    ]);
+
+    Router::map('GET', '/accountant/logs', [
+        AccountantController::class,
+        'logs',
+    ]);
+
+    Router::map('GET', '/accountant/:accountantId', [
+        AccountantController::class,
+        'show',
+    ]);
+
+    Router::map('GET', '/accountant/:accountantId/print', [
+        AccountantController::class,
+        'print',
+    ]);
+
+    Router::map('GET', '/payout/register', [
+        PayoutController::class,
+        'register',
+    ]);
+
+    Router::map('GET', '/payout/index', [
+        PayoutController::class,
+        'index',
+    ]);
+
+    Router::map('GET', '/payout/:payoutHistoryId', [
+        PayoutController::class,
+        'show',
+    ]);
+    
+    Router::map('GET', '/payout/:payoutHistoryId/print', [
+        PayoutController::class,
+        'print',
+    ]);
+
+    Router::map('GET', '/product/itemList/index', [
+        ItemListController::class,
+        'index',
+    ]);
+
+    Router::map('GET', '/product/itemList/:itemListId', [
+        ItemListController::class,
+        'show',
+    ]);
+
+    Router::map('GET', '/product/itemList/:itemListId/print', [
+        ItemListController::class,
+        'print',
+    ])/* ->service($useCaseProvider->getItemListPrintInteractor()) */;
+
+    Router::map('GET', 'acceptance', [
+        AcceptanceController::class,
+        'index',
+    ]);
+
+    Router::map('GET', 'acceptance/:acceptanceId', [
+        AcceptanceController::class,
+        'show',
+    ]);
+
+
+    Router::map('GET', '/acceptance/:acceptanceId/print', [
+        AcceptanceController::class,
+        'print',
+    ]);
+    
+    Router::map('GET', '/label/payout/:payoutId', [
+        LabelController::class,
+        'payoutLabelPrint',
+    ]);
+    
+    Router::map('GET', '/label/acceptance/:acceptanceId', [
+        LabelController::class,
+        'payoutLabelPrintForAcceptance',
+    ]);
+    
+    
+    Router::map('GET', '/stocktaking/stocktakingList/index', [
+        StocktakingListController::class,
+        'index',
+    ]);
+
+    Router::map('GET', '/stocktaking/stocktakingList/:stockListId', [
+        StocktakingListController::class,
+        'show',
+    ]);
+
+    Router::map('GET', '/stocktaking/stocktakingList/:stockListId/print', [
+        StocktakingListController::class,
+        'print',
+    ]);
+    
+    Router::map('GET', '/error',function(){
+        echo view('html/Common/Error-js');
+    });
+
+    https://i02.smp.ne.jp/u/joypla/new/js/createPage-dev.js
 });
 
 $router = new Router();
@@ -258,25 +389,7 @@ $exceptionHandler = new WebExceptionHandler();
 $kernel = new \framework\Http\Kernel($app, $router, $exceptionHandler);
 $request = new Request();
 
-$auth = new Auth('NJ_HUserDB', [
-    'registrationTime',
-    'updateTime',
-    'authKey',
-    'hospitalId',
-    'divisionId',
-    'userPermission',
-    'loginId',
-    'loginPassword',
-    'name',
-    'nameKana',
-    'mailAddress',
-    'remarks',
-    'termsAgreement',
-    'tenantId',
-    'agreementDate',
-    'hospitalAuthKey',
-    'userCheck',
-]);
+$auth = $app->getAuth();
 
 $request->setUser($auth);
 $kernel->handle($request);

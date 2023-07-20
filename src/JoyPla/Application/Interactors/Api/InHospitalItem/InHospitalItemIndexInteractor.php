@@ -4,11 +4,15 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\InHospitalItem {
+
+    use ApiErrorCode\LoginLocked;
     use JoyPla\Application\InputPorts\Api\InHospitalItem\InHospitalItemIndexInputData;
     use JoyPla\Application\InputPorts\Api\InHospitalItem\InHospitalItemIndexInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\InHospitalItem\InHospitalItemIndexOutputData;
     use JoyPla\Application\OutputPorts\Api\InHospitalItem\InHospitalItemIndexOutputPortInterface;
+    use JoyPla\Enterprise\Models\DivisionId;
     use JoyPla\Enterprise\Models\HospitalId;
+    use JoyPla\Enterprise\Models\InHospitalItemId;
     use JoyPla\InterfaceAdapters\GateWays\Repository\InHospitalItemRepositoryInterface;
     use JoyPla\Service\Presenter\Api\PresenterProvider;
     use JoyPla\Service\Repository\RepositoryProvider;
@@ -37,7 +41,7 @@ namespace JoyPla\Application\Interactors\Api\InHospitalItem {
         public function handle(InHospitalItemIndexInputData $inputData)
         {
             [
-                $InHospitalItem,
+                $inHospitalItem,
                 $count,
             ] = $this->repositoryProvider
                 ->getInHospitalItemRepository()
@@ -45,10 +49,39 @@ namespace JoyPla\Application\Interactors\Api\InHospitalItem {
                     new HospitalId($inputData->hospitalId),
                     $inputData->search
                 );
+
+                /*
+                $stocks = [];
+            
+            if($inputData->divisionId){
+                $inHospitalItemIds = array_map(function($inHospitalItem){
+                    return new InHospitalItemId($inHospitalItem->inHospitalItemId);
+                },$inHospitalItem);
+
+                $stocks = $this->repositoryProvider
+                ->getStockRepository()->getInHospitalItemIdsAndDivisionId(
+                    new HospitalId($inputData->hospitalId),
+                    new DivisionId($inputData->divisionId),
+                    $inHospitalItemIds
+                );
+            }
+                
+            foreach($inHospitalItem as $key => $item)
+            {
+                $stock = array_find($stocks, function($stock) use ($item)
+                {
+                    return $stock->inHospitalItemId == $item->inHospitalItemId;
+                });
+
+
+                $inHospitalItem[$key]->_stock = $stock;
+            }
+            */
+
             $this->presenterProvider
                 ->getInHospitalItemIndexPresenter()
                 ->output(
-                    new InHospitalItemIndexOutputData($InHospitalItem, $count)
+                    new InHospitalItemIndexOutputData($inHospitalItem, $count)
                 );
         }
     }
@@ -68,12 +101,14 @@ namespace JoyPla\Application\InputPorts\Api\InHospitalItem {
     {
         public stdClass $search;
         public string $hospitalId;
+        public string $divisionId;
         /**
          * InHospitalItemIndexInputData constructor.
          */
-        public function __construct(string $hospitalId, array $search)
+        public function __construct(string $hospitalId, array $search , string $divisionId = '')
         {
             $this->hospitalId = $hospitalId;
+            $this->divisionId = $divisionId;
             $this->search = new stdClass();
             $this->search->itemName = $search['itemName'];
             $this->search->makerName = $search['makerName'];
@@ -113,7 +148,7 @@ namespace JoyPla\Application\OutputPorts\Api\InHospitalItem {
      */
     class InHospitalItemIndexOutputData
     {
-        public array $InHospitalItems = [];
+        public array $inHospitalItems = [];
         public int $count = 0;
         /**
          * InHospitalItemIndexOutputData constructor.

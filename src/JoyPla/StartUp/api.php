@@ -9,6 +9,7 @@ require_once 'JoyPla/require.php';
 use App\Http\Middleware\VerifyCsrfTokenMiddleware;
 use framework\Http\Request;
 use framework\Routing\Router;
+use JoyPla\InterfaceAdapters\Controllers\Api\AcceptanceController;
 use JoyPla\InterfaceAdapters\Controllers\Api\BarcodeController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ConsumptionController;
 use JoyPla\InterfaceAdapters\Controllers\Api\DistributorController;
@@ -22,6 +23,11 @@ use JoyPla\InterfaceAdapters\Controllers\Api\StocktakingController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ReferenceController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ItemRequestController;
 use JoyPla\InterfaceAdapters\Controllers\Api\PayoutController;
+use JoyPla\InterfaceAdapters\Controllers\Api\AccountantController;
+use JoyPla\InterfaceAdapters\Controllers\Api\AccountantLogController;
+use JoyPla\InterfaceAdapters\Controllers\Api\ItemListController; //商品一覧表用
+use JoyPla\InterfaceAdapters\Controllers\Api\StockController;
+use JoyPla\InterfaceAdapters\Controllers\Api\StocktakingListController; //棚卸商品管理表用
 use JoyPla\JoyPlaApplication;
 use JoyPla\Service\Presenter\Api\PresenterProvider;
 use JoyPla\Service\Repository\QueryProvider;
@@ -59,6 +65,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'index',
     ])->service($useCaseProvider->getInHospitalItemIndexInteractor());
 
+    Router::map('GET', '/api/inHospitalItem/show', [
+        InHospitalItemController::class,
+        'show',
+    ])->service($useCaseProvider->getInHospitalItemShowInteractor());
+
     Router::map('POST', '/api/consumption/register', [
         ConsumptionController::class,
         'register',
@@ -69,11 +80,20 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'index',
     ])->service($useCaseProvider->getConsumptionIndexInteractor());
 
+    Router::map('PATCH', '/api/consumption/:consumptionId', [
+        ConsumptionController::class,
+        'update',
+    ]);
+
     Router::map('DELETE', '/api/consumption/:consumptionId/delete', [
         ConsumptionController::class,
         'delete',
     ])->service($useCaseProvider->getConsumptionDeleteInteractor());
-
+    
+    Router::map('DELETE', '/api/consumption/:consumptionId/item/delete', [
+        ConsumptionController::class,
+        'deleteItem',
+    ]);
     Router::map('POST', '/api/order/register', [
         OrderController::class,
         'register',
@@ -140,6 +160,16 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'revised',
     ])->service($useCaseProvider->getOrderRevisedInteractor());
 
+    Router::map('DELETE', '/api/order/:orderId/delete', [
+        OrderController::class,
+        'delete',
+    ])->service($useCaseProvider->getOrderDeleteInteractor());
+
+    Router::map('POST', '/api/order/:orderId/sent', [
+        OrderController::class,
+        'sent',
+    ]);
+
     Router::map('GET', '/api/received/order/list', [
         ReceivedController::class,
         'orderList',
@@ -164,6 +194,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         ReceivedController::class,
         'register',
     ])->service($useCaseProvider->getReceivedRegisterInteractor());
+
+    Router::map('POST', '/api/received/lateRegister', [
+        ReceivedController::class,
+        'lateRegister',
+    ])->service($useCaseProvider->getReceivedLateRegisterInteractor());
 
     Router::map('GET', '/api/return/show', [
         ReturnController::class,
@@ -225,10 +260,177 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         'totalization',
     ])->service($useCaseProvider->getTotalizationInteractor());
 
+    Router::map('PATCH', '/api/itemrequest/item/bulk', [
+        ItemRequestController::class,
+        'itemBulk',
+    ])->service($useCaseProvider->getItemRequestBulkUpdateInteractor());
+
     Router::map('POST', '/api/payout/register', [
         PayoutController::class,
         'register',
     ])->service($useCaseProvider->getPayoutRegisterInteractor());
+
+    Router::map('GET', '/api/payout/index', [
+        PayoutController::class,
+        'index',
+    ]);
+    
+    Router::map('GET', '/api/payout/:payoutHistoryId', [
+        PayoutController::class,
+        'show',
+    ]);
+
+    Router::map('PATCH', '/api/payout/:payoutHistoryId', [
+        PayoutController::class,
+        'update',
+    ]);
+    
+    Router::map('DELETE', '/api/payout/:payoutHistoryId', [
+        PayoutController::class,
+        'delete',
+    ]);
+
+    Router::map('POST', '/api/acceptance/register', [
+        AcceptanceController::class,
+        'register',
+    ])->service($useCaseProvider->getAcceptanceRegisterInteractor());
+
+    
+    Router::map('GET', '/api/acceptance/index', [
+        AcceptanceController::class,
+        'index',
+    ]);
+    
+    Router::map('GET', '/api/acceptance/:acceptanceId', [
+        AcceptanceController::class,
+        'show',
+    ]);
+    
+    Router::map('Patch', '/api/acceptance/:acceptanceId', [
+        AcceptanceController::class,
+        'update',
+    ]);
+    
+    Router::map('POST', '/api/acceptance/:acceptanceId/payout', [
+        AcceptanceController::class,
+        'payoutRegister',
+    ]);
+
+    Router::map('Delete', '/api/acceptance/:acceptanceId', [
+        AcceptanceController::class,
+        'delete',
+    ]);
+
+    Router::map('POST', '/api/accountant/register', [
+        AccountantController::class,
+        'register',
+    ])->service($useCaseProvider->getAccountantRegisterInteractor());
+
+    Router::map('GET', '/api/accountant/index', [
+        AccountantController::class,
+        'index',
+    ])->service($useCaseProvider->getAccountantIndexInteractor());
+
+    Router::map('GET', '/api/accountant/items', [
+        AccountantController::class,
+        'items',
+    ])->service($useCaseProvider->getAccountantItemsIndexInteractor());
+
+    Router::map('GET', '/api/accountant/logs', [
+        AccountantLogController::class,
+        'logs',
+    ])->service($useCaseProvider->getAccountantLogsIndexInteractor());
+
+    Router::map('GET', '/api/accountant/:accountantId', [
+        AccountantController::class,
+        'show',
+    ])->service($useCaseProvider->getAccountantShowInteractor());
+
+    Router::map('patch', '/api/accountant/:accountantId/update', [
+        AccountantController::class,
+        'update',
+    ])->service($useCaseProvider->getAccountantUpdateInteractor());
+
+    Router::map('delete', '/api/accountant/:accountantId/delete', [
+        AccountantController::class,
+        'delete',
+    ])->service($useCaseProvider->getAccountantUpdateInteractor());
+
+    Router::map('get', '/api/accountant/items/download', [
+        AccountantController::class,
+        'itemsDownload',
+    ]);
+
+    Router::map('get', '/api/accountant/items/totalPrice', [
+        AccountantController::class,
+        'totalPrice',
+    ]);
+
+    Router::map('get', '/api/accountant/logs/download', [
+        AccountantLogController::class,
+        'itemsDownload',
+    ]);
+
+    Router::map('get', '/api/accountant/logs/totalPrice', [
+        AccountantLogController::class,
+        'totalPrice',
+    ]);
+
+    Router::map('GET', '/api/product/itemList/index', [
+        ItemListController::class,
+        'index',
+    ])->service($useCaseProvider->getItemListIndexInteractor());
+
+    Router::map('POST', '/api/product/itemList/register', [
+        ItemListController::class,
+        'register',
+    ])->service($useCaseProvider->getItemListRegisterInteractor());
+
+    Router::map('GET', '/api/product/itemList/:itemListId', [
+        ItemListController::class,
+        'show',
+    ])->service($useCaseProvider->getItemListShowInteractor());
+
+    Router::map('patch', '/api/product/itemList/:itemListId/update', [
+        ItemListController::class,
+        'update',
+    ])->service($useCaseProvider->getItemListUpdateInteractor());
+
+    Router::map('delete', '/api/product/itemList/:itemListId/delete', [
+        ItemListController::class,
+        'delete',
+    ]);
+
+    
+    Router::map('GET', '/api/stock/:divisionId/:inHospitalItemId', [
+        StockController::class,
+        'stock',
+    ]);
+
+    Router::map('GET', '/api/stocktaking/stocktakingList/index', [
+        StocktakingListController::class,
+        'index',
+    ])->service($useCaseProvider->getStocktakingListIndexInteractor());
+
+    Router::map('POST', '/api/stocktaking/stocktakingList/register', [
+        StocktakingListController::class,
+        'register',
+    ])->service($useCaseProvider->getStocktakingListRegisterInteractor());
+
+    Router::map('GET', '/api/stocktaking/stocktakingList/:stockListId', [
+        StocktakingListController::class,
+        'show',
+    ])->service($useCaseProvider->getStocktakingListShowInteractor());
+
+    Router::map('patch', '/api/stocktaking/stocktakingList/:stockListId/update', [
+        StocktakingListController::class,
+        'update',
+    ])->service($useCaseProvider->getStocktakingListUpdateInteractor());
+
+    Router::map('delete', '/api/stocktaking/stocktakingList/:stockListId/delete', [
+        StocktakingListController::class,
+        'delete',
+    ]);
 });
 
 $router = new Router();
@@ -236,25 +438,8 @@ $app = new JoyPlaApplication();
 $exceptionHandler = new ApiExceptionHandler();
 $kernel = new \framework\Http\Kernel($app, $router, $exceptionHandler);
 $request = new Request();
-$auth = new Auth('NJ_HUserDB', [
-    'registrationTime',
-    'updateTime',
-    'authKey',
-    'hospitalId',
-    'divisionId',
-    'userPermission',
-    'loginId',
-    'loginPassword',
-    'name',
-    'nameKana',
-    'mailAddress',
-    'remarks',
-    'termsAgreement',
-    'tenantId',
-    'agreementDate',
-    'hospitalAuthKey',
-    'userCheck',
-]);
+
+$auth = $app->getAuth();
 
 $request->setUser($auth);
 $kernel->handle($request);

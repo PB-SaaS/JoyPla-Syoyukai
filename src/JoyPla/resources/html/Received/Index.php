@@ -14,7 +14,7 @@
                     <v-button-default type="button" class="md:w-1/6 w-full" @click.native="label( received.receivedId )">ラベルプリント</v-button-default>
                 </div>
                 <div class="p-4 text-base bg-gray-100 border border-gray-400">
-                    <v-text title="登録日" class="flex w-full gap-6">{{ received.registDate }}</v-text>
+                    <v-text title="入荷日" class="flex w-full gap-6">{{ received.registDate }}</v-text>
                     <v-text title="発注番号" class="flex w-full gap-6">{{ received.orderId }}</v-text>
                     <v-text title="入庫番号" class="flex w-full gap-6">{{ received.receivedId }}</v-text>
                     <v-text title="発注元部署" class="flex w-full gap-6">{{ received.division.divisionName }}</v-text>
@@ -195,7 +195,7 @@
                     sleepComplate();
                 });
                 const breadcrumbs = [{
-                    text: '発注メニュー',
+                    text: '発注・入荷メニュー',
                     disabled: false,
                     href: _ROOT + '&path=/order'
                 }, {

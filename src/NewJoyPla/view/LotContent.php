@@ -96,26 +96,7 @@
 			<hr>
 			<div class="uk-width-1-3@m">
 				<div class="uk-margin">
-					<select class="uk-width-3-4 uk-select uk-inline" id="divisionId" v-model="divisionId" v-bind:disabled="lists.length > 0">
-						<option value="">----- 部署選択 -----</option>
-						<?php
-							foreach($division->data as $data)
-							{
-								if($data->divisionType === '1')
-								{
-									echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'(大倉庫)</option>';
-									echo '<option value="" disabled>--------------------</option>';
-								}
-							}
-							foreach($division->data as $data)
-							{
-								if($data->divisionType === '2')
-								{
-									echo '<option value="'.$data->divisionId.'">'.$data->divisionName.'</option>';
-								}
-							}
-							?>
-					</select>
+					<searchable-select name="busyo" v-model="divisionId" id="divisionId" v-bind:disabled="lists.length > 0" :options="divisionOptions"></searchable-select>
 				</div>
 			</div>
 			<div class="uk-margin-bottom">
@@ -287,18 +268,45 @@
 	</div>
 </div>
 
-<form action="<?php echo $api_url ?>" target="_blank" method="post" class="print_hidden uk-inline" id="createLabelForm">
+<form action="<?php echo $api_url; ?>" target="_blank" method="post" class="print_hidden uk-inline" id="createLabelForm">
 	<input type="hidden" value="" name="card_ids">
 	<input type="hidden" value="cardLabelPrint" name="Action">
 </form>
 
 <script>
 
+	
+<?php
+$options = [
+    [
+        'value' => '',
+        'text' => '----- 部署を選択してください -----',
+    ],
+];
+foreach ($division->data as $data) {
+    if ($data->divisionType === '1') {
+        $options[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+foreach ($division->data as $data) {
+    if ($data->divisionType === '2') {
+        $options[] = [
+            'value' => $data->divisionId,
+            'text' => $data->divisionName,
+        ];
+    }
+}
+$defaultDivisionId = $user_info->isUser() ? $user_info->getDivisionId() : '';
+?>
 var app = new Vue({
 	el: '#app',
 	data: {
 		lists: [],
-		divisionId: "<?php echo ($user_info->isUser())? $user_info->getDivisionId() : "" ; ?>",
+		divisionOptions: <?php echo json_encode($options); ?>,
+		divisionId: "<?php echo $defaultDivisionId; ?>",
 	},
 	watch: {
 	},
@@ -324,10 +332,10 @@ var app = new Vue({
 				loading();
 				$.ajax({
 					async: false,
-					url: "<?php echo $api_url ?>",
+					url: "<?php echo $api_url; ?>",
 					type:'POST',
 					data:{
-						_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+						_csrf: "<?php echo $csrf_token; ?>",  // CSRFトークンを送信
 						Action : 'lotRegister',
 						lots : JSON.stringify( objectValueToURIencode(app.lists) ),
 						divisionId : app.divisionId,
@@ -492,7 +500,7 @@ var app = new Vue({
 				url:'%url/rel:mpgt:labelBarcodeSAPI%',
 				type:'POST',
 				data:{
-					_csrf: "<?php echo $csrf_token ?>",  // CSRFトークンを送信
+					_csrf: "<?php echo $csrf_token; ?>",  // CSRFトークンを送信
 					divisionId : app.divisionId,
 					barcode : barcode,
 				},

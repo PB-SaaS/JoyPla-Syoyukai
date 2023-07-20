@@ -293,14 +293,14 @@ var JoyPlaApp = Vue.createApp({
           itemJANCode : (getParam("itemJANCode")) ? getParam("itemJANCode") : "",
           registerDate: (getParam("registerDate")) ? getParam("registerDate") : "",
           orderDate: (getParam("orderDate")) ? getParam("orderDate") : "",
-          perPage: (Number.isInteger(getParam("perPage"))) ? getParam("perPage") : "10",
+          perPage: (Number.isInteger(parseInt(getParam("perPage")))) ? getParam("perPage") : "10",
           currentPage : (Number.isInteger(parseInt(getParam("currentPage")))) ? parseInt(getParam("currentPage")) : 1,
           divisionIds: (getParam("divisionIds")) ? ( Array.isArray(getParam("divisionIds"))? getParam("divisionIds") : (getParam("divisionIds")).split(',') ) : [],
         },
       });
       const breadcrumbs = [
           {
-            text: '発注メニュー',
+            text: '発注・入荷メニュー',
             disabled: false,
             href: _ROOT + '&path=/order',
           },
@@ -406,19 +406,14 @@ var JoyPlaApp = Vue.createApp({
       const searchClear = () =>
       {
         values.currentPage = 1;
-        resetForm({
-          orderId : "",
-          itemName  : "",
-          makerName : "",
-          itemCode : "",
-          itemStandard :  "",
-          itemJANCode :  "",
-          registerDate: "",
-          orderDate: "",
-          divisionIds: [],
-          currentPage : 1,
-          perPage: values.perPage,
-        });
+        values.orderId = '';
+        values.itemName = '';
+        values.makerName = '';
+        values.itemCode = '';
+        values.itemStandard = '';
+        values.itemJANCode = '';
+        values.registerDate = '';
+        values.divisionIds = [];
         listGet();
       };
 

@@ -52,6 +52,7 @@ class OrderController extends Controller
             compact('orderitems'),
             false
         )->render();
+
         echo view('html/Common/Template', compact('body'), false)->render();
     }
 
@@ -144,6 +145,25 @@ class OrderController extends Controller
             $this->request->user(),
             $vars['orderId'],
             false,
+            $gate->isOnlyMyDivision()
+        );
+        $inputPort->handle($inputData);
+    }
+
+    public function printOfUnapproved(
+        $vars,
+        OrderIndexInputPortInterface $inputPort
+    ) {
+        if (Gate::denies('list_of_order_slips')) {
+            Router::abort(403);
+        }
+
+        $gate = Gate::getGateInstance('list_of_order_slips');
+
+        $inputData = new OrderIndexInputData(
+            $this->request->user(),
+            $vars['orderId'],
+            true,
             $gate->isOnlyMyDivision()
         );
         $inputPort->handle($inputData);

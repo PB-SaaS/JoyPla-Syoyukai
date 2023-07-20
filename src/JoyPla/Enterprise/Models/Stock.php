@@ -114,6 +114,11 @@ class Stock
         return $this->inHospitalItemId;
     }
 
+    public function getDivision()
+    {
+        return $this->division;
+    }
+
     public function getInventoryQuantity()
     {
         return $this->inventory;

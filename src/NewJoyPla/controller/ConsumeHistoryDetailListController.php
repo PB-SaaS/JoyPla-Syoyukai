@@ -56,7 +56,7 @@ class ConsumeHistListController extends Controller
                         'export' => false,
                         'submenulink' => "%url/rel:mpg:top%&path=trackrecord",
                         'submenu' => '実績メニュー',
-                        'table' => '%sf:usr:search15:mstfilter%',
+                        'table' => '%sf:usr:361_consume:mstfilter%',
                         'csrf_token' => Csrf::generate(16),
                         'script' => $division_script->render(),
                         ] , false);
@@ -120,7 +120,7 @@ class ConsumeHistListController extends Controller
                     'export' => false,
                     'submenulink' => "%url/rel:mpg:top%&path=trackrecord",
                     'submenu' => '実績メニュー',
-                    'table' => '%sf:usr:search15:mstfilter%',
+                    'table' => '%sf:usr:361_consume:mstfilter%',
                     'csrf_token' => Csrf::generate(16),
                     'script' => $division_script->render(),
                     ] , false);

@@ -2,6 +2,13 @@
 
 namespace JoyPla\Service\UseCase\Api;
 
+use JoyPla\Application\Interactors\Api\Acceptance\AcceptanceRegisterInteractor;
+use JoyPla\Application\Interactors\Api\Accountant\AccountantIndexInteractor;
+use JoyPla\Application\Interactors\Api\Accountant\AccountantItemsIndexInteractor;
+use JoyPla\Application\Interactors\Api\Accountant\AccountantLogsIndexInteractor;
+use JoyPla\Application\Interactors\Api\Accountant\AccountantRegisterInteractor;
+use JoyPla\Application\Interactors\Api\Accountant\AccountantShowInteractor;
+use JoyPla\Application\Interactors\Api\Accountant\AccountantUpdateInteractor;
 use JoyPla\Application\Interactors\Api\Barcode\BarcodeOrderSearchInteractor;
 use JoyPla\Application\Interactors\Api\Barcode\BarcodeSearchInteractor;
 use JoyPla\Application\Interactors\Api\Consumption\ConsumptionDeleteInteractor;
@@ -10,14 +17,21 @@ use JoyPla\Application\Interactors\Api\Consumption\ConsumptionRegisterInteractor
 use JoyPla\Application\Interactors\Api\Distributor\DistributorIndexInteractor;
 use JoyPla\Application\Interactors\Api\Division\DivisionIndexInteractor;
 use JoyPla\Application\Interactors\Api\InHospitalItem\InHospitalItemIndexInteractor;
+use JoyPla\Application\Interactors\Api\InHospitalItem\InHospitalItemShowInteractor;
+use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestBulkUpdateInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestDeleteInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestHistoryInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestRegisterInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\ItemRequestUpdateInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\RequestItemDeleteInteractor;
 use JoyPla\Application\Interactors\Api\ItemRequest\TotalizationInteractor;
+use JoyPla\Application\Interactors\Api\ItemList\ItemListIndexInteractor;
+use JoyPla\Application\Interactors\Api\ItemList\ItemListRegisterInteractor;
+use JoyPla\Application\Interactors\Api\ItemList\ItemListShowInteractor;
+use JoyPla\Application\Interactors\Api\ItemList\ItemListUpdateInteractor;
 use JoyPla\Application\Interactors\Api\Notification\NotificationShowInteractor;
 use JoyPla\Application\Interactors\Api\Order\FixedQuantityOrderInteractor;
+use JoyPla\Application\Interactors\Api\Order\OrderDeleteInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderItemBulkUpdateInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Order\OrderRevisedInteractor;
@@ -33,10 +47,15 @@ use JoyPla\Application\Interactors\Api\Price\PriceRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Price\PriceShowInteractor;
 use JoyPla\Application\Interactors\Api\Received\ReceivedRegisterByOrderSlipInteractor;
 use JoyPla\Application\Interactors\Api\Received\ReceivedRegisterInteractor;
+use JoyPla\Application\Interactors\Api\Received\ReceivedLateRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Received\ReceivedReturnRegisterInteractor;
 use JoyPla\Application\Interactors\Api\Received\ReceivedShowInteractor;
 use JoyPla\Application\Interactors\Api\ReceivedReturn\ReturnShowInteractor;
 use JoyPla\Application\Interactors\Api\Reference\ConsumptionHistoryShowInteractor;
+use JoyPla\Application\Interactors\Api\StocktakingList\StocktakingListIndexInteractor;
+use JoyPla\Application\Interactors\Api\StocktakingList\StocktakingListRegisterInteractor;
+use JoyPla\Application\Interactors\Api\StocktakingList\StocktakingListShowInteractor;
+use JoyPla\Application\Interactors\Api\StocktakingList\StocktakingListUpdateInteractor;
 use JoyPla\Service\Presenter\Api\PresenterProvider;
 use JoyPla\Service\Repository\QueryProvider;
 use JoyPla\Service\Repository\RepositoryProvider;
@@ -93,6 +112,21 @@ class UseCaseProvider
             $this->repositoryProvider,
             $this->presenterProvider
         ) extends InHospitalItemIndexInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getInHospitalItemShowInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends InHospitalItemShowInteractor {
             public function __construct(
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
@@ -252,6 +286,21 @@ class UseCaseProvider
         };
     }
 
+    public function getOrderDeleteInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends OrderDeleteInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
     public function getOrderUnapprovedApprovalInteractor()
     {
         return new class(
@@ -363,6 +412,21 @@ class UseCaseProvider
             $this->repositoryProvider,
             $this->presenterProvider
         ) extends ReceivedRegisterInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getReceivedLateRegisterInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends ReceivedLateRegisterInteractor {
             public function __construct(
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
@@ -537,6 +601,21 @@ class UseCaseProvider
         };
     }
 
+    public function getItemRequestBulkUpdateInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends ItemRequestBulkUpdateInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
     public function getItemRequestHistoryInteractor()
     {
         return new class(
@@ -573,6 +652,231 @@ class UseCaseProvider
             $this->repositoryProvider,
             $this->presenterProvider
         ) extends ItemRequestUpdateInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getAccountantRegisterInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends AccountantRegisterInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getAccountantIndexInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends AccountantIndexInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getAccountantItemsIndexInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends AccountantItemsIndexInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getAccountantLogsIndexInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends AccountantLogsIndexInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getAccountantShowInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends AccountantShowInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getAccountantUpdateInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends AccountantUpdateInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getItemListIndexInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends ItemListIndexInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getItemListRegisterInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends ItemListRegisterInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getAcceptanceRegisterInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends AcceptanceRegisterInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getItemListShowInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends ItemListShowInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getItemListUpdateInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends ItemListUpdateInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getStocktakingListIndexInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends StocktakingListIndexInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getStocktakingListRegisterInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends StocktakingListRegisterInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getStocktakingListShowInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends StocktakingListShowInteractor {
+            public function __construct(
+                RepositoryProvider $repositoryProvider,
+                PresenterProvider $presenterProvider
+            ) {
+                parent::__construct($presenterProvider, $repositoryProvider);
+            }
+        };
+    }
+
+    public function getStocktakingListUpdateInteractor()
+    {
+        return new class(
+            $this->repositoryProvider,
+            $this->presenterProvider
+        ) extends StocktakingListUpdateInteractor {
             public function __construct(
                 RepositoryProvider $repositoryProvider,
                 PresenterProvider $presenterProvider
