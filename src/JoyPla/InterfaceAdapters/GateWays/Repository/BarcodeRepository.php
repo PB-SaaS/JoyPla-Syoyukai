@@ -65,6 +65,7 @@ class BarcodeRepository implements BarcodeRepositoryInterface
         );
         //$instance = OrderItemView::where('hospitalId', $hospitalId->value());
         $instance->where('itemJANCode', $jancode);
+        $instance->where('orderStatus', OrderStatus::UnOrdered , '!=');
 
         $instance->orWhere('receivingFlag', '0');
         $instance->orWhere('receivingFlag', '0', 'ISNULL');
@@ -137,6 +138,7 @@ class BarcodeRepository implements BarcodeRepositoryInterface
             $hospitalId->value()
         );
         $instance->where('inHospitalItemId', $inHospitalItemId->value());
+        $instance->where('orderStatus', OrderStatus::UnOrdered , '!=');
         $instance->where('receivingFlag', '1', '!=');
 
         if ($divisionId instanceof DivisionId) {

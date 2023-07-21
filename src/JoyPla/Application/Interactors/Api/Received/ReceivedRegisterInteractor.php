@@ -4,25 +4,19 @@
  * USECASE
  */
 namespace JoyPla\Application\Interactors\Api\Received {
-    use App\Model\Division;
     use Exception;
     use framework\Exception\NotFoundException;
     use JoyPla\Application\InputPorts\Api\Received\ReceivedRegisterInputData;
     use JoyPla\Application\InputPorts\Api\Received\ReceivedRegisterInputPortInterface;
     use JoyPla\Application\OutputPorts\Api\Received\ReceivedRegisterOutputData;
-    use JoyPla\Application\OutputPorts\Api\Received\ReceivedRegisterOutputPortInterface;
-    use JoyPla\Enterprise\Models\Accountant;
     use JoyPla\Enterprise\Models\AccountantService;
     use JoyPla\Enterprise\Models\DateYearMonthDay;
     use JoyPla\Enterprise\Models\DateYearMonthDayHourMinutesSecond;
-    use JoyPla\Enterprise\Models\OrderId;
     use JoyPla\Enterprise\Models\HospitalId;
     use JoyPla\Enterprise\Models\InventoryCalculation;
     use JoyPla\Enterprise\Models\Lot;
     use JoyPla\Enterprise\Models\LotDate;
     use JoyPla\Enterprise\Models\LotNumber;
-    use JoyPla\Enterprise\Models\Order;
-    use JoyPla\Enterprise\Models\OrderItemId;
     use JoyPla\Enterprise\Models\OrderStatus;
     use JoyPla\Enterprise\Models\Price;
     use JoyPla\Enterprise\Models\Received;
@@ -33,11 +27,6 @@ namespace JoyPla\Application\Interactors\Api\Received {
     use JoyPla\Enterprise\Models\ReceivedStatus;
     use JoyPla\Enterprise\Models\Redemption;
     use JoyPla\Enterprise\Models\ReturnQuantity;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\DivisionRepositoryInterface;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\InventoryCalculationRepositoryInterface;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\OrderRepositoryInterface;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\ReceivedRepositoryInterface;
-    use JoyPla\InterfaceAdapters\GateWays\Repository\stockRepositoryInterface;
     use JoyPla\Service\Presenter\Api\PresenterProvider;
     use JoyPla\Service\Repository\RepositoryProvider;
 
@@ -92,6 +81,11 @@ namespace JoyPla\Application\Interactors\Api\Received {
             $receiveds = [];
             $inventoryCalculations = [];
             foreach ($orders as $orderKey => $order) {
+
+                if($order->getOrderStatus()->value() === OrderStatus::UnOrdered) {
+                    throw new Exception('is UnOrdered.', 400);
+                }
+
                 $received = new Received(
                     $order->getOrderId(),
                     ReceivedId::generate(),
