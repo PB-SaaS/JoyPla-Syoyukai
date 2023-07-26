@@ -145,6 +145,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         [OrderController::class, 'unapprovedItemDelete']
     )->service($useCaseProvider->getOrderUnapprovedItemDeleteInteractor());
 
+    Router::map('POST', '/api/order/items', [
+        OrderController::class,
+        'items',
+    ]);
+
     Router::map('GET', '/api/order/show', [
         OrderController::class,
         'show',

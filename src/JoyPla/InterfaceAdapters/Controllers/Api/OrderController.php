@@ -409,4 +409,11 @@ class OrderController extends Controller
 
         echo (new ApiResponse([$result], 1, 200, 'success', []))->toJson();
     }
+
+    public function items(){
+        $order = ModelRepository::getOrderInstance()
+            ->where('hospitalId', $this->request->user()->hospitalId)
+            ->where('orderNumber', $vars['orderId'])
+            ->get();
+    }
 }

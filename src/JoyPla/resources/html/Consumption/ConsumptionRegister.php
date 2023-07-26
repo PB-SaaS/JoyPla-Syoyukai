@@ -1,6 +1,6 @@
 <div id="top" v-cloak>
   <header-navi></header-navi>
-  <v-loading :show="loading"></v-loading>
+  <v-loading :show="loading" :text="loadingText"></v-loading>
   <v-breadcrumbs :items="breadcrumbs"></v-breadcrumbs>
   <div id="content" class="flex h-full px-1">
     <div class="flex-auto">
@@ -44,6 +44,14 @@
             <v-button-default type="button" data-micromodal-trigger="inHospitalItemModal">商品検索</v-button-default>
             <v-in-hospital-item-modal v-on:additem="additem" :unit-price-use="consumptionUnitPriceUseFlag">
             </v-in-hospital-item-modal>
+          </div>
+          <div class="my-4 w-full items-center flex">
+            <div class="mx-2">
+              <v-switch id="isOrder" v-model="isOrder" :message="(isOrder)? '発注書を作成する' : '発注書を作成しない'"></v-switch>
+            </div>
+            <div class="mx-2" v-if="isOrder">
+              <v-switch id="integrate" v-model="integrate" :message="(integrate)? '既存の未発注伝票に追加します' : '新規発行します'"></v-switch>
+            </div>
           </div>
           <div class="p-2 bg-gray-300">
             <v-barcode-search @additem="addItemByBarcode"></v-barcode-search>
@@ -203,7 +211,8 @@ var JoyPlaApp = Vue.createApp({
       const consumptionUnitPriceUseFlag = "<?php echo $consumptionUnitPriceUseFlag; ?>";
 
       const loading = ref(false);
-      const start = () => {
+      const loadingText = ref('');
+      const start = (text) => {
           loading.value = true;
       }
 
@@ -280,11 +289,33 @@ var JoyPlaApp = Vue.createApp({
         });
         return consumeItems;
       };
+      
+      const createOrderModel = (values) => {
+        let items = values.consumeItems;
+        let orderItems = [];
+        items.forEach(function(item, idx) {
+          if (orderQuantity(idx) !== 0) {
+            orderItems.push({
+              'inHospitalItemId': item.inHospitalItemId,
+              'orderUnitQuantity': parseInt(orderQuantity(idx)),
+              'divisionId': values.divisionId,
+            });
+          }
+        });
+        return orderItems;
+      };
 
       const consumeQuantity = (idx) => {
         let num = 0;
         num += parseInt(values.consumeItems[idx].consumeQuantity);
         num += parseInt(values.consumeItems[idx].quantity * values.consumeItems[idx].consumeUnitQuantity);
+        return num;
+      };
+      
+      const orderQuantity = (idx) => {
+        let num = 0;
+        num += parseInt(values.consumeItems[idx].consumeUnitQuantity);
+        num += Math.ceil(values.consumeItems[idx].consumeQuantity / values.consumeItems[idx].quantity);
         return num;
       };
 
@@ -361,8 +392,34 @@ var JoyPlaApp = Vue.createApp({
         }
       };
 
+      const postConsumptionRegister = async (consumptionModels) => {
+        let params = new URLSearchParams();
+        params.append("path", "/api/consumption/register");
+        params.append("_method", 'post');
+        params.append("_csrf", _CSRF);
+        params.append("consumptionType", values.type);
+        params.append("consumptionDate", values.consumeDate);
+        params.append("consumptionItems", JSON.stringify(encodeURIToObject(consumptionModels)));
+
+        return await axios.post(_APIURL,params);
+      }
+
+      const postOrderRegister = async (orderModels) => {
+
+        let params = new URLSearchParams();
+        params.append("path", "/api/order/register");
+        params.append("_method", 'post');
+        params.append("_csrf", _CSRF);
+        //params.append("orderDate", values.orderDate);
+        params.append("integrate", integrate.value);
+        params.append("orderItems", JSON.stringify(encodeURIToObject(orderModels)));
+
+        return await axios.post(_APIURL,params);
+      }
+
       const consumptionRegister = handleSubmit(async (values) => {
         try {
+            let orderModels = [];
             const consumptionModels = createConsumptionModel(values);
             if( consumptionModels.length === 0)
             {
@@ -373,21 +430,35 @@ var JoyPlaApp = Vue.createApp({
               })
               return false;
             }
-            
-            let params = new URLSearchParams();
-            params.append("path", "/api/consumption/register");
-            params.append("_method", 'post');
-            params.append("_csrf", _CSRF);
-            params.append("consumptionType", values.type);
-            params.append("consumptionDate", values.consumeDate);
-            params.append("consumptionItems", JSON.stringify(encodeURIToObject(consumptionModels)));
 
-            const res = await axios.post(_APIURL,params);
-            
+            if(isOrder.value){
+              orderModels = createOrderModel(values);
+              console.log(orderModels);
+              if (orderModels.length === 0) {
+                Swal.fire({
+                  icon: 'error',
+                  title: '登録する商品がありませんでした。',
+                  text: '内容を確認の上、再送信をしてください。',
+                })
+                return false;
+              }
+            }
+
+            loadingText.value = '消費登録中...';
+            const res = await postConsumptionRegister(consumptionModels);
+
             if(res.data.code != 200) {
               throw new Error(res.data.message)
             }
-            
+
+            if(isOrder.value){
+              loadingText.value = '発注登録中...';
+              const orderRes = await postOrderRegister(orderModels);
+              if(orderRes.data.code != 200) {
+                throw new Error(orderRes.data.message)
+              }
+            }
+
             Swal.fire({
                 icon: 'success',
                 title: '登録が完了しました。',
@@ -402,7 +473,6 @@ var JoyPlaApp = Vue.createApp({
               text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
             });
           }
-          
       });
 
       const updateItem = (idx, key , value) => {
@@ -513,14 +583,21 @@ var JoyPlaApp = Vue.createApp({
         { label: "通常消費", value: "1" },
         { label: "直納処理", value: "3" }
       ];
+      
+      const integrate = ref(localStorage.joypla_unorder_slip_integrate === 'true');
+
+      const isOrder = ref(localStorage.joypla_is_order === 'true');
 
       return {
+        isOrder,
+        integrate,
         consumeTypes,
         values,
         addItemByBarcode,
         selectInHospitalItems,
         openModal,
         loading, 
+        loadingText,
         start, 
         complete,
         itemCount,
@@ -545,6 +622,12 @@ var JoyPlaApp = Vue.createApp({
       };
     },
     watch: {
+      integrate(bool) {
+        localStorage.joypla_unorder_slip_integrate = bool;
+      },
+      isOrder(bool) {
+        localStorage.joypla_is_order = bool;
+      },
       isSubmitting(){
         this.loading = this.isSubmitting;
       },
@@ -576,6 +659,7 @@ var JoyPlaApp = Vue.createApp({
       'v-input-number': vInputNumber,
       'v-in-hospital-item-modal': vInHospitalItemModal,
       'v-open-modal': vOpenModal,
+      'v-switch': vSwitch,
       'header-navi' : headerNavi
     },
 }).mount('#top');

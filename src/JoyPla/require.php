@@ -158,6 +158,7 @@ require_once('JoyPla/InterfaceAdapters/Controllers/Web/OrderController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/PayoutController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/PriceAndInHospitalItemRegisterController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/ReceivedController.php');
+require_once('JoyPla/InterfaceAdapters/Controllers/Web/ReceivedLabelController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/ReturnController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/StocktakingController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/StocktakingListController.php');

@@ -363,8 +363,6 @@ EOM;
         }
         return $response;
     }
-
-    
     private function convertInputDataForAcceptance(array $requestData)
     {
         $response = [];

@@ -355,7 +355,6 @@
             text: 'システムエラーが発生しました。\r\nしばらく経ってから再度送信してください。',
           });
         }
-
       });
 
       const updateItem = (idx, key, value) => {

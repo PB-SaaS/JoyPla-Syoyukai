@@ -168,4 +168,15 @@ class OrderController extends Controller
         );
         $inputPort->handle($inputData);
     }
+
+    public function items(){
+
+        $body = View::forge(
+            'html/Order/Items',
+            [],
+            false
+        )->render();
+
+        echo view('html/Common/Template', compact('body'), false)->render();
+    }
 }

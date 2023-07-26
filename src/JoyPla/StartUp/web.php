@@ -150,6 +150,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
     ])->service($useCaseProvider->getUnapprovedOrderIndexInteractor());
 
     Router::map('GET', '/order/show', [OrderController::class, 'show']);
+    
+    Router::map('GET', '/order/items', [
+        OrderController::class,
+        'items',
+    ]);
 
     Router::map('GET', '/order/:orderId', [
         OrderController::class,
@@ -166,6 +171,7 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'print',
     ])->service($useCaseProvider->getOrderPrintInteractor());
 
+ 
     Router::map('GET', '/received/show', [ReceivedController::class, 'show']);
 
     Router::map('GET', '/received/register', [

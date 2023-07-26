@@ -142,8 +142,9 @@
                           label="価格"
                           title=""
                           suffix="&yen;"
-                          :rules="{ between: [-99999 , 99999] }"
+                          :rules="{ between: [-9999999999999.99 , 9999999999999.99] }"
                           class="w-24"
+                          step="0.01"
                           change-class-name="inputChange"
                           ></v-input>
                       </td>
@@ -154,8 +155,9 @@
                           type="number"
                           label="税率"
                           title=""
+                          step="0.01"
                           prefix="%"
-                          :rules="{ between: [-99999 , 99999] }"
+                          :rules="{ between: [-9999999999999.99 , 9999999999999.99] }"
                           class="w-24"
                           change-class-name="inputChange"
                           ></v-input>
