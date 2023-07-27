@@ -314,6 +314,7 @@ class AccountantRepository implements AccountantRepositoryInterface
 
             foreach ($accountant->getItems() as $item) {
                 $item = $item->toArray();
+            
                 $itemUpsert[] = [
                     'updateTime' => 'now',
                     'accountantId' => (string) $accountant

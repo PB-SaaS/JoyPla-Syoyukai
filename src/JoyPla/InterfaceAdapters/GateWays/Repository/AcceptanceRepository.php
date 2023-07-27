@@ -125,6 +125,7 @@ class AcceptanceRepository implements AcceptanceRepositoryInterface
 
             $itemInstance->orWhere('acceptanceId', $acceptance['acceptanceId'], '=');
             foreach ($acceptance['items'] as $item) {
+                
                 $itemUpsert[] = [
                     'updateTime' => 'now',
                     'acceptanceId' => (string)$item['acceptanceId'],

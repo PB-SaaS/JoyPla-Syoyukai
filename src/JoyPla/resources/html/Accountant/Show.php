@@ -141,8 +141,9 @@
                           type="number"
                           label="価格"
                           title=""
+                          step="0.01"
                           suffix="&yen;"
-                          :rules="{ between: [-99999 , 99999] }"
+                          :rules="{ between: [-9999999999999.99 , 9999999999999.99] , decimal: 2 }"
                           class="w-24"
                           change-class-name="inputChange"
                           ></v-input>
@@ -155,7 +156,8 @@
                           label="税率"
                           title=""
                           prefix="%"
-                          :rules="{ between: [-99999 , 99999] }"
+                          step="0.01"
+                          :rules="{ between: [-9999999999999.99 , 9999999999999.99] , decimal: 2 }"
                           class="w-24"
                           change-class-name="inputChange"
                           ></v-input>
@@ -277,7 +279,7 @@
                           <v-input
                             name="register.price"
                             type="number"
-                            :rules="{ between: [-99999 , 99999] }" 
+                            :rules="{ between: [-9999999999999.99 , 9999999999999.99] }"
                             label="価格"
                             title="価格"
                             suffix="&yen;"
@@ -287,7 +289,7 @@
                           <v-input
                             name="register.taxrate"
                             type="number"
-                            :rules="{ between: [-99999 , 99999] }" 
+                            :rules="{ between: [-9999999999999.99 , 9999999999999.99] }"
                             label="税率"
                             title="税率"
                             prefix="%"
@@ -421,7 +423,7 @@ var JoyPlaApp = Vue.createApp({
         startLoading();
         const response = await getSlipData(accountantId);
         values.accountant = response.data;
-        replace(response.data.items);
+        replace(response.data.items.sort((a, b) => a.index - b.index));
         completeLoading();
       };
       
