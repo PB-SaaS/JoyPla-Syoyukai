@@ -275,7 +275,8 @@ var JoyPlaApp = Vue.createApp({
         startLoading();
         const response = await getSlipData(stocktakingListId);
         values.stocktakingList = response.data;
-        replace(response.data.items);
+        replace(response.data.items.sort((a, b) => a.index - b.index));
+
         completeLoading();
       };
       

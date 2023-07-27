@@ -107,14 +107,14 @@
                                         <td>&yen;{{ i.price | number_format }}</td>
                                         <td>&yen;{{ i.unitPrice  | number_format }}</td>
                                         <td>{{ i.quantity | number_format }}{{ i.quantityUnit }}</td>
-                                        <td>{{ get_before_inventory_nums(i.inHospitalItemId).count | number_format }}{{ i.quantityUnit }}</td>
-                                        <td>&yen;{{ Math.round( get_before_inventory_nums(i.inHospitalItemId).count * i.unitPrice * 100 ) / 100 | number_format }}</td>
-                                        <td>{{ get_receiving_nums(i.inHospitalItemId).count | number_format }}{{ i.quantityUnit }}</td>
-                                        <td>&yen;{{ get_receiving_nums(i.inHospitalItemId).price  | number_format }}</td>
-                                        <td>{{ get_consumed_nums(i.inHospitalItemId).count | number_format }}{{ i.quantityUnit }}</td>
-                                        <td>&yen;{{ get_consumed_nums(i.inHospitalItemId).price  | number_format }}</td>
-                                        <td>{{ get_inventory_nums(i.inHospitalItemId).count | number_format }}{{ i.quantityUnit }}</td>
-                                        <td>&yen;{{ Math.round( get_inventory_nums(i.inHospitalItemId).count * i.unitPrice * 100 ) / 100  | number_format }}</td>
+                                        <td>{{ get_before_inventory_nums(i.inHospitalItemId , i.divisionId).count | number_format }}{{ i.quantityUnit }}</td>
+                                        <td>&yen;{{ Math.round( get_before_inventory_nums(i.inHospitalItemId , i.divisionId).count * i.unitPrice * 100 ) / 100 | number_format }}</td>
+                                        <td>{{ get_receiving_nums(i.inHospitalItemId , i.divisionId).count | number_format }}{{ i.quantityUnit }}</td>
+                                        <td>&yen;{{ get_receiving_nums(i.inHospitalItemId , i.divisionId).price  | number_format }}</td>
+                                        <td>{{ get_consumed_nums(i.inHospitalItemId , i.divisionId).count | number_format }}{{ i.quantityUnit }}</td>
+                                        <td>&yen;{{ get_consumed_nums(i.inHospitalItemId , i.divisionId).price  | number_format }}</td>
+                                        <td>{{ get_inventory_nums(i.inHospitalItemId , i.divisionId).count | number_format }}{{ i.quantityUnit }}</td>
+                                        <td>&yen;{{ Math.round( get_inventory_nums(i.inHospitalItemId , i.divisionId).count * i.unitPrice * 100 ) / 100  | number_format }}</td>
                                     </tr>
                                 </tbody>
                                 <tfoot>
@@ -294,28 +294,28 @@
             get_before_inventory_total_price: function() {
                 let num = 0;
                 this.items.forEach(function(i) {
-                    num += Math.round(app.get_before_inventory_nums(i.inHospitalItemId).count * i.unitPrice * 100) / 100;
+                    num += Math.round(app.get_before_inventory_nums(i.inHospitalItemId , i.divisionId).count * i.unitPrice * 100) / 100;
                 });
                 return num;
             },
             get_receivig_total_price: function() {
                 let num = 0;
                 this.items.forEach(function(i) {
-                    num += app.get_receiving_nums(i.inHospitalItemId).price;
+                    num += app.get_receiving_nums(i.inHospitalItemId , i.divisionId).price;
                 });
                 return num;
             },
             get_consumed_total_price: function() {
                 let num = 0;
                 this.items.forEach(function(i) { 
-                    num += app.get_consumed_nums(i.inHospitalItemId).price;
+                    num += app.get_consumed_nums(i.inHospitalItemId , i.divisionId).price;
                 });
                 return num;
             },
             get_inventory_total_price: function() {
                 let num = 0;
                 this.items.forEach(function(i) {
-                    num += Math.round(app.get_inventory_nums(i.inHospitalItemId).count * i.unitPrice * 100) / 100;
+                    num += Math.round(app.get_inventory_nums(i.inHospitalItemId , i.divisionId).count * i.unitPrice * 100) / 100;
                 });
                 return num;
             },
@@ -332,11 +332,11 @@
                     };
                 }
             },
-            get_before_inventory_nums: function(in_hospital_id) {
+            get_before_inventory_nums: function(in_hospital_id , divisionId) {
                 if (!in_hospital_id) {
                     return {}
                 }
-                let res = app.beforeInventoryNums.find(i => i.inHospitalItemId === in_hospital_id);
+                let res = app.beforeInventoryNums.find(i => i.inHospitalItemId === in_hospital_id && i.divisionId === divisionId);
                 if (res) {
                     return res;
                 } else {
@@ -346,11 +346,11 @@
                     };
                 }
             },
-            get_inventory_nums: function(in_hospital_id) {
+            get_inventory_nums: function(in_hospital_id , divisionId) {
                 if (!in_hospital_id) {
                     return {}
                 }
-                let res = app.inventoryNums.find(i => i.inHospitalItemId === in_hospital_id);
+                let res = app.inventoryNums.find(i => i.inHospitalItemId === in_hospital_id && i.divisionId === divisionId);
                 if (res) {
                     return res;
                 } else {
@@ -360,11 +360,11 @@
                     };
                 }
             },
-            get_receiving_nums: function(in_hospital_id) {
+            get_receiving_nums: function(in_hospital_id , divisionId) {
                 if (!in_hospital_id) {
                     return {}
                 }
-                let res = app.receivingNums.find(i => i.inHospitalItemId === in_hospital_id);
+                let res = app.receivingNums.find(i => i.inHospitalItemId === in_hospital_id && i.divisionId === divisionId);
                 if (res) {
                     return res;
                 } else {
@@ -374,11 +374,11 @@
                     };
                 }
             },
-            get_consumed_nums: function(in_hospital_id) {
+            get_consumed_nums: function(in_hospital_id , divisionId) {
                 if (!in_hospital_id) {
                     return {}
                 }
-                let res = app.consumedNums.find(i => i.inHospitalItemId === in_hospital_id);
+                let res = app.consumedNums.find(i => i.inHospitalItemId === in_hospital_id && i.divisionId === divisionId);
                 if (res) {
                     return res;
                 } else {
@@ -584,14 +584,14 @@
                         app.items[i].unitPrice,
                         app.items[i].quantity,
                         app.items[i].quantityUnit,
-                        app.get_before_inventory_nums(app.items[i].inHospitalItemId).count,
-                        Math.round(app.get_before_inventory_nums(app.items[i].inHospitalItemId).count * app.items[i].unitPrice * 100) / 100,
-                        app.get_receiving_nums(app.items[i].inHospitalItemId).count,
-                        app.get_receiving_nums(app.items[i].inHospitalItemId).price,
-                        app.get_consumed_nums(app.items[i].inHospitalItemId).count,
-                        app.get_consumed_nums(app.items[i].inHospitalItemId).price,
-                        app.get_inventory_nums(app.items[i].inHospitalItemId).count,
-                        Math.round(app.get_inventory_nums(app.items[i].inHospitalItemId).count * app.items[i].unitPrice * 100) / 100,
+                        app.get_before_inventory_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).count,
+                        Math.round(app.get_before_inventory_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).count * app.items[i].unitPrice * 100) / 100,
+                        app.get_receiving_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).count,
+                        app.get_receiving_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).price,
+                        app.get_consumed_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).count,
+                        app.get_consumed_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).price,
+                        app.get_inventory_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).count,
+                        Math.round(app.get_inventory_nums(app.items[i].inHospitalItemId , app.items[i].divisionId).count * app.items[i].unitPrice * 100) / 100,
                         app.hospitalName,
                         app.items[i].divisionName,
                     ];

@@ -1,5 +1,3 @@
-
-
 function getTwoFieldRequiredParam(params){
   if (!params) {
       return {
@@ -95,6 +93,15 @@ VeeValidate.defineRule('lotnumber', value => {
   return false;
 });
 
+
+
+VeeValidate.defineRule('decimal', (value, params , ctx) => {
+    const regex = new RegExp(`^-?\\d*(\\.\\d{1,${params[0]}})?$`);
+    if(regex.test(value)){ return true; }
+    return `${ctx.field}は小数点以下${params[0]}桁の数字でなければなりません`;
+});
+
+
 VeeValidate.configure({
   generateMessage: VeeValidateI18n.localize('ja', {
     messages: {
@@ -103,4 +110,3 @@ VeeValidate.configure({
     },
   }),
 });
-

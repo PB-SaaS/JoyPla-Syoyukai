@@ -124,13 +124,6 @@ class ItemListRepository implements ItemListRepositoryInterface
             ->where('hospitalId', $hospitalId->value())
             ->get()
             ->first();
-/* ここいらないはず
-        $distributor = ModelRepository::getDistributorInstance()
-            ->where('distributorId', $accountant->distributorId)
-            ->where('hospitalId', $hospitalId->value())
-            ->get()
-            ->first();
- */
 
         $itemList = new ItemList(
             new ItemListId($itemList->itemListId),
@@ -141,17 +134,9 @@ class ItemListRepository implements ItemListRepositoryInterface
             $itemList->itemListName ?? null,
             $itemList->usableStatus,
             $itemList->itemsNumber
-/* ここいらないはず
-            $accountant->distributorId
-                ? new DistributorId($accountant->distributorId)
-                : null,
- */
         );
 
         $itemList->_division = $division;
-/* 
-        $accountant->_distributor = $distributor;
- */
 
         $items = ModelRepository::getItemListRowsViewInstance() //多分仮想DBのほう。画面表示に使いそうだし。
             ->where('itemListId', $itemListId->value())

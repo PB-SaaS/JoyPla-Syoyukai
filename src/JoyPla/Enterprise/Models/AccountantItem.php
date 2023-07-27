@@ -143,10 +143,10 @@ class AccountantItem
         $result['itemJANCode'] = $this->itemJANCode
             ? $this->itemJANCode->value()
             : null;
-        $result['count'] = $this->count;
+        $result['count'] = (string)$this->count;
         $result['unit'] = $this->unit;
-        $result['price'] = $this->price;
-        $result['taxrate'] = $this->taxrate;
+        $result['price'] = (string)$this->price;
+        $result['taxrate'] = (string)$this->taxrate;
 
         foreach ($this->option as $field => $value) {
             if (is_object($value)) {
