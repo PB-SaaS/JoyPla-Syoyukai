@@ -279,7 +279,8 @@
                           <v-input
                             name="register.price"
                             type="number"
-                            :rules="{ between: [-9999999999999.99 , 9999999999999.99] }"
+                            step="0.01"
+                            :rules="{ between: [-9999999999999.99 , 9999999999999.99] , decimal: 2 }"
                             label="価格"
                             title="価格"
                             suffix="&yen;"
@@ -289,7 +290,8 @@
                           <v-input
                             name="register.taxrate"
                             type="number"
-                            :rules="{ between: [-9999999999999.99 , 9999999999999.99] }"
+                            step="0.01"
+                            :rules="{ between: [-9999999999999.99 , 9999999999999.99] , decimal: 2 }"
                             label="税率"
                             title="税率"
                             prefix="%"

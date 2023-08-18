@@ -25,6 +25,7 @@ use JoyPla\InterfaceAdapters\Controllers\Web\TopController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ItemRequestController;
 use JoyPla\InterfaceAdapters\Controllers\Web\ItemListController;
 use JoyPla\InterfaceAdapters\Controllers\Web\LabelController;
+use JoyPla\InterfaceAdapters\Controllers\Web\ProductController;
 use JoyPla\InterfaceAdapters\Controllers\Web\StocktakingListController;
 use JoyPla\InterfaceAdapters\GateWays\Middleware\PersonalInformationConsentMiddleware;
 use JoyPla\InterfaceAdapters\GateWays\Middleware\UnorderDataExistMiddleware;
@@ -339,6 +340,7 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'print',
     ])/* ->service($useCaseProvider->getItemListPrintInteractor()) */;
 
+    
     Router::map('GET', 'acceptance', [
         AcceptanceController::class,
         'index',
@@ -355,6 +357,11 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'print',
     ]);
     
+    Router::map('GET', 'product/label/index', [
+        ProductController::class,
+        'labelIndex',
+    ]);
+
     Router::map('GET', '/label/payout/:payoutId', [
         LabelController::class,
         'payoutLabelPrint',

@@ -118,7 +118,7 @@ class DatabaseSchemaCheck extends Command
         }
         foreach($response['schema']['fieldList'] as $field)
         {
-            echo $field['title'] . PHP_EOL;
+            echo "'" . $field['title'] ."'," . PHP_EOL;
         }
         return true;
     }

@@ -26,6 +26,7 @@ use JoyPla\InterfaceAdapters\Controllers\Api\PayoutController;
 use JoyPla\InterfaceAdapters\Controllers\Api\AccountantController;
 use JoyPla\InterfaceAdapters\Controllers\Api\AccountantLogController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ItemListController; //商品一覧表用
+use JoyPla\InterfaceAdapters\Controllers\Api\ProductController;
 use JoyPla\InterfaceAdapters\Controllers\Api\StockController;
 use JoyPla\InterfaceAdapters\Controllers\Api\StocktakingListController; //棚卸商品管理表用
 use JoyPla\JoyPlaApplication;
@@ -145,7 +146,7 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
         [OrderController::class, 'unapprovedItemDelete']
     )->service($useCaseProvider->getOrderUnapprovedItemDeleteInteractor());
 
-    Router::map('POST', '/api/order/items', [
+    Router::map('GET', '/api/order/items', [
         OrderController::class,
         'items',
     ]);
@@ -379,6 +380,11 @@ Router::group(VerifyCsrfTokenMiddleware::class, function () use (
     Router::map('get', '/api/accountant/logs/totalPrice', [
         AccountantLogController::class,
         'totalPrice',
+    ]);
+    
+    Router::map('GET', '/api/product/label/items', [
+        ProductController::class,
+        'items',
     ]);
 
     Router::map('GET', '/api/product/itemList/index', [
