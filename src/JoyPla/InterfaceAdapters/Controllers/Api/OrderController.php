@@ -412,44 +412,4 @@ class OrderController extends Controller
 
         echo (new ApiResponse([$result], 1, 200, 'success', []))->toJson();
     }
-
-    public function items($vars){
-        $search = $this->request->get('search',[]);
-        $user = $this->request->user();
-        if (Gate::allows('is_user')) {
-            $search['divisionIds'] = [$user->divisionId];
-        }
-
-        $searchObject = new stdClass();
-        $searchObject->registerDate = $search['registerDate'];
-        $searchObject->orderDate = $search['orderDate'];
-        $searchObject->itemName = $search['itemName'];
-        $searchObject->makerName = $search['makerName'];
-        $searchObject->itemCode = $search['itemCode'];
-        $searchObject->itemStandard = $search['itemStandard'];
-        $searchObject->itemJANCode = $search['itemJANCode'];
-        $searchObject->distributorIds = $search['distributorIds'];
-        $searchObject->divisionIds = $search['divisionIds'];
-        $searchObject->perPage = $search['perPage'];
-        $searchObject->currentPage = $search['currentPage'];
-        $searchObject->category = $search['category'];
-        $searchObject->smallCategory = $search['smallCategory'];
-        $searchObject->catalogNo = $search['catalogNo'];
-        $searchObject->medicineCategory = $search['medicineCategory'];
-        $searchObject->homeCategory = $search['homeCategory'];
-        $searchObject->receivedFlag = 0; // null("") is not search
-        $searchObject->orderStatus = [
-            OrderStatus::OrderCompletion,
-            OrderStatus::OrderFinished,
-            OrderStatus::PartOfTheCollectionIsIn,
-            OrderStatus::DeliveryDateReported,
-        ];
-
-        [ $items , $count ]  = (new RepositoryProvider())->getOrderRepository()->searchItems(
-            new HospitalId($this->request->user()->hospitalId),
-            $searchObject
-        );
-
-        echo (new ApiResponse($items , $count , 0 , '' ))->toJson();
-    }
 }
