@@ -21,7 +21,7 @@ require_once 'NewJoyPla/core/Csrf.php';
 
 require_once 'NewJoyPla/lib/ApiSpiral.php';
 require_once 'NewJoyPla/lib/Logger.php';
-require_once 'NewJoyPla/lib/LoggingSpiralv2.php';
+//require_once 'NewJoyPla/lib/LoggingSpiralv2.php';
 require_once 'NewJoyPla/lib/UserInfo.php';
 require_once 'NewJoyPla/lib/SpiralDataBase.php';
 require_once 'NewJoyPla/lib/SpiralSendMail.php';
