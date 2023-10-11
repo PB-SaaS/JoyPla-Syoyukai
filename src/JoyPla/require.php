@@ -138,6 +138,7 @@ require_once('JoyPla/InterfaceAdapters/Controllers/Api/NotificationController.ph
 require_once('JoyPla/InterfaceAdapters/Controllers/Api/OrderController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Api/PayoutController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Api/PriceAndInHospitalItemController.php');
+require_once('JoyPla/InterfaceAdapters/Controllers/Api/ProductController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Api/ReceivedController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Api/ReferenceController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Api/ReturnController.php');
@@ -157,7 +158,9 @@ require_once('JoyPla/InterfaceAdapters/Controllers/Web/OptionController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/OrderController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/PayoutController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/PriceAndInHospitalItemRegisterController.php');
+require_once('JoyPla/InterfaceAdapters/Controllers/Web/ProductController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/ReceivedController.php');
+require_once('JoyPla/InterfaceAdapters/Controllers/Web/ReceivedLabelController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/ReturnController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/StocktakingController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/StocktakingListController.php');

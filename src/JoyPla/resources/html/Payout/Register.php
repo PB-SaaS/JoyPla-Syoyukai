@@ -1,6 +1,6 @@
 <div id="top" v-cloak>
   <header-navi></header-navi>
-  <v-loading :show="loading"></v-loading>
+  <v-loading :show="loading" :text="loadingText"></v-loading>
   <v-breadcrumbs :items="breadcrumbs"></v-breadcrumbs>
   <div id="content" class="flex h-full px-1">
     <div class="flex-auto">
@@ -33,8 +33,19 @@
                 <v-consumption-history-modal-for-item-request v-on:addconsumptions="additemsForSlip" :source-division-id="values.targetDivisionId">
                 </v-consumption-history-modal-for-item-request>
               </div>
-              <div class="my-4 items-center">
-                <v-switch id="labelCreate" v-model="labelCreate" :message="(labelCreate)? 'ラベル発行をする' : 'ラベル発行をしない'"></v-switch>
+              <div class="my-4 w-full items-center flex">
+                <div class="mx-2">
+                  <v-switch id="labelCreate" v-model="labelCreate" :message="(labelCreate)? 'ラベル発行をする' : 'ラベル発行をしない'"></v-switch>
+                </div>
+                <?php 
+                if(gate('is_admin')): 
+                ?>
+                <div class="mx-2">
+                  <v-switch id="isConsumption" v-model="isConsumption" :message="(isConsumption)? '払出先の消費登録を行う' : '払出先の消費登録を行わない'"></v-switch>
+                </div>
+                <?php 
+                endif;
+                ?>
               </div>
             </div>
             <div class="p-2 bg-gray-300">
@@ -202,6 +213,7 @@
       
       const payoutUnitPriceUseFlag = "<?php echo $payoutUnitPriceUseFlag; ?>";
 
+      const loadingText = ref('');
       const loading = ref(false);
       const start = () => {
         loading.value = true;
@@ -254,7 +266,7 @@
       } = useFieldArray('payoutItems', control);
     
       const labelCreate = ref(localStorage.joypla_payoutLabelCreate === 'true');
-
+      const isConsumption = ref(localStorage.joypla_is_consumption === 'true');
       const alertModel = reactive({
         message: "",
         headtext: "",
@@ -284,27 +296,6 @@
           disabled: true,
         }
       ];
-
-      const createPayoutModel = (values) => {
-        let items = values.payoutItems;
-        let payoutItems = [];
-        items.forEach(function(item, idx) {
-          item._payout.forEach(function(payout, pidx) {
-            if (payout.count != 0) {
-              payoutItems.push({
-                'inHospitalItemId': item.inHospitalItemId,
-                'payoutQuantity': parseInt(payout.count),
-                'targetDivisionId' : values.targetDivisionId,
-                'sourceDivisionId' : values.sourceDivisionId,
-                'lotNumber' : payout.lotNumber,
-                'lotDate' : payout.lotDate,
-                'card' : payout.card,
-              })
-            }
-          })
-        });
-        return payoutItems;
-      };
 
       const createAcceptanceModel = (values) => {
         let items = values.payoutItems;
@@ -429,6 +420,33 @@
             return false;
           }
           
+          <?php 
+          if(gate('is_admin')): 
+          ?>
+          if(isConsumption.value){
+            consumptionModels = createConsumptionModel(values);
+            if (consumptionModels.length === 0) {
+              Swal.fire({
+                icon: 'error',
+                title: '登録する商品がありませんでした。',
+                text: '内容を確認の上、再送信をしてください。',
+              })
+              return false;
+            }
+          }
+          
+          if(isConsumption.value){
+            loadingText.value = '消費登録中...';
+            const consumeRes = await postConsumptionRegister(consumptionModels);
+            if (consumeRes.data.code != 200) {
+              throw new Error(res.data.message)
+            }
+          }
+          <?php 
+          endif;
+          ?>
+
+          loadingText.value = '出庫登録中...';
           let params = new URLSearchParams();
           params.append("path", "/api/acceptance/register");
           params.append("_method", 'post');
@@ -464,8 +482,78 @@
 
       });
 
+
+      const postConsumptionRegister = async (consumptionModels) => {
+        let params = new URLSearchParams();
+        params.append("path", "/api/consumption/register");
+        params.append("_method", 'post');
+        params.append("_csrf", _CSRF);
+        params.append("consumptionType", '1');
+        params.append("consumptionDate", values.payoutDate);
+        params.append("consumptionItems", JSON.stringify(encodeURIToObject(consumptionModels)));
+
+        return await axios.post(_APIURL,params);
+      }
+      
+      const postPayoutRegister = async (payoutModels) => {
+          let params = new URLSearchParams();
+          params.append("path", "/api/payout/register");
+          params.append("_method", 'post');
+          params.append("_csrf", _CSRF);
+          params.append("isOnlyPayout", 'true');
+          params.append("payoutDate", values.payoutDate);
+          params.append("payoutItems", JSON.stringify(encodeURIToObject(payoutModels)));
+
+        return await axios.post(_APIURL,params);
+      }
+
+
+      const createPayoutModel = (values) => {
+        let items = values.payoutItems;
+        let payoutItems = [];
+        items.forEach(function(item, idx) {
+          item._payout.forEach(function(payout, pidx) {
+            if (payout.count != 0) {
+              payoutItems.push({
+                'inHospitalItemId': item.inHospitalItemId,
+                'payoutQuantity': parseInt(payout.count),
+                'targetDivisionId' : values.targetDivisionId,
+                'sourceDivisionId' : values.sourceDivisionId,
+                'lotNumber' : payout.lotNumber,
+                'lotDate' : payout.lotDate,
+                'card' : payout.card,
+              })
+            }
+          })
+        });
+        return payoutItems;
+      };
+      
+      const createConsumptionModel = ( values ) => {
+        let items = values.payoutItems;
+        let consumeItems = [];
+        items.forEach(function(item, idx) {
+          item._payout.forEach(function(payout, pidx) {
+            if (payout.count != 0) {
+              consumeItems.push({
+                'inHospitalItemId': item.inHospitalItemId,
+                'consumeLotDate': '',
+                'consumeLotNumber': '',
+                'consumeQuantity': parseInt(payout.count),
+                'consumeUnitQuantity': 0,
+                'divisionId' : values.targetDivisionId,
+                'cardId' : '',
+                'lotManagement' : false,
+              })
+            }
+          })
+        });
+        return consumeItems;
+      };
+
       const payoutRegister = handleSubmit(async (values) => {
         try {
+          let consumptionModels = [];
           const payoutModels = createPayoutModel(values);
           if (payoutModels.length === 0) {
             Swal.fire({
@@ -476,15 +564,34 @@
             return false;
           }
           
-          let params = new URLSearchParams();
-          params.append("path", "/api/payout/register");
-          params.append("_method", 'post');
-          params.append("_csrf", _CSRF);
-          params.append("isOnlyPayout", 'true');
-          params.append("payoutDate", values.payoutDate);
-          params.append("payoutItems", JSON.stringify(encodeURIToObject(payoutModels)));
+          <?php 
+          if(gate('is_admin')): 
+          ?>
+          if(isConsumption.value){
+            consumptionModels = createConsumptionModel(values);
+            if (consumptionModels.length === 0) {
+              Swal.fire({
+                icon: 'error',
+                title: '登録する商品がありませんでした。',
+                text: '内容を確認の上、再送信をしてください。',
+              })
+              return false;
+            }
+          }
 
-          const res = await axios.post(_APIURL, params);
+          if(isConsumption.value){
+            loadingText.value = '消費登録中...';
+            const consumeRes = await postConsumptionRegister(consumptionModels);
+            if (consumeRes.data.code != 200) {
+              throw new Error(res.data.message)
+            }
+          }
+          <?php 
+          endif;
+          ?>
+
+          loadingText.value = '払出登録中...';
+          const res = await postPayoutRegister(payoutModels);
 
           if (res.data.code != 200) {
             throw new Error(res.data.message)
@@ -826,6 +933,8 @@
           .post(_APIURL, params)
       }
       return {
+        loadingText,
+        isConsumption,
         isRequired,
         values,
         openModal,
@@ -867,6 +976,9 @@
       },
       labelCreate(bool) {
         localStorage.joypla_payoutLabelCreate = bool;
+      },
+      isConsumption(bool) {
+        localStorage.joypla_is_consumption = bool;
       },
       fields: {
         async handler(val, oldVal) {

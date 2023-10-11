@@ -233,7 +233,6 @@ class OrderRepository extends ModelRepository implements
             }
             $instance->delete();
         }
-
         if (count($items) > 0) {
             $instance = ModelRepository::getOrderItemInstance();
             //$instance = SpiralDbOrderItem::getNewInstance();

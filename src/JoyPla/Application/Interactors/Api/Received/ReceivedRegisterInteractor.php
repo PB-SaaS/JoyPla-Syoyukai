@@ -81,7 +81,7 @@ namespace JoyPla\Application\Interactors\Api\Received {
             $receiveds = [];
             $inventoryCalculations = [];
             foreach ($orders as $orderKey => $order) {
-
+                $receivedItems = [];
                 if($order->getOrderStatus()->value() === OrderStatus::UnOrdered) {
                     throw new Exception('is UnOrdered.', 400);
                 }

@@ -163,7 +163,58 @@ class ModelRepository
             'medicodeStatus',
             'medicodeSentDate',
             'orderMethod',
+            
         ]);
+    }
+
+    public static function get362OrderItemInstance()
+    {
+        return SpiralDB::title('362_orderItem')->value([
+            'registrationTime',
+            'updateTime',
+            'receivingTime',
+            'dueDate',
+            'orderCNumber',
+            'hospitalId',
+            'inHospitalItemId',
+            'orderNumber',
+            'price',
+            'orderQuantity',
+            'orderPrice',
+            'receivingFlag',
+            'receivingNum',
+            'quantity',
+            'quantityUnit',
+            'itemUnit',
+            'divisionId',
+            'distributorId',
+            'lotManagement',
+            'itemId',
+            'priceId',
+            'distributorMCode',
+            'itemName',
+            'itemCode',
+            'itemStandard',
+            'itemJANCode',
+            'makerName',
+            'divisionName',
+            'orderStatus',
+            'category',
+            'adjustment',
+            'catalogNo',
+            'serialNo',
+            'distributorName',
+            'useMedicode',
+            'hospitalCode',
+            'distributorCode',
+            'medicodeStatus',
+            'medicodeSentDate',
+            'recordId',
+            'deliveryDestCode',
+            'orderMethod',
+            'subSendCode'
+        ]);
+
     }
 
     public static function getDivisionInstance()

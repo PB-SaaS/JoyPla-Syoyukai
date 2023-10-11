@@ -87,8 +87,15 @@ namespace framework\SpiralConnecter {
 
     abstract class SpiralModel {
 
+        protected $title;  // モデルが関連付けられるテーブル名
+        protected $fields;  // データベースに保存可能なカラム
+    
         public function init()
         {
+            if (!isset($this->title) || !isset($this->fields)) {
+                throw new \Exception('The $title and $fields properties must be defined in the child class.');
+            }
+
             return (new SpiralManager(SpiralDB::getConnection()))->setTitle($this->title)->fields($this->fields);
         }
     }
