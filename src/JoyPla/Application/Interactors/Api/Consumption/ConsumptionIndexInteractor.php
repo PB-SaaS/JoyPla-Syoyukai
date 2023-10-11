@@ -85,6 +85,7 @@ namespace JoyPla\Application\InputPorts\Api\Consumption {
             $this->search->divisionIds = $search['divisionIds'];
             $this->search->perPage = $search['perPage'];
             $this->search->currentPage = $search['currentPage'];
+            $this->search->billingStatus = $search['billingStatus'];
         }
     }
 

@@ -159,6 +159,14 @@
                 ></v-multiple-select-division>
             </div>
             <?php endif; ?>
+            <?php if(gate('is_use_direct_delivery')): ?>
+              <div class="my-4">
+                <v-multiple-select-billing-status
+                  name="billingStatus"
+                  title="消費タイプ"
+                  ></v-multiple-select-billing-status>
+              </div>
+            <?php endif; ?>
             <div class="mx-auto lg:w-2/3 mb-4 text-center flex items-center gap-6 justify-center">
               <v-button-default type="button" @click.native="searchClear">クリア</v-button-default>
               <v-button-primary type="button" @click.native="searchExec">絞り込み</v-button-primary>
@@ -193,7 +201,8 @@ var JoyPlaApp = Vue.createApp({
       'item-view': itemView,
       'v-pagination' : vPagination,
       'v-select' : vSelect,
-      'v-multiple-select-division' : vMultipleSelectDivision
+      'v-multiple-select-division' : vMultipleSelectDivision,
+      'v-multiple-select-billing-status' : vMultipleSelectBillingStatus
     },
     setup(){
       const { ref , onMounted } = Vue;
@@ -254,6 +263,7 @@ var JoyPlaApp = Vue.createApp({
         url.searchParams.set('perPage',values.perPage);
         url.searchParams.set('currentPage',values.currentPage);
         url.searchParams.set('divisionIds',values.divisionIds);
+        url.searchParams.set('billingStatus',values.billingStatus);
         history.pushState({}, '', url);
       }
 
@@ -268,6 +278,7 @@ var JoyPlaApp = Vue.createApp({
           perPage: (Number.isInteger(getParam("perPage"))) ? getParam("perPage") : "10",
           currentPage : (Number.isInteger(parseInt(getParam("currentPage")))) ? parseInt(getParam("currentPage")) : 1,
           divisionIds: (getParam("divisionIds")) ? ( Array.isArray(getParam("divisionIds"))? getParam("divisionIds") : (getParam("divisionIds")).split(',') ) : [],
+          billingStatus: (getParam("billingStatus")) ? ( Array.isArray(getParam("billingStatus"))? getParam("billingStatus") : (getParam("billingStatus")).split(',') ) : [],
         },
       });
       const breadcrumbs = [
@@ -386,6 +397,7 @@ var JoyPlaApp = Vue.createApp({
         values.itemJANCode = '';
         values.yearMonth = '';
         values.divisionIds = [];
+        values.billingStatus = [];
         
         listGet();
       };

@@ -237,6 +237,44 @@ const vMultipleSelectDivision = {
 `,
 };
 
+const vMultipleSelectBillingStatus = {
+  components: {
+    "v-multiple-select": vMultipleSelect,
+  },
+  setup(props) {
+    const { ref } = Vue;
+    
+    const consumeTypes = ref([
+      { label: "通常消費", value: "1" },
+      { label: "直納処理", value: "3" }
+    ]);
+
+    return {
+      consumeTypes
+    };
+  },
+  props: {
+    name: {
+      type: String,
+      required: true,
+      default: "billingStatus",
+    },
+    title: {
+      type: String,
+      required: true,
+      default: "",
+    },
+    id : {
+      type: String,
+      required: false,
+      default: "multipleBillingStatus",
+    }
+  },
+  template: `
+<v-multiple-select :name="name" :title="title" :options="consumeTypes" :id="id" />
+`,
+};
+
 const vMultipleSelectDistributor = {
   components: {
     "v-multiple-select": vMultipleSelect,
