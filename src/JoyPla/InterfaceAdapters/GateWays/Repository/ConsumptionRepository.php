@@ -282,6 +282,12 @@ class ConsumptionRepository implements ConsumptionRepositoryInterface
             );
         }
 
+        if (is_array($search->billingStatus) && count($search->billingStatus) > 0) {
+            foreach ($search->billingStatus as $billingStatus) {
+                $historyViewInstance->orWhere('billingStatus', $billingStatus);
+            }
+        }
+
         $historys = $historyViewInstance
             ->orderBy('billingDate', 'desc')
             ->page($search->currentPage)
