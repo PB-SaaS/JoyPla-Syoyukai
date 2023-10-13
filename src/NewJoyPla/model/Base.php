@@ -1497,6 +1497,7 @@ class OrderedItemView extends Model
         'adjustment',
         'distributorMCode',
         'orderTime',
+        'receivedStatus',
     ];
 
     //デフォルト値
