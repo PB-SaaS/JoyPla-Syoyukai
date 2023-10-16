@@ -1670,4 +1670,15 @@ class ModelRepository
         ]);
     }
 
+    public static function getCustomLabelInstance()
+    {
+        return SpiralDB::title('NJ_CustomLabel')->value([
+            'id',
+            'registrationTime',
+            'updateTime',
+            'hospitalId',
+            'labelDesign',
+            'designType',
+        ]);
+    }
 }
