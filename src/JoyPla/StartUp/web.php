@@ -372,6 +372,10 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'payoutLabelPrintForAcceptance',
     ]);
     
+    Router::map('GET', '/label/order/:orderNumber', [
+        LabelController::class,
+        'orderLabelPrint',
+    ]);
     
     Router::map('GET', '/stocktaking/stocktakingList/index', [
         StocktakingListController::class,
