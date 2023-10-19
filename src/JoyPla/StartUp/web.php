@@ -35,7 +35,8 @@ use JoyPla\Service\Repository\QueryProvider;
 use JoyPla\Service\Repository\RepositoryProvider;
 use JoyPla\Service\UseCase\Web\UseCaseProvider;
 use Test\Exceptions\WebExceptionHandler;
-
+use JoyPla\InterfaceAdapters\Controllers\Web\MedicalLabelController;
+ 
 //param _method="" を指定すると GET PUT DELETE GET PATCH を区別できる
 
 const VIEW_FILE_ROOT = 'JoyPla/resources';
@@ -49,6 +50,7 @@ $useCaseProvider = new UseCaseProvider(
     $presenterProvider
 );
 
+
 Router::map('GET', '/agree', [AgreeFormController::class, 'index']);
 
 Router::map('POST', '/agree', [AgreeFormController::class, 'send']);
@@ -56,6 +58,9 @@ Router::map('POST', '/agree', [AgreeFormController::class, 'send']);
 Router::group(PersonalInformationConsentMiddleware::class, function () use (
     $useCaseProvider
 ) {
+
+    Router::map('Get','/medicalLabel', [MedicalLabelController::class, 'index']);
+
     Router::map('GET', '/', [TopController::class, 'index']);
 
     Router::map('GET', '/order', [TopController::class, 'orderpage']);
