@@ -17,23 +17,68 @@ class MedicalLabelController extends Controller
     public function index(array $vars)
     {
 
-        // throw new Exception("testItomasayuki");
+        $request = $this->request->get('request' , []);
+        $inHospitalItems = [];
+        $inHospitalItems = array_merge($inHospitalItems, $this->mockHospitalItem());
+        $inHospitalItemLabels = [];
+        
+
+        function duplicateItemByPrintValue($item) {
+            $result = [];
+        
+            if (isset($item['payout'])) {
+                foreach ($item['payout'] as $payout) {
+                    if (isset($payout['print'])) {
+                        foreach ($payout['print'] as $print) {
+                            $printValue = (int)$print['print'];
+                            for ($i = 0; $i < $printValue; $i++) {
+                                $result[] = $item;
+                            }
+                        }
+                    }
+                }
+            }
+        
+            return $result;
+        }
+        
+
+        // 印刷数を設定
+        if(!empty($request)){
+            for ($i = 0; $i < count($request); $i++) {
+                $newPrintValue = $request[$i]['print'][0]['print'];
+                $payoutItemId = $request[$i]['payoutItemId'];
+                foreach ($inHospitalItems[$i]['payout'] as &$payout) {
+                    if ($payout['payoutItemId'] == $payoutItemId && isset($payout['print'])) {
+                        foreach ($payout['print'] as &$print) {
+                            $print['print'] = $newPrintValue;
+                        }
+                    }
+                }
+            }
+        }
+       
+        // 印刷数の数だけオブジェクトを複製する
+        $duplicatedItems = [];
+        foreach($inHospitalItems as &$item) {
+            $duplicatedItems = array_merge($duplicatedItems, duplicateItemByPrintValue($item));
+        }
+        $inHospitalItemLabels = $duplicatedItems;
+       
 
         $payoutId ="05652f5f66c6165";
-        $inHospitalItems= $this->mockHospitalItem();
         $labeldesign=$this->defaultDesign();
 
         $body = View::forge('labelPrint/medical/Label', [
             'payoutId' => $payoutId,
             'inHospitalItems' => $inHospitalItems,
             'totalPrintCount' => count($inHospitalItems),
-            'labelHtml' => $this->convertKeyword($labeldesign , $inHospitalItems),
-            // 'labelHtml' => $labeldesign,
+            'labelHtml' => $this->convertKeyword($labeldesign , $inHospitalItemLabels),
+            'request'=>$request, // Debug用
         ], false)->render();
         echo view('html/Common/Template', compact('body'), false)->render();
     }
 
-    //  %%で囲われた変数名の中身が空文字の時にどうするか確認する。
     private function defaultDesign()
     {
         return <<<EOM
@@ -43,9 +88,6 @@ class MedicalLabelController extends Controller
                 <b class="font-size-16">償還</b><br>
                 <span>%itemName%</span><br>
                 <span>%makerName%</span><br>
-                <span>%catalogNo%</span><br>
-                <span>%itemStandard%</span><br>
-                <span>%medicineCategory%</span><br>
             </div>
             <div class="uk-text-right uk-padding-remove">
                 <span>%printDate%</span><br>
@@ -53,7 +95,9 @@ class MedicalLabelController extends Controller
                 <b>償還価格:%officialprice%円</b><br>
             </div>
         </div>
-    
+        <span>%catalogNo%</span><br>
+        <span>%itemStandard%</span><br>
+        <span>%medicineCategory%</span><br>
         <br>
         <span>%distributorName%</span><br>
 
@@ -86,7 +130,7 @@ EOM;
                 "itemCode" => "",
                 "itemStandard" => "M",
                 "itemJANCode" => "4987603115095",
-                "officialFlag" => "0",
+                "officialFlag" => "1",
                 "officialpriceOld" => "",
                 "officialprice" => "2000",
                 "catalogNo" => "01231809",
@@ -110,7 +154,7 @@ EOM;
                         "lotDate" => "2099年10月01日",
                         "print" => [
                             [
-                                "count" => "2",
+                                "count" => "1",
                                 "print" => "1"
                             ]
                         ]
@@ -131,6 +175,72 @@ EOM;
                     "constantByDiv" => "10"
                 ]
                 ],
+                [
+                    "id" => "1",
+                    "registrationTime" => "2023年10月6日 09時10分53秒",
+                    "updateTime" => "2023年10月18日 13時30分30秒",
+                    "itemId" => "item_0000000002",
+                    "priceId" => "price_0000000001",
+                    "inHospitalItemId" => "00000001",
+                    "authKey" => "h4a23cg4ynf35326",
+                    "hospitalId" => "hospital_0000000001",
+                    "medicineCategory" => "アルコール毛細管体温計\n単回使用気管切開チューブ",
+                    "homeCategory" => "",
+                    "notUsedFlag" => "0",
+                    "notice" => "",
+                    "HPstock" => "3073",
+                    "unitPrice" => "1000",
+                    "measuringInst" => "",
+                    "makerName" => "グリコ株式会社",
+                    "itemName" => "ポッキー",
+                    "itemCode" => "",
+                    "itemStandard" => "M",
+                    "itemJANCode" => "4987603115095",
+                    "officialFlag" => "1",
+                    "officialpriceOld" => "",
+                    "officialprice" => "2000",
+                    "catalogNo" => "01231809",
+                    "serialNo" => "",
+                    "lotManagement" => "",
+                    "category" => "1",
+                    "distributorId" => "dis_1014796949",
+                    "distributorName" => "Cell医療薬品株式会社",
+                    "price" => "1000",
+                    "quantity" => "100",
+                    "itemUnit" => "枚",
+                    "quantityUnit" => "箱",
+                    "distributorMCode" => "",
+                    "inItemImage" => "",
+                    "labelId" => "00000001",
+                    "payout" => [
+                        [
+                            "payoutItemId" => "payout_0000000002",
+                            "inHospitalItemId" => "00000001",
+                            "lotNumber" => "rotto012",
+                            "lotDate" => "2099年10月01日",
+                            "print" => [
+                                [
+                                    "count" => "1",
+                                    "print" => "2"
+                                ]
+                            ]
+                        ]
+                    ],
+                    "target" => [
+                        "divisionId" => "div_0833326238",
+                        "divisionName" => "リハビリテーション科",
+                        "inHospitalItemId" => "00000001",
+                        "rackName" => "",
+                        "constantByDiv" => "10"
+                    ],
+                    "source" => [
+                        "divisionId" => "div_0053498963",
+                        "divisionName" => "内科",
+                        "inHospitalItemId" => "00000001",
+                        "rackName" => "",
+                        "constantByDiv" => "10"
+                    ]
+                    ],
                 
         ];
     }
@@ -155,7 +265,7 @@ EOM;
         return $html;
     }
 
-    private function getToday($timezone = 'UTC') {
+    private function getToday($timezone = 'Asia/Tokyo') {
         date_default_timezone_set($timezone);
         return date('y/m/d');
     }

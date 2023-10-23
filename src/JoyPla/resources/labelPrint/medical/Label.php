@@ -56,7 +56,6 @@ body {
                                 <th class="border border-slate-100 font-medium p-4 pr-8 text-left">商品情報</th>
                                 <th class="border border-slate-100 font-medium p-4 pr-8 text-left">ロット番号</th>
                                 <th class="border border-slate-100 font-medium p-4 pr-8 text-left">使用期限</th>
-                                <th class="border border-slate-100 font-medium p-4 pr-8 text-left w-0">数量</th>
                                 <th class="border border-slate-100 font-medium p-4 pr-8 text-left w-0">枚数</th>
                                 <th></th>
                                 <th></th>
@@ -73,22 +72,11 @@ body {
                                                     <p>{{ inHospitalItem.itemCode }}</p>
                                                     <p>{{ inHospitalItem.itemStandard }}</p>
                                                     <p>{{ inHospitalItem.itemJANCode }}</p>
-                                                    <p>{{ (inHospitalItem.officialFlag == 1)? '償還品' : '' }}</p>
                                                 </div>
                                             </td>
+                                            <!-- @TODO ロット番号と使用期限は任意項目のため空文字のときの表示を確認する。 -->
                                             <td v-if="printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="payout.print.length">{{ payout.lotNumber }}</td>
                                             <td v-if="printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="payout.print.length">{{ payout.lotDate }}</td>
-                                            <td class="border border-slate-100 p-4 pr-8 text-slate-500">
-                                                <v-input-number 
-                                                :name="`items[${idx}].payout[${pIdx}].print[${printIdx}].count`"
-                                                :rules="{ between: [0 , 9999] }" 
-                                                label="数量" 
-                                                :min="0"
-                                                :unit="inHospitalItem.quantityUnit" 
-                                                :step="1" 
-                                                title="数量" 
-                                                class=" w-[240px]"></v-input-number>
-                                            </td>
                                             <td class="border border-slate-100 p-4 pr-8 text-slate-500">
                                                 <v-input-number 
                                                 :name="`items[${idx}].payout[${pIdx}].print[${printIdx}].print`"
@@ -98,14 +86,9 @@ body {
                                                 unit="枚" 
                                                 :step="1" 
                                                 title="枚数" 
-                                                class=" w-[240px]"></v-input-number></td>
-                                            <!-- @TODO 削除を影響範囲を調べてから削除する。 -->
-                                            <!-- <td class="border border-slate-100 p-4 pr-8 text-slate-500 text-center">
-                                                <v-button-primary @click.native="copy(idx,pIdx)">複製</v-button-primary>
-                                            </td> -->
-                                            <td class="border border-slate-100 p-4 pr-8 text-slate-500 text-center">
-                                                <v-button-danger v-if="print.isDeleteButton" @click.native="removeItem(idx,pIdx,printIdx)">削除</v-button-danger>
+                                                class=" w-[240px]"></v-input-number>
                                             </td>
+
                                         </tr>
                                     </template>
                                 </template>
@@ -127,10 +110,6 @@ body {
                     </div>
                 </div>
                 <div class="flex gap-3">
-                    <!-- @TODO 削除を影響範囲を調べてから削除する。 -->
-                    <!-- <div class="md:w-1/4">
-                        <v-input prefix="px" type="number" name="setting.barcodeHeight" title="バーコードの高さ" label="バーコードの高さ"></v-input>
-                    </div> -->
                     <div class="md:w-1/4">
                         <v-input prefix="mm" type="number" name="setting.labelwidth" title="ラベルの幅" label="ラベルの幅"></v-input>
                     </div>
@@ -154,31 +133,26 @@ body {
 </div>
 <script>
     const PHPData = <?php echo json_encode($inHospitalItems, true); ?>;
+    // Debug用
+    const RequestData = <?php echo json_encode($request, true); ?>;
+    console.log(RequestData);
+
     var JoyPlaApp = Vue.createApp({
         components: {
-            'v-text': vText,
             'v-select': vSelect,
             'v-button-default': vButtonDefault,
-            'v-button-danger': vButtonDanger,
-            'v-button-primary': vButtonPrimary,
-            'v-checkbox': vCheckbox,
-            'v-loading': vLoading,
             'header-navi': headerNavi,
-            'v-breadcrumbs': vBreadcrumbs,
-            'item-view': itemView,
             'v-input-number': vInputNumber,
             'v-input': vInput,
-            'v-textarea': vTextarea
         },
         setup() {
             const {ref , onCreated , onMounted} = Vue;
             const {useFieldArray, useForm} = VeeValidate;
-            let label_setting = JSON.parse(localStorage.getItem("joypla_LabelCreate")) ?? [];
+            let label_setting = JSON.parse(localStorage.getItem("joypla_Medical_LabelCreate")) ?? [];
             const { handleSubmit , control, meta , validate , values , isSubmitting } = useForm({
                 initialValues: {
                     setting: {
                         pagePadding: (label_setting['pagePadding'])? label_setting['pagePadding'] : 5,
-                        barcodeHeight: (label_setting['barcodeHeight'])? label_setting['barcodeHeight'] : 50,
                         labelwidth:  (label_setting['labelwidth'])? label_setting['labelwidth'] :85,
                         labelheight: (label_setting['labelheight'])? label_setting['labelheight'] : 50,
                         printType:  (label_setting['printType'])? label_setting['printType'] :1,
@@ -187,7 +161,6 @@ body {
                 },
                 validateOnMount : false
             });
-
             const payoutId = "<?php echo $payoutId ?>";
 
             const {
@@ -273,19 +246,6 @@ body {
                 }
                 document.body.appendChild(style);
                 
-
-                const generateBarcode = (idname,value) =>
-                {
-                    JsBarcode("#"+idname,value,{width: 1.8, height: values.setting.barcodeHeight,fontSize: 14});
-                }
-                
-                const totalPrintCount = <?php echo $totalPrintCount ?>;
-                for(let i = 1 ; i <= totalPrintCount ; i++)
-                {
-                    barcode = document.getElementById('barcode_' + i).innerText;
-                    document.getElementById('barcode_' + i).innerHTML = '<svg style="margin: auto" id="barcode_area_'+i+'"></svg>';
-                    generateBarcode('barcode_area_' + i,barcode);
-                }
             });
 
             const createLabelModel = (values) => {
@@ -307,7 +267,7 @@ body {
                 
                 let params = {};
 
-                params.path = "/label/payout/" + payoutId;
+                params.path = "/medicalLabel";
                 params._method = 'get';
                 params._csrf = _CSRF;
                 params.request = JSON.stringify(encodeURIToObject(labelModel));
@@ -335,32 +295,17 @@ body {
                 }
                 let setting = {
                     "pagePadding": values.setting.pagePadding,
-                    "barcodeHeight":values.setting.barcodeHeight,
                     "labelwidth":values.setting.labelwidth,
                     "labelheight":values.setting.labelheight,
                     "printType":values.setting.printType,
                 };
 
-                localStorage.setItem("joypla_LabelCreate", JSON.stringify(setting));
+                localStorage.setItem("joypla_Medical_LabelCreate", JSON.stringify(setting));
                 
                 // フォームをドキュメントに追加して送信
                 document.body.appendChild(form);
                 form.submit();
             });
-
-            const copy = (idx,pIdx) => {
-                values.items[idx].payout[pIdx].print.push({
-                    count: 0 ,
-                    print: 0 ,
-                    isDeleteButton : true
-                });
-                replace(values.items)
-            }
-            
-            const removeItem = (idx,pIdx, printIdx) => {
-                values.items[idx].payout[pIdx].print.splice( printIdx, 1 );
-                replace(values.items)
-            }
 
             const calcRow = (payouts) => {
                 let printCount = 0;
@@ -372,8 +317,6 @@ body {
 
             return {
                 calcRow,
-                copy,
-                removeItem,
                 values,
                 printTypes,
                 labelReload,
