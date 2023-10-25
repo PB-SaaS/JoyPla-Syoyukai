@@ -222,6 +222,7 @@
                         </table>
                     </div>
                 </div>
+
                 <table class="print-table" style="line-height: normal;">
                     <thead>
                         <tr class="print-text-default">

@@ -15,9 +15,6 @@
 	}
 		
 	body {
-    	width: 190mm; /* needed for Chrome */
-		-webkit-print-color-adjust: exact;
-		color-adjust: exact;
 		line-height: 1.5em;
 	}
 
@@ -27,19 +24,10 @@
 
 	/* 印刷1ページ用のコンテンツはここで定義 */
 	#detail-sheet {
-		width: 210mm; /* 用紙の横幅を改めて指定 */
-		page-break-after: always;
 		box-sizing: border-box;
 		font-size: 11pt;
-	}
-
-	#detail-sheet {
 		display: block !important;
 	}
-	#detail-sheet .sheet {
-		page-break-after: always;
-	}
-
 	#detail-sheet .print-text-xsmall {
 		font-size: 6pt;
 	}
@@ -68,8 +56,11 @@
 	#detail-sheet .print-table td {
 		border: 1.2px gray solid;
 		border-spacing: 0;
-		font-size: 6pt;
+		font-size: 6pt !important;
 		padding : 2pt;
+	}
+	*+.uk-grid-margin, .uk-grid+.uk-grid, .uk-grid>.uk-grid-margin {
+		margin-top: 0px !important;
 	}
 }
 </style>
