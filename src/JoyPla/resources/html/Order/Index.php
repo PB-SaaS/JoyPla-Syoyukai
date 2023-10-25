@@ -329,7 +329,8 @@ var JoyPlaApp = Vue.createApp({
       }
 
       const openMedicalLabel = () => {
-        location.href = _ROOT + "&path=/label/medicalOrder/" + order.orderId;    
+        const url = _ROOT +  "&path=/label/medicalOrder/" + order.orderId;  
+        window.open(url, '_blank');
       }
 
       const sentSlip = async() => 
