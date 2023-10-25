@@ -172,7 +172,7 @@
 
     <!-- print Only -->
     <div id="detail-sheet">
-        <section class="sheet">
+        <section class="c">
             <p class="uk-text-center print-text-xlarge title_spacing">発注書</p>
             <div>
                 <div uk-grid>
@@ -222,6 +222,7 @@
                         </table>
                     </div>
                 </div>
+
                 <table class="print-table" style="line-height: normal;">
                     <thead>
                         <tr class="print-text-default">
