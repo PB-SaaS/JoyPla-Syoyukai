@@ -12,6 +12,7 @@
                         <v-button-danger type="button" class="md:w-1/6 w-full" :disabled="! isChange" @click.native="onRegister">返品登録</v-button-danger>
                     <?php endif; ?>
                     <v-button-default type="button" class="md:w-1/6 w-full" @click.native="label( received.receivedId )">ラベルプリント</v-button-default>
+                    <v-button-default class="md:w-1/6 w-full" @click.native="openMedicalLabel()">医事ラベル発行</v-button-default>
                 </div>
                 <div class="p-4 text-base bg-gray-100 border border-gray-400">
                     <v-text title="入荷日" class="flex w-full gap-6">{{ received.registDate }}</v-text>
@@ -429,6 +430,11 @@
                     //location.href = _ROOT + "&path=/received/" + url + "/label";    
                 }
 
+                const openMedicalLabel = () => {
+                    const url = _ROOT + '&path=/label/medicalReceived/' + received.receivedId;
+                    window.open(url, '_blank')
+                };
+
                 return {
                     label,
                     selectInHospitalItems,
@@ -446,7 +452,8 @@
                     breadcrumbs,
                     loading,
                     start,
-                    complete
+                    complete,
+                    openMedicalLabel,
                 }
             },
         })
