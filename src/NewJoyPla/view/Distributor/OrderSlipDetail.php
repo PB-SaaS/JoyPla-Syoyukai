@@ -172,7 +172,7 @@
 
     <!-- print Only -->
     <div id="detail-sheet">
-        <section class="c">
+        <section class="sheet">
             <p class="uk-text-center print-text-xlarge title_spacing">発注書</p>
             <div>
                 <div uk-grid>
