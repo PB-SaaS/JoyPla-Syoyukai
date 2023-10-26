@@ -35,6 +35,7 @@ use JoyPla\Service\Repository\QueryProvider;
 use JoyPla\Service\Repository\RepositoryProvider;
 use JoyPla\Service\UseCase\Web\UseCaseProvider;
 use Test\Exceptions\WebExceptionHandler;
+use JoyPla\InterfaceAdapters\Controllers\Web\MedicalLabelController;
 
 //param _method="" を指定すると GET PUT DELETE GET PATCH を区別できる
 
@@ -377,6 +378,21 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'orderLabelPrint',
     ]);
     
+    Router::map('Get','/label/medicalOrder/:orderId', [
+        MedicalLabelController::class,
+        'MedicalOrderLabelPrint'
+    ]);
+
+    Router::map('Get','/label/medicalReceived/:receivedId', [
+        MedicalLabelController::class,
+        'MedicalReceivedLabelPrint'
+    ]);
+
+    Router::map('Get','/label/medicalPayout/:payoutHistoryId', [
+        MedicalLabelController::class,
+        'MedicalPayoutLabelPrint'
+    ]);
+
     Router::map('GET', '/stocktaking/stocktakingList/index', [
         StocktakingListController::class,
         'index',

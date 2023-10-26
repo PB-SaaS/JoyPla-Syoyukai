@@ -90,6 +90,7 @@ namespace JoyPla\Application\Interactors\Api\Order {
                         ) {
                             $exist = true;
                             $orders[] = $h->addOrderItem($i);
+                            unset($historyOrders[$key]);
                             break;
                         }
                     }

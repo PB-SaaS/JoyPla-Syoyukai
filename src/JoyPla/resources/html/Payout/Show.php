@@ -20,6 +20,9 @@
             <v-button-default class="md:w-1/6 w-full" @click.native="openPrintPage()">
                 払出伝票印刷
             </v-button-default>
+            <v-button-default class="md:w-1/6 w-full" @click.native="openMedicalLabel()">
+                医事ラベル発行
+            </v-button-default>
         </div>
         <div class="p-4 text-base bg-gray-100 border border-gray-400">
             <div class="flex w-full gap-6">
@@ -399,6 +402,11 @@ var JoyPlaApp = Vue.createApp({
           window.open(url, '_blank')
       }
 
+      const openMedicalLabel = () => {
+        const url = _ROOT + '&path=/label/medicalPayout/' + payoutHistoryId;
+        window.open(url, '_blank')
+      }
+
       const payoutTotalCount = (inHospitalItem) => {
         let count = 0;
         inHospitalItem._payoutItems.forEach((elem) => {
@@ -440,6 +448,7 @@ var JoyPlaApp = Vue.createApp({
         openPrintPage,
         userDivisionId,
         isUser,
+        openMedicalLabel,
       }
   },
   watch: {

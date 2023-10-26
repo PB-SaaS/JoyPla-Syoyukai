@@ -2934,7 +2934,7 @@ video {
 }
 
 .text-xxs {
-  font-size : 0.5rem;
+  font-size : 0.75rem;
   line-height: 1rem;
 }
 

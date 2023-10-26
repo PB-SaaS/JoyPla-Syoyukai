@@ -28,6 +28,7 @@
               <p class="w-full">お待ちください...</p>
             </template>
           </v-button-default>
+          <v-button-default type="button" class="md:w-1/6 w-full" @click.native="openMedicalLabel">医事ラベル発行</v-button-default>
         </div>
         <div class="p-4 text-base bg-gray-100 border border-gray-400">
           <v-text title="登録日" class="flex w-full gap-6">{{ order.registDate }}</v-text>
