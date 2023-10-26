@@ -333,6 +333,11 @@ var JoyPlaApp = Vue.createApp({
         window.open(url, '_blank');
       }
 
+      const openMedicalLabel = () => {
+        const url = _ROOT +  "&path=/label/medicalOrder/" + order.orderId;  
+        window.open(url, '_blank');
+      }
+
       const sentSlip = async() => 
       {
           if(order.sent.disabled){
@@ -372,6 +377,7 @@ var JoyPlaApp = Vue.createApp({
         complete,
         openReceipt,
         openLabel,
+        openMedicalLabel,
       }
   },
   watch: {
