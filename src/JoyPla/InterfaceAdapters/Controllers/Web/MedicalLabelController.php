@@ -1,12 +1,12 @@
 <?php
 
 namespace JoyPla\InterfaceAdapters\Controllers\Web;
- 
+
 use Exception;
 use framework\Http\Request;
 use framework\Http\Controller;
 use framework\Http\View;
- use JoyPla\Enterprise\Models\HospitalId;
+use JoyPla\Enterprise\Models\HospitalId;
 use JoyPla\Enterprise\Models\DivisionId;
 use JoyPla\Enterprise\Models\InHospitalItemId;
 use JoyPla\InterfaceAdapters\GateWays\ModelRepository;
@@ -31,19 +31,12 @@ class MedicalLabelController extends Controller
         ->get()
         ->first();
 
-        $inHospitalItemIds = [];
-
         $orderItems = ModelRepository::getOrderItemInstance()
         ->where('hospitalId', $this->request->user()->hospitalId)
         ->where('orderNumber', $orderId)
         ->get();
 
         $orderItems = $orderItems->toArray();
-
-        foreach ($orderItems as $orderItem) {
-            $inHospitalItemIds[] = $orderItem['inHospitalItemId'];
-        }
-
 
         foreach( $orderItems as $orderItem )
         {
@@ -84,22 +77,6 @@ class MedicalLabelController extends Controller
             },$requestPrint)
         );
 
-
-
-        // ob_start();
-        // print_r($request);
-        // $result = ob_get_clean();
-        // $htmlList = "<pre>" . $result . "</pre>";
-
-        // $listItems = array_map(function($itemId) {
-        //     return "<li>{$itemId}</li>";
-        // }, $inHospitalItemIds);
-        
-        // // リストの開始と終了タグを追加
-        // $htmlList = "<ul>" . implode('', $listItems) . "</ul>";
-
-
-
         foreach($inHospitalItems as $key => $item)
         {
             foreach($requestPrint as $rKey => $printItem)
@@ -123,22 +100,11 @@ class MedicalLabelController extends Controller
         $labeldesign = $hospital->labelDesign2 !== '' ?  $hospital->labelDesign2 : $this->defaultDesign2();
 
         $words = $this->convertInputDateForOrder($inHospitalItems);
-        // $body = View::forge('html/Label/Payout', [
         $body = View::forge('html/LabelPrint/Medical/Label', [
             'orderId' => $orderId,
             'inHospitalItems' => $inHospitalItems,
             'totalPrintCount' => count($words),
             'labelHtml' => $this->convertKeyword($labeldesign , $words),
-            // 'inHospitalItems' => array(),
-            // 'totalPrintCount' => 3,
-            // 'labelHtml' => <<<EOM
-            // <div class='printarea uk-margin-remove'>
-            //     <div>
-            //         <b class='font-size-16'>aaaaaaaaaa</b>
-            //         $htmlList
-            //     </div>
-            // </div>
-            // EOM,
         ], false)->render();
 
         echo view('html/Common/Template', compact('body'), false)->render();
@@ -147,78 +113,128 @@ class MedicalLabelController extends Controller
     public function MedicalReceivedLabelPrint(array $vars) {
 
     }
- 
-    public function index(array $vars)
-    {
 
-        $request = $this->request->get('request' , []);
-        $inHospitalItems = [];
-        $inHospitalItems = array_merge($inHospitalItems, $this->mockHospitalItem());
-        $inHospitalItemLabels = [];
-        
-
-        function duplicateItemByPrintValue($item) {
-            $result = [];
-        
-            if (isset($item['payout'])) {
-                foreach ($item['payout'] as $payout) {
-                    if (isset($payout['print'])) {
-                        foreach ($payout['print'] as $print) {
-                            $printValue = (int)$print['print'];
-                            for ($i = 0; $i < $printValue; $i++) {
-                                $result[] = $item;
-                            }
-                        }
-                    }
-                }
-            }
-        
-            return $result;
-        }
-        
-
-        // 印刷数を設定
-        if(!empty($request)){
-            for ($i = 0; $i < count($request); $i++) {
-                $newPrintValue = $request[$i]['print'][0]['print'];
-                $payoutItemId = $request[$i]['payoutItemId'];
-                foreach ($inHospitalItems[$i]['payout'] as &$payout) {
-                    if ($payout['payoutItemId'] == $payoutItemId && isset($payout['print'])) {
-                        foreach ($payout['print'] as &$print) {
-                            $print['print'] = $newPrintValue;
-                        }
-                    }
-                }
-            }
-        }
-       
-        // 印刷数の数だけオブジェクトを複製する
-        $duplicatedItems = [];
-        foreach($inHospitalItems as &$item) {
-            $duplicatedItems = array_merge($duplicatedItems, duplicateItemByPrintValue($item));
-        }
-        $inHospitalItemLabels = $duplicatedItems;
-       
-
-        $payoutId ="05652f5f66c6165";
-        $labeldesign=$this->defaultDesign();
-
-        $body = View::forge('labelPrint/medical/Label', [
-            'payoutId' => $payoutId,
-            'inHospitalItems' => $inHospitalItems,
-            'totalPrintCount' => count($inHospitalItems),
-            'labelHtml' => $this->convertKeyword($labeldesign , $inHospitalItemLabels),
-            'request'=>$request, // Debug用
-        ], false)->render();
-        echo view('html/Common/Template', compact('body'), false)->render();
-    }
-
-    private function defaultDesign()
-    {
-
-    }
     public function MedicalPayoutLabelPrint(array $vars)
     {
 
     }
+
+    private function convertInputDateForOrder(array $requestData){
+        $response = [];
+        foreach($requestData as $rkey => $rdata){
+            foreach($rdata['order'] as $orderKey => $orderData){
+                foreach($orderData['print'] as $okey => $odata){
+                    for($num = 0 ; $num < $odata['print'] ; $num++){
+                        $response[] = [
+                            'printDate' => date('y/m/d'),
+                            'itemName' => $rdata['itemName'],
+                            'itemStandard' => $rdata['itemStandard'],
+                            'itemUnit' => $rdata['itemUnit'],
+                            'count' => $odata['count'],
+                            'catalogNo' => $rdata['catalogNo'],
+                            'labelId' => $rdata['labelId'],
+                            'printCount' => $odata['print'],
+                            'distributorName' => $rdata['distributorName'],
+                            'makerName' => $rdata['makerName'],
+                            'quantityUnit' => $rdata['quantityUnit'],
+                            'divisionName' => $rdata['divisionName'],
+                            'officialFlag' => $rdata['officialFlag'],
+                            'medicineCategory' => $rdata['medicineCategory'],
+                            'officialprice' => $rdata['officialprice'],
+                        ];
+                    }
+                }
+            }
+        }
+        return $response;
+    }
+
+    private function defaultDesign2()
+    {
+        return <<<EOM
+    <div class="printarea uk-margin-remove">
+    <div class="uk-child-width-1-2 uk-grid" uk-grid="">
+        <div class="uk-first-column">
+            <b class="font-size-16">償還</b><br>
+            <span>%JoyPla:itemName%</span><br>
+            <span>%JoyPla:makerName%</span><br>
+        </div>
+        <div class="uk-text-right uk-padding-remove">
+            <span>%JoyPla:printDate%</span><br>
+            <b>入数単位:1%JoyPla:quantityUnit%</b><br>
+            <b>償還価格:%JoyPla:officialprice%円</b><br>
+        </div>
+    </div>
+    <span>%JoyPla:catalogNo%</span><br>
+    <span>%JoyPla:itemStandard%</span><br>
+    <span>%JoyPla:medicineCategory%</span><br>
+    <br>
+    <span>%JoyPla:distributorName%</span><br>
+    </div>
+
+EOM;
+    }
+
+    private function convertKeyword(string $template, array $inputData){
+        $html = '';
+        foreach($inputData as $key => $input)
+        {
+            $design = $template;
+            $design = str_replace('%JoyPla:itemName%',			$input['itemName'],                 $design);//商品名
+            $design = str_replace('%JoyPla:makerName%',		$input['makerName'], 		        $design);//メーカー名
+            $design = str_replace('%JoyPla:printDate%',		$input['printDate'], 					$design);//印刷日
+            $design = str_replace('%JoyPla:quantityUnit%',		$input['quantityUnit'],	            $design);//入数単位
+            $design = str_replace('%JoyPla:officialprice%',	number_format_jp((float)$input['officialprice']),  $design);//償還価格
+            $design = str_replace('%JoyPla:catalogNo%',		$input['catalogNo'], 		        $design);//カタログNo
+            $design = str_replace('%JoyPla:itemStandard%',		$input['itemStandard'], 		    $design);//規格
+            $replacedMedicineCategory = str_replace("\n", '<br>', $input['medicineCategory']);
+            $design = str_replace('%JoyPla:medicineCategory%',	$replacedMedicineCategory, 		$design);//(特定保険材料名称「保険請求分類(医科)」)
+            $design = str_replace('%JoyPla:distributorName%',		$input['distributorName'], 		        $design);//卸業者            
+            $html .= $design;
+        }   
+        return $html;
+    }
+
+
+    private function convertInputDataForPayout(array $requestData)
+    {
+        $response = [];
+        foreach($requestData as $rkey => $rdata){
+            foreach($rdata['payout'] as $paykey => $paydata){
+                foreach($paydata['print'] as $pkey => $pdata){
+                    for($num = 0 ; $num < $pdata['print'] ; $num++){
+                        $response[] = [
+                            'printDate' => date('y/m/d'),
+                            'inHospitalItemId' => $paydata['inHospitalItemId'],
+                            'itemName' => $rdata['itemName'],
+                            'itemCode' => $rdata['itemCode'],
+                            'itemStandard' => $rdata['itemStandard'],
+                            'itemJANCode' => $rdata['itemJANCode'],
+                            'itemUnit' => $rdata['itemUnit'],
+                            'count' => $pdata['count'],
+                            'catalogNo' => $rdata['catalogNo'],
+                            'labelId' => $rdata['labelId'],
+                            'printCount' => $pdata['print'],
+                            'distributorName' => $rdata['distributorName'],
+                            'makerName' => $rdata['makerName'],
+                            'quantityUnit' => $rdata['quantityUnit'],
+                            'divisionName' => $rdata['target']['divisionName'],
+                            'rackName' => $rdata['target']['rackName'],
+                            'sourceDivisionName' => $rdata['source']['divisionName'],
+                            'sourceRackName' => $rdata['source']['rackName'],
+                            'constantByDiv' => $rdata['target']['constantByDiv'],
+                            'officialFlag' => $rdata['officialFlag'],
+                            'lotNumber' => $paydata['lotNumber'],
+                            'lotDate' => $paydata['lotDate'],
+                            'medicineCategory' => $rdata['medicineCategory'],
+                            'officialprice' => $rdata['officialprice'],
+                        ];
+                    }
+                }
+            }
+        }
+        return $response;
+    }
+
+
 }
