@@ -123,7 +123,8 @@ class MedicalLabelController extends Controller
         $labeldesign = $hospital->labelDesign2 !== '' ?  $hospital->labelDesign2 : $this->defaultDesign2();
 
         $words = $this->convertInputDateForOrder($inHospitalItems);
-        $body = View::forge('html/Label/Payout', [
+        // $body = View::forge('html/Label/Payout', [
+        $body = View::forge('html/LabelPrint/Medical/Label', [
             'orderId' => $orderId,
             'inHospitalItems' => $inHospitalItems,
             'totalPrintCount' => count($words),
@@ -144,7 +145,7 @@ class MedicalLabelController extends Controller
 
     }
     public function MedicalReceivedLabelPrint(array $vars) {
-        
+
     }
  
     public function index(array $vars)
