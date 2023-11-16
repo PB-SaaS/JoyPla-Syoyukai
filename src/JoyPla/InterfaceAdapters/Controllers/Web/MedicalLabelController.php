@@ -143,7 +143,9 @@ class MedicalLabelController extends Controller
         echo view('html/Common/Template', compact('body'), false)->render();
 
     }
-    public function MedicalReceivedLabelPrint(array $vars)
+    public function MedicalReceivedLabelPrint(array $vars) {
+        
+    }
  
     public function index(array $vars)
     {
