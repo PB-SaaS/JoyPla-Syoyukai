@@ -63,10 +63,10 @@ body {
                         </thead>
                         <tbody>
                             <template  v-for="(inHospitalItem , idx) in values.items">
-                                <template v-for="(payout , pIdx) in inHospitalItem.payout">
-                                    <template v-for="(print , printIdx) in payout.print">
+                                <template v-for="(order , pIdx) in inHospitalItem.order">
+                                    <template v-for="(print , printIdx) in order.print">
                                         <tr>
-                                            <td v-if="pIdx === 0 && printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="calcRow(inHospitalItem.payout)">
+                                            <td v-if="pIdx === 0 && printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="calcRow(inHospitalItem.order)">
                                                 <div>
                                                     <p>{{ inHospitalItem.itemName }}</p>
                                                     <p>{{ inHospitalItem.itemCode }}</p>
@@ -75,11 +75,11 @@ body {
                                                 </div>
                                             </td>
                                             <!-- @TODO ロット番号と使用期限は任意項目のため空文字のときの表示を確認する。 -->
-                                            <td v-if="printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="payout.print.length">{{ payout.lotNumber }}</td>
-                                            <td v-if="printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="payout.print.length">{{ payout.lotDate }}</td>
+                                            <td v-if="printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="order.print.length">{{ order.lotNumber }}</td>
+                                            <td v-if="printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="order.print.length">{{ order.lotDate }}</td>
                                             <td class="border border-slate-100 p-4 pr-8 text-slate-500">
                                                 <v-input-number 
-                                                :name="`items[${idx}].payout[${pIdx}].print[${printIdx}].print`"
+                                                :name="`items[${idx}].order[${pIdx}].print[${printIdx}].print`"
                                                 :rules="{ between: [0 , 9999] }" 
                                                 label="枚数" 
                                                 :min="0"
@@ -133,9 +133,9 @@ body {
 </div>
 <script>
     const PHPData = <?php echo json_encode($inHospitalItems, true); ?>;
+    
     // Debug用
-    const RequestData = <?php echo json_encode($request, true); ?>;
-    console.log(RequestData);
+    console.log(PHPData);
 
     var JoyPlaApp = Vue.createApp({
         components: {
@@ -161,7 +161,6 @@ body {
                 },
                 validateOnMount : false
             });
-            const payoutId = "<?php echo $payoutId ?>";
 
             const {
                 remove,
@@ -251,10 +250,10 @@ body {
             const createLabelModel = (values) => {
                 let model = [];
                 values.items.forEach(item => {
-                    item.payout.forEach(payout => {
+                    item.order.forEach(order => {
                         let obj = {};
-                        obj.payoutItemId = payout.payoutItemId
-                        obj.print = payout.print
+                        obj.orderItemId = order.inHospitalItemId
+                        obj.print = order.print
                         model.push(obj);
                     })
                 });
@@ -276,7 +275,9 @@ body {
                 
                 // フォームの設定
                 form.method = 'post';
-                form.action = _ROOT;
+
+                // @TODO このパスはAPI次第で変える必要がある。
+                form.action = _ROOT+"&path=/label/medicalOrder/03654da0e6eff67";
                 
                 // パラメータをループしてフォームに追加
                 for (let key in params) {
@@ -307,10 +308,10 @@ body {
                 form.submit();
             });
 
-            const calcRow = (payouts) => {
+            const calcRow = (orders) => {
                 let printCount = 0;
-                payouts.forEach(function(payout) {
-                    printCount += payout.print.length;
+                orders.forEach(function(order) {
+                    printCount += order.print.length;
                 });
                 return printCount;
             }
