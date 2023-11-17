@@ -777,6 +777,11 @@
             items.item[id].divisionId = values.targetDivisionId
           });
         }
+        if(items.type == "order"){
+            items.item.forEach((x , id)=>{
+                items.item[id].payoutCount = parseInt(items.item[id].quantity);
+            });
+        }
 
         if (items.item.length === 1) {
           if (items.item[0].divisionId) {

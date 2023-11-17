@@ -602,6 +602,11 @@
                         items.item[id].requestQuantity = parseInt(items.item[id].customQuantity);
                     });
                 }
+                if(items.type == "order"){
+                    items.item.forEach((x , id)=>{
+                        items.item[id].requestUnitQuantity = 1; //parseInt(items.item[id].orderQuantity);
+                    });
+                }
 
                 if (items.item.length === 1) {
                     if (items.item[0].divisionId) {
