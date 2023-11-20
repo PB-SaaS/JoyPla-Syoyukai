@@ -277,7 +277,7 @@ body {
                 form.method = 'post';
 
                 // @TODO このパスはAPI次第で変える必要がある。
-                form.action = _ROOT+"&path=/label/medicalOrder/03654da0e6eff67";
+                form.action = _ROOT;
                 
                 // パラメータをループしてフォームに追加
                 for (let key in params) {
