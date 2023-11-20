@@ -422,12 +422,25 @@ var JoyPlaApp = Vue.createApp({
             });
         }
 
-        if(items.type !== "received" && items.type !== "payout" && items.type !== "card" && !(items.type == "customlabel" && items.isLabel)) //読み込み対象外のバーコード
+        if(items.type == "order") //発注商品ラベル
+        {
+          items.item.forEach((x , id)=>{
+            items.item[id].consumeUnitQuantity = 1; //parseInt(items.item[id].orderQuantity);
+          });
+        }
+
+        if(
+          items.type !== "received" && 
+          items.type !== "payout" && 
+          items.type !== "card" && 
+          items.type !== "order" && 
+          !(items.type == "customlabel" && items.isLabel)
+        ) //読み込み対象外のバーコード
         {
           Swal.fire({
             icon: 'error',
             title: 'エラー',
-            html: 'このバーコードは読み込めません。<br><span class="font-bold">読み込み対象のバーコード</span><p class="text-sm font-bold">01から始めるバーコード</p><p class="text-sm font-bold">20から始めるバーコード</p><p class="text-sm font-bold">30から始めるバーコード</p><p class="text-sm font-bold">90から始めるバーコード</p>',
+            html: 'このバーコードは読み込めません。<br><span class="font-bold">読み込み対象のバーコード</span><p class="text-sm font-bold">01から始めるバーコード</p><p class="text-sm font-bold">20から始めるバーコード</p><p class="text-sm font-bold">30から始めるバーコード</p><p class="text-sm font-bold">80から始めるバーコード</p><p class="text-sm font-bold">90から始めるバーコード</p>',
           });
           return false;
         }

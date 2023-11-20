@@ -14,6 +14,7 @@ use App\Model\PayoutView;
 use App\Model\CardInfoView;
 use App\Model\Hospital;
 use App\Model\Division;
+use App\Model\Order;
 
 use ApiErrorCode\FactoryApiErrorCode;
 use App\Model\Card;
@@ -297,6 +298,65 @@ class LabelBarcodeSearchController extends Controller
                     $result->count,
                     $result->code,
                     $result->message,
+                    ['LabelBarcodeSearchApi']
+                );
+                $content = $content->toJson();
+            } elseif (preg_match('/^80/', $barcode) && strlen($barcode) == 15) {
+                //発注商品ラベル
+                $order_num = substr($barcode, 2);
+                $orderedItemInfoView = Order::where('hospitalId', $user_info->getHospitalId())
+                    ->where('orderCNumber', 'BO'.$order_num)
+                    ->get();
+
+                if ($orderedItemInfoView->count == '0') {
+                    throw new Exception(
+                        FactoryApiErrorCode::factory(191)->getMessage(),
+                        FactoryApiErrorCode::factory(191)->getCode()
+                    );
+                }
+                $orderedItem = $orderedItemInfoView->data->get(0);
+                $inHospitalItemId = $orderedItem->inHospitalItemId;
+
+                $inHospitalItemView = InHospitalItemView::where('notUsedFlag', '0')
+                    ->where('inHospitalItemId', $inHospitalItemId)
+                    ->where('hospitalId', $user_info->getHospitalId())
+                    ->get();
+
+                if ($inHospitalItemView->count == '0') {
+                    throw new Exception(
+                        FactoryApiErrorCode::factory(191)->getMessage(),
+                        FactoryApiErrorCode::factory(191)->getCode()
+                    );
+                }
+
+                $record = $inHospitalItemView->data->get(0);
+                $data = [
+                    'divisionId' => $orderedItem->divisionId,
+                    'itemId' => $record->itemId,
+                    'maker' => $record->makerName,
+                    'shouhinName' => $record->itemName,
+                    'code' => $record->itemCode,
+                    'kikaku' => $record->itemStandard,
+                    'irisu' => $record->quantity,
+                    'kakaku' => $record->price,
+                    'jan' => $record->itemJANCode,
+                    'oroshi' => $record->distributorName,
+                    'recordId' => $record->inHospitalItemId,
+                    'unit' => $record->quantityUnit,
+                    'itemUnit' => $record->itemUnit,
+                    'distributorId' => $record->distributorId,
+                    'count' => (int) $record->quantity,
+                    'labelId' => $record->labelId,
+                    'unitPrice' => $record->unitPrice,
+                    'lotFlag' => $record->lotManagement == 1 ? 'はい' : '',
+                    'lotFlagBool' => $record->lotManagement,
+                ];
+
+                $content = new ApiResponse(
+                    $data,
+                    $orderedItemInfoView->count,
+                    $orderedItemInfoView->code,
+                    $orderedItemInfoView->message,
                     ['LabelBarcodeSearchApi']
                 );
                 $content = $content->toJson();

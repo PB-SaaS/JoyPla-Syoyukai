@@ -335,6 +335,47 @@ namespace JoyPla\Application\Interactors\Api\Barcode {
                         $record->divisionId
                     );
                 }
+            } elseif(
+                preg_match('/^80/', $inputData->barcode) &&
+                strlen($inputData->barcode) == 15
+            ){
+                //order:発注商品ラベル
+
+                $type = 'order';
+
+                //発注商品の特定
+                $inHospitalItems; //これにデータを入れてく
+                //発注商品ラベルから発行されたラベル
+                $order_num = substr($inputData->barcode, 2);
+
+                $orderItem = ModelRepository::getOrderItemViewInstance()
+                    ->where('hospitalId',$inputData->user->hospitalId)
+                    ->where('orderCNumber', 'BO'.$order_num)
+                    ->get()
+                    ->first();
+                if (empty($orderItem)) {
+                    throw new Exception('Order Label');
+                }
+
+                //商品情報の取得
+                $InHospitalItemView = ModelRepository::getInHospitalItemViewInstance()
+                    ->where('notUsedFlag', '1', '!=')
+                    ->where('hospitalId', $inputData->user->hospitalId)
+                    ->where('inHospitalItemId', $orderItem->inHospitalItemId);
+
+                $result = $InHospitalItemView->get();
+                $count = $result->count();
+                if ($result->count() == '0') {
+                    throw new Exception('Not Ordered Label');
+                }
+                $inHospitalItems = $result->all();
+
+                foreach($inHospitalItems as $key => $val){
+                    $inHospitalItems[$key]->set('orderQuantity', $orderItem->orderQuantity ? $orderItem->orderQuantity : 1);
+                    $inHospitalItems[$key]->set('divisionId', $orderItem->divisionId);
+                    $inHospitalItems[$key]->set('divisionName', $orderItem->divisionName);
+                }
+
             } elseif (strlen($inputData->barcode) == 13) {
                 //JanCode
 

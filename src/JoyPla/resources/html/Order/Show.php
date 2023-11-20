@@ -93,6 +93,9 @@
                       <p class="w-full">お待ちください...</p>
                     </template>
                   </v-button-default>
+                  <v-button-default type="button" class="w-full" @click.native="openLabel( order.orderId )">
+                    発注商品ラベルを表示
+                  </v-button-default>
                 </div>
               </div>
               <div class="lg:w-4/5 p-2">
@@ -461,9 +464,14 @@ var JoyPlaApp = Vue.createApp({
       };
 
       const openSlip = ( url ) => {
-        location.href = _ROOT + "&path=/order/" + url;    
+        location.href = _ROOT + "&path=/order/" + url;
       }
-      
+
+      const openLabel = ( orderId ) => {
+        const url = _ROOT + "&path=/label/order/" + orderId;
+        window.open(url, '_blank');
+      }
+
       const deleteSlip = ( orderId ) => 
       {
           Swal.fire({
@@ -547,6 +555,7 @@ var JoyPlaApp = Vue.createApp({
         complete,
         openPrint,
         openSlip,
+        openLabel,
         searchClear,
         searchExec,
         changeParPage,
