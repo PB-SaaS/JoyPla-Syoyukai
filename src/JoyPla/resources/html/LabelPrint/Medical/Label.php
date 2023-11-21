@@ -72,7 +72,6 @@ body {
                                                     <p>{{ inHospitalItem.itemJANCode }}</p>
                                                 </div>
                                             </td>
-                                            <!-- @TODO ロット番号と使用期限は任意項目のため空文字のときの表示を確認する。 -->
                                             <td class="border border-slate-100 p-4 pr-8 text-slate-500">
                                                 <v-input-number 
                                                 :name="`items[${idx}].target[${pIdx}].print[${printIdx}].print`"
@@ -129,9 +128,6 @@ body {
 </div>
 <script>
     const PHPData = <?php echo json_encode($inHospitalItems, true); ?>;
-    
-    // Debug用
-    console.log(PHPData);
 
     var JoyPlaApp = Vue.createApp({
         components: {
