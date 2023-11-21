@@ -21,7 +21,7 @@ class MedicalLabelController extends Controller
 
     public function MedicalOrderLabelPrint(array $vars)
     {
-        $orderId = $vars['orderId'];
+        $orderId = $vars['targetId'];
 
         $request = $this->request->get('request' , []);
 
@@ -30,6 +30,13 @@ class MedicalLabelController extends Controller
         ->where('orderNumber', $orderId)
         ->get()
         ->first();
+
+        if(
+            gate('is_user') &&
+            $order->divisionId !== $this->request->user()->divisionId
+        ){
+            Router::abort(403);
+        }
 
         $orderItems = ModelRepository::getOrderItemInstance()
         ->where('hospitalId', $this->request->user()->hospitalId)
@@ -41,7 +48,7 @@ class MedicalLabelController extends Controller
         foreach( $orderItems as $orderItem )
         {
             $requestItem = array_find($request, function($req) use ($orderItem){
-                return $orderItem['orderCNumber'] === $req['orderCNumber'];
+                return $orderItem['inHospitalItemId'] === $req['targetItemId'];
             });
 
             $print = [];
@@ -83,10 +90,10 @@ class MedicalLabelController extends Controller
             {
                 if($item->inHospitalItemId === $printItem['inHospitalItemId'])
                 {
-                    if(!$inHospitalItems[$key]->order){
-                        $inHospitalItems[$key]->order = [];
+                    if(!$inHospitalItems[$key]->target){
+                        $inHospitalItems[$key]->target = [];
                     }
-                    $inHospitalItems[$key]->order[] = $printItem;
+                    $inHospitalItems[$key]->target[] = $printItem;
                 }
                 $inHospitalItems[$key]->quantity = $printItem['orderQuantity'];
             }
@@ -101,7 +108,201 @@ class MedicalLabelController extends Controller
 
         $words = $this->convertInputDateForOrder($inHospitalItems);
         $body = View::forge('html/LabelPrint/Medical/Label', [
-            'orderId' => $orderId,
+            'targetId' => $orderId,
+            'targetPath' => '/label/medicalOrder/',
+            'inHospitalItems' => $inHospitalItems,
+            'totalPrintCount' => count($words),
+            'labelHtml' => $this->convertKeyword($labeldesign , $words),
+        ], false)->render();
+
+        echo view('html/Common/Template', compact('body'), false)->render();
+    }
+    public function MedicalReceivedLabelPrint(array $vars) {
+        $receivingHId = $vars['targetId'];
+
+        $request = $this->request->get('request' , []);
+
+        $received = ModelRepository::getReceivedInstance()
+        ->where('hospitalId', $this->request->user()->hospitalId)
+        ->where('receivingHId', $receivingHId)
+        ->get()
+        ->first();
+
+        if(
+            gate('is_user') &&
+            $received->divisionId !== $this->request->user()->divisionId
+        ){
+            Router::abort(403);
+        }
+
+        $receivedItems = ModelRepository::getReceivedItemInstance()
+        ->where('hospitalId', $this->request->user()->hospitalId)
+        ->where('receivingHId', $receivingHId)
+        ->get();
+
+        $receivedItems = $receivedItems->toArray();
+
+        foreach( $receivedItems as $receivedItem )
+        {
+            $requestItem = array_find($request, function($req) use ($receivedItem){
+                return $receivedItem['inHospitalItemId'] === $req['targetItemId'];
+            });
+
+            $print = [];
+            if(empty($requestItem['print']))
+            {
+                $print[] = [
+                    'count' => $receivedItem['quantity'], //数量欄
+                    'print' => 1 // 初期値
+                ];
+            } else {
+                $print = $requestItem['print'];
+            }
+
+            $requests[] = [
+                'inHospitalItemId' => $receivedItem['inHospitalItemId'],
+                'print'            => $print,
+            ];
+        }
+
+        $requestPrint = $requests;
+
+        $repository = new RepositoryProvider();
+        $hospital = $repository->getHospitalRepository()->findRow(new HospitalId($this->request->user()->hospitalId));
+        $divisionId = new DivisionId($received->divisionId);
+        $division = $repository->getDivisionRepository()->find(new HospitalId($received->hospitalId), $divisionId);
+
+        $inHospitalItems = $repository->getInHospitalItemRepository()->getInHospitalItemViewByInHospitalItemIds(
+            new HospitalId($this->request->user()->hospitalId),
+            array_map(function($item){
+                return new InHospitalItemId($item['inHospitalItemId']);
+            },$requestPrint)
+        );
+
+        foreach($inHospitalItems as $key => $item)
+        {
+            foreach($requestPrint as $rKey => $printItem)
+            {
+                if($item->inHospitalItemId === $printItem['inHospitalItemId'])
+                {
+                    if(!$inHospitalItems[$key]->target){
+                        $inHospitalItems[$key]->target = [];
+                    }
+                    $inHospitalItems[$key]->target[] = $printItem;
+                }
+                // $inHospitalItems[$key]->quantity = $printItem['orderQuantity'];
+            }
+            $inHospitalItems[$key]->divisionName = $division->getDivisionName()->value();
+        }
+
+        $inHospitalItems = array_map(function($inHospitalItem){
+            return $inHospitalItem->toArray();
+        },$inHospitalItems);
+
+        $labeldesign = $hospital->labelDesign2 !== '' ?  $hospital->labelDesign2 : $this->defaultDesign2();
+
+        $words = $this->convertInputDateForOrder($inHospitalItems);
+        $body = View::forge('html/LabelPrint/Medical/Label', [
+            'targetId' => $receivingHId,
+            'targetPath' => '/label/medicalReceived/',
+            'inHospitalItems' => $inHospitalItems,
+            'totalPrintCount' => count($words),
+            'labelHtml' => $this->convertKeyword($labeldesign , $words),
+        ], false)->render();
+
+        echo view('html/Common/Template', compact('body'), false)->render();
+    }
+
+    public function MedicalPayoutLabelPrint(array $vars)
+    {
+        $payoutHistoryId = $vars['targetId'];
+
+        $request = $this->request->get('request' , []);
+
+        $payout = ModelRepository::getPayoutInstance()
+        ->where('hospitalId', $this->request->user()->hospitalId)
+        ->where('payoutHistoryId', $payoutHistoryId)
+        ->get()
+        ->first();
+
+        if(
+            gate('is_user') &&
+            $payout->sourceDivisionId !== $this->request->user()->divisionId &&
+            $payout->targetDivisionId !== $this->request->user()->divisionId
+        ){
+            Router::abort(403);
+        }
+
+        $payoutItems = ModelRepository::getPayoutItemInstance()
+        ->where('hospitalId', $this->request->user()->hospitalId)
+        ->where('payoutHistoryId', $payoutHistoryId)
+        ->get();
+
+        $payoutItems = $payoutItems->toArray();
+
+        foreach( $payoutItems as $payoutItem )
+        {
+            $requestItem = array_find($request, function($req) use ($payoutItem){
+                return $payoutItem['inHospitalItemId'] === $req['targetItemId'];
+            });
+
+            $print = [];
+            if(empty($requestItem['print']))
+            {
+                $print[] = [
+                    'count' => $payoutItem['quantity'], //数量欄
+                    'print' => $payoutItem['payoutQuantity'],
+                ];
+            } else {
+                $print = $requestItem['print'];
+            }
+
+            $requests[] = [
+                'inHospitalItemId' => $payoutItem['inHospitalItemId'],
+                'print'            => $print,
+            ];
+        }
+
+        $requestPrint = $requests;
+
+        $repository = new RepositoryProvider();
+        $hospital = $repository->getHospitalRepository()->findRow(new HospitalId($this->request->user()->hospitalId));
+        $divisionId = new DivisionId($payout->sourceDivisionId);
+        $division = $repository->getDivisionRepository()->find(new HospitalId($payout->hospitalId), $divisionId);
+
+        $inHospitalItems = $repository->getInHospitalItemRepository()->getInHospitalItemViewByInHospitalItemIds(
+            new HospitalId($this->request->user()->hospitalId),
+            array_map(function($item){
+                return new InHospitalItemId($item['inHospitalItemId']);
+            },$requestPrint)
+        );
+
+        foreach($inHospitalItems as $key => $item)
+        {
+            foreach($requestPrint as $rKey => $printItem)
+            {
+                if($item->inHospitalItemId === $printItem['inHospitalItemId'])
+                {
+                    if(!$inHospitalItems[$key]->target){
+                        $inHospitalItems[$key]->target = [];
+                    }
+                    $inHospitalItems[$key]->target[] = $printItem;
+                }
+                $inHospitalItems[$key]->quantity = $printItem['payoutQuantity'];
+            }
+            $inHospitalItems[$key]->divisionName = $division->getDivisionName()->value();
+        }
+
+        $inHospitalItems = array_map(function($inHospitalItem){
+            return $inHospitalItem->toArray();
+        },$inHospitalItems);
+
+        $labeldesign = $hospital->labelDesign2 !== '' ?  $hospital->labelDesign2 : $this->defaultDesign2();
+
+        $words = $this->convertInputDateForOrder($inHospitalItems);
+        $body = View::forge('html/LabelPrint/Medical/Label', [
+            'targetId' => $payoutHistoryId,
+            'targetPath' => '/label/medicalPayout/',
             'inHospitalItems' => $inHospitalItems,
             'totalPrintCount' => count($words),
             'labelHtml' => $this->convertKeyword($labeldesign , $words),
@@ -109,31 +310,24 @@ class MedicalLabelController extends Controller
 
         echo view('html/Common/Template', compact('body'), false)->render();
 
-    }
-    public function MedicalReceivedLabelPrint(array $vars) {
-
-    }
-
-    public function MedicalPayoutLabelPrint(array $vars)
-    {
 
     }
 
     private function convertInputDateForOrder(array $requestData){
         $response = [];
         foreach($requestData as $rkey => $rdata){
-            foreach($rdata['order'] as $orderKey => $orderData){
-                foreach($orderData['print'] as $okey => $odata){
-                    for($num = 0 ; $num < $odata['print'] ; $num++){
+            foreach($rdata['target'] as $targetKey => $targetData){
+                foreach($targetData['print'] as $tkey => $tdata){
+                    for($num = 0 ; $num < $tdata['print'] ; $num++){
                         $response[] = [
                             'printDate' => date('y/m/d'),
                             'itemName' => $rdata['itemName'],
                             'itemStandard' => $rdata['itemStandard'],
                             'itemUnit' => $rdata['itemUnit'],
-                            'count' => $odata['count'],
+                            'count' => $tdata['count'],
                             'catalogNo' => $rdata['catalogNo'],
                             'labelId' => $rdata['labelId'],
-                            'printCount' => $odata['print'],
+                            'printCount' => $tdata['print'],
                             'distributorName' => $rdata['distributorName'],
                             'makerName' => $rdata['makerName'],
                             'quantityUnit' => $rdata['quantityUnit'],

@@ -59,8 +59,6 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
     $useCaseProvider
 ) {
 
-    Router::map('Get','/medicalLabel', [MedicalLabelController::class, 'index']);
-
     Router::map('GET', '/', [TopController::class, 'index']);
 
     Router::map('GET', '/order', [TopController::class, 'orderpage']);
@@ -382,17 +380,17 @@ Router::group(PersonalInformationConsentMiddleware::class, function () use (
         'orderLabelPrint',
     ]);
     
-    Router::map('Get','/label/medicalOrder/:orderId', [
+    Router::map('Get','/label/medicalOrder/:targetId', [
         MedicalLabelController::class,
         'MedicalOrderLabelPrint'
     ]);
 
-    Router::map('Get','/label/medicalReceived/:receivedId', [
+    Router::map('Get','/label/medicalReceived/:targetId', [
         MedicalLabelController::class,
         'MedicalReceivedLabelPrint'
     ]);
 
-    Router::map('Get','/label/medicalPayout/:payoutHistoryId', [
+    Router::map('Get','/label/medicalPayout/:targetId', [
         MedicalLabelController::class,
         'MedicalPayoutLabelPrint'
     ]);

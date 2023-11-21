@@ -63,10 +63,10 @@ body {
                         </thead>
                         <tbody>
                             <template  v-for="(inHospitalItem , idx) in values.items">
-                                <template v-for="(order , pIdx) in inHospitalItem.order">
-                                    <template v-for="(print , printIdx) in order.print">
+                                <template v-for="(target , pIdx) in inHospitalItem.target">
+                                    <template v-for="(print , printIdx) in target.print">
                                         <tr>
-                                            <td v-if="pIdx === 0 && printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="calcRow(inHospitalItem.order)">
+                                            <td v-if="pIdx === 0 && printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="calcRow(inHospitalItem.target)">
                                                 <div>
                                                     <p>{{ inHospitalItem.itemName }}</p>
                                                     <p>{{ inHospitalItem.itemCode }}</p>
@@ -75,11 +75,11 @@ body {
                                                 </div>
                                             </td>
                                             <!-- @TODO ロット番号と使用期限は任意項目のため空文字のときの表示を確認する。 -->
-                                            <td v-if="printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="order.print.length">{{ order.lotNumber }}</td>
-                                            <td v-if="printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="order.print.length">{{ order.lotDate }}</td>
+                                            <td v-if="printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="target.print.length">{{ target.lotNumber }}</td>
+                                            <td v-if="printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="target.print.length">{{ target.lotDate }}</td>
                                             <td class="border border-slate-100 p-4 pr-8 text-slate-500">
                                                 <v-input-number 
-                                                :name="`items[${idx}].order[${pIdx}].print[${printIdx}].print`"
+                                                :name="`items[${idx}].target[${pIdx}].print[${printIdx}].print`"
                                                 :rules="{ between: [0 , 9999] }" 
                                                 label="枚数" 
                                                 :min="0"
@@ -162,6 +162,9 @@ body {
                 validateOnMount : false
             });
 
+            const targetId = "<?php echo $targetId ?>";
+            const targetPath = "<?php echo $targetPath ?>";
+            
             const {
                 remove,
                 insert,
@@ -250,10 +253,10 @@ body {
             const createLabelModel = (values) => {
                 let model = [];
                 values.items.forEach(item => {
-                    item.order.forEach(order => {
+                    item.target.forEach(target => {
                         let obj = {};
-                        obj.orderItemId = order.inHospitalItemId
-                        obj.print = order.print
+                        obj.targetItemId = target.inHospitalItemId;
+                        obj.print = target.print;
                         model.push(obj);
                     })
                 });
@@ -266,7 +269,7 @@ body {
                 
                 let params = {};
 
-                params.path = "/medicalLabel";
+                params.path = targetPath + targetId;
                 params._method = 'get';
                 params._csrf = _CSRF;
                 params.request = JSON.stringify(encodeURIToObject(labelModel));
@@ -276,7 +279,6 @@ body {
                 // フォームの設定
                 form.method = 'post';
 
-                // @TODO このパスはAPI次第で変える必要がある。
                 form.action = _ROOT;
                 
                 // パラメータをループしてフォームに追加
@@ -308,10 +310,10 @@ body {
                 form.submit();
             });
 
-            const calcRow = (orders) => {
+            const calcRow = (targets) => {
                 let printCount = 0;
-                orders.forEach(function(order) {
-                    printCount += order.print.length;
+                targets.forEach(function(target) {
+                    printCount += target.print.length;
                 });
                 return printCount;
             }
