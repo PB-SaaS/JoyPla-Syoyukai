@@ -84,6 +84,7 @@ class MedicalLabelController extends Controller
             },$requestPrint)
         );
 
+        $filteredItems = [];
         foreach($inHospitalItems as $key => $item)
         {
             foreach($requestPrint as $rKey => $printItem)
@@ -98,13 +99,19 @@ class MedicalLabelController extends Controller
                 $inHospitalItems[$key]->quantity = $printItem['orderQuantity'];
             }
             $inHospitalItems[$key]->divisionName = $division->getDivisionName()->value();
+
+            if ($item->officialFlag == "1") {
+                $filteredItems[$key] = $inHospitalItems[$key];
+            }
         }
 
+        $inHospitalItems = $filteredItems;
         $inHospitalItems = array_map(function($inHospitalItem){
             return $inHospitalItem->toArray();
         },$inHospitalItems);
 
-        $labeldesign = $hospital->labelDesign2 !== '' ?  $hospital->labelDesign2 : $this->defaultDesign2();
+        $customLabelInstance = ModelRepository::getCustomLabelInstance()->where('hospitalId', $hospital->hospitalId)->where('designType', 2)->orderBy('id', 'desc')->get();
+        $labeldesign = $customLabelInstance->count() !== 0 ? $customLabelInstance->first()->labelDesign : $this->defaultDesign2();
 
         $words = $this->convertInputDateForOrder($inHospitalItems);
         $body = View::forge('html/LabelPrint/Medical/Label', [
@@ -117,6 +124,7 @@ class MedicalLabelController extends Controller
 
         echo view('html/Common/Template', compact('body'), false)->render();
     }
+
     public function MedicalReceivedLabelPrint(array $vars) {
         $receivingHId = $vars['targetId'];
 
@@ -179,6 +187,7 @@ class MedicalLabelController extends Controller
             },$requestPrint)
         );
 
+        $filteredItems = [];
         foreach($inHospitalItems as $key => $item)
         {
             foreach($requestPrint as $rKey => $printItem)
@@ -190,16 +199,21 @@ class MedicalLabelController extends Controller
                     }
                     $inHospitalItems[$key]->target[] = $printItem;
                 }
-                // $inHospitalItems[$key]->quantity = $printItem['orderQuantity'];
             }
             $inHospitalItems[$key]->divisionName = $division->getDivisionName()->value();
+
+            if ($item->officialFlag == "1") {
+                $filteredItems[$key] = $inHospitalItems[$key];
+            }
         }
+        $inHospitalItems = $filteredItems;
 
         $inHospitalItems = array_map(function($inHospitalItem){
             return $inHospitalItem->toArray();
         },$inHospitalItems);
 
-        $labeldesign = $hospital->labelDesign2 !== '' ?  $hospital->labelDesign2 : $this->defaultDesign2();
+        $customLabelInstance = ModelRepository::getCustomLabelInstance()->where('hospitalId', $hospital->hospitalId)->where('designType', 2)->orderBy('id', 'desc')->get();
+        $labeldesign = $customLabelInstance->count() !== 0 ? $customLabelInstance->first()->labelDesign : $this->defaultDesign2();
 
         $words = $this->convertInputDateForOrder($inHospitalItems);
         $body = View::forge('html/LabelPrint/Medical/Label', [
@@ -277,6 +291,7 @@ class MedicalLabelController extends Controller
             },$requestPrint)
         );
 
+        $filteredItems = [];
         foreach($inHospitalItems as $key => $item)
         {
             foreach($requestPrint as $rKey => $printItem)
@@ -291,13 +306,19 @@ class MedicalLabelController extends Controller
                 $inHospitalItems[$key]->quantity = $printItem['payoutQuantity'];
             }
             $inHospitalItems[$key]->divisionName = $division->getDivisionName()->value();
+
+            if ($item->officialFlag == "1") {
+                $filteredItems[$key] = $inHospitalItems[$key];
+            }
         }
 
+        $inHospitalItems = $filteredItems;
         $inHospitalItems = array_map(function($inHospitalItem){
             return $inHospitalItem->toArray();
-        },$inHospitalItems);
+        }, $inHospitalItems);
 
-        $labeldesign = $hospital->labelDesign2 !== '' ?  $hospital->labelDesign2 : $this->defaultDesign2();
+        $customLabelInstance = ModelRepository::getCustomLabelInstance()->where('hospitalId', $hospital->hospitalId)->where('designType', 2)->orderBy('id', 'desc')->get();
+        $labeldesign = $customLabelInstance->count() !== 0 ? $customLabelInstance->first()->labelDesign : $this->defaultDesign2();
 
         $words = $this->convertInputDateForOrder($inHospitalItems);
         $body = View::forge('html/LabelPrint/Medical/Label', [
@@ -309,8 +330,6 @@ class MedicalLabelController extends Controller
         ], false)->render();
 
         echo view('html/Common/Template', compact('body'), false)->render();
-
-
     }
 
     private function convertInputDateForOrder(array $requestData){

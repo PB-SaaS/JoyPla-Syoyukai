@@ -54,8 +54,6 @@ body {
                         <thead>
                             <tr>
                                 <th class="border border-slate-100 font-medium p-4 pr-8 text-left">商品情報</th>
-                                <th class="border border-slate-100 font-medium p-4 pr-8 text-left">ロット番号</th>
-                                <th class="border border-slate-100 font-medium p-4 pr-8 text-left">使用期限</th>
                                 <th class="border border-slate-100 font-medium p-4 pr-8 text-left w-0">枚数</th>
                                 <th></th>
                                 <th></th>
@@ -75,8 +73,6 @@ body {
                                                 </div>
                                             </td>
                                             <!-- @TODO ロット番号と使用期限は任意項目のため空文字のときの表示を確認する。 -->
-                                            <td v-if="printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="target.print.length">{{ target.lotNumber }}</td>
-                                            <td v-if="printIdx === 0" class="border border-slate-100 p-4 pr-8 text-slate-500" :rowspan="target.print.length">{{ target.lotDate }}</td>
                                             <td class="border border-slate-100 p-4 pr-8 text-slate-500">
                                                 <v-input-number 
                                                 :name="`items[${idx}].target[${pIdx}].print[${printIdx}].print`"
