@@ -339,9 +339,12 @@ class MedicalLabelController extends Controller
                 foreach($targetData['print'] as $tkey => $tdata){
                     for($num = 0 ; $num < $tdata['print'] ; $num++){
                         $response[] = [
+                            'nowTime' => date('Y年m月d日 H時i分s秒'),
                             'printDate' => date('y/m/d'),
                             'itemName' => $rdata['itemName'],
+                            'itemCode' => $rdata['itemCode'],
                             'itemStandard' => $rdata['itemStandard'],
+                            'itemJANCode' => $rdata['itemJANCode'],
                             'itemUnit' => $rdata['itemUnit'],
                             'count' => $tdata['count'],
                             'catalogNo' => $rdata['catalogNo'],
@@ -393,61 +396,28 @@ EOM;
         foreach($inputData as $key => $input)
         {
             $design = $template;
-            $design = str_replace('%JoyPla:itemName%',			$input['itemName'],                 $design);//商品名
-            $design = str_replace('%JoyPla:makerName%',		$input['makerName'], 		        $design);//メーカー名
-            $design = str_replace('%JoyPla:printDate%',		$input['printDate'], 					$design);//印刷日
-            $design = str_replace('%JoyPla:quantityUnit%',		$input['quantityUnit'],	            $design);//入数単位
-            $design = str_replace('%JoyPla:officialprice%',	number_format_jp((float)$input['officialprice']),  $design);//償還価格
-            $design = str_replace('%JoyPla:catalogNo%',		$input['catalogNo'], 		        $design);//カタログNo
-            $design = str_replace('%JoyPla:itemStandard%',		$input['itemStandard'], 		    $design);//規格
+            $design = str_replace('%JoyPla:nowTime%',          $input['nowTime'],                                 $design);//バーコードの値
+            $design = str_replace('%JoyPla:num%',              $key + 1,                                          $design);//枚目
+            $design = str_replace('%JoyPla:inHPId%',           $input['inHospitalItemId'],                        $design);//院内商品ID
+            $design = str_replace('%JoyPla:itemName%',         $input['itemName'],                                $design);//商品名
+            $design = str_replace('%JoyPla:itemCode%',         $input['itemCode'],                                $design);//製品コードb
+            $design = str_replace('%JoyPla:makerName%',        $input['makerName'],                               $design);//メーカー名
+            $design = str_replace('%JoyPla:printDate%',        $input['printDate'],                               $design);//印刷日
+            $design = str_replace('%JoyPla:itemMaker%',        $input['makerName'],                               $design);//メーカー名
+            $design = str_replace('%JoyPla:quantityUnit%',     $input['quantityUnit'],                            $design);//入数単位
+            $design = str_replace('%JoyPla:officialprice%',    number_format_jp((float)$input['officialprice']),  $design);//償還価格
+            $design = str_replace('%JoyPla:itemUnit%',         $input['itemUnit'],                                $design);//個数単位
+            $design = str_replace('%JoyPla:quantity%',         $input['count'],                                   $design);//入り数
+            $design = str_replace('%JoyPla:catalogNo%',        $input['catalogNo'],                               $design);//カタログNo
+            $design = str_replace('%JoyPla:labelId%',          $input['labelId'],                                 $design);//ラベルID
+            $design = str_replace('%JoyPla:printCount%',       $input['printCount'],                              $design);//印刷数
+            $design = str_replace('%JoyPla:itemStandard%',     $input['itemStandard'],                            $design);//規格
+            $design = str_replace('%JoyPla:itemJANCode%',      $input['itemJANCode'],                             $design);//JANコードb
             $replacedMedicineCategory = str_replace("\n", '<br>', $input['medicineCategory']);
-            $design = str_replace('%JoyPla:medicineCategory%',	$replacedMedicineCategory, 		$design);//(特定保険材料名称「保険請求分類(医科)」)
-            $design = str_replace('%JoyPla:distributorName%',		$input['distributorName'], 		        $design);//卸業者            
+            $design = str_replace('%JoyPla:medicineCategory%', $replacedMedicineCategory,                         $design);//(特定保険材料名称「保険請求分類(医科)」)
+            $design = str_replace('%JoyPla:distributorName%',  $input['distributorName'],                         $design);//卸業者            
             $html .= $design;
         }   
         return $html;
     }
-
-
-    private function convertInputDataForPayout(array $requestData)
-    {
-        $response = [];
-        foreach($requestData as $rkey => $rdata){
-            foreach($rdata['payout'] as $paykey => $paydata){
-                foreach($paydata['print'] as $pkey => $pdata){
-                    for($num = 0 ; $num < $pdata['print'] ; $num++){
-                        $response[] = [
-                            'printDate' => date('y/m/d'),
-                            'inHospitalItemId' => $paydata['inHospitalItemId'],
-                            'itemName' => $rdata['itemName'],
-                            'itemCode' => $rdata['itemCode'],
-                            'itemStandard' => $rdata['itemStandard'],
-                            'itemJANCode' => $rdata['itemJANCode'],
-                            'itemUnit' => $rdata['itemUnit'],
-                            'count' => $pdata['count'],
-                            'catalogNo' => $rdata['catalogNo'],
-                            'labelId' => $rdata['labelId'],
-                            'printCount' => $pdata['print'],
-                            'distributorName' => $rdata['distributorName'],
-                            'makerName' => $rdata['makerName'],
-                            'quantityUnit' => $rdata['quantityUnit'],
-                            'divisionName' => $rdata['target']['divisionName'],
-                            'rackName' => $rdata['target']['rackName'],
-                            'sourceDivisionName' => $rdata['source']['divisionName'],
-                            'sourceRackName' => $rdata['source']['rackName'],
-                            'constantByDiv' => $rdata['target']['constantByDiv'],
-                            'officialFlag' => $rdata['officialFlag'],
-                            'lotNumber' => $paydata['lotNumber'],
-                            'lotDate' => $paydata['lotDate'],
-                            'medicineCategory' => $rdata['medicineCategory'],
-                            'officialprice' => $rdata['officialprice'],
-                        ];
-                    }
-                }
-            }
-        }
-        return $response;
-    }
-
-
 }
