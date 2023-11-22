@@ -191,7 +191,6 @@
         const _CSRF = "<?php echo Csrf::generate(16); ?>";
         const _APIURL = "%url/rel:mpgt:ApiRoot%";
         const _ROOT = "%url/rel:mpgt:Root%";
-        console.log(_ROOT);
     </script>
 
     <script>

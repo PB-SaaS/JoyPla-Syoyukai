@@ -152,7 +152,6 @@ body {
 </div>
 <script>
     const PHPData = <?php echo json_encode($inHospitalItems, true); ?>;
-    console.log(PHPData);
     var JoyPlaApp = Vue.createApp({
         components: {
             'v-text': vText,
