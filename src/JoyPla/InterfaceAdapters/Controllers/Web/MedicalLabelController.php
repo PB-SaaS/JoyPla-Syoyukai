@@ -101,7 +101,7 @@ class MedicalLabelController extends Controller
             $inHospitalItems[$key]->divisionName = $division->getDivisionName()->value();
 
             if ($item->officialFlag == "1") {
-                $filteredItems[$key] = $inHospitalItems[$key];
+                $filteredItems[] = $inHospitalItems[$key];
             }
         }
 
