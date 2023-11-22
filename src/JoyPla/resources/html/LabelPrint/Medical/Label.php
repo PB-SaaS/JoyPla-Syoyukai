@@ -30,13 +30,13 @@ body {
 }
 
 @page {
-	margin: 5mm;
+    margin: 5mm;
 }
 @media print{
     #createLabel{
         width: auto !important;
         border : 0px dotted #cccccc !important;
-	    padding: 0;
+        padding: 0;
     }
 }
 </style>
