@@ -53,10 +53,8 @@ body {
                     <table class="table-auto w-full text-sm">
                         <thead>
                             <tr>
-                                <th class="border border-slate-100 font-medium p-4 pr-8 text-left">商品情報</th>
-                                <th class="border border-slate-100 font-medium p-4 pr-8 text-left w-0">枚数</th>
-                                <th></th>
-                                <th></th>
+                                <th class="border border-slate-100 font-medium p-4 pr-8 text-left w-1/2">商品情報</th>
+                                <th class="border border-slate-100 font-medium p-4 pr-8 text-left w-1/2">枚数</th>
                             </tr>
                         </thead>
                         <tbody>
