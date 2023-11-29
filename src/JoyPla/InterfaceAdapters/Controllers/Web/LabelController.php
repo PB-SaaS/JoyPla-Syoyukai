@@ -423,6 +423,7 @@ EOM;
                 <span>%JoyPla:itemMaker%</span><br>
                 <span>%JoyPla:itemName%</span><br>
                 <span>%JoyPla:itemStandard%</span><br>
+                <span>%JoyPla:itemCode%</span><br>
                 <span>%JoyPla:divisionName%</span><br>
             </div>
             <div class='uk-text-right uk-padding-remove'>
