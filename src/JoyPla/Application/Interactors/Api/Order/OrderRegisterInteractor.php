@@ -77,15 +77,6 @@ namespace JoyPla\Application\Interactors\Api\Order {
             $ids = [];
             $orders = [];
 
-            // 注文商品の名前を出力
-            // $array = [];
-            // foreach ($orderItems as $item) {                
-            //     $array[] = $item->getItem()->getItemName();
-            // }
-            // $jsonString = json_encode($array);
-            // throw new Exception($jsonString);
-            // [{\"value\":\"\ビ\オ\フ\ェ\ル\ミ\ン\"},{\"value\":\"\ポ\ッ\キ\ー\"},{\"value\":\"\消\毒\用\ア\ル\コ\ー\ル\綿\"}]
-
             $breakOuterLoop = false;
             // 発注商品ごとにループ　例）商品A,B,C
             foreach ($orderItems as $i) {
