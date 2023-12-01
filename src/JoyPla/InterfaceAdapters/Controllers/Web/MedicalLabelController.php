@@ -160,7 +160,7 @@ class MedicalLabelController extends Controller
             if(empty($requestItem['print']))
             {
                 $print[] = [
-                    'count' => $receivedItem['quantity'], //数量欄
+                    'count' => $receivedItem['receivingCount'], //数量欄
                     'print' => 1 // 初期値
                 ];
             } else {
@@ -264,7 +264,7 @@ class MedicalLabelController extends Controller
             if(empty($requestItem['print']))
             {
                 $print[] = [
-                    'count' => $payoutItem['quantity'], //数量欄
+                    'count' => ( $payoutItem['payoutCount'] != '' ) ? $payoutItem['payoutCount']  : $payoutItem['payoutQuantity'], //数量欄
                     'print' => $payoutItem['payoutQuantity'],
                 ];
             } else {
@@ -341,6 +341,7 @@ class MedicalLabelController extends Controller
                         $response[] = [
                             'nowTime' => date('Y年m月d日 H時i分s秒'),
                             'printDate' => date('y/m/d'),
+                            'inHospitalItemId' => $rdata['inHospitalItemId'],
                             'itemName' => $rdata['itemName'],
                             'itemCode' => $rdata['itemCode'],
                             'itemStandard' => $rdata['itemStandard'],
