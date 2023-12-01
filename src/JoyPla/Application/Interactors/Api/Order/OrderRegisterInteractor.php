@@ -76,21 +76,36 @@ namespace JoyPla\Application\Interactors\Api\Order {
             }
             $ids = [];
             $orders = [];
+
+            $breakOuterLoop = false;
+            // 発注商品ごとにループ　例）商品A,B,C
             foreach ($orderItems as $i) {
+                if ($breakOuterLoop) {
+                    break;
+                }
                 $exist = false;
                 if ($inputData->integrate) {
+                    // 発注履歴から過去の未発注の伝票を取得し、最新の未発注書からループ　例）未発注書A,未発注書B,
                     foreach ($historyOrders as $key => $h) {
+                        // 同一発注部署、同一業者ならば
                         if (
                             $h->equalOrderSlip(
                                 $i->getDivision(),
                                 $i->getDistributor()
                             ) &&
+                            // 発注数が0をまたがないならば
                             ($h->isPlus() === $i->isPlus() ||
                                 $h->isMinus() === $i->isMinus())
                         ) {
+                            // 最新の未発注伝票に発注数を加算し、既存伝票にない商品を追加
+                            $latestPastOrder = $h;
+                            foreach ($orderItems as $item) {
+                                $latestPastOrder = $latestPastOrder->addOrderItem($item);
+                            }
+                            
+                            $orders[] = $latestPastOrder;
+                            $breakOuterLoop = true;
                             $exist = true;
-                            $orders[] = $h->addOrderItem($i);
-                            unset($historyOrders[$key]);
                             break;
                         }
                     }
