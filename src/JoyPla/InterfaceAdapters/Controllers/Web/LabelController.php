@@ -416,7 +416,6 @@ EOM;
         return <<<EOM
 <div class='printarea uk-margin-remove'>
     <div>
-        <b class='font-size-16'></b>
         <div class='uk-child-width-1-2' uk-grid>
             <div class=''>
                 <span>%JoyPla:distributorName%</span><br>
@@ -428,7 +427,7 @@ EOM;
             </div>
             <div class='uk-text-right uk-padding-remove'>
                 <div class="h-12"></div>
-                入数:%JoyPla:quantity%%JoyPla:quantityUnit%</span><br>
+                <span>入数:%JoyPla:quantity%%JoyPla:quantityUnit%</span><br>
             </div>
         </div>
         <div class='uk-text-center' id='barcode_%JoyPla:num%'>%JoyPla:barcodeId%</div>
