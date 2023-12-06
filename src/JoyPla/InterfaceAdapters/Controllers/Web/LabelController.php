@@ -431,7 +431,6 @@ EOM;
             </div>
         </div>
         <div class='uk-text-center' id='barcode_%JoyPla:num%'>%JoyPla:barcodeId%</div>
-        <div class='uk-text-right'></div>
     </div>
 </div>
 EOM;
