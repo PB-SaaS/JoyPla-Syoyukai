@@ -153,6 +153,7 @@ require_once('JoyPla/InterfaceAdapters/Controllers/Web/ItemAndPriceAndInHospital
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/ItemListController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/ItemRequestController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/LabelController.php');
+require_once('JoyPla/InterfaceAdapters/Controllers/Web/MedicalLabelController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/NotificationController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/OptionController.php');
 require_once('JoyPla/InterfaceAdapters/Controllers/Web/OrderController.php');
