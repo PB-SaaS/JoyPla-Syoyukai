@@ -38,7 +38,7 @@ class MedicalLabelController extends Controller
             Router::abort(403);
         }
 
-        $orderItems = ModelRepository::getOrderItemInstance()
+        $orderItems = ModelRepository::getOrderItemViewInstance()
         ->where('hospitalId', $this->request->user()->hospitalId)
         ->where('orderNumber', $orderId)
         ->get();
@@ -56,7 +56,7 @@ class MedicalLabelController extends Controller
             {
                 $print[] = [
                     'count' => $orderItem['quantity'], //数量欄
-                    'print' => $orderItem['orderQuantity'], //多分枚数欄：発注数ベース
+                    'print' => $orderItem['quantity'], //枚数欄：入数
                 ];
             } else {
                 $print = $requestItem['print'];
@@ -143,7 +143,7 @@ class MedicalLabelController extends Controller
             Router::abort(403);
         }
 
-        $receivedItems = ModelRepository::getReceivedItemInstance()
+        $receivedItems = ModelRepository::getReceivedItemViewInstance()
         ->where('hospitalId', $this->request->user()->hospitalId)
         ->where('receivingHId', $receivingHId)
         ->get();
@@ -160,8 +160,8 @@ class MedicalLabelController extends Controller
             if(empty($requestItem['print']))
             {
                 $print[] = [
-                    'count' => $receivedItem['receivingCount'], //数量欄
-                    'print' => 1 // 初期値
+                    'count' => $receivedItem['quantity'], //数量欄
+                    'print' => $receivedItem['quantity'], //枚数欄：入数
                 ];
             } else {
                 $print = $requestItem['print'];
