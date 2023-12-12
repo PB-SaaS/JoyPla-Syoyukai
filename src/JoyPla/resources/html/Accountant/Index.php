@@ -405,7 +405,7 @@ var JoyPlaApp = Vue.createApp({
       const deleteSlip = ( accountantId ) => 
       {
           Swal.fire({
-            title: '消費伝票を削除',
+            title: '会計伝票を削除',
             text: "削除後は元に戻せません。\r\nよろしいですか？",
             icon: 'warning',
             confirmButtonText: '削除します',
