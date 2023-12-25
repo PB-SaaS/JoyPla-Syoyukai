@@ -38,24 +38,7 @@
                     <form method="post" action="/regist/Reg2">
                         <input type="hidden" name="confirm" value="true">
                         <div class="smp_tmpl">
-                            <dl class="cf">
-                                <dt class="title">
-                                    部署
-                                </dt>
-                                <dd class="data ">
-                                    <?php echo $divisionName?>
-                                    <br>
-                                </dd>
-                            </dl>
-                            <dl class="cf">
-                                <dt class="title">
-                                    ユーザー権限
-                                </dt>
-                                <dd class="data ">
-                                    $userPermission$
-                                    <br>
-                                </dd>
-                            </dl>
+                            
                             <dl class="cf">
                                 <dt class="title">
                                     ログインID

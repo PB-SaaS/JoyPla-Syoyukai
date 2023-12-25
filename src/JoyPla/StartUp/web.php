@@ -7,6 +7,7 @@ require_once 'JoyPla/require.php';
 /** components */
 
 use framework\Http\Request;
+use framework\Http\View;
 use framework\Routing\Router;
 use JoyPla\InterfaceAdapters\Controllers\Web\AcceptanceController;
 use JoyPla\InterfaceAdapters\Controllers\Web\PayoutController;
@@ -54,6 +55,11 @@ $useCaseProvider = new UseCaseProvider(
 Router::map('GET', '/agree', [AgreeFormController::class, 'index']);
 
 Router::map('POST', '/agree', [AgreeFormController::class, 'send']);
+
+Router::map('GET' , '/select/affiliation', function (){
+    $body = View::forge('html/Common/Affiliation', [], false)->render();
+    echo view('html/Common/Template', compact('body'), false)->render();
+});
 
 Router::group(PersonalInformationConsentMiddleware::class, function () use (
     $useCaseProvider

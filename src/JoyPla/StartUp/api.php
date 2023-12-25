@@ -9,6 +9,7 @@ require_once 'JoyPla/require.php';
 use App\Http\Middleware\VerifyCsrfTokenMiddleware;
 use framework\Http\Request;
 use framework\Routing\Router;
+use framework\SpiralConnecter\SpiralDB;
 use JoyPla\InterfaceAdapters\Controllers\Api\AcceptanceController;
 use JoyPla\InterfaceAdapters\Controllers\Api\BarcodeController;
 use JoyPla\InterfaceAdapters\Controllers\Api\ConsumptionController;
@@ -46,11 +47,70 @@ $useCaseProvider = new UseCaseProvider(
     $queryProvider,
     $presenterProvider
 );
+$request = new Request();
 //Router::map('Get','/api/order/maintenance',[OrderController::class,'maintenance']);
 
 Router::group(VerifyCsrfTokenMiddleware::class, function () use (
-    $useCaseProvider
+    $useCaseProvider,$request
 ) {
+    Router::map('GET', '/api/user/affiliation', function($vars) {
+        $auth =  new Auth('NJ_HUserDB', [
+            'id',
+            'registrationTime',
+            'updateTime',
+            'authKey',
+            'hospitalId',
+            'divisionId',
+            'userPermission',
+            'loginId',
+            'loginPassword',
+            'name',
+            'nameKana',
+            'mailAddress',
+            'remarks',
+            'termsAgreement',
+            'tenantId',
+            'agreementDate',
+            'hospitalAuthKey',
+            'userCheck',
+            'affiliationHId'
+        ]);
+        $data = SpiralDB::title('HAffiliationView')->value(['loginId','hospitalName','affiliationHId'])->where('loginId' , $auth->loginId)->get();
+        $res =[['value'=> '', 'label' => '--- 選択してください ---']];
+        foreach($data as $d){
+            $res[] = ['value'=> $d->affiliationHId , 'label' => $d->hospitalName];
+        }
+        echo (new ApiResponse($res , 1 , 200 , 'success', []))->toJson();
+    });
+    Router::map('POST', '/api/user/change/affiliation', function($vars) use ($request){
+        $auth =  new Auth('NJ_HUserDB', [
+            'id',
+            'registrationTime',
+            'updateTime',
+            'authKey',
+            'hospitalId',
+            'divisionId',
+            'userPermission',
+            'loginId',
+            'loginPassword',
+            'name',
+            'nameKana',
+            'mailAddress',
+            'remarks',
+            'termsAgreement',
+            'tenantId',
+            'agreementDate',
+            'hospitalAuthKey',
+            'userCheck',
+            'affiliationHId'
+        ]);
+
+        $data = SpiralDB::title('NJ_HUserDB')->where('loginId' , $auth->loginId)->update([
+            'affiliationHId' => $request->affiliationId   
+        ]);
+        echo (new ApiResponse([], $data  , 200 , 'success', []))->toJson();
+    });
+
     Router::map('GET', '/api/division/index', [
         DivisionController::class,
         'index',
@@ -443,7 +503,6 @@ $router = new Router();
 $app = new JoyPlaApplication();
 $exceptionHandler = new ApiExceptionHandler();
 $kernel = new \framework\Http\Kernel($app, $router, $exceptionHandler);
-$request = new Request();
 
 $auth = $app->getAuth();
 

@@ -52,6 +52,7 @@ class JoyPlaApplication extends Application
             'agreementDate',
             'hospitalAuthKey',
             'userCheck',
+            'affiliationHId'
         ]);
     }
 

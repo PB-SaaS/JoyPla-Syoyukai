@@ -109,4 +109,8 @@ class UserInfo{
         }
         return false;
     }
+
+    public function getAffiliationHospitalId(){
+        return $this->spiral->getContextByFieldTitle("affiliationHId");
+    }
 }

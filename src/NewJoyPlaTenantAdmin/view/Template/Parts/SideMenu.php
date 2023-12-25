@@ -9,6 +9,13 @@ $auth = new App\Lib\Auth(); ?>
         <span class="uk-text-default"><?php echo $auth->name; ?></span>
     </div>
     <ul class="uk-nav-default uk-nav-divider uk-nav-parent-icon uk-margin" uk-nav>
+        <li class="uk-parent <?php echo $n0; ?>">
+            <a href="#"><span class="uk-margin-small-right" uk-icon="icon: user"></span> 病院ユーザー管理</a>
+            <ul class="uk-nav-sub">
+                <li class=" <?php echo $n0_1; ?>"><a href="%url/rel:mpgt:Facility%&Action=Users&table_cache=true">病院ユーザー管理</a></li>
+                <li class=" <?php echo $n0_2; ?>"><a href="%url/rel:mpgt:Facility%&Action=UserReg&table_cache=true">病院ユーザー登録</a></li>
+            </ul>
+        </li>
         <li class="uk-parent <?php echo $n1; ?>">
             <a href="#"><span class="uk-margin-small-right" uk-icon="icon: users"></span> 病院情報管理</a>
             <ul class="uk-nav-sub">
@@ -103,12 +110,6 @@ $auth = new App\Lib\Auth(); ?>
                 <?php endif; ?>
                 <?php if ($auth->Gate('InventoryMovement')): ?>
                 <li class=" <?php echo $n4_12; ?>"><a href="%url/rel:mpgt:MonthlyReport%&Action=InventoryMovement&table_cache=true">棚卸実績</a></li>
-                <?php endif; ?>
-                <?php if ($auth->Gate('ReceiveHistoryMCH')): ?>
-                <li class=" <?php echo $n4_10; ?>"><a href="%url/rel:mpgt:History%&Action=ReceivingHistoryMCH&table_cache=true">入庫実績(MCH様)</a></li>
-                <?php endif; ?>
-                <?php if ($auth->Gate('ReturnHistoryMCH')): ?>
-                <li class=" <?php echo $n4_11; ?>"><a href="%url/rel:mpgt:History%&Action=ReturnHistoryMCH&table_cache=true">返品実績(MCH様)</a></li>
                 <?php endif; ?>
             </ul>
         </li>

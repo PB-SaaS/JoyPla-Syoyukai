@@ -45,33 +45,6 @@
                         <div class="smp_tmpl">
                             <dl class="cf">
                                 <dt class="title">
-                                    部署
-                                    <span class="need">必須</span>
-                                </dt>
-                                <dd class="data " id="division">
-                                    <searchable-select name="divisionId" :error="'$errorInputColor:divisionId$' == 'error'" v-model="divisionId" :default="divisionId" :options="divisionOptions"></searchable-select>
-                                    <br>
-                                    <span class="msg">$error:divisionId$</span>
-                                </dd>
-                            </dl>
-                            <dl class="cf">
-                                <dt class="title">
-                                    ユーザー権限
-                                </dt>
-                                <dd class="data ">
-
-                                    <select class="$errorInputColor:userPermission$" name="userPermission">
-                                        <option value="">----- 選択してください -----</option>
-                                        <option value="1" $userPermission:1$>管理者</option>
-                                        <option value="2" $userPermission:2$>担当者</option>
-                                        <option value="3" $userPermission:3$>承認者</option>
-                                    </select>
-                                    <br>
-                                    <span class="msg">$error:userPermission$</span>
-                                </dd>
-                            </dl>
-                            <dl class="cf">
-                                <dt class="title">
                                     ログインID
                                     <span class="need">必須</span>
                                 </dt>

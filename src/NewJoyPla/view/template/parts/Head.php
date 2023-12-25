@@ -8,6 +8,7 @@
 <!-- UIkit JS --> 
 <script src="https://i02.smp.ne.jp/u/joypla/new/js/uikit.min.js" charset="UTF-8"></script>
 <script src="https://i02.smp.ne.jp/u/joypla/new/js/uikit-icons.min.js" charset="UTF-8"></script>
+    <script src="https://i02.smp.ne.jp/u/joypla_developer/340/axios.min.js"></script>
 
 <script src="https://i02.smp.ne.jp/u/joypla/new/js/jquery-3.5.1.js" charset="UTF-8"></script>
 

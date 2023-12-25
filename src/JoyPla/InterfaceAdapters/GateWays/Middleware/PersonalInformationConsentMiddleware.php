@@ -12,6 +12,10 @@ class PersonalInformationConsentMiddleware extends Middleware implements
     public function process(array $vars): void
     {
         $auth = $this->request->user();
+        if($auth->affiliationHId === ''){
+            Router::redirect('/select/affiliation', $this->request);
+            exit();
+        }
         if ($auth->termsAgreement != '2') {
             Router::redirect('/agree', $this->request);
             exit();

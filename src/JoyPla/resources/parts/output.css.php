@@ -2485,10 +2485,6 @@ video {
   font-size: 1.25rem;
 }
 
-.text-\[1\.5rem\] {
-  font-size: 1.5rem;
-}
-
 .text-\[11px\] {
   font-size: 11px;
 }

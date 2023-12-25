@@ -21,50 +21,6 @@
                         <div class="smp_tmpl">
                             <dl class="cf">
                                 <dt class="title">
-                                    部署
-                                    <span class="need">必須</span>
-                                </dt>
-                                <dd class="data ">
-
-                                    <select
-                                        name="divisionId"
-                                        class="uk-select $errorInputColor:divisionId$"
-                                        >
-                                        <option value="">----- 選択してください -----</option>
-                                        <?php 
-                                            foreach($division as $div)
-                                            {
-                                                $selected = "";
-                                                if($current_division === $div->divisionId){
-                                                    $selected = "selected";
-                                                }
-                                                echo "<option value='".$div->divisionId."' ".$selected.">". $div->divisionName ."</option>";
-                                            }
-                                        ?>
-                                    </select>
-                                    <br>
-                                    <span class="msg">$error:divisionId$</span>
-                                </dd>
-                            </dl>
-                            <dl class="cf">
-                                <dt class="title">
-                                    ユーザー権限
-                                    <span class="need">必須</span>
-                                </dt>
-                                <dd class="data ">
-
-                                    <select class="$errorInputColor:userPermission$" name="userPermission">
-                                        <option value="">----- 選択してください -----</option>
-                                        <option value="1" $userPermission:1$="$userPermission:1$">管理者</option>
-                                        <option value="2" $userPermission:2$="$userPermission:2$">担当者</option>
-                                        <option value="3" $userPermission:3$="$userPermission:3$">承認者</option>
-                                    </select>
-                                    <br>
-                                    <span class="msg">$error:userPermission$</span>
-                                </dd>
-                            </dl>
-                            <dl class="cf">
-                                <dt class="title">
                                     ログインID
                                     <span class="need">必須</span>
                                 </dt>
@@ -171,8 +127,7 @@
                         </div>
                         <input type="hidden" name="detect" value="判定">
                         <!-- HIDDEN_PARAM START -->
-                        $form:hidden$<input type="hidden" name="hospitalId" value="$hospitalId$">
-                        <input type="hidden" name="hospitalAuthKey" value="$hospitalAuthKey:val$">
+                        $form:hidden$
                         <!-- HIDDEN_PARAM END -->
                         <input class="submit" type="submit" name="submit" value="確認">
                     </form>

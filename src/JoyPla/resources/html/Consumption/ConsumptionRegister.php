@@ -248,6 +248,8 @@ var JoyPlaApp = Vue.createApp({
       });
       const { remove, insert, fields , update , replace } = useFieldArray('consumeItems' , control);
 
+
+
       const alertModel = reactive({
         message: "",
         headtext: "",

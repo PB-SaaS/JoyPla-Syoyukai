@@ -134,8 +134,23 @@ if (!$nav->user_info->isHospitalUser()) {
 								<h3 class="uk-card-title uk-margin-remove-bottom">
 									<?php
 									if ($nav->user_info->isHospitalUser()) {
+									?>
+									<div class="mb-2">
+										<select class="uk-select" style="font-size: 1rem;" @change="changeTenant()" v-model="affiliationId">
+											<template v-for="affiliation in affiliations">
+												<option :value="affiliation.value">{{ affiliation.label }}</option>
+											</template>
+										</select>
+									</div>
+									<?php
+									}
+									?>
+									<?php
+									/*
+									if ($nav->user_info->isHospitalUser()) {
 										echo html($nav->hospital->hospitalName) . '<br>';
 									}
+									*/
 									if ($nav->user_info->isDistributorUser()) {
 										echo html($nav->distributor->distributorName) . '<br>';
 										echo '<span class="uk-text-small">担当施設：' . html($nav->hospital->hospitalName) . '</span><br>';
@@ -215,15 +230,45 @@ if (!$nav->user_info->isHospitalUser()) {
 			notificationView: false,
 			userModalView: false,
 			supportView: false,
+			affiliations: [],
+			affiliationId: '<?php echo $nav->user_info->getAffiliationHospitalId() ?>',
 		},
 		mounted() {
 			this.notification();
 			addEventListener('click', this.clickOutside);
+			<?php
+			if ($nav->user_info->isHospitalUser()) {
+			?>
+			this.getAffiliations();
+			<?php
+			}
+			?>
 		},
 		beforeMount() {
 			removeEventListener('click', this.clickOutside)
 		},
 		methods: {
+			postChangeAffiliation: async () => {
+				let params = new URLSearchParams();
+				params.append("path", "/api/user/change/affiliation");
+				params.append("_method", 'post');
+				params.append("_csrf", "<?php echo Csrf::generate(16) ?>");
+				params.append("affiliationId", nav.affiliationId);
+
+				return await axios.post("%url/rel:mpgt:ApiRoot%",params);
+			},
+			changeTenant: async(e) => {
+				await nav.postChangeAffiliation()
+				location.reload();
+			},
+			getAffiliations : async () => {
+				let params = new URLSearchParams();
+				params.append("path", "/api/user/affiliation");
+				params.append("_method", 'get');
+				params.append("_csrf", "<?php echo Csrf::generate(16) ?>");
+				let res = await axios.post("%url/rel:mpgt:ApiRoot%",params);
+				nav.affiliations = res.data.data;
+			},
 			clickOutside: function(e) {
 				// [対象の要素]が[クリックされた要素]を含まない場合
 				if (e.target instanceof Node && !this.$refs.notificationModal?.contains(e.target)) {

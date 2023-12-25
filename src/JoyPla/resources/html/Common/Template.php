@@ -186,7 +186,7 @@
                 }
             });
             return result;
-        };
+        }; 
         
         const _CSRF = "<?php echo Csrf::generate(16); ?>";
         const _APIURL = "%url/rel:mpgt:ApiRoot%";

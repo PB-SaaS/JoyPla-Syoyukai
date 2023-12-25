@@ -200,7 +200,7 @@ $auth = new App\Lib\Auth();
 
             <h3>ユーザー一覧</h3>
             <div class="uk-margin spiral_table_area" style="display:none">
-                %sf:usr:search9:table:mstfilter%
+                %sf:usr:search71:table:mstfilter%
             </div>
 
             <?php elseif($switch_4 != ""): ?>

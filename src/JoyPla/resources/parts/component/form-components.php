@@ -806,7 +806,7 @@ const vSelect = {
   components: {
     "v-text": vText,
   },
-  setup(props) {
+  setup(props, { emit }) {
     // a simple `name` field with basic required validator]
     const { ref, onMounted } = Vue;
     const { value, errorMessage, meta, validate } = VeeValidate.useField(
@@ -820,11 +820,16 @@ const vSelect = {
     };
 
     const changeClass = ref({});
+
+    const onSelectChange = () => {
+      emit('change', value.value);
+    };
     return {
       changeClass,
       isRequired,
       value,
       meta,
+      onSelectChange,
       successClassName: ["text-gray-700", "border-gray-300"],
       errorClassName: ["text-red-500", "border-red-500"],
       errorMessage,
@@ -883,7 +888,8 @@ const vSelect = {
       <select :name="name"
         v-model="value"
         :class="[( ! meta.valid && meta.validated == true) ? errorClassName : successClassName , changeClass]"
-        class="appearance-none border w-full py-2 px-3 leading-tight" >
+        class="appearance-none border w-full py-2 px-3 leading-tight"
+        @change="onSelectChange" >
         <template v-for="(option, index) in options">
           <option :value="option.value" :selected="option.value == value">
             {{ option.label }}

@@ -185,7 +185,6 @@ const headerNavi = {
             params.append("_csrf", _CSRF);
 
             const res = await axios.post('<?php echo $api_url; ?>',params);
-            //if(res.data.code != 200) {
             if(res.data.code != 0) {
               throw new Error(res.data.message)
             }
@@ -200,6 +199,7 @@ const headerNavi = {
         const userModal = ref(null); // 対象の要素
         const supportModal = ref(null); // 対象の要素
         const notificationModal = ref(null); // 対象の要素
+        
 
         const clickOutside = (e) => {
           // [対象の要素]が[クリックされた要素]を含まない場合
@@ -222,9 +222,37 @@ const headerNavi = {
         
         onMounted(() => {
           notification();
+          getAffiliations();
           addEventListener('click', clickOutside);
         });
-        
+        const affiliationId = ref("<?php echo $SPIRAL->getContextByFieldTitle('affiliationHId') ?>");
+
+        const postChangeAffiliation = async () => {
+          let params = new URLSearchParams();
+          params.append("path", "/api/user/change/affiliation");
+          params.append("_method", 'post');
+          params.append("_csrf", _CSRF);
+          params.append("affiliationId", affiliationId.value);
+
+          return await axios.post(_APIURL,params);
+        }
+
+        const changeTenant = async(e) => {
+          await postChangeAffiliation()
+          location.reload();
+        }
+
+        let affiliations = ref([]); 
+
+        const getAffiliations = async () => {
+          let params = new URLSearchParams();
+          params.append("path", "/api/user/affiliation");
+          params.append("_method", 'get');
+          params.append("_csrf", _CSRF);
+          let res = await axios.post(_APIURL,params);
+          affiliations.value = res.data.data;
+        }
+
         return {
           notificationModal,
           notificationView,
@@ -237,7 +265,10 @@ const headerNavi = {
           hospitalName,
           notifications,
           count,
-          badge
+          badge,
+          changeTenant,
+          affiliationId,
+          affiliations
         }
     },
     props: {
@@ -367,9 +398,13 @@ const headerNavi = {
             <div class="max-h-[450px] flow-root md:p-[40px] p-[30px]">
 				        <div class="items-center ml-[-30px] flex flex-wrap m-0 p-0 list-none">
 				            <div class="flex-1 min-w-[1px] box-border w-full max-w-full pl-[30px] m-0 flow-root break-words">
-				                <h3 class="mb-0 text-[1.5rem]" style="line-height: 1.4">
-                        {{ hospitalName }}<br>
-                        </h3>
+                        <div class="mb-2">
+                          <select class="appearance-none border w-full py-2 px-3 leading-tight" @change="changeTenant" v-model="affiliationId">
+                            <template v-for="affiliation in affiliations">
+                              <option :value="affiliation.value">{{ affiliation.label }}</option>
+                            </template>
+                          </select>
+                        </div>
                         <span class="text-white py-0 p-[15px] inline-block px-[10px] text-[0.875rem] align-middle whitespace-nowrap rounded-sm tra" style="line-height: 1.5; background-color: #7AAE36;  text-transform: uppercase"><?php echo $permissionText; ?></span>
                         <p class="mt-[20px]" >{{ userName }} 様</p>
 				            </div>
